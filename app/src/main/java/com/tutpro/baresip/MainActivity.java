@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         String aor = ua_aor(ua);
         Log.d("Baresip", "Adding account " + ua + " with AoR " + aor);
         Accounts.add(new Account(ua, aor));
-        AoRs.add(aor + " ()");
+        AoRs.add(aor);
         Images.add(R.drawable.yellow);
         runOnUiThread(new Runnable() {
                 @Override
@@ -416,6 +416,7 @@ public class MainActivity extends AppCompatActivity {
                                 peer_uri);
                         final Call new_call = new Call(ua, call, peer_uri, "Answer");
                         In.add(new_call);
+                        Log.d("Baresip", "Current UA is " + ua_current());
                         if (ua.equals(ua_current())) {
                             runOnUiThread(new Runnable() {
                                 @Override
