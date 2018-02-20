@@ -1,0 +1,34 @@
+#
+# SIP accounts - one account per line
+#
+# Displayname <sip:user:password@domain;uri-params>;addr-params
+#
+#  uri-params:
+#    ;transport={udp,tcp,tls}
+#
+#  addr-params:
+#    ;answermode={manual,early,auto}
+#    ;audio_codecs=speex/16000,pcma,...
+#    ;auth_user=username
+#    ;mediaenc={srtp,srtp-mand,srtp-mandf,dtls_srtp,zrtp}
+#    ;medianat={stun,turn,ice}
+#    ;outbound="sip:primary.example.com;transport=tcp"
+#    ;outbound2=sip:secondary.example.com
+#    ;ptime={10,20,30,40,...}
+#    ;regint=3600
+#    ;pubint=0 (publishing off)
+#    ;regq=0.5
+#    ;rtpkeep={zero,stun,dyna,rtcp}
+#    ;sipnat={outbound}
+#    ;stunuser=STUN/TURN/ICE-username
+#    ;stunpass=STUN/TURN/ICE-password
+#    ;stunserver=stun:[user:pass]@host[:port]
+#    ;video_codecs=h264,h263,...
+#
+# Examples:
+#
+#  <sip:user:secret@domain.com;transport=tcp>
+#  <sip:user:secret@1.2.3.4;transport=tcp>
+#  <sip:user:secret@[2001:df8:0:16:216:6fff:fe91:614c]:5070;transport=tcp>
+#
+<sip:foo:password@test.tutpro.com>;auth_user=foo;outbound="sip:192.168.43.98:5060;transport=tcp";ptime=20;audio_codecs=OPUS/48000/2,speex/16000,speex/8000;video_codecs="";regint=600;pubint=0;sipnat=outbound

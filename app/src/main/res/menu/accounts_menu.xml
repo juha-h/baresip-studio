@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <item android:id="@+id/stop"
+        android:title="Stop" />
+
+  <item android:id="@+id/quit"
+        android:title="Quit" />
+
+  <item android:id="@+id/help"
+        android:title="Help" />
+
+</menu>
