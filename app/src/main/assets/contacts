@@ -1,0 +1,17 @@
+#
+# SIP contacts
+#
+# Displayname <sip:user@domain>;addr-params
+#
+#  addr-params:
+#    ;presence={none,p2p}
+#    ;access={allow,block}
+#
+
+"Echo Server" <sip:echo@creytiv.com>
+#"user" <sip:user@domain>;presence=p2p
+
+
+# Access rules
+#"Catch All" <sip:*@*>;access=block
+#"Good Friend" <sip:good@friend.com>;access=allow
