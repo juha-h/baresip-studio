@@ -8,53 +8,28 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 public class EditContactsActivity extends AppCompatActivity {
 
     private EditText editText;
-    private String path;
-    private File file;
+    static public ArrayList<Contact> Contacts = new java.util.ArrayList<>();
+    static public ArrayList<String> Names = new java.util.ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_contacts);
-
         editText = (EditText)findViewById(R.id.editText);
-        path = getApplicationContext().getFilesDir().getAbsolutePath() +
-                "/contacts";
-        file = new File(path);
-        String content;
-
-        if (!file.exists()) {
-            Log.e("Baresip", "Failed to find contacts file");
-            content = "No contacts";
-        } else {
-            Log.e("Baresip", "Found contacts file");
-            int length = (int)file.length();
-            byte[] bytes = new byte[length];
-            try {
-                FileInputStream in = new FileInputStream(file);
-                try {
-                    in.read(bytes);
-                } finally {
-                    in.close();
-                }
-                content = new String(bytes);
-            } catch (java.io.IOException e) {
-                Log.e("Baresip", "Failed to read contacts file: " + e.toString());
-                content = "Failed to read account file";
-            }
-        }
-
-        Log.d("Baresip", "Content length is: " + content.length());
-
+        String path = getApplicationContext().getFilesDir().getAbsolutePath() + "/contacts";
+        File file = new File(path);
+        String content = Utils.getFileContents(file);
+        Log.d("Baresip", "Contacts length is: " + content.length());
         editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimension(R.dimen.textsize));
         editText.setText(content, TextView.BufferType.EDITABLE);
@@ -71,34 +46,71 @@ public class EditContactsActivity extends AppCompatActivity {
         Intent i = new Intent(this, MainActivity.class);
         switch (item.getItemId()) {
         case R.id.save:
-            try {
-                FileOutputStream fOut =
-                    new FileOutputStream(file.getAbsoluteFile(), false);
-                OutputStreamWriter fWriter = new OutputStreamWriter(fOut);
-                String res = editText.getText().toString();
-                try {
-                    fWriter.write(res);
-                    fWriter.close();
-                    fOut.close();
-                } catch (java.io.IOException e) {
-                    Log.e("Baresip", "Failed to write contacts file: " +
-                          e.toString());
-                }
-            } catch (java.io.FileNotFoundException e) {
-                Log.e("Baresip", "Failed to find contacts file: " +
-                      e.toString());
-            }
+            String path = getApplicationContext().getFilesDir().getAbsolutePath() + "/contacts";
+            File file = new File(path);
+            Utils.putFileContents(file, editText.getText().toString());
             Log.d("Baresip", "Updated contacts file");
+            MainActivity.contacts_remove();
+            updateContactsAndNames();
+            // MainActivity.CalleeAdapter.notifyDataSetChanged();
+            MainActivity.CalleeAdapter = new ArrayAdapter<String>
+                    (this,android.R.layout.select_dialog_item, Names);
+            MainActivity.callee.setThreshold(2);
+            MainActivity.callee.setAdapter(MainActivity.CalleeAdapter);
             i.putExtra("action", "save");
-            startActivity(i);
+            setResult(RESULT_OK, i);
+            finish();
             return true;
         case R.id.cancel:
             i.putExtra("action", "cancel");
-            startActivity(i);
+            setResult(RESULT_OK, i);
+            finish();
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
     }
+
+    static public void updateContactsAndNames() {
+        String path = MainActivity.mainActivityContext.getFilesDir().getAbsolutePath() + "/contacts";
+        File file = new File(path);
+        String[] lines = Utils.getFileContents(file).split("\n");
+        String name, uri;
+        Contacts.clear();
+        Names.clear();
+        for (String line : lines) {
+            line.trim();
+            if (line.startsWith("#") || line.length() == 0) continue;
+            String[] parts = line.split("\"");
+            if (parts.length != 3) {
+                Log.e("Baresip", "Invalid contacts line: " + line);
+                continue;
+            }
+            name = parts[1];
+            if (name.length() < 2) {
+                Log.e("Baresip", "Too short contact display name: " + name);
+                continue;
+            }
+            uri = parts[2].trim();
+            if (!uri.startsWith("<") || !uri.contains(">")) {
+                Log.e("Baresip", "Invalid contact uri: " + uri);
+                continue;
+            }
+            MainActivity.contact_add("\"" + name + "\" " + uri);
+            if (uri.indexOf(";access") > 0) continue;
+            uri = uri.substring(1, uri.indexOf(">"));
+            Log.d("Baresip", "Adding contact name/uri: " + name + "/" + uri);
+            Contacts.add(new Contact(name, uri));
+            Names.add(name);
+        }
+    }
+
+    static public String findContactURI(String name) {
+        for (Contact c : Contacts) {
+            if (c.getName().equals(name)) return c.getURI();
+        }
+        return name;
+    }
+
 }
 

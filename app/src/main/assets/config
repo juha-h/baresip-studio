@@ -19,27 +19,27 @@ call_max_calls	4
 # Audio
 audio_player		opensles,nil
 audio_source		opensles,nil
-audio_alert		opensles,nil
-audio_srate		8000-48000
+audio_alert		    opensles,nil
+audio_srate		    8000-48000
 audio_channels		1-2
 #ausrc_srate		48000
 #auplay_srate		48000
 #ausrc_channels		0
 #auplay_channels	0
-audio_level		no
+audio_level		    no
 
 # Video
 #video_source		v4l2,/dev/video0
 #video_display		x11,nil
-video_size		352x288
+video_size		    352x288
 video_bitrate		500000
-video_fps		25
+video_fps		    25
 video_fullscreen	yes
 
 # AVT - Audio/Video Transport
 rtp_tos			184
 #rtp_ports		10000-20000
-#rtp_bandwidth		512-1024 # [kbit/s]
+#rtp_bandwidth	512-1024 # [kbit/s]
 rtcp_enable		yes
 rtcp_mux		no
 jitter_buffer_delay	5-10		# frames
@@ -176,13 +176,13 @@ speex_complexity	7 # 0-10
 speex_enhancement	0 # 0-1
 speex_mode_nb		3 # 1-6
 speex_mode_wb		6 # 1-6
-speex_vbr		0 # Variable Bit Rate 0-1
-speex_vad		0 # Voice Activity Detection 0-1
+speex_vbr		    0 # Variable Bit Rate 0-1
+speex_vad		    0 # Voice Activity Detection 0-1
 speex_agc_level		8000
 
 # Opus codec parameters
 opus_bitrate		28000 # 6000-510000
-opus_cbr		no
+opus_cbr		    no
 opus_inbandfec		yes
 
 # Selfview
@@ -192,7 +192,7 @@ opus_inbandfec		yes
 # ICE
 ice_turn		no
 ice_debug		no
-ice_nomination		regular	# {regular,aggressive}
+ice_nomination	regular	# {regular,aggressive}
 ice_mode		full	# {full,lite}
 
 # Menu

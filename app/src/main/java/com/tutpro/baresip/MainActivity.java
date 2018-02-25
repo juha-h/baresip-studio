@@ -1,13 +1,18 @@
 package com.tutpro.baresip;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.*;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.AutoCompleteTextView;
 import android.view.*;
 import android.util.Log;
 import java.util.*;
@@ -18,16 +23,18 @@ public class MainActivity extends AppCompatActivity {
 
     static Context mainActivityContext;
     static Boolean running = false;
-    static List <Account> accountList = new ArrayList<>();
-    static EditText callee;
+    static AutoCompleteTextView callee;
     static RelativeLayout layout;
     static Button callButton;
     static ArrayList<Account> Accounts = new ArrayList<>();
     static ArrayList<String> AoRs = new ArrayList<>();
     static ArrayList<Integer> Images = new ArrayList<>();
     static AccountSpinnerAdapter AccountAdapter = null;
+    static ArrayAdapter<String> CalleeAdapter = null;
     static ArrayList<Call> In = new ArrayList<>();
     static ArrayList<Call> Out = new ArrayList<>();
+
+    private static final int RECORD_AUDIO_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String[] assets = {"config", "accounts", "busy.wav", "callwaiting.wav", "error.wav",
-                "message.wav", "notfound.wav", "ring.wav", "ringback.wav"};
+        String[] assets = {"accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
+                "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav"};
         final String path = mainActivityContext.getFilesDir().getPath();
         Log.d("Baresip", "path is: " + path);
         File file;
@@ -93,7 +100,16 @@ public class MainActivity extends AppCompatActivity {
             if (!file.exists()) {
                 Log.d("Baresip", "Copying asset " + a);
                 copyAsset(a, path + "/" + a);
+            } else {
+                Log.d("Baresip", "Asset " + a + " already copied");
             }
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Baresip", "Baresip does not have RECORD_AUDIO permission");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_PERMISSION);
         }
 
         if (!running) {
@@ -108,7 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
         layout = (RelativeLayout) findViewById(R.id.mainActivityLayout);
 
-        callee = (EditText)findViewById(R.id.callee);
+        callee = (AutoCompleteTextView)findViewById(R.id.callee);
+        EditContactsActivity.updateContactsAndNames();
+        CalleeAdapter = new ArrayAdapter<String>
+                (this,android.R.layout.select_dialog_item, EditContactsActivity.Names);
+        callee.setThreshold(2);
+        callee.setAdapter(CalleeAdapter);
 
         callButton = (Button)findViewById(R.id.callButton);
         callButton.setText("Call");
@@ -117,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String ua = ua_current();
                 if (callButton.getText().toString().equals("Call")) {
-                    String uri = ((EditText) findViewById(R.id.callee)).getText().toString();
+                    String callee = ((EditText) findViewById(R.id.callee)).getText().toString();
+                    String uri = EditContactsActivity.findContactURI(callee);
                     if (!uri.startsWith("sip:")) uri = "sip:" + uri;
                     if (!uri.contains("@")) {
                         String aor = ua_aor(ua);
@@ -152,6 +174,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case RECORD_AUDIO_PERMISSION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Baresip", "RECORD_AUDIO permission granted");
+                } else {
+                    Log.d("Baresip", "RECORD_AUDIO permission NOT granted");
+                }
+                return;
+            }
+            default:
+                Log.e("Baresip", "Unknown permissions request code: " + requestCode);
+        }
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
@@ -166,14 +206,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,
                         EditAccountsActivity.class));
                 return true;
+            case R.id.contacts:
+                startActivity(new Intent(MainActivity.this,
+                        EditContactsActivity.class));
+
+                return true;
             case R.id.config:
                 startActivity(new Intent(MainActivity.this,
                         EditConfigActivity.class));
                 return true;
-            //case R.id.contacts:
-            //    startActivity(new Intent(MainActivity.this,
-            //           EditContactsActivity.class));
-            //return true;
             case R.id.about:
                 startActivity(new Intent(MainActivity.this,
                         AboutActivity.class));
@@ -414,6 +455,7 @@ public class MainActivity extends AppCompatActivity {
                         final String peer_uri = call_peeruri(call);
                         Log.d("Baresip", "Incoming call " + ua + "/" + call + "/" +
                                 peer_uri);
+
                         final Call new_call = new Call(ua, call, peer_uri, "Answer");
                         In.add(new_call);
                         Log.d("Baresip", "Current UA is " + ua_current());
@@ -485,13 +527,14 @@ public class MainActivity extends AppCompatActivity {
     public native String ua_aor(String ua);
     public native Boolean ua_isregistered(long ua_ptr);
     public native String ua_call(String ua);
-    public native String ua_prev_call(String ua);
     public native String call_peeruri(String call);
     public native String ua_current();
     public static native void ua_current_set(String s);
     public native String ua_connect(String s);
     public native void ua_answer(String ua, String call);
     public native void ua_hangup(String ua, String call, int code, String reason);
+    static public native void contacts_remove();
+    static public native void contact_add(String contact);
 
     static {
         System.loadLibrary("baresip");
