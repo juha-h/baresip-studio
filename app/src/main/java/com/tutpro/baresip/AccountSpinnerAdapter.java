@@ -38,6 +38,7 @@ public class AccountSpinnerAdapter extends ArrayAdapter<Integer> {
         View row = inflater.inflate(R.layout.account_spinner, parent, false);
         TextView textView = (TextView) row.findViewById(R.id.spinnerText);
         textView.setText(aors.get(position));
+        textView.setTextSize(17);
         ImageView imageView = (ImageView) row.findViewById(R.id.spinnerImage);
         imageView.setImageResource(images.get(position));
         return row;

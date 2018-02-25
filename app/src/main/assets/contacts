@@ -1,16 +1,19 @@
 #
 # SIP contacts
 #
-# Displayname <sip:user@domain>;addr-params
+# "display-name" <sip:user@domain>;addr-params
+#
+#  display-name:
+#    needs to be at least two characters long
 #
 #  addr-params:
 #    ;presence={none,p2p}
 #    ;access={allow,block}
 #
 
+# Peer contacts
 "Echo Server" <sip:echo@creytiv.com>
 #"user" <sip:user@domain>;presence=p2p
-
 
 # Access rules
 #"Catch All" <sip:*@*>;access=block

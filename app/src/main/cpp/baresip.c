@@ -456,3 +456,31 @@ Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
     return;
 }
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_MainActivity_contacts_1remove(JNIEnv *env, jobject thiz) {
+    struct le *le;
+    le = list_head(contact_list(baresip_contacts()));
+    while ((le = list_head(contact_list(baresip_contacts())))) {
+        struct contact *c = le->data;
+        contact_remove(baresip_contacts(), c);
+    }
+    return;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_MainActivity_contact_1add(JNIEnv *env, jobject thiz,
+                                                  jstring javaContact) {
+    struct pl pl_addr;
+    const struct list *lst;
+    struct le *le;
+    const char *native_contact = (*env)->GetStringUTFChars(env, javaContact, 0);
+    pl_set_str(&pl_addr, native_contact);
+    if (contact_add(baresip_contacts(), NULL, &pl_addr) != 0) {
+        LOGE("failed to add contact %s\n", native_contact);
+    } else {
+        LOGD("added contact %s\n", native_contact);
+    }
+    return;
+}
+
