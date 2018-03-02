@@ -1,6 +1,7 @@
 package com.tutpro.baresip;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -8,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.*;
@@ -200,11 +202,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent i = new Intent(this, MainActivity.class);
+        Intent i;
         switch (item.getItemId()) {
             case R.id.accounts:
-                startActivity(new Intent(MainActivity.this,
-                        EditAccountsActivity.class));
+                i = new Intent(this, EditAccountsActivity.class);
+                startActivityForResult(i, 1);
                 return true;
             case R.id.contacts:
                 startActivity(new Intent(MainActivity.this,
@@ -212,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             case R.id.config:
-                startActivity(new Intent(MainActivity.this,
-                        EditConfigActivity.class));
+                i = new Intent(this, EditConfigActivity.class);
+                startActivityForResult(i, 2);
                 return true;
             case R.id.about:
                 startActivity(new Intent(MainActivity.this,
@@ -233,6 +235,37 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("You need to restart baresip in order to activate saved accounts!");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+            if (resultCode == RESULT_CANCELED) {
+                Log.d("Baresip", "Edit accounts canceled");
+            }
+        }
+        if (requestCode == 2) {
+            if(resultCode == RESULT_OK) {
+                Utils.alertView(this,
+                        "You need to restart baresip in order to activate saved config!");
+                reload_config();
+            }
+            if (resultCode == RESULT_CANCELED) {
+                Log.d("Baresip", "Edit accounts canceled");
+            }
         }
     }
 
@@ -535,6 +568,7 @@ public class MainActivity extends AppCompatActivity {
     public native void ua_hangup(String ua, String call, int code, String reason);
     static public native void contacts_remove();
     static public native void contact_add(String contact);
+    static public native int reload_config();
 
     static {
         System.loadLibrary("baresip");

@@ -67,7 +67,7 @@ public class EditAccountsActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent i = new Intent(this, MainActivity.class);
+        Intent i = new Intent();
         switch (item.getItemId()) {
         case R.id.save:
             try {
@@ -88,13 +88,11 @@ public class EditAccountsActivity extends AppCompatActivity {
                       e.toString());
             }
             Log.d("Baresip", "Updated accounts file");
-            i.putExtra("action", "save");
             setResult(RESULT_OK, i);
             finish();
             return true;
         case R.id.cancel:
-            i.putExtra("action", "cancel");
-            setResult(RESULT_OK, i);
+            setResult(RESULT_CANCELED, i);
             finish();
             return true;
         default:

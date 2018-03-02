@@ -484,3 +484,15 @@ Java_com_tutpro_baresip_MainActivity_contact_1add(JNIEnv *env, jobject thiz,
     return;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_reload_1config(JNIEnv *env, jobject thiz) {
+    int err;
+    err = conf_configure();
+    if (err) {
+        LOGE("failed to reload config %d\n", err);
+    } else {
+        LOGD("config reload succeeded");
+    }
+    return err;
+}
+
