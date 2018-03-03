@@ -36,10 +36,6 @@ add_library(lib_rem STATIC IMPORTED)
 set_target_properties(lib_rem PROPERTIES IMPORTED_LOCATION
     ${distribution_DIR}/rem/lib/${ANDROID_ABI}/librem.a)
 
-add_library(lib_speex STATIC IMPORTED)
-set_target_properties(lib_speex PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/speex/lib/${ANDROID_ABI}/libspeex.a)
-
 add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
@@ -72,7 +68,6 @@ target_link_libraries(baresip
                       lib_re
                       lib_ssl
                       lib_crypto
-                      lib_speex
                       lib_opus
                       lib_zrtp
                       lib_bn
