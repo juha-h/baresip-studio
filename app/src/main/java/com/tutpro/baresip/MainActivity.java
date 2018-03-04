@@ -269,14 +269,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public ArrayList<String> aorStatusList() {
-        ArrayList<String> res = new ArrayList<>();
-        for (Account a : Accounts) {
-            res.add(a.getAoR() + " (" + a.getStatus() + ")");
-        }
-        return res;
-    }
-
     public void addAccount(String ua) {
         String aor = ua_aor(ua);
         Log.d("Baresip", "Adding account " + ua + " with AoR " + aor);
@@ -363,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                                     Button answer_button = (Button)layout.findViewById(answer_id);
                                     answer_button.setText("Hangup");
                                     Button reject_button = (Button)layout.findViewById(answer_id + 1);
-                                    reject_button.setEnabled(false);
+                                    reject_button.setText("Hold");
                                 }
                             });
                         }
@@ -396,9 +388,21 @@ public class MainActivity extends AppCompatActivity {
         reject_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("Baresip", "UA " + call.getUA() +
-                        " rejecting incoming call " + call.getCall());
-                ua_hangup(call.getUA(), call.getCall(), 486, "Rejected");
+                switch (((Button)v).getText().toString()) {
+                    case "Reject":
+                        Log.i("Baresip", "UA " + call.getUA() +
+                                " rejecting incoming call " + call.getCall());
+                        ua_hangup(call.getUA(), call.getCall(), 486, "Rejected");
+                        break;
+                    case "Hold":
+                        call_hold(call.getCall());
+                        ((Button)v).setText("Unhold");
+                        break;
+                    case "Unhold":
+                        call_unhold(call.getCall());
+                        ((Button)v).setText("Hold");
+                        break;
+                }
             }
         });
         LayoutParams reject_button_params = new LayoutParams(200,
@@ -565,6 +569,8 @@ public class MainActivity extends AppCompatActivity {
     public static native void ua_current_set(String s);
     public native String ua_connect(String s);
     public native void ua_answer(String ua, String call);
+    public native Integer call_hold(String call);
+    public native Integer call_unhold(String call);
     public native void ua_hangup(String ua, String call, int code, String reason);
     static public native void contacts_remove();
     static public native void contact_add(String contact);
