@@ -429,13 +429,32 @@ Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     LOGD("answering call %s/%s\n", native_ua, native_call);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    struct ua *ua = (struct ua *) strtoul(native_ua, NULL, 10);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     ua_answer(ua, call);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
 
     return;
+
+}
+
+JNIEXPORT jint JNICALL  Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
+                                                                        jstring javaCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    LOGD("holding call %s\n", native_call);
+    int res = call_hold(ua_call(uag_current()), true);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
+}
+
+JNIEXPORT jint JNICALL  Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
+                                                                        jstring javaCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    LOGD("holding call %s\n", native_call);
+    int res = call_hold(ua_call(uag_current()), false);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
 }
 
 JNIEXPORT void JNICALL
