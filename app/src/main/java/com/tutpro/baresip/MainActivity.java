@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     static AutoCompleteTextView callee;
     static RelativeLayout layout;
     static Button callButton;
+    static Button holdButton;
     static ArrayList<Account> Accounts = new ArrayList<>();
     static ArrayList<String> AoRs = new ArrayList<>();
     static ArrayList<Integer> Images = new ArrayList<>();
@@ -58,17 +59,28 @@ public class MainActivity extends AppCompatActivity {
                 ua_current_set(aor);
                 ArrayList<Call> out = uaCalls(Out, ua_current());
                 if (out.size() == 0) {
-                    callee.setText("");
+                    callee.setHint("Callee");
                     callButton.setText("Call");
+                    holdButton.setVisibility(View.INVISIBLE);
                 } else {
                     callee.setText(out.get(0).getPeerURI());
                     callButton.setText(out.get(0).getStatus());
+                    if (out.get(0).getStatus() == "Hangup") {
+                        if (out.get(0).getHold()) {
+                            holdButton.setText("Unhold");
+                        } else {
+                            holdButton.setText("Hold");
+                        }
+                        holdButton.setVisibility(View.VISIBLE);
+                    } else {
+                        holdButton.setVisibility(View.INVISIBLE);
+                    }
                 }
                 ArrayList<Call> in = uaCalls(In, ua_current());
                 int view_count = layout.getChildCount();
                 Log.d("Baresip", "View count is " + view_count);
-                if (view_count > 4) {
-                    layout.removeViews(4, view_count - 4);
+                if (view_count > 5) {
+                    layout.removeViews(5, view_count - 5);
                 }
                 for (Call c: in) {
                     for (int call_index = 0; call_index < In.size(); call_index++) {
@@ -161,6 +173,27 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("Baresip", "Hanging up " +
                             ((EditText) findViewById(R.id.callee)).getText());
                     ua_hangup(ua, "", 486, "Rejected");
+                }
+            }
+        });
+
+        holdButton = (Button)findViewById(R.id.holdButton);
+        holdButton.setVisibility(View.INVISIBLE);
+        holdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holdButton.getText().toString().equals("Hold")) {
+                    Log.i("Baresip", "Holding up " +
+                            ((EditText) findViewById(R.id.callee)).getText());
+                    call_hold(Out.get(0).getCall());
+                    Out.get(0).setHold(true);
+                    holdButton.setText("Unhold");
+                } else {
+                    Log.i("Baresip", "Unholding " +
+                            ((EditText) findViewById(R.id.callee)).getText());
+                    call_unhold(Out.get(0).getCall());
+                    Out.get(0).setHold(false);
+                    holdButton.setText("Hold");
                 }
             }
         });
@@ -330,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(caller_uri);
 
         Button answer_button = new Button(mainActivityContext);
-        answer_button.setText("Answer");
+        answer_button.setText(call.getStatus());
         answer_button.setBackgroundResource(android.R.drawable.btn_default);
         answer_button.setTextColor(Color.BLACK);
         Log.d("Baresip", "Creating new answer button at " + (id + 2));
@@ -347,7 +380,9 @@ public class MainActivity extends AppCompatActivity {
                         ua_answer(call_ua, call_call);
                         final int final_in_index = callIndex(In, call_ua, call_call);
                         if (final_in_index >= 0) {
-                            Log.d("Baresip", "Changing answer button text to Hangup");
+                            Log.d("Baresip", "Updating Hangup and Hold");
+                            In.get(final_in_index).setStatus("Hangup");
+                            In.get(final_in_index).setHold(false);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -380,7 +415,15 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(answer_button);
 
         Button reject_button = new Button(mainActivityContext);
-        reject_button.setText("Reject");
+        if (call.getStatus() == "Answer") {
+            reject_button.setText("Reject");
+        } else {
+            if (call.getHold()) {
+                reject_button.setText("Unhold");
+            } else {
+                reject_button.setText("Hold");
+            }
+        }
         reject_button.setBackgroundResource(android.R.drawable.btn_default);
         reject_button.setTextColor(Color.BLACK);
         Log.d("Baresip", "Creating new reject button at " + (id + 3));
@@ -397,10 +440,12 @@ public class MainActivity extends AppCompatActivity {
                     case "Hold":
                         call_hold(call.getCall());
                         ((Button)v).setText("Unhold");
+                        call.setHold(true);
                         break;
                     case "Unhold":
                         call_unhold(call.getCall());
                         ((Button)v).setText("Hold");
+                        call.setHold(false);
                         break;
                 }
             }
@@ -470,16 +515,19 @@ public class MainActivity extends AppCompatActivity {
                     case "call ringing":
                         break;
                     case "call established":
-                        Log.d("Baresip", "Out call number is " + Out.size());
+                        Log.d("Baresip", "Out call index is " + (Out.size() - 1));
                         int out_index = callIndex(Out, ua, call);
                         if (out_index >= 0) {
-                            Log.d("Baresip", "Changing call button text to Hangup");
+                            Log.d("Baresip", "Update Hangup and Hold");
                             Out.get(out_index).setStatus("Hangup");
+                            Out.get(out_index).setHold(false);
                             if (ua.equals(ua_current())) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         callButton.setText("Hangup");
+                                        holdButton.setText("Hold");
+                                        holdButton.setVisibility(View.VISIBLE);
                                     }
                                 });
                             }
@@ -543,6 +591,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         callButton.setText("Call");
                                         callButton.setEnabled(true);
+                                        holdButton.setVisibility(View.INVISIBLE);
                                     }
                                 });
                             }

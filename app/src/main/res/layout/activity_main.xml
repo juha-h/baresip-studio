@@ -53,8 +53,18 @@
             android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
+            android:layout_below="@id/callee" >
+        </Button>
+
+        <Button
+            android:id="@+id/holdButton"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/btn_default"
+            android:text="Hold"
             android:layout_below="@id/callee"
-            android:text="@id/callee" >
+            android:layout_marginLeft="106dp"
+            android:visibility="invisible" >
         </Button>
 
     </RelativeLayout>
