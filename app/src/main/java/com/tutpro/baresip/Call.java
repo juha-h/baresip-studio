@@ -3,6 +3,7 @@ package com.tutpro.baresip;
 public class Call {
 
     private String ua, call, peer_uri, status;
+    Boolean hold;
 
     public Call(String ua, String call, String peer_uri, String status) {
         this.ua = ua;
@@ -28,5 +29,12 @@ public class Call {
     }
     public String getStatus() {
         return status;
+    }
+
+    public void setHold(Boolean hold) {
+        this.hold = hold;
+    }
+    public Boolean getHold() {
+        return hold;
     }
 }
