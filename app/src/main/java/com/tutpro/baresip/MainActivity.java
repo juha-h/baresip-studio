@@ -17,9 +17,11 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.AutoCompleteTextView;
 import android.view.*;
 import android.util.Log;
+import android.content.Context;
+import android.text.format.Time;
+
 import java.util.*;
 import java.io.*;
-import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,8 +38,15 @@ public class MainActivity extends AppCompatActivity {
     static ArrayAdapter<String> CalleeAdapter = null;
     static ArrayList<Call> In = new ArrayList<>();
     static ArrayList<Call> Out = new ArrayList<>();
+    static ArrayList<History> History = new ArrayList();
+    static String CurrentUA = null;
 
     private static final int RECORD_AUDIO_PERMISSION = 1;
+    private static final int EDIT_ACCOUNTS_CODE = 1;
+    private static final int EDIT_CONTACTS_CODE = 2;
+    private static final int EDIT_CONFIG_CODE = 3;
+    private static final int HISTORY_CODE = 4;
+    private static final int ABOUT_CODE = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +66,17 @@ public class MainActivity extends AppCompatActivity {
                 String aor = AoRs.get(position);
                 Log.i("Baresip", "Setting " + aor + " current");
                 ua_current_set(aor);
-                ArrayList<Call> out = uaCalls(Out, ua_current());
+                CurrentUA = ua_current();
+                ArrayList<Call> out = uaCalls(Out, CurrentUA);
                 if (out.size() == 0) {
                     callee.setHint("Callee");
                     callButton.setText("Call");
-                    holdButton.setVisibility(View.INVISIBLE);
+                    if (aorHasHistory(History, aor)) {
+                        holdButton.setText("History");
+                        holdButton.setVisibility(View.VISIBLE);
+                    } else {
+                        holdButton.setVisibility(View.INVISIBLE);
+                    }
                 } else {
                     callee.setText(out.get(0).getPeerURI());
                     callButton.setText(out.get(0).getStatus());
@@ -76,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                         holdButton.setVisibility(View.INVISIBLE);
                     }
                 }
-                ArrayList<Call> in = uaCalls(In, ua_current());
+                ArrayList<Call> in = uaCalls(In, CurrentUA);
                 int view_count = layout.getChildCount();
                 Log.d("Baresip", "View count is " + view_count);
                 if (view_count > 5) {
@@ -150,50 +165,45 @@ public class MainActivity extends AppCompatActivity {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String ua = ua_current();
                 if (callButton.getText().toString().equals("Call")) {
-                    String callee = ((EditText) findViewById(R.id.callee)).getText().toString();
-                    String uri = EditContactsActivity.findContactURI(callee);
-                    if (!uri.startsWith("sip:")) uri = "sip:" + uri;
-                    if (!uri.contains("@")) {
-                        String aor = ua_aor(ua);
-                        String host = aor.substring(aor.indexOf("@") + 1);
-                        uri = uri + "@" + host;
-                    }
-                    ((EditText) findViewById(R.id.callee)).setText(uri);
-                    Log.i("Baresip", "Calling " + uri);
-                    String call = ua_connect(uri);
-                    if (!call.equals("")) {
-                        Log.i("Baresip", "Adding outgoing call " + ua + "/" + call +
-                                "/" + uri);
-                        Out.add(new Call(ua, call, uri,"Cancel"));
-                        callButton.setText("Cancel");
-                    }
+                    call(((EditText) findViewById(R.id.callee)).getText().toString());
                 } else {
-                    Log.i("Baresip", "Hanging up " +
+                    Log.i("Baresip", "Canceling UA " + CurrentUA + " call " +
+                            Out.get(0).getCall() + " to " +
                             ((EditText) findViewById(R.id.callee)).getText());
-                    ua_hangup(ua, "", 486, "Rejected");
+                    ua_hangup(CurrentUA, Out.get(0).getCall(), 486, "Rejected");
                 }
             }
         });
 
         holdButton = (Button)findViewById(R.id.holdButton);
-        holdButton.setVisibility(View.INVISIBLE);
+        if (aorHasHistory(History, ua_aor(ua_current()))) {
+            holdButton.setText("History");
+        } else {
+            holdButton.setVisibility(View.INVISIBLE);
+        }
         holdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holdButton.getText().toString().equals("Hold")) {
-                    Log.i("Baresip", "Holding up " +
+                switch (holdButton.getText().toString()) {
+                    case "Hold":
+                        Log.i("Baresip", "Holding up " +
                             ((EditText) findViewById(R.id.callee)).getText());
-                    call_hold(Out.get(0).getCall());
-                    Out.get(0).setHold(true);
-                    holdButton.setText("Unhold");
-                } else {
-                    Log.i("Baresip", "Unholding " +
+                        call_hold(Out.get(0).getCall());
+                        Out.get(0).setHold(true);
+                        holdButton.setText("Unhold");
+                        break;
+                    case "Unhold":
+                        Log.i("Baresip", "Unholding " +
                             ((EditText) findViewById(R.id.callee)).getText());
-                    call_unhold(Out.get(0).getCall());
-                    Out.get(0).setHold(false);
-                    holdButton.setText("Hold");
+                        call_unhold(Out.get(0).getCall());
+                        Out.get(0).setHold(false);
+                        holdButton.setText("Hold");
+                        break;
+                    case "History":
+                        Intent i = new Intent(MainActivity.this, HistoryActivity.class);
+                        startActivityForResult(i, HISTORY_CODE);
+                        break;
                 }
             }
         });
@@ -239,20 +249,19 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.accounts:
                 i = new Intent(this, EditAccountsActivity.class);
-                startActivityForResult(i, 1);
+                startActivityForResult(i, EDIT_ACCOUNTS_CODE);
                 return true;
             case R.id.contacts:
-                startActivity(new Intent(MainActivity.this,
-                        EditContactsActivity.class));
-
+                i = new Intent(this, EditContactsActivity.class);
+                startActivityForResult(i, EDIT_CONTACTS_CODE);
                 return true;
             case R.id.config:
                 i = new Intent(this, EditConfigActivity.class);
-                startActivityForResult(i, 2);
+                startActivityForResult(i, EDIT_CONFIG_CODE);
                 return true;
             case R.id.about:
-                startActivity(new Intent(MainActivity.this,
-                        AboutActivity.class));
+                i = new Intent(this, AboutActivity.class);
+                startActivityForResult(i, ABOUT_CODE);
                 return true;
             case R.id.quit:
                 if (running) {
@@ -273,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
+        if (requestCode == EDIT_ACCOUNTS_CODE) {
             if(resultCode == RESULT_OK) {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Alert");
@@ -290,15 +299,26 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Baresip", "Edit accounts canceled");
             }
         }
-        if (requestCode == 2) {
+        if (requestCode == EDIT_CONFIG_CODE) {
             if(resultCode == RESULT_OK) {
                 Utils.alertView(this,
                         "You need to restart baresip in order to activate saved config!");
                 reload_config();
             }
             if (resultCode == RESULT_CANCELED) {
-                Log.d("Baresip", "Edit accounts canceled");
+                Log.d("Baresip", "Edit config canceled");
             }
+        }
+        if (requestCode == HISTORY_CODE) {
+            if(resultCode == RESULT_OK) {
+                callee.setText(data.getStringExtra("peer_uri"));
+            }
+            if(resultCode == RESULT_CANCELED) {
+                Log.d("Baresip", "History canceled");
+            }
+        }
+        if ((requestCode == EDIT_CONTACTS_CODE) || (requestCode == ABOUT_CODE)) {
+            Log.d("Baresip", "Back arrow or Cancel pressed at request: " + requestCode);
         }
     }
 
@@ -314,6 +334,28 @@ public class MainActivity extends AppCompatActivity {
                     AccountAdapter.notifyDataSetChanged();
                 }
             });
+    }
+
+    private void call(String callee) {
+        if (callee.length() == 0) return;
+        String uri = EditContactsActivity.findContactURI(callee);
+        if (!uri.startsWith("sip:")) uri = "sip:" + uri;
+        if (!uri.contains("@")) {
+            String aor = ua_aor(CurrentUA);
+            String host = aor.substring(aor.indexOf("@") + 1);
+            uri = uri + "@" + host;
+        }
+        ((EditText) findViewById(R.id.callee)).setText(uri);
+        Log.i("Baresip", "Calling " + uri);
+        String call = ua_connect(uri);
+        if (!call.equals("")) {
+            Log.i("Baresip", "Adding outgoing call " + CurrentUA + "/" + call +
+                    "/" + uri);
+            Out.add(new Call(CurrentUA, call, uri, "Cancel"));
+            History.add(new History(ua_aor(CurrentUA), uri, "out"));
+            callButton.setText("Cancel");
+            holdButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void copyAsset(String asset, String path) {
@@ -474,15 +516,21 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    private Boolean aorHasHistory(ArrayList<History> history, String aor) {
+        for (History h : history) {
+            if (h.getAoR().equals(aor)) return true;
+        }
+        return false;
+    }
+
     private void updateStatus(String event, final String ua, final String call) {
         String aor = ua_aor(ua);
-        int index, call_index;
-
+        int call_index;
         Log.d("Baresip", "Handling event " + event + " for " + ua + "/" + call + "/" +
                 aor);
-        for (index = 0; index < Accounts.size(); index++) {
-            if (Accounts.get(index).getAoR().equals(aor)) {
-                Log.d("Baresip", "Found AoR at index " + index);
+        for (int account_index = 0; account_index < Accounts.size(); account_index++) {
+            if (Accounts.get(account_index).getAoR().equals(aor)) {
+                Log.d("Baresip", "Found AoR at index " + account_index);
                 switch (event) {
                     case "registering":
                     case "unregistering":
@@ -490,9 +538,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "registered":
                         Log.d("Baresip", "Setting status to green");
-                        Accounts.get(index).setStatus("OK");
-                        AoRs.set(index, aor);
-                        Images.set(index, R.drawable.green);
+                        Accounts.get(account_index).setStatus("OK");
+                        AoRs.set(account_index, aor);
+                        Images.set(account_index, R.drawable.green);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -502,9 +550,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "registering failed":
                         Log.d("Baresip", "Setting status to red");
-                        Accounts.get(index).setStatus("FAIL");
-                        AoRs.set(index, aor);
-                        Images.set(index, R.drawable.red);
+                        Accounts.get(account_index).setStatus("FAIL");
+                        AoRs.set(account_index, aor);
+                        Images.set(account_index, R.drawable.red);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -521,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Baresip", "Update Hangup and Hold");
                             Out.get(out_index).setStatus("Hangup");
                             Out.get(out_index).setHold(false);
-                            if (ua.equals(ua_current())) {
+                            if (ua.equals(CurrentUA)) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -540,11 +588,11 @@ public class MainActivity extends AppCompatActivity {
                         final String peer_uri = call_peeruri(call);
                         Log.d("Baresip", "Incoming call " + ua + "/" + call + "/" +
                                 peer_uri);
-
                         final Call new_call = new Call(ua, call, peer_uri, "Answer");
                         In.add(new_call);
-                        Log.d("Baresip", "Current UA is " + ua_current());
-                        if (ua.equals(ua_current())) {
+                        History.add(new History(aor, peer_uri, "in"));
+                        Log.d("Baresip", "Current UA is " + CurrentUA);
+                        if (ua.equals(CurrentUA)) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -555,18 +603,23 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "call closed":
                         call_index = callIndex(In, ua, call);
+                        Log.d("Baresip", "Incoming call index is " + call_index);
                         if (call_index != -1) {
                             Log.d("Baresip", "Removing inbound call " + ua + "/" +
-                                    call + "/" + In.get(index).getPeerURI());
+                                    call + "/" + In.get(call_index).getPeerURI());
                             final int view_id = (call_index + 1) * 10;
                             final int remove_count = In.size() - call_index;
                             final int final_call_index = call_index;
                             In.remove(call_index);
-                            Log.d("Baresip", "Current UA is " + ua_current());
-                            if (ua.equals(ua_current())) {
+                            Log.d("Baresip", "Current UA is " + CurrentUA);
+                            if (ua.equals(CurrentUA)) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        if (callButton.getText().equals("Call")) {
+                                            holdButton.setText("History");
+                                            holdButton.setVisibility(View.VISIBLE);
+                                        }
                                         View caller_heading = layout.findViewById(view_id);
                                         int view_index = layout.indexOfChild(caller_heading);
                                         Log.d("Baresip", "Index of caller heading is " +
@@ -581,17 +634,21 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         }
                         call_index = callIndex(Out, ua, call);
+                        Log.d("Baresip", "Outgoing call index is " + call_index);
                         if (call_index != -1) {
                             Log.d("Baresip", "Removing called call " + ua + "/" +
-                                    call + "/" + Out.get(index).getPeerURI());
+                                    call + "/" + Out.get(call_index).getPeerURI());
                             Out.remove(call_index);
-                            if (ua.equals(ua_current())) {
+                            if (ua.equals(CurrentUA)) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         callButton.setText("Call");
                                         callButton.setEnabled(true);
-                                        holdButton.setVisibility(View.INVISIBLE);
+                                        callee.setText("");
+                                        callee.setHint("Callee");
+                                        holdButton.setText("History");
+                                        holdButton.setVisibility(View.VISIBLE);
                                     }
                                 });
                             }
@@ -610,11 +667,11 @@ public class MainActivity extends AppCompatActivity {
 
     public native void baresipStart(String path);
     public native void baresipStop();
-    public native String ua_aor(String ua);
+    public static native String ua_current();
+    public static native String ua_aor(String ua);
     public native Boolean ua_isregistered(long ua_ptr);
     public native String ua_call(String ua);
     public native String call_peeruri(String call);
-    public native String ua_current();
     public static native void ua_current_set(String s);
     public native String ua_connect(String s);
     public native void ua_answer(String ua, String call);

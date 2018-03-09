@@ -70,36 +70,35 @@ public class EditConfigActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent i = new Intent(this, MainActivity.class);
         switch (item.getItemId()) {
-        case R.id.save:
-            try {
-                FileOutputStream fOut =
-                    new FileOutputStream(file.getAbsoluteFile(), false);
-                OutputStreamWriter fWriter = new OutputStreamWriter(fOut);
-                String res = editText.getText().toString();
+            case R.id.save:
                 try {
-                    fWriter.write(res);
-                    fWriter.close();
-                    fOut.close();
-                } catch (java.io.IOException e) {
-                    Log.e("Baresip", "Failed to write config file: " +
+                    FileOutputStream fOut =
+                        new FileOutputStream(file.getAbsoluteFile(), false);
+                    OutputStreamWriter fWriter = new OutputStreamWriter(fOut);
+                    String res = editText.getText().toString();
+                    try {
+                        fWriter.write(res);
+                        fWriter.close();
+                        fOut.close();
+                    } catch (java.io.IOException e) {
+                        Log.e("Baresip", "Failed to write config file: " +
+                              e.toString());
+                    }
+                } catch (java.io.FileNotFoundException e) {
+                    Log.e("Baresip", "Failed to find config file: " +
                           e.toString());
                 }
-            } catch (java.io.FileNotFoundException e) {
-                Log.e("Baresip", "Failed to find config file: " +
-                      e.toString());
-            }
-            Log.d("Baresip", "Updated config file");
-            i.putExtra("action", "save");
-            setResult(RESULT_OK, i);
-            finish();
-            return true;
-        case R.id.cancel:
-            i.putExtra("action", "cancel");
-            setResult(RESULT_OK, i);
-            finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+                Log.d("Baresip", "Updated config file");
+                setResult(RESULT_OK, i);
+                finish();
+                return true;
+            case R.id.cancel:
+            case android.R.id.home:
+                setResult(RESULT_CANCELED, i);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

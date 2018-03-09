@@ -468,8 +468,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     LOGD("hanging up call %s/%s\n", native_ua, native_call);
-    // ua_hangup(ua, call, native_code, native_reason);
-    ua_hangup(uag_current(), NULL, 0, NULL);
+    ua_hangup(ua, call, native_code, native_reason);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
