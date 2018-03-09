@@ -44,31 +44,32 @@ public class EditContactsActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent i = new Intent(this, MainActivity.class);
-        switch (item.getItemId()) {
-        case R.id.save:
-            String path = getApplicationContext().getFilesDir().getAbsolutePath() + "/contacts";
-            File file = new File(path);
-            Utils.putFileContents(file, editText.getText().toString());
-            Log.d("Baresip", "Updated contacts file");
-            MainActivity.contacts_remove();
-            updateContactsAndNames();
-            // MainActivity.CalleeAdapter.notifyDataSetChanged();
-            MainActivity.CalleeAdapter = new ArrayAdapter<String>
-                    (this,android.R.layout.select_dialog_item, Names);
-            MainActivity.callee.setThreshold(2);
-            MainActivity.callee.setAdapter(MainActivity.CalleeAdapter);
-            i.putExtra("action", "save");
-            setResult(RESULT_OK, i);
-            finish();
-            return true;
-        case R.id.cancel:
-            i.putExtra("action", "cancel");
-            setResult(RESULT_OK, i);
-            finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
+            switch (item.getItemId()) {
+                case R.id.save:
+                    String path = getApplicationContext().getFilesDir().getAbsolutePath() + "/contacts";
+                    File file = new File(path);
+                    Utils.putFileContents(file, editText.getText().toString());
+                    Log.d("Baresip", "Updated contacts file");
+                    MainActivity.contacts_remove();
+                    updateContactsAndNames();
+                    // MainActivity.CalleeAdapter.notifyDataSetChanged();
+                    MainActivity.CalleeAdapter = new ArrayAdapter<String>
+                            (this,android.R.layout.select_dialog_item, Names);
+                    MainActivity.callee.setThreshold(2);
+                    MainActivity.callee.setAdapter(MainActivity.CalleeAdapter);
+                    i.putExtra("action", "save");
+                    setResult(RESULT_OK, i);
+                    finish();
+                    return true;
+                case R.id.cancel:
+                case android.R.id.home:
+                    i.putExtra("action", "cancel");
+                    setResult(RESULT_OK, i);
+                    finish();
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
     }
 
     static public void updateContactsAndNames() {

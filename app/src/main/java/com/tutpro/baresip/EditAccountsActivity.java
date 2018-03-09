@@ -69,34 +69,35 @@ public class EditAccountsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent i = new Intent();
         switch (item.getItemId()) {
-        case R.id.save:
-            try {
-                FileOutputStream fOut =
-                    new FileOutputStream(file.getAbsoluteFile(), false);
-                OutputStreamWriter fWriter = new OutputStreamWriter(fOut);
-                String res = editText.getText().toString();
+            case R.id.save:
                 try {
-                    fWriter.write(res);
-                    fWriter.close();
-                    fOut.close();
-                } catch (java.io.IOException e) {
-                    Log.e("Baresip", "Failed to write accounts file: " +
-                          e.toString());
+                    FileOutputStream fOut =
+                            new FileOutputStream(file.getAbsoluteFile(), false);
+                    OutputStreamWriter fWriter = new OutputStreamWriter(fOut);
+                    String res = editText.getText().toString();
+                    try {
+                        fWriter.write(res);
+                        fWriter.close();
+                        fOut.close();
+                    } catch (java.io.IOException e) {
+                        Log.e("Baresip", "Failed to write accounts file: " +
+                                e.toString());
+                    }
+                } catch (java.io.FileNotFoundException e) {
+                    Log.e("Baresip", "Failed to find accounts file: " +
+                            e.toString());
                 }
-            } catch (java.io.FileNotFoundException e) {
-                Log.e("Baresip", "Failed to find accounts file: " +
-                      e.toString());
-            }
-            Log.d("Baresip", "Updated accounts file");
-            setResult(RESULT_OK, i);
-            finish();
-            return true;
-        case R.id.cancel:
-            setResult(RESULT_CANCELED, i);
-            finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+                Log.d("Baresip", "Updated accounts file");
+                setResult(RESULT_OK, i);
+                finish();
+                return true;
+            case R.id.cancel:
+            case android.R.id.home:
+                setResult(RESULT_CANCELED, i);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
