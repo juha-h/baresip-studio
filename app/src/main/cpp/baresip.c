@@ -99,6 +99,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             break;
         default:
             re_snprintf(event_buf, sizeof event_buf, "%s", "unknown event");
+            return;
     }
     event = event_buf;
 
