@@ -1,24 +1,25 @@
 package com.tutpro.baresip;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class HistoryActivity extends AppCompatActivity {
 
-	static ArrayList<String> history = new ArrayList<>();
+    ArrayList<HistoryRow> uaHistory = new ArrayList<>();
+    ArrayList<Integer> posAtHistory = new ArrayList<>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,27 +28,56 @@ public class HistoryActivity extends AppCompatActivity {
 
         final ListView listview = (ListView) findViewById(R.id.history);
 
-        ArrayList<String> history = new ArrayList<>();
-		for (Integer i = MainActivity.History.size() - 1; i >= 0; i--) {
-		    History h = MainActivity.History.get(i);
-            if (h.getAoR().equals(MainActivity.ua_aor(MainActivity.ua_current()))) {
-                if (!history.contains(h.getPeerURI())) history.add(h.getPeerURI());
-            }
-        }
+        generate_ua_history();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, history);
+        final HistoryListAdapter adapter = new HistoryListAdapter(this, uaHistory);
         listview.setAdapter(adapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                HistoryRow row = uaHistory.get(position);
+                Intent i = new Intent();
+                i.putExtra("peer_uri", row.getPeerURI());
+                setResult(RESULT_OK, i);
+                finish();
+            }
+        });
 
-		listview.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Intent i = new Intent();
-				i.putExtra("peer_uri", ((TextView) view).getText());
-				setResult(RESULT_OK, i);
-				finish();
-			}
-		});
+        listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int pos, long id) {
+                DialogInterface.OnClickListener dialogClickListener =
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                MainActivity.History.remove((posAtHistory.get(pos)).intValue());
+                                generate_ua_history();
+                                if (uaHistory.size() == 0) {
+                                    Intent i = new Intent();
+                                    setResult(RESULT_CANCELED, i);
+                                    finish();
+                                }
+                                adapter.notifyDataSetChanged();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(HistoryActivity.this,
+                                R.style.Theme_AppCompat);
+                builder.setMessage("Do you want to delete " +
+                        MainActivity.History.get(pos).getPeerURI() + "?")
+                        .setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+                return true;
+            }
+        });
+
+        listview.setLongClickable(true);
     }
 
     @Override
@@ -61,6 +91,45 @@ public class HistoryActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    private void generate_ua_history() {
+        uaHistory.clear();
+        posAtHistory.clear();
+        for (Integer i = MainActivity.History.size() - 1; i >= 0; i--) {
+            History h = MainActivity.History.get(i);
+            if (h.getAoR().equals(MainActivity.ua_aor(MainActivity.ua_current()))) {
+                String time;
+                if (isToday(h.getTime())) {
+                    SimpleDateFormat fmt = new SimpleDateFormat("HH:mm");
+                    time = fmt.format(h.getTime().getTime());
+                } else {
+                    SimpleDateFormat fmt = new SimpleDateFormat("MMM dd");
+                    time = fmt.format(h.getTime().getTime());
+                }
+                if (h.getDirection().equals("in")) {
+                    if (h.getConnected()) {
+                        uaHistory.add(new HistoryRow(h.getPeerURI(), R.drawable.arrow_down_green, time));
+                    } else {
+                        uaHistory.add(new HistoryRow(h.getPeerURI(), R.drawable.arrow_down_red, time));
+                    }
+                } else {
+                    if (h.getConnected()) {
+                        uaHistory.add(new HistoryRow(h.getPeerURI(), R.drawable.arrow_up_green, time));
+                    } else {
+                        uaHistory.add(new HistoryRow(h.getPeerURI(), R.drawable.arrow_up_red, time));
+                    }
+                }
+                posAtHistory.add(i);
+            }
+        }
+    }
+
+    private Boolean isToday(GregorianCalendar time) {
+        GregorianCalendar now = new GregorianCalendar();
+        return now.get(Calendar.YEAR) == time.get(Calendar.YEAR) &&
+                now.get(Calendar.MONTH) == time.get(Calendar.MONTH) &&
+                now.get(Calendar.DAY_OF_MONTH) == time.get(Calendar.DAY_OF_MONTH);
     }
 
 }
