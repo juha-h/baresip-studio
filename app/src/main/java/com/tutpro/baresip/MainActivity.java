@@ -18,7 +18,6 @@ import android.widget.AutoCompleteTextView;
 import android.view.*;
 import android.util.Log;
 import android.content.Context;
-import android.text.format.Time;
 
 import java.util.*;
 import java.io.*;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     static ArrayAdapter<String> CalleeAdapter = null;
     static ArrayList<Call> In = new ArrayList<>();
     static ArrayList<Call> Out = new ArrayList<>();
-    static ArrayList<History> History = new ArrayList();
+    static ArrayList<History> History = new ArrayList<>();
     static String CurrentUA = null;
 
     private static final int RECORD_AUDIO_PERMISSION = 1;
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     callee.setText(out.get(0).getPeerURI());
                     callButton.setText(out.get(0).getStatus());
-                    if (out.get(0).getStatus() == "Hangup") {
+                    if (out.get(0).getStatus().equals("Hangup")) {
                         if (out.get(0).getHold()) {
                             holdButton.setText("Unhold");
                         } else {
@@ -113,8 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav"};
         final String path = mainActivityContext.getFilesDir().getPath();
         Log.d("Baresip", "path is: " + path);
-        File file;
-        file = new File(path);
+        File file = new File(path);
         if (!file.exists()) {
             Log.d("Baresip", "Creating baresip directory");
             try {
@@ -128,10 +126,22 @@ public class MainActivity extends AppCompatActivity {
             file = new File(path + "/" + a);
             if (!file.exists()) {
                 Log.d("Baresip", "Copying asset " + a);
-                copyAsset(a, path + "/" + a);
+                copyAssetToFile(a, path + "/" + a);
             } else {
                 Log.d("Baresip", "Asset " + a + " already copied");
             }
+        }
+
+        file = new File(path, "history");
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            History = (ArrayList<History>)ois.readObject();
+            Log.d("Baresip", "Restored History");
+            ois.close();
+            fis.close();
+        } catch (Exception e) {
+            Log.w("Baresip", "InputStream exception: - " + e.toString());
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -266,10 +276,23 @@ public class MainActivity extends AppCompatActivity {
             case R.id.quit:
                 if (running) {
                     Log.d("Baresip", "Stopping");
-                    baresipStop();
+                    final String path = mainActivityContext.getFilesDir().getPath();
+                    File file = new File(path,"history");
+                    try {
+                        FileOutputStream fos = new FileOutputStream(file);
+                        ObjectOutputStream oos = new ObjectOutputStream(fos);
+                        oos.writeObject(History);
+                        oos.close();
+                        fos.close();
+                    } catch (IOException e) {
+                        Log.w("Baresip", "OutputStream exception: " + e.toString());
+                        e.printStackTrace();
+                    }
+                    History.clear();
                     Accounts.clear();
                     AoRs.clear();
                     Images.clear();
+                    baresipStop();
                     running = false;
                 }
                 finish();
@@ -315,6 +338,9 @@ public class MainActivity extends AppCompatActivity {
             }
             if(resultCode == RESULT_CANCELED) {
                 Log.d("Baresip", "History canceled");
+                if (!aorHasHistory(History, ua_aor(ua_current()))) {
+                    holdButton.setVisibility(View.INVISIBLE);
+                }
             }
         }
         if ((requestCode == EDIT_CONTACTS_CODE) || (requestCode == ABOUT_CODE)) {
@@ -352,13 +378,13 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Baresip", "Adding outgoing call " + CurrentUA + "/" + call +
                     "/" + uri);
             Out.add(new Call(CurrentUA, call, uri, "Cancel"));
-            History.add(new History(ua_aor(CurrentUA), uri, "out"));
+            // History.add(new History(ua_aor(CurrentUA), uri, "out"));
             callButton.setText("Cancel");
             holdButton.setVisibility(View.INVISIBLE);
         }
     }
 
-    private void copyAsset(String asset, String path) {
+    private void copyAssetToFile(String asset, String path) {
         try {
             AssetManager assetManager = getAssets();
             InputStream is = assetManager.open(asset);
@@ -457,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(answer_button);
 
         Button reject_button = new Button(mainActivityContext);
-        if (call.getStatus() == "Answer") {
+        if (call.getStatus().equals("Answer")) {
             reject_button.setText("Reject");
         } else {
             if (call.getHold()) {
@@ -523,11 +549,20 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private Boolean callHasHistory(ArrayList<History> history, String ua, String call) {
+        for (History h : history) {
+            if (h.getUA().equals(ua) && h.getCall().equals(call)) return true;
+        }
+        return false;
+    }
+
     private void updateStatus(String event, final String ua, final String call) {
         String aor = ua_aor(ua);
         int call_index;
+
         Log.d("Baresip", "Handling event " + event + " for " + ua + "/" + call + "/" +
                 aor);
+
         for (int account_index = 0; account_index < Accounts.size(); account_index++) {
             if (Accounts.get(account_index).getAoR().equals(aor)) {
                 Log.d("Baresip", "Found AoR at index " + account_index);
@@ -579,7 +614,12 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            History.add(new History(ua, call, aor, call_peeruri(call),
+                                    "out", true));
                             break;
+                        } else {
+                            History.add(new History(ua, call, aor, call_peeruri(call),
+                                    "in", true));
                         }
                         Log.e("Baresip", "Unknown call " + ua + "/" + call +
                                 " established");
@@ -590,7 +630,7 @@ public class MainActivity extends AppCompatActivity {
                                 peer_uri);
                         final Call new_call = new Call(ua, call, peer_uri, "Answer");
                         In.add(new_call);
-                        History.add(new History(aor, peer_uri, "in"));
+                        // History.add(new History(aor, call_peeruri(call), "in"));
                         Log.d("Baresip", "Current UA is " + CurrentUA);
                         if (ua.equals(CurrentUA)) {
                             runOnUiThread(new Runnable() {
@@ -631,12 +671,16 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            if (!callHasHistory(History, ua, call)) {
+                                History.add(new History(ua, call, aor, call_peeruri(call),
+                                        "in", false));
+                            }
                             break;
                         }
                         call_index = callIndex(Out, ua, call);
                         Log.d("Baresip", "Outgoing call index is " + call_index);
                         if (call_index != -1) {
-                            Log.d("Baresip", "Removing called call " + ua + "/" +
+                            Log.d("Baresip", "Removing outgoing call " + ua + "/" +
                                     call + "/" + Out.get(call_index).getPeerURI());
                             Out.remove(call_index);
                             if (ua.equals(CurrentUA)) {
@@ -651,6 +695,10 @@ public class MainActivity extends AppCompatActivity {
                                         holdButton.setVisibility(View.VISIBLE);
                                     }
                                 });
+                            }
+                            if (!callHasHistory(History, ua, call)) {
+                                History.add(new History(ua, call, aor, call_peeruri(call),
+                                        "out", false));
                             }
                             break;
                         }
