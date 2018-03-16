@@ -314,22 +314,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1aor(JNIEnv *env, jobject thiz, jstring 
         return (*env)->NewStringUTF(env, "");
 }
 
-JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1isregistered(JNIEnv *env, jobject thiz, jlong ua_ptr)
-{
-    struct ua *ua = (struct ua *)ua_ptr;
-    bool result;
-
-    result = ua_isregistered(ua);
-    if (ua == NULL) {
-        LOGD("ua_ptr is null\n");
-    } else {
-        LOGD("ua_ptr is NOT null\n");
-    }
-    return result;
-}
-
-JNIEXPORT void JNICALL
+JNIEXPORT void JNICALL /* currently not in use */
 Java_com_tutpro_baresip_MainActivity_ua_1current_1set(JNIEnv *env, jobject thiz,
                                                       jstring javaAoR)
 {
@@ -343,7 +328,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1current_1set(JNIEnv *env, jobject thiz,
     return;
 }
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT jstring JNICALL /* currently not in use */
 Java_com_tutpro_baresip_MainActivity_ua_1current(JNIEnv *env, jobject thiz)
 {
     struct ua *current_ua = uag_current();
@@ -357,32 +342,18 @@ Java_com_tutpro_baresip_MainActivity_ua_1current(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1prev_1call(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_MainActivity_aor_1ua(JNIEnv *env, jobject thiz,
+                                             jstring javaAoR)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    const char *native_aor = (*env)->GetStringUTFChars(env, javaAoR, 0);
+    struct ua *ua = uag_find_aor(native_aor);
+    char ua_buf[256];
 
-    struct call *call = ua_prev_call(ua);
-    char call_buf[256];
-    if (call == NULL)
-        call_buf[0] = '\0';
+    if (ua == NULL)
+        ua_buf[0] = '\0';
     else
-        sprintf(call_buf, "%lu", (unsigned long)call);
-    return (*env)->NewStringUTF(env, call_buf);
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1call(JNIEnv *env, jobject thiz, jstring javaUA)
-{
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-
-    struct call *call = ua_call(ua);
-    char call_buf[256];
-    sprintf(call_buf, "%lu", (unsigned long)call);
-    return (*env)->NewStringUTF(env, call_buf);
+        sprintf(ua_buf, "%lu", (unsigned long)ua);
+    return (*env)->NewStringUTF(env, ua_buf);
 }
 
 JNIEXPORT jstring JNICALL
@@ -398,28 +369,26 @@ Java_com_tutpro_baresip_MainActivity_call_1peeruri(JNIEnv *env, jobject thiz, js
 
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_MainActivity_ua_1connect(JNIEnv *env, jobject thiz,
-                                                jstring uri) {
+                                                jstring javaUA, jstring javaURI) {
     struct call *call;
     struct ua *ua;
     int err;
-    const char *native_uri = (*env)->GetStringUTFChars(env, uri, 0);
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    const char *native_uri = (*env)->GetStringUTFChars(env, javaURI, 0);
     char call_buf[256];
 
-    LOGD("connecting to %s\n", native_uri);
-    ua = uag_current();
-    if (ua != NULL) {
-        err = ua_connect(ua, &call, NULL, native_uri, NULL, VIDMODE_ON);
-        if (err) {
-            LOGW("connecting to %s failed with error %d\n", native_uri, err);
-            call_buf[0] = '\0';
-        } else {
-            sprintf(call_buf, "%lu", (unsigned long)call);
-        }
-    } else {
-        LOGE("no current ua\n");
+    LOGD("connecting ua %s to %s\n", native_ua, native_uri);
+    ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    err = ua_connect(ua, &call, NULL, native_uri, NULL, VIDMODE_ON);
+    if (err) {
+        LOGW("connecting to %s failed with error %d\n", native_uri, err);
         call_buf[0] = '\0';
+    } else {
+        sprintf(call_buf, "%lu", (unsigned long)call);
     }
-    (*env)->ReleaseStringUTFChars(env, uri, native_uri);
+
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    (*env)->ReleaseStringUTFChars(env, javaURI, native_uri);
     return (*env)->NewStringUTF(env, call_buf);
 }
 
@@ -440,7 +409,8 @@ Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
 
 }
 
-JNIEXPORT jint JNICALL  Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
                                                                         jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     LOGD("holding call %s\n", native_call);
@@ -449,7 +419,8 @@ JNIEXPORT jint JNICALL  Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *
     return res;
 }
 
-JNIEXPORT jint JNICALL  Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
                                                                         jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     LOGD("holding call %s\n", native_call);
@@ -477,7 +448,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_contacts_1remove(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_MainActivity_00024Companion_contacts_1remove(JNIEnv *env, jobject thiz) {
     struct le *le;
     le = list_head(contact_list(baresip_contacts()));
     while ((le = list_head(contact_list(baresip_contacts())))) {
@@ -488,8 +459,8 @@ Java_com_tutpro_baresip_MainActivity_contacts_1remove(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_contact_1add(JNIEnv *env, jobject thiz,
-                                                  jstring javaContact) {
+Java_com_tutpro_baresip_MainActivity_00024Companion_contact_1add(JNIEnv *env, jobject thiz,
+                                                                 jstring javaContact) {
     struct pl pl_addr;
     const struct list *lst;
     struct le *le;
