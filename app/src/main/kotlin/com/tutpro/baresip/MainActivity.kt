@@ -650,12 +650,12 @@ class MainActivity : AppCompatActivity() {
         internal var In = ArrayList<Call>()
         internal var Out = ArrayList<Call>()
 
-        private val RECORD_AUDIO_PERMISSION = 1
-        private val EDIT_ACCOUNTS_CODE = 1
-        private val EDIT_CONTACTS_CODE = 2
-        private val EDIT_CONFIG_CODE = 3
-        private val HISTORY_CODE = 4
-        private val ABOUT_CODE = 5
+        const val RECORD_AUDIO_PERMISSION = 1
+        const val EDIT_ACCOUNTS_CODE = 1
+        const val EDIT_CONTACTS_CODE = 2
+        const val EDIT_CONFIG_CODE = 3
+        const val HISTORY_CODE = 4
+        const val ABOUT_CODE = 5
 
         external fun contacts_remove()
         external fun contact_add(contact: String)

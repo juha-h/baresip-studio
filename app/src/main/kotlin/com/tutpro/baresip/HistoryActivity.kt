@@ -35,9 +35,8 @@ class HistoryActivity : AppCompatActivity() {
         val adapter = HistoryListAdapter(this, uaHistory)
         listview.adapter = adapter
         listview.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val row = uaHistory[position]
             val i = Intent()
-            i.putExtra("peer_uri", row.peerURI)
+            i.putExtra("peer_uri", uaHistory[position].peerURI)
             setResult(Activity.RESULT_OK, i)
             finish()
         }
@@ -89,6 +88,10 @@ class HistoryActivity : AppCompatActivity() {
         for (i in History.indices.reversed()) {
             val h = History[i]
             if (h.aor == aor) {
+                var peer_uri = h.peerURI
+                if (Utils.uriHostPart(peer_uri) == Utils.uriHostPart(aor)) {
+                    peer_uri = Utils.uriUserPart(peer_uri)
+                }
                 val time: String
                 if (isToday(h.time)) {
                     val fmt = SimpleDateFormat("HH:mm")
@@ -99,15 +102,15 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 if (h.direction == "in") {
                     if (h.connected) {
-                        uaHistory.add(HistoryRow(h.peerURI, R.drawable.arrow_down_green, time))
+                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_down_green, time))
                     } else {
-                        uaHistory.add(HistoryRow(h.peerURI, R.drawable.arrow_down_red, time))
+                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_down_red, time))
                     }
                 } else {
                     if (h.connected) {
-                        uaHistory.add(HistoryRow(h.peerURI, R.drawable.arrow_up_green, time))
+                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_up_green, time))
                     } else {
-                        uaHistory.add(HistoryRow(h.peerURI, R.drawable.arrow_up_red, time))
+                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_up_red, time))
                     }
                 }
                 posAtHistory.add(i)

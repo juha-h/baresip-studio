@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import android.content.DialogInterface
 import android.support.v7.app.AlertDialog
 import android.util.Log
 
@@ -62,6 +61,17 @@ object Utils {
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
         ) { dialog, _ -> dialog.dismiss() }
         alertDialog.show()
+    }
+
+    fun uriHostPart(uri: String): String {
+        return uri.substringAfter("@")
+                .substringBefore(":")
+                .substringBefore(";")
+                .substringBefore(">")
+    }
+
+    fun uriUserPart(uri: String): String {
+        return uri.substringAfter(":").substringBefore("@")
     }
 
 }
