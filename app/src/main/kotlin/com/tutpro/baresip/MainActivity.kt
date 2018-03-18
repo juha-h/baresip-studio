@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.widget.*
 import android.widget.RelativeLayout.LayoutParams
 import android.widget.AutoCompleteTextView
@@ -34,19 +35,17 @@ class MainActivity : AppCompatActivity() {
         callButton = findViewById(R.id.callButton) as Button
         holdButton = findViewById(R.id.holdButton) as Button
 
-        AoRSpinner = findViewById(R.id.AoRList) as Spinner
-
-        Log.i("Baresip", "Setting AccountAdapter")
-        AccountAdapter = AccountSpinnerAdapter(applicationContext, AoRs, Images)
-        AoRSpinner.adapter = AccountAdapter
-        AoRSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        aorSpinner = findViewById(R.id.AoRList) as Spinner
+        accountAdapter = AccountSpinnerAdapter(applicationContext, aors, images)
+        aorSpinner.adapter = accountAdapter
+        aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val aor = AoRs[position]
+                val aor = aors[position]
                 val callee = findViewById(R.id.callee) as AutoCompleteTextView
                 val callButton = findViewById(R.id.callButton) as Button
                 val holdButton = findViewById(R.id.holdButton) as Button
                 Log.i("Baresip", "Setting $aor current")
-                val out = uaCalls(Out, aor_ua(aor))
+                val out = uaCalls(callsOut, aor_ua(aor))
                 if (out.size == 0) {
                     callee.text.clear()
                     callee.hint = "Callee"
@@ -71,14 +70,14 @@ class MainActivity : AppCompatActivity() {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
-                val `in` = uaCalls(In, aor_ua(aor))
+                val `in` = uaCalls(callsIn, aor_ua(aor))
                 val view_count = layout.childCount
                 Log.d("Baresip", "View count is $view_count")
                 if (view_count > 5) {
                     layout.removeViews(5, view_count - 5)
                 }
                 for (c in `in`) {
-                    for (call_index in In.indices) {
+                    for (call_index in callsIn.indices) {
                         addCallViews(c, (call_index + 1) * 10)
                     }
                 }
@@ -138,21 +137,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath + "/contacts")
-        CalleeAdapter = ArrayAdapter(this, android.R.layout.select_dialog_item, EditContactsActivity.Names)
+
+        calleeAdapter = ArrayAdapter(this, android.R.layout.select_dialog_item, EditContactsActivity.Names)
         callee.threshold = 2
-        callee.setAdapter<ArrayAdapter<String>>(CalleeAdapter)
+        callee.setAdapter<ArrayAdapter<String>>(calleeAdapter)
 
         callButton.text = "Call"
         callButton.setOnClickListener {
-            Log.d("Baresip", "AoR at position is " + AoRs[AoRSpinner.selectedItemPosition])
-            val aor = AoRs[AoRSpinner.selectedItemPosition]
+            Log.d("Baresip", "AoR at position is " + aors[aorSpinner.selectedItemPosition])
+            val aor = aors[aorSpinner.selectedItemPosition]
             if (callButton.text.toString() == "Call") {
                 call(aor, (findViewById(R.id.callee) as EditText).text.toString())
             } else {
                 Log.i("Baresip", "Canceling UA " + aor_ua(aor) + " call " +
-                        Out[0].call + " to " +
+                        callsOut[0].call + " to " +
                         (findViewById(R.id.callee) as EditText).text)
-                ua_hangup(aor_ua(aor), Out[0].call, 486, "Rejected")
+                ua_hangup(aor_ua(aor), callsOut[0].call, 486, "Rejected")
             }
         }
 
@@ -161,20 +161,20 @@ class MainActivity : AppCompatActivity() {
             when (holdButton.text.toString()) {
                 "Hold" -> {
                     Log.i("Baresip", "Holding up " + (findViewById(R.id.callee) as EditText).text)
-                    call_hold(Out[0].call)
-                    Out[0].hold = true
+                    call_hold(callsOut[0].call)
+                    callsOut[0].hold = true
                     holdButton.text = "Unhold"
                 }
                 "Unhold" -> {
                     Log.i("Baresip", "Unholding " + (findViewById(R.id.callee) as EditText).text)
-                    call_unhold(Out[0].call)
-                    Out[0].hold = false
+                    call_unhold(callsOut[0].call)
+                    callsOut[0].hold = false
                     holdButton.text = "Hold"
                 }
                 "History" -> {
                     val i = Intent(this@MainActivity, HistoryActivity::class.java)
                     val b = Bundle()
-                    b.putString("aor", AoRs[AoRSpinner.selectedItemPosition])
+                    b.putString("aor", aors[aorSpinner.selectedItemPosition])
                     i.putExtras(b)
                     startActivityForResult(i, HISTORY_CODE)
                 }
@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (resultCode == RESULT_CANCELED) {
                 Log.d("Baresip", "History canceled")
-                if (!aorHasHistory(AoRs[AoRSpinner.selectedItemPosition])) {
+                if (!aorHasHistory(aors[aorSpinner.selectedItemPosition])) {
                     (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
                 }
             }
@@ -309,10 +309,10 @@ class MainActivity : AppCompatActivity() {
     fun addAccount(ua: String) {
         val aor = ua_aor(ua)
         Log.d("Baresip", "Adding account $ua with AoR $aor")
-        Accounts.add(Account(ua, aor, ""))
-        AoRs.add(aor)
-        Images.add(R.drawable.yellow)
-        runOnUiThread { AccountAdapter.notifyDataSetChanged() }
+        accounts.add(Account(ua, aor, ""))
+        aors.add(aor)
+        images.add(R.drawable.yellow)
+        runOnUiThread { accountAdapter.notifyDataSetChanged() }
     }
 
     private fun call(aor: String, callee: String) {
@@ -329,7 +329,7 @@ class MainActivity : AppCompatActivity() {
         val call = ua_connect(ua, uri)
         if (call != "") {
             Log.i("Baresip", "Adding outgoing call $ua / $call / $uri")
-            Out.add(Call(ua, call, uri, "Cancel"))
+            callsOut.add(Call(ua, call, uri, "Cancel"))
             (findViewById(R.id.callButton) as Button).text = "Cancel"
             (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
         }
@@ -356,8 +356,8 @@ class MainActivity : AppCompatActivity() {
     private fun addCallViews(call: Call, id: Int) {
         Log.d("Baresip", "Creating new Incoming textview at $id")
 
+        //val caller_heading = TextView(mainActivityContext)
         val caller_heading = TextView(mainActivityContext)
-
         caller_heading.text = "Incoming call from ..."
         caller_heading.setTextColor(Color.BLACK)
         caller_heading.textSize = 20f
@@ -373,7 +373,7 @@ class MainActivity : AppCompatActivity() {
         layout.addView(caller_heading)
 
         val caller_uri = TextView(mainActivityContext)
-        caller_uri.text = In[In.size - 1].peerURI
+        caller_uri.text = callsIn[callsIn.size - 1].peerURI
         caller_uri.setTextColor(Color.GREEN)
         caller_uri.textSize = 20f
         caller_uri.setPadding(10, 10, 0, 10)
@@ -399,11 +399,11 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "UA " + call_ua + " accepting incoming call " +
                             call_call)
                     ua_answer(call_ua, call_call)
-                    val final_in_index = callIndex(In, call_ua, call_call)
+                    val final_in_index = callIndex(callsIn, call_ua, call_call)
                     if (final_in_index >= 0) {
                         Log.d("Baresip", "Updating Hangup and Hold")
-                        In[final_in_index].status = "Hangup"
-                        In[final_in_index].hold = false
+                        callsIn[final_in_index].status = "Hangup"
+                        callsIn[final_in_index].hold = false
                         runOnUiThread {
                             val answer_id = (final_in_index + 1) * 10 + 2
                             val answer_but = layout.findViewById(answer_id) as Button
@@ -506,36 +506,36 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Handling event " + event + " for " + ua + "/" + call + "/" +
                 aor)
 
-        for (account_index in Accounts.indices) {
-            if (Accounts[account_index].aoR == aor) {
+        for (account_index in accounts.indices) {
+            if (accounts[account_index].aoR == aor) {
                 Log.d("Baresip", "Found AoR at index $account_index")
                 when (event) {
                     "registering", "unregistering" -> {
                     }
                     "registered" -> {
                         Log.d("Baresip", "Setting status to green")
-                        Accounts[account_index].status = "OK"
-                        AoRs[account_index] = aor
-                        Images[account_index] = R.drawable.green
-                        runOnUiThread { AccountAdapter.notifyDataSetChanged() }
+                        accounts[account_index].status = "OK"
+                        aors[account_index] = aor
+                        images[account_index] = R.drawable.green
+                        runOnUiThread { accountAdapter.notifyDataSetChanged() }
                     }
                     "registering failed" -> {
                         Log.d("Baresip", "Setting status to red")
-                        Accounts[account_index].status = "FAIL"
-                        AoRs[account_index] = aor
-                        Images[account_index] = R.drawable.red
-                        runOnUiThread { AccountAdapter.notifyDataSetChanged() }
+                        accounts[account_index].status = "FAIL"
+                        aors[account_index] = aor
+                        images[account_index] = R.drawable.red
+                        runOnUiThread { accountAdapter.notifyDataSetChanged() }
                     }
                     "call ringing" -> {
                     }
                     "call established" -> {
-                        val out_index = callIndex(Out, ua, call)
+                        val out_index = callIndex(callsOut, ua, call)
                         if (out_index >= 0) {
                             Log.d("Baresip", "Outbound call " + call + " established")
-                            Out[out_index].status = "Hangup"
-                            Out[out_index].hold = false
+                            callsOut[out_index].status = "Hangup"
+                            callsOut[out_index].hold = false
                             runOnUiThread {
-                                if (ua == aor_ua(AoRs[AoRSpinner.selectedItemPosition])) {
+                                if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                     callButton.text = "Hangup"
                                     holdButton.text = "Hold"
                                     holdButton.visibility = View.VISIBLE
@@ -554,48 +554,48 @@ class MainActivity : AppCompatActivity() {
                         Log.d("Baresip", "Incoming call " + ua + "/" + call + "/" +
                                 peer_uri)
                         val new_call = Call(ua, call, peer_uri, "Answer")
-                        In.add(new_call)
+                        callsIn.add(new_call)
                         this@MainActivity.runOnUiThread {
-                            if (ua == aor_ua(AoRs[AoRSpinner.selectedItemPosition])) {
-                                addCallViews(new_call, In.size * 10)
+                            if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
+                                addCallViews(new_call, callsIn.size * 10)
                             }
                         }
                     }
                     "call closed" -> {
-                        call_index = callIndex(In, ua, call)
+                        call_index = callIndex(callsIn, ua, call)
                         if (call_index != -1) {
                             Log.d("Baresip", "Removing inbound call " + ua + "/" +
-                                    call + "/" + In[call_index].peerURI)
+                                    call + "/" + callsIn[call_index].peerURI)
                             val view_id = (call_index + 1) * 10
-                            val remove_count = In.size - call_index
-                            In.removeAt(call_index)
-                                this@MainActivity.runOnUiThread {
-                                    if (ua == aor_ua(AoRs[AoRSpinner.selectedItemPosition])) {
-                                        if (callButton.text == "Call") {
-                                            holdButton.text = "History"
-                                            holdButton.visibility = View.VISIBLE
-                                        }
-                                        val caller_heading = layout.findViewById(view_id)
-                                        val view_index = layout.indexOfChild(caller_heading)
-                                        Log.d("Baresip", "Index of caller heading is $view_index")
-                                        layout.removeViews(view_index, 4 * remove_count)
-                                        for (i in call_index until In.size) {
-                                            this@MainActivity.addCallViews(In[i], (i + 1) * 10)
-                                        }
+                            val remove_count = callsIn.size - call_index
+                            callsIn.removeAt(call_index)
+                            this@MainActivity.runOnUiThread {
+                                if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
+                                    if (callButton.text == "Call") {
+                                        holdButton.text = "History"
+                                        holdButton.visibility = View.VISIBLE
+                                    }
+                                    val caller_heading = layout.findViewById(view_id)
+                                    val view_index = layout.indexOfChild(caller_heading)
+                                    Log.d("Baresip", "Index of caller heading is $view_index")
+                                    layout.removeViews(view_index, 4 * remove_count)
+                                    for (i in call_index until callsIn.size) {
+                                        this@MainActivity.addCallViews(callsIn[i], (i + 1) * 10)
                                     }
                                 }
+                            }
                             if (!callHasHistory(ua, call)) {
                                 HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                         "in", false))
                             }
                         } else {
-                            call_index = callIndex(Out, ua, call)
+                            call_index = callIndex(callsOut, ua, call)
                             if (call_index != -1) {
                                 Log.d("Baresip", "Removing outgoing call " + ua + "/" +
-                                        call + "/" + Out[call_index].peerURI)
-                                Out.removeAt(call_index)
+                                        call + "/" + callsOut[call_index].peerURI)
+                                callsOut.removeAt(call_index)
                                 runOnUiThread {
-                                    if (ua == aor_ua(AoRs[AoRSpinner.selectedItemPosition])) {
+                                    if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                         callButton.text = "Call"
                                         callButton.isEnabled = true
                                         callee.setText("")
@@ -627,8 +627,8 @@ class MainActivity : AppCompatActivity() {
     external fun aor_ua(aor: String): String
     external fun ua_connect(ua: String, peer_uri: String): String
     external fun ua_answer(ua: String, call: String)
-    external fun call_hold(call: String): Int?
-    external fun call_unhold(call: String): Int?
+    external fun call_hold(call: String): Int
+    external fun call_unhold(call: String): Int
     external fun ua_hangup(ua: String, call: String, code: Int, reason: String)
     external fun reload_config(): Int
 
@@ -639,16 +639,16 @@ class MainActivity : AppCompatActivity() {
         internal lateinit var callee: AutoCompleteTextView
         internal lateinit var callButton: Button
         internal lateinit var holdButton: Button
-        internal lateinit var AccountAdapter: AccountSpinnerAdapter
-        internal lateinit var AoRSpinner: Spinner
+        internal lateinit var accountAdapter: AccountSpinnerAdapter
+        internal lateinit var aorSpinner: Spinner
+        internal lateinit var calleeAdapter: ArrayAdapter<String>
 
         internal var running: Boolean = false
-        internal var Accounts = ArrayList<Account>()
-        internal var AoRs = ArrayList<String>()
-        internal var Images = ArrayList<Int>()
-        internal var CalleeAdapter: ArrayAdapter<String>? = null
-        internal var In = ArrayList<Call>()
-        internal var Out = ArrayList<Call>()
+        internal var accounts = ArrayList<Account>()
+        internal var aors = ArrayList<String>()
+        internal var images = ArrayList<Int>()
+        internal var callsIn = ArrayList<Call>()
+        internal var callsOut = ArrayList<Call>()
 
         const val RECORD_AUDIO_PERMISSION = 1
         const val EDIT_ACCOUNTS_CODE = 1

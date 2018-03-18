@@ -48,7 +48,7 @@ class EditContactsActivity : AppCompatActivity() {
                 Log.d("Baresip", "Updated contacts file")
                 MainActivity.contacts_remove()
                 updateContactsAndNames(path)
-                // MainActivity.CalleeAdapter.notifyDataSetChanged(); does not work
+                // MainActivity.calleeAdapter.notifyDataSetChanged(); does not work
                 setResult(RESULT_OK, i)
                 finish()
                 return true
