@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainActivityContext = applicationContext
+        appContext = applicationContext
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         callee = findViewById(R.id.callee) as AutoCompleteTextView
         callButton = findViewById(R.id.callButton) as Button
@@ -130,12 +130,6 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
         }
 
-        if (!running) {
-            Log.i("Baresip", "Starting Baresip with path $path")
-            Thread(Runnable { baresipStart(path) }).start()
-            running = true
-        }
-
         EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath + "/contacts")
 
         calleeAdapter = ArrayAdapter(this, android.R.layout.select_dialog_item, EditContactsActivity.Names)
@@ -179,6 +173,12 @@ class MainActivity : AppCompatActivity() {
                     startActivityForResult(i, HISTORY_CODE)
                 }
             }
+        }
+
+        if (!running) {
+            Log.i("Baresip", "Starting Baresip with path $path")
+            Thread(Runnable { baresipStart(path) }).start()
+            running = true
         }
     }
 
@@ -356,8 +356,7 @@ class MainActivity : AppCompatActivity() {
     private fun addCallViews(call: Call, id: Int) {
         Log.d("Baresip", "Creating new Incoming textview at $id")
 
-        //val caller_heading = TextView(mainActivityContext)
-        val caller_heading = TextView(mainActivityContext)
+        val caller_heading = TextView(appContext)
         caller_heading.text = "Incoming call from ..."
         caller_heading.setTextColor(Color.BLACK)
         caller_heading.textSize = 20f
@@ -372,7 +371,7 @@ class MainActivity : AppCompatActivity() {
         caller_heading.layoutParams = heading_params
         layout.addView(caller_heading)
 
-        val caller_uri = TextView(mainActivityContext)
+        val caller_uri = TextView(appContext)
         caller_uri.text = callsIn[callsIn.size - 1].peerURI
         caller_uri.setTextColor(Color.GREEN)
         caller_uri.textSize = 20f
@@ -385,7 +384,7 @@ class MainActivity : AppCompatActivity() {
         caller_uri.layoutParams = caller_uri_params
         layout.addView(caller_uri)
 
-        val answer_button = Button(mainActivityContext)
+        val answer_button = Button(appContext)
         answer_button.text = call.status
         answer_button.setBackgroundResource(android.R.drawable.btn_default)
         answer_button.setTextColor(Color.BLACK)
@@ -428,7 +427,7 @@ class MainActivity : AppCompatActivity() {
         answer_button.layoutParams = answer_button_params
         layout.addView(answer_button)
 
-        val reject_button = Button(mainActivityContext)
+        val reject_button = Button(appContext)
         if (call.status == "Answer") {
             reject_button.text = "Reject"
         } else {
@@ -634,7 +633,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
-        internal lateinit var mainActivityContext: Context
+        internal lateinit var appContext: Context
         internal lateinit var layout: RelativeLayout
         internal lateinit var callee: AutoCompleteTextView
         internal lateinit var callButton: Button
