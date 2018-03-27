@@ -11,7 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.annotation.UiThread
+import android.support.annotation.Keep
 import android.widget.*
 import android.widget.RelativeLayout.LayoutParams
 import android.widget.AutoCompleteTextView
@@ -306,15 +306,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun addAccount(ua: String) {
-        val aor = ua_aor(ua)
-        Log.d("Baresip", "Adding account $ua with AoR $aor")
-        accounts.add(Account(ua, aor, ""))
-        aors.add(aor)
-        images.add(R.drawable.yellow)
-        runOnUiThread { accountAdapter.notifyDataSetChanged() }
-    }
-
     private fun call(aor: String, callee: String) {
         if (callee.length == 0) return
         var uri = EditContactsActivity.findContactURI(callee)
@@ -498,6 +489,17 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
+    @Keep
+    fun addAccount(ua: String) {
+        val aor = ua_aor(ua)
+        Log.d("Baresip", "Adding account $ua with AoR $aor")
+        accounts.add(Account(ua, aor, ""))
+        aors.add(aor)
+        images.add(R.drawable.yellow)
+        runOnUiThread { accountAdapter.notifyDataSetChanged() }
+    }
+
+    @Keep
     private fun updateStatus(event: String, ua: String, call: String) {
         val aor = ua_aor(ua)
         var call_index: Int
