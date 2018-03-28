@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                     callee.text.clear()
                     callee.hint = "Callee"
                     callButton.text = "Call"
-                    if (aorHasHistory(aor)) {
+                    if (HistoryActivity.aorHistory(aor) > 0) {
                         holdButton.text = "History"
                         holdButton.visibility = View.VISIBLE
                     } else {
@@ -304,7 +304,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (resultCode == RESULT_CANCELED) {
                 Log.d("Baresip", "History canceled")
-                if (!aorHasHistory(aors[aorSpinner.selectedItemPosition])) {
+                if (HistoryActivity.aorHistory(aors[aorSpinner.selectedItemPosition]) == 0) {
                     (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
                 }
             }
@@ -483,20 +483,6 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun aorHasHistory(aor: String): Boolean {
-        for (h in HistoryActivity.History) {
-            if (h.aor == aor) return true
-        }
-        return false
-    }
-
-    private fun callHasHistory(ua: String, call: String): Boolean {
-        for (h in HistoryActivity.History) {
-            if (h.ua == ua && h.call == call) return true
-        }
-        return false
-    }
-
     @Keep
     fun addAccount(ua: String) {
         val aor = ua_aor(ua)
@@ -557,6 +543,8 @@ class MainActivity : AppCompatActivity() {
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                     "in", true))
                         }
+                        if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
+                            HistoryActivity.aorRemoveHistory(aor)
                     }
                     "call incoming" -> {
                         val peer_uri = call_peeruri(call)
@@ -593,7 +581,9 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-                            if (!callHasHistory(ua, call)) {
+                            if (!HistoryActivity.callHasHistory(ua, call)) {
+                                if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
+                                    HistoryActivity.aorRemoveHistory(aor)
                                 HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                         "in", false))
                             }
@@ -613,7 +603,9 @@ class MainActivity : AppCompatActivity() {
                                         holdButton.visibility = View.VISIBLE
                                     }
                                 }
-                                if (!callHasHistory(ua, call)) {
+                                if (!HistoryActivity.callHasHistory(ua, call)) {
+                                    if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
+                                        HistoryActivity.aorRemoveHistory(aor)
                                     HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                             "out", false))
                                 }
@@ -656,6 +648,8 @@ class MainActivity : AppCompatActivity() {
         const val EDIT_CONFIG_CODE = 3
         const val HISTORY_CODE = 4
         const val ABOUT_CODE = 5
+
+        const val HISTORY_SIZE = 100
 
         external fun contacts_remove()
         external fun contact_add(contact: String)
