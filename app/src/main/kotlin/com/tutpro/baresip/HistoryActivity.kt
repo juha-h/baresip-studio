@@ -126,7 +126,33 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     companion object {
-        var History: ArrayList<History> = ArrayList<History>()
+
+        var History: ArrayList<History> = ArrayList()
+
+        fun aorHistory(aor: String): Int {
+            var size = 0;
+            for (h in History) {
+                if (h.aor == aor) size++
+            }
+            return size
+        }
+
+        fun callHasHistory(ua: String, call: String): Boolean {
+            for (h in History) {
+                if (h.ua == ua && h.call == call) return true
+            }
+            return false
+        }
+
+        fun aorRemoveHistory(aor: String) {
+            for (h in History) {
+                if (h.aor == aor) {
+                    History.remove(h)
+                    return
+                }
+            }
+        }
+
     }
 
 }
