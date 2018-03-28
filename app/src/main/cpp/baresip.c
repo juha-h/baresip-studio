@@ -18,7 +18,7 @@
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, "Baresip", __VA_ARGS__))
 
-typedef struct tick_context {
+typedef struct update_context {
     JavaVM  *javaVM;
     jclass   jniHelperClz;
     jobject  jniHelperObj;
@@ -26,9 +26,9 @@ typedef struct tick_context {
     jobject  mainActivityObj;
     pthread_mutex_t  lock;
     int      done;
-} TickContext;
+} UpdateContext;
 
-TickContext g_ctx;
+UpdateContext g_ctx;
 
 static void signal_handler(int sig)
 {
@@ -103,7 +103,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     }
     event = event_buf;
 
-    TickContext *pctx = (TickContext*)(&g_ctx);
+    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -114,7 +114,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             return;
         }
     }
-    jmethodID statusId = (*env)->GetMethodID(env, pctx->jniHelperClz,
+    jmethodID statusId = (*env)->GetMethodID(env, pctx->mainActivityClz,
                                              "updateStatus",
                                              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     sprintf(ua_buf, "%lu", (unsigned long)ua);
@@ -123,7 +123,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     jstring javaCall = (*env)->NewStringUTF(env, call_buf);
     jstring javaEvent = (*env)->NewStringUTF(env, event);
     LOGD("sending ua/call %s/%s event %s\n", ua_buf, call_buf, event);
-    (*env)->CallVoidMethod(env, pctx->jniHelperObj, statusId, javaEvent, javaUA, javaCall);
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, statusId, javaEvent, javaUA, javaCall);
     (*env)->DeleteLocalRef(env, javaUA);
     (*env)->DeleteLocalRef(env, javaCall);
     (*env)->DeleteLocalRef(env, javaEvent);
@@ -181,23 +181,24 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     jclass  clz = (*env)->FindClass(env, "com/tutpro/baresip/MainActivity");
     g_ctx.jniHelperClz = (*env)->NewGlobalRef(env, clz);
 
-    jmethodID  jniHelperCtor = (*env)->GetMethodID(env, g_ctx.jniHelperClz,
-                                                   "<init>", "()V");
-    jobject    handler = (*env)->NewObject(env, g_ctx.jniHelperClz,
-                                           jniHelperCtor);
+    jmethodID jniHelperCtor = (*env)->GetMethodID(env, g_ctx.jniHelperClz, "<init>", "()V");
+    jobject    handler = (*env)->NewObject(env, g_ctx.jniHelperClz, jniHelperCtor);
     g_ctx.jniHelperObj = (*env)->NewGlobalRef(env, handler);
 
-    g_ctx.done = 0;
     g_ctx.mainActivityObj = NULL;
     return  JNI_VERSION_1_6;
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject thiz, jstring javaPath)
+Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance, jstring javaPath)
 {
     int err;
     const char *path = (*env)->GetStringUTFChars(env, javaPath, 0);
     struct le *le;
+
+    jclass clz = (*env)->GetObjectClass(env, instance);
+    g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
+    g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
 
     runLoggingThread();
 
@@ -237,7 +238,7 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject thiz, jst
         goto out;
     }
 
-    TickContext *pctx = (TickContext*)(&g_ctx);
+    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
@@ -256,9 +257,9 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject thiz, jst
         sprintf(ua_buf, "%lu", (unsigned long)ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
         LOGD("adding account %s/%s\n", ua_aor(ua), ua_buf);
-        jmethodID accountId = (*env)->GetMethodID(env, pctx->jniHelperClz, "addAccount",
+        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addAccount",
                                                   "(Ljava/lang/String;)V");
-        (*env)->CallVoidMethod(env, pctx->jniHelperObj, accountId, javaUA);
+        (*env)->CallVoidMethod(env, pctx->mainActivityObj, accountId, javaUA);
         (*env)->DeleteLocalRef(env, javaUA);
     }
 

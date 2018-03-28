@@ -24,6 +24,14 @@ import android.widget.RelativeLayout
 
 class MainActivity : AppCompatActivity() {
 
+    internal lateinit var appContext: Context
+    internal lateinit var layout: RelativeLayout
+    internal lateinit var callee: AutoCompleteTextView
+    internal lateinit var callButton: Button
+    internal lateinit var holdButton: Button
+    internal lateinit var accountAdapter: AccountSpinnerAdapter
+    internal lateinit var aorSpinner: Spinner
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -132,9 +140,9 @@ class MainActivity : AppCompatActivity() {
 
         EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath + "/contacts")
 
-        calleeAdapter = ArrayAdapter(this, android.R.layout.select_dialog_item, EditContactsActivity.Names)
         callee.threshold = 2
-        callee.setAdapter<ArrayAdapter<String>>(calleeAdapter)
+        callee.setAdapter<ArrayAdapter<String>>(ArrayAdapter(this,
+                android.R.layout.select_dialog_item, EditContactsActivity.Names))
 
         callButton.text = "Call"
         callButton.setOnClickListener {
@@ -394,7 +402,7 @@ class MainActivity : AppCompatActivity() {
                         Log.d("Baresip", "Updating Hangup and Hold")
                         callsIn[final_in_index].status = "Hangup"
                         callsIn[final_in_index].hold = false
-                        runOnUiThread {
+                        this@MainActivity.runOnUiThread {
                             val answer_id = (final_in_index + 1) * 10 + 2
                             val answer_but = layout.findViewById(answer_id) as Button
                             answer_but.text = "Hangup"
@@ -496,7 +504,7 @@ class MainActivity : AppCompatActivity() {
         accounts.add(Account(ua, aor, ""))
         aors.add(aor)
         images.add(R.drawable.yellow)
-        runOnUiThread { accountAdapter.notifyDataSetChanged() }
+        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
     }
 
     @Keep
@@ -518,14 +526,14 @@ class MainActivity : AppCompatActivity() {
                         accounts[account_index].status = "OK"
                         aors[account_index] = aor
                         images[account_index] = R.drawable.green
-                        runOnUiThread { accountAdapter.notifyDataSetChanged() }
+                        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
                     }
                     "registering failed" -> {
                         Log.d("Baresip", "Setting status to red")
                         accounts[account_index].status = "FAIL"
                         aors[account_index] = aor
                         images[account_index] = R.drawable.red
-                        runOnUiThread { accountAdapter.notifyDataSetChanged() }
+                        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
                     }
                     "call ringing" -> {
                     }
@@ -535,7 +543,7 @@ class MainActivity : AppCompatActivity() {
                             Log.d("Baresip", "Outbound call " + call + " established")
                             callsOut[out_index].status = "Hangup"
                             callsOut[out_index].hold = false
-                            runOnUiThread {
+                            this@MainActivity.runOnUiThread {
                                 if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                     callButton.text = "Hangup"
                                     holdButton.text = "Hold"
@@ -595,7 +603,7 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("Baresip", "Removing outgoing call " + ua + "/" +
                                         call + "/" + callsOut[call_index].peerURI)
                                 callsOut.removeAt(call_index)
-                                runOnUiThread {
+                                this@MainActivity.runOnUiThread {
                                     if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                         callButton.text = "Call"
                                         callButton.isEnabled = true
@@ -634,15 +642,6 @@ class MainActivity : AppCompatActivity() {
     external fun reload_config(): Int
 
     companion object {
-
-        internal lateinit var appContext: Context
-        internal lateinit var layout: RelativeLayout
-        internal lateinit var callee: AutoCompleteTextView
-        internal lateinit var callButton: Button
-        internal lateinit var holdButton: Button
-        internal lateinit var accountAdapter: AccountSpinnerAdapter
-        internal lateinit var aorSpinner: Spinner
-        internal lateinit var calleeAdapter: ArrayAdapter<String>
 
         internal var running: Boolean = false
         internal var accounts = ArrayList<Account>()
