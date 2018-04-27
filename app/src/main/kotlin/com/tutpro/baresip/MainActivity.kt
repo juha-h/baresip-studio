@@ -579,7 +579,7 @@ class MainActivity : AppCompatActivity() {
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                     "in", true))
                         }
-                        am.mode = AudioManager.MODE_IN_CALL
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                         am.isSpeakerphoneOn = false
                         am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                                 (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
