@@ -67,6 +67,17 @@
             android:visibility="invisible" >
         </Button>
 
+        <EditText
+            android:id="@+id/dtmf"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/callee"
+            android:layout_marginLeft="212dp"
+            android:inputType="phone"
+            android:textSize="20sp"
+            android:hint="DTMF" >
+        </EditText>
+
     </RelativeLayout>
 
 </ScrollView>
