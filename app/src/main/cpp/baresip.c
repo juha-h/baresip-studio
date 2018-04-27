@@ -448,6 +448,18 @@ Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
     return;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz,
+                                                  jstring javaCall, jchar digit) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    const uint16_t native_digit = digit;
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
+    int res = call_send_digit(call, (char)native_digit);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
+}
+
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_MainActivity_00024Companion_contacts_1remove(JNIEnv *env, jobject thiz) {
     struct le *le;

@@ -21,6 +21,18 @@ import android.util.Log
 import java.util.*
 import java.io.*
 import android.widget.RelativeLayout
+import android.media.AudioManager
+import android.media.AudioManager.STREAM_VOICE_CALL
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+
+
+
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,8 +41,11 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var callee: AutoCompleteTextView
     internal lateinit var callButton: Button
     internal lateinit var holdButton: Button
+    internal lateinit var dtmf: EditText
     internal lateinit var accountAdapter: AccountSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
+    internal lateinit var am: AudioManager
+    internal lateinit var imm: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -42,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         callee = findViewById(R.id.callee) as AutoCompleteTextView
         callButton = findViewById(R.id.callButton) as Button
         holdButton = findViewById(R.id.holdButton) as Button
+        dtmf = findViewById(R.id.dtmf) as EditText
+
+        am = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         aorSpinner = findViewById(R.id.AoRList) as Spinner
         accountAdapter = AccountSpinnerAdapter(applicationContext, aors, images)
@@ -64,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         holdButton.visibility = View.INVISIBLE
                     }
+                    dtmf.visibility = View.INVISIBLE
                 } else {
                     callee.setText(out[0].peerURI)
                     callButton.text = out[0].status
@@ -74,15 +94,18 @@ class MainActivity : AppCompatActivity() {
                             holdButton.text = "Hold"
                         }
                         holdButton.visibility = View.VISIBLE
+                        dtmf.visibility = View.VISIBLE
+                        dtmf.requestFocus()
                     } else {
                         holdButton.visibility = View.INVISIBLE
+                        dtmf.visibility = View.INVISIBLE
                     }
                 }
                 val `in` = uaCalls(callsIn, aor_ua(aor))
                 val view_count = layout.childCount
                 Log.d("Baresip", "View count is $view_count")
-                if (view_count > 5) {
-                    layout.removeViews(5, view_count - 5)
+                if (view_count > 6) {
+                    layout.removeViews(6, view_count - 6)
                 }
                 for (c in `in`) {
                     for (call_index in callsIn.indices) {
@@ -534,6 +557,19 @@ class MainActivity : AppCompatActivity() {
                                     callButton.text = "Hangup"
                                     holdButton.text = "Hold"
                                     holdButton.visibility = View.VISIBLE
+                                    dtmf.setText("")
+                                    dtmf.hint = "DTMF"
+                                    dtmf.visibility = View.VISIBLE
+                                    dtmf.requestFocus()
+                                    dtmf.addTextChangedListener(object: TextWatcher {
+                                        override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
+                                        override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
+                                            val digit = sequence.subSequence(start, start+count).toString()
+                                            Log.d("Baresip", "Got DTMF digit '" + digit + "'")
+                                            if (digit.isNotEmpty()) call_send_digit(call, digit[0])
+                                        }
+                                        override fun afterTextChanged(sequence: Editable) {}
+                                    })
                                 }
                             }
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
@@ -543,6 +579,11 @@ class MainActivity : AppCompatActivity() {
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                     "in", true))
                         }
+                        am.mode = AudioManager.MODE_IN_CALL
+                        am.isSpeakerphoneOn = false
+                        am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                                (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
+                                AudioManager.STREAM_VOICE_CALL)
                         if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
                             HistoryActivity.aorRemoveHistory(aor)
                     }
@@ -557,6 +598,8 @@ class MainActivity : AppCompatActivity() {
                                 addCallViews(new_call, callsIn.size * 10)
                             }
                         }
+                        am.mode = AudioManager.MODE_RINGTONE
+                        am.isSpeakerphoneOn = true
                     }
                     "call closed" -> {
                         call_index = callIndex(callsIn, ua, call)
@@ -571,6 +614,7 @@ class MainActivity : AppCompatActivity() {
                                     if (callButton.text == "Call") {
                                         holdButton.text = "History"
                                         holdButton.visibility = View.VISIBLE
+                                        callee.setOnKeyListener(null)
                                     }
                                     val caller_heading = layout.findViewById(view_id)
                                     val view_index = layout.indexOfChild(caller_heading)
@@ -601,6 +645,10 @@ class MainActivity : AppCompatActivity() {
                                         callee.hint = "Callee"
                                         holdButton.text = "History"
                                         holdButton.visibility = View.VISIBLE
+                                        if (this.currentFocus == dtmf) {
+                                            imm.hideSoftInputFromWindow(dtmf.getWindowToken(), 0)
+                                        }
+                                        dtmf.visibility = View.INVISIBLE
                                     }
                                 }
                                 if (!HistoryActivity.callHasHistory(ua, call)) {
@@ -614,6 +662,7 @@ class MainActivity : AppCompatActivity() {
                                         " closed")
                             }
                         }
+                        am.mode = AudioManager.MODE_NORMAL
                     }
                     else -> Log.d("Baresip", "Unknown event '$event'")
                 }
@@ -630,6 +679,7 @@ class MainActivity : AppCompatActivity() {
     external fun ua_answer(ua: String, call: String)
     external fun call_hold(call: String): Int
     external fun call_unhold(call: String): Int
+    external fun call_send_digit(call: String, digit: Char): Int
     external fun ua_hangup(ua: String, call: String, code: Int, reason: String)
     external fun reload_config(): Int
 
