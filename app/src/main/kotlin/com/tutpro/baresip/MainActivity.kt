@@ -352,7 +352,9 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Baresip", "Got DTMF digit '" + digit + "'")
                     if (digit.isNotEmpty()) call_send_digit(call, digit[0])
                 }
-                override fun afterTextChanged(sequence: Editable) {}
+                override fun afterTextChanged(sequence: Editable) {
+                    call_send_digit(call, 4.toChar())
+                }
             }
             callsOut.add(Call(ua, call, uri, "Cancel", dtmfWatcher))
             (findViewById(R.id.callButton) as Button).text = "Cancel"
