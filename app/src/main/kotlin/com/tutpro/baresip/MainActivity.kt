@@ -28,12 +28,6 @@ import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 
-
-
-
-
-
-
 class MainActivity : AppCompatActivity() {
 
     internal lateinit var appContext: Context
@@ -351,7 +345,16 @@ class MainActivity : AppCompatActivity() {
         val call = ua_connect(ua, uri)
         if (call != "") {
             Log.i("Baresip", "Adding outgoing call $ua / $call / $uri")
-            callsOut.add(Call(ua, call, uri, "Cancel"))
+            val dtmfWatcher = object: TextWatcher {
+                override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
+                    val digit = sequence.subSequence(start, start+count).toString()
+                    Log.d("Baresip", "Got DTMF digit '" + digit + "'")
+                    if (digit.isNotEmpty()) call_send_digit(call, digit[0])
+                }
+                override fun afterTextChanged(sequence: Editable) {}
+            }
+            callsOut.add(Call(ua, call, uri, "Cancel", dtmfWatcher))
             (findViewById(R.id.callButton) as Button).text = "Cancel"
             (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
         }
@@ -561,15 +564,7 @@ class MainActivity : AppCompatActivity() {
                                     dtmf.hint = "DTMF"
                                     dtmf.visibility = View.VISIBLE
                                     dtmf.requestFocus()
-                                    dtmf.addTextChangedListener(object: TextWatcher {
-                                        override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
-                                        override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
-                                            val digit = sequence.subSequence(start, start+count).toString()
-                                            Log.d("Baresip", "Got DTMF digit '" + digit + "'")
-                                            if (digit.isNotEmpty()) call_send_digit(call, digit[0])
-                                        }
-                                        override fun afterTextChanged(sequence: Editable) {}
-                                    })
+                                    dtmf.addTextChangedListener(callsOut[out_index].dtmfWatcher)
                                 }
                             }
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
@@ -591,7 +586,7 @@ class MainActivity : AppCompatActivity() {
                         val peer_uri = call_peeruri(call)
                         Log.d("Baresip", "Incoming call " + ua + "/" + call + "/" +
                                 peer_uri)
-                        val new_call = Call(ua, call, peer_uri, "Answer")
+                        val new_call = Call(ua, call, peer_uri, "Answer", null)
                         callsIn.add(new_call)
                         this@MainActivity.runOnUiThread {
                             if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
@@ -636,7 +631,6 @@ class MainActivity : AppCompatActivity() {
                             if (call_index != -1) {
                                 Log.d("Baresip", "Removing outgoing call " + ua + "/" +
                                         call + "/" + callsOut[call_index].peerURI)
-                                callsOut.removeAt(call_index)
                                 this@MainActivity.runOnUiThread {
                                     if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                         callButton.text = "Call"
@@ -648,9 +642,11 @@ class MainActivity : AppCompatActivity() {
                                         if (this.currentFocus == dtmf) {
                                             imm.hideSoftInputFromWindow(dtmf.getWindowToken(), 0)
                                         }
+                                        dtmf.removeTextChangedListener(callsOut[call_index].dtmfWatcher)
                                         dtmf.visibility = View.INVISIBLE
                                     }
                                 }
+                                callsOut.removeAt(call_index)
                                 if (!HistoryActivity.callHasHistory(ua, call)) {
                                     if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
                                         HistoryActivity.aorRemoveHistory(aor)
