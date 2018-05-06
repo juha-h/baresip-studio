@@ -165,13 +165,22 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             Log.d("Baresip", "AoR at position is " + aors[aorSpinner.selectedItemPosition])
             val aor = aors[aorSpinner.selectedItemPosition]
-            if (callButton.text.toString() == "Call") {
-                call(aor, (findViewById(R.id.callee) as EditText).text.toString())
-            } else {
-                Log.i("Baresip", "Canceling UA " + aor_ua(aor) + " call " +
-                        callsOut[0].call + " to " +
-                        (findViewById(R.id.callee) as EditText).text)
-                ua_hangup(aor_ua(aor), callsOut[0].call, 486, "Rejected")
+            when (callButton.text.toString()) {
+                "Call" -> {
+                    call(aor, (findViewById(R.id.callee) as EditText).text.toString())
+                }
+                "Cancel" -> {
+                    Log.i("Baresip", "Canceling UA " + aor_ua(aor) + " call " +
+                            callsOut[0].call + " to " +
+                            (findViewById(R.id.callee) as EditText).text)
+                    ua_hangup(aor_ua(aor), callsOut[0].call, 486, "Rejected")
+                }
+                "Hangup" -> {
+                    Log.i("Baresip", "Hanging up UA " + aor_ua(aor) + " call " +
+                            callsOut[0].call + " to " +
+                            (findViewById(R.id.callee) as EditText).text)
+                    ua_hangup(aor_ua(aor), callsOut[0].call,0, "")
+                }
             }
         }
 
