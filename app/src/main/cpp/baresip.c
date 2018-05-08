@@ -30,6 +30,16 @@ typedef struct update_context {
 
 UpdateContext g_ctx;
 
+static int vprintf_null(const char *p, size_t size, void *arg)
+{
+    (void)p;
+    (void)size;
+    (void)arg;
+    return 0;
+}
+
+static struct re_printf pf_null = {vprintf_null, 0};
+
 static void signal_handler(int sig)
 {
 	static bool term = false;
@@ -70,7 +80,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     char ua_buf[256];
     char call_buf[256];
 
-    LOGD("ua event (%s)\n", uag_event_str(ev));
+    LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
     switch (ev) {
         case UA_EVENT_REGISTERING:
@@ -90,6 +100,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             break;
         case UA_EVENT_CALL_INCOMING:
             re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
+            break;
+        case UA_EVENT_CALL_MENC:
+            re_snprintf(event_buf, sizeof event_buf, "%s", prm);
             break;
         case UA_EVENT_CALL_CLOSED:
             re_snprintf(event_buf, sizeof event_buf, "%s", "call closed");
@@ -315,6 +328,19 @@ Java_com_tutpro_baresip_MainActivity_ua_1aor(JNIEnv *env, jobject thiz, jstring 
         return (*env)->NewStringUTF(env, "");
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_MainActivity_ua_1mediaenc(JNIEnv *env, jobject thiz, jstring javaUA)
+{
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    struct account *acc = ua_account(ua);
+    char *mediaenc = account_mediaenc(acc);
+    if (mediaenc)
+        return (*env)->NewStringUTF(env, mediaenc);
+    else
+        return (*env)->NewStringUTF(env, "");
+}
+
 JNIEXPORT void JNICALL /* currently not in use */
 Java_com_tutpro_baresip_MainActivity_ua_1current_1set(JNIEnv *env, jobject thiz,
                                                       jstring javaAoR)
@@ -441,7 +467,10 @@ Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     LOGD("hanging up call %s/%s\n", native_ua, native_call);
-    ua_hangup(ua, call, native_code, native_reason);
+    if (strlen(native_reason) == 0)
+        ua_hangup(ua, call, native_code, NULL);
+    else
+        ua_hangup(ua, call, native_code, native_reason);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
@@ -499,3 +528,11 @@ Java_com_tutpro_baresip_MainActivity_reload_1config(JNIEnv *env, jobject thiz) {
     return err;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
+    const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
+    LOGD("processing command '%s'\n", native_cmd);
+    int res = cmd_process_long(baresip_commands(), native_cmd, strlen(native_cmd), &pf_null, NULL);
+    (*env)->ReleaseStringUTFChars(env, javaCmd, native_cmd);
+    return res;
+}
