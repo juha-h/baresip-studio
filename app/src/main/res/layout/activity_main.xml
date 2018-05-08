@@ -37,23 +37,43 @@
             android:text="Outgoing call to ..." >
         </TextView>
 
-        <AutoCompleteTextView
-            android:id="@+id/callee"
+        <LinearLayout
+            android:id="@+id/calleeRow"
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/outTitle"
-            android:inputType="textEmailAddress"
-            android:textSize="20sp"
-            android:hint="Callee" >
-            <!-- <requestFocus /> -->
-        </AutoCompleteTextView>
+            android:layout_below="@id/outTitle" >
+
+            <AutoCompleteTextView
+                android:id="@+id/callee"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight = "1"
+                android:inputType="textEmailAddress"
+                android:textSize="20sp"
+                android:hint="Callee" >
+                <!-- <requestFocus /> -->
+            </AutoCompleteTextView>
+
+            <ImageButton
+                android:id="@+id/securityButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_weight = "0"
+                android:layout_gravity = "center_vertical"
+                android:visibility="invisible"
+                android:contentDescription="@string/app_name"
+                >
+            </ImageButton>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/callButton"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
-            android:layout_below="@id/callee" >
+            android:layout_below="@id/calleeRow" >
         </Button>
 
         <Button
@@ -62,7 +82,7 @@
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
             android:text="Hold"
-            android:layout_below="@id/callee"
+            android:layout_below="@id/calleeRow"
             android:layout_marginLeft="106dp"
             android:visibility="invisible" >
         </Button>
@@ -71,7 +91,7 @@
             android:id="@+id/dtmf"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/callee"
+            android:layout_below="@id/calleeRow"
             android:layout_marginLeft="212dp"
             android:inputType="phone"
             android:textSize="20sp"
