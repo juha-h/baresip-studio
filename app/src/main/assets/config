@@ -183,5 +183,6 @@ ice_nomination	regular	# {regular,aggressive}
 ice_mode		full	# {full,lite}
 
 # Menu
+statmode_default    off
 #redial_attempts	3 # Num or <inf>
 #redial_delay		5 # Delay in seconds
