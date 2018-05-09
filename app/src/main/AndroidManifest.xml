@@ -55,8 +55,7 @@
         <activity
             android:name=".EditAccountsActivity"
             android:label="Edit Accounts"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -65,8 +64,7 @@
         <activity
             android:name=".EditConfigActivity"
             android:label="Edit Config"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -75,8 +73,7 @@
         <activity
             android:name=".EditContactsActivity"
             android:label="Edit Contacts"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -85,8 +82,7 @@
         <activity
             android:name=".HistoryActivity"
             android:label="Call History"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -95,8 +91,7 @@
         <activity
             android:name=".AboutActivity"
             android:label="About"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
