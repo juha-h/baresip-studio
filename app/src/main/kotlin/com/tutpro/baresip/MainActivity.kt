@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         holdButton = findViewById(R.id.holdButton) as Button
         dtmf = findViewById(R.id.dtmf) as EditText
 
-
         am = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
@@ -66,9 +65,6 @@ class MainActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 val aor = aors[position]
                 val ua = aor_ua(aor)
-                val callee = findViewById(R.id.callee) as AutoCompleteTextView
-                val callButton = findViewById(R.id.callButton) as Button
-                val holdButton = findViewById(R.id.holdButton) as Button
                 Log.i("Baresip", "Setting $aor current")
                 val out = uaCalls(callsOut, ua)
                 if (out.size == 0) {
@@ -94,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         holdButton.visibility = View.VISIBLE
                         securityButton.setImageResource(out[0].security)
+                        Utils.setSecurityButtonTag(securityButton, out[0].security)
                         if (ua_mediaenc(ua) == "")
                             securityButton.visibility = View.INVISIBLE
                         else
@@ -125,7 +122,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav", "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav")
+        val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
+                "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav")
         val path = applicationContext.filesDir.path
         Log.d("Baresip", "path is: $path")
         var file = File(path)
@@ -161,21 +159,58 @@ class MainActivity : AppCompatActivity() {
             Log.w("Baresip", "InputStream exception: - " + e.toString())
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             Log.d("Baresip", "Baresip does not have RECORD_AUDIO permission")
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
         }
 
-        EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath + "/contacts")
+        EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath +
+                "/contacts")
 
         callee.threshold = 2
         callee.setAdapter<ArrayAdapter<String>>(ArrayAdapter(this,
                 android.R.layout.select_dialog_item, EditContactsActivity.Names))
 
+        securityButton.setOnClickListener {
+            when (securityButton.tag) {
+                "red" -> {
+                    Utils.alertView(this, "Alert", "This call is NOT secure!")
+                }
+                "yellow" -> {
+                    Utils.alertView(this, "Alert",
+                            "This call is SECURE, but peer is NOT verified!")
+                }
+                "green" -> {
+                    val unverifyDialog = AlertDialog.Builder(this)
+                    unverifyDialog.setTitle("Info")
+                    unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
+                            "Do you want to unverify the peer?")
+                    unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
+                        val out = uaCalls(callsOut, aor_ua(aors[aorSpinner.selectedItemPosition]))
+                        if (out.size > 0) {
+                            if (cmd_exec("zrtp_unverify " + out[0].zid) != 0) {
+                                Log.w("Baresip",
+                                        "Command 'zrtp_unverify ${out[0].zid}' failed")
+                            } else {
+                                securityButton.setImageResource(R.drawable.box_yellow)
+                                securityButton.tag = "yellow"
+                            }
+                        }
+                        dialog.dismiss()
+                    }
+                    unverifyDialog.setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    unverifyDialog.create().show()
+                }
+            }
+        }
+
         callButton.text = "Call"
         callButton.setOnClickListener {
-            Log.d("Baresip", "AoR at position is " + aors[aorSpinner.selectedItemPosition])
+            Log.d("Baresip", "AoR at position " + aors[aorSpinner.selectedItemPosition])
             val aor = aors[aorSpinner.selectedItemPosition]
             when (callButton.text.toString()) {
                 "Call" -> {
@@ -313,12 +348,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDIT_ACCOUNTS_CODE) {
             if (resultCode == RESULT_OK) {
-                val alertDialog = AlertDialog.Builder(this).create()
-                alertDialog.setTitle("Alert")
-                alertDialog.setMessage("You need to restart baresip in order to activate saved accounts!")
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK")
-                    { dialog, _ -> dialog.dismiss() }
-                alertDialog.show()
+                Utils.alertView(this, "Notice",
+                        "You need to restart baresip in order to activate saved accounts!")
             }
             if (resultCode == RESULT_CANCELED) {
                 Log.d("Baresip", "Edit accounts canceled")
@@ -326,7 +357,7 @@ class MainActivity : AppCompatActivity() {
         }
         if (requestCode == EDIT_CONFIG_CODE) {
             if (resultCode == RESULT_OK) {
-                Utils.alertView(this,
+                Utils.alertView(this, "Notice",
                         "You need to restart baresip in order to activate saved config!")
                 reload_config()
             }
@@ -447,10 +478,12 @@ class MainActivity : AppCompatActivity() {
         security_button.layoutParams = security_button_params
         if ((call.security != 0) && (ua_mediaenc(ua) != "")) {
             security_button.setImageResource(call.security)
+            Utils.setSecurityButtonTag(securityButton, call.security)
             security_button.visibility = View.VISIBLE
         } else {
             security_button.visibility = View.INVISIBLE
         }
+        Utils.setSecurityButtonOnClickListener(this, security_button, call)
         caller_row.addView(security_button)
 
         layout.addView(caller_row)
@@ -611,6 +644,7 @@ class MainActivity : AppCompatActivity() {
                                         securityButton.visibility = View.INVISIBLE
                                     } else {
                                         securityButton.setImageResource(R.drawable.box_red)
+                                        securityButton.tag = "red"
                                         securityButton.visibility = View.VISIBLE
                                     }
                                     dtmf.setText("")
@@ -634,6 +668,7 @@ class MainActivity : AppCompatActivity() {
                                             var view_id = (in_index + 1) * 10 + 3
                                             val securityButton = findViewById(view_id) as ImageButton
                                             securityButton.setImageResource(R.drawable.box_red)
+                                            securityButton.tag = "red"
                                             securityButton.visibility = View.VISIBLE
                                             view_id = (in_index + 1) * 10 + 5
                                             val rejectButton = findViewById(view_id) as Button
@@ -671,10 +706,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call verify" -> {
                         this@MainActivity.runOnUiThread {
-                            val verifyBuilder = AlertDialog.Builder(this)
-                            verifyBuilder.setTitle("Verify")
-                            verifyBuilder.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
-                            verifyBuilder.setPositiveButton("Yes") { dialog, _ ->
+                            val verifyDialog = AlertDialog.Builder(this)
+                            verifyDialog.setTitle("Verify")
+                            verifyDialog.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
+                            verifyDialog.setPositiveButton("Yes") { dialog, _ ->
                                 val security: Int
                                 if (cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                                     Log.w("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
@@ -687,6 +722,7 @@ class MainActivity : AppCompatActivity() {
                                     callsOut[index].security = security
                                     callsOut[index].zid = ev[3]
                                     securityButton.setImageResource(security)
+                                    Utils.setSecurityButtonTag(securityButton, security)
                                     securityButton.visibility = View.VISIBLE
                                 } else {
                                     index = callIndex(callsIn, ua, call)
@@ -697,29 +733,31 @@ class MainActivity : AppCompatActivity() {
                                             val view_id = (index + 1) * 10 + 3
                                             val securityButton = layout.findViewById(view_id) as ImageButton
                                             securityButton.setImageResource(security)
+                                            Utils.setSecurityButtonTag(securityButton, security)
                                             securityButton.visibility = View.VISIBLE
                                         }
                                     }
                                 }
                                 dialog.dismiss()
                             }
-                            verifyBuilder.setNegativeButton("No") { dialog, _ ->
-                                val security = R.drawable.box_yellow
+                            verifyDialog.setNegativeButton("No") { dialog, _ ->
                                 var index = callIndex(callsOut, ua, call)
                                 if (index >= 0) {
-                                    callsOut[index].security = security
+                                    callsOut[index].security = R.drawable.box_yellow
                                     callsOut[index].zid = ev[3]
-                                    securityButton.setImageResource(security)
+                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.tag = "yellow"
                                     securityButton.visibility = View.VISIBLE
                                 } else {
                                     index = callIndex(callsIn, ua, call)
                                     if (index != -1) {
-                                        callsIn[index].security = security
+                                        callsIn[index].security = R.drawable.box_yellow
                                         callsIn[index].zid = ev[3]
                                         if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                             val view_id = (index + 1) * 10 + 3
                                             val securityButton = layout.findViewById(view_id) as ImageButton
                                             securityButton.setImageResource(R.drawable.box_yellow)
+                                            securityButton.tag = "yellow"
                                             securityButton.visibility = View.VISIBLE
                                         }
                                     } else {
@@ -728,7 +766,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 dialog.dismiss()
                             }
-                            verifyBuilder.create().show()
+                            verifyDialog.create().show()
                         }
                     }
                     "call verified" -> {
@@ -739,6 +777,7 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity.runOnUiThread {
                                 if (ua == aor_ua(aors[aorSpinner.selectedItemPosition])) {
                                     securityButton.setImageResource(R.drawable.box_green)
+                                    securityButton.tag = "green"
                                     securityButton.visibility = View.VISIBLE
                                 }
                             }
@@ -752,6 +791,7 @@ class MainActivity : AppCompatActivity() {
                                         val view_id = (in_index + 1) * 10 + 3
                                         val securityButton = layout.findViewById(view_id) as ImageButton
                                         securityButton.setImageResource(R.drawable.box_green)
+                                        securityButton.tag = "green"
                                         securityButton.visibility = View.VISIBLE
                                     }
                                 }

@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.widget.ImageButton
 
 import java.io.File
 import java.io.FileInputStream
@@ -54,9 +55,10 @@ object Utils {
 
     }
 
-    fun alertView(context: Context, message: String) {
+    fun alertView(context: Context, title: String, message: String) {
+        // val alertDialog = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert).create()
         val alertDialog = AlertDialog.Builder(context).create()
-        alertDialog.setTitle("Alert")
+        alertDialog.setTitle(title)
         alertDialog.setMessage(message)
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
         ) { dialog, _ -> dialog.dismiss() }
@@ -73,5 +75,47 @@ object Utils {
     fun uriUserPart(uri: String): String {
         return uri.substringAfter(":").substringBefore("@")
     }
+
+    fun setSecurityButtonTag(button: ImageButton, security: Int) {
+        when (security) {
+            R.drawable.box_red -> { button.tag = "red" }
+            R.drawable.box_yellow -> { button.tag = "yellow" }
+            R.drawable.box_green -> { button.tag = "green" }
+        }
+    }
+
+    fun setSecurityButtonOnClickListener(context: Context, button: ImageButton, call: Call) {
+        button.setOnClickListener {
+            when (button.tag) {
+                "red" -> {
+                    Utils.alertView(context, "Alert", "This call is NOT secure!")
+                }
+                "yellow" -> {
+                    Utils.alertView(context, "Alert",
+                            "This call is SECURE, but peer is NOT verified!")
+                }
+                "green" -> {
+                    val unverifyDialog = AlertDialog.Builder(context)
+                    unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
+                            "Do you want to unverify the peer?")
+                    unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
+                        if (cmd_exec("zrtp_unverify " + call.zid) != 0) {
+                            Log.w("Baresip", "Command 'zrtp_unverify ${call.zid}' failed")
+                        } else {
+                            button.setImageResource(R.drawable.box_yellow)
+                            button.tag = "yellow"
+                        }
+                        dialog.dismiss()
+                    }
+                    unverifyDialog.setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    unverifyDialog.create().show()
+                }
+            }
+        }
+    }
+
+    external fun cmd_exec(cmd: String): Int
 
 }
