@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.Manifest
 import android.app.Notification
+import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -563,6 +564,7 @@ class MainActivity : AppCompatActivity() {
         val notification = Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentTitle("Baresip is running")
+                .setVisibility(VISIBILITY_PUBLIC)
                 .setOngoing(true).build()
         nm.notify(id, notification)
     }
