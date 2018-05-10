@@ -4,13 +4,26 @@ import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.ImageButton
-
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
+import java.io.*
 
 object Utils {
+
+    fun copyAssetToFile(context: Context, asset: String, path: String) {
+        try {
+            val `is` = context.assets.open(asset)
+            val os = FileOutputStream(path)
+            val buffer = ByteArray(512)
+            var byteRead: Int = `is`.read(buffer)
+            while (byteRead  != -1) {
+                os.write(buffer, 0, byteRead)
+                byteRead = `is`.read(buffer)
+            }
+        } catch (e: IOException) {
+            Log.e("Baresip", "Failed to read asset " + asset + ": " +
+                    e.toString())
+        }
+
+    }
 
     fun getFileContents(file: File): String {
         if (!file.exists()) {
