@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 val aor = aors[position]
                 val ua = aor_ua(aor)
                 Log.i("Baresip", "Setting $aor current")
-                val out = uaCalls(callsOut, ua)
+                val out = Call.uaCalls(callsOut, ua)
                 if (out.size == 0) {
                     callee.text.clear()
                     callee.hint = "Callee"
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                         dtmf.visibility = View.INVISIBLE
                     }
                 }
-                val `in` = uaCalls(callsIn, aor_ua(aor))
+                val `in` = Call.uaCalls(callsIn, aor_ua(aor))
                 val view_count = layout.childCount
                 Log.d("Baresip", "View count is $view_count")
                 if (view_count > 7) {
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             file = File("$path/$a")
             if (!file.exists()) {
                 Log.d("Baresip", "Copying asset $a")
-                copyAssetToFile(a, "$path/$a")
+                Utils.copyAssetToFile(applicationContext, a, "$path/$a")
             } else {
                 Log.d("Baresip", "Asset $a already copied")
             }
@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                     unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
                             "Do you want to unverify the peer?")
                     unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
-                        val out = uaCalls(callsOut, aor_ua(aors[aorSpinner.selectedItemPosition]))
+                        val out = Call.uaCalls(callsOut, aor_ua(aors[aorSpinner.selectedItemPosition]))
                         if (out.size > 0) {
                             if (cmd_exec("zrtp_unverify " + out[0].zid) != 0) {
                                 Log.w("Baresip",
@@ -419,24 +419,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun copyAssetToFile(asset: String, path: String) {
-        try {
-            val assetManager = assets
-            val `is` = assetManager.open(asset)
-            val os = FileOutputStream(path)
-            val buffer = ByteArray(512)
-            var byteRead: Int = `is`.read(buffer)
-            while (byteRead  != -1) {
-                os.write(buffer, 0, byteRead)
-                byteRead = `is`.read(buffer)
-            }
-        } catch (e: IOException) {
-            Log.e("Baresip", "Failed to read asset " + asset + ": " +
-                    e.toString())
-        }
-
-    }
-
     private fun addCallViews(ua: String, call: Call, id: Int) {
         Log.d("Baresip", "Creating new Incoming textview at $id")
 
@@ -507,7 +489,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "UA " + call_ua + " accepting incoming call " +
                             call_call)
                     ua_answer(call_ua, call_call)
-                    val final_in_index = callIndex(callsIn, call_ua, call_call)
+                    val final_in_index = Call.callIndex(callsIn, call_ua, call_call)
                     if (final_in_index >= 0) {
                         Log.d("Baresip", "Updating Hangup and Hold")
                         callsIn[final_in_index].status = "Hangup"
@@ -585,22 +567,6 @@ class MainActivity : AppCompatActivity() {
         nm.notify(id, notification)
     }
 
-    private fun callIndex(calls: ArrayList<Call>, ua: String, call: String): Int {
-        for (i in calls.indices) {
-            if (calls[i].ua.equals(ua) && calls[i].call == call)
-                return i
-        }
-        return -1
-    }
-
-    private fun uaCalls(calls: ArrayList<Call>, ua: String): ArrayList<Call> {
-        val result = ArrayList<Call>()
-        for (i in calls.indices) {
-            if (calls[i].ua == ua) result.add(calls[i])
-        }
-        return result
-    }
-
     @Keep
     fun addAccount(ua: String) {
         val aor = ua_aor(ua)
@@ -643,7 +609,7 @@ class MainActivity : AppCompatActivity() {
                     "call ringing" -> {
                     }
                     "call established" -> {
-                        val out_index = callIndex(callsOut, ua, call)
+                        val out_index = Call.callIndex(callsOut, ua, call)
                         if (out_index != -1) {
                             Log.d("Baresip", "Outbound call $call established")
                             callsOut[out_index].status = "Hangup"
@@ -671,7 +637,7 @@ class MainActivity : AppCompatActivity() {
                             HistoryActivity.History.add(History(ua, call, aor, call_peeruri(call),
                                     "out", true))
                         } else {
-                            val in_index = callIndex(callsIn, ua, call)
+                            val in_index = Call.callIndex(callsIn, ua, call)
                             if (in_index != -1) {
                                 Log.d("Baresip", "Inbound call $call established")
                                 callsIn[in_index].status = "Answer"
@@ -731,7 +697,7 @@ class MainActivity : AppCompatActivity() {
                                 } else {
                                     security = R.drawable.box_green
                                 }
-                                var index = callIndex(callsOut, ua, call)
+                                var index = Call.callIndex(callsOut, ua, call)
                                 if (index != -1) {
                                     callsOut[index].security = security
                                     callsOut[index].zid = ev[3]
@@ -739,7 +705,7 @@ class MainActivity : AppCompatActivity() {
                                     Utils.setSecurityButtonTag(securityButton, security)
                                     securityButton.visibility = View.VISIBLE
                                 } else {
-                                    index = callIndex(callsIn, ua, call)
+                                    index = Call.callIndex(callsIn, ua, call)
                                     if (index != -1) {
                                         callsIn[index].security = security
                                         callsIn[index].zid = ev[3]
@@ -755,7 +721,7 @@ class MainActivity : AppCompatActivity() {
                                 dialog.dismiss()
                             }
                             verifyDialog.setNegativeButton("No") { dialog, _ ->
-                                var index = callIndex(callsOut, ua, call)
+                                var index = Call.callIndex(callsOut, ua, call)
                                 if (index >= 0) {
                                     callsOut[index].security = R.drawable.box_yellow
                                     callsOut[index].zid = ev[3]
@@ -763,7 +729,7 @@ class MainActivity : AppCompatActivity() {
                                     securityButton.tag = "yellow"
                                     securityButton.visibility = View.VISIBLE
                                 } else {
-                                    index = callIndex(callsIn, ua, call)
+                                    index = Call.callIndex(callsIn, ua, call)
                                     if (index != -1) {
                                         callsIn[index].security = R.drawable.box_yellow
                                         callsIn[index].zid = ev[3]
@@ -784,7 +750,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call verified" -> {
-                        val out_index = callIndex(callsOut, ua, call)
+                        val out_index = Call.callIndex(callsOut, ua, call)
                         if (out_index != -1) {
                             callsOut[out_index].security = R.drawable.box_green
                             callsOut[out_index].zid = ev[1]
@@ -796,7 +762,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         } else {
-                            val in_index = callIndex(callsIn, ua, call)
+                            val in_index = Call.callIndex(callsIn, ua, call)
                             if (in_index != -1) {
                                 callsIn[in_index].security = R.drawable.box_green
                                 callsIn[in_index].zid = ev[1]
@@ -815,7 +781,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call closed" -> {
-                        val in_index = callIndex(callsIn, ua, call)
+                        val in_index = Call.callIndex(callsIn, ua, call)
                         if (in_index != -1) {
                             Log.d("Baresip", "Removing inbound call " + ua + "/" +
                                     call + "/" + callsIn[in_index].peerURI)
@@ -844,7 +810,7 @@ class MainActivity : AppCompatActivity() {
                                         "in", false))
                             }
                         } else {
-                            val out_index = callIndex(callsOut, ua, call)
+                            val out_index = Call.callIndex(callsOut, ua, call)
                             if (out_index != -1) {
                                 Log.d("Baresip", "Removing outgoing call " + ua + "/" +
                                         call + "/" + callsOut[out_index].peerURI)
