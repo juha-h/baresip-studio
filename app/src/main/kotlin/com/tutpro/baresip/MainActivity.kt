@@ -1,6 +1,8 @@
 package com.tutpro.baresip
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var aorSpinner: Spinner
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
+    internal lateinit var nm: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -259,6 +262,7 @@ class MainActivity : AppCompatActivity() {
         if (!running) {
             Log.i("Baresip", "Starting Baresip with path $path")
             Thread(Runnable { baresipStart(path) }).start()
+            addStatusBarIcon(10)
             running = true
         }
     }
@@ -335,6 +339,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     baresipStop()
+                    nm.cancel(10)
                     running = false
                 }
                 finish()
@@ -569,6 +574,15 @@ class MainActivity : AppCompatActivity() {
         reject_button_params.setMargins(225, 10, 0, 0)
         reject_button.layoutParams = reject_button_params
         layout.addView(reject_button)
+    }
+
+    private fun addStatusBarIcon(id: Int) {
+        nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notification = Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_stat)
+                .setContentTitle("Baresip is running")
+                .setOngoing(true).build()
+        nm.notify(id, notification)
     }
 
     private fun callIndex(calls: ArrayList<Call>, ua: String, call: String): Int {
