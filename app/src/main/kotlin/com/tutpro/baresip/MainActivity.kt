@@ -25,7 +25,7 @@ import java.util.*
 import java.io.*
 import android.widget.RelativeLayout
 import android.media.AudioManager
-import android.media.AudioManager.STREAM_VOICE_CALL
+import android.support.v7.view.menu.ActionMenuItemView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
@@ -296,12 +296,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
+        inflater.inflate(R.menu.speaker_icon, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val i: Intent
         when (item.itemId) {
+            R.id.speakerIcon -> {
+                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
+                val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
+                if (am.isSpeakerphoneOn)
+                    speakerIcon.setBackgroundColor(Color.RED)
+                    // speakerIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.speaker_on))
+                else
+                    speakerIcon.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+                return true
+            }
             R.id.accounts -> {
                 i = Intent(this, EditAccountsActivity::class.java)
                 startActivityForResult(i, EDIT_ACCOUNTS_CODE)
@@ -666,9 +677,9 @@ class MainActivity : AppCompatActivity() {
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         am.isSpeakerphoneOn = false
-                        am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
-                                (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
-                                AudioManager.STREAM_VOICE_CALL)
+                        // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                        //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
+                        //        AudioManager.STREAM_VOICE_CALL)
                         if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
                             HistoryActivity.aorRemoveHistory(aor)
                     }
@@ -684,7 +695,7 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         am.mode = AudioManager.MODE_RINGTONE
-                        am.isSpeakerphoneOn = true
+                        // am.isSpeakerphoneOn = true
                     }
                     "call verify" -> {
                         this@MainActivity.runOnUiThread {
@@ -844,7 +855,8 @@ class MainActivity : AppCompatActivity() {
                                         " closed")
                             }
                         }
-                        am.mode = AudioManager.MODE_NORMAL
+                        if ((callsIn.size == 0) && (callsOut.size == 0))
+                            am.mode = AudioManager.MODE_NORMAL
                     }
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
                 }
