@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -262,8 +263,8 @@ class MainActivity : AppCompatActivity() {
 
         if (!running) {
             Log.i("Baresip", "Starting Baresip with path $path")
+            statusBarIcon(NOTIFICATION_ID, "")
             Thread(Runnable { baresipStart(path) }).start()
-            addStatusBarIcon(10)
             running = true
         }
     }
@@ -570,14 +571,38 @@ class MainActivity : AppCompatActivity() {
         layout.addView(reject_button)
     }
 
-    private fun addStatusBarIcon(id: Int) {
+    private fun statusBarIcon(id: Int, status: String) {
+        val ni = Intent(this, MainActivity::class.java)
+            .setAction(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val pi = PendingIntent.getActivity(this, id, ni, PendingIntent.FLAG_UPDATE_CURRENT)
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val notification = Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat)
-                .setContentTitle("Baresip is running")
+                .setContentTitle("Baresip is running${status}!")
                 .setVisibility(VISIBILITY_PUBLIC)
+                .setContentIntent(pi)
                 .setOngoing(true).build()
         nm.notify(id, notification)
+    }
+
+    private fun updateNotification() {
+        var status: String = ""
+        for (image in images) {
+            when (image) {
+                R.drawable.dot_red -> {
+                    status = status + " X"
+                }
+                R.drawable.dot_yellow -> {
+                    status = status + " ?"
+                }
+                R.drawable.dot_green -> {
+                    status = status + " OK"
+                }
+            }
+        }
+        statusBarIcon(NOTIFICATION_ID, status)
     }
 
     @Keep
@@ -587,7 +612,10 @@ class MainActivity : AppCompatActivity() {
         accounts.add(Account(ua, aor, ua_mediaenc(ua),""))
         aors.add(aor)
         images.add(R.drawable.dot_yellow)
-        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
+        this@MainActivity.runOnUiThread {
+            accountAdapter.notifyDataSetChanged()
+            updateNotification()
+        }
     }
 
     @Keep
@@ -610,14 +638,20 @@ class MainActivity : AppCompatActivity() {
                         accounts[account_index].status = "OK"
                         aors[account_index] = aor
                         images[account_index] = R.drawable.dot_green
-                        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
+                        this@MainActivity.runOnUiThread {
+                            accountAdapter.notifyDataSetChanged()
+                            updateNotification()
+                        }
                     }
                     "registering failed" -> {
                         Log.d("Baresip", "Setting status to red")
                         accounts[account_index].status = "FAIL"
                         aors[account_index] = aor
                         images[account_index] = R.drawable.dot_red
-                        this@MainActivity.runOnUiThread { accountAdapter.notifyDataSetChanged() }
+                        this@MainActivity.runOnUiThread {
+                            accountAdapter.notifyDataSetChanged()
+                            updateNotification()
+                        }
                     }
                     "call ringing" -> {
                     }
@@ -896,6 +930,7 @@ class MainActivity : AppCompatActivity() {
         const val ABOUT_CODE = 5
 
         const val HISTORY_SIZE = 100
+        const val NOTIFICATION_ID = 10
 
         external fun contacts_remove()
         external fun contact_add(contact: String)
