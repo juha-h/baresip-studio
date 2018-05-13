@@ -308,9 +308,10 @@ class MainActivity : AppCompatActivity() {
                 am.isSpeakerphoneOn = !am.isSpeakerphoneOn
                 val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
                 if (am.isSpeakerphoneOn)
-                    speakerIcon.setBackgroundColor(Color.RED)
                     // speakerIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.speaker_on))
+                    speakerIcon.setBackgroundColor(Color.rgb(0x04,0xb4, 0x04))
                 else
+                    // speakerIcon.setBackgroundColor(resources.getColor(R.color.colorPrimary, applicationContext.theme))
                     speakerIcon.setBackgroundColor(resources.getColor(R.color.colorPrimary))
                 return true
             }
