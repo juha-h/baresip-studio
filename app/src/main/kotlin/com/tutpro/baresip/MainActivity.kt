@@ -21,16 +21,17 @@ import android.widget.RelativeLayout.LayoutParams
 import android.widget.AutoCompleteTextView
 import android.view.*
 import android.util.Log
-
-import java.util.*
-import java.io.*
 import android.widget.RelativeLayout
 import android.media.AudioManager
+import android.support.v7.app.NotificationCompat
 import android.support.v7.view.menu.ActionMenuItemView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+
+import java.util.*
+import java.io.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
+    internal lateinit var nb: NotificationCompat.Builder
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -60,8 +62,20 @@ class MainActivity : AppCompatActivity() {
         holdButton = findViewById(R.id.holdButton) as Button
         dtmf = findViewById(R.id.dtmf) as EditText
 
-        am = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        nb = NotificationCompat.Builder(this)
+        nb.setVisibility(VISIBILITY_PUBLIC).setOngoing(true).setSmallIcon(R.drawable.ic_stat)
+                .setContentIntent(
+                        PendingIntent.getActivity(this, NOTIFICATION_ID,
+                                Intent(this, MainActivity::class.java)
+                                        .setAction(Intent.ACTION_MAIN)
+                                        .addCategory(Intent.CATEGORY_LAUNCHER)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                        PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContent(RemoteViews(getPackageName(), R.layout.notification))
 
         aorSpinner = findViewById(R.id.AoRList) as Spinner
         accountAdapter = AccountSpinnerAdapter(applicationContext, aors, images)
@@ -263,7 +277,7 @@ class MainActivity : AppCompatActivity() {
 
         if (!running) {
             Log.i("Baresip", "Starting Baresip with path $path")
-            statusBarIcon(NOTIFICATION_ID, "")
+            nm.notify(NOTIFICATION_ID, nb.build())
             Thread(Runnable { baresipStart(path) }).start()
             running = true
         }
@@ -365,40 +379,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == EDIT_ACCOUNTS_CODE) {
-            if (resultCode == RESULT_OK) {
-                Utils.alertView(this, "Notice",
-                        "You need to restart baresip in order to activate saved accounts!")
-            }
-            if (resultCode == RESULT_CANCELED) {
-                Log.d("Baresip", "Edit accounts canceled")
-            }
-        }
-        if (requestCode == EDIT_CONFIG_CODE) {
-            if (resultCode == RESULT_OK) {
-                Utils.alertView(this, "Notice",
-                        "You need to restart baresip in order to activate saved config!")
-                reload_config()
-            }
-            if (resultCode == RESULT_CANCELED) {
-                Log.d("Baresip", "Edit config canceled")
-            }
-        }
-        if (requestCode == HISTORY_CODE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null) {
-                    (findViewById(R.id.callee) as EditText).setText(data.getStringExtra("peer_uri"))
+
+        when (requestCode) {
+
+            EDIT_ACCOUNTS_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    Utils.alertView(this, "Notice",
+                            "You need to restart baresip in order to activate saved accounts!")
+                }
+                if (resultCode == RESULT_CANCELED) {
+                    Log.d("Baresip", "Edit accounts canceled")
                 }
             }
-            if (resultCode == RESULT_CANCELED) {
-                Log.d("Baresip", "History canceled")
-                if (HistoryActivity.aorHistory(aors[aorSpinner.selectedItemPosition]) == 0) {
-                    (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
+
+            EDIT_CONFIG_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    Utils.alertView(this, "Notice",
+                            "You need to restart baresip in order to activate saved config!")
+                    reload_config()
+                }
+                if (resultCode == RESULT_CANCELED) {
+                    Log.d("Baresip", "Edit config canceled")
                 }
             }
-        }
-        if (requestCode == EDIT_CONTACTS_CODE || requestCode == ABOUT_CODE) {
-            Log.d("Baresip", "Back arrow or Cancel pressed at request: $requestCode")
+
+            HISTORY_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        (findViewById(R.id.callee) as EditText).setText(data.getStringExtra("peer_uri"))
+                    }
+                }
+                if (resultCode == RESULT_CANCELED) {
+                    Log.d("Baresip", "History canceled")
+                    if (HistoryActivity.aorHistory(aors[aorSpinner.selectedItemPosition]) == 0) {
+                        (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
+                    }
+                }
+            }
+
+            EDIT_CONTACTS_CODE, ABOUT_CODE -> {
+                Log.d("Baresip", "Back arrow or Cancel pressed at request: $requestCode")
+            }
         }
     }
 
@@ -572,38 +593,23 @@ class MainActivity : AppCompatActivity() {
         layout.addView(reject_button)
     }
 
-    private fun statusBarIcon(id: Int, status: String) {
-        val ni = Intent(this, MainActivity::class.java)
-            .setAction(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val pi = PendingIntent.getActivity(this, id, ni, PendingIntent.FLAG_UPDATE_CURRENT)
-        nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val notification = Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat)
-                .setContentTitle("Baresip is running${status}!")
-                .setVisibility(VISIBILITY_PUBLIC)
-                .setContentIntent(pi)
-                .setOngoing(true).build()
-        nm.notify(id, notification)
-    }
-
     private fun updateNotification() {
-        var status: String = ""
-        for (image in images) {
-            when (image) {
-                R.drawable.dot_red -> {
-                    status = status + " X"
-                }
-                R.drawable.dot_yellow -> {
-                    status = status + " ?"
-                }
-                R.drawable.dot_green -> {
-                    status = status + " OK"
-                }
+        val contentView = RemoteViews(getPackageName(), R.layout.notification)
+        for (i: Int in 0 .. 3)  {
+            val resID = resources.getIdentifier("status$i", "id", packageName);
+            if (i < images.size) {
+                contentView.setImageViewResource(resID, images[i])
+                contentView.setViewVisibility(resID, View.VISIBLE)
+            } else {
+                contentView.setViewVisibility(resID, View.INVISIBLE)
             }
         }
-        statusBarIcon(NOTIFICATION_ID, status)
+        if (images.size > 4)
+            contentView.setViewVisibility(R.id.etc, View.VISIBLE)
+        else
+            contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
+        nb.setContent(contentView);
+        nm.notify(NOTIFICATION_ID, nb.build())
     }
 
     @Keep
@@ -923,13 +929,13 @@ class MainActivity : AppCompatActivity() {
         internal var callsIn = ArrayList<Call>()
         internal var callsOut = ArrayList<Call>()
 
-        const val RECORD_AUDIO_PERMISSION = 1
         const val EDIT_ACCOUNTS_CODE = 1
         const val EDIT_CONTACTS_CODE = 2
         const val EDIT_CONFIG_CODE = 3
         const val HISTORY_CODE = 4
         const val ABOUT_CODE = 5
 
+        const val RECORD_AUDIO_PERMISSION = 1
         const val HISTORY_SIZE = 100
         const val NOTIFICATION_ID = 10
 
