@@ -10,7 +10,7 @@ import android.widget.TextView
 
 import java.util.ArrayList
 
-class AccountSpinnerAdapter(private val cxt: Context, private val aors: ArrayList<String>,
+class AccountSpinnerAdapter(private val cxt: Context, private val accounts: ArrayList<Account>,
                             private val images: ArrayList<Int>) :
         ArrayAdapter<Int>(cxt, android.R.layout.simple_spinner_item, images) {
 
@@ -26,7 +26,7 @@ class AccountSpinnerAdapter(private val cxt: Context, private val aors: ArrayLis
         val inflater = cxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val row = inflater.inflate(R.layout.account_spinner, parent, false)
         val textView = row.findViewById(R.id.spinnerText) as TextView
-        textView.text = aors[position]
+        textView.text = accounts[position].aoR
         textView.textSize = 17f
         val imageView = row.findViewById(R.id.spinnerImage) as ImageView
         imageView.setImageResource(images[position])

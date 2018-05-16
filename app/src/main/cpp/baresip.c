@@ -369,21 +369,6 @@ Java_com_tutpro_baresip_MainActivity_ua_1current(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_aor_1ua(JNIEnv *env, jobject thiz,
-                                             jstring javaAoR)
-{
-    const char *native_aor = (*env)->GetStringUTFChars(env, javaAoR, 0);
-    struct ua *ua = uag_find_aor(native_aor);
-    char ua_buf[256];
-
-    if (ua == NULL)
-        ua_buf[0] = '\0';
-    else
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
-    return (*env)->NewStringUTF(env, ua_buf);
-}
-
-JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_MainActivity_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
 {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
