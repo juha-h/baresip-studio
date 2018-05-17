@@ -26,7 +26,7 @@ class AccountSpinnerAdapter(private val cxt: Context, private val accounts: Arra
         val inflater = cxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val row = inflater.inflate(R.layout.account_spinner, parent, false)
         val textView = row.findViewById(R.id.spinnerText) as TextView
-        textView.text = accounts[position].aoR
+        textView.text = accounts[position].aoR.replace("sip:", "")
         textView.textSize = 17f
         val imageView = row.findViewById(R.id.spinnerImage) as ImageView
         imageView.setImageResource(images[position])
