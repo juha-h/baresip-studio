@@ -144,15 +144,21 @@ class MainActivity : AppCompatActivity() {
 
         aorSpinner.setOnTouchListener { view, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                if ((event.x - view.left) < 100) {
-                    val i = Intent(this, AccountActivity::class.java)
-                    val b = Bundle()
-                    b.putString("accp", uas[aorSpinner.selectedItemPosition].account.accp)
-                    i.putExtras(b)
-                    startActivityForResult(i, ACCOUNT_CODE)
+                if (aorSpinner.selectedItemPosition == -1) {
+                    val i = Intent(this, AccountsActivity::class.java)
+                    startActivityForResult(i, ACCOUNTS_CODE)
                     true
                 } else {
-                    false
+                    if ((event.x - view.left) < 100) {
+                        val i = Intent(this, AccountActivity::class.java)
+                        val b = Bundle()
+                        b.putString("accp", uas[aorSpinner.selectedItemPosition].account.accp)
+                        i.putExtras(b)
+                        startActivityForResult(i, ACCOUNT_CODE)
+                        true
+                    } else {
+                        false
+                    }
                 }
             } else {
                 false
@@ -415,6 +421,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Baresip", "Edit accounts OK")
                 if (resultCode == RESULT_CANCELED)
                     Log.d("Baresip", "Edit accounts canceled")
+                uaAdapter.notifyDataSetChanged()
             }
 
             EDIT_CONFIG_CODE -> {
