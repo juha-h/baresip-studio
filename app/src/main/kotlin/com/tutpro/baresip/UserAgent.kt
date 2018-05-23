@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import android.util.Log
+
 class UserAgent (val uap: String) {
 
     val account = Account(ua_account(uap))
@@ -13,19 +15,18 @@ class UserAgent (val uap: String) {
         external fun ua_isregistered(ua: String): Boolean
         external fun ua_unregister(ua: String)
 
-        fun userAgents(): ArrayList<UserAgent> {
-            val res = ArrayList<UserAgent>()
-            for (ua in MainActivity.uas) {
-                res.add(ua)
-            }
-            return res
-        }
-
         fun find(uas: ArrayList<UserAgent>, uap: String): UserAgent? {
-            for (u in uas) {
-                if (u.uap == uap) return u
+            for (ua in uas) {
+                if (ua.uap == uap) return ua
             }
             return null
+        }
+
+        fun register(uas: ArrayList<UserAgent>) {
+            for (ua in uas) {
+                if (ua_register(ua.uap) != 0)
+                    Log.e("Baresip", "Failed to register ${ua.aor}")
+            }
         }
     }
 }
