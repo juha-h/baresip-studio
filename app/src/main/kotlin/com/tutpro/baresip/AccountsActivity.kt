@@ -93,7 +93,7 @@ class AccountsActivity : AppCompatActivity() {
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             val path = MainActivity.filesPath + "/accounts"
             Utils.putFileContents(File(path), accounts)
-            Log.d("Baresip", "Saved accounts '${accounts}' to '$path")
+//            Log.d("Baresip", "Saved accounts '${accounts}' to '$path")
         }
     }
 
