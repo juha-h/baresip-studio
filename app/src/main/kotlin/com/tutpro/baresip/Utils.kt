@@ -3,27 +3,10 @@ package com.tutpro.baresip
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.widget.ImageButton
+
 import java.io.*
 
 object Utils {
-
-    fun copyAssetToFile(context: Context, asset: String, path: String) {
-        try {
-            val `is` = context.assets.open(asset)
-            val os = FileOutputStream(path)
-            val buffer = ByteArray(512)
-            var byteRead: Int = `is`.read(buffer)
-            while (byteRead  != -1) {
-                os.write(buffer, 0, byteRead)
-                byteRead = `is`.read(buffer)
-            }
-        } catch (e: IOException) {
-            Log.e("Baresip", "Failed to read asset " + asset + ": " +
-                    e.toString())
-        }
-
-    }
 
     fun getFileContents(file: File): String {
         if (!file.exists()) {
@@ -89,46 +72,51 @@ object Utils {
         return uri.substringAfter(":").substringBefore("@")
     }
 
-    fun setSecurityButtonTag(button: ImageButton, security: Int) {
-        when (security) {
-            R.drawable.box_red -> { button.tag = "red" }
-            R.drawable.box_yellow -> { button.tag = "yellow" }
-            R.drawable.box_green -> { button.tag = "green" }
-        }
+    fun checkUserID(id: String): Boolean {
+        return Regex("^[a-zA-Z]([._-]|[a-zA-Z0-9]){1,49}\$").matches(id)
     }
 
-    fun setSecurityButtonOnClickListener(context: Context, button: ImageButton, call: Call) {
-        button.setOnClickListener {
-            when (button.tag) {
-                "red" -> {
-                    Utils.alertView(context, "Alert", "This call is NOT secure!")
-                }
-                "yellow" -> {
-                    Utils.alertView(context, "Alert",
-                            "This call is SECURE, but peer is NOT verified!")
-                }
-                "green" -> {
-                    val unverifyDialog = AlertDialog.Builder(context)
-                    unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
-                            "Do you want to unverify the peer?")
-                    unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
-                        if (cmd_exec("zrtp_unverify " + call.zid) != 0) {
-                            Log.w("Baresip", "Command 'zrtp_unverify ${call.zid}' failed")
-                        } else {
-                            button.setImageResource(R.drawable.box_yellow)
-                            button.tag = "yellow"
-                        }
-                        dialog.dismiss()
-                    }
-                    unverifyDialog.setNegativeButton("No") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    unverifyDialog.create().show()
-                }
-            }
+    fun checkTelNo(no: String): Boolean {
+        return Regex("^[+]?[0-9]{1,16}\$").matches(no)
+    }
+
+    fun checkIP(ip: String): Boolean {
+        return Regex("^(([0-1]?[0-9]{1,2}\\.)|(2[0-4][0-9]\\.)|(25[0-5]\\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/$").matches(ip)
+    }
+
+    fun checkDomain(domain: String): Boolean {
+        val parts = domain.split(".")
+        for (p in parts) {
+            if (p.length == 0 || p.endsWith("-") || !Regex("^[a-zA-z]([-]|[a-zA-Z0-9])+\$").matches(p))
+                return false
         }
+        return true
+    }
+
+    fun checkPrintASCII(s: String): Boolean {
+        if (s == "") return true
+        val printASCIIRegex = Regex("^[ -~]*\$")
+        return printASCIIRegex.matches(s)
+    }
+
+    fun checkUint(s: String): Boolean {
+        val uintRegex = Regex("^[0-9]+\$")
+        return uintRegex.matches(s)
+    }
+
+    fun implode(list: List<String>, sep: String): String {
+        var res = ""
+        for (s in list) {
+            if (res == "")
+                res = s
+            else
+                res = res + sep + s
+        }
+        return res
     }
 
     external fun cmd_exec(cmd: String): Int
+    external fun uri_decode(uri: String): Boolean
+    external fun audio_codecs(): String
 
 }

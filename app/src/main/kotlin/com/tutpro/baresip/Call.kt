@@ -3,31 +3,47 @@ package com.tutpro.baresip
 import android.text.TextWatcher
 import java.util.ArrayList
 
-class Call(val ua: String, val call: String, val peerURI: String, var status: String,
-           val dtmfWatcher: TextWatcher?) {
+class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: String,
+           var status: String, val dtmfWatcher: TextWatcher?) {
 
-    var hold: Boolean = false
-    var security: Int = 0
-    var zid: String = ""
+    var hold = false
+    var security = 0
+    var zid = ""
+    var hasHistory = false
 
     companion object {
 
-        fun uaCalls(calls: ArrayList<Call>, ua: String): ArrayList<Call> {
+        fun calls(calls: ArrayList<Call>, dir: String): ArrayList<Call> {
             val result = ArrayList<Call>()
             for (i in calls.indices) {
-                if (calls[i].ua == ua) result.add(calls[i])
+                if (calls[i].dir == dir) result.add(calls[i])
             }
             return result
         }
 
-        fun callIndex(calls: ArrayList<Call>, ua: String, call: String): Int {
+        fun uaCalls(calls: ArrayList<Call>, ua: UserAgent, dir: String): ArrayList<Call> {
+            val result = ArrayList<Call>()
             for (i in calls.indices) {
-                if (calls[i].ua.equals(ua) && calls[i].call == call)
-                    return i
+                if ((calls[i].ua == ua) && (calls[i].dir == dir)) result.add(calls[i])
             }
-            return -1
+            return result
         }
 
+        fun find(calls: ArrayList<Call>, callp: String): Call? {
+            for (c in calls) {
+                if (c.callp == callp) return c
+            }
+            return null
+        }
+
+        fun index(calls: ArrayList<Call>, call: Call, dir: String): Int {
+            var res = 0
+            for (c in calls) {
+                if (c == call) return res
+                if ((dir == "") || (call.dir == dir)) res++
+            }
+            return res
+        }
 
     }
 }

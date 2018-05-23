@@ -30,7 +30,7 @@ class HistoryActivity : AppCompatActivity() {
 
         val b = intent.extras
         aor = b.getString("aor")
-        generate_ua_history(aor)
+        aorGenerateHistory(aor)
 
         val adapter = HistoryListAdapter(this, uaHistory)
         listview.adapter = adapter
@@ -46,7 +46,7 @@ class HistoryActivity : AppCompatActivity() {
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
                         History.removeAt(posAtHistory[pos])
-                        generate_ua_history(aor)
+                        aorGenerateHistory(aor)
                         if (uaHistory.size == 0) {
                             val i = Intent()
                             setResult(Activity.RESULT_CANCELED, i)
@@ -82,7 +82,7 @@ class HistoryActivity : AppCompatActivity() {
         return true
     }
 
-    private fun generate_ua_history(aor: String) {
+    private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
         posAtHistory.clear()
         for (i in History.indices.reversed()) {
@@ -135,13 +135,6 @@ class HistoryActivity : AppCompatActivity() {
                 if (h.aor == aor) size++
             }
             return size
-        }
-
-        fun callHasHistory(ua: String, call: String): Boolean {
-            for (h in History) {
-                if (h.ua == ua && h.call == call) return true
-            }
-            return false
         }
 
         fun aorRemoveHistory(aor: String) {
