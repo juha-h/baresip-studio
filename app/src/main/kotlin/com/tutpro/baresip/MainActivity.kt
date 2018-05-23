@@ -4,9 +4,10 @@ import android.Manifest
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.getActivity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
@@ -23,7 +24,7 @@ import android.view.*
 import android.util.Log
 import android.widget.RelativeLayout
 import android.media.AudioManager
-import android.os.SystemClock
+import android.net.NetworkInfo
 import android.support.v7.app.NotificationCompat
 import android.support.v7.view.menu.ActionMenuItemView
 import android.text.Editable
@@ -78,6 +79,19 @@ class MainActivity : AppCompatActivity() {
                                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                                         PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContent(RemoteViews(getPackageName(), R.layout.notification))
+
+        val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val intentExtras = intent.extras
+                val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
+                if (running && (info.state == NetworkInfo.State.CONNECTED)) {
+                    Log.d("Baresip", "Registering upon CONNECTED event")
+                    UserAgent.register(uas)
+                }
+            }
+        }
+        registerReceiver(receiver, intentFilter)
 
         aorSpinner = findViewById(R.id.AoRList) as Spinner
         uaAdapter = UaSpinnerAdapter(applicationContext, uas, images)
