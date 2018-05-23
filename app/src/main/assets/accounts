@@ -31,4 +31,3 @@
 #  <sip:user@1.2.3.4;auth_pass=secret;transport=tcp>
 #  <sip:user@[2001:df8:0:16:216:6fff:fe91:614c]:5070;transport=tcp;auth_pass=secret>
 #
-<sip:foo@test.tutpro.com>;auth_user=foo;auth_pass=xxx;outbound="sip:192.168.43.98:5060;transport=tcp";ptime=20;audio_codecs=OPUS/48000/2,PCMU,PCMA;video_codecs="";regint=600;pubint=0;sipnat=outbound

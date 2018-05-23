@@ -54,8 +54,13 @@ struct account;
 
 int account_alloc(struct account **accp, const char *sipaddr);
 int account_debug(struct re_printf *pf, const struct account *acc);
+int account_set_auth_user(struct account *acc, const char *user);
 int account_set_auth_pass(struct account *acc, const char *pass);
+int account_set_outbound(struct account *acc, const char *ob, unsigned ix);
 int account_set_display_name(struct account *acc, const char *dname);
+int account_set_regint(struct account *acc, uint32_t regint);
+int account_set_mediaenc(struct account *acc, const char *mediaenc);
+int account_set_audio_codecs(struct account *acc, const char *codecs);
 int account_auth(const struct account *acc, char **username, char **password,
 		 const char *realm);
 struct list *account_aucodecl(const struct account *acc);
@@ -65,6 +70,7 @@ uint32_t account_regint(const struct account *acc);
 uint32_t account_pubint(const struct account *acc);
 uint32_t account_ptime(const struct account *acc);
 enum answermode account_answermode(const struct account *acc);
+const char *account_display_name(const struct account *acc);
 const char *account_aor(const struct account *acc);
 const char *account_auth_user(const struct account *acc);
 const char *account_auth_pass(const struct account *acc);
@@ -100,6 +106,12 @@ enum call_event {
 	CALL_EVENT_TRANSFER,
 	CALL_EVENT_TRANSFER_FAILED,
 	CALL_EVENT_MENC,
+};
+
+enum menc_event {
+	MENC_EVENT_SECURE,
+	MENC_EVENT_VERIFY_REQUEST,
+	MENC_EVENT_PEER_VERIFIED,
 };
 
 struct call;
@@ -247,7 +259,7 @@ struct config_avt {
 
 /* Network */
 struct config_net {
-	char ifname[16];        /**< Bind to interface (optional)   */
+	char ifname[64];        /**< Bind to interface (optional)   */
 	struct {
 		char addr[64];
 	} nsv[NET_MAX_NS];      /**< Configured DNS nameservers     */
@@ -518,11 +530,11 @@ struct menc_media;
 
 typedef void (menc_error_h)(int err, void *arg);
 
-typedef void (menc_status_h)(const char *status, const char *prm, void *arg);
+typedef void (menc_event_h)(enum menc_event event, const char *prm, void *arg);
 
 typedef int  (menc_sess_h)(struct menc_sess **sessp, struct sdp_session *sdp,
-			   bool offerer, menc_status_h *statush,
-			   menc_error_h *errorh, void *arg);
+			   bool offerer, menc_event_h *eventh,
+                           menc_error_h *errorh, void *arg);
 
 typedef int  (menc_media_h)(struct menc_media **mp, struct menc_sess *sess,
 			    struct rtp_sock *rtp, int proto,
@@ -942,8 +954,10 @@ typedef int (videnc_update_h)(struct videnc_state **vesp,
 			      const struct vidcodec *vc,
 			      struct videnc_param *prm, const char *fmtp,
 			      videnc_packet_h *pkth, void *arg);
+
 typedef int (videnc_encode_h)(struct videnc_state *ves, bool update,
-			      const struct vidframe *frame);
+			      const struct vidframe *frame,
+			      uint64_t timestamp);
 
 typedef int (viddec_update_h)(struct viddec_state **vdsp,
 			      const struct vidcodec *vc, const char *fmtp);
@@ -1054,6 +1068,7 @@ void  video_set_devicename(struct video *v, const char *src, const char *disp);
 void  video_encoder_cycle(struct video *video);
 int   video_debug(struct re_printf *pf, const struct video *v);
 uint64_t video_calc_rtp_timestamp(int64_t pts, double fps);
+uint64_t video_calc_rtp_timestamp_fix(uint64_t timestamp);
 double video_calc_seconds(uint64_t rtp_ts);
 struct stream *video_strm(const struct video *v);
 double video_timestamp_to_seconds(uint64_t timestamp);

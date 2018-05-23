@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/AccountView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp" >
+
+        <TextView
+            android:id="@+id/DisplayNameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="Display Name" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/DisplayName"
+            android:layout_height="wrap_content"
+            android:hint="Your Name"
+            android:inputType="textPersonName"
+            android:textSize="18sp"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/AuthUserTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Authentication Username" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/AuthUser"
+            android:layout_height="wrap_content"
+            android:hint="User ID"
+            android:textSize="18sp"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/AuthPassTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Authentication Password" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/AuthPass"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:textSize="18sp"
+            android:inputType="textPassword"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/OutboundProxyTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Outbound Proxies" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/Outbound1"
+            android:layout_height="wrap_content"
+            android:hint="SIP URI of Proxy Server"
+            android:textSize="18sp"
+            android:inputType="textUri"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <EditText
+            android:id="@+id/Outbound2"
+            android:layout_height="wrap_content"
+            android:hint="SIP URI of another Proxy Server"
+            android:textSize="18sp"
+            android:inputType="textUri"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/RegIntTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Registration Interval (sec)" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/RegInt"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:inputType="number"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/AudioCodecsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Audio Codecs" >
+        </TextView>
+
+        <LinearLayout
+            android:id="@+id/CodecSpinners"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/MediaEncTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:text="Media Encryption" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/mediaEncSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:popupBackground="@drawable/spinner_background" >
+        </Spinner>
+
+    </LinearLayout>
+
+</ScrollView>

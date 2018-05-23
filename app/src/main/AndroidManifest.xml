@@ -51,8 +51,18 @@
         </activity>
 
         <activity
-            android:name=".EditAccountsActivity"
-            android:label="Edit Accounts"
+            android:name=".AccountsActivity"
+            android:label="Accounts"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutpro.baresip.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".AccountActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Account"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
