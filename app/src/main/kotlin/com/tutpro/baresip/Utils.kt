@@ -3,6 +3,8 @@ package com.tutpro.baresip
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 
 import java.io.*
 
@@ -113,6 +115,17 @@ object Utils {
                 res = res + sep + s
         }
         return res
+    }
+
+    fun isConnected(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        if (activeNetwork != null && activeNetwork.isConnected) {
+            val networkType = activeNetwork.type
+            return networkType == ConnectivityManager.TYPE_WIFI || networkType == ConnectivityManager.TYPE_MOBILE
+        } else {
+            return false
+        }
     }
 
     external fun cmd_exec(cmd: String): Int

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,6 +23,7 @@ import android.view.*
 import android.util.Log
 import android.widget.RelativeLayout
 import android.media.AudioManager
+import android.os.SystemClock
 import android.support.v7.app.NotificationCompat
 import android.support.v7.view.menu.ActionMenuItemView
 import android.text.Editable
@@ -312,9 +314,16 @@ class MainActivity : AppCompatActivity() {
 
         if (!running) {
             Log.i("Baresip", "Starting Baresip with path $path")
-            nm.notify(NOTIFICATION_ID, nb.build())
-            Thread(Runnable { baresipStart(path) }).start()
-            running = true
+            if (!Utils.isConnected(this)) {
+                Toast.makeText(this, "No network connection!",
+                        Toast.LENGTH_LONG).show()
+                finish()
+                // System.exit(0)
+            } else {
+                nm.notify(NOTIFICATION_ID, nb.build())
+                Thread(Runnable { baresipStart(path) }).start()
+                running = true
+            }
         }
     }
 
