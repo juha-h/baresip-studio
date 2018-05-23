@@ -37,9 +37,11 @@ class AccountsActivity : AppCompatActivity() {
             } else if (Account.exists(MainActivity.uas, aor)) {
                 Log.e("Baresip", "Account $aor already exists")
             } else {
-                if (UserAgent.ua_alloc("<$aor>;regq=0.5;pubint=0;regint=600") != 0)
+                if (UserAgent.ua_alloc("<$aor>;regq=0.5;pubint=0;regint=600") != 0) {
                     Log.e("Baresip", "Failed to allocate UA $aor")
-                else {
+                    Utils.alertView(this, "Notice",
+                            "Failed to allocate new account. Check your network connection.")
+                } else {
                     SystemClock.sleep(200);
                     newAorView.setText("")
                     newAorView.setHint("SIP URI user@domain")
