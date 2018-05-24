@@ -11,6 +11,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var nb: NotificationCompat.Builder
+    internal lateinit var receiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -81,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 .setContent(RemoteViews(getPackageName(), R.layout.notification))
 
         val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
-        val receiver = object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val intentExtras = intent.extras
                 val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
@@ -107,6 +109,8 @@ class MainActivity : AppCompatActivity() {
                     callee.text.clear()
                     callee.hint = "Callee"
                     callButton.text = "Call"
+                    callButton.setTextColor(Color.BLACK)
+                    callButton.getBackground().clearColorFilter()
                     if (HistoryActivity.aorHistory(aor) > 0) {
                         holdButton.text = "History"
                         holdButton.visibility = View.VISIBLE
@@ -268,6 +272,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         callButton.text = "Call"
+        callButton.getBackground().clearColorFilter()
+        callButton.setBackgroundResource(android.R.drawable.btn_default)
         callButton.setOnClickListener {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.aor
@@ -331,6 +337,7 @@ class MainActivity : AppCompatActivity() {
             if (!Utils.isConnected(this)) {
                 Toast.makeText(this, "No network connection!",
                         Toast.LENGTH_LONG).show()
+                unregisterReceiver(receiver)
                 finish()
                 // System.exit(0)
             } else {
@@ -427,6 +434,7 @@ class MainActivity : AppCompatActivity() {
                     nm.cancel(10)
                     running = false
                 }
+                unregisterReceiver(receiver)
                 finish()
                 System.exit(0)
                 return true
@@ -496,14 +504,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             calls.add(Call(call, ua, uri, "out","Cancel", dtmfWatcher))
-            (findViewById(R.id.callButton) as Button).text = "Cancel"
+            val callButton = findViewById(R.id.callButton) as Button
+            callButton.text = "Cancel"
+            callButton.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
+            callButton.setTextColor(Color.WHITE)
             (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
         }
     }
 
     private fun addCallViews(ua: UserAgent, call: Call, id: Int) {
-        Log.d("Baresip", "Creating new Incoming textview at $id")
-
         val acc = ua.account
         val caller_heading = TextView(appContext)
         caller_heading.text = "Incoming call from ..."
@@ -518,10 +527,11 @@ class MainActivity : AppCompatActivity() {
         else
             heading_params.addRule(RelativeLayout.BELOW, id - 10 + 4)
         caller_heading.layoutParams = heading_params
+        Log.d("Baresip", "Adding incoming call heading at ${caller_heading.id}")
         layout.addView(caller_heading)
 
         val caller_row = LinearLayout(appContext)
-        caller_row.id = id + 1
+        caller_row.id = caller_heading.id + 1
         caller_row.setOrientation(LinearLayout.HORIZONTAL)
         val caller_row_params = LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -533,15 +543,15 @@ class MainActivity : AppCompatActivity() {
         caller_uri.setTextColor(Color.BLUE)
         caller_uri.textSize = 20f
         caller_uri.setPadding(10, 10, 0, 10)
-        Log.d("Baresip", "Creating new caller textview at " + (id + 2))
-        caller_uri.id = id + 2
+        caller_uri.id = caller_row.id + 1
         val caller_uri_params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
         caller_uri.layoutParams = caller_uri_params
+        Log.d("Baresip", "Adding caller uri at ${caller_uri.id}")
         caller_row.addView(caller_uri)
 
         val security_button = ImageButton(appContext)
-        security_button.id = id + 3
+        security_button.id = caller_uri.id + 1
         val dp24px = ((24 * appContext.resources.displayMetrics.density) + 0.5).toInt()
         val security_button_params = LinearLayout.LayoutParams(dp24px, dp24px, 0.0f)
         security_button_params.gravity = Gravity.CENTER_VERTICAL
@@ -582,16 +592,30 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        Log.d("Baresip", "Adding security button at ${security_button.id}")
         caller_row.addView(security_button)
 
+        Log.d("Baresip", "Adding caller row at ${caller_row.id}")
         layout.addView(caller_row)
+
+        val answer_row = LinearLayout(appContext)
+        answer_row.id = security_button.id + 1
+        answer_row.setOrientation(LinearLayout.HORIZONTAL)
+        val answer_row_params = LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+        answer_row_params.addRule(RelativeLayout.BELOW, caller_row.id)
+        answer_row.layoutParams = answer_row_params
 
         val answer_button = Button(appContext)
         answer_button.text = call.status
-        answer_button.setBackgroundResource(android.R.drawable.btn_default)
-        answer_button.setTextColor(Color.BLACK)
-        Log.d("Baresip", "Creating new answer button at " + (id + 4))
-        answer_button.id = id + 4
+        if (answer_button.text == "Answer") {
+            answer_button.getBackground().setColorFilter(0xFF00FF00.toInt(), PorterDuff.Mode.MULTIPLY)
+            answer_button.setTextColor(Color.WHITE)
+        } else {
+            answer_button.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
+            answer_button.setTextColor(Color.WHITE)
+        }
+        answer_button.id = answer_row.id + 1
         answer_button.setOnClickListener { v ->
             when ((v as Button).text.toString()) {
                 "Answer" -> {
@@ -602,11 +626,16 @@ class MainActivity : AppCompatActivity() {
                         call.status = "Hangup"
                         call.hold = false
                         this@MainActivity.runOnUiThread {
-                            val answer_id = (Call.index(calls, call,"in") + 1) * 10 + 4
-                            val answer_but = layout.findViewById(answer_id) as Button
-                            answer_but.text = "Hangup"
-                            val reject_button = layout.findViewById(answer_id + 1) as Button
+                            Log.d("Baresip", "Setting answer button at ${answer_button.id} to Hangup")
+                            val answer_button = layout.findViewById(answer_button.id) as Button
+                            answer_button.text = "Hangup"
+                            answer_button.getBackground().setColorFilter(0xFFFF00000.toInt(), PorterDuff.Mode.MULTIPLY)
+                            answer_button.setTextColor(Color.WHITE)
+                            Log.d("Baresip", "Setting reject button at ${answer_button.id + 1} to Hold")
+                            val reject_button = layout.findViewById(answer_button.id + 1) as Button
                             reject_button.text = "Hold"
+                            reject_button.getBackground().clearColorFilter()
+                            reject_button.setTextColor(Color.BLACK)
                         }
                     }
                 }
@@ -617,26 +646,28 @@ class MainActivity : AppCompatActivity() {
                 else -> Log.e("Baresip", "Invalid answer button text: " + v.text.toString())
             }
         }
-        val answer_button_params = LayoutParams(200, LayoutParams.WRAP_CONTENT)
-        answer_button_params.addRule(RelativeLayout.BELOW, id + 1)
+        val answer_button_params = LayoutParams(resources.getDimensionPixelSize(R.dimen.button_width),
+                LayoutParams.WRAP_CONTENT)
         answer_button_params.setMargins(3, 10, 0, 0)
         answer_button.layoutParams = answer_button_params
-        layout.addView(answer_button)
+        Log.d("Baresip", "Adding answer button at ${answer_button.id}")
+        answer_row.addView(answer_button)
 
         val reject_button = Button(appContext)
         if (call.status == "Answer") {
             reject_button.text = "Reject"
+            reject_button.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
+            reject_button.setTextColor(Color.WHITE)
         } else {
+            reject_button.setBackgroundResource(android.R.drawable.btn_default)
+            reject_button.setTextColor(Color.BLACK)
             if (call.hold) {
                 reject_button.text = "Unhold"
             } else {
                 reject_button.text = "Hold"
             }
         }
-        reject_button.setBackgroundResource(android.R.drawable.btn_default)
-        reject_button.setTextColor(Color.BLACK)
-        Log.d("Baresip", "Creating new reject button at " + (id + 5))
-        reject_button.id = id + 5
+        reject_button.id = answer_button.id + 1
         reject_button.setOnClickListener { v ->
             when ((v as Button).text.toString()) {
                 "Reject" -> {
@@ -656,12 +687,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        val reject_button_params = LayoutParams(200,
+        val reject_button_params = LayoutParams(resources.getDimensionPixelSize(R.dimen.button_width),
                 LayoutParams.WRAP_CONTENT)
-        reject_button_params.addRule(RelativeLayout.BELOW, id + 1)
-        reject_button_params.setMargins(225, 10, 0, 0)
+        reject_button_params.setMargins(16, 10, 0, 0)
         reject_button.layoutParams = reject_button_params
-        layout.addView(reject_button)
+        Log.d("Baresip", "Adding reject button at ${reject_button.id}")
+        answer_row.addView(reject_button)
+
+        Log.d("Baresip", "Adding answer row at ${answer_row.id}")
+        layout.addView(answer_row)
     }
 
     private fun updateNotification() {
@@ -746,6 +780,8 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
                                     callButton.text = "Hangup"
+                                    callButton.setTextColor(Color.WHITE)
+                                    callButton.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
                                     holdButton.text = "Hold"
                                     holdButton.visibility = View.VISIBLE
                                     if (acc.mediaenc == "") {
@@ -778,7 +814,7 @@ class MainActivity : AppCompatActivity() {
                                         securityButton.setImageResource(R.drawable.box_red)
                                         securityButton.tag = "red"
                                         securityButton.visibility = View.VISIBLE
-                                        view_id = (inIndex + 1) * 10 + 5
+                                        view_id = (inIndex + 1) * 10 + 6
                                         val rejectButton = findViewById(view_id) as Button
                                         rejectButton.text = "Hold"
                                     }
@@ -915,7 +951,7 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     val caller_heading = layout.findViewById(view_id)
                                     val view_index = layout.indexOfChild(caller_heading)
-                                    layout.removeViews(view_index, 4 * remove_count)
+                                    layout.removeViews(view_index, 3 * remove_count)
                                     val callsIn = Call.calls(calls, "in")
                                     for (i in inIndex until callsIn.size) {
                                         this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
@@ -934,6 +970,8 @@ class MainActivity : AppCompatActivity() {
                                 this@MainActivity.runOnUiThread {
                                     if (ua == uas[aorSpinner.selectedItemPosition]) {
                                         callButton.text = "Call"
+                                        callButton.setTextColor(Color.BLACK)
+                                        callButton.getBackground().clearColorFilter()
                                         callButton.isEnabled = true
                                         callee.setText("")
                                         callee.hint = "Callee"
