@@ -70,7 +70,7 @@
 
         <Button
             android:id="@+id/callButton"
-            android:layout_width="96dp"
+            android:layout_width="@dimen/button_width"
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
             android:layout_below="@id/calleeRow" >
@@ -78,7 +78,7 @@
 
         <Button
             android:id="@+id/holdButton"
-            android:layout_width="96dp"
+            android:layout_width="@dimen/button_width"
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
             android:text="Hold"
@@ -87,9 +87,20 @@
             android:visibility="invisible" >
         </Button>
 
+        <Button
+            android:id="@+id/contactsButton"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/btn_default"
+            android:text="Contacts"
+            android:layout_below="@id/calleeRow"
+            android:layout_marginLeft="212dp"
+            android:visibility="invisible" >
+        </Button>
+
         <EditText
             android:id="@+id/dtmf"
-            android:layout_width="96dp"
+            android:layout_width="@dimen/button_width"
             android:layout_height="wrap_content"
             android:layout_below="@id/calleeRow"
             android:layout_marginLeft="212dp"
