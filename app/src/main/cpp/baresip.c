@@ -746,8 +746,10 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
                                                 jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+
     LOGD("holding call %s\n", native_call);
-    int res = call_hold(ua_call(uag_current()), true);
+    int res = call_hold(call, true);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
 }
@@ -756,8 +758,10 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
                                                   jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    LOGD("holding call %s\n", native_call);
-    int res = call_hold(ua_call(uag_current()), false);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+
+    LOGD("unholding call %s\n", native_call);
+    int res = call_hold(call, false);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
 }
