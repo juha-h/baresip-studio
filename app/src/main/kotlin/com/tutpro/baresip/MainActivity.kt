@@ -11,7 +11,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -42,8 +41,9 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var layout: RelativeLayout
     internal lateinit var callee: AutoCompleteTextView
     internal lateinit var securityButton: ImageButton
-    internal lateinit var callButton: Button
-    internal lateinit var holdButton: Button
+    internal lateinit var callButton: ImageButton
+    internal lateinit var holdButton: ImageButton
+    internal lateinit var historyButton: ImageButton
     internal lateinit var dtmf: EditText
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
@@ -62,8 +62,9 @@ class MainActivity : AppCompatActivity() {
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         callee = findViewById(R.id.callee) as AutoCompleteTextView
         securityButton = findViewById(R.id.securityButton) as ImageButton
-        callButton = findViewById(R.id.callButton) as Button
-        holdButton = findViewById(R.id.holdButton) as Button
+        callButton = findViewById(R.id.callButton) as ImageButton
+        holdButton = findViewById(R.id.holdButton) as ImageButton
+        historyButton = findViewById(R.id.historyButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
         filesPath = applicationContext.filesDir.absolutePath
 
@@ -87,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
                 val intentExtras = intent.extras
                 val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
+                Log.d("Baresip", "Got event $info")
                 if (running && (info.state == NetworkInfo.State.CONNECTED)) {
                     Log.d("Baresip", "Registering upon CONNECTED event")
                     UserAgent.register(uas)
@@ -108,25 +110,23 @@ class MainActivity : AppCompatActivity() {
                 if (callsOut.size == 0) {
                     callee.text.clear()
                     callee.hint = "Callee"
-                    callButton.text = "Call"
-                    callButton.setTextColor(Color.BLACK)
-                    callButton.getBackground().clearColorFilter()
+                    callButton.tag = "Call"
+                    callButton.setImageResource(R.drawable.call)
                     if (HistoryActivity.aorHistory(aor) > 0) {
-                        holdButton.text = "History"
-                        holdButton.visibility = View.VISIBLE
+                        historyButton.visibility = View.VISIBLE
                     } else {
-                        holdButton.visibility = View.INVISIBLE
+                        historyButton.visibility = View.INVISIBLE
                     }
                     securityButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                 } else {
                     callee.setText(callsOut[0].peerURI)
-                    callButton.text = callsOut[0].status
+                    callButton.tag = callsOut[0].status
                     if (callsOut[0].status == "Hangup") {
                         if (callsOut[0].hold) {
-                            holdButton.text = "Unhold"
+                            holdButton.setImageResource(R.drawable.resume)
                         } else {
-                            holdButton.text = "Hold"
+                            holdButton.setImageResource(R.drawable.hold)
                         }
                         holdButton.visibility = View.VISIBLE
                         securityButton.setImageResource(callsOut[0].security)
@@ -271,13 +271,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        callButton.text = "Call"
-        callButton.getBackground().clearColorFilter()
-        callButton.setBackgroundResource(android.R.drawable.btn_default)
+        callButton.tag = "Call"
         callButton.setOnClickListener {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.aor
-            when (callButton.text.toString()) {
+            when (callButton.tag) {
                 "Call" -> {
                     val callee = (findViewById(R.id.callee) as EditText).text.toString()
                     if (callee.length > 0) {
@@ -305,31 +303,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val holdButton = findViewById(R.id.holdButton) as Button
+        holdButton.tag = "Hold"
+        holdButton.visibility = View.INVISIBLE
         holdButton.setOnClickListener {
-            when (holdButton.text.toString()) {
+            when (holdButton.tag) {
                 "Hold" -> {
-                    Log.i("Baresip", "Holding up " + (findViewById(R.id.callee) as EditText).text)
+                    Log.i("Baresip", "Holding " + (findViewById(R.id.callee) as EditText).text)
                     val call = Call.calls(calls, "out")[0]
                     call_hold(call.callp)
                     call.hold = true
-                    holdButton.text = "Unhold"
+                    holdButton.tag= "Resume"
+                    holdButton.setImageResource(R.drawable.resume)
                 }
-                "Unhold" -> {
-                    Log.i("Baresip", "Unholding " + (findViewById(R.id.callee) as EditText).text)
+                "Resume" -> {
+                    Log.i("Baresip", "Resuming " + (findViewById(R.id.callee) as EditText).text)
                     val call = Call.calls(calls, "out")[0]
                     call_unhold(call.callp)
                     call.hold = false
-                    holdButton.text = "Hold"
-                }
-                "History" -> {
-                    val i = Intent(this@MainActivity, HistoryActivity::class.java)
-                    val b = Bundle()
-                    b.putString("aor", uas[aorSpinner.selectedItemPosition].aor)
-                    i.putExtras(b)
-                    startActivityForResult(i, HISTORY_CODE)
+                    holdButton.tag= "Hold"
+                    holdButton.setImageResource(R.drawable.hold)
                 }
             }
+        }
+
+        historyButton.visibility = View.INVISIBLE
+        historyButton.setOnClickListener {
+            val i = Intent(this@MainActivity, HistoryActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", uas[aorSpinner.selectedItemPosition].aor)
+            i.putExtras(b)
+            startActivityForResult(i, HISTORY_CODE)
         }
 
         if (!running) {
@@ -475,7 +478,7 @@ class MainActivity : AppCompatActivity() {
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
                     if (HistoryActivity.aorHistory(uas[aorSpinner.selectedItemPosition].aor) == 0) {
-                        (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
+                        holdButton.visibility = View.INVISIBLE
                     }
                 }
             }
@@ -504,11 +507,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             calls.add(Call(call, ua, uri, "out","Cancel", dtmfWatcher))
-            val callButton = findViewById(R.id.callButton) as Button
-            callButton.text = "Cancel"
-            callButton.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
-            callButton.setTextColor(Color.WHITE)
-            (findViewById(R.id.holdButton) as Button).visibility = View.INVISIBLE
+            callButton.tag = "Cancel"
+            callButton.setImageResource(R.drawable.hangup)
+            holdButton.visibility = View.INVISIBLE
         }
     }
 
@@ -606,18 +607,15 @@ class MainActivity : AppCompatActivity() {
         answer_row_params.addRule(RelativeLayout.BELOW, caller_row.id)
         answer_row.layoutParams = answer_row_params
 
-        val answer_button = Button(appContext)
-        answer_button.text = call.status
-        if (answer_button.text == "Answer") {
-            answer_button.getBackground().setColorFilter(0xFF00FF00.toInt(), PorterDuff.Mode.MULTIPLY)
-            answer_button.setTextColor(Color.WHITE)
-        } else {
-            answer_button.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
-            answer_button.setTextColor(Color.WHITE)
-        }
+        val answer_button = ImageButton(appContext)
+        answer_button.tag = call.status
+        if (answer_button.tag == "Answer")
+            answer_button.setImageResource(R.drawable.call)
+        else
+            answer_button.setImageResource(R.drawable.hangup)
         answer_button.id = answer_row.id + 1
         answer_button.setOnClickListener { v ->
-            when ((v as Button).text.toString()) {
+            when ((v as ImageButton).tag) {
                 "Answer" -> {
                     Log.i("Baresip", "UA ${call.ua.uap} accepting incoming call ${call.callp}")
                     ua_answer(call.ua.uap, call.callp)
@@ -627,15 +625,13 @@ class MainActivity : AppCompatActivity() {
                         call.hold = false
                         this@MainActivity.runOnUiThread {
                             Log.d("Baresip", "Setting answer button at ${answer_button.id} to Hangup")
-                            val answer_button = layout.findViewById(answer_button.id) as Button
-                            answer_button.text = "Hangup"
-                            answer_button.getBackground().setColorFilter(0xFFFF00000.toInt(), PorterDuff.Mode.MULTIPLY)
-                            answer_button.setTextColor(Color.WHITE)
+                            // val answer_button = layout.findViewById(answer_button.id) as ImageButton
+                            answer_button.tag = "Hangup"
+                            answer_button.setImageResource(R.drawable.hangup)
                             Log.d("Baresip", "Setting reject button at ${answer_button.id + 1} to Hold")
-                            val reject_button = layout.findViewById(answer_button.id + 1) as Button
-                            reject_button.text = "Hold"
-                            reject_button.getBackground().clearColorFilter()
-                            reject_button.setTextColor(Color.BLACK)
+                            val reject_button = layout.findViewById(answer_button.id + 1) as ImageButton
+                            reject_button.tag = "Hold"
+                            reject_button.setImageResource(R.drawable.hold)
                         }
                     }
                 }
@@ -643,33 +639,33 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "UA ${call.ua.uap} hanging up call ${call.callp}")
                     ua_hangup(call.ua.uap, call.callp, 200, "OK")
                 }
-                else -> Log.e("Baresip", "Invalid answer button text: " + v.text.toString())
+                else -> Log.e("Baresip", "Invalid answer button tag: " + v.tag)
             }
         }
-        val answer_button_params = LayoutParams(resources.getDimensionPixelSize(R.dimen.button_width),
+        val answer_button_params = LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT)
         answer_button_params.setMargins(3, 10, 0, 0)
         answer_button.layoutParams = answer_button_params
+        answer_button.setPadding(0, 0, 0, 0)
         Log.d("Baresip", "Adding answer button at ${answer_button.id}")
         answer_row.addView(answer_button)
 
-        val reject_button = Button(appContext)
+        val reject_button = ImageButton(appContext)
         if (call.status == "Answer") {
-            reject_button.text = "Reject"
-            reject_button.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
-            reject_button.setTextColor(Color.WHITE)
+            reject_button.tag = "Reject"
+            reject_button.setImageResource(R.drawable.hangup)
         } else {
-            reject_button.setBackgroundResource(android.R.drawable.btn_default)
-            reject_button.setTextColor(Color.BLACK)
             if (call.hold) {
-                reject_button.text = "Unhold"
+                reject_button.tag = "Resume"
+                reject_button.setImageResource(R.drawable.resume)
             } else {
-                reject_button.text = "Hold"
+                reject_button.tag = "Hold"
+                reject_button.setImageResource(R.drawable.hold)
             }
         }
         reject_button.id = answer_button.id + 1
         reject_button.setOnClickListener { v ->
-            when ((v as Button).text.toString()) {
+            when ((v as ImageButton).tag) {
                 "Reject" -> {
                     Log.i("Baresip", "UA " + call.ua +
                             " rejecting incoming call " + call.callp)
@@ -677,20 +673,23 @@ class MainActivity : AppCompatActivity() {
                 }
                 "Hold" -> {
                     call_hold(call.callp)
-                    v.text = "Unhold"
+                    v.tag = "Resume"
+                    reject_button.setImageResource(R.drawable.resume)
                     call.hold = true
                 }
-                "Unhold" -> {
+                "Resume" -> {
                     call_unhold(call.callp)
-                    v.text = "Hold"
+                    v.tag = "Hold"
+                    reject_button.setImageResource(R.drawable.hold)
                     call.hold = false
                 }
             }
         }
-        val reject_button_params = LayoutParams(resources.getDimensionPixelSize(R.dimen.button_width),
+        val reject_button_params = LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT)
         reject_button_params.setMargins(16, 10, 0, 0)
         reject_button.layoutParams = reject_button_params
+        reject_button.setPadding(0, 0, 0, 0)
         Log.d("Baresip", "Adding reject button at ${reject_button.id}")
         answer_row.addView(reject_button)
 
@@ -779,10 +778,10 @@ class MainActivity : AppCompatActivity() {
                             call.security = R.drawable.box_red
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    callButton.text = "Hangup"
-                                    callButton.setTextColor(Color.WHITE)
-                                    callButton.getBackground().setColorFilter(0xFFFF0000.toInt(), PorterDuff.Mode.MULTIPLY)
-                                    holdButton.text = "Hold"
+                                    callButton.tag = "Hangup"
+                                    callButton.setImageResource(R.drawable.hangup)
+                                    holdButton.tag = "Hold"
+                                    holdButton.setImageResource(R.drawable.hold)
                                     holdButton.visibility = View.VISIBLE
                                     if (acc.mediaenc == "") {
                                         securityButton.visibility = View.INVISIBLE
@@ -809,14 +808,14 @@ class MainActivity : AppCompatActivity() {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
                                     if (acc.mediaenc != "") {
                                         val inIndex = Call.index(calls, call, "in")
-                                        var view_id = (inIndex + 1) * 10 + 3
+                                        val view_id = (inIndex + 1) * 10 + 3
                                         val securityButton = findViewById(view_id) as ImageButton
                                         securityButton.setImageResource(R.drawable.box_red)
                                         securityButton.tag = "red"
                                         securityButton.visibility = View.VISIBLE
-                                        view_id = (inIndex + 1) * 10 + 6
-                                        val rejectButton = findViewById(view_id) as Button
-                                        rejectButton.text = "Hold"
+                                        val rejectButton = findViewById(view_id + 3) as ImageButton
+                                        rejectButton.tag = "Hold"
+                                        rejectButton.setImageResource(R.drawable.hold)
                                     }
                                 }
                             }
@@ -944,9 +943,7 @@ class MainActivity : AppCompatActivity() {
                             calls.removeAt(Call.index(calls, call, ""))
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    if (callButton.text == "Call") {
-                                        holdButton.text = "History"
-                                        holdButton.visibility = View.VISIBLE
+                                    if (callButton.tag == "Call") {
                                         callee.setOnKeyListener(null)
                                     }
                                     val caller_heading = layout.findViewById(view_id)
@@ -969,14 +966,12 @@ class MainActivity : AppCompatActivity() {
                                         call.peerURI)
                                 this@MainActivity.runOnUiThread {
                                     if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        callButton.text = "Call"
-                                        callButton.setTextColor(Color.BLACK)
-                                        callButton.getBackground().clearColorFilter()
+                                        callButton.tag = "Call"
+                                        callButton.setImageResource(R.drawable.call)
                                         callButton.isEnabled = true
                                         callee.setText("")
                                         callee.hint = "Callee"
-                                        holdButton.text = "History"
-                                        holdButton.visibility = View.VISIBLE
+                                        holdButton.visibility = View.INVISIBLE
                                         if (this.currentFocus == dtmf) {
                                             imm.hideSoftInputFromWindow(dtmf.getWindowToken(), 0)
                                         }
@@ -993,6 +988,7 @@ class MainActivity : AppCompatActivity() {
                                             "out", false))
                                 }
                         }
+                        historyButton.visibility = View.VISIBLE
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
                     }
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
