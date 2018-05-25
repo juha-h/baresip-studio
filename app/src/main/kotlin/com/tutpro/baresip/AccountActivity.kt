@@ -59,6 +59,7 @@ class AccountActivity : AppCompatActivity() {
         while (newCodecs.size < audioCodecs.size) newCodecs.add("")
 
         val layout = findViewById(R.id.CodecSpinners) as LinearLayout
+        var spinnerList = Array(audioCodecs.size, {i -> ArrayList<String>()})
         for (i in audioCodecs.indices) {
             val spinner = Spinner(applicationContext)
             spinner.id = i + 100
@@ -66,19 +67,18 @@ class AccountActivity : AppCompatActivity() {
             spinner.setPopupBackgroundResource(R.drawable.spinner_background)
             layout.addView(spinner)
 
-            var spinnerList = ArrayList<String>()
             if (acc.audioCodec.size > i) {
                 val codec = acc.audioCodec[i]
-                spinnerList.add(codec)
-                for (c in audioCodecs) if (c != codec) spinnerList.add(c)
-                spinnerList.add("")
+                spinnerList[i].add(codec)
+                for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
+                spinnerList[i].add("")
             } else {
-                spinnerList = audioCodecs
-                spinnerList.add(0, "")
+                spinnerList[i] = audioCodecs
+                spinnerList[i].add(0, "")
             }
             val codecSpinner = findViewById(spinner.id) as Spinner
             val adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
-                spinnerList)
+                spinnerList[i])
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             codecSpinner.adapter = adapter
             codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
