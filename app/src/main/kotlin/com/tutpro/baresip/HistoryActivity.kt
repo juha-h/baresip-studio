@@ -45,7 +45,7 @@ class HistoryActivity : AppCompatActivity() {
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        History.removeAt(posAtHistory[pos])
+                        MainActivity.history.removeAt(posAtHistory[pos])
                         aorGenerateHistory(aor)
                         if (uaHistory.size == 0) {
                             val i = Intent()
@@ -61,7 +61,7 @@ class HistoryActivity : AppCompatActivity() {
             val builder = AlertDialog.Builder(this@HistoryActivity,
                     R.style.Theme_AppCompat)
             builder.setMessage("Do you want to delete " +
-                    History[pos].peerURI + "?")
+                    MainActivity.history[pos].peerURI + "?")
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show()
             true
@@ -85,8 +85,8 @@ class HistoryActivity : AppCompatActivity() {
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
         posAtHistory.clear()
-        for (i in History.indices.reversed()) {
-            val h = History[i]
+        for (i in MainActivity.history.indices.reversed()) {
+            val h = MainActivity.history[i]
             if (h.aor == aor) {
                 var peer_uri = h.peerURI
                 if (Utils.uriHostPart(peer_uri) == Utils.uriHostPart(aor)) {
@@ -123,29 +123,6 @@ class HistoryActivity : AppCompatActivity() {
         return now.get(Calendar.YEAR) == time.get(Calendar.YEAR) &&
                 now.get(Calendar.MONTH) == time.get(Calendar.MONTH) &&
                 now.get(Calendar.DAY_OF_MONTH) == time.get(Calendar.DAY_OF_MONTH)
-    }
-
-    companion object {
-
-        var History: ArrayList<History> = ArrayList()
-
-        fun aorHistory(aor: String): Int {
-            var size = 0;
-            for (h in History) {
-                if (h.aor == aor) size++
-            }
-            return size
-        }
-
-        fun aorRemoveHistory(aor: String) {
-            for (h in History) {
-                if (h.aor == aor) {
-                    History.remove(h)
-                    return
-                }
-            }
-        }
-
     }
 
 }

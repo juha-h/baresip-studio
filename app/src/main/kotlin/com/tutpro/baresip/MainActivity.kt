@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                     callee.hint = "Callee"
                     callButton.tag = "Call"
                     callButton.setImageResource(R.drawable.call)
-                    if (HistoryActivity.aorHistory(aor) > 0) {
+                    if (History.aorHistory(history, aor) > 0) {
                         historyButton.visibility = View.VISIBLE
                     } else {
                         historyButton.visibility = View.INVISIBLE
@@ -214,8 +214,8 @@ class MainActivity : AppCompatActivity() {
             val fis = FileInputStream(file)
             val ois = ObjectInputStream(fis)
             @SuppressWarnings("unchecked")
-            HistoryActivity.History = ois.readObject() as ArrayList<History>
-            Log.d("Baresip", "Restored History of " + HistoryActivity.History.size + " entries")
+            history = ois.readObject() as ArrayList<History>
+            Log.d("Baresip", "Restored History of ${history.size} entries")
             ois.close()
             fis.close()
         } catch (e: Exception) {
@@ -277,15 +277,22 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.aor
             when (callButton.tag) {
                 "Call" -> {
-                    val callee = (findViewById(R.id.callee) as EditText).text.toString()
-                    if (callee.length > 0) {
-                        var uri = EditContactsActivity.findContactURI(callee)
+                    val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
+                    if (calleeText.length > 0) {
+                        var uri = EditContactsActivity.findContactURI(calleeText)
                         if (!uri.startsWith("sip:")) uri = "sip:$uri"
                         if (!uri.contains("@")) {
                             val host = aor.substring(aor.indexOf("@") + 1)
                             uri = "$uri@$host"
                         }
                         call(ua, uri)
+                    } else {
+                        val latest = History.aorLatestHistory(history, aor)
+                        if (latest != null)
+                            if (Utils.uriHostPart(latest.peerURI) == Utils.uriHostPart(aor))
+                                callee.setText(Utils.uriUserPart(latest.peerURI))
+                            else
+                                callee.setText(latest.peerURI)
                     }
                 }
                 "Cancel" -> {
@@ -426,7 +433,7 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val fos = FileOutputStream(file)
                         val oos = ObjectOutputStream(fos)
-                        oos.writeObject(HistoryActivity.History)
+                        oos.writeObject(history)
                         oos.close()
                         fos.close()
                     } catch (e: IOException) {
@@ -477,7 +484,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
-                    if (HistoryActivity.aorHistory(uas[aorSpinner.selectedItemPosition].aor) == 0) {
+                    if (History.aorHistory(history, uas[aorSpinner.selectedItemPosition].aor) == 0) {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
@@ -797,8 +804,7 @@ class MainActivity : AppCompatActivity() {
                                     dtmf.addTextChangedListener(call.dtmfWatcher)
                                 }
                             }
-                            HistoryActivity.History.add(History(aor, call.peerURI, "out",
-                                    true))
+                            history.add(History(aor, call.peerURI, "out", true))
                             call.hasHistory = true
                         } else {
                             Log.d("Baresip", "Inbound call $callp established")
@@ -819,8 +825,7 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-                            HistoryActivity.History.add(History(aor, call.peerURI, "in",
-                                    true))
+                            history.add(History(aor, call.peerURI, "in", true))
                             call.hasHistory = true
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -828,8 +833,8 @@ class MainActivity : AppCompatActivity() {
                         // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                         //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
                         //        AudioManager.STREAM_VOICE_CALL)
-                        if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
-                            HistoryActivity.aorRemoveHistory(aor)
+                        if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                            History.aorRemoveHistory(history, aor)
                     }
                     "call incoming" -> {
                         val peer_uri = call_peeruri(callp)
@@ -953,13 +958,13 @@ class MainActivity : AppCompatActivity() {
                                     for (i in inIndex until callsIn.size) {
                                         this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
                                     }
+                                    historyButton.visibility = View.VISIBLE
                                 }
                             }
                             if (!call.hasHistory) {
-                                if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
-                                    HistoryActivity.aorRemoveHistory(aor)
-                                HistoryActivity.History.add(History(aor, call.peerURI,
-                                        "in", false))
+                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                                    History.aorRemoveHistory(history, aor)
+                                history.add(History(aor, call.peerURI,"in", false))
                             }
                         } else {
                             Log.d("Baresip", "Removing outgoing call $uap / $callp / " +
@@ -978,17 +983,17 @@ class MainActivity : AppCompatActivity() {
                                         securityButton.visibility = View.INVISIBLE
                                         dtmf.removeTextChangedListener(call.dtmfWatcher)
                                         dtmf.visibility = View.INVISIBLE
+                                        historyButton.visibility = View.VISIBLE
                                     }
                                     calls.removeAt(Call.index(calls, call, ""))
                                 }
                                 if (!call.hasHistory) {
-                                    if (HistoryActivity.aorHistory(aor) > HISTORY_SIZE)
-                                        HistoryActivity.aorRemoveHistory(aor)
-                                    HistoryActivity.History.add(History(aor, call.peerURI,
-                                            "out", false))
+                                    if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                                        History.aorRemoveHistory(history, aor)
+                                    history.add(History(aor, call.peerURI, "out",
+                                            false))
                                 }
                         }
-                        historyButton.visibility = View.VISIBLE
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
                     }
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
@@ -1039,6 +1044,7 @@ class MainActivity : AppCompatActivity() {
         var uas = ArrayList<UserAgent>()
         internal var images = ArrayList<Int>()
         internal var calls = ArrayList<Call>()
+        var history: ArrayList<History> = ArrayList()
         var filesPath = ""
 
         const val ACCOUNTS_CODE = 1
