@@ -89,10 +89,9 @@ class MainActivity : AppCompatActivity() {
                 val intentExtras = intent.extras
                 val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
                 Log.d("Baresip", "Got event $info")
-                if (running && (info.state == NetworkInfo.State.CONNECTED)) {
-                    Log.d("Baresip", "Registering upon CONNECTED event")
-                    UserAgent.register(uas)
-                }
+                //if (running && (info.state == NetworkInfo.State.CONNECTED)) {
+                // Log.d("Baresip", "Registering upon CONNECTED event")
+                if (running) UserAgent.register(uas)
             }
         }
         registerReceiver(receiver, intentFilter)
@@ -458,11 +457,8 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
 
             ACCOUNTS_CODE -> {
-                if (resultCode == RESULT_OK)
-                    Log.d("Baresip", "Edit accounts OK")
-                if (resultCode == RESULT_CANCELED)
-                    Log.d("Baresip", "Edit accounts canceled")
                 uaAdapter.notifyDataSetChanged()
+                updateNotification()
             }
 
             EDIT_CONFIG_CODE -> {
@@ -704,9 +700,9 @@ class MainActivity : AppCompatActivity() {
         layout.addView(answer_row)
     }
 
-    private fun updateNotification() {
+    fun updateNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.notification)
-        for (i: Int in 0 .. 3)  {
+        for (i: Int in 0 .. 5)  {
             val resID = resources.getIdentifier("status$i", "id", packageName);
             if (i < images.size) {
                 contentView.setImageViewResource(resID, images[i])

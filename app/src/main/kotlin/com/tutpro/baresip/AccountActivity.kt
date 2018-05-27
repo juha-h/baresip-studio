@@ -261,8 +261,19 @@ class AccountActivity : AppCompatActivity() {
             finish()
             return true
 
-        } else
-            return super.onOptionsItemSelected(item)
+        } else if (item.itemId == android.R.id.home) {
+
+            Log.d("Baresip", "Back array was pressed at Account")
+            intent.putExtra("action", "cancel")
+            if (acc.regint > 0) {
+                Log.d("Baresip", "Registering ${acc.aor}")
+                UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
+            }
+            setResult(RESULT_OK, intent)
+            finish()
+            return true
+
+        } else return super.onOptionsItemSelected(item)
     }
 
     private fun checkDisplayName(dn: String): Boolean {

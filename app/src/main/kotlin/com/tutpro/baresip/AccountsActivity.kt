@@ -58,7 +58,7 @@ class AccountsActivity : AppCompatActivity() {
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Accounts")
                 val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
+                setResult(Activity.RESULT_OK, i)
                 finish()
             }
         }
