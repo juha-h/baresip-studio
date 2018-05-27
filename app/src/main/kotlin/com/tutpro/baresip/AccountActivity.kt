@@ -116,163 +116,153 @@ class AccountActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
-        inflater.inflate(R.menu.edit_menu, menu)
+        inflater.inflate(R.menu.check_icon, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val intent = Intent(this, MainActivity::class.java)
-        when (item.itemId) {
-            R.id.save -> {
-                val dn = displayName.text.toString().trim()
-                if (dn != acc.displayName) {
-                    if (checkDisplayName(dn)) {
-                        if (account_set_display_name(acc.accp, dn) == 0) {
-                            acc.displayName = account_display_name(acc.accp);
-                            Log.d("Baresip", "New display name is ${acc.displayName}")
-                            save = true
-                        } else {
-                            Log.e("Baresip", "Setting of display name failed")
-                        }
+
+        if (item.itemId == R.id.checkIcon) {
+
+            val dn = displayName.text.toString().trim()
+            if (dn != acc.displayName) {
+                if (checkDisplayName(dn)) {
+                    if (account_set_display_name(acc.accp, dn) == 0) {
+                        acc.displayName = account_display_name(acc.accp);
+                        Log.d("Baresip", "New display name is ${acc.displayName}")
+                        save = true
                     } else {
-                        Utils.alertView(this, "Notice", "Invalid Display Name: $dn")
-                        return false
+                        Log.e("Baresip", "Setting of display name failed")
                     }
+                } else {
+                    Utils.alertView(this, "Notice", "Invalid Display Name: $dn")
+                    return false
                 }
+            }
 
-                val au = authUser.text.toString().trim()
-                if (au != acc.authUser) {
-                    if (checkAuthUser(au)) {
-                        if (account_set_auth_user(acc.accp, au) == 0) {
-                            acc.authUser = account_auth_user(acc.accp);
-                            Log.d("Baresip", "New auth user is ${acc.authUser}")
-                            save = true
-                        } else {
-                            Log.e("Baresip", "Setting of auth user failed")
-                        }
+            val au = authUser.text.toString().trim()
+            if (au != acc.authUser) {
+                if (checkAuthUser(au)) {
+                    if (account_set_auth_user(acc.accp, au) == 0) {
+                        acc.authUser = account_auth_user(acc.accp);
+                        Log.d("Baresip", "New auth user is ${acc.authUser}")
+                        save = true
                     } else {
-                        Utils.alertView(this, "Notice",
-                                "Invalid Authentication UserName: $au")
-                        return false
-                    }
-                }
-
-                val ap = authPass.text.toString().trim()
-                if (ap != acc.authPass) {
-                    if (Utils.checkPrintASCII(ap)) {
-                        if (account_set_auth_pass(acc.accp, ap) == 0) {
-                            acc.authPass = account_auth_pass(acc.accp)
-                            Log.d("Baresip", "New auth password is ${acc.authPass}")
-                            save = true
-                        } else {
-                            Log.e("Baresip", "Setting of auth pass failed")
-                        }
-                    } else {
-                        Utils.alertView(this, "Notice",
-                                "Invalid Authentication Password: $ap")
-                        return false
-                    }
-                }
-
-                val ob = ArrayList<String>()
-                if (outbound1.text.toString().trim() != "")
-                    ob.add(outbound1.text.toString().trim().replace(" ", ""))
-                if (outbound2.text.toString().trim() != "")
-                    ob.add(outbound2.text.toString().trim().replace(" ", ""))
-                if (ob != acc.outbound) {
-                    val outbound = ArrayList<String>()
-                    for (i in ob.indices) {
-                        if ((ob[i] == "") || Utils.uri_decode(ob[i])) {
-                            if (account_set_outbound(acc.accp, ob[i], i) == 0) {
-                                if (ob[i] != "")
-                                    outbound.add(account_outbound(acc.accp, i))
-                            } else {
-                                Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
-                                break
-                            }
-                        } else {
-                            Utils.alertView(this, "Notice",
-                                    "Invalid Outbound Proxy: ${ob[i]}")
-                            return false
-                        }
-                    }
-                    Log.d("Baresip", "New outbound proxies are ${outbound}")
-                    acc.outbound = outbound
-                    save = true
-                }
-
-                val ri = regint.text.toString().trim()
-                if (Utils.checkUint(ri)) {
-                    if (ri.toInt() != acc.regint) {
-                        if (account_set_regint(acc.accp, ri.toInt()) == 0) {
-                            acc.regint = account_regint(acc.accp)
-                            Log.d("Baresip", "New regint is ${acc.regint}")
-                            save = true
-                        } else {
-                            Log.e("Baresip", "Setting of regint $ri failed")
-                        }
+                        Log.e("Baresip", "Setting of auth user failed")
                     }
                 } else {
                     Utils.alertView(this, "Notice",
-                            "Invalid Registration Interval: $ri")
+                            "Invalid Authentication UserName: $au")
                     return false
                 }
-
-                val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter{it != ""} as ArrayList<String>))
-                if (ac != acc.audioCodec) {
-                    Log.d("Baresip", "New codecs ${newCodecs.filter { it != "" }}")
-                    val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
-                    if (account_set_audio_codecs(acc.accp, acParam) == 0) {
-                        var i = 0
-                        while (true) {
-                            val codec = account_audio_codec(acc.accp, i)
-                            if (codec != "") {
-                                Log.d("Baresip", "Found audio codec $codec")
-                                i++
-                            } else {
-                                break
-                            }
-                        }
-                        acc.audioCodec = ac
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of audio codecs $acParam failed")
-                    }
-                }
-
-                if (mediaEnc != acc.mediaenc) {
-                    if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                        acc.mediaenc = account_mediaenc(acc.accp)
-                        Log.d("Baresip", "New mediaenc is ${acc.mediaenc}")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
-                    }
-                }
-
-                if (save) {
-                    AccountsActivity.saveAccounts()
-                    if (acc.regint > 0) {
-                        Log.d("Baresip", "Registering ${acc.aor}")
-                        UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
-                    }
-                }
-                setResult(RESULT_OK, intent)
-                finish()
-                return true
             }
-            R.id.cancel, android.R.id.home -> {
-                intent.putExtra("action", "cancel")
+
+            val ap = authPass.text.toString().trim()
+            if (ap != acc.authPass) {
+                if (Utils.checkPrintASCII(ap)) {
+                    if (account_set_auth_pass(acc.accp, ap) == 0) {
+                        acc.authPass = account_auth_pass(acc.accp)
+                        Log.d("Baresip", "New auth password is ${acc.authPass}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of auth pass failed")
+                    }
+                } else {
+                    Utils.alertView(this, "Notice",
+                            "Invalid Authentication Password: $ap")
+                    return false
+                }
+            }
+
+            val ob = ArrayList<String>()
+            if (outbound1.text.toString().trim() != "")
+                ob.add(outbound1.text.toString().trim().replace(" ", ""))
+            if (outbound2.text.toString().trim() != "")
+                ob.add(outbound2.text.toString().trim().replace(" ", ""))
+            if (ob != acc.outbound) {
+                val outbound = ArrayList<String>()
+                for (i in ob.indices) {
+                    if ((ob[i] == "") || Utils.uri_decode(ob[i])) {
+                        if (account_set_outbound(acc.accp, ob[i], i) == 0) {
+                            if (ob[i] != "")
+                                outbound.add(account_outbound(acc.accp, i))
+                        } else {
+                            Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
+                            break
+                        }
+                    } else {
+                        Utils.alertView(this, "Notice",
+                                "Invalid Outbound Proxy: ${ob[i]}")
+                        return false
+                    }
+                }
+                Log.d("Baresip", "New outbound proxies are ${outbound}")
+                acc.outbound = outbound
+                save = true
+            }
+
+            val ri = regint.text.toString().trim()
+            if (Utils.checkUint(ri)) {
+                if (ri.toInt() != acc.regint) {
+                    if (account_set_regint(acc.accp, ri.toInt()) == 0) {
+                        acc.regint = account_regint(acc.accp)
+                        Log.d("Baresip", "New regint is ${acc.regint}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of regint $ri failed")
+                    }
+                }
+            } else {
+                Utils.alertView(this, "Notice",
+                        "Invalid Registration Interval: $ri")
+                return false
+            }
+
+            val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "" } as ArrayList<String>))
+            if (ac != acc.audioCodec) {
+                Log.d("Baresip", "New codecs ${newCodecs.filter { it != "" }}")
+                val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
+                if (account_set_audio_codecs(acc.accp, acParam) == 0) {
+                    var i = 0
+                    while (true) {
+                        val codec = account_audio_codec(acc.accp, i)
+                        if (codec != "") {
+                            Log.d("Baresip", "Found audio codec $codec")
+                            i++
+                        } else {
+                            break
+                        }
+                    }
+                    acc.audioCodec = ac
+                    save = true
+                } else {
+                    Log.e("Baresip", "Setting of audio codecs $acParam failed")
+                }
+            }
+
+            if (mediaEnc != acc.mediaenc) {
+                if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
+                    acc.mediaenc = account_mediaenc(acc.accp)
+                    Log.d("Baresip", "New mediaenc is ${acc.mediaenc}")
+                    save = true
+                } else {
+                    Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
+                }
+            }
+
+            if (save) {
+                AccountsActivity.saveAccounts()
                 if (acc.regint > 0) {
                     Log.d("Baresip", "Registering ${acc.aor}")
                     UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
                 }
-                setResult(RESULT_OK, intent)
-                finish()
-                return true
             }
-            else -> return super.onOptionsItemSelected(item)
-        }
+            setResult(RESULT_OK, intent)
+            finish()
+            return true
+
+        } else
+            return super.onOptionsItemSelected(item)
     }
 
     private fun checkDisplayName(dn: String): Boolean {
