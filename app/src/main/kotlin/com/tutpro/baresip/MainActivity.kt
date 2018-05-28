@@ -487,7 +487,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             EDIT_CONTACTS_CODE, ABOUT_CODE -> {
-                Log.d("Baresip", "Back arrow or Cancel pressed at request: $requestCode")
             }
         }
     }

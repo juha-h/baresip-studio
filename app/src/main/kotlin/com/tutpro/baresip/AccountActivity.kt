@@ -29,8 +29,7 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        val b = intent.extras
-        acc = Account.find(MainActivity.uas, b.getString("accp"))!!
+        acc = Account.find(MainActivity.uas, intent.extras.getString("accp"))!!
         aor = acc.aor
         setTitle(aor.replace("sip:", ""))
 
@@ -121,6 +120,8 @@ class AccountActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val i = Intent(this, MainActivity::class.java)
 
         if (item.itemId == R.id.checkIcon) {
 
@@ -257,19 +258,19 @@ class AccountActivity : AppCompatActivity() {
                     UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
                 }
             }
-            setResult(RESULT_OK, intent)
+            setResult(RESULT_OK, i)
             finish()
             return true
 
         } else if (item.itemId == android.R.id.home) {
 
             Log.d("Baresip", "Back array was pressed at Account")
-            intent.putExtra("action", "cancel")
+            i.putExtra("action", "cancel")
             if (acc.regint > 0) {
                 Log.d("Baresip", "Registering ${acc.aor}")
                 UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
             }
-            setResult(RESULT_OK, intent)
+            setResult(RESULT_OK, i)
             finish()
             return true
 

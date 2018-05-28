@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -34,33 +35,33 @@ class EditContactsActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
-        inflater.inflate(R.menu.edit_menu, menu)
+        inflater.inflate(R.menu.check_icon, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         val i = Intent(this, MainActivity::class.java)
-        when (item.itemId) {
-            R.id.save -> {
-                val path = applicationContext.filesDir.absolutePath + "/contacts"
-                val file = File(path)
-                Utils.putFileContents(file, editText!!.text.toString())
-                Log.d("Baresip", "Updated contacts file")
-                MainActivity.contacts_remove()
-                updateContactsAndNames(path)
-                // MainActivity.calleeAdapter.notifyDataSetChanged(); does not work
-                setResult(RESULT_OK, i)
-                finish()
-                return true
-            }
-            R.id.cancel, android.R.id.home -> {
-                i.putExtra("action", "cancel")
-                setResult(RESULT_OK, i)
-                finish()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
+
+        if (item.itemId == R.id.checkIcon) {
+            val path = applicationContext.filesDir.absolutePath + "/contacts"
+            val file = File(path)
+            Utils.putFileContents(file, editText!!.text.toString())
+            Log.d("Baresip", "Updated contacts file")
+            MainActivity.contacts_remove()
+            updateContactsAndNames(path)
+            setResult(RESULT_OK, i)
+            finish()
+            return true
+
+        } else if (item.itemId == android.R.id.home) {
+            Log.d("Baresip", "Back array was pressed at Contacts")
+            setResult(Activity.RESULT_CANCELED, i)
+            finish()
+            return true
+
+        } else return super.onOptionsItemSelected(item)
+
     }
 
     companion object {
