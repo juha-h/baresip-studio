@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -63,41 +64,44 @@ class EditConfigActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
-        inflater.inflate(R.menu.edit_menu, menu)
+        inflater.inflate(R.menu.check_icon, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val i = Intent(this, MainActivity::class.java)
-        when (item.itemId) {
-            R.id.save -> {
-                try {
-                    val fOut = FileOutputStream(file!!.absoluteFile, false)
-                    val fWriter = OutputStreamWriter(fOut)
-                    val res = editText!!.text.toString()
-                    try {
-                        fWriter.write(res)
-                        fWriter.close()
-                        fOut.close()
-                    } catch (e: java.io.IOException) {
-                        Log.e("Baresip", "Failed to write config file: " + e.toString())
-                    }
 
-                } catch (e: java.io.FileNotFoundException) {
-                    Log.e("Baresip", "Failed to find config file: " + e.toString())
+        val i = Intent(this, MainActivity::class.java)
+
+        if (item.itemId == R.id.checkIcon) {
+            try {
+                val fOut = FileOutputStream(file!!.absoluteFile, false)
+                val fWriter = OutputStreamWriter(fOut)
+                val res = editText!!.text.toString()
+                try {
+                    fWriter.write(res)
+                    fWriter.close()
+                    fOut.close()
+                } catch (e: java.io.IOException) {
+                    Log.e("Baresip", "Failed to write config file: " + e.toString())
                 }
 
-                Log.d("Baresip", "Updated config file")
-                setResult(RESULT_OK, i)
-                finish()
-                return true
+            } catch (e: java.io.FileNotFoundException) {
+                Log.e("Baresip", "Failed to find config file: " + e.toString())
             }
-            R.id.cancel, android.R.id.home -> {
-                setResult(RESULT_CANCELED, i)
-                finish()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
+
+            Log.d("Baresip", "Updated config file")
+            setResult(RESULT_OK, i)
+            finish()
+            return true
+
+        } else if (item.itemId == android.R.id.home) {
+
+            Log.d("Baresip", "Back array was pressed at Edit Config")
+            setResult(Activity.RESULT_CANCELED, i)
+            finish()
+            return true
+
+        } else return super.onOptionsItemSelected(item)
+
     }
 }

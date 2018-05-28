@@ -73,7 +73,7 @@ class HistoryActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed")
+                Log.d("Baresip", "Back array was pressed at History")
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
