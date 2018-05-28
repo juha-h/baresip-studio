@@ -4,10 +4,7 @@ import android.Manifest
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
@@ -842,7 +839,9 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         am.mode = AudioManager.MODE_RINGTONE
-                        // am.isSpeakerphoneOn = true
+                        val i = Intent(this, MainActivity::class.java)
+                        i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        startActivity(i);
                     }
                     "call verify" -> {
                         val call = Call.find(calls, callp)
@@ -935,7 +934,7 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         if (call.dir == "in") {
-                            Log.d("Baresip", "Removing inbound call $uap / $callp / " +
+                            Log.d("Baresip", "Removing inbound call ${uap}/${callp}/" +
                                     call.peerURI)
                             val inIndex = Call.index(calls, call, "in")
                             val view_id = (inIndex + 1) * 10
