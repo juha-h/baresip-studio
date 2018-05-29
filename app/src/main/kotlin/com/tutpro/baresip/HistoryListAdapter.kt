@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import java.util.*
 
@@ -16,18 +17,27 @@ class HistoryListAdapter(private val cxt: Context, private val rows: ArrayList<H
         val row = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.history_row, parent, false)
-        val directionView = rowView.findViewById(R.id.direction) as ImageView
-        directionView.setImageResource(row.direction)
+        val directions = rowView.findViewById(R.id.directions) as LinearLayout
+        var count = 1
+        for (d in row.directions) {
+            if (count > 3) {
+                val etc = rowView.findViewById(R.id.etc) as TextView
+                etc.text = "..."
+                break
+            }
+            val dirView = ImageView(cxt)
+            val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT)
+            dirView.layoutParams = params
+            dirView.setPadding(0, 5, 0, 0)
+            dirView.setImageResource(d)
+            directions.addView(dirView)
+            count++
+        }
         val peerURIView = rowView.findViewById(R.id.peer_uri) as TextView
         peerURIView.text = row.peerURI
         val timeView = rowView.findViewById(R.id.time) as TextView
-        val now = GregorianCalendar()
-        if (row.time.get(Calendar.YEAR).equals(now.get(Calendar.YEAR)) &&
-                row.time.get(Calendar.DAY_OF_YEAR).equals(now.get(Calendar.DAY_OF_YEAR)))
-            timeView.text = String.format("%02d", row.time.get(Calendar.HOUR_OF_DAY)) + ":" +
-                    String.format("%02d", row.time.get(Calendar.HOUR_OF_DAY))
-        else
-            timeView.text = row.time
+        timeView.text = row.time
         return rowView
     }
 
