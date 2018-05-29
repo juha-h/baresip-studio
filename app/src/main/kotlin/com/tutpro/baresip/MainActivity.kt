@@ -666,8 +666,7 @@ class MainActivity : AppCompatActivity() {
         reject_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
                 "Reject" -> {
-                    Log.i("Baresip", "UA " + call.ua +
-                            " rejecting incoming call " + call.callp)
+                    Log.i("Baresip", "UA ${call.ua} rejecting incoming call ${call.callp}")
                     ua_hangup(call.ua.uap, call.callp, 486, "Rejected")
                 }
                 "Hold" -> {
@@ -834,8 +833,12 @@ class MainActivity : AppCompatActivity() {
                         val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
                         this@MainActivity.runOnUiThread {
                             calls.add(new_call)
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                addCallViews(ua, new_call, Call.calls(calls, "in").size * 10)
+                            } else {
+                                aorSpinner.setSelection(UserAgent.findAorIndex(uas, aor)!!)
+                            }
                             am.mode = AudioManager.MODE_RINGTONE
-                            aorSpinner.setSelection(UserAgent.findAorIndex(uas, aor)!!)
                         }
                         val i = Intent(this, MainActivity::class.java)
                         i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
