@@ -22,6 +22,13 @@ class UserAgent (val uap: String) {
             return null
         }
 
+        fun findAorIndex(uas: ArrayList<UserAgent>, aor: String): Int? {
+            for (i in uas.indices) {
+                if (uas[i].aor == aor) return i
+            }
+            return null
+        }
+
         fun register(uas: ArrayList<UserAgent>) {
             for (ua in uas) {
                 if (ua_register(ua.uap) != 0)

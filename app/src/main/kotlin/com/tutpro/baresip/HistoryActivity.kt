@@ -92,28 +92,31 @@ class HistoryActivity : AppCompatActivity() {
                 if (Utils.uriHostPart(peer_uri) == Utils.uriHostPart(aor)) {
                     peer_uri = Utils.uriUserPart(peer_uri)
                 }
-                val time: String
-                if (isToday(h.time)) {
-                    val fmt = SimpleDateFormat("HH:mm")
-                    time = fmt.format(h.time.time)
+                var direction: Int
+                if (h.direction == "in")
+                    if (h.connected)
+                        direction = R.drawable.arrow_down_green
+                    else
+                        direction = R.drawable.arrow_down_red
+                else
+                    if (h.connected)
+                        direction = R.drawable.arrow_up_green
+                    else
+                        direction = R.drawable.arrow_up_red
+                if (uaHistory.isNotEmpty() && (uaHistory.last().peerURI == peer_uri)) {
+                    uaHistory.last().directions.add(direction)
                 } else {
-                    val fmt = SimpleDateFormat("MMM dd")
-                    time = fmt.format(h.time.time)
-                }
-                if (h.direction == "in") {
-                    if (h.connected) {
-                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_down_green, time))
+                    val time: String
+                    if (isToday(h.time)) {
+                        val fmt = SimpleDateFormat("HH:mm")
+                        time = fmt.format(h.time.time)
                     } else {
-                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_down_red, time))
+                        val fmt = SimpleDateFormat("dd.MM")
+                        time = fmt.format(h.time.time)
                     }
-                } else {
-                    if (h.connected) {
-                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_up_green, time))
-                    } else {
-                        uaHistory.add(HistoryRow(peer_uri, R.drawable.arrow_up_red, time))
-                    }
+                    uaHistory.add(HistoryRow(peer_uri, direction, time))
+                    posAtHistory.add(i)
                 }
-                posAtHistory.add(i)
             }
         }
     }
