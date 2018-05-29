@@ -748,16 +748,16 @@ class MainActivity : AppCompatActivity() {
                     }
                     "registered" -> {
                         Log.d("Baresip", "Setting status to green")
-                        images[account_index] = R.drawable.dot_green
                         this@MainActivity.runOnUiThread {
+                            images[account_index] = R.drawable.dot_green
                             uaAdapter.notifyDataSetChanged()
                             updateNotification()
                         }
                     }
                     "registering failed" -> {
                         Log.d("Baresip", "Setting status to red")
-                        images[account_index] = R.drawable.dot_red
                         this@MainActivity.runOnUiThread {
+                            images[account_index] = R.drawable.dot_red
                             uaAdapter.notifyDataSetChanged()
                             updateNotification()
                         }
@@ -832,13 +832,11 @@ class MainActivity : AppCompatActivity() {
                         val peer_uri = call_peeruri(callp)
                         Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
                         val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
-                        calls.add(new_call)
                         this@MainActivity.runOnUiThread {
-                            if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                addCallViews(ua, new_call, Call.calls(calls, "in").size * 10)
-                            }
+                            calls.add(new_call)
+                            am.mode = AudioManager.MODE_RINGTONE
+                            aorSpinner.setSelection(UserAgent.findAorIndex(uas, aor)!!)
                         }
-                        am.mode = AudioManager.MODE_RINGTONE
                         val i = Intent(this, MainActivity::class.java)
                         i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                         startActivity(i);
@@ -992,6 +990,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
                 }
+                break
             }
         }
     }
