@@ -49,8 +49,11 @@ class Account(val accp: String) {
 
         if (authPass != "") res = res + ";auth_pass=\"${authPass}\""
 
-        if (outbound.size > 0) res = res + ";outbound=\"${outbound[0]}\""
-        if (outbound.size > 1) res = res + ";outbound2=\"${outbound[1]}\""
+        if (outbound.size > 0) {
+            res = res + ";outbound=\"${outbound[0]}\""
+            if (outbound.size > 1) res = res + ";outbound2=\"${outbound[1]}\""
+            res = res + ";sipnat=outbound"
+        }
 
         if (audioCodec.size > 0) {
             var first = true
@@ -66,7 +69,7 @@ class Account(val accp: String) {
 
         if (mediaenc != "") res = res + ";mediaenc=${mediaenc}"
 
-        res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual;sipnat=outbound"
+        res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual"
 
         return res
     }
@@ -74,7 +77,7 @@ class Account(val accp: String) {
     companion object {
 
         fun accounts(): ArrayList<Account> {
-            var res = ArrayList<Account>()
+            val res = ArrayList<Account>()
             for (ua in MainActivity.uas) {
                 res.add(ua.account)
             }
@@ -102,12 +105,6 @@ class Account(val accp: String) {
             return false
         }
 
-        fun printNew(aor: String) : String {
-            var res = "<$aor>;auth_user=\"\";auth_pass=\"\";audio_codecs=opus/48000/2,PCMU,PCMA"
-            res = res + ";ptime=20;regint=600;regq=0.5;pubint=0;answermode=manual;sipnat=outbound"
-            res = res + ";mediaenc=zrtp"
-            return res
-        }
     }
 }
 
