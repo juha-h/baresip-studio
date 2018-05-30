@@ -64,7 +64,7 @@ rtp_stats               no
 
 # Audio codec Modules (in order)
 module                  opus.so
-module                  g7221.so
+#module                  g7221.so
 #module                 amr.so
 #module                 g722.so
 #module                 g726.so
