@@ -10,7 +10,7 @@ class UserAgent (val uap: String) {
     companion object {
 
         external fun ua_alloc(uri: String): Int
-        external fun ua_destroy(uri: String)
+        external fun ua_destroy(ua: String)
         external fun ua_register(ua: String): Int
         external fun ua_isregistered(ua: String): Boolean
         external fun ua_unregister(ua: String)
