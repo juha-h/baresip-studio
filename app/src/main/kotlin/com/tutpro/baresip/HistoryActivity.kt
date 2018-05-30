@@ -19,7 +19,6 @@ import java.util.GregorianCalendar
 class HistoryActivity : AppCompatActivity() {
 
     internal var uaHistory = ArrayList<HistoryRow>()
-    internal var posAtHistory = ArrayList<Int>()
     internal var aor: String = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +44,7 @@ class HistoryActivity : AppCompatActivity() {
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        MainActivity.history.removeAt(posAtHistory[pos])
-                        aorGenerateHistory(aor)
+                        removeUaHistoryAt(pos)
                         if (uaHistory.size == 0) {
                             val i = Intent()
                             setResult(Activity.RESULT_CANCELED, i)
@@ -61,7 +59,7 @@ class HistoryActivity : AppCompatActivity() {
             val builder = AlertDialog.Builder(this@HistoryActivity,
                     R.style.Theme_AppCompat)
             builder.setMessage("Do you want to delete " +
-                    MainActivity.history[pos].peerURI + "?")
+                    uaHistory[pos].peerURI + " call history?")
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show()
             true
@@ -84,7 +82,6 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
-        posAtHistory.clear()
         for (i in MainActivity.history.indices.reversed()) {
             val h = MainActivity.history[i]
             if (h.aor == aor) {
@@ -105,6 +102,7 @@ class HistoryActivity : AppCompatActivity() {
                         direction = R.drawable.arrow_up_red
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerURI == peer_uri)) {
                     uaHistory.last().directions.add(direction)
+                    uaHistory.last().indexes.add(i)
                 } else {
                     val time: String
                     if (isToday(h.time)) {
@@ -114,11 +112,16 @@ class HistoryActivity : AppCompatActivity() {
                         val fmt = SimpleDateFormat("dd.MM")
                         time = fmt.format(h.time.time)
                     }
-                    uaHistory.add(HistoryRow(peer_uri, direction, time))
-                    posAtHistory.add(i)
+                    uaHistory.add(HistoryRow(peer_uri, direction, time, i))
                 }
             }
         }
+    }
+
+    private fun removeUaHistoryAt(i: Int) {
+        for (index in uaHistory[i].indexes)
+            MainActivity.history.removeAt(index)
+        uaHistory.removeAt(i)
     }
 
     private fun isToday(time: GregorianCalendar): Boolean {
