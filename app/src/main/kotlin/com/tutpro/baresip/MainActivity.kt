@@ -726,9 +726,17 @@ class MainActivity : AppCompatActivity() {
     fun addAccount(ua: String) {
         val userAgent = UserAgent(ua)
         uas.add(userAgent)
-        images.add(R.drawable.dot_yellow)
+        if (UserAgent.ua_isregistered(ua)) {
+            Log.d("Baresip", "Ua $ua is registered")
+            images.add(R.drawable.dot_green)
+        } else {
+            Log.d("Baresip", "Ua $ua is NOT registered")
+            images.add(R.drawable.dot_yellow)
+            UserAgent.ua_register(ua)
+        }
         this@MainActivity.runOnUiThread {
             uaAdapter.notifyDataSetChanged()
+            
             updateNotification()
         }
     }
