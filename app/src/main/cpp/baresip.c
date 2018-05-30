@@ -270,7 +270,7 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
     LOGD("Adding %u accounts", list_count(uag_list()));
     char ua_buf[256];
     struct ua *ua;
-    for (le = list_head(uag_list()); le; le = le->next) {
+    for (le = list_head(uag_list()); le != NULL; le = le->next) {
         ua = le->data;
         sprintf(ua_buf, "%lu", (unsigned long)ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
