@@ -740,7 +740,7 @@ class MainActivity : AppCompatActivity() {
         }
         this@MainActivity.runOnUiThread {
             uaAdapter.notifyDataSetChanged()
-            
+            if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
             updateNotification()
         }
     }
