@@ -93,7 +93,7 @@ class Account(val accp: String) {
 
         fun findUA(aor: String): UserAgent? {
             for (ua in MainActivity.uas) {
-                if (ua.aor == aor) return ua
+                if (ua.account.aor == aor) return ua
             }
             return null
         }
@@ -117,6 +117,8 @@ external fun account_auth_pass(acc: String): String
 external fun account_set_auth_pass(acc: String, pass: String): Int
 external fun account_outbound(acc: String, ix: Int): String
 external fun account_set_outbound(acc: String, ob: String, ix: Int): Int
+external fun account_sipnat(acc: String): String
+external fun account_set_sipnat(acc: String, sipnat: String): Int
 external fun account_audio_codec(acc: String, ix: Int): String
 external fun account_regint(acc: String): Int
 external fun account_set_regint(acc: String, regint: Int): Int

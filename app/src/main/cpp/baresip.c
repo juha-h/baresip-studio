@@ -274,8 +274,8 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
         ua = le->data;
         sprintf(ua_buf, "%lu", (unsigned long)ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        LOGD("adding account %s/%s\n", ua_aor(ua), ua_buf);
-        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addAccount",
+        LOGD("adding UA for AoR %s/%s\n", ua_aor(ua), ua_buf);
+        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addUA",
                                                   "(Ljava/lang/String;)V");
         (*env)->CallVoidMethod(env, pctx->mainActivityObj, accountId, javaUA);
         (*env)->DeleteLocalRef(env, javaUA);
@@ -569,27 +569,47 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1mediaenc(JNIEnv *env, jobject th
     (*env)->ReleaseStringUTFChars(env, javaMencid, mencid);
     return res;
 }
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1sipnat(JNIEnv *env, jobject thiz, jstring javaAcc)
+{
+    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    if (acc) {
+        const char *sipnat = account_sipnat(acc);
+        if (sipnat) return (*env)->NewStringUTF(env, sipnat);
+    }
+    return (*env)->NewStringUTF(env, "");
+}
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1alloc(JNIEnv *env, jobject thiz,
-                                                           jstring javaSipUri) {
-    const char *sip_uri = (*env)->GetStringUTFChars(env, javaSipUri, 0);
-    struct ua *ua;
-    LOGD("allocating UA '%s'\n", sip_uri);
-    int res = ua_alloc(&ua, sip_uri);
-    (*env)->ReleaseStringUTFChars(env, javaSipUri, sip_uri);
-    if (res == 0) {
-        char ua_buf[64];
-        UpdateContext *pctx = (UpdateContext*)(&g_ctx);
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
-        jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        LOGD("adding account %s/%s\n", ua_aor(ua), ua_buf);
-        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addAccount",
-                                                  "(Ljava/lang/String;)V");
-        (*env)->CallVoidMethod(env, pctx->mainActivityObj, accountId, javaUA);
-        (*env)->DeleteLocalRef(env, javaUA);
-    }
+Java_com_tutpro_baresip_AccountKt_account_1set_1sipnat(JNIEnv *env, jobject thiz,
+                                                         jstring javaAcc, jstring javaSipNat) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    const char *sipnat = (*env)->GetStringUTFChars(env, javaSipNat, 0);
+    int res;
+    if (strlen(sipnat) > 0)
+        res = account_set_sipnat(acc, sipnat);
+    else
+        res = account_set_sipnat(acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, javaSipNat, sipnat);
     return res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1alloc(JNIEnv *env, jobject thiz,
+                                                           jstring javaUri) {
+    const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
+    struct ua *ua;
+    LOGD("allocating UA '%s'\n", uri);
+    int res = ua_alloc(&ua, uri);
+    (*env)->ReleaseStringUTFChars(env, javaUri, uri);
+    char ua_buf[64];
+    ua_buf[0] = '\0';
+    if (res == 0) sprintf(ua_buf, "%lu", (unsigned long)ua);
+    return (*env)->NewStringUTF(env, ua_buf);
 }
 
 JNIEXPORT jint JNICALL
@@ -620,6 +640,16 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1isregistered(JNIEnv *env, j
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     return ua_isregistered(ua);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1update_1account(JNIEnv *env, jobject thiz,
+                                                                    jstring javaUA)
+{
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    return ua_update_account(ua);
 }
 
 JNIEXPORT void JNICALL

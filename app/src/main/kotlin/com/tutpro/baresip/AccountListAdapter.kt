@@ -37,12 +37,9 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         actionView.setOnClickListener { _ ->
             Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
-            deleteDialog.setMessage("Do you want to delete account ${MainActivity.uas[position].aor}?")
+            deleteDialog.setMessage("Do you want to delete account ${MainActivity.uas[position].account.aor}?")
             deleteDialog.setPositiveButton("Delete") { dialog, _ ->
-                if (UserAgent.ua_isregistered(MainActivity.uas[position].uap)) {
-                    UserAgent.ua_unregister(MainActivity.uas[position].uap)
-                }
-                UserAgent.ua_destroy(MainActivity.uas[position].uap)
+                MainActivity.uas[position].destroy()
                 MainActivity.uas.remove(MainActivity.uas[position])
                 MainActivity.images.removeAt(position)
                 AccountsActivity.saveAccounts()

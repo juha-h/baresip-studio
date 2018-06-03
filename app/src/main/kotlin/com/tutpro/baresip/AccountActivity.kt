@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -58,7 +59,7 @@ class AccountActivity : AppCompatActivity() {
         while (newCodecs.size < audioCodecs.size) newCodecs.add("")
 
         val layout = findViewById(R.id.CodecSpinners) as LinearLayout
-        var spinnerList = Array(audioCodecs.size, {i -> ArrayList<String>()})
+        val spinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
         for (i in audioCodecs.indices) {
             val spinner = Spinner(applicationContext)
             spinner.id = i + 100
@@ -121,7 +122,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val i = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, MainActivity::class.java)
 
         if (item.itemId == R.id.checkIcon) {
 
@@ -163,7 +164,7 @@ class AccountActivity : AppCompatActivity() {
                 if (Utils.checkPrintASCII(ap)) {
                     if (account_set_auth_pass(acc.accp, ap) == 0) {
                         acc.authPass = account_auth_pass(acc.accp)
-                        Log.d("Baresip", "New auth password is ${acc.authPass}")
+                        // Log.d("Baresip", "New auth password is ${acc.authPass}")
                         save = true
                     } else {
                         Log.e("Baresip", "Setting of auth pass failed")
@@ -199,6 +200,10 @@ class AccountActivity : AppCompatActivity() {
                 }
                 Log.d("Baresip", "New outbound proxies are ${outbound}")
                 acc.outbound = outbound
+                if (outbound.isEmpty())
+                    account_set_sipnat(acc.accp, "")
+                else
+                    account_set_sipnat(acc.accp, "outbound")
                 save = true
             }
 
@@ -253,24 +258,25 @@ class AccountActivity : AppCompatActivity() {
 
             if (save) {
                 AccountsActivity.saveAccounts()
-                if (acc.regint > 0) {
-                    Log.d("Baresip", "Registering ${acc.aor}")
-                    UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
+                val uaIndex = UserAgent.findAorIndex(MainActivity.uas, aor)
+                if (uaIndex != null) {
+                    if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
+                        Log.e("Baresip", "Failed to update UA with AoR $aor")
+                    else if (acc.regint > 0)
+                        UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
+                } else {
+                    Log.e("Baresip", "Did not find UA matching AoR $aor")
                 }
             }
-            setResult(RESULT_OK, i)
+
+            setResult(RESULT_OK, intent)
             finish()
             return true
 
         } else if (item.itemId == android.R.id.home) {
 
             Log.d("Baresip", "Back array was pressed at Account")
-            i.putExtra("action", "cancel")
-            if (acc.regint > 0) {
-                Log.d("Baresip", "Registering ${acc.aor}")
-                UserAgent.ua_register(Account.findUA(acc.aor)!!.uap)
-            }
-            setResult(RESULT_OK, i)
+            setResult(RESULT_CANCELED, intent)
             finish()
             return true
 

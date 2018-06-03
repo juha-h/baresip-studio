@@ -57,6 +57,7 @@ int account_debug(struct re_printf *pf, const struct account *acc);
 int account_set_auth_user(struct account *acc, const char *user);
 int account_set_auth_pass(struct account *acc, const char *pass);
 int account_set_outbound(struct account *acc, const char *ob, unsigned ix);
+int account_set_sipnat(struct account *acc, const char *sipnat);
 int account_set_display_name(struct account *acc, const char *dname);
 int account_set_regint(struct account *acc, uint32_t regint);
 int account_set_mediaenc(struct account *acc, const char *mediaenc);
@@ -75,6 +76,7 @@ const char *account_aor(const struct account *acc);
 const char *account_auth_user(const struct account *acc);
 const char *account_auth_pass(const struct account *acc);
 const char *account_outbound(const struct account *acc, unsigned ix);
+const char *account_sipnat(const struct account *acc);
 const char *account_stun_user(const struct account *acc);
 const char *account_stun_pass(const struct account *acc);
 const char *account_stun_host(const struct account *acc);
@@ -534,7 +536,7 @@ typedef void (menc_event_h)(enum menc_event event, const char *prm, void *arg);
 
 typedef int  (menc_sess_h)(struct menc_sess **sessp, struct sdp_session *sdp,
 			   bool offerer, menc_event_h *eventh,
-                           menc_error_h *errorh, void *arg);
+			   menc_error_h *errorh, void *arg);
 
 typedef int  (menc_media_h)(struct menc_media **mp, struct menc_sess *sess,
 			    struct rtp_sock *rtp, int proto,
@@ -649,6 +651,7 @@ int  ua_debug(struct re_printf *pf, const struct ua *ua);
 int  ua_print_calls(struct re_printf *pf, const struct ua *ua);
 int  ua_print_status(struct re_printf *pf, const struct ua *ua);
 int  ua_print_supported(struct re_printf *pf, const struct ua *ua);
+int  ua_update_account(struct ua *ua);
 int  ua_register(struct ua *ua);
 void ua_unregister(struct ua *ua);
 bool ua_isregistered(const struct ua *ua);
