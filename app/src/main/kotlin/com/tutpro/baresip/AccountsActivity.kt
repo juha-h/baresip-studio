@@ -15,6 +15,7 @@ import java.util.ArrayList
 class AccountsActivity : AppCompatActivity() {
 
     internal var aor: String = ""
+    internal lateinit var alAdapter: AccountListAdapter
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +23,7 @@ class AccountsActivity : AppCompatActivity() {
 
         val listview = findViewById(R.id.accounts) as ListView
         generateAccounts()
-        val alAdapter = AccountListAdapter(this, accounts)
+        alAdapter = AccountListAdapter(this, accounts)
         listview.adapter = alAdapter
 
         val addAccountButton = findViewById(R.id.addAccount) as ImageButton
@@ -37,17 +38,26 @@ class AccountsActivity : AppCompatActivity() {
             } else if (Account.exists(MainActivity.uas, aor)) {
                 Log.e("Baresip", "Account $aor already exists")
             } else {
-                if (UserAgent.ua_alloc("<$aor>;regq=0.5;pubint=0;regint=600") != 0) {
-                    Log.e("Baresip", "Failed to allocate UA $aor")
+                val ua = UserAgent.uaAlloc("<$aor>;regq=0.5;pubint=0;regint=0")
+                if (ua == null) {
+                    Log.e("Baresip", "Failed to allocate UA for $aor")
                     Utils.alertView(this, "Notice",
-                            "Failed to allocate new account. Check your network connection.")
+                            "Failed to allocate new account.")
                 } else {
-                    SystemClock.sleep(200);
                     newAorView.setText("")
-                    newAorView.setHint("SIP URI user@domain")
+                    newAorView.hint = "SIP URI user@domain"
                     newAorView.clearFocus()
+                    MainActivity.uas.add(ua)
+                    MainActivity.images.add(R.drawable.dot_yellow)
+                    generateAccounts()
+                    alAdapter.notifyDataSetChanged()
                     saveAccounts()
-                    recreate()
+                    val i = Intent(this, AccountActivity::class.java)
+                    val b = Bundle()
+                    b.putString("accp", ua.account.accp)
+                    i.putExtras(b)
+                    startActivity(i)
+                    // recreate()
                 }
             }
         }
@@ -84,7 +94,8 @@ class AccountsActivity : AppCompatActivity() {
             posAtAccounts.clear()
             var i = 0;
             for (ua in MainActivity.uas) {
-                accounts.add(AccountRow(ua.aor.replace("sip:", ""), R.drawable.action_remove))
+                accounts.add(AccountRow(ua.account.aor.replace("sip:", ""),
+                        R.drawable.action_remove))
                 posAtAccounts.add(i)
                 i++
             }
@@ -95,7 +106,7 @@ class AccountsActivity : AppCompatActivity() {
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             val path = MainActivity.filesPath + "/accounts"
             Utils.putFileContents(File(path), accounts)
-//            Log.d("Baresip", "Saved accounts '${accounts}' to '$path")
+            // Log.d("Baresip", "Saved accounts '${accounts}' to '$path")
         }
     }
 

@@ -56,6 +56,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+
         setContentView(R.layout.activity_main)
 
         appContext = applicationContext
@@ -75,22 +80,17 @@ class MainActivity : AppCompatActivity() {
         wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK or
                 PowerManager.ACQUIRE_CAUSES_WAKEUP, "")
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-
         nb = NotificationCompat.Builder(this)
         nb.setVisibility(VISIBILITY_PUBLIC).setOngoing(true).setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(
                         PendingIntent.getActivity(this, NOTIFICATION_ID,
                                 Intent(this, MainActivity::class.java)
                                         .setAction(Intent.ACTION_MAIN)
-                                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                        .addCategory(Intent.CATEGORY_LAUNCHER),
                                         PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContent(RemoteViews(getPackageName(), R.layout.notification))
 
-        val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
+        val netFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val intentExtras = intent.extras
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                 if (running) UserAgent.register(uas)
             }
         }
-        registerReceiver(receiver, intentFilter)
+        registerReceiver(receiver, netFilter)
 
         aorSpinner = findViewById(R.id.AoRList) as Spinner
         uaAdapter = UaSpinnerAdapter(applicationContext, uas, images)
@@ -150,15 +150,11 @@ class MainActivity : AppCompatActivity() {
                 val `in` = Call.uaCalls(calls, ua, "in")
                 val view_count = layout.childCount
                 Log.d("Baresip", "View count is $view_count")
-                if (view_count > 7) {
-                    // remove all incoming call views
+                if (view_count > 7)
                     layout.removeViews(7, view_count - 7)
-                }
-                for (c in `in`) {
-                    for (call_index in Call.calls(calls, "in").indices) {
+                for (c in `in`)
+                    for (call_index in Call.uaCalls(calls, ua,"in").indices)
                         addCallViews(ua, c, (call_index + 1) * 10)
-                    }
-                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -278,7 +274,7 @@ class MainActivity : AppCompatActivity() {
         callButton.tag = "Call"
         callButton.setOnClickListener {
             val ua = uas[aorSpinner.selectedItemPosition]
-            val aor = ua.aor
+            val aor = ua.account.aor
             when (callButton.tag) {
                 "Call" -> {
                     val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
@@ -341,7 +337,7 @@ class MainActivity : AppCompatActivity() {
         historyButton.setOnClickListener {
             val i = Intent(this@MainActivity, HistoryActivity::class.java)
             val b = Bundle()
-            b.putString("aor", uas[aorSpinner.selectedItemPosition].aor)
+            b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
             i.putExtras(b)
             startActivityForResult(i, HISTORY_CODE)
         }
@@ -360,6 +356,17 @@ class MainActivity : AppCompatActivity() {
                 running = true
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("Baresip", "Paused")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Baresip", "Resumed")
+        nm.cancel(INCOMING_ID)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -405,11 +412,10 @@ class MainActivity : AppCompatActivity() {
                 am.isSpeakerphoneOn = !am.isSpeakerphoneOn
                 val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
                 if (am.isSpeakerphoneOn)
-                    // speakerIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.speaker_on))
                     speakerIcon.setBackgroundColor(Color.rgb(0x04, 0xb4, 0x04))
                 else
-                    // speakerIcon.setBackgroundColor(resources.getColor(R.color.colorPrimary, applicationContext.theme))
-                    speakerIcon.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+                    speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
+                            R.color.colorPrimary))
                 return true
             }
             R.id.accounts -> {
@@ -489,7 +495,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
-                    if (History.aorHistory(history, uas[aorSpinner.selectedItemPosition].aor) == 0) {
+                    if (History.aorHistory(history, uas[aorSpinner.selectedItemPosition].account.aor) == 0) {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
@@ -727,16 +733,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Keep
-    fun addAccount(ua: String) {
-        val userAgent = UserAgent(ua)
-        uas.add(userAgent)
-        if (UserAgent.ua_isregistered(ua)) {
+    fun addUA(uap: String) {
+        val ua = UserAgent(uap)
+        uas.add(ua)
+        if (UserAgent.ua_isregistered(uap)) {
             Log.d("Baresip", "Ua $ua is registered")
             images.add(R.drawable.dot_green)
         } else {
             Log.d("Baresip", "Ua $ua is NOT registered")
             images.add(R.drawable.dot_yellow)
-            UserAgent.ua_register(ua)
+            ua.register()
         }
         this@MainActivity.runOnUiThread {
             uaAdapter.notifyDataSetChanged()
@@ -753,14 +759,14 @@ class MainActivity : AppCompatActivity() {
             Log.e("Baresip", "Update status did not find ua $uap")
             return
         }
-        val aor = ua.aor
+        val aor = ua.account.aor
         val acc = ua.account
         val ev = event.split(",")
 
         Log.d("Baresip", "Handling event ${ev[0]} for $uap/$callp/$aor")
 
         for (account_index in uas.indices) {
-            if (uas[account_index].aor == aor) {
+            if (uas[account_index].account.aor == aor) {
                 Log.d("Baresip", "Found AoR at index $account_index")
                 when (ev[0]) {
                     "registering", "unregistering" -> {
@@ -796,13 +802,16 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity.runOnUiThread {
                             calls.add(new_call)
                             if (ua != uas[aorSpinner.selectedItemPosition])
-                                aorSpinner.setSelection(UserAgent.findAorIndex(uas, aor)!!)
-                            addCallViews(ua, new_call, Call.calls(calls, "in").size * 10)
+                                aorSpinner.setSelection(account_index)
+                            else
+                                addCallViews(ua, new_call, Call.uaCalls(calls, ua,"in").size * 10)
                             am.mode = AudioManager.MODE_RINGTONE
                         }
-                        val i = Intent(this, MainActivity::class.java)
-                        i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                        startActivity(i)
+                        if (Utils.foregrounded()) {
+                            val i = Intent(this, MainActivity::class.java)
+                            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            startActivity(i)
+                        }
                     }
                     "call established" -> {
                         val call = Call.find(calls, callp)
@@ -845,7 +854,7 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
                                     if (acc.mediaenc != "") {
-                                        val inIndex = Call.index(calls, call, "in")
+                                        val inIndex = Call.uaCallIndex(calls, ua, call, "in")
                                         val view_id = (inIndex + 1) * 10 + 3
                                         val securityButton = findViewById(view_id) as ImageButton
                                         securityButton.setImageResource(R.drawable.box_red)
@@ -895,7 +904,7 @@ class MainActivity : AppCompatActivity() {
                                     securityButton.visibility = View.VISIBLE
                                 } else {
                                     if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        val view_id = (Call.index(calls, call, "in") + 1) * 10 + 3
+                                        val view_id = (Call.uaCallIndex(calls, ua, call,"in") + 1) * 10 + 3
                                         val securityButton = layout.findViewById(view_id) as ImageButton
                                         securityButton.setImageResource(security)
                                         setSecurityButtonTag(securityButton, security)
@@ -913,7 +922,7 @@ class MainActivity : AppCompatActivity() {
                                     securityButton.visibility = View.VISIBLE
                                 } else {
                                     if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        val view_id = (Call.index(calls, call, "in") + 1) * 10 + 3
+                                        val view_id = (Call.uaCallIndex(calls, ua, call,"in") + 1) * 10 + 3
                                         val securityButton = layout.findViewById(view_id) as ImageButton
                                         securityButton.setImageResource(R.drawable.box_yellow)
                                         securityButton.tag = "yellow"
@@ -944,7 +953,7 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    val view_id = (Call.index(calls, call, "in") + 1) * 10 + 3
+                                    val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
                                     val securityButton = layout.findViewById(view_id) as ImageButton
                                     securityButton.setImageResource(R.drawable.box_green)
                                     securityButton.tag = "green"
@@ -962,10 +971,10 @@ class MainActivity : AppCompatActivity() {
                         if (call.dir == "in") {
                             Log.d("Baresip", "Removing inbound call ${uap}/${callp}/" +
                                     call.peerURI)
-                            val inIndex = Call.index(calls, call, "in")
+                            val inIndex = Call.uaCallIndex(calls, ua, call, "in")
                             val view_id = (inIndex + 1) * 10
-                            val remove_count = Call.calls(calls, "in").size - inIndex
-                            calls.removeAt(Call.index(calls, call, ""))
+                            val remove_count = Call.uaCalls(calls, ua,"in").size - inIndex
+                            calls.remove(call)
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
                                     if (callButton.tag == "Call") {
@@ -974,7 +983,7 @@ class MainActivity : AppCompatActivity() {
                                     val caller_heading = layout.findViewById(view_id)
                                     val view_index = layout.indexOfChild(caller_heading)
                                     layout.removeViews(view_index, 3 * remove_count)
-                                    val callsIn = Call.calls(calls, "in")
+                                    val callsIn = Call.uaCalls(calls, ua,"in")
                                     for (i in inIndex until callsIn.size) {
                                         this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
                                     }
@@ -1005,7 +1014,7 @@ class MainActivity : AppCompatActivity() {
                                         dtmf.visibility = View.INVISIBLE
                                         historyButton.visibility = View.VISIBLE
                                     }
-                                    calls.removeAt(Call.index(calls, call, ""))
+                                    calls.remove(call)
                                 }
                                 if (!call.hasHistory) {
                                     if (History.aorHistory(history, aor) > HISTORY_SIZE)
@@ -1079,6 +1088,7 @@ class MainActivity : AppCompatActivity() {
         const val RECORD_AUDIO_PERMISSION = 1
         const val HISTORY_SIZE = 100
         const val NOTIFICATION_ID = 10
+        const val INCOMING_ID = 11
 
         external fun contacts_remove()
         external fun contact_add(contact: String)

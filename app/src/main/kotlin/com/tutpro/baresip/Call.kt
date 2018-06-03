@@ -36,13 +36,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
             return null
         }
 
-        fun index(calls: ArrayList<Call>, call: Call, dir: String): Int {
-            var res = 0
-            for (c in calls) {
-                if (c == call) return res
-                if ((dir == "") || (call.dir == dir)) res++
-            }
-            return res
+        fun uaCallIndex(calls: ArrayList<Call>, ua: UserAgent, call: Call, dir: String): Int {
+            return uaCalls(calls, ua, dir).indexOf(call)
         }
 
     }

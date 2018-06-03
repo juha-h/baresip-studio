@@ -1,11 +1,17 @@
 package com.tutpro.baresip
 
+import android.app.ActivityManager
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.net.ConnectivityManager
 
 import java.io.*
+import android.os.Build
+import android.os.PowerManager
+import android.app.KeyguardManager
+
+
 
 object Utils {
 
@@ -125,6 +131,30 @@ object Utils {
         } else {
             return false
         }
+    }
+
+    fun foregrounded(): Boolean {
+        val appProcessInfo = ActivityManager.RunningAppProcessInfo()
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return ((appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) or
+                (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE))
+    }
+
+    fun isDeviceLocked(context: Context): Boolean {
+        val isLocked: Boolean
+
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        val inKeyguardRestrictedInputMode = keyguardManager.inKeyguardRestrictedInputMode()
+
+        if (inKeyguardRestrictedInputMode) {
+            isLocked = true
+        } else {
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            isLocked = !powerManager.isInteractive
+        }
+
+        Log.d("Baresip", "Now device is ${if (isLocked) "locked" else "unlocked"}")
+        return isLocked
     }
 
     external fun cmd_exec(cmd: String): Int
