@@ -531,6 +531,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addCallViews(ua: UserAgent, call: Call, id: Int) {
+        Log.d("Baresip", "Adding incoming views for UA ${ua.uap} Call ${call.callp}")
         val acc = ua.account
         val caller_heading = TextView(appContext)
         caller_heading.text = "Incoming call from ..."
@@ -626,7 +627,7 @@ class MainActivity : AppCompatActivity() {
 
         val answer_button = ImageButton(appContext)
         answer_button.tag = call.status
-        if (answer_button.tag == "Answer")
+        if (call.status == "Answer")
             answer_button.setImageResource(R.drawable.call)
         else
             answer_button.setImageResource(R.drawable.hangup)
@@ -637,15 +638,11 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "UA ${call.ua.uap} accepting incoming call ${call.callp}")
                     ua_answer(call.ua.uap, call.callp)
                     if (call.dir == "in") {
-                        Log.d("Baresip", "Updating Hangup and Hold")
-                        call.status = "Hangup"
-                        call.hold = false
                         this@MainActivity.runOnUiThread {
-                            Log.d("Baresip", "Setting answer button at ${answer_button.id} to Hangup")
-                            // val answer_button = layout.findViewById(answer_button.id) as ImageButton
+                            call.status = "Hangup"
+                            call.hold = false
                             answer_button.tag = "Hangup"
                             answer_button.setImageResource(R.drawable.hangup)
-                            Log.d("Baresip", "Setting reject button at ${answer_button.id + 1} to Hold")
                             val reject_button = layout.findViewById(answer_button.id + 1) as ImageButton
                             reject_button.tag = "Hold"
                             reject_button.setImageResource(R.drawable.hold)
@@ -849,7 +846,7 @@ class MainActivity : AppCompatActivity() {
                             call.hasHistory = true
                         } else {
                             Log.d("Baresip", "Inbound call $callp established")
-                            call.status = "Answer"
+                            call.status = "Hangup"
                             call.security = R.drawable.box_red
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
@@ -996,7 +993,7 @@ class MainActivity : AppCompatActivity() {
                                 history.add(History(aor, call.peerURI,"in", false))
                             }
                         } else {
-                            Log.d("Baresip", "Removing outgoing call $uap / $callp / " +
+                            Log.d("Baresip", "Removing outgoing call $uap/$callp/" +
                                         call.peerURI)
                                 this@MainActivity.runOnUiThread {
                                     if (ua == uas[aorSpinner.selectedItemPosition]) {
