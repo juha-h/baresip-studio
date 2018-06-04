@@ -773,6 +773,23 @@ Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MainActivity_ua_1hold_1answer(JNIEnv *env, jobject thiz,
+                                                      jstring javaUA, jstring javaCall) {
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    LOGD("answering call %s/%s\n", native_ua, native_call);
+    struct ua *ua = (struct ua *) strtoul(native_ua, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    struct call *call;
+    if (strlen(native_call) > 0)
+        call = (struct call *) strtoul(native_call, NULL, 10);
+    else
+        call = NULL;
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return ua_hold_answer(ua, call);
+}
+
+JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
                                                 jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
