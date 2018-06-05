@@ -359,6 +359,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.d("Baresip", "Resumed")
+        imm.hideSoftInputFromWindow(callee.windowToken, 0)
         nm.cancel(INCOMING_ID)
     }
 
@@ -994,7 +995,7 @@ class MainActivity : AppCompatActivity() {
                                         callee.hint = "Callee"
                                         holdButton.visibility = View.INVISIBLE
                                         if (this.currentFocus == dtmf) {
-                                            imm.hideSoftInputFromWindow(dtmf.getWindowToken(), 0)
+                                            imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                                         }
                                         securityButton.visibility = View.INVISIBLE
                                         dtmf.removeTextChangedListener(call.dtmfWatcher)
