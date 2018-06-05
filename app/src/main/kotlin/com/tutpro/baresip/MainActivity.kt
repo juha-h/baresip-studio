@@ -22,7 +22,6 @@ import android.util.Log
 import android.widget.RelativeLayout
 import android.media.AudioManager
 import android.net.NetworkInfo
-import android.os.PowerManager
 import android.support.v7.app.NotificationCompat
 import android.support.v7.view.menu.ActionMenuItemView
 import android.text.Editable
@@ -48,8 +47,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
-    internal lateinit var pm: PowerManager
-    internal lateinit var wl: PowerManager.WakeLock
     internal lateinit var nb: NotificationCompat.Builder
     internal lateinit var receiver: BroadcastReceiver
 
@@ -57,10 +54,9 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
         setContentView(R.layout.activity_main)
 
         appContext = applicationContext
@@ -76,9 +72,6 @@ class MainActivity : AppCompatActivity() {
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK or
-                PowerManager.ACQUIRE_CAUSES_WAKEUP, "")
 
         nb = NotificationCompat.Builder(this)
         nb.setVisibility(VISIBILITY_PUBLIC).setOngoing(true).setSmallIcon(R.drawable.ic_stat)
@@ -455,7 +448,7 @@ class MainActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                     baresipStop()
-                    nm.cancel(10)
+                    nm.cancelAll()
                     running = false
                 }
                 unregisterReceiver(receiver)
@@ -635,8 +628,8 @@ class MainActivity : AppCompatActivity() {
         answer_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
                 "Answer" -> {
-                    Log.i("Baresip", "UA ${call.ua.uap} accepting incoming call ${call.callp}")
-                    ua_answer(call.ua.uap, call.callp)
+                    Log.i("Baresip", "UA ${ua.uap} accepting incoming call ${call.callp}")
+                    ua_hold_answer(ua.uap, "")
                     if (call.dir == "in") {
                         this@MainActivity.runOnUiThread {
                             call.status = "Hangup"
@@ -787,12 +780,6 @@ class MainActivity : AppCompatActivity() {
                     "call ringing" -> {
                     }
                     "call incoming" -> {
-                        if (!pm.isInteractive) {
-                            Log.d("Baresip", "Acquiring wake lock")
-                            wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK or
-                                    PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag")
-                            wl.acquire()
-                        }
                         val peer_uri = call_peeruri(callp)
                         Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
                         val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
@@ -803,12 +790,15 @@ class MainActivity : AppCompatActivity() {
                             else
                                 addCallViews(ua, new_call, Call.uaCalls(calls, ua,"in").size * 10)
                             am.mode = AudioManager.MODE_RINGTONE
+                            if (Utils.foregrounded()) {
+                                val i = Intent(this, MainActivity::class.java)
+                                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                                startActivity(i)
+                            } else {
+                                showNotification(peer_uri)
+                            }
                         }
-                        if (Utils.foregrounded()) {
-                            val i = Intent(this, MainActivity::class.java)
-                            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                            startActivity(i)
-                        }
+
                     }
                     "call established" -> {
                         val call = Call.find(calls, callp)
@@ -865,7 +855,6 @@ class MainActivity : AppCompatActivity() {
                             }
                             history.add(History(aor, call.peerURI, "in", true))
                             call.hasHistory = true
-                            if (wl.isHeld) wl.release()
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         am.isSpeakerphoneOn = false
@@ -986,6 +975,7 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     historyButton.visibility = View.VISIBLE
                                 }
+                                nm.cancel(INCOMING_ID)
                             }
                             if (!call.hasHistory) {
                                 if (History.aorHistory(history, aor) > HISTORY_SIZE)
@@ -1020,7 +1010,6 @@ class MainActivity : AppCompatActivity() {
                                             false))
                                 }
                         }
-                        if (wl.isHeld) wl.release()
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
                     }
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
@@ -1055,10 +1044,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showNotification(peerUri: String) {
+        Log.d("Baresip", "Showing notification")
+        val nb = NotificationCompat.Builder(this)
+            .setVisibility(VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_stat)
+                .setContentTitle("Incoming call from")
+                .setContentText("$peerUri")
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(
+                        PendingIntent.getActivity(this, INCOMING_ID,
+                                Intent(this, MainActivity::class.java)
+                                        .setAction(Intent.ACTION_MAIN)
+                                        .addCategory(Intent.CATEGORY_LAUNCHER),
+                                PendingIntent.FLAG_UPDATE_CURRENT))
+        nm.notify(INCOMING_ID, nb.build())
+    }
+
     external fun baresipStart(path: String)
     external fun baresipStop()
     external fun ua_connect(ua: String, peer_uri: String): String
     external fun ua_answer(ua: String, call: String)
+    external fun ua_hold_answer(ua: String, call: String): Int
     external fun ua_hangup(ua: String, call: String, code: Int, reason: String)
     external fun call_peeruri(call: String): String
     external fun call_hold(call: String): Int
