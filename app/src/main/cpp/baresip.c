@@ -30,6 +30,8 @@ typedef struct update_context {
 
 UpdateContext g_ctx;
 
+struct play *play = NULL;
+
 static int vprintf_null(const char *p, size_t size, void *arg)
 {
     (void)p;
@@ -72,6 +74,17 @@ static const char *ua_event_reg_str(enum ua_event ev)
     }
 }
 
+static const char *translate_errorcode(uint16_t scode)
+{
+	switch (scode) {
+
+	case 404: return "notfound.wav";
+	case 486: return "busy.wav";
+	case 487: return NULL; /* ignore */
+	default:  return "error.wav";
+	}
+}
+
 static void ua_event_handler(struct ua *ua, enum ua_event ev,
 			     struct call *call, const char *prm, void *arg)
 {
@@ -79,6 +92,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     char event_buf[256];
     char ua_buf[256];
     char call_buf[256];
+
+    struct player *player = baresip_player();
 
     LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
@@ -90,15 +105,26 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
             break;
         case UA_EVENT_CALL_RINGING:
+            play = mem_deref(play);
+            (void)play_file(&play, player, "ringback.wav", -1);
             re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
             re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
             break;
         case UA_EVENT_CALL_ESTABLISHED:
+            play = mem_deref(play);
             re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
         case UA_EVENT_CALL_INCOMING:
+            uag_current_set(ua);
+            play = mem_deref(play);
+            if (list_count(ua_calls(ua)) > 1) {
+				(void)play_file(&play, player, "callwaiting.wav", 3);
+			}
+			else {
+				(void)play_file(&play, player, "ring.wav", -1);
+			}
             re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_MENC:
@@ -110,6 +136,14 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 re_snprintf(event_buf, sizeof event_buf, "%s", "unknown menc event");
             break;
         case UA_EVENT_CALL_CLOSED:
+            play = mem_deref(play);
+            if (call_scode(call)) {
+			    const char *tone;
+			    tone = translate_errorcode(call_scode(call));
+			    if (tone) {
+				    (void)play_file(&play, player, tone, 1);
+			    }
+		    }
             re_snprintf(event_buf, sizeof event_buf, "%s", "call closed");
             break;
         case UA_EVENT_EXIT:

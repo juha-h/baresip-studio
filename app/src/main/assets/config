@@ -140,11 +140,11 @@ module_app              contact.so
 module_app              debug_cmd.so
 #module_app             dtmfio.so
 #module_app             echo.so
-module_app              menu.so
+#module_app             menu.so
 #module_app             mwi.so
 #module_app             natbd.so
 #module_app             presence.so
-module_app              vidloop.so
+#module_app             vidloop.so
 
 
 #------------------------------------------------------------------------------
