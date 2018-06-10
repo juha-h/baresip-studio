@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">baresip</string>
-    <string name="title_activity_edit">EditActivity</string>
-    <string name="title_activity_edit_accounts">EditAccounts</string>
     <string name="aboutText">
       Baresip Android application\n\n
             Work in progress\n\n
