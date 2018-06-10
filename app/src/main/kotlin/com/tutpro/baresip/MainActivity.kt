@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var dtmf: EditText
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
+    internal lateinit var calleeAdapter: ArrayAdapter<String>
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
@@ -103,6 +104,7 @@ class MainActivity : AppCompatActivity() {
                 val aor = acc.aor
                 val ua = uas[position]
                 Log.i("Baresip", "Setting $aor current")
+                uag_current_set(uas[position].uap)
                 val callsOut = Call.uaCalls(calls, ua, "out")
                 if (callsOut.size == 0) {
                     callee.text.clear()
@@ -222,12 +224,13 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
         }
 
-        EditContactsActivity.updateContactsAndNames(applicationContext.filesDir.absolutePath +
+        ContactsActivity.generateContacts(applicationContext.filesDir.absolutePath +
                 "/contacts")
 
         callee.threshold = 2
-        callee.setAdapter<ArrayAdapter<String>>(ArrayAdapter(this,
-                android.R.layout.select_dialog_item, EditContactsActivity.Names))
+        calleeAdapter = ArrayAdapter(this,
+                android.R.layout.select_dialog_item, ContactsActivity.contactNames)
+        callee.setAdapter(calleeAdapter)
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -272,7 +275,7 @@ class MainActivity : AppCompatActivity() {
                 "Call" -> {
                     val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
                     if (calleeText.length > 0) {
-                        var uri = EditContactsActivity.findContactURI(calleeText)
+                        var uri = ContactsActivity.findContactURI(calleeText)
                         if (!uri.startsWith("sip:")) uri = "sip:$uri"
                         if (!uri.contains("@")) {
                             val host = aor.substring(aor.indexOf("@") + 1)
@@ -308,12 +311,7 @@ class MainActivity : AppCompatActivity() {
         holdButton.setOnClickListener {
             when (holdButton.tag) {
                 "Hold" -> {
-                    Log.i("Baresip", "Holding " + (findViewById(R.id.callee) as EditText).text)
-                    val call = Call.calls(calls, "out")[0]
-                    call_hold(call.callp)
-                    call.hold = true
-                    holdButton.tag= "Resume"
-                    holdButton.setImageResource(R.drawable.resume)
+                    holdCallAt(Call.calls(calls, "out")[0], holdButton)
                 }
                 "Resume" -> {
                     Log.i("Baresip", "Resuming " + (findViewById(R.id.callee) as EditText).text)
@@ -418,8 +416,8 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.contacts -> {
-                i = Intent(this, EditContactsActivity::class.java)
-                startActivityForResult(i, EDIT_CONTACTS_CODE)
+                i = Intent(this, ContactsActivity::class.java)
+                startActivityForResult(i, CONTACTS_CODE)
                 return true
             }
             R.id.config -> {
@@ -428,6 +426,7 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.about -> {
+                Utils.cmd_exec("audio_debug")
                 i = Intent(this, AboutActivity::class.java)
                 startActivityForResult(i, ABOUT_CODE)
                 return true
@@ -470,6 +469,10 @@ class MainActivity : AppCompatActivity() {
                 updateNotification()
             }
 
+            CONTACTS_CODE -> {
+                calleeAdapter.notifyDataSetChanged()
+            }
+
             EDIT_CONFIG_CODE -> {
                 if (resultCode == RESULT_OK) {
                     Utils.alertView(this, "Notice",
@@ -495,14 +498,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            EDIT_CONTACTS_CODE, ABOUT_CODE -> {
+            ABOUT_CODE -> {
             }
         }
     }
 
     private fun call(ua: UserAgent, uri: String) {
         (findViewById(R.id.callee) as EditText).setText(uri)
-        Log.i("Baresip", "Calling $ua.uap / $uri")
+        Log.i("Baresip", "Calling $ua.uap/$uri")
         val call = ua_connect(ua.uap, uri)
         if (call != "") {
             Log.i("Baresip", "Adding outgoing call $ua.uap / $call / $uri")
@@ -630,7 +633,7 @@ class MainActivity : AppCompatActivity() {
             when ((v as ImageButton).tag) {
                 "Answer" -> {
                     Log.i("Baresip", "UA ${ua.uap} accepting incoming call ${call.callp}")
-                    ua_hold_answer(ua.uap, "")
+                    ua_answer(ua.uap, call.callp)
                     if (call.dir == "in") {
                         this@MainActivity.runOnUiThread {
                             call.status = "Hangup"
@@ -679,10 +682,7 @@ class MainActivity : AppCompatActivity() {
                     ua_hangup(call.ua.uap, call.callp, 486, "Rejected")
                 }
                 "Hold" -> {
-                    call_hold(call.callp)
-                    v.tag = "Resume"
-                    reject_button.setImageResource(R.drawable.resume)
-                    call.hold = true
+                    holdCallAt(call, reject_button)
                 }
                 "Resume" -> {
                     call_unhold(call.callp)
@@ -783,23 +783,26 @@ class MainActivity : AppCompatActivity() {
                     "call incoming" -> {
                         val peer_uri = call_peeruri(callp)
                         Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
-                        val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
-                        this@MainActivity.runOnUiThread {
-                            calls.add(new_call)
-                            if (ua != uas[aorSpinner.selectedItemPosition])
-                                aorSpinner.setSelection(account_index)
-                            else
-                                addCallViews(ua, new_call, Call.uaCalls(calls, ua,"in").size * 10)
-                            am.mode = AudioManager.MODE_RINGTONE
-                            if (Utils.foregrounded()) {
-                                val i = Intent(this, MainActivity::class.java)
-                                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                                startActivity(i)
-                            } else {
-                                showNotification(peer_uri)
+                        if (ONE_CALL_ONLY && (calls.size > 0)) {
+                            ua_hangup(uap, callp, 486, "Busy Here")
+                        } else {
+                            val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
+                            this@MainActivity.runOnUiThread {
+                                calls.add(new_call)
+                                if (ua != uas[aorSpinner.selectedItemPosition])
+                                    aorSpinner.setSelection(account_index)
+                                else
+                                    addCallViews(ua, new_call, Call.uaCalls(calls, ua, "in").size * 10)
+                                am.mode = AudioManager.MODE_RINGTONE
+                                if (Utils.foregrounded()) {
+                                    val i = Intent(this, MainActivity::class.java)
+                                    i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                                    startActivity(i)
+                                } else {
+                                    showNotification(peer_uri)
+                                }
                             }
                         }
-
                     }
                     "call established" -> {
                         val call = Call.find(calls, callp)
@@ -1045,6 +1048,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun holdCallAt(call: Call, button: ImageButton) {
+        Log.i("Baresip", "Holding call with ${call.peerURI} at ${button.id}")
+        call_hold(call.callp)
+        call.hold = true
+        button.tag= "Resume"
+        button.setImageResource(R.drawable.resume)
+    }
+
     private fun showNotification(peerUri: String) {
         Log.d("Baresip", "Showing notification")
         val nb = NotificationCompat.Builder(this)
@@ -1066,14 +1077,16 @@ class MainActivity : AppCompatActivity() {
 
     external fun baresipStart(path: String)
     external fun baresipStop()
-    external fun ua_connect(ua: String, peer_uri: String): String
-    external fun ua_answer(ua: String, call: String)
-    external fun ua_hold_answer(ua: String, call: String): Int
-    external fun ua_hangup(ua: String, call: String, code: Int, reason: String)
-    external fun call_peeruri(call: String): String
-    external fun call_hold(call: String): Int
-    external fun call_unhold(call: String): Int
-    external fun call_send_digit(call: String, digit: Char): Int
+    external fun uag_current(): String
+    external fun uag_current_set(uap: String)
+    external fun ua_connect(uap: String, peer_uri: String): String
+    external fun ua_answer(uap: String, callp: String)
+    external fun ua_hold_answer(uap: String, callp: String): Int
+    external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
+    external fun call_peeruri(callp: String): String
+    external fun call_hold(callp: String): Int
+    external fun call_unhold(callp: String): Int
+    external fun call_send_digit(callp: String, digit: Char): Int
     external fun reload_config(): Int
 
     companion object {
@@ -1086,16 +1099,19 @@ class MainActivity : AppCompatActivity() {
         var filesPath = ""
 
         const val ACCOUNTS_CODE = 1
-        const val EDIT_CONTACTS_CODE = 2
+        const val CONTACTS_CODE = 2
         const val EDIT_CONFIG_CODE = 3
         const val HISTORY_CODE = 4
         const val ABOUT_CODE = 5
         const val ACCOUNT_CODE = 6
+        const val CONTACT_CODE = 7
 
         const val RECORD_AUDIO_PERMISSION = 1
         const val HISTORY_SIZE = 100
         const val NOTIFICATION_ID = 10
         const val INCOMING_ID = 11
+
+        const val ONE_CALL_ONLY = false
 
         external fun contacts_remove()
         external fun contact_add(contact: String)
