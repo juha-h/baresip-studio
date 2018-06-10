@@ -35,14 +35,13 @@
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
 
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -50,16 +49,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".AccountsActivity"
             android:label="Accounts"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
-
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -69,7 +66,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
-
+        <activity
+            android:name=".ContactsActivity"
+            android:label="Contacts"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutpro.baresip.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ContactActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Contact"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutpro.baresip.MainActivity" />
+        </activity>
         <activity
             android:name=".EditConfigActivity"
             android:label="Edit Config"
@@ -78,16 +92,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
-
-        <activity
-            android:name=".EditContactsActivity"
-            android:label="Edit Contacts"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
-        </activity>
-
         <activity
             android:name=".HistoryActivity"
             android:label="Call History"
@@ -96,7 +100,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
-
         <activity
             android:name=".AboutActivity"
             android:label="About"
@@ -105,8 +108,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
-
     </application>
 
 </manifest>
-
