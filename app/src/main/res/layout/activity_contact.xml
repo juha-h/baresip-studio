@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ContactView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="24dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/NameTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:text="Contact Name" >
+    </TextView>
+
+    <EditText
+        android:id="@+id/Name"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:textSize="18sp"
+        android:layout_width="fill_parent">
+    </EditText>
+
+    <TextView
+            android:id="@+id/SipUriTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:paddingTop="10dp"
+            android:text="SIP URI" >
+    </TextView>
+
+    <EditText
+            android:id="@+id/Uri"
+            android:layout_height="wrap_content"
+            android:hint="SIP URI, telephone number, or userid"
+            android:inputType="textUri"
+            android:textSize="18sp"
+            android:layout_width="fill_parent">
+    </EditText>
+
+</LinearLayout>
+
