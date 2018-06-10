@@ -104,6 +104,16 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_REGISTER_FAIL:
             re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
             break;
+        case UA_EVENT_CALL_INCOMING:
+            play = mem_deref(play);
+            if (list_count(ua_calls(ua)) > 1) {
+                (void)play_file(&play, player, "callwaiting.wav", 3);
+            }
+            else {
+                (void)play_file(&play, player, "ring.wav", -1);
+            }
+            re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
+            break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
             (void)play_file(&play, player, "ringback.wav", -1);
@@ -115,17 +125,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CALL_ESTABLISHED:
             play = mem_deref(play);
             re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
-            break;
-        case UA_EVENT_CALL_INCOMING:
-            uag_current_set(ua);
-            play = mem_deref(play);
-            if (list_count(ua_calls(ua)) > 1) {
-				(void)play_file(&play, player, "callwaiting.wav", 3);
-			}
-			else {
-				(void)play_file(&play, player, "ring.wav", -1);
-			}
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '1')
@@ -259,7 +258,9 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
 	    goto out;
 
     conf_path_set(path);
-    
+
+    // log_enable_debug(true);
+
     err = conf_configure();
     if (err) {
         LOGW("conf_configure() failed: (%d)\n", err);
@@ -326,6 +327,7 @@ out:
     }
 
     LOGD("closing upon main loop exit");
+    play = mem_deref(play);
     ua_close();
     conf_close();
     baresip_close();
@@ -726,22 +728,22 @@ Java_com_tutpro_baresip_UserAgentKt_ua_1aor(JNIEnv *env, jobject thiz, jstring j
         return (*env)->NewStringUTF(env, "");
 }
 
-JNIEXPORT void JNICALL /* currently not in use */
-Java_com_tutpro_baresip_MainActivity_ua_1current_1set(JNIEnv *env, jobject thiz,
-                                                      jstring javaAoR)
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_MainActivity_uag_1current_1set(JNIEnv *env, jobject thiz,
+                                                       jstring javaUA)
 {
     struct ua *new_current_ua;
-    const char *native_aor = (*env)->GetStringUTFChars(env, javaAoR, 0);
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
 
-    LOGD("running ua_current_set on %s\n", native_aor);
-    new_current_ua = uag_find_aor(native_aor);
-    uag_current_set(new_current_ua);
-    (*env)->ReleaseStringUTFChars(env, javaAoR, native_aor);
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    LOGD("running uag_current_set on %s\n", native_ua);
+    uag_current_set(ua);
     return;
 }
 
-JNIEXPORT jstring JNICALL /* currently not in use */
-Java_com_tutpro_baresip_MainActivity_ua_1current(JNIEnv *env, jobject thiz)
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_MainActivity_uag_1current(JNIEnv *env, jobject thiz)
 {
     struct ua *current_ua = uag_current();
     char ua_buf[256];
@@ -798,10 +800,10 @@ Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
     LOGD("answering call %s/%s\n", native_ua, native_call);
     struct ua *ua = (struct ua *) strtoul(native_ua, NULL, 10);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    play = mem_deref(play);
     ua_answer(ua, call);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-
     return;
 
 }
@@ -820,6 +822,10 @@ Java_com_tutpro_baresip_MainActivity_ua_1hold_1answer(JNIEnv *env, jobject thiz,
     else
         call = NULL;
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    play = mem_deref(play);
+    audio_set_source(call_audio(ua_call(uag_current())), NULL, NULL);
+    call_hold(ua_call(uag_current()), true);
+    ua_answer(ua, call);
     return ua_hold_answer(ua, call);
 }
 
@@ -831,6 +837,7 @@ Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
 
     LOGD("holding call %s\n", native_call);
     int res = call_hold(call, true);
+    // audio_set_source(call_audio(call), NULL, NULL);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
 }
@@ -842,6 +849,7 @@ Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
 
     LOGD("unholding call %s\n", native_call);
+    // audio_set_source(call_audio(call), "opensles", "nil");
     int res = call_hold(call, false);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
@@ -923,6 +931,9 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Utils_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
+    if (strcmp(native_cmd, "audio_debug") == 0) {
+        re_printf("Baresip audio debug '%H\n", audio_debug, call_audio(ua_call(uag_current())));
+    }
     int res = cmd_process_long(baresip_commands(), native_cmd, strlen(native_cmd), &pf_null, NULL);
     (*env)->ReleaseStringUTFChars(env, javaCmd, native_cmd);
     return res;
