@@ -36,7 +36,10 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:25.2.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:design:25.4.0'
 }
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'kotlin-android-extensions'
