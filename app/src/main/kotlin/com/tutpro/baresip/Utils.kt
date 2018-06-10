@@ -11,8 +11,6 @@ import android.os.Build
 import android.os.PowerManager
 import android.app.KeyguardManager
 
-
-
 object Utils {
 
     fun getFileContents(file: File): String {
@@ -100,6 +98,13 @@ object Utils {
         return true
     }
 
+    fun checkUri(uri: String): Boolean {
+        if (!uri.startsWith("sip:")) return false
+        val parts = uri.substring(4).split("@")
+        return (checkUserID(parts[0]) || checkTelNo(parts[0])) &&
+                (checkDomain(parts[1]) || checkIP(parts[1]))
+    }
+
     fun checkPrintASCII(s: String): Boolean {
         if (s == "") return true
         val printASCIIRegex = Regex("^[ -~]*\$")
@@ -109,6 +114,14 @@ object Utils {
     fun checkUint(s: String): Boolean {
         val uintRegex = Regex("^[0-9]+\$")
         return uintRegex.matches(s)
+    }
+
+    fun checkName(name: String): Boolean {
+        if (name.length < 2) return false
+        for (c in name) {
+            if (!c.isLetterOrDigit() && !(c in "-.!%*_+`'~ ")) return false
+        }
+        return true
     }
 
     fun implode(list: List<String>, sep: String): String {
