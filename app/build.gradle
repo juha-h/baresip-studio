@@ -38,6 +38,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:design:25.4.0'
 }
+
 repositories {
     mavenCentral()
 }
