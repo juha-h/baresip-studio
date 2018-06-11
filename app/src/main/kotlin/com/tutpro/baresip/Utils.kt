@@ -89,6 +89,12 @@ object Utils {
         return Regex("^(([0-1]?[0-9]{1,2}\\.)|(2[0-4][0-9]\\.)|(25[0-5]\\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/$").matches(ip)
     }
 
+    fun checkUriUser(user: String): Boolean {
+        for (c in user)
+            if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
+        return true
+    }
+
     fun checkDomain(domain: String): Boolean {
         val parts = domain.split(".")
         for (p in parts) {
@@ -101,8 +107,7 @@ object Utils {
     fun checkUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
         val parts = uri.substring(4).split("@")
-        return (checkUserID(parts[0]) || checkTelNo(parts[0])) &&
-                (checkDomain(parts[1]) || checkIP(parts[1]))
+        return checkUriUser(parts[0]) && (checkDomain(parts[1]) || checkIP(parts[1]))
     }
 
     fun checkPrintASCII(s: String): Boolean {
