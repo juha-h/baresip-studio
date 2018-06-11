@@ -43,7 +43,22 @@ class HistoryActivity : AppCompatActivity() {
         listview.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEUTRAL -> {
+                        ContactsActivity.contactNames.add("New Name")
+                        if (uaHistory[pos].peerDomain == "")
+                            ContactsActivity.contactURIs.add(uaHistory[pos].peerURI)
+                        else
+                            ContactsActivity.contactURIs.add("sip:${uaHistory[pos].peerURI}" +
+                                    "@" + uaHistory[pos].peerDomain)
+                        ContactsActivity.posAtContacts.add(ContactsActivity.contactNames.size)
+                        ContactsActivity.saveContacts()
+                        val i = Intent(this, ContactActivity::class.java)
+                        val b = Bundle()
+                        b.putInt("index", ContactsActivity.contactNames.size - 1)
+                        i.putExtras(b)
+                        startActivityForResult(i, MainActivity.CONTACT_CODE)
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
                         removeUaHistoryAt(pos)
                         if (uaHistory.size == 0) {
                             val i = Intent()
@@ -52,16 +67,18 @@ class HistoryActivity : AppCompatActivity() {
                         }
                         adapter.notifyDataSetChanged()
                     }
-                    DialogInterface.BUTTON_NEGATIVE -> {
+                    DialogInterface.BUTTON_POSITIVE -> {
                     }
                 }
             }
             val builder = AlertDialog.Builder(this@HistoryActivity,
                     R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to delete " +
-                    uaHistory[pos].peerURI + " call history?")
-                    .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show()
+            builder.setMessage("Do you want to add ${uaHistory[pos].peerURI} to contacs or " +
+                    "delete it from call history?")
+                    .setPositiveButton("Cancel", dialogClickListener)
+                    .setNegativeButton("Delete History", dialogClickListener)
+                    .setNeutralButton("Add Contact", dialogClickListener)
+                    .show()
             true
         }
 
@@ -86,8 +103,10 @@ class HistoryActivity : AppCompatActivity() {
             val h = MainActivity.history[i]
             if (h.aor == aor) {
                 var peer_uri = h.peerURI
+                var peer_domain = ""
                 if (Utils.uriHostPart(peer_uri) == Utils.uriHostPart(aor)) {
                     peer_uri = Utils.uriUserPart(peer_uri)
+                    peer_domain = Utils.uriHostPart(aor)
                 }
                 var direction: Int
                 if (h.direction == "in")
@@ -112,7 +131,7 @@ class HistoryActivity : AppCompatActivity() {
                         val fmt = SimpleDateFormat("dd.MM")
                         time = fmt.format(h.time.time)
                     }
-                    uaHistory.add(HistoryRow(peer_uri, direction, time, i))
+                    uaHistory.add(HistoryRow(peer_uri, peer_domain, direction, time, i))
                 }
             }
         }
