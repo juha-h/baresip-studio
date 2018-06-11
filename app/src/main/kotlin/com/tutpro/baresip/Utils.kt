@@ -107,7 +107,9 @@ object Utils {
     fun checkUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
         val parts = uri.substring(4).split("@")
-        return checkUriUser(parts[0]) && (checkDomain(parts[1]) || checkIP(parts[1]))
+        val hostParams = parts[1].split(";", limit = 2)
+        // todo: check also possible params
+        return checkUriUser(parts[0]) && (checkDomain(hostParams[0]) || checkIP(hostParams[0]))
     }
 
     fun checkPrintASCII(s: String): Boolean {
