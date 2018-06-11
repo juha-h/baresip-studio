@@ -40,7 +40,7 @@
     <EditText
             android:id="@+id/Uri"
             android:layout_height="wrap_content"
-            android:hint="SIP URI, telephone number, or userid"
+            android:hint="SIP URI"
             android:inputType="textUri"
             android:textSize="18sp"
             android:layout_width="fill_parent">
