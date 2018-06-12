@@ -7,5 +7,17 @@
             Juha Heinanen jh@tutpro.com\n\n
     </string>
     <string name="noAccounts">No accounts</string>
-    <string name="emptyString"></string>
+    <string name="dispName">Name (if any) used in From URI of outbound requests.</string>
+    <string name="authUser">Authentication username if required by outbound proxy.</string>
+    <string name="authPass">Authentication password if required by outbound proxy.</string>
+    <string name="obProxies">SIP URI of one or two proxies that must be used when sending requests.
+        If two is given, REGISTER requests are sent to both and other requests are sent to
+        one that responds.  If no outbound proxy is given, requests are sent based on
+        DNS NAPTR/SRV/A record lookup of callee URI hostpart.\nExample:\nsip:foo.com:5060;transport=tls
+    </string>
+    <string name="regInt">Tells how often (in seconds) REGISTER requests are sent.  Value 0
+        disables registration.
+    </string>
+    <string name="auCodecs">List of supported audio codecs in priority order.</string>
+    <string name="mediaEnc">Supported or required media encryption protocol.</string>
 </resources>
