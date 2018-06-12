@@ -42,7 +42,6 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<S
             deleteDialog.setPositiveButton("Delete") { dialog, _ ->
                 ContactsActivity.contactNames.removeAt(position)
                 ContactsActivity.contactURIs.removeAt(position)
-                ContactsActivity.posAtContacts.removeAt(position)
                 ContactsActivity.saveContacts()
                 this.notifyDataSetChanged()
                 dialog.dismiss()

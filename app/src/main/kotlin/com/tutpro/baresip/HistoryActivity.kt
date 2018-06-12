@@ -50,7 +50,6 @@ class HistoryActivity : AppCompatActivity() {
                         else
                             ContactsActivity.contactURIs.add("sip:${uaHistory[pos].peerURI}" +
                                     "@" + uaHistory[pos].peerDomain)
-                        ContactsActivity.posAtContacts.add(ContactsActivity.contactNames.size)
                         ContactsActivity.saveContacts()
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()

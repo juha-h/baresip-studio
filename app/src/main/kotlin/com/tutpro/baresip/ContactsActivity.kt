@@ -45,7 +45,6 @@ class ContactsActivity : AppCompatActivity() {
                 newNameView.clearFocus()
                 contactNames.add(name)
                 contactURIs.add("")
-                posAtContacts.add(contactNames.size)
                 clAdapter.notifyDataSetChanged()
                 saveContacts()
                 val i = Intent(this, ContactActivity::class.java)
@@ -80,15 +79,12 @@ class ContactsActivity : AppCompatActivity() {
 
         var contactNames = ArrayList<String>()
         var contactURIs = ArrayList<String>()
-        var posAtContacts = ArrayList<Int>()
 
         fun generateContacts(path: String) {
             val content = Utils.getFileContents(File(path))
             MainActivity.contacts_remove()
             contactNames.clear()
             contactURIs.clear()
-            posAtContacts.clear()
-            var i = 0
             content.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
@@ -97,7 +93,6 @@ class ContactsActivity : AppCompatActivity() {
                     MainActivity.contact_add("\"$name\" $uri")
                     contactNames.add(name)
                     contactURIs.add(uri)
-                    posAtContacts.add(i++)
                 }
             }
         }
