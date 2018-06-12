@@ -273,22 +273,24 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             when (callButton.tag) {
                 "Call" -> {
-                    val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
-                    if (calleeText.length > 0) {
-                        var uri = ContactsActivity.findContactURI(calleeText)
-                        if (!uri.startsWith("sip:")) uri = "sip:$uri"
-                        if (!uri.contains("@")) {
-                            val host = aor.substring(aor.indexOf("@") + 1)
-                            uri = "$uri@$host"
+                    if (ONE_CALL_ONLY && calls.isEmpty()) {
+                        val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
+                        if (calleeText.length > 0) {
+                            var uri = ContactsActivity.findContactURI(calleeText)
+                            if (!uri.startsWith("sip:")) uri = "sip:$uri"
+                            if (!uri.contains("@")) {
+                                val host = aor.substring(aor.indexOf("@") + 1)
+                                uri = "$uri@$host"
+                            }
+                            call(ua, uri)
+                        } else {
+                            val latest = History.aorLatestHistory(history, aor)
+                            if (latest != null)
+                                if (Utils.uriHostPart(latest.peerURI) == Utils.uriHostPart(aor))
+                                    callee.setText(Utils.uriUserPart(latest.peerURI))
+                                else
+                                    callee.setText(latest.peerURI)
                         }
-                        call(ua, uri)
-                    } else {
-                        val latest = History.aorLatestHistory(history, aor)
-                        if (latest != null)
-                            if (Utils.uriHostPart(latest.peerURI) == Utils.uriHostPart(aor))
-                                callee.setText(Utils.uriUserPart(latest.peerURI))
-                            else
-                                callee.setText(latest.peerURI)
                     }
                 }
                 "Cancel" -> {
@@ -782,13 +784,16 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val peer_uri = call_peeruri(callp)
-                        Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
+                        val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
                         if (ONE_CALL_ONLY && (calls.size > 0)) {
+                            Log.d("Baresip", "Auto-rejecting incoming call $uap/$callp/$peer_uri")
                             ua_hangup(uap, callp, 486, "Busy Here")
+                            history.add(History(aor, peer_uri, "in", false))
+                            new_call.hasHistory = true
                         } else {
-                            val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
+                            Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
+                            calls.add(new_call)
                             this@MainActivity.runOnUiThread {
-                                calls.add(new_call)
                                 if (ua != uas[aorSpinner.selectedItemPosition])
                                     aorSpinner.setSelection(account_index)
                                 else
@@ -955,7 +960,7 @@ class MainActivity : AppCompatActivity() {
                     "call closed" -> {
                         val call = Call.find(calls, callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp that is closed is not found")
+                            Log.d("Baresip", "Call $callp that is closed is not found")
                             return
                         }
                         if (call.dir == "in") {
@@ -1111,7 +1116,7 @@ class MainActivity : AppCompatActivity() {
         const val NOTIFICATION_ID = 10
         const val INCOMING_ID = 11
 
-        const val ONE_CALL_ONLY = false
+        const val ONE_CALL_ONLY = true
 
         external fun contacts_remove()
         external fun contact_add(contact: String)
