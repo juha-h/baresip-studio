@@ -696,7 +696,7 @@ class MainActivity : AppCompatActivity() {
         }
         val reject_button_params = LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT)
-        reject_button_params.setMargins(16, 10, 0, 0)
+        reject_button_params.setMargins(40, 10, 0, 0)
         reject_button.layoutParams = reject_button_params
         reject_button.setPadding(0, 0, 0, 0)
         Log.d("Baresip", "Adding reject button at ${reject_button.id}")
