@@ -40,6 +40,10 @@ add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
 
+add_library(lib_g7221 STATIC IMPORTED)
+set_target_properties(lib_g7221 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/g722_1/lib/${ANDROID_ABI}/libg722_1.a)
+
 add_library(lib_bn STATIC IMPORTED)
 set_target_properties(lib_bn PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/bn/lib/${ANDROID_ABI}/libbn.a)
@@ -69,6 +73,7 @@ target_link_libraries(baresip
                       lib_ssl
                       lib_crypto
                       lib_opus
+                      lib_g7221
                       lib_zrtp
                       lib_bn
                       z
