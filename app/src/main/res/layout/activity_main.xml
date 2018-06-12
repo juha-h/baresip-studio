@@ -83,7 +83,7 @@
             android:layout_below="@id/calleeRow"
             android:padding="0dp"
             android:src="@drawable/hold"
-            android:layout_marginStart="60dp"
+            android:layout_marginStart="70dp"
             android:visibility="invisible" >
         </ImageButton>
 
@@ -92,7 +92,7 @@
             android:layout_width="@dimen/button_width"
             android:layout_height="wrap_content"
             android:layout_below="@id/calleeRow"
-            android:layout_marginStart="120dp"
+            android:layout_marginStart="140dp"
             android:inputType="phone"
             android:textSize="20sp"
             android:hint="DTMF"
