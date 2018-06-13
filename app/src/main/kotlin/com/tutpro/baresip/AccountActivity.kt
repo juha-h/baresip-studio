@@ -91,8 +91,8 @@ class AccountActivity : AppCompatActivity() {
 
         mediaEnc = acc.mediaenc
         val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
-        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp", "srtp-mand", "")
-        val mediaEncVals = arrayListOf("ZRTP", "DTLS SRTP", "SRTP", "Mandatory SRTP", "")
+        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
+        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTP", "SRTP-MANDF", "SRTP-MAND", "SRTP", "")
         val keyIx = mediaEncKeys.indexOf(acc.mediaenc)
         val keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)
@@ -283,7 +283,6 @@ class AccountActivity : AppCompatActivity() {
     }
 
     fun onClick(v: View) {
-        Log.d("Baresip", "Account click on $v")
         when (v) {
             findViewById(R.id.DisplayNameTitle) -> {
                 Utils.alertView(this, "Display Name", getString(R.string.dispName))
@@ -307,7 +306,8 @@ class AccountActivity : AppCompatActivity() {
                 Utils.alertView(this, "Audio Codecs", getString(R.string.auCodecs))
             }
             findViewById(R.id.MediaEncTitle) -> {
-                Utils.alertView(this, "Media Encryption", getString(R.string.mediaEnc))
+                Utils.alertView(this, "Media Encryption",
+                        getText(R.string.mediaEnc).toString())
             }
         }
     }
