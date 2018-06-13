@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var dtmf: EditText
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
-    internal lateinit var calleeAdapter: ArrayAdapter<String>
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
@@ -228,9 +227,8 @@ class MainActivity : AppCompatActivity() {
                 "/contacts")
 
         callee.threshold = 2
-        calleeAdapter = ArrayAdapter(this,
-                android.R.layout.select_dialog_item, ContactsActivity.contactNames)
-        callee.setAdapter(calleeAdapter)
+        callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                ContactsActivity.contacts.map{Contact -> Contact.name}))
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -472,7 +470,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             CONTACTS_CODE -> {
-                calleeAdapter.notifyDataSetChanged()
+                callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                        ContactsActivity.contacts.map{Contact -> Contact.name}))
             }
 
             EDIT_CONFIG_CODE -> {

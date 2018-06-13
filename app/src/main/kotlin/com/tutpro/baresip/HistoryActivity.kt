@@ -27,8 +27,7 @@ class HistoryActivity : AppCompatActivity() {
 
         val listview = findViewById(R.id.history) as ListView
 
-        val b = intent.extras
-        aor = b.getString("aor")
+        aor = intent.extras.getString("aor")
         aorGenerateHistory(aor)
 
         val adapter = HistoryListAdapter(this, uaHistory)
@@ -44,16 +43,15 @@ class HistoryActivity : AppCompatActivity() {
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEUTRAL -> {
-                        ContactsActivity.contactNames.add("New Name")
-                        if (uaHistory[pos].peerDomain == "")
-                            ContactsActivity.contactURIs.add(uaHistory[pos].peerURI)
-                        else
-                            ContactsActivity.contactURIs.add("sip:${uaHistory[pos].peerURI}" +
-                                    "@" + uaHistory[pos].peerDomain)
-                        ContactsActivity.saveContacts()
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
-                        b.putInt("index", ContactsActivity.contactNames.size - 1)
+                        b.putBoolean("new", true)
+                        b.putString("name", "New Name")
+                        if (uaHistory[pos].peerDomain == "")
+                            b.putString("uri", uaHistory[pos].peerURI)
+                        else
+                            b.putString("uri", "sip:${uaHistory[pos].peerURI}@" +
+                                    uaHistory[pos].peerDomain)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }

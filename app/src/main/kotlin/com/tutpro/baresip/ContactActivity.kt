@@ -17,13 +17,23 @@ class ContactActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact)
 
-        index = intent.extras.getInt("index")
-        val name = ContactsActivity.contactNames[index]
-        val uri = ContactsActivity.contactURIs[index]
+        new = intent.extras.getBoolean("new")
+        val name: String
+        val uri: String
+        if (new) {
+            name = intent.extras.getString("name")
+            uri = intent.extras.getString("uri")
+        } else {
+            index = intent.extras.getInt("index")
+            name = ContactsActivity.contacts[index].name
+            uri = ContactsActivity.contacts[index].uri
+        }
+
         setTitle(name)
 
         nameView = findViewById(R.id.Name) as EditText
         nameView.setText(name)
+        if (new) nameView.setSelection(nameView.text.length)
 
         uriView = findViewById(R.id.Uri) as EditText
         uriView.setText(uri)
@@ -42,25 +52,37 @@ class ContactActivity : AppCompatActivity() {
 
         if (item.itemId == R.id.checkIcon) {
 
-            val name = nameView.text.toString().trim()
-            if (!Utils.checkName(name)) {
+            val newName = nameView.text.toString().trim()
+            if (!Utils.checkName(newName)) {
                 Utils.alertView(this, "Notice",
-                        "Invalid contact name: $name")
+                        "Invalid contact name: $newName")
+                return false
+            }
+            if ((new || (ContactsActivity.contacts[index].name != newName)) &&
+                    ContactsActivity.nameExists(newName)) {
+                Utils.alertView(this, "Notice",
+                        "Contact $newName already exists")
                 return false
             }
 
-            var uri = uriView.text.toString().trim()
-            if (!uri.startsWith("<")) {
-                if (!uri.startsWith("sip:")) uri = "sip:$uri"
-                if (!Utils.checkUri(uri)) {
-                    Utils.alertView(this, "Notice","Invalid contact URI: $uri")
+            var newUri = uriView.text.toString().trim()
+            if (!newUri.startsWith("<")) {
+                if (!newUri.startsWith("sip:")) newUri = "sip:$newUri"
+                if (!Utils.checkUri(newUri)) {
+                    Utils.alertView(this, "Notice","Invalid contact URI: $newUri")
                     return false
                 }
             }
 
-            ContactsActivity.contactNames[index] = name
-            ContactsActivity.contactURIs[index] = uri
+            if (new) {
+                ContactsActivity.contacts.add(Contact(newName, newUri))
+            } else {
+                ContactsActivity.contacts[index].uri = newUri
+                ContactsActivity.contacts[index].name = newName
+            }
+            ContactsActivity.contacts.sortBy { Contact -> Contact.name }
             ContactsActivity.saveContacts()
+
             setResult(RESULT_OK, i)
             finish()
             return true
@@ -77,6 +99,7 @@ class ContactActivity : AppCompatActivity() {
 
     companion object {
         internal var index = 0
+        internal var new = false
     }
 
 }
