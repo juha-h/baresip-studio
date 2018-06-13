@@ -15,20 +15,21 @@ import android.widget.TextView
 
 import java.util.*
 
-class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<String>) :
-        ArrayAdapter<String>(cxt, R.layout.contact_row, rows) {
+class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>) :
+        ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val row = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.contact_row, parent, false)
         val nameView = rowView.findViewById(R.id.contactName) as TextView
-        nameView.text = row
+        nameView.text = row.name
         nameView.textSize = 20f
         nameView.setPadding(6, 6, 0, 6)
         nameView.setOnClickListener { _ ->
             val i = Intent(cxt, ContactActivity::class.java)
             val b = Bundle()
+            b.putBoolean("new", false)
             b.putInt("index", position)
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
@@ -38,10 +39,9 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<S
         actionView.setOnClickListener { _ ->
             Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
-            deleteDialog.setMessage("Do you want to delete contact ${row}")
+            deleteDialog.setMessage("Do you want to delete contact ${row.name}")
             deleteDialog.setPositiveButton("Delete") { dialog, _ ->
-                ContactsActivity.contactNames.removeAt(position)
-                ContactsActivity.contactURIs.removeAt(position)
+                ContactsActivity.contacts.removeAt(position)
                 ContactsActivity.saveContacts()
                 this.notifyDataSetChanged()
                 dialog.dismiss()
