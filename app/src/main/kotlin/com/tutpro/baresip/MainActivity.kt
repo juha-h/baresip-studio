@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             when (callButton.tag) {
                 "Call" -> {
-                    if (ONE_CALL_ONLY && calls.isEmpty()) {
+                    if (!ONE_CALL_ONLY || calls.isEmpty()) {
                         val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
                         if (calleeText.length > 0) {
                             var uri = ContactsActivity.findContactURI(calleeText)
