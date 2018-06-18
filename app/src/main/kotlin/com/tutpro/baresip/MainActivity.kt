@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                         holdButton.visibility = View.VISIBLE
                         securityButton.setImageResource(callsOut[0].security)
                         setSecurityButtonTag(securityButton, callsOut[0].security)
-                        if ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtp"))
+                        if ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtpf"))
                             securityButton.visibility = View.VISIBLE
                         else
                             securityButton.visibility = View.INVISIBLE
@@ -574,7 +574,7 @@ class MainActivity : AppCompatActivity() {
         val security_button_params = LinearLayout.LayoutParams(dp24px, dp24px, 0.0f)
         security_button_params.gravity = Gravity.CENTER_VERTICAL
         security_button.layoutParams = security_button_params
-        if ((call.security != 0) && ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtp"))) {
+        if ((call.security != 0) && ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtpf"))) {
             security_button.setImageResource(call.security)
             setSecurityButtonTag(securityButton, call.security)
             security_button.visibility = View.VISIBLE
