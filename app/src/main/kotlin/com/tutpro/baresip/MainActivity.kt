@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
+
         setContentView(R.layout.activity_main)
 
         appContext = applicationContext
@@ -129,10 +130,10 @@ class MainActivity : AppCompatActivity() {
                         holdButton.visibility = View.VISIBLE
                         securityButton.setImageResource(callsOut[0].security)
                         setSecurityButtonTag(securityButton, callsOut[0].security)
-                        if (acc.mediaenc == "")
-                            securityButton.visibility = View.INVISIBLE
-                        else
+                        if ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtp"))
                             securityButton.visibility = View.VISIBLE
+                        else
+                            securityButton.visibility = View.INVISIBLE
                         dtmf.visibility = View.VISIBLE
                         dtmf.requestFocus()
                     } else {
@@ -573,7 +574,7 @@ class MainActivity : AppCompatActivity() {
         val security_button_params = LinearLayout.LayoutParams(dp24px, dp24px, 0.0f)
         security_button_params.gravity = Gravity.CENTER_VERTICAL
         security_button.layoutParams = security_button_params
-        if ((call.security != 0) && (acc.mediaenc != "")) {
+        if ((call.security != 0) && ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtp"))) {
             security_button.setImageResource(call.security)
             setSecurityButtonTag(securityButton, call.security)
             security_button.visibility = View.VISIBLE
@@ -928,19 +929,26 @@ class MainActivity : AppCompatActivity() {
                             verifyDialog.create().show()
                         }
                     }
-                    "call verified" -> {
+                    "call verified", "call secure" -> {
                         val call = Call.find(calls, callp)
                         if (call == null) {
                             Log.e("Baresip", "Call $callp that is verified is not found")
                             return
                         }
-                        call.security = R.drawable.box_green
-                        call.zid = ev[1]
+                        val tag: String
+                        if (ev[0] == "call secure") {
+                            call.security = R.drawable.box_yellow
+                            tag = "yellow"
+                        } else {
+                            call.security = R.drawable.box_green
+                            tag = "green"
+                            call.zid = ev[1]
+                        }
                         if (call.dir == "out") {
                             this@MainActivity.runOnUiThread {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    securityButton.setImageResource(R.drawable.box_green)
-                                    securityButton.tag = "green"
+                                    securityButton.setImageResource(call.security)
+                                    securityButton.tag = tag
                                     securityButton.visibility = View.VISIBLE
                                 }
                             }
@@ -949,8 +957,8 @@ class MainActivity : AppCompatActivity() {
                                 if (ua == uas[aorSpinner.selectedItemPosition]) {
                                     val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
                                     val securityButton = layout.findViewById(view_id) as ImageButton
-                                    securityButton.setImageResource(R.drawable.box_green)
-                                    securityButton.tag = "green"
+                                    securityButton.setImageResource(call.security)
+                                    securityButton.tag = tag
                                     securityButton.visibility = View.VISIBLE
                                 }
                             }
