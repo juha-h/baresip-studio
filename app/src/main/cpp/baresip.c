@@ -838,10 +838,11 @@ Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
 
     LOGD("holding call %s\n", native_call);
-    int res = call_hold(call, true);
-    // audio_set_source(call_audio(call), NULL, NULL);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return res;
+    struct audio *au = call_audio(call);
+    audio_set_hold(au, true);
+    audio_set_source(au, NULL, NULL);
+    return call_hold(call, true);
 }
 
 JNIEXPORT jint JNICALL
@@ -851,10 +852,11 @@ Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz,
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
 
     LOGD("unholding call %s\n", native_call);
-    // audio_set_source(call_audio(call), "opensles", "nil");
-    int res = call_hold(call, false);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return res;
+    struct audio *au = call_audio(call);
+    audio_set_hold(au, false);
+    audio_set_source(au, "opensles", "nil");
+    return call_hold(call, false);
 }
 
 JNIEXPORT void JNICALL
