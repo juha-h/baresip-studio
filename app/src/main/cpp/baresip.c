@@ -127,7 +127,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
         case UA_EVENT_CALL_MENC:
-            if (prm[0] == '1')
+            if (prm[0] == '0')
+                re_snprintf(event_buf, sizeof event_buf, "call secure");
+            else if (prm[0] == '1')
                 re_snprintf(event_buf, sizeof event_buf, "call verify,%s", prm+2);
             else if (prm[0] == '2')
                 re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm+2);
