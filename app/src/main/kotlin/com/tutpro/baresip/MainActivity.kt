@@ -303,6 +303,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "Hanging up AoR $aor call $callp to " +
                             (findViewById(R.id.callee) as EditText).text)
                     ua_hangup(ua.uap, callp,0, "")
+                    callButton.isEnabled = false
                 }
             }
         }
