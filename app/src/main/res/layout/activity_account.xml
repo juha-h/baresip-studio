@@ -21,7 +21,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:text="Display Name" >
@@ -42,7 +41,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Authentication Username" >
         </TextView>
 
@@ -60,7 +58,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Authentication Password" >
         </TextView>
 
@@ -79,7 +76,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Outbound Proxies" >
         </TextView>
 
@@ -107,7 +103,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Registration Interval (sec)" >
         </TextView>
 
@@ -125,7 +120,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Audio Codecs" >
         </TextView>
 
@@ -143,7 +137,6 @@
             android:paddingTop="10dp"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:onClick="onClick"
             android:text="Media Encryption" >
         </TextView>
 

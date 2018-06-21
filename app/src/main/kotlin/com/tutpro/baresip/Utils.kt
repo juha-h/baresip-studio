@@ -4,12 +4,10 @@ import android.app.ActivityManager
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.net.ConnectivityManager
-
-import java.io.*
-import android.os.Build
 import android.os.PowerManager
 import android.app.KeyguardManager
+
+import java.io.*
 
 object Utils {
 
@@ -52,6 +50,25 @@ object Utils {
 
         } catch (e: java.io.FileNotFoundException) {
             Log.e("Baresip", "Failed to find contents file: " + e.toString())
+        }
+
+    }
+
+    fun copyAssetToFile(context: Context, asset: String, path: String) {
+        try {
+            val `is` = context.assets.open(asset)
+            val os = FileOutputStream(path)
+            val buffer = ByteArray(512)
+            var byteRead: Int = `is`.read(buffer)
+            while (byteRead  != -1) {
+                os.write(buffer, 0, byteRead)
+                byteRead = `is`.read(buffer)
+            }
+            os.close()
+            `is`.close()
+        } catch (e: IOException) {
+            Log.e("Baresip", "Failed to read asset " + asset + ": " +
+                    e.toString())
         }
 
     }
@@ -142,22 +159,10 @@ object Utils {
         return res
     }
 
-    fun isConnected(context: Context): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = cm.activeNetworkInfo
-        if (activeNetwork != null && activeNetwork.isConnected) {
-            val networkType = activeNetwork.type
-            return networkType == ConnectivityManager.TYPE_WIFI || networkType == ConnectivityManager.TYPE_MOBILE
-        } else {
-            return false
-        }
-    }
-
-    fun foregrounded(): Boolean {
+    fun isVisible(): Boolean {
         val appProcessInfo = ActivityManager.RunningAppProcessInfo()
-        ActivityManager.getMyMemoryState(appProcessInfo);
-        return ((appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) or
-                (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE))
+        ActivityManager.getMyMemoryState(appProcessInfo)
+        return appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
     }
 
     fun isDeviceLocked(context: Context): Boolean {

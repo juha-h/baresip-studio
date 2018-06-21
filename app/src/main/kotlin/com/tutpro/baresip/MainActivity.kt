@@ -1,41 +1,37 @@
 package com.tutpro.baresip
 
 import android.Manifest
-import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.*
-import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.graphics.Color
+import android.content.BroadcastReceiver
+import android.content.Intent
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.annotation.Keep
-import android.widget.*
-import android.widget.RelativeLayout.LayoutParams
-import android.widget.AutoCompleteTextView
-import android.view.*
 import android.util.Log
-import android.widget.RelativeLayout
+import android.view.Menu
+import android.view.MenuItem
+import android.content.Context
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.graphics.Color
 import android.media.AudioManager
-import android.net.NetworkInfo
-import android.support.v7.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
+import android.view.inputmethod.InputMethodManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-
-import java.util.*
-import java.io.*
+import android.widget.RelativeLayout.LayoutParams
+import android.widget.RelativeLayout
+import android.widget.*
+import android.view.*
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var appContext: Context
     internal lateinit var layout: RelativeLayout
+    internal lateinit var baresipService: Intent
     internal lateinit var callee: AutoCompleteTextView
     internal lateinit var securityButton: ImageButton
     internal lateinit var callButton: ImageButton
@@ -47,18 +43,21 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var am: AudioManager
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
-    internal lateinit var nb: NotificationCompat.Builder
-    internal lateinit var receiver: BroadcastReceiver
+    internal lateinit var serviceEventReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        Log.d("Baresip", "At onCreate")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(R.layout.activity_main)
+
+        filesPath = applicationContext.filesDir.absolutePath
 
         appContext = applicationContext
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
@@ -68,32 +67,27 @@ class MainActivity : AppCompatActivity() {
         holdButton = findViewById(R.id.holdButton) as ImageButton
         historyButton = findViewById(R.id.historyButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
-        filesPath = applicationContext.filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        nb = NotificationCompat.Builder(this)
-        nb.setVisibility(VISIBILITY_PUBLIC).setOngoing(true).setSmallIcon(R.drawable.ic_stat)
-                .setContentIntent(
-                        PendingIntent.getActivity(this, NOTIFICATION_ID,
-                                Intent(this, MainActivity::class.java)
-                                        .setAction(Intent.ACTION_MAIN)
-                                        .addCategory(Intent.CATEGORY_LAUNCHER),
-                                        PendingIntent.FLAG_UPDATE_CURRENT))
-                .setContent(RemoteViews(getPackageName(), R.layout.notification))
-
-        val netFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
-        receiver = object : BroadcastReceiver() {
+        serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val intentExtras = intent.extras
-                val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
-                Log.d("Baresip", "Got event $info")
-                if (running) UserAgent.register(uas)
+                handleServiceEvent(intent.getStringExtra("event"),
+                        intent.getStringExtra("uap" ),
+                        intent.getStringExtra("callp"))
             }
         }
-        registerReceiver(receiver, netFilter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
+                IntentFilter("service event"))
+
+        if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Baresip", "Baresip does not have RECORD_AUDIO permission")
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
+        }
 
         aorSpinner = findViewById(R.id.AoRList) as Spinner
         uaAdapter = UaSpinnerAdapter(applicationContext, uas, images)
@@ -179,53 +173,6 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
-
-        val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
-                "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav")
-        val path = applicationContext.filesDir.path
-        Log.d("Baresip", "path is: $path")
-        var file = File(path)
-        if (!file.exists()) {
-            Log.d("Baresip", "Creating baresip directory")
-            try {
-                File(path).mkdirs()
-            } catch (e: Error) {
-                Log.e("Baresip", "Failed to create directory: " + e.toString())
-            }
-
-        }
-        for (a in assets) {
-            file = File("$path/$a")
-            if (!file.exists()) {
-                Log.d("Baresip", "Copying asset $a")
-                copyAssetToFile(applicationContext, a, "$path/$a")
-            } else {
-                Log.d("Baresip", "Asset $a already copied")
-            }
-        }
-
-        file = File(path, "history")
-        try {
-            val fis = FileInputStream(file)
-            val ois = ObjectInputStream(fis)
-            @SuppressWarnings("unchecked")
-            history = ois.readObject() as ArrayList<History>
-            Log.d("Baresip", "Restored History of ${history.size} entries")
-            ois.close()
-            fis.close()
-        } catch (e: Exception) {
-            Log.w("Baresip", "InputStream exception: - " + e.toString())
-        }
-
-        if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("Baresip", "Baresip does not have RECORD_AUDIO permission")
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
-        }
-
-        ContactsActivity.generateContacts(applicationContext.filesDir.absolutePath +
-                "/contacts")
 
         callee.threshold = 2
         callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
@@ -335,18 +282,266 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, HISTORY_CODE)
         }
 
-        if (!running) {
-            Log.i("Baresip", "Starting Baresip with path $path")
-            if (!Utils.isConnected(this)) {
-                Toast.makeText(this, "No network connection!",
-                        Toast.LENGTH_LONG).show()
-                unregisterReceiver(receiver)
-                finish()
-                // System.exit(0)
-            } else {
-                nm.notify(NOTIFICATION_ID, nb.build())
-                Thread(Runnable { baresipStart(path) }).start()
-                running = true
+        baresipService = Intent(this@MainActivity, BaresipService::class.java)
+        if (!BaresipService.IS_SERVICE_RUNNING) {
+            baresipService.setAction("Start")
+            startService(baresipService)
+        }
+    }
+
+    private fun handleServiceEvent(event: String, uap: String, callp: String) {
+        val ua = UserAgent.find(uas, uap)!!
+        val aor = ua.account.aor
+        val acc = ua.account
+        val ev = event.split(",")
+        Log.d("Baresip", "Handling service event ${ev[0]} for $uap/$callp/$aor")
+        for (account_index in uas.indices) {
+            if (uas[account_index].account.aor == aor) {
+                when (ev[0]) {
+                    "ua added" -> {
+                        uaAdapter.notifyDataSetChanged()
+                        if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
+                    }
+                    "registered" -> {
+                        uaAdapter.notifyDataSetChanged()
+                    }
+                    "registering failed" -> {
+                        uaAdapter.notifyDataSetChanged()
+                    }
+                    "call ringing" -> {
+                    }
+                    "call incoming" -> {
+                        val peer_uri = Api.call_peeruri(callp)
+                        val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
+                        if (ONE_CALL_ONLY && (calls.size > 0)) {
+                            Log.d("Baresip", "Auto-rejecting incoming call $uap/$callp/$peer_uri")
+                            ua_hangup(uap, callp, 486, "Busy Here")
+                            history.add(History(aor, peer_uri, "in", false))
+                            new_call.hasHistory = true
+                        } else {
+                            Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
+                            calls.add(new_call)
+                            if (ua != uas[aorSpinner.selectedItemPosition])
+                                aorSpinner.setSelection(account_index)
+                            else
+                                addCallViews(ua, new_call, Call.uaCalls(calls, ua, "in").size * 10)
+                            am.mode = AudioManager.MODE_RINGTONE
+                            if (Utils.isVisible()) {
+                                Log.d("Baresip", "Baresip is visible")
+                                val i = Intent(applicationContext, MainActivity::class.java)
+                                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                                startActivity(i)
+                            }
+                        }
+                    }
+                    "call established" -> {
+                        val call = Call.find(calls, callp)
+                        if (call == null) {
+                            Log.e("Baresip", "Established call $callp not found")
+                            return
+                        }
+                        if (call.dir == "out") {
+                            Log.d("Baresip", "Outbound call $callp established")
+                            call.status = "Hangup"
+                            call.hold = false
+                            call.security = R.drawable.box_red
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                callButton.tag = "Hangup"
+                                callButton.setImageResource(R.drawable.hangup)
+                                holdButton.tag = "Hold"
+                                holdButton.setImageResource(R.drawable.hold)
+                                holdButton.visibility = View.VISIBLE
+                                if (acc.mediaenc == "") {
+                                    securityButton.visibility = View.INVISIBLE
+                                } else {
+                                    securityButton.setImageResource(R.drawable.box_red)
+                                    securityButton.tag = "red"
+                                    securityButton.visibility = View.VISIBLE
+                                }
+                                dtmf.setText("")
+                                dtmf.hint = "DTMF"
+                                dtmf.visibility = View.VISIBLE
+                                dtmf.requestFocus()
+                                dtmf.addTextChangedListener(call.dtmfWatcher)
+                            }
+                            history.add(History(aor, call.peerURI, "out", true))
+                            call.hasHistory = true
+                        } else {
+                            Log.d("Baresip", "Inbound call $callp established")
+                            call.status = "Hangup"
+                            call.security = R.drawable.box_red
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                if (acc.mediaenc != "") {
+                                    val inIndex = Call.uaCallIndex(calls, ua, call, "in")
+                                    val view_id = (inIndex + 1) * 10 + 3
+                                    val securityButton = findViewById(view_id) as ImageButton
+                                    securityButton.setImageResource(R.drawable.box_red)
+                                    securityButton.tag = "red"
+                                    securityButton.visibility = View.VISIBLE
+                                    val rejectButton = findViewById(view_id + 3) as ImageButton
+                                    rejectButton.tag = "Hold"
+                                    rejectButton.setImageResource(R.drawable.hold)
+                                }
+                            }
+                            history.add(History(aor, call.peerURI, "in", true))
+                            call.hasHistory = true
+                        }
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        am.isSpeakerphoneOn = false
+                        // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                        //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
+                        //        AudioManager.STREAM_VOICE_CALL)
+                        if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                            History.aorRemoveHistory(history, aor)
+                    }
+                    "call verify" -> {
+                        val call = Call.find(calls, callp)
+                        if (call == null) {
+                            Log.e("Baresip", "Call $callp to be verified is not found")
+                            return
+                        }
+                        val verifyDialog = AlertDialog.Builder(this@MainActivity)
+                        verifyDialog.setTitle("Verify")
+                        verifyDialog.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
+                        verifyDialog.setPositiveButton("Yes") { dialog, _ ->
+                            val security: Int
+                            if (Utils.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                                Log.w("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
+                                security = R.drawable.box_yellow
+                            } else {
+                                security = R.drawable.box_green
+                            }
+                            call.security = security
+                            call.zid = ev[3]
+                            if (call.dir == "out") {
+                                securityButton.setImageResource(security)
+                                setSecurityButtonTag(securityButton, security)
+                                securityButton.visibility = View.VISIBLE
+                            } else {
+                                if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                    val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
+                                    val securityButton = layout.findViewById(view_id) as ImageButton
+                                    securityButton.setImageResource(security)
+                                    setSecurityButtonTag(securityButton, security)
+                                    securityButton.visibility = View.VISIBLE
+                                }
+                            }
+                            dialog.dismiss()
+                        }
+                        verifyDialog.setNegativeButton("No") { dialog, _ ->
+                            call.security = R.drawable.box_yellow
+                            call.zid = ev[3]
+                            if (call.dir == "out") {
+                                securityButton.setImageResource(R.drawable.box_yellow)
+                                securityButton.tag = "yellow"
+                                securityButton.visibility = View.VISIBLE
+                            } else {
+                                if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                    val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
+                                    val securityButton = layout.findViewById(view_id) as ImageButton
+                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.tag = "yellow"
+                                    securityButton.visibility = View.VISIBLE
+                                }
+                            }
+                            dialog.dismiss()
+                        }
+                        verifyDialog.create().show()
+                    }
+                    "call verified", "call secure" -> {
+                        val call = Call.find(calls, callp)
+                        if (call == null) {
+                            Log.e("Baresip", "Call $callp that is verified is not found")
+                            return
+                        }
+                        val tag: String
+                        if (ev[0] == "call secure") {
+                            call.security = R.drawable.box_yellow
+                            tag = "yellow"
+                        } else {
+                            call.security = R.drawable.box_green
+                            tag = "green"
+                            call.zid = ev[1]
+                        }
+                        if (call.dir == "out") {
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                securityButton.setImageResource(call.security)
+                                securityButton.tag = tag
+                                securityButton.visibility = View.VISIBLE
+                            }
+                        } else {
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
+                                val securityButton = layout.findViewById(view_id) as ImageButton
+                                securityButton.setImageResource(call.security)
+                                securityButton.tag = tag
+                                securityButton.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+                    "call closed" -> {
+                        val call = Call.find(calls, callp)
+                        if (call == null) {
+                            Log.d("Baresip", "Call $callp that is closed is not found")
+                            return
+                        }
+                        if (call.dir == "in") {
+                            Log.d("Baresip", "Removing inbound call ${uap}/${callp}/" +
+                                    call.peerURI)
+                            val inIndex = Call.uaCallIndex(calls, ua, call, "in")
+                            val view_id = (inIndex + 1) * 10
+                            val remove_count = Call.uaCalls(calls, ua, "in").size - inIndex
+                            calls.remove(call)
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                if (callButton.tag == "Call") {
+                                    callee.setOnKeyListener(null)
+                                }
+                                val caller_heading = layout.findViewById(view_id)
+                                val view_index = layout.indexOfChild(caller_heading)
+                                layout.removeViews(view_index, 3 * remove_count)
+                                val callsIn = Call.uaCalls(calls, ua, "in")
+                                for (i in inIndex until callsIn.size) {
+                                    this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
+                                }
+                                historyButton.visibility = View.VISIBLE
+                            }
+                            // nm.cancel(INCOMING_ID)
+                            if (!call.hasHistory) {
+                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                                    History.aorRemoveHistory(history, aor)
+                                history.add(History(aor, call.peerURI, "in", false))
+                            }
+                        } else {
+                            Log.d("Baresip", "Removing outgoing call $uap/$callp/" +
+                                    call.peerURI)
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                callButton.tag = "Call"
+                                callButton.setImageResource(R.drawable.call)
+                                callButton.isEnabled = true
+                                callee.setText("")
+                                callee.hint = "Callee"
+                                holdButton.visibility = View.INVISIBLE
+                                if (currentFocus == dtmf) {
+                                    imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                                }
+                                securityButton.visibility = View.INVISIBLE
+                                dtmf.removeTextChangedListener(call.dtmfWatcher)
+                                dtmf.visibility = View.INVISIBLE
+                                historyButton.visibility = View.VISIBLE
+                            }
+                            calls.remove(call)
+                            if (!call.hasHistory) {
+                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                                    History.aorRemoveHistory(history, aor)
+                                history.add(History(aor, call.peerURI, "out",
+                                        false))
+                            }
+                        }
+                        if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
+                    }
+                    else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
+                }
+                break
             }
         }
     }
@@ -354,48 +549,30 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.d("Baresip", "Paused")
+        visible = false
     }
 
     override fun onResume() {
         super.onResume()
         Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
-        nm.cancel(INCOMING_ID)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Log.d("Baresip", "Screen orientation change to landscape")
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Log.d("Baresip", "Screen orientation change to portrait")
-        }
+        visible = true
+        // nm.cancel(INCOMING_ID)
     }
 
     override fun onBackPressed() {
         moveTaskToBack(true)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            RECORD_AUDIO_PERMISSION -> {
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("Baresip", "RECORD_AUDIO permission granted")
-                } else {
-                    Log.d("Baresip", "RECORD_AUDIO permission NOT granted")
-                }
-                return
-            }
-            else -> Log.e("Baresip", "Unknown permissions request code: $requestCode")
-        }
+    override fun onDestroy() {
+        Log.d("Baresip", "Destroyed")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        super.onCreateOptionsMenu(menu)
-        val inflater = menuInflater
-        inflater.inflate(R.menu.main_menu, menu)
-        inflater.inflate(R.menu.speaker_icon, menu)
+        menuInflater.inflate(R.menu.main_menu, menu)
+        menuInflater.inflate(R.menu.speaker_icon, menu)
         return true
     }
 
@@ -434,33 +611,21 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.quit -> {
-                if (running) {
-                    Log.d("Baresip", "Stopping")
-                    val path = applicationContext.filesDir.path
-                    Log.d("Baresip", "Saving history to $path")
-                    val file = File(path, "history")
-                    try {
-                        val fos = FileOutputStream(file)
-                        val oos = ObjectOutputStream(fos)
-                        oos.writeObject(history)
-                        oos.close()
-                        fos.close()
-                    } catch (e: IOException) {
-                        Log.w("Baresip", "OutputStream exception: " + e.toString())
-                        e.printStackTrace()
-                    }
-                    baresipStop()
-                    nm.cancelAll()
-                    running = false
+                Log.d("Baresip", "Quiting")
+                if (BaresipService.IS_SERVICE_RUNNING) {
+                    HistoryActivity.saveHistory()
+                    baresipService.setAction("Stop");
+                    startService(baresipService)
                 }
-                unregisterReceiver(receiver)
+                // nm.cancelAll()
                 finish()
-                System.exit(0)
+                // System.exit(0)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
@@ -468,7 +633,8 @@ class MainActivity : AppCompatActivity() {
 
             ACCOUNTS_CODE -> {
                 uaAdapter.notifyDataSetChanged()
-                updateNotification()
+                baresipService.setAction("UpdateNotification")
+                startService(baresipService)
             }
 
             CONTACTS_CODE -> {
@@ -508,10 +674,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun call(ua: UserAgent, uri: String) {
         (findViewById(R.id.callee) as EditText).setText(uri)
-        Log.i("Baresip", "Calling $ua.uap/$uri")
+        Log.i("Baresip", "Calling ${ua.uap}/$uri")
         val call = ua_connect(ua.uap, uri)
         if (call != "") {
-            Log.i("Baresip", "Adding outgoing call $ua.uap / $call / $uri")
+            Log.i("Baresip", "Adding outgoing call ${ua.uap}/$call/$uri")
             val dtmfWatcher = object: TextWatcher {
                 override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
@@ -539,8 +705,7 @@ class MainActivity : AppCompatActivity() {
         caller_heading.textSize = 20f
         caller_heading.setPadding(10, 20, 0, 0)
         caller_heading.id = id
-        val heading_params = LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT)
+        val heading_params = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         if (id == 10)
             heading_params.addRule(RelativeLayout.BELOW, callButton.id)
         else
@@ -549,7 +714,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Adding incoming call heading at ${caller_heading.id}")
         layout.addView(caller_heading)
 
-        val caller_row = LinearLayout(appContext)
+        val caller_row = LinearLayout(applicationContext)
         caller_row.id = caller_heading.id + 1
         caller_row.setOrientation(LinearLayout.HORIZONTAL)
         val caller_row_params = LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -557,7 +722,7 @@ class MainActivity : AppCompatActivity() {
         caller_row_params.addRule(RelativeLayout.BELOW, id)
         caller_row.layoutParams = caller_row_params
 
-        val caller_uri = TextView(appContext)
+        val caller_uri = TextView(applicationContext)
         caller_uri.text = call.peerURI
         caller_uri.setTextColor(Color.BLUE)
         caller_uri.textSize = 20f
@@ -569,13 +734,13 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Adding caller uri at ${caller_uri.id}")
         caller_row.addView(caller_uri)
 
-        val security_button = ImageButton(appContext)
+        val security_button = ImageButton(applicationContext)
         security_button.id = caller_uri.id + 1
-        val dp24px = ((24 * appContext.resources.displayMetrics.density) + 0.5).toInt()
+        val dp24px = ((24 * applicationContext.resources.displayMetrics.density) + 0.5).toInt()
         val security_button_params = LinearLayout.LayoutParams(dp24px, dp24px, 0.0f)
         security_button_params.gravity = Gravity.CENTER_VERTICAL
         security_button.layoutParams = security_button_params
-        if ((call.security != 0) && ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtpf"))) {
+        if ((call.security != 0) && (acc.mediaenc != "")) {
             security_button.setImageResource(call.security)
             setSecurityButtonTag(securityButton, call.security)
             security_button.visibility = View.VISIBLE
@@ -617,7 +782,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Adding caller row at ${caller_row.id}")
         layout.addView(caller_row)
 
-        val answer_row = LinearLayout(appContext)
+        val answer_row = LinearLayout(applicationContext)
         answer_row.id = security_button.id + 1
         answer_row.setOrientation(LinearLayout.HORIZONTAL)
         val answer_row_params = LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -625,7 +790,7 @@ class MainActivity : AppCompatActivity() {
         answer_row_params.addRule(RelativeLayout.BELOW, caller_row.id)
         answer_row.layoutParams = answer_row_params
 
-        val answer_button = ImageButton(appContext)
+        val answer_button = ImageButton(applicationContext)
         answer_button.tag = call.status
         if (call.status == "Answer")
             answer_button.setImageResource(R.drawable.call)
@@ -638,15 +803,13 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Baresip", "UA ${ua.uap} accepting incoming call ${call.callp}")
                     ua_answer(ua.uap, call.callp)
                     if (call.dir == "in") {
-                        this@MainActivity.runOnUiThread {
-                            call.status = "Hangup"
-                            call.hold = false
-                            answer_button.tag = "Hangup"
-                            answer_button.setImageResource(R.drawable.hangup)
-                            val reject_button = layout.findViewById(answer_button.id + 1) as ImageButton
-                            reject_button.tag = "Hold"
-                            reject_button.setImageResource(R.drawable.hold)
-                        }
+                        call.status = "Hangup"
+                        call.hold = false
+                        answer_button.tag = "Hangup"
+                        answer_button.setImageResource(R.drawable.hangup)
+                        val reject_button = layout.findViewById(answer_button.id + 1) as ImageButton
+                        reject_button.tag = "Hold"
+                        reject_button.setImageResource(R.drawable.hold)
                     }
                 }
                 "Hangup" -> {
@@ -695,362 +858,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        val reject_button_params = LayoutParams(LayoutParams.WRAP_CONTENT,
+        val reject_button_params = RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT)
-        reject_button_params.setMargins(40, 10, 0, 0)
+        reject_button_params.topMargin = 10
+        reject_button_params.addRule(RelativeLayout.ALIGN_PARENT_END)
         reject_button.layoutParams = reject_button_params
-        reject_button.setPadding(0, 0, 0, 0)
+        reject_button.setPadding(50, 0, 0, 0)
+        reject_button.background = null
         Log.d("Baresip", "Adding reject button at ${reject_button.id}")
         answer_row.addView(reject_button)
 
         Log.d("Baresip", "Adding answer row at ${answer_row.id}")
         layout.addView(answer_row)
-    }
-
-    fun updateNotification() {
-        val contentView = RemoteViews(getPackageName(), R.layout.notification)
-        for (i: Int in 0 .. 5)  {
-            val resID = resources.getIdentifier("status$i", "id", packageName)
-            if (i < images.size) {
-                contentView.setImageViewResource(resID, images[i])
-                contentView.setViewVisibility(resID, View.VISIBLE)
-            } else {
-                contentView.setViewVisibility(resID, View.INVISIBLE)
-            }
-        }
-        if (images.size > 4)
-            contentView.setViewVisibility(R.id.etc, View.VISIBLE)
-        else
-            contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
-        nb.setContent(contentView)
-        nm.notify(NOTIFICATION_ID, nb.build())
-    }
-
-    @Keep
-    fun addUA(uap: String) {
-        val ua = UserAgent(uap)
-        uas.add(ua)
-        if (UserAgent.ua_isregistered(uap)) {
-            Log.d("Baresip", "Ua $ua is registered")
-            images.add(R.drawable.dot_green)
-        } else {
-            Log.d("Baresip", "Ua $ua is NOT registered")
-            images.add(R.drawable.dot_yellow)
-            ua.register()
-        }
-        this@MainActivity.runOnUiThread {
-            uaAdapter.notifyDataSetChanged()
-            if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
-            updateNotification()
-        }
-    }
-
-    @Keep
-    private fun updateStatus(event: String, uap: String, callp: String) {
-
-        val ua = UserAgent.find(uas, uap)
-        if (ua == null) {
-            Log.e("Baresip", "Update status did not find ua $uap")
-            return
-        }
-        val aor = ua.account.aor
-        val acc = ua.account
-        val ev = event.split(",")
-
-        Log.d("Baresip", "Handling event ${ev[0]} for $uap/$callp/$aor")
-
-        for (account_index in uas.indices) {
-            if (uas[account_index].account.aor == aor) {
-                Log.d("Baresip", "Found AoR at index $account_index")
-                when (ev[0]) {
-                    "registering", "unregistering" -> {
-                    }
-                    "registered" -> {
-                        Log.d("Baresip", "Setting status to green")
-                        this@MainActivity.runOnUiThread {
-                            images[account_index] = R.drawable.dot_green
-                            uaAdapter.notifyDataSetChanged()
-                            updateNotification()
-                        }
-                    }
-                    "registering failed" -> {
-                        Log.d("Baresip", "Setting status to red")
-                        this@MainActivity.runOnUiThread {
-                            images[account_index] = R.drawable.dot_red
-                            uaAdapter.notifyDataSetChanged()
-                            updateNotification()
-                        }
-                    }
-                    "call ringing" -> {
-                    }
-                    "call incoming" -> {
-                        val peer_uri = call_peeruri(callp)
-                        val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
-                        if (ONE_CALL_ONLY && (calls.size > 0)) {
-                            Log.d("Baresip", "Auto-rejecting incoming call $uap/$callp/$peer_uri")
-                            ua_hangup(uap, callp, 486, "Busy Here")
-                            history.add(History(aor, peer_uri, "in", false))
-                            new_call.hasHistory = true
-                        } else {
-                            Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
-                            calls.add(new_call)
-                            this@MainActivity.runOnUiThread {
-                                if (ua != uas[aorSpinner.selectedItemPosition])
-                                    aorSpinner.setSelection(account_index)
-                                else
-                                    addCallViews(ua, new_call, Call.uaCalls(calls, ua, "in").size * 10)
-                                am.mode = AudioManager.MODE_RINGTONE
-                                if (Utils.foregrounded()) {
-                                    val i = Intent(this, MainActivity::class.java)
-                                    i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                                    startActivity(i)
-                                } else {
-                                    showNotification(peer_uri)
-                                }
-                            }
-                        }
-                    }
-                    "call established" -> {
-                        val call = Call.find(calls, callp)
-                        if (call == null) {
-                            Log.e("Baresip", "Established call $callp not found")
-                            return
-                        }
-                        if (call.dir == "out") {
-                            Log.d("Baresip", "Outbound call $callp established")
-                            call.status = "Hangup"
-                            call.hold = false
-                            call.security = R.drawable.box_red
-                            this@MainActivity.runOnUiThread {
-                                if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    callButton.tag = "Hangup"
-                                    callButton.setImageResource(R.drawable.hangup)
-                                    holdButton.tag = "Hold"
-                                    holdButton.setImageResource(R.drawable.hold)
-                                    holdButton.visibility = View.VISIBLE
-                                    if (acc.mediaenc == "") {
-                                        securityButton.visibility = View.INVISIBLE
-                                    } else {
-                                        securityButton.setImageResource(R.drawable.box_red)
-                                        securityButton.tag = "red"
-                                        securityButton.visibility = View.VISIBLE
-                                    }
-                                    dtmf.setText("")
-                                    dtmf.hint = "DTMF"
-                                    dtmf.visibility = View.VISIBLE
-                                    dtmf.requestFocus()
-                                    dtmf.addTextChangedListener(call.dtmfWatcher)
-                                }
-                            }
-                            history.add(History(aor, call.peerURI, "out", true))
-                            call.hasHistory = true
-                        } else {
-                            Log.d("Baresip", "Inbound call $callp established")
-                            call.status = "Hangup"
-                            call.security = R.drawable.box_red
-                            this@MainActivity.runOnUiThread {
-                                if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    if (acc.mediaenc != "") {
-                                        val inIndex = Call.uaCallIndex(calls, ua, call, "in")
-                                        val view_id = (inIndex + 1) * 10 + 3
-                                        val securityButton = findViewById(view_id) as ImageButton
-                                        securityButton.setImageResource(R.drawable.box_red)
-                                        securityButton.tag = "red"
-                                        securityButton.visibility = View.VISIBLE
-                                        val rejectButton = findViewById(view_id + 3) as ImageButton
-                                        rejectButton.tag = "Hold"
-                                        rejectButton.setImageResource(R.drawable.hold)
-                                    }
-                                }
-                            }
-                            history.add(History(aor, call.peerURI, "in", true))
-                            call.hasHistory = true
-                        }
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        am.isSpeakerphoneOn = false
-                        // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
-                        //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
-                        //        AudioManager.STREAM_VOICE_CALL)
-                        if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                            History.aorRemoveHistory(history, aor)
-                    }
-                    "call verify" -> {
-                        val call = Call.find(calls, callp)
-                        if (call == null) {
-                            Log.e("Baresip", "Call $callp to be verified is not found")
-                            return
-                        }
-                        this@MainActivity.runOnUiThread {
-                            val verifyDialog = AlertDialog.Builder(this)
-                            verifyDialog.setTitle("Verify")
-                            verifyDialog.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
-                            verifyDialog.setPositiveButton("Yes") { dialog, _ ->
-                                val security: Int
-                                if (Utils.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                                    Log.w("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
-                                    security = R.drawable.box_yellow
-                                } else {
-                                    security = R.drawable.box_green
-                                }
-                                call.security = security
-                                call.zid = ev[3]
-                                if (call.dir == "out") {
-                                    securityButton.setImageResource(security)
-                                    setSecurityButtonTag(securityButton, security)
-                                    securityButton.visibility = View.VISIBLE
-                                } else {
-                                    if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        val view_id = (Call.uaCallIndex(calls, ua, call,"in") + 1) * 10 + 3
-                                        val securityButton = layout.findViewById(view_id) as ImageButton
-                                        securityButton.setImageResource(security)
-                                        setSecurityButtonTag(securityButton, security)
-                                        securityButton.visibility = View.VISIBLE
-                                    }
-                                }
-                                dialog.dismiss()
-                            }
-                            verifyDialog.setNegativeButton("No") { dialog, _ ->
-                                call.security = R.drawable.box_yellow
-                                call.zid = ev[3]
-                                if (call.dir == "out") {
-                                    securityButton.setImageResource(R.drawable.box_yellow)
-                                    securityButton.tag = "yellow"
-                                    securityButton.visibility = View.VISIBLE
-                                } else {
-                                    if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        val view_id = (Call.uaCallIndex(calls, ua, call,"in") + 1) * 10 + 3
-                                        val securityButton = layout.findViewById(view_id) as ImageButton
-                                        securityButton.setImageResource(R.drawable.box_yellow)
-                                        securityButton.tag = "yellow"
-                                        securityButton.visibility = View.VISIBLE
-                                    }
-                                }
-                                dialog.dismiss()
-                            }
-                            verifyDialog.create().show()
-                        }
-                    }
-                    "call verified", "call secure" -> {
-                        val call = Call.find(calls, callp)
-                        if (call == null) {
-                            Log.e("Baresip", "Call $callp that is verified is not found")
-                            return
-                        }
-                        val tag: String
-                        if (ev[0] == "call secure") {
-                            call.security = R.drawable.box_yellow
-                            tag = "yellow"
-                        } else {
-                            call.security = R.drawable.box_green
-                            tag = "green"
-                            call.zid = ev[1]
-                        }
-                        if (call.dir == "out") {
-                            this@MainActivity.runOnUiThread {
-                                if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    securityButton.setImageResource(call.security)
-                                    securityButton.tag = tag
-                                    securityButton.visibility = View.VISIBLE
-                                }
-                            }
-                        } else {
-                            this@MainActivity.runOnUiThread {
-                                if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    val view_id = (Call.uaCallIndex(calls, ua, call, "in") + 1) * 10 + 3
-                                    val securityButton = layout.findViewById(view_id) as ImageButton
-                                    securityButton.setImageResource(call.security)
-                                    securityButton.tag = tag
-                                    securityButton.visibility = View.VISIBLE
-                                }
-                            }
-                        }
-                    }
-                    "call closed" -> {
-                        val call = Call.find(calls, callp)
-                        if (call == null) {
-                            Log.d("Baresip", "Call $callp that is closed is not found")
-                            return
-                        }
-                        if (call.dir == "in") {
-                            Log.d("Baresip", "Removing inbound call ${uap}/${callp}/" +
-                                    call.peerURI)
-                            val inIndex = Call.uaCallIndex(calls, ua, call, "in")
-                            val view_id = (inIndex + 1) * 10
-                            val remove_count = Call.uaCalls(calls, ua,"in").size - inIndex
-                            calls.remove(call)
-                            this@MainActivity.runOnUiThread {
-                                if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                    if (callButton.tag == "Call") {
-                                        callee.setOnKeyListener(null)
-                                    }
-                                    val caller_heading = layout.findViewById(view_id)
-                                    val view_index = layout.indexOfChild(caller_heading)
-                                    layout.removeViews(view_index, 3 * remove_count)
-                                    val callsIn = Call.uaCalls(calls, ua,"in")
-                                    for (i in inIndex until callsIn.size) {
-                                        this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
-                                    }
-                                    historyButton.visibility = View.VISIBLE
-                                }
-                                nm.cancel(INCOMING_ID)
-                            }
-                            if (!call.hasHistory) {
-                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                                    History.aorRemoveHistory(history, aor)
-                                history.add(History(aor, call.peerURI,"in", false))
-                            }
-                        } else {
-                            Log.d("Baresip", "Removing outgoing call $uap/$callp/" +
-                                        call.peerURI)
-                                this@MainActivity.runOnUiThread {
-                                    if (ua == uas[aorSpinner.selectedItemPosition]) {
-                                        callButton.tag = "Call"
-                                        callButton.setImageResource(R.drawable.call)
-                                        callButton.isEnabled = true
-                                        callee.setText("")
-                                        callee.hint = "Callee"
-                                        holdButton.visibility = View.INVISIBLE
-                                        if (this.currentFocus == dtmf) {
-                                            imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
-                                        }
-                                        securityButton.visibility = View.INVISIBLE
-                                        dtmf.removeTextChangedListener(call.dtmfWatcher)
-                                        dtmf.visibility = View.INVISIBLE
-                                        historyButton.visibility = View.VISIBLE
-                                    }
-                                    calls.remove(call)
-                                }
-                                if (!call.hasHistory) {
-                                    if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                                        History.aorRemoveHistory(history, aor)
-                                    history.add(History(aor, call.peerURI, "out",
-                                            false))
-                                }
-                        }
-                        if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
-                    }
-                    else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
-                }
-                break
-            }
-        }
-    }
-
-    private fun copyAssetToFile(context: Context, asset: String, path: String) {
-        try {
-            val `is` = context.assets.open(asset)
-            val os = FileOutputStream(path)
-            val buffer = ByteArray(512)
-            var byteRead: Int = `is`.read(buffer)
-            while (byteRead  != -1) {
-                os.write(buffer, 0, byteRead)
-                byteRead = `is`.read(buffer)
-            }
-        } catch (e: IOException) {
-            Log.e("Baresip", "Failed to read asset " + asset + ": " +
-                    e.toString())
-        }
-
     }
 
     private fun setSecurityButtonTag(button: ImageButton, security: Int) {
@@ -1069,34 +888,12 @@ class MainActivity : AppCompatActivity() {
         button.setImageResource(R.drawable.resume)
     }
 
-    private fun showNotification(peerUri: String) {
-        Log.d("Baresip", "Showing notification")
-        val nb = NotificationCompat.Builder(this)
-            .setVisibility(VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_stat)
-                .setContentTitle("Incoming call from")
-                .setContentText("$peerUri")
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setContentIntent(
-                        PendingIntent.getActivity(this, INCOMING_ID,
-                                Intent(this, MainActivity::class.java)
-                                        .setAction(Intent.ACTION_MAIN)
-                                        .addCategory(Intent.CATEGORY_LAUNCHER),
-                                PendingIntent.FLAG_UPDATE_CURRENT))
-        nm.notify(INCOMING_ID, nb.build())
-    }
-
-    external fun baresipStart(path: String)
-    external fun baresipStop()
     external fun uag_current(): String
     external fun uag_current_set(uap: String)
     external fun ua_connect(uap: String, peer_uri: String): String
     external fun ua_answer(uap: String, callp: String)
     external fun ua_hold_answer(uap: String, callp: String): Int
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
-    external fun call_peeruri(callp: String): String
     external fun call_hold(callp: String): Int
     external fun call_unhold(callp: String): Int
     external fun call_send_digit(callp: String, digit: Char): Int
@@ -1104,12 +901,12 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
-        internal var running: Boolean = false
         var uas = ArrayList<UserAgent>()
         internal var images = ArrayList<Int>()
-        internal var calls = ArrayList<Call>()
         var history: ArrayList<History> = ArrayList()
+        internal var calls = ArrayList<Call>()
         var filesPath = ""
+        var visible = true
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
@@ -1121,17 +918,9 @@ class MainActivity : AppCompatActivity() {
 
         const val RECORD_AUDIO_PERMISSION = 1
         const val HISTORY_SIZE = 100
-        const val NOTIFICATION_ID = 10
-        const val INCOMING_ID = 11
-
         const val ONE_CALL_ONLY = true
 
-        external fun contacts_remove()
-        external fun contact_add(contact: String)
+        const val INCOMING_ID = 102
 
-        init {
-            System.loadLibrary("baresip")
-        }
     }
-
 }
