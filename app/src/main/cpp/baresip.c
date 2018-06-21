@@ -930,7 +930,7 @@ Java_com_tutpro_baresip_MainActivity_reload_1config(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Utils_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
+Java_com_tutpro_baresip_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
     if (strcmp(native_cmd, "audio_debug") == 0) {
@@ -942,7 +942,7 @@ Java_com_tutpro_baresip_Utils_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaC
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Utils_audio_1codecs(JNIEnv *env, jobject thiz)
+Java_com_tutpro_baresip_Api_audio_1codecs(JNIEnv *env, jobject thiz)
 {
     struct list *aucodecl = baresip_aucodecl();
     struct le *le;
@@ -969,7 +969,7 @@ Java_com_tutpro_baresip_Utils_audio_1codecs(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Utils_uri_1decode(JNIEnv *env, jobject thiz, jstring javaUri) {
+Java_com_tutpro_baresip_Api_uri_1decode(JNIEnv *env, jobject thiz, jstring javaUri) {
     const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
     struct pl pl;
     struct uri uri2;

@@ -182,8 +182,4 @@ object Utils {
         return isLocked
     }
 
-    external fun cmd_exec(cmd: String): Int
-    external fun uri_decode(uri: String): Boolean
-    external fun audio_codecs(): String
-
 }

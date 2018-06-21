@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                     unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
                         val outCalls = Call.uaCalls(calls, uas[aorSpinner.selectedItemPosition], "out")
                         if (outCalls.size > 0) {
-                            if (Utils.cmd_exec("zrtp_unverify " + outCalls[0].zid) != 0) {
+                            if (Api.cmd_exec("zrtp_unverify " + outCalls[0].zid) != 0) {
                                 Log.w("Baresip",
                                         "Command 'zrtp_unverify ${outCalls[0].zid}' failed")
                             } else {
@@ -405,7 +405,7 @@ class MainActivity : AppCompatActivity() {
                         verifyDialog.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
                         verifyDialog.setPositiveButton("Yes") { dialog, _ ->
                             val security: Int
-                            if (Utils.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                            if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                                 Log.w("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
                                 security = R.drawable.box_yellow
                             } else {
@@ -605,7 +605,7 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.about -> {
-                Utils.cmd_exec("audio_debug")
+                Api.cmd_exec("audio_debug")
                 i = Intent(this, AboutActivity::class.java)
                 startActivityForResult(i, ABOUT_CODE)
                 return true
@@ -761,7 +761,7 @@ class MainActivity : AppCompatActivity() {
                     unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
                             "Do you want to unverify the peer?")
                     unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
-                        if (Utils.cmd_exec("zrtp_unverify " + call.zid) != 0) {
+                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0) {
                             Log.w("Baresip", "Command 'zrtp_unverify ${call.zid}' failed")
                         } else {
                             security_button.setImageResource(R.drawable.box_yellow)
