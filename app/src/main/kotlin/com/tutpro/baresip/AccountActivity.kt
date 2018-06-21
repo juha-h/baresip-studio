@@ -53,7 +53,7 @@ class AccountActivity : AppCompatActivity() {
         regint = findViewById(R.id.RegInt) as EditText
         regint.setText(acc.regint.toString())
 
-        val audioCodecs = ArrayList(Utils.audio_codecs().split(","))
+        val audioCodecs = ArrayList(Api.audio_codecs().split(","))
         newCodecs.addAll(audioCodecs)
         while (newCodecs.size < audioCodecs.size) newCodecs.add("")
 
@@ -183,7 +183,7 @@ class AccountActivity : AppCompatActivity() {
             if (ob != acc.outbound) {
                 val outbound = ArrayList<String>()
                 for (i in ob.indices) {
-                    if ((ob[i] == "") || Utils.uri_decode(ob[i])) {
+                    if ((ob[i] == "") || Api.uri_decode(ob[i])) {
                         if (account_set_outbound(acc.accp, ob[i], i) == 0) {
                             if (ob[i] != "")
                                 outbound.add(account_outbound(acc.accp, i))
