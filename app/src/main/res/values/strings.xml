@@ -27,10 +27,8 @@
     <string name="mediaEnc">Selects media transport encryption protocol.\n
         ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
         the call has been established.\n
-        DTLS-SRTP means that UDP/TLS/RTP/SAVP is offered in outgoing call and that RTP/SAVP,
-        RTP/SAVPF, or UDP/TLS/RTP/SAVP is used if offered in incoming call.\n
-        SRTP-MANF means that RTP/SAVPS is offered in outgoing call and that RTP/SAVP or RTP/SAVPF
-        is used if offered in incoming call.\n
+        DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
+        RTP/SAVPF, UDP/TLS/RTP/SAVP, or UDP/TLS/RTP/SAVPF is used if offered in incoming call.\n
         SRTP-MAND means that RTP/SAVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF
         is used if offered in incoming call.\n
         SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used

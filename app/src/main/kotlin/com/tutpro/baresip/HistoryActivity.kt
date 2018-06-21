@@ -10,6 +10,10 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectOutputStream
 
 import java.text.SimpleDateFormat
 import java.util.ArrayList
@@ -147,4 +151,20 @@ class HistoryActivity : AppCompatActivity() {
                 now.get(Calendar.DAY_OF_MONTH) == time.get(Calendar.DAY_OF_MONTH)
     }
 
+    companion object {
+
+        fun saveHistory() {
+            val file = File(MainActivity.filesPath, "history")
+            try {
+                val fos = FileOutputStream(file)
+                val oos = ObjectOutputStream(fos)
+                oos.writeObject(MainActivity.history)
+                oos.close()
+                fos.close()
+            } catch (e: IOException) {
+                Log.w("Baresip", "OutputStream exception: " + e.toString())
+                e.printStackTrace()
+            }
+        }
+    }
 }

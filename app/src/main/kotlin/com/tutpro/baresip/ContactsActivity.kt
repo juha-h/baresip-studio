@@ -85,14 +85,14 @@ class ContactsActivity : AppCompatActivity() {
 
         fun generateContacts(path: String) {
             val content = Utils.getFileContents(File(path))
-            MainActivity.contacts_remove()
+            contacts_remove()
             contacts.clear()
             content.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
                     val name = parts[1]
                     val uri = parts[2].trim()
-                    MainActivity.contact_add("\"$name\" $uri")
+                    contact_add("\"$name\" $uri")
                     contacts.add(Contact(name, uri))
                 }
             }
@@ -121,6 +121,10 @@ class ContactsActivity : AppCompatActivity() {
                 if (c.name.equals(name, ignoreCase = true)) return true
             return false
         }
+
+        external fun contacts_remove()
+        external fun contact_add(contact: String)
+
     }
 
 }
