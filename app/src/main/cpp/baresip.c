@@ -243,8 +243,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance, jstring javaPath)
-{
+Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring javaPath) {
     int err;
     const char *path = (*env)->GetStringUTFChars(env, javaPath, 0);
     struct le *le;
@@ -257,7 +256,7 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
 
     err = libre_init();
     if (err)
-	    goto out;
+        goto out;
 
     conf_path_set(path);
 
@@ -293,9 +292,9 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
         goto out;
     }
 
-    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    UpdateContext *pctx = (UpdateContext *) (&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
-    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
+    jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
@@ -309,7 +308,7 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
         ua = le->data;
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
+        sprintf(ua_buf, "%lu", (unsigned long) ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
         LOGD("adding UA for AoR %s/%s\n", ua_aor(ua), ua_buf);
         jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addUA",
@@ -321,11 +320,11 @@ Java_com_tutpro_baresip_MainActivity_baresipStart(JNIEnv *env, jobject instance,
     LOGI("Running main loop\n");
     err = re_main(signal_handler);
 
-out:
+    out:
 
     if (err) {
         LOGE("error: (%d)\n", err);
-	    ua_stop_all(true);
+        ua_stop_all(true);
     }
 
     LOGD("closing upon main loop exit");
@@ -343,8 +342,7 @@ out:
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_baresipStop(JNIEnv *env, jobject thiz)
-{
+Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
     LOGD("closing upon stop");
     ua_stop_all(false);
     ua_close();
@@ -758,7 +756,7 @@ Java_com_tutpro_baresip_MainActivity_uag_1current(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
+Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
 {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call;
@@ -893,7 +891,7 @@ Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_00024Companion_contacts_1remove(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_ContactsActivity_00024Companion_contacts_1remove(JNIEnv *env, jobject thiz) {
     struct le *le;
     le = list_head(contact_list(baresip_contacts()));
     while ((le = list_head(contact_list(baresip_contacts())))) {
@@ -904,7 +902,7 @@ Java_com_tutpro_baresip_MainActivity_00024Companion_contacts_1remove(JNIEnv *env
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_00024Companion_contact_1add(JNIEnv *env, jobject thiz,
+Java_com_tutpro_baresip_ContactsActivity_00024Companion_contact_1add(JNIEnv *env, jobject thiz,
                                                                  jstring javaContact) {
     struct pl pl_addr;
     const struct list *lst;
