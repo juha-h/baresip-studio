@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
+import android.os.Handler
 import android.os.IBinder
 import android.support.annotation.Keep
 import android.support.v4.app.NotificationCompat
@@ -116,6 +117,16 @@ class BaresipService: Service() {
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
                 showNotification()
+
+                val handler = Handler()
+                val delay = 1000 * 600L
+                handler.postDelayed(object : Runnable {
+                    override fun run() {
+                        Log.d(LOG_TAG, "Handler based registration")
+                        UserAgent.register(MainActivity.uas)
+                        handler.postDelayed(this, delay)
+                    }
+                }, delay)
             }
 
             "UpdateNotification" -> {

@@ -21,8 +21,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
+            android:onClick="onClick"
             android:text="Display Name" >
         </TextView>
 
@@ -41,6 +40,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:onClick="onClick"
             android:text="Authentication Username" >
         </TextView>
 
@@ -58,6 +58,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:onClick="onClick"
             android:text="Authentication Password" >
         </TextView>
 
@@ -76,6 +77,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:onClick="onClick"
             android:text="Outbound Proxies" >
         </TextView>
 
@@ -97,22 +99,27 @@
             android:layout_width="fill_parent">
         </EditText>
 
-        <TextView
-            android:id="@+id/RegIntTitle"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:text="Registration Interval (sec)" >
-        </TextView>
-
-        <EditText
-            android:id="@+id/RegInt"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:inputType="number"
-            android:layout_width="fill_parent">
-        </EditText>
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/RegTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:onClick="onClick"
+                android:text="Register" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/Register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:checked="false" >
+            </CheckBox>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/AudioCodecsTitle"
@@ -120,6 +127,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:onClick="onClick"
             android:text="Audio Codecs" >
         </TextView>
 
@@ -137,6 +145,7 @@
             android:paddingTop="10dp"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:onClick="onClick"
             android:text="Media Encryption" >
         </TextView>
 
