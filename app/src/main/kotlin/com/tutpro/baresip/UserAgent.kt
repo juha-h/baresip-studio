@@ -9,9 +9,6 @@ class UserAgent (val uap: String) {
     fun register() {
         if (account.regint > 0) {
             Log.d("Baresip", "Registering ${account.aor} UA ${uap}")
-            val accp = ua_account(uap)
-            val reg_int = account_regint(accp)
-            Log.d("Baresip", "reg_int is $reg_int")
             if (ua_register(uap) != 0)
                 Log.e("Baresip", "Registering failed")
         }
@@ -52,8 +49,9 @@ class UserAgent (val uap: String) {
 
         fun register(uas: ArrayList<UserAgent>) {
             for (ua in uas) {
-                if (ua_register(ua.uap) != 0)
-                    Log.e("Baresip", "Failed to register ${ua.account.aor}")
+                if (ua.account.regint > 0)
+                    if (ua_register(ua.uap) != 0)
+                        Log.e("Baresip", "Failed to register ${ua.account.aor}")
             }
         }
     }

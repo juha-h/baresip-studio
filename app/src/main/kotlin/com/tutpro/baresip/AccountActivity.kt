@@ -19,7 +19,7 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var authPass: EditText
     internal lateinit var outbound1: EditText
     internal lateinit var outbound2: EditText
-    internal lateinit var regint: EditText
+    internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
 
     private var newCodecs = ArrayList<String>()
@@ -50,8 +50,8 @@ class AccountActivity : AppCompatActivity() {
                 outbound2.setText(acc.outbound[1])
         }
 
-        regint = findViewById(R.id.RegInt) as EditText
-        regint.setText(acc.regint.toString())
+        regCheck = findViewById(R.id.Register) as CheckBox
+        regCheck.isChecked = acc.regint > 0
 
         val audioCodecs = ArrayList(Api.audio_codecs().split(","))
         newCodecs.addAll(audioCodecs)
@@ -206,22 +206,19 @@ class AccountActivity : AppCompatActivity() {
                 save = true
             }
 
-            val ri = regint.text.toString().trim()
-            if (Utils.checkUint(ri)) {
-                if (ri.toInt() != acc.regint) {
-                    if (account_set_regint(acc.accp, ri.toInt()) == 0) {
-                        acc.regint = account_regint(acc.accp)
-                        Log.d("Baresip", "New regint is ${acc.regint}")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of regint $ri failed")
-                    }
+            var newRegint = -1
+            if (regCheck.isChecked)
+                if (acc.regint != 3600) newRegint = 3600
+            else
+                if (acc.regint != 0) newRegint = 0
+            if (newRegint != -1)
+                if (account_set_regint(acc.accp, newRegint) == 0) {
+                    acc.regint = account_regint(acc.accp)
+                    Log.d("Baresip", "New regint is ${acc.regint}")
+                    save = true
+                } else {
+                    Log.e("Baresip", "Setting of regint failed")
                 }
-            } else {
-                Utils.alertView(this, "Notice",
-                        "Invalid Registration Interval: $ri")
-                return false
-            }
 
             val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "" } as ArrayList<String>))
             if (ac != acc.audioCodec) {
@@ -299,8 +296,8 @@ class AccountActivity : AppCompatActivity() {
                 Utils.alertView(this, "Outbound Proxies",
                         getString(R.string.obProxies))
             }
-            findViewById(R.id.RegIntTitle) -> {
-                Utils.alertView(this, "Registration Interval", getString(R.string.regInt))
+            findViewById(R.id.RegTitle) -> {
+                Utils.alertView(this, "Register", getString(R.string.register))
             }
             findViewById(R.id.AudioCodecsTitle) -> {
                 Utils.alertView(this, "Audio Codecs", getString(R.string.auCodecs))

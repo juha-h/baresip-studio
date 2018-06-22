@@ -20,8 +20,8 @@
         one that responds.  If no outbound proxy is given, requests are sent based on
         DNS NAPTR/SRV/A record lookup of callee URI hostpart.\nExample:\nsip:foo.com:5060;transport=tls
     </string>
-    <string name="regInt">Tells how often (in seconds) REGISTER requests are sent.  Value 0
-        disables registration.
+    <string name="register">If checked, registration is enabled and REGISTER requests are sent at
+        10 minute intervals.
     </string>
     <string name="auCodecs">List of supported audio codecs in priority order.</string>
     <string name="mediaEnc">Selects media transport encryption protocol.\n
