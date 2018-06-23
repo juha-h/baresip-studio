@@ -13,7 +13,8 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="16dp"
-        android:paddingBottom="24dp" >
+        android:paddingBottom="24dp"
+        android:focusableInTouchMode="true" >
 
         <TextView
             android:id="@+id/DisplayNameTitle"
