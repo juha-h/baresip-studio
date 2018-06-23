@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
+import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.os.PowerManager
 import android.support.annotation.Keep
@@ -32,6 +33,7 @@ class BaresipService: Service() {
     internal lateinit var npi: PendingIntent
     internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
+    internal lateinit var fl: WifiManager.WifiLock
 
     override fun onCreate() {
 
@@ -64,10 +66,6 @@ class BaresipService: Service() {
             }
         }
 
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
-        wl.acquire()
-
         super.onCreate()
     }
 
@@ -76,7 +74,14 @@ class BaresipService: Service() {
         when (intent.getAction()) {
 
             "Start" -> {
-                Log.i(LOG_TAG, "Received Start Foreground Intent ");
+                Log.i(LOG_TAG, "Received Start Foreground Intent")
+
+                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+                wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
+                wl.acquire()
+
+                val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                fl = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
 
                 val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
                         "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav")
@@ -125,7 +130,7 @@ class BaresipService: Service() {
             }
 
             "UpdateNotification" -> {
-                Log.i(LOG_TAG, "UpdateNotification")
+                Log.i(LOG_TAG, "Received UpdateNotification")
                 updateNotification()
             }
 
@@ -140,12 +145,13 @@ class BaresipService: Service() {
                 unregisterReceiver(nr)
                 nm.cancelAll()
                 wl.release()
+                fl.release()
                 stopForeground(true)
                 stopSelf()
             }
         }
 
-        return START_STICKY;
+        return START_STICKY
     }
 
     private fun showNotification() {
@@ -155,7 +161,7 @@ class BaresipService: Service() {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.notification))
-        startForeground(STATUS_NOTIFICATION_ID, nb.build());
+        startForeground(STATUS_NOTIFICATION_ID, nb.build())
     }
 
     @Keep
@@ -243,7 +249,7 @@ class BaresipService: Service() {
 
     override fun onDestroy() {
         Log.i(LOG_TAG, "In onDestroy")
-        super.onDestroy();
+        super.onDestroy()
     }
 
     fun updateNotification() {
