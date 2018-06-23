@@ -505,7 +505,6 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 historyButton.visibility = View.VISIBLE
                             }
-                            // nm.cancel(INCOMING_ID)
                             if (!call.hasHistory) {
                                 if (History.aorHistory(history, aor) > HISTORY_SIZE)
                                     History.aorRemoveHistory(history, aor)
@@ -557,7 +556,6 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
         visible = true
-        // nm.cancel(INCOMING_ID)
     }
 
     override fun onBackPressed() {
@@ -613,11 +611,9 @@ class MainActivity : AppCompatActivity() {
             R.id.quit -> {
                 Log.d("Baresip", "Quiting")
                 if (BaresipService.IS_SERVICE_RUNNING) {
-                    HistoryActivity.saveHistory()
                     baresipService.setAction("Stop");
                     startService(baresipService)
                 }
-                // nm.cancelAll()
                 finish()
                 // System.exit(0)
                 return true

@@ -117,16 +117,6 @@ class BaresipService: Service() {
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
                 showNotification()
-
-                val handler = Handler()
-                val delay = 1000 * 600L
-                handler.postDelayed(object : Runnable {
-                    override fun run() {
-                        Log.d(LOG_TAG, "Handler based registration")
-                        UserAgent.register(MainActivity.uas)
-                        handler.postDelayed(this, delay)
-                    }
-                }, delay)
             }
 
             "UpdateNotification" -> {
@@ -136,6 +126,10 @@ class BaresipService: Service() {
 
             "Stop" -> {
                 Log.i(LOG_TAG, "Received Stop Foreground Intent")
+                HistoryActivity.saveHistory()
+                MainActivity.uas.clear()
+                MainActivity.images.clear()
+                MainActivity.history.clear()
                 baresipStop()
                 BaresipService.IS_SERVICE_RUNNING = false
                 unregisterReceiver(nr)
