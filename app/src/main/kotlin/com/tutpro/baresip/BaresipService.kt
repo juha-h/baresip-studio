@@ -144,8 +144,8 @@ class BaresipService: Service() {
                 BaresipService.IS_SERVICE_RUNNING = false
                 unregisterReceiver(nr)
                 nm.cancelAll()
-                wl.release()
-                fl.release()
+                if (wl.isHeld) wl.release()
+                if (fl.isHeld) fl.release()
                 stopForeground(true)
                 stopSelf()
             }
