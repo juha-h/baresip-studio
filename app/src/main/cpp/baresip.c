@@ -327,12 +327,16 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         ua_stop_all(true);
     }
 
-    LOGD("closing upon main loop exit");
+    LOGD("Main loop exit");
+
     play = mem_deref(play);
     ua_close();
     conf_close();
     baresip_close();
+
+    LOGD("Unloading modules");
     mod_close();
+
     libre_close();
 
     // tmr_debug();
@@ -346,8 +350,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
     LOGD("closing upon stop");
     ua_stop_all(false);
     ua_close();
-    // conf_close();
-    // baresip_close();
+    conf_close();
+    baresip_close();
     // mod_close();
     // libre_close();
 
