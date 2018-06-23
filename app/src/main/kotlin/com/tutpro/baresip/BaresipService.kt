@@ -10,8 +10,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
-import android.os.Handler
 import android.os.IBinder
+import android.os.PowerManager
 import android.support.annotation.Keep
 import android.support.v4.app.NotificationCompat
 import android.util.Log
@@ -31,6 +31,7 @@ class BaresipService: Service() {
     internal lateinit var ni: Intent
     internal lateinit var npi: PendingIntent
     internal lateinit var nr: BroadcastReceiver
+    internal lateinit var wl: PowerManager.WakeLock
 
     override fun onCreate() {
 
@@ -62,6 +63,10 @@ class BaresipService: Service() {
                 }
             }
         }
+
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
+        wl.acquire()
 
         super.onCreate()
     }
@@ -133,6 +138,8 @@ class BaresipService: Service() {
                 baresipStop()
                 BaresipService.IS_SERVICE_RUNNING = false
                 unregisterReceiver(nr)
+                nm.cancelAll()
+                wl.release()
                 stopForeground(true)
                 stopSelf()
             }
