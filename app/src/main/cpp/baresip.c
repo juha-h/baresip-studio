@@ -105,12 +105,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
             break;
         case UA_EVENT_CALL_INCOMING:
-            play = mem_deref(play);
             if (list_count(ua_calls(ua)) > 1) {
+                play = mem_deref(play);
                 (void)play_file(&play, player, "callwaiting.wav", 3);
-            }
-            else {
-                (void)play_file(&play, player, "ring.wav", -1);
             }
             re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
