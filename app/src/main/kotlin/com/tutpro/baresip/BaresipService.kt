@@ -158,7 +158,7 @@ class BaresipService: Service() {
         nb.setVisibility(VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(npi)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.notification))
         startForeground(STATUS_NOTIFICATION_ID, nb.build())
@@ -202,7 +202,10 @@ class BaresipService: Service() {
                         return
                     }
                     "registered" -> {
-                        MainActivity.images[account_index] = R.drawable.dot_green
+                        if (ua.account.regint == 0)
+                            MainActivity.images[account_index] = R.drawable.dot_yellow
+                        else
+                            MainActivity.images[account_index] = R.drawable.dot_green
                         updateNotification()
                         if (!MainActivity.visible) return
                     }
@@ -217,20 +220,20 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
                             Log.d(LOG_TAG, "Baresip is NOT visible")
-                            val peer_uri = Api.call_peeruri(callp)
-                            val huBuilder = NotificationCompat.Builder(this)
-                                    .setSmallIcon(R.drawable.ic_stat)
-                                    .setContentText("Incoming call from $peer_uri")
-                                    .setDefaults(Notification.DEFAULT_ALL)
-                                    .setPriority(Notification.PRIORITY_HIGH)
-                                    .setAutoCancel(true)
-                                    .setContentIntent(npi)
-                            nm.notify(INCOMING_NOTIFICATION_ID, huBuilder.build())
+                            nb.setVibrate(LongArray(0))
+                            val view = RemoteViews(getPackageName(), R.layout.notification)
+                            view.setTextViewText(R.id.incoming, "Call from ${Api.call_peeruri(callp)}")
+                            view.setViewVisibility(R.id.incoming, View.VISIBLE)
+                            nb.setContent(view)
+                            nm.notify(STATUS_NOTIFICATION_ID, nb.build())
                         }
                     }
                     "call established", "call closed" -> {
-                        nb.mActions.clear()
-                        nb.mContentText = ""
+                        nm.cancel(STATUS_NOTIFICATION_ID)
+                        val view = RemoteViews(getPackageName(), R.layout.notification)
+                        view.setViewVisibility(R.id.incoming, View.GONE)
+                        nb.setContent(view)
+                        nb.setVibrate(null)
                         nm.notify(STATUS_NOTIFICATION_ID, nb.build())
                     }
                 }
@@ -278,7 +281,6 @@ class BaresipService: Service() {
 
         var IS_SERVICE_RUNNING = false
         val STATUS_NOTIFICATION_ID = 101
-        val INCOMING_NOTIFICATION_ID = 102
         var disconnected = false
 
     }
