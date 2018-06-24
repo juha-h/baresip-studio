@@ -302,13 +302,8 @@ class MainActivity : AppCompatActivity() {
                         uaAdapter.notifyDataSetChanged()
                         if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
                     }
-                    "registered" -> {
+                    "registered", "registering failed", "unregistering" -> {
                         uaAdapter.notifyDataSetChanged()
-                    }
-                    "registering failed" -> {
-                        uaAdapter.notifyDataSetChanged()
-                    }
-                    "call ringing" -> {
                     }
                     "call incoming" -> {
                         val peer_uri = Api.call_peeruri(callp)
@@ -501,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                                 layout.removeViews(view_index, 3 * remove_count)
                                 val callsIn = Call.uaCalls(calls, ua, "in")
                                 for (i in inIndex until callsIn.size) {
-                                    this@MainActivity.addCallViews(ua, callsIn[i], (i + 1) * 10)
+                                    addCallViews(ua, callsIn[i], (i + 1) * 10)
                                 }
                                 historyButton.visibility = View.VISIBLE
                             }
@@ -615,7 +610,6 @@ class MainActivity : AppCompatActivity() {
                     startService(baresipService)
                 }
                 finish()
-                // System.exit(0)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

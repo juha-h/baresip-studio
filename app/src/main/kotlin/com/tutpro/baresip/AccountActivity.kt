@@ -24,6 +24,7 @@ class AccountActivity : AppCompatActivity() {
 
     private var newCodecs = ArrayList<String>()
     private var save = false
+    private var uaIndex= -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +32,8 @@ class AccountActivity : AppCompatActivity() {
 
         acc = Account.find(MainActivity.uas, intent.extras.getString("accp"))!!
         aor = acc.aor
+        uaIndex = UserAgent.findAorIndex(MainActivity.uas, aor)!!
+
         setTitle(aor.replace("sip:", ""))
 
         displayName = findViewById(R.id.DisplayName) as EditText
@@ -207,10 +210,14 @@ class AccountActivity : AppCompatActivity() {
             }
 
             var newRegint = -1
-            if (regCheck.isChecked)
+            if (regCheck.isChecked) {
                 if (acc.regint != 3600) newRegint = 3600
-            else
-                if (acc.regint != 0) newRegint = 0
+            } else {
+                if (acc.regint != 0) {
+                    UserAgent.ua_unregister(MainActivity.uas[uaIndex].uap)
+                    newRegint = 0
+                }
+            }
             if (newRegint != -1)
                 if (account_set_regint(acc.accp, newRegint) == 0) {
                     acc.regint = account_regint(acc.accp)
@@ -254,15 +261,10 @@ class AccountActivity : AppCompatActivity() {
 
             if (save) {
                 AccountsActivity.saveAccounts()
-                val uaIndex = UserAgent.findAorIndex(MainActivity.uas, aor)
-                if (uaIndex != null) {
-                    if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
-                        Log.e("Baresip", "Failed to update UA with AoR $aor")
-                    else if (acc.regint > 0)
-                        UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
-                } else {
-                    Log.e("Baresip", "Did not find UA matching AoR $aor")
-                }
+                if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
+                    Log.e("Baresip", "Failed to update UA with AoR $aor")
+                if (newRegint > 0)
+                    UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
             }
 
             setResult(RESULT_OK, intent)
