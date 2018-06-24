@@ -205,7 +205,7 @@ class BaresipService: Service() {
         for (account_index in MainActivity.uas.indices) {
             if (MainActivity.uas[account_index].account.aor == aor) {
                 when (event) {
-                    "registering", "unregistering" -> {
+                    "registering" -> {
                         return
                     }
                     "registered" -> {
@@ -214,19 +214,23 @@ class BaresipService: Service() {
                         else
                             MainActivity.images[account_index] = R.drawable.dot_green
                         updateNotification()
-                        if (!MainActivity.visible) return
+                        if (!Utils.isVisible()) return
                     }
                     "registering failed" -> {
                         MainActivity.images[account_index] = R.drawable.dot_red
                         updateNotification()
-                        if (!MainActivity.visible) return
+                        if (!Utils.isVisible()) return
+                    }
+                    "unregistering" -> {
+                        MainActivity.images[account_index] = R.drawable.dot_yellow
+                        updateNotification()
+                        if (!Utils.isVisible()) return
                     }
                     "call ringing" -> {
                         return
                     }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
-                            Log.d(LOG_TAG, "Baresip is NOT visible")
                             nb.setVibrate(LongArray(0))
                             val view = RemoteViews(getPackageName(), R.layout.notification)
                             view.setTextViewText(R.id.incoming, "Call from ${Api.call_peeruri(callp)}")
