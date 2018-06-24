@@ -22,6 +22,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import android.support.v4.content.LocalBroadcastManager
+import android.media.RingtoneManager
+import android.media.Ringtone
 
 class BaresipService: Service() {
 
@@ -34,6 +36,7 @@ class BaresipService: Service() {
     internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
+    internal lateinit var rt: Ringtone
 
     override fun onCreate() {
 
@@ -65,6 +68,10 @@ class BaresipService: Service() {
                 }
             }
         }
+
+        val currentRtUri = RingtoneManager
+                .getActualDefaultRingtoneUri(applicationContext, RingtoneManager.TYPE_RINGTONE)
+        rt = RingtoneManager.getRingtone(applicationContext, currentRtUri)
 
         super.onCreate()
     }
@@ -227,6 +234,7 @@ class BaresipService: Service() {
                             nb.setContent(view)
                             nm.notify(STATUS_NOTIFICATION_ID, nb.build())
                         }
+                        rt.play()
                     }
                     "call established", "call closed" -> {
                         nm.cancel(STATUS_NOTIFICATION_ID)
@@ -235,6 +243,7 @@ class BaresipService: Service() {
                         nb.setContent(view)
                         nb.setVibrate(null)
                         nm.notify(STATUS_NOTIFICATION_ID, nb.build())
+                        rt.stop()
                     }
                 }
             }
