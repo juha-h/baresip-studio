@@ -30,7 +30,8 @@ class BaresipService: Service() {
     private val LOG_TAG = "Baresip Service"
     internal lateinit var intent: Intent
     internal lateinit var nm: NotificationManager
-    internal lateinit var nb: NotificationCompat.Builder
+    internal lateinit var snb: NotificationCompat.Builder
+    internal lateinit var cnb: NotificationCompat.Builder
     internal lateinit var ni: Intent
     internal lateinit var npi: PendingIntent
     internal lateinit var nr: BroadcastReceiver
@@ -46,7 +47,8 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip")
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        nb = NotificationCompat.Builder(this)
+        snb = NotificationCompat.Builder(this)
+        cnb = NotificationCompat.Builder(this)
 
         ni = Intent(this, MainActivity::class.java)
                 .setAction(Intent.ACTION_MAIN)
@@ -162,13 +164,13 @@ class BaresipService: Service() {
     }
 
     private fun showNotification() {
-        nb.setVisibility(VISIBILITY_PUBLIC)
+        snb.setVisibility(VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(npi)
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setOngoing(true)
-                .setContent(RemoteViews(packageName, R.layout.notification))
-        startForeground(STATUS_NOTIFICATION_ID, nb.build())
+                .setContent(RemoteViews(packageName, R.layout.status_notification))
+        startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     @Keep
@@ -194,7 +196,7 @@ class BaresipService: Service() {
 
     @Keep
     fun updateStatus(event: String, uap: String, callp: String) {
-        Log.d(LOG_TAG, "updateStatus got event $event")
+        Log.d(LOG_TAG, "updateStatus got event $event/$uap/$callp")
         if (!IS_SERVICE_RUNNING) return
         val ua = UserAgent.find(MainActivity.uas, uap)
         if (ua == null) {
@@ -231,22 +233,55 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
-                            nb.setVibrate(LongArray(0))
-                            val view = RemoteViews(getPackageName(), R.layout.notification)
-                            view.setTextViewText(R.id.incoming, "Call from ${Api.call_peeruri(callp)}")
-                            view.setViewVisibility(R.id.incoming, View.VISIBLE)
-                            nb.setContent(view)
-                            nm.notify(STATUS_NOTIFICATION_ID, nb.build())
+                            snb.setVibrate(LongArray(0))
+                            val view = RemoteViews(getPackageName(), R.layout.status_notification)
+                            view.setTextViewText(R.id.callFrom, "Call from ${Api.call_peeruri(callp)}")
+                            view.setViewVisibility(R.id.incomingCall, View.VISIBLE)
+                            snb.setContent(view)
+                            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
                         }
                         rt.play()
+                        /* if (!Utils.isVisible()) {
+                            nm.cancel(STATUS_NOTIFICATION_ID)
+                            val cnb = NotificationCompat.Builder(this)
+                                    .setSmallIcon(R.drawable.ic_stat)
+                                    .setContentIntent(npi)
+                                    .setVisibility(VISIBILITY_PUBLIC)
+                                    .setPriority(Notification.PRIORITY_HIGH)
+                                    .setVibrate(LongArray(0))
+                            val answerIntent = Intent(this, MainActivity::class.java)
+                            answerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            answerIntent.putExtra("action", "answer")
+                            answerIntent.putExtra("uap", uap)
+                            answerIntent.putExtra("callp", callp)
+                            val answerPendingIntent = PendingIntent.getActivity(this,
+                                    0, answerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            val rejectIntent = Intent(this, MainActivity::class.java)
+                            rejectIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            rejectIntent.putExtra("action", "reject")
+                            rejectIntent.putExtra("uap", uap)
+                            rejectIntent.putExtra("callp", callp)
+                            val rejectPendingIntent = PendingIntent.getActivity(this,
+                                    0, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            val view = RemoteViews(getPackageName(), R.layout.call_notification)
+                            view.setTextViewText(R.id.caller, "${Api.call_peeruri(callp)}")
+                            view.setOnClickPendingIntent(R.id.answerButton, answerPendingIntent)
+                            view.setOnClickPendingIntent(R.id.rejectButton, rejectPendingIntent)
+                            cnb.setCustomBigContentView(view)
+                            cnb.setVibrate(LongArray(0))
+                            nm.notify(CALL_NOTIFICATION_ID, cnb.build())
+                            return
+                        } */
                     }
                     "call established", "call closed" -> {
-                        nm.cancel(STATUS_NOTIFICATION_ID)
-                        val view = RemoteViews(getPackageName(), R.layout.notification)
-                        view.setViewVisibility(R.id.incoming, View.GONE)
-                        nb.setContent(view)
-                        nb.setVibrate(null)
-                        nm.notify(STATUS_NOTIFICATION_ID, nb.build())
+                        nm.cancel(CALL_NOTIFICATION_ID)
+                        val view = RemoteViews(getPackageName(), R.layout.status_notification)
+                        view.setViewVisibility(R.id.incomingCall, View.GONE)
+                        snb.setContent(view)
+                        snb.setVibrate(null)
+                        nm.notify(STATUS_NOTIFICATION_ID, snb.build())
                         rt.stop()
                     }
                 }
@@ -269,7 +304,7 @@ class BaresipService: Service() {
     }
 
     fun updateNotification() {
-        val contentView = RemoteViews(getPackageName(), R.layout.notification)
+        val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
         for (i: Int in 0 .. 5)  {
             val resID = resources.getIdentifier("status$i", "id", packageName)
             if (i < MainActivity.images.size) {
@@ -283,8 +318,8 @@ class BaresipService: Service() {
             contentView.setViewVisibility(R.id.etc, View.VISIBLE)
         else
             contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
-        nb.setContent(contentView)
-        nm.notify(STATUS_NOTIFICATION_ID, nb.build())
+        snb.setContent(contentView)
+        nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     external fun baresipStart(path: String)
@@ -294,6 +329,7 @@ class BaresipService: Service() {
 
         var IS_SERVICE_RUNNING = false
         val STATUS_NOTIFICATION_ID = 101
+        val CALL_NOTIFICATION_ID = 102
         var disconnected = false
 
     }

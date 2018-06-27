@@ -12,7 +12,7 @@ class RunOnStartup : BroadcastReceiver() {
             val i = Intent(context, MainActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             val b = Bundle()
-            b.putBoolean("onstartup", true)
+            b.putBoolean("onStartup", true)
             i.putExtras(b)
             context.startActivity(i)
         }
