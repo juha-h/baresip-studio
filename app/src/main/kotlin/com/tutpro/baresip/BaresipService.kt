@@ -236,7 +236,7 @@ class BaresipService: Service() {
                             snb.setVibrate(LongArray(0))
                             val view = RemoteViews(getPackageName(), R.layout.status_notification)
                             view.setTextViewText(R.id.callFrom, "Call from ${Api.call_peeruri(callp)}")
-                            view.setViewVisibility(R.id.incomingCall, View.VISIBLE)
+                            view.setViewVisibility(R.id.callFrom, View.VISIBLE)
                             snb.setContent(view)
                             nm.notify(STATUS_NOTIFICATION_ID, snb.build())
                         }
@@ -278,7 +278,7 @@ class BaresipService: Service() {
                     "call established", "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val view = RemoteViews(getPackageName(), R.layout.status_notification)
-                        view.setViewVisibility(R.id.incomingCall, View.GONE)
+                        view.setViewVisibility(R.id.callFrom, View.GONE)
                         snb.setContent(view)
                         snb.setVibrate(null)
                         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
