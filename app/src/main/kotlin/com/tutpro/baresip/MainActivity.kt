@@ -287,6 +287,9 @@ class MainActivity : AppCompatActivity() {
             baresipService.setAction("Start")
             startService(baresipService)
         }
+
+        if (intent.hasExtra("onStartup"))
+            moveTaskToBack(true)
     }
 
     private fun handleServiceEvent(event: String, uap: String, callp: String) {
@@ -311,8 +314,9 @@ class MainActivity : AppCompatActivity() {
                         if (ONE_CALL_ONLY && (calls.size > 0)) {
                             Log.d("Baresip", "Auto-rejecting incoming call $uap/$callp/$peer_uri")
                             ua_hangup(uap, callp, 486, "Busy Here")
+                            if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                                History.aorRemoveHistory(history, aor)
                             history.add(History(aor, peer_uri, "in", false))
-                            new_call.hasHistory = true
                         } else {
                             Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
                             calls.add(new_call)
@@ -536,6 +540,31 @@ class MainActivity : AppCompatActivity() {
                     else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
                 }
                 break
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        setIntent(intent)
+        val action = intent.getStringExtra("action")
+        Log.d("Baresip", "Got onNewIntent action $action")
+        if (action == null) return
+        val uap = intent.getStringExtra("uap")
+        val callp = intent.getStringExtra("callp")
+        val ua = UserAgent.find(uas, intent.getStringExtra("uap"))!!
+        val aor = ua.account.aor
+        val peer_uri = Api.call_peeruri(callp)
+        when (action) {
+            "answer" -> {
+                /* TODO */
+            }
+            "reject" -> {
+                Log.d("Baresip", "Rejecting incoming call from $peer_uri")
+                ua_hangup(uap, callp, 486, "Busy Here")
+                if (History.aorHistory(history, aor) > HISTORY_SIZE)
+                    History.aorRemoveHistory(history, aor)
+                history.add(History(aor, peer_uri, "in", false))
+                moveTaskToBack(true)
             }
         }
     }
