@@ -249,8 +249,8 @@ class MainActivity : AppCompatActivity() {
                     val callp = Call.calls(calls, "out")[0].callp
                     Log.i("Baresip", "Hanging up AoR $aor call $callp to " +
                             (findViewById(R.id.callee) as EditText).text)
-                    ua_hangup(ua.uap, callp,0, "")
                     callButton.isEnabled = false
+                    ua_hangup(ua.uap, callp,0, "")
                 }
             }
         }
@@ -833,6 +833,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "Hangup" -> {
                     Log.i("Baresip", "UA ${call.ua.uap} hanging up call ${call.callp}")
+                    answer_button.isEnabled = false
                     ua_hangup(call.ua.uap, call.callp, 200, "OK")
                 }
                 else -> Log.e("Baresip", "Invalid answer button tag: " + v.tag)
@@ -864,6 +865,8 @@ class MainActivity : AppCompatActivity() {
             when ((v as ImageButton).tag) {
                 "Reject" -> {
                     Log.i("Baresip", "UA ${call.ua} rejecting incoming call ${call.callp}")
+                    reject_button.isEnabled = false
+                    answer_button.isEnabled = false
                     ua_hangup(call.ua.uap, call.callp, 486, "Rejected")
                 }
                 "Hold" -> {
