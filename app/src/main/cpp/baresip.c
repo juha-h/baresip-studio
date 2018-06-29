@@ -326,7 +326,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         //ua_close();
         conf_close();
         baresip_close();
-        //mod_close();
+        mod_close();
         //libre_close();
     }
 
@@ -344,7 +344,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
     // ua_close();
     conf_close();
     baresip_close();
-    // mod_close();
+    mod_close();
     // libre_close();
     // tmr_debug();
     // mem_debug();
