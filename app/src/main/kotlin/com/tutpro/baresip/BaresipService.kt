@@ -71,20 +71,20 @@ class BaresipService: Service() {
             }
         }
 
-        val currentRtUri = RingtoneManager
+        val uri = RingtoneManager
                 .getActualDefaultRingtoneUri(applicationContext, RingtoneManager.TYPE_RINGTONE)
-        rt = RingtoneManager.getRingtone(applicationContext, currentRtUri)
+        rt = RingtoneManager.getRingtone(applicationContext, uri)
 
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
+        Log.d(LOG_TAG, "Received onStartCommand action ${intent.getAction()}")
+
         when (intent.getAction()) {
 
             "Start" -> {
-                Log.i(LOG_TAG, "Received Start Foreground Intent")
-
                 val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
                 wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
                 wl.acquire()
@@ -136,31 +136,40 @@ class BaresipService: Service() {
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
                 showNotification()
+                if (!RUN_FOREGROUNG) super.onStartCommand(intent, flags, startId)
             }
 
             "UpdateNotification" -> {
-                Log.i(LOG_TAG, "Received UpdateNotification")
                 updateNotification()
             }
 
             "Stop" -> {
-                Log.i(LOG_TAG, "Received Stop Foreground Intent")
-                HistoryActivity.saveHistory()
-                MainActivity.uas.clear()
-                MainActivity.images.clear()
-                MainActivity.history.clear()
-                baresipStop()
-                BaresipService.IS_SERVICE_RUNNING = false
-                unregisterReceiver(nr)
-                nm.cancelAll()
-                if (wl.isHeld) wl.release()
-                if (fl.isHeld) fl.release()
-                stopForeground(true)
+                cleanStop()
+                if (RUN_FOREGROUNG) stopForeground(true)
+                stopSelf()
+            }
+
+            "Kill" -> {
                 stopSelf()
             }
         }
 
         return START_STICKY
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
+
+    override fun onDestroy() {
+        Log.i(LOG_TAG, "In onDestroy")
+        super.onDestroy()
+        if (IS_SERVICE_RUNNING) {
+            Log.i(LOG_TAG, "Restart baresip killed by Android")
+            cleanStop()
+            val broadcastIntent = Intent("com.tutpro.baresip.Restart")
+            sendBroadcast(broadcastIntent)
+        }
     }
 
     private fun showNotification() {
@@ -170,7 +179,10 @@ class BaresipService: Service() {
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.status_notification))
-        startForeground(STATUS_NOTIFICATION_ID, snb.build())
+        if (RUN_FOREGROUNG)
+            startForeground(STATUS_NOTIFICATION_ID, snb.build())
+        else
+            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     @Keep
@@ -294,16 +306,7 @@ class BaresipService: Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return null
-    }
-
-    override fun onDestroy() {
-        Log.i(LOG_TAG, "In onDestroy")
-        super.onDestroy()
-    }
-
-    fun updateNotification() {
+    private fun updateNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
         for (i: Int in 0 .. 5)  {
             val resID = resources.getIdentifier("status$i", "id", packageName)
@@ -322,6 +325,19 @@ class BaresipService: Service() {
         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
+    private fun cleanStop() {
+        HistoryActivity.saveHistory()
+        MainActivity.uas.clear()
+        MainActivity.images.clear()
+        MainActivity.history.clear()
+        baresipStop()
+        BaresipService.IS_SERVICE_RUNNING = false
+        unregisterReceiver(nr)
+        nm.cancelAll()
+        if (wl.isHeld) wl.release()
+        if (fl.isHeld) fl.release()
+    }
+
     external fun baresipStart(path: String)
     external fun baresipStop()
 
@@ -331,6 +347,7 @@ class BaresipService: Service() {
         val STATUS_NOTIFICATION_ID = 101
         val CALL_NOTIFICATION_ID = 102
         var disconnected = false
+        val RUN_FOREGROUNG = true
 
     }
 
