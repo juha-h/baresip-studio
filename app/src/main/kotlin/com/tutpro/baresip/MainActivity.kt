@@ -589,6 +589,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         Log.d("Baresip", "Destroyed")
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        if (BaresipService.IS_SERVICE_RUNNING) {
+            baresipService.setAction("Kill")
+            startService(baresipService)
+        }
         super.onDestroy()
     }
 
