@@ -108,9 +108,10 @@
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
 
-        <service android:name=".BaresipService" >
+        <service android:name=".BaresipService"
+            android:enabled="true" >
         </service>
-
+        
         <receiver
             android:enabled="true"
             android:exported="true"
@@ -118,6 +119,7 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.tutpro.baresip.Restart" />
             </intent-filter>
         </receiver>
 
