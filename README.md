@@ -13,4 +13,6 @@ After cloning the project, in android-studio:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
+Now available also in Google Play store.
+
 Feedback welcome.
