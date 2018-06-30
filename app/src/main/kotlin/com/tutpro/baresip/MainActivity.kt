@@ -495,7 +495,7 @@ class MainActivity : AppCompatActivity() {
                                 if (callButton.tag == "Call") {
                                     callee.setOnKeyListener(null)
                                 }
-                                val caller_heading = layout.findViewById(view_id)
+                                val caller_heading = layout.findViewById(view_id) as TextView
                                 val view_index = layout.indexOfChild(caller_heading)
                                 layout.removeViews(view_index, 3 * remove_count)
                                 val callsIn = Call.uaCalls(calls, ua, "in")

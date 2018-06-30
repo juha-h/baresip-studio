@@ -177,7 +177,7 @@ class BaresipService: Service() {
         snb.setVisibility(VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(npi)
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.status_notification))
         if (RUN_FOREGROUNG)
