@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion = 25
+    compileSdkVersion = 26
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
-        targetSdkVersion 25
-        versionCode = 1
+        targetSdkVersion 26
+        versionCode = 3
         versionName = '1.0'
         ndk {
             abiFilters 'armeabi-v7a'
