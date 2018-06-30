@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
         if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("Baresip", "Baresip does not have RECORD_AUDIO permission")
+            Log.w("Baresip", "Baresip does not have RECORD_AUDIO permission")
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
         }
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                 val acc = uas[position].account
                 val aor = acc.aor
                 val ua = uas[position]
-                Log.i("Baresip", "Setting $aor current")
+                Log.d("Baresip", "Setting $aor current")
                 uag_current_set(uas[position].uap)
                 val callsOut = Call.uaCalls(calls, ua, "out")
                 if (callsOut.size == 0) {
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 val `in` = Call.uaCalls(calls, ua, "in")
                 val view_count = layout.childCount
-                Log.d("Baresip", "View count is $view_count")
+                // Log.d("Baresip", "View count is $view_count")
                 if (view_count > 7)
                     layout.removeViews(7, view_count - 7)
                 for (c in `in`)
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                Log.i("Baresip", "Nothing selected")
+                Log.d("Baresip", "Nothing selected")
             }
         }
 
@@ -241,13 +241,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 "Cancel" -> {
                     val callp = Call.calls(calls, "out")[0].callp
-                    Log.i("Baresip", "Canceling AoR $aor call $callp to " +
+                    Log.d("Baresip", "Canceling AoR $aor call $callp to " +
                             (findViewById(R.id.callee) as EditText).text)
                     ua_hangup(ua.uap, callp, 486, "Rejected")
                 }
                 "Hangup" -> {
                     val callp = Call.calls(calls, "out")[0].callp
-                    Log.i("Baresip", "Hanging up AoR $aor call $callp to " +
+                    Log.d("Baresip", "Hanging up AoR $aor call $callp to " +
                             (findViewById(R.id.callee) as EditText).text)
                     callButton.isEnabled = false
                     ua_hangup(ua.uap, callp,0, "")
@@ -263,7 +263,7 @@ class MainActivity : AppCompatActivity() {
                     holdCallAt(Call.calls(calls, "out")[0], holdButton)
                 }
                 "Resume" -> {
-                    Log.i("Baresip", "Resuming " + (findViewById(R.id.callee) as EditText).text)
+                    Log.d("Baresip", "Resuming " + (findViewById(R.id.callee) as EditText).text)
                     val call = Call.calls(calls, "out")[0]
                     call_unhold(call.callp)
                     call.hold = false
@@ -537,7 +537,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
                     }
-                    else -> Log.d("Baresip", "Unknown event '${ev[0]}'")
+                    else -> Log.w("Baresip", "Unknown event '${ev[0]}'")
                 }
                 break
             }
@@ -697,10 +697,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun call(ua: UserAgent, uri: String) {
         (findViewById(R.id.callee) as EditText).setText(uri)
-        Log.i("Baresip", "Calling ${ua.uap}/$uri")
         val call = ua_connect(ua.uap, uri)
         if (call != "") {
-            Log.i("Baresip", "Adding outgoing call ${ua.uap}/$call/$uri")
+            Log.d("Baresip", "Adding outgoing call ${ua.uap}/$call/$uri")
             val dtmfWatcher = object: TextWatcher {
                 override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
@@ -716,6 +715,8 @@ class MainActivity : AppCompatActivity() {
             callButton.tag = "Cancel"
             callButton.setImageResource(R.drawable.hangup)
             holdButton.visibility = View.INVISIBLE
+        } else {
+            Log.w("Baresip", "ua_connect ${ua.uap}/$uri failed")
         }
     }
 
@@ -734,7 +735,7 @@ class MainActivity : AppCompatActivity() {
         else
             heading_params.addRule(RelativeLayout.BELOW, id - 10 + 4)
         caller_heading.layoutParams = heading_params
-        Log.d("Baresip", "Adding incoming call heading at ${caller_heading.id}")
+        // Log.d("Baresip", "Adding incoming call heading at ${caller_heading.id}")
         layout.addView(caller_heading)
 
         val caller_row = LinearLayout(applicationContext)
@@ -754,7 +755,7 @@ class MainActivity : AppCompatActivity() {
         val caller_uri_params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
         caller_uri.layoutParams = caller_uri_params
-        Log.d("Baresip", "Adding caller uri at ${caller_uri.id}")
+        // Log.d("Baresip", "Adding caller uri at ${caller_uri.id}")
         caller_row.addView(caller_uri)
 
         val security_button = ImageButton(applicationContext)
@@ -799,10 +800,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        Log.d("Baresip", "Adding security button at ${security_button.id}")
+        // Log.d("Baresip", "Adding security button at ${security_button.id}")
         caller_row.addView(security_button)
 
-        Log.d("Baresip", "Adding caller row at ${caller_row.id}")
+        // Log.d("Baresip", "Adding caller row at ${caller_row.id}")
         layout.addView(caller_row)
 
         val answer_row = LinearLayout(applicationContext)
@@ -823,7 +824,7 @@ class MainActivity : AppCompatActivity() {
         answer_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
                 "Answer" -> {
-                    Log.i("Baresip", "UA ${ua.uap} accepting incoming call ${call.callp}")
+                    Log.d("Baresip", "UA ${ua.uap} accepting incoming call ${call.callp}")
                     ua_answer(ua.uap, call.callp)
                     if (call.dir == "in") {
                         call.status = "Hangup"
@@ -836,7 +837,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "Hangup" -> {
-                    Log.i("Baresip", "UA ${call.ua.uap} hanging up call ${call.callp}")
+                    Log.d("Baresip", "UA ${call.ua.uap} hanging up call ${call.callp}")
                     answer_button.isEnabled = false
                     ua_hangup(call.ua.uap, call.callp, 200, "OK")
                 }
@@ -848,7 +849,7 @@ class MainActivity : AppCompatActivity() {
         answer_button_params.setMargins(3, 10, 0, 0)
         answer_button.layoutParams = answer_button_params
         answer_button.setPadding(0, 0, 0, 0)
-        Log.d("Baresip", "Adding answer button at ${answer_button.id}")
+        // Log.d("Baresip", "Adding answer button at ${answer_button.id}")
         answer_row.addView(answer_button)
 
         val reject_button = ImageButton(appContext)
@@ -868,7 +869,7 @@ class MainActivity : AppCompatActivity() {
         reject_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
                 "Reject" -> {
-                    Log.i("Baresip", "UA ${call.ua} rejecting incoming call ${call.callp}")
+                    Log.d("Baresip", "UA ${call.ua} rejecting incoming call ${call.callp}")
                     reject_button.isEnabled = false
                     answer_button.isEnabled = false
                     ua_hangup(call.ua.uap, call.callp, 486, "Rejected")
@@ -891,10 +892,10 @@ class MainActivity : AppCompatActivity() {
         reject_button.layoutParams = reject_button_params
         reject_button.setPadding(50, 0, 0, 0)
         reject_button.background = null
-        Log.d("Baresip", "Adding reject button at ${reject_button.id}")
+        // Log.d("Baresip", "Adding reject button at ${reject_button.id}")
         answer_row.addView(reject_button)
 
-        Log.d("Baresip", "Adding answer row at ${answer_row.id}")
+        // Log.d("Baresip", "Adding answer row at ${answer_row.id}")
         layout.addView(answer_row)
     }
 
@@ -907,7 +908,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun holdCallAt(call: Call, button: ImageButton) {
-        Log.i("Baresip", "Holding call with ${call.peerURI} at ${button.id}")
+        Log.d("Baresip", "Holding call with ${call.peerURI} at ${button.id}")
         call_hold(call.callp)
         call.hold = true
         button.tag= "Resume"
