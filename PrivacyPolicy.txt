@@ -1,0 +1,10 @@
+baresip Privacy Policy
+
+baresip does not collect any personal information.
+
+baresip needs access to microphone for the purpose of voice
+communication with other parties.
+
+baresip supports secure call setup via TLS and secure media via
+ZRTP and (DTLS) SRTP encapsulation options.
+
