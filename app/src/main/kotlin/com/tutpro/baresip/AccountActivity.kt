@@ -283,28 +283,28 @@ class AccountActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.DisplayNameTitle) -> {
+            findViewById(R.id.DisplayNameTitle) as TextView-> {
                 Utils.alertView(this, "Display Name", getString(R.string.dispName))
             }
-            findViewById(R.id.AuthUserTitle) -> {
+            findViewById(R.id.AuthUserTitle) as TextView -> {
                 Utils.alertView(this, "Authentication Username",
                         getString(R.string.authUser))
             }
-            findViewById(R.id.AuthPassTitle) -> {
+            findViewById(R.id.AuthPassTitle) as TextView-> {
                 Utils.alertView(this, "Authentication Password",
                         getString(R.string.authPass))
             }
-            findViewById(R.id.OutboundProxyTitle) -> {
+            findViewById(R.id.OutboundProxyTitle) as TextView -> {
                 Utils.alertView(this, "Outbound Proxies",
                         getString(R.string.obProxies))
             }
-            findViewById(R.id.RegTitle) -> {
+            findViewById(R.id.RegTitle) as TextView -> {
                 Utils.alertView(this, "Register", getString(R.string.register))
             }
-            findViewById(R.id.AudioCodecsTitle) -> {
+            findViewById(R.id.AudioCodecsTitle) as TextView -> {
                 Utils.alertView(this, "Audio Codecs", getString(R.string.auCodecs))
             }
-            findViewById(R.id.MediaEncTitle) -> {
+            findViewById(R.id.MediaEncTitle) as TextView -> {
                 Utils.alertView(this, "Media Encryption",
                         getText(R.string.mediaEnc).toString())
             }
