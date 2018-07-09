@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.app.Notification
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.MediaPlayer
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.IBinder
@@ -23,7 +21,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import android.support.v4.content.LocalBroadcastManager
-import android.media.RingtoneManager
 
 class BaresipService: Service() {
 
@@ -37,7 +34,6 @@ class BaresipService: Service() {
     internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
-    internal lateinit var mp: MediaPlayer
 
     override fun onCreate() {
 
@@ -70,11 +66,6 @@ class BaresipService: Service() {
                 }
             }
         }
-
-        val uri = RingtoneManager
-                .getActualDefaultRingtoneUri(applicationContext, RingtoneManager.TYPE_RINGTONE)
-        mp = MediaPlayer.create(getApplicationContext(), uri)
-        mp.isLooping = true
 
         super.onCreate()
     }
@@ -253,7 +244,6 @@ class BaresipService: Service() {
                             snb.setContent(view)
                             nm.notify(STATUS_NOTIFICATION_ID, snb.build())
                         }
-                        mp.start()
                         /* if (!Utils.isVisible()) {
                             nm.cancel(STATUS_NOTIFICATION_ID)
                             val cnb = NotificationCompat.Builder(this)
@@ -295,7 +285,6 @@ class BaresipService: Service() {
                         snb.setContent(view)
                         snb.setVibrate(null)
                         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
-                        mp.stop()
                     }
                 }
             }
