@@ -17,6 +17,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioManager
+import android.media.Ringtone
+import android.media.RingtoneManager
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
@@ -26,6 +28,7 @@ import android.widget.RelativeLayout.LayoutParams
 import android.widget.RelativeLayout
 import android.widget.*
 import android.view.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
     internal lateinit var am: AudioManager
+    internal lateinit var rt: Ringtone
+    internal var rtTimer: Timer? = null
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var serviceEventReceiver: BroadcastReceiver
@@ -69,6 +74,9 @@ class MainActivity : AppCompatActivity() {
         dtmf = findViewById(R.id.dtmf) as EditText
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
+                RingtoneManager.TYPE_RINGTONE)
+        rt = RingtoneManager.getRingtone(applicationContext, rtUri)
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -325,6 +333,15 @@ class MainActivity : AppCompatActivity() {
                             else
                                 addCallViews(ua, new_call, Call.uaCalls(calls, ua, "in").size * 10)
                             am.mode = AudioManager.MODE_RINGTONE
+                            rt.play()
+                            rtTimer = Timer()
+                            rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
+                                override fun run() {
+                                    if (!rt.isPlaying()) {
+                                        rt.play()
+                                    }
+                                }
+                            }, 1000 * 1, 1000 * 1)
                             if (Utils.isVisible()) {
                                 Log.d("Baresip", "Baresip is visible")
                                 val i = Intent(applicationContext, MainActivity::class.java)
@@ -384,6 +401,11 @@ class MainActivity : AppCompatActivity() {
                             }
                             history.add(History(aor, call.peerURI, "in", true))
                             call.hasHistory = true
+                        }
+                        if (rtTimer != null) {
+                            rtTimer!!.cancel()
+                            rtTimer = null
+                            if (rt.isPlaying) rt.stop()
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         am.isSpeakerphoneOn = false
@@ -508,6 +530,11 @@ class MainActivity : AppCompatActivity() {
                                 if (History.aorHistory(history, aor) > HISTORY_SIZE)
                                     History.aorRemoveHistory(history, aor)
                                 history.add(History(aor, call.peerURI, "in", false))
+                            }
+                            if (rtTimer != null) {
+                                rtTimer!!.cancel()
+                                rtTimer = null
+                                if (rt.isPlaying) rt.stop()
                             }
                         } else {
                             Log.d("Baresip", "Removing outgoing call $uap/$callp/" +
