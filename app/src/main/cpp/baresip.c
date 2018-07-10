@@ -31,6 +31,7 @@ typedef struct update_context {
 UpdateContext g_ctx;
 
 struct play *play = NULL;
+struct message_lsnr *message;
 
 static int vprintf_null(const char *p, size_t size, void *arg)
 {
@@ -179,6 +180,18 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     (*env)->DeleteLocalRef(env, javaEvent);
 }
 
+static void message_handler(const struct pl *peer, const struct pl *ctype,
+                            struct mbuf *body, void *arg)
+{
+    (void)ctype;
+    (void)arg;
+
+    LOGD("got message '%.*s' from peer '%.*s'", mbuf_get_left(body), mbuf_buf(body),
+        peer->l, peer->p);
+
+    (void)play_file(NULL, baresip_player(), "message.wav", 0);
+}
+
 #include <unistd.h>
 
 static int pfd[2];
@@ -281,7 +294,18 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     uag_set_exit_handler(ua_exit_handler, NULL);
-    uag_event_register(ua_event_handler, NULL);
+
+    err = uag_event_register(ua_event_handler, NULL);
+    if (err) {
+        LOGE("uag_event_register() failed (%d)\n", err);
+        goto out;
+    }
+
+    err = message_listen(&message, baresip_message(), message_handler, NULL);
+    if (err) {
+        LOGE("message_listen() failed (%d)\n", err);
+        goto out;
+    }
 
     err = conf_modules();
     if (err) {
@@ -323,6 +347,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         LOGE("Closing upon re_main error: (%d)\n", err);
         ua_stop_all(true);
         play = mem_deref(play);
+        message = mem_deref(message);
         //ua_close();
         conf_close();
         baresip_close();
@@ -772,7 +797,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1connect(JNIEnv *env, jobject thiz,
 
     LOGD("connecting ua %s to %s\n", native_ua, native_uri);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    err = ua_connect(ua, &call, NULL, native_uri, NULL, VIDMODE_ON);
+    err = ua_connect(ua, &call, NULL, native_uri, NULL, VIDMODE_OFF);
     if (err) {
         LOGW("connecting to %s failed with error %d\n", native_uri, err);
         call_buf[0] = '\0';
