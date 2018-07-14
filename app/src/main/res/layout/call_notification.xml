@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notificationLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/callHeading"
+        android:id="@+id/mainRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:layout_marginBottom="10dp"
         android:orientation="horizontal" >
 
-        <ImageView android:id="@+id/headingImage"
+        <ImageView android:id="@+id/image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
             android:src="@drawable/baresip" />
 
-        <TextView android:id="@+id/headingText"
+        <TextView android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="15dp"
             android:textColor="#000000"
-            android:text="Call from"
+            android:text="Baresip "
             style = "@android:style/TextAppearance.Medium" />
 
     </LinearLayout>
 
-    <TextView android:id="@+id/caller"
+    <TextView android:id="@+id/callFrom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_below="@id/callHeading"
+        android:layout_below="@id/mainRow"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="10dp"
         android:textSize="15dp"
-        android:text="peer uri"
         style = "@android:style/TextAppearance.Medium" />
 
+    <!--
     <Button android:id="@+id/answerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/caller"
+        android:layout_below="@id/callFrom"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="14dp"
         android:layout_marginStart="16dp"
@@ -53,12 +55,13 @@
     <Button android:id="@+id/rejectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/caller"
+        android:layout_below="@id/callFrom"
         android:layout_toEndOf="@id/answerButton"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="14dp"
         android:layout_marginStart="20dp"
         android:layout_gravity="center"
         android:text="Reject" />
-
+    -->
+    
 </RelativeLayout>

@@ -974,7 +974,5 @@ class MainActivity : AppCompatActivity() {
         const val HISTORY_SIZE = 100
         const val ONE_CALL_ONLY = true
 
-        const val INCOMING_ID = 102
-
     }
 }
