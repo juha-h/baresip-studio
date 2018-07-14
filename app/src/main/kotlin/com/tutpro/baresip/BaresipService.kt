@@ -1,9 +1,7 @@
 package com.tutpro.baresip
 
+import android.app.*
 import android.app.Notification.VISIBILITY_PUBLIC
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +19,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import android.support.v4.content.LocalBroadcastManager
+import android.os.Build
 
 class BaresipService: Service() {
 
@@ -43,8 +42,9 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip")
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        snb = NotificationCompat.Builder(this)
-        cnb = NotificationCompat.Builder(this)
+        createNotificationChannels()
+        snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+        cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
 
         ni = Intent(this, MainActivity::class.java)
                 .setAction(Intent.ACTION_MAIN)
@@ -127,12 +127,12 @@ class BaresipService: Service() {
                 Thread(Runnable { baresipStart(path) }).start()
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
-                showNotification()
+                showStatusNotification()
                 if (!RUN_FOREGROUNG) super.onStartCommand(intent, flags, startId)
             }
 
             "UpdateNotification" -> {
-                updateNotification()
+                updateStatusNotification()
             }
 
             "Stop" -> {
@@ -164,11 +164,26 @@ class BaresipService: Service() {
         }
     }
 
-    private fun showNotification() {
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
+                    NotificationManager.IMPORTANCE_DEFAULT)
+            defaultChannel.description = "Tells that baresip is running"
+            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            nm.createNotificationChannel(defaultChannel)
+            val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
+                    NotificationManager.IMPORTANCE_HIGH)
+            highChannel.description = "Tells about incoming call or message"
+            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            highChannel.enableVibration(true)
+            nm.createNotificationChannel(highChannel)
+        }
+    }
+
+    private fun showStatusNotification() {
         snb.setVisibility(VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(npi)
-                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.status_notification))
         if (RUN_FOREGROUNG)
@@ -195,7 +210,7 @@ class BaresipService: Service() {
         intent.putExtra("uap", uap)
         intent.putExtra("callp", "")
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-        updateNotification()
+        updateStatusNotification()
     }
 
     @Keep
@@ -219,17 +234,17 @@ class BaresipService: Service() {
                             MainActivity.images[account_index] = R.drawable.dot_yellow
                         else
                             MainActivity.images[account_index] = R.drawable.dot_green
-                        updateNotification()
+                        updateStatusNotification()
                         if (!Utils.isVisible()) return
                     }
                     "registering failed" -> {
                         MainActivity.images[account_index] = R.drawable.dot_red
-                        updateNotification()
+                        updateStatusNotification()
                         if (!Utils.isVisible()) return
                     }
                     "unregistering" -> {
                         MainActivity.images[account_index] = R.drawable.dot_yellow
-                        updateNotification()
+                        updateStatusNotification()
                         if (!Utils.isVisible()) return
                     }
                     "call ringing" -> {
@@ -237,15 +252,20 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
-                            snb.setVibrate(LongArray(0))
-                            val view = RemoteViews(getPackageName(), R.layout.status_notification)
+                            cnb.setVisibility(VISIBILITY_PUBLIC)
+                                    .setSmallIcon(R.drawable.ic_stat)
+                                    .setContentIntent(npi)
+                                    .setAutoCancel(true)
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                cnb.setVibrate(LongArray(0))
+                                        .setPriority(Notification.PRIORITY_HIGH)
+                            }
+                            val view = RemoteViews(getPackageName(), R.layout.call_notification)
                             view.setTextViewText(R.id.callFrom, "Call from ${Api.call_peeruri(callp)}")
-                            view.setViewVisibility(R.id.callFrom, View.VISIBLE)
-                            snb.setContent(view)
-                            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+                            cnb.setContent(view)
+                            nm.notify(CALL_NOTIFICATION_ID, cnb.build())
                         }
                         /* if (!Utils.isVisible()) {
-                            nm.cancel(STATUS_NOTIFICATION_ID)
                             val cnb = NotificationCompat.Builder(this)
                                     .setSmallIcon(R.drawable.ic_stat)
                                     .setContentIntent(npi)
@@ -280,11 +300,6 @@ class BaresipService: Service() {
                     }
                     "call established", "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        val view = RemoteViews(getPackageName(), R.layout.status_notification)
-                        view.setViewVisibility(R.id.callFrom, View.GONE)
-                        snb.setContent(view)
-                        snb.setVibrate(null)
-                        nm.notify(STATUS_NOTIFICATION_ID, snb.build())
                     }
                 }
             }
@@ -296,7 +311,7 @@ class BaresipService: Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private fun updateNotification() {
+    private fun updateStatusNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
         for (i: Int in 0 .. 5)  {
             val resID = resources.getIdentifier("status$i", "id", packageName)
@@ -335,7 +350,9 @@ class BaresipService: Service() {
 
         var IS_SERVICE_RUNNING = false
         val STATUS_NOTIFICATION_ID = 101
+        val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
         val CALL_NOTIFICATION_ID = 102
+        val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
         var disconnected = false
         val RUN_FOREGROUNG = false
 
