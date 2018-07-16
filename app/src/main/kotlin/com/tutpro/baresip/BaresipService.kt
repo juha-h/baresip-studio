@@ -27,8 +27,6 @@ class BaresipService: Service() {
     internal lateinit var intent: Intent
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
-    internal lateinit var cnb: NotificationCompat.Builder
-    internal lateinit var ni: Intent
     internal lateinit var npi: PendingIntent
     internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
@@ -44,9 +42,8 @@ class BaresipService: Service() {
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
-        cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
 
-        ni = Intent(this, MainActivity::class.java)
+        val ni = Intent(this, MainActivity::class.java)
                 .setAction(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
         npi = PendingIntent.getActivity(this, 0, ni, 0)
@@ -252,51 +249,40 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
+                            val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             cnb.setVisibility(VISIBILITY_PUBLIC)
                                     .setSmallIcon(R.drawable.ic_stat)
                                     .setContentIntent(npi)
                                     .setAutoCancel(true)
+                                    .setContentText("Call from ${Api.call_peeruri(callp)}")
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 cnb.setVibrate(LongArray(0))
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
-                            val view = RemoteViews(getPackageName(), R.layout.call_notification)
+                            /* val view = RemoteViews(getPackageName(), R.layout.call_notification)
                             view.setTextViewText(R.id.callFrom, "Call from ${Api.call_peeruri(callp)}")
-                            cnb.setContent(view)
-                            nm.notify(CALL_NOTIFICATION_ID, cnb.build())
-                        }
-                        /* if (!Utils.isVisible()) {
-                            val cnb = NotificationCompat.Builder(this)
-                                    .setSmallIcon(R.drawable.ic_stat)
-                                    .setContentIntent(npi)
-                                    .setVisibility(VISIBILITY_PUBLIC)
-                                    .setPriority(Notification.PRIORITY_HIGH)
-                                    .setVibrate(LongArray(0))
+                            cnb.setContent(view) */
                             val answerIntent = Intent(this, MainActivity::class.java)
                             answerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             answerIntent.putExtra("action", "answer")
-                            answerIntent.putExtra("uap", uap)
                             answerIntent.putExtra("callp", callp)
                             val answerPendingIntent = PendingIntent.getActivity(this,
                                     0, answerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val rejectIntent = Intent(this, MainActivity::class.java)
                             rejectIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             rejectIntent.putExtra("action", "reject")
-                            rejectIntent.putExtra("uap", uap)
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getActivity(this,
-                                    0, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            val view = RemoteViews(getPackageName(), R.layout.call_notification)
-                            view.setTextViewText(R.id.caller, "${Api.call_peeruri(callp)}")
-                            view.setOnClickPendingIntent(R.id.answerButton, answerPendingIntent)
+                                    1, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            /* view.setOnClickPendingIntent(R.id.answerButton, answerPendingIntent)
                             view.setOnClickPendingIntent(R.id.rejectButton, rejectPendingIntent)
-                            cnb.setCustomBigContentView(view)
-                            cnb.setVibrate(LongArray(0))
+                            cnb.setCustomBigContentView(view) */
+                            cnb.addAction(R.drawable.ic_stat, "Answer", answerPendingIntent)
+                            cnb.addAction(R.drawable.ic_stat, "Reject", rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, cnb.build())
-                            return
-                        } */
+                        }
                     }
                     "call established", "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
