@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 handleServiceEvent(intent.getStringExtra("event"),
-                        intent.getStringExtra("uap" ),
+                        intent.getStringExtra("uap"),
                         intent.getStringExtra("callp"))
             }
         }
@@ -97,11 +97,12 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
         }
 
-        aorSpinner = findViewById(R.id.AoRList) as Spinner
+        aorSpinner = findViewById(R.id.AoRList)
         uaAdapter = UaSpinnerAdapter(applicationContext, uas, images)
         aorSpinner.adapter = uaAdapter
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                Log.d("Baresip", "aorSpinner selecting $position")
                 val acc = uas[position].account
                 val aor = acc.aor
                 val ua = uas[position]
@@ -144,14 +145,26 @@ class MainActivity : AppCompatActivity() {
                         dtmf.visibility = View.INVISIBLE
                     }
                 }
-                val `in` = Call.uaCalls(calls, ua, "in")
                 val view_count = layout.childCount
                 // Log.d("Baresip", "View count is $view_count")
                 if (view_count > 7)
                     layout.removeViews(7, view_count - 7)
-                for (c in `in`)
-                    for (call_index in Call.uaCalls(calls, ua,"in").indices)
-                        addCallViews(ua, c, (call_index + 1) * 10)
+                for (c in Call.uaCalls(calls, ua, "in"))
+                    for (call_index in Call.uaCalls(calls, ua, "in").indices) {
+                        val startIndex = (call_index + 1) * 10
+                        addCallViews(ua, c, startIndex)
+                        if (answerCall == c.callp) {
+                            answerCall = ""
+                            val answerButton = layout.findViewById(startIndex + 5) as ImageButton
+                            answerButton.performClick()
+                        }
+                        if (rejectCall == c.callp) {
+                            rejectCall = ""
+                            val rejectButton = layout.findViewById(startIndex + 6) as ImageButton
+                            rejectButton.performClick()
+                            moveTaskToBack(true)
+                        }
+                    }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -184,7 +197,7 @@ class MainActivity : AppCompatActivity() {
 
         callee.threshold = 2
         callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                ContactsActivity.contacts.map{Contact -> Contact.name}))
+                ContactsActivity.contacts.map { Contact -> Contact.name }))
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -258,7 +271,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Baresip", "Hanging up AoR $aor call $callp to " +
                             (findViewById(R.id.callee) as EditText).text)
                     callButton.isEnabled = false
-                    ua_hangup(ua.uap, callp,0, "")
+                    ua_hangup(ua.uap, callp, 0, "")
                 }
             }
         }
@@ -275,7 +288,7 @@ class MainActivity : AppCompatActivity() {
                     val call = Call.calls(calls, "out")[0]
                     call_unhold(call.callp)
                     call.hold = false
-                    holdButton.tag= "Hold"
+                    holdButton.tag = "Hold"
                     holdButton.setImageResource(R.drawable.hold)
                 }
             }
@@ -332,16 +345,7 @@ class MainActivity : AppCompatActivity() {
                                 aorSpinner.setSelection(account_index)
                             else
                                 addCallViews(ua, new_call, Call.uaCalls(calls, ua, "in").size * 10)
-                            am.mode = AudioManager.MODE_RINGTONE
-                            rt.play()
-                            rtTimer = Timer()
-                            rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
-                                override fun run() {
-                                    if (!rt.isPlaying()) {
-                                        rt.play()
-                                    }
-                                }
-                            }, 1000 * 1, 1000 * 1)
+                            startRinging()
                             if (Utils.isVisible()) {
                                 Log.d("Baresip", "Baresip is visible")
                                 val i = Intent(applicationContext, MainActivity::class.java)
@@ -531,11 +535,7 @@ class MainActivity : AppCompatActivity() {
                                     History.aorRemoveHistory(history, aor)
                                 history.add(History(aor, call.peerURI, "in", false))
                             }
-                            if (rtTimer != null) {
-                                rtTimer!!.cancel()
-                                rtTimer = null
-                                if (rt.isPlaying) rt.stop()
-                            }
+                            stopRinging()
                         } else {
                             Log.d("Baresip", "Removing outgoing call $uap/$callp/" +
                                     call.peerURI)
@@ -576,21 +576,13 @@ class MainActivity : AppCompatActivity() {
         val action = intent.getStringExtra("action")
         Log.d("Baresip", "Got onNewIntent action $action")
         if (action == null) return
-        val uap = intent.getStringExtra("uap")
         val callp = intent.getStringExtra("callp")
-        val ua = UserAgent.find(uas, intent.getStringExtra("uap"))!!
-        val aor = ua.account.aor
-        val peer_uri = Api.call_peeruri(callp)
         when (action) {
             "answer" -> {
-                /* TODO */
+                answerCall = callp
             }
             "reject" -> {
-                Log.d("Baresip", "Rejecting incoming call from $peer_uri")
-                ua_hangup(uap, callp, 486, "Busy Here")
-                if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                    History.aorRemoveHistory(history, aor)
-                history.add(History(aor, peer_uri, "in", false))
+                rejectCall = callp
                 moveTaskToBack(true)
             }
         }
@@ -607,6 +599,24 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
         visible = true
+        if ((answerCall != "") && (layout.childCount > 7)) {
+            answerCall = ""
+            /* if multiple calls, right answer button needs to be searched */
+            val answerButton = layout.findViewById(10 + 5) as ImageButton
+            answerButton.performClick()
+        }
+        if ((rejectCall != "") && (layout.childCount > 7)) {
+            rejectCall = ""
+            /* if multiple calls, right reject button needs to be searched */
+            val rejectButton = layout.findViewById(10 + 6) as ImageButton
+            rejectButton.performClick()
+        }
+    }
+
+     override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+         Log.d("Baresip", "View count at onAttachedToWindow is ${layout.childCount}")
+         Toast.makeText(this, "Hi UI is fully loaded", Toast.LENGTH_SHORT).show();
     }
 
     override fun onBackPressed() {
@@ -727,10 +737,10 @@ class MainActivity : AppCompatActivity() {
         val call = ua_connect(ua.uap, uri)
         if (call != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$call/$uri")
-            val dtmfWatcher = object: TextWatcher {
+            val dtmfWatcher = object : TextWatcher {
                 override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
-                    val digit = sequence.subSequence(start, start+count).toString()
+                    val digit = sequence.subSequence(start, start + count).toString()
                     Log.d("Baresip", "Got DTMF digit '" + digit + "'")
                     if (digit.isNotEmpty()) call_send_digit(call, digit[0])
                 }
@@ -738,7 +748,7 @@ class MainActivity : AppCompatActivity() {
                     call_send_digit(call, 4.toChar())
                 }
             }
-            calls.add(Call(call, ua, uri, "out","Cancel", dtmfWatcher))
+            calls.add(Call(call, ua, uri, "out", "Cancel", dtmfWatcher))
             callButton.tag = "Cancel"
             callButton.setImageResource(R.drawable.hangup)
             holdButton.visibility = View.INVISIBLE
@@ -928,9 +938,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setSecurityButtonTag(button: ImageButton, security: Int) {
         when (security) {
-            R.drawable.box_red -> { button.tag = "red" }
-            R.drawable.box_yellow -> { button.tag = "yellow" }
-            R.drawable.box_green -> { button.tag = "green" }
+            R.drawable.box_red -> {
+                button.tag = "red"
+            }
+            R.drawable.box_yellow -> {
+                button.tag = "yellow"
+            }
+            R.drawable.box_green -> {
+                button.tag = "green"
+            }
         }
     }
 
@@ -938,8 +954,29 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Holding call with ${call.peerURI} at ${button.id}")
         call_hold(call.callp)
         call.hold = true
-        button.tag= "Resume"
+        button.tag = "Resume"
         button.setImageResource(R.drawable.resume)
+    }
+
+    private fun startRinging() {
+        am.mode = AudioManager.MODE_RINGTONE
+        rt.play()
+        rtTimer = Timer()
+        rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                if (!rt.isPlaying()) {
+                    rt.play()
+                }
+            }
+        }, 1000 * 1, 1000 * 1)
+    }
+
+    private fun stopRinging() {
+        if (rtTimer != null) {
+            rtTimer!!.cancel()
+            rtTimer = null
+            if (rt.isPlaying) rt.stop()
+        }
     }
 
     external fun uag_current(): String
@@ -961,6 +998,8 @@ class MainActivity : AppCompatActivity() {
         internal var calls = ArrayList<Call>()
         var filesPath = ""
         var visible = true
+        var answerCall = ""
+        var rejectCall = ""
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2

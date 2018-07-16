@@ -41,7 +41,6 @@
         android:textSize="15dp"
         style = "@android:style/TextAppearance.Medium" />
 
-    <!--
     <Button android:id="@+id/answerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,6 +61,5 @@
         android:layout_marginStart="20dp"
         android:layout_gravity="center"
         android:text="Reject" />
-    -->
     
 </RelativeLayout>
