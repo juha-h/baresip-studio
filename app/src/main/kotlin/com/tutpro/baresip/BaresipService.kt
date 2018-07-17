@@ -20,6 +20,7 @@ import java.io.FileInputStream
 import java.io.ObjectInputStream
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
+import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 
 class BaresipService: Service() {
 
@@ -171,7 +172,7 @@ class BaresipService: Service() {
             val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
                     NotificationManager.IMPORTANCE_HIGH)
             highChannel.description = "Tells about incoming call or message"
-            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            highChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             highChannel.enableVibration(true)
             nm.createNotificationChannel(highChannel)
         }
@@ -250,13 +251,13 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
                             val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            cnb.setVisibility(VISIBILITY_PUBLIC)
-                                    .setSmallIcon(R.drawable.ic_stat)
+                            cnb.setSmallIcon(R.drawable.ic_stat)
                                     .setContentIntent(npi)
                                     .setAutoCancel(true)
                                     .setContentText("Call from ${Api.call_peeruri(callp)}")
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 cnb.setVibrate(LongArray(0))
+                                        .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
                             /* val view = RemoteViews(getPackageName(), R.layout.call_notification)
