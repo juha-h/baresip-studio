@@ -521,12 +521,14 @@ class MainActivity : AppCompatActivity() {
                                 if (callButton.tag == "Call") {
                                     callee.setOnKeyListener(null)
                                 }
-                                val caller_heading = layout.findViewById(view_id) as TextView
-                                val view_index = layout.indexOfChild(caller_heading)
-                                layout.removeViews(view_index, 3 * remove_count)
-                                val callsIn = Call.uaCalls(calls, ua, "in")
-                                for (i in inIndex until callsIn.size) {
-                                    addCallViews(ua, callsIn[i], (i + 1) * 10)
+                                val caller_heading = layout.findViewById(view_id) as TextView?
+                                if (caller_heading != null) {
+                                    val view_index = layout.indexOfChild(caller_heading)
+                                    layout.removeViews(view_index, 3 * remove_count)
+                                    val callsIn = Call.uaCalls(calls, ua, "in")
+                                    for (i in inIndex until callsIn.size) {
+                                        addCallViews(ua, callsIn[i], (i + 1) * 10)
+                                    }
                                 }
                                 historyButton.visibility = View.VISIBLE
                             }
@@ -611,12 +613,6 @@ class MainActivity : AppCompatActivity() {
             val rejectButton = layout.findViewById(10 + 6) as ImageButton
             rejectButton.performClick()
         }
-    }
-
-     override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-         Log.d("Baresip", "View count at onAttachedToWindow is ${layout.childCount}")
-         Toast.makeText(this, "Hi UI is fully loaded", Toast.LENGTH_SHORT).show();
     }
 
     override fun onBackPressed() {
