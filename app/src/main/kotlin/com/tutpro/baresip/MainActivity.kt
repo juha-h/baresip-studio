@@ -314,7 +314,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleServiceEvent(event: String, uap: String, callp: String) {
-        val ua = UserAgent.find(uas, uap)!!
+        val ua = UserAgent.find(uas, uap)
+        if (ua == null) {
+            Log.w("Baresip", "handleServiceEvent '$event' did not find ua $uap")
+            return
+        }
         val aor = ua.account.aor
         val acc = ua.account
         val ev = event.split(",")

@@ -217,7 +217,7 @@ class BaresipService: Service() {
         if (!IS_SERVICE_RUNNING) return
         val ua = UserAgent.find(MainActivity.uas, uap)
         if (ua == null) {
-            Log.e(LOG_TAG, "updateStatus did not find ua $uap")
+            Log.w(LOG_TAG, "updateStatus did not find ua $uap")
             return
         }
         val aor = ua.account.aor
