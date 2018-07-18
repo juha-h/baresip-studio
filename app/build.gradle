@@ -8,7 +8,7 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode = 7
+        versionCode = 8
         versionName = '1.0'
         ndk {
             abiFilters 'armeabi-v7a'
