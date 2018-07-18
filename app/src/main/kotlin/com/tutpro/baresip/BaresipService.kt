@@ -252,9 +252,10 @@ class BaresipService: Service() {
                         if (!Utils.isVisible()) {
                             val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             cnb.setSmallIcon(R.drawable.ic_stat)
+                                    .setColor(0x0ca1fd)
                                     .setContentIntent(npi)
                                     .setAutoCancel(true)
-                                    .setContentText("Call from ${Api.call_peeruri(callp)}")
+                                    .setContentTitle("Call from ${Api.call_peeruri(callp)}")
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 cnb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
