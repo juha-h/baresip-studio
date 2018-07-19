@@ -784,7 +784,7 @@ class MainActivity : AppCompatActivity() {
         caller_row.layoutParams = caller_row_params
 
         val caller_uri = TextView(applicationContext)
-        caller_uri.text = call.peerURI
+        caller_uri.text = ContactsActivity.contactName(call.peerURI)
         caller_uri.setTextColor(Color.BLUE)
         caller_uri.textSize = 20f
         caller_uri.setPadding(10, 10, 0, 10)
