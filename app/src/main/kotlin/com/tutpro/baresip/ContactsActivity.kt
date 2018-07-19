@@ -122,6 +122,14 @@ class ContactsActivity : AppCompatActivity() {
             return false
         }
 
+        fun contactName(uri: String): String {
+            for (c in contacts)
+                if ((Utils.uriUserPart(c.uri) == Utils.uriUserPart(uri)) &&
+                        (Utils.uriHostPart(c.uri) == Utils.uriHostPart(uri)))
+                    return c.name
+            return uri
+        }
+
         external fun contacts_remove()
         external fun contact_add(contact: String)
 
