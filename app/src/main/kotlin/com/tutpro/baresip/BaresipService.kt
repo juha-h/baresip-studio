@@ -255,7 +255,8 @@ class BaresipService: Service() {
                                     .setColor(0x0ca1fd)
                                     .setContentIntent(npi)
                                     .setAutoCancel(true)
-                                    .setContentTitle("Call from ${Api.call_peeruri(callp)}")
+                                    .setContentTitle("Call from ${ContactsActivity.contactName(
+                                            Api.call_peeruri(callp))}")
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 cnb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
@@ -298,7 +299,7 @@ class BaresipService: Service() {
         intent.putExtra("callp", callp)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
-
+    
     private fun updateStatusNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
         for (i: Int in 0 .. 5)  {
