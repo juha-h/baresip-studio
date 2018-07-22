@@ -9,14 +9,18 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -36,9 +40,10 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -47,7 +52,7 @@
         <activity
             android:name=".AccountsActivity"
             android:label="Accounts"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -64,8 +69,8 @@
         <activity
             android:name=".ContactsActivity"
             android:label="Contacts"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -74,7 +79,7 @@
             android:name=".ContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Contact"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutpro.baresip.MainActivity" />
@@ -96,6 +101,22 @@
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
         <activity
+            android:name=".MessagesActivity"
+            android:label="Message History"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutpro.baresip.MainActivity" />
+        </activity>
+        <activity
+            android:name=".MessageActivity"
+            android:label="Message"
+            android:parentActivityName=".MessagesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutpro.baresip.MainActivity" />
+        </activity>
+        <activity
             android:name=".AboutActivity"
             android:label="About"
             android:parentActivityName=".MainActivity">
@@ -104,21 +125,21 @@
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
 
-        <service android:name=".BaresipService"
+        <service
+            android:name=".BaresipService"
             android:enabled="true" >
         </service>
-        
+
         <receiver
+            android:name=".RunOnStartup"
             android:enabled="true"
             android:exported="true"
-            android:name="com.tutpro.baresip.RunOnStartup"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.tutpro.baresip.Restart" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

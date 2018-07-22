@@ -29,6 +29,7 @@ import android.widget.RelativeLayout
 import android.widget.*
 import android.view.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,7 +40,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var securityButton: ImageButton
     internal lateinit var callButton: ImageButton
     internal lateinit var holdButton: ImageButton
-    internal lateinit var historyButton: ImageButton
+    internal lateinit var messagesButton: ImageButton
+    internal lateinit var callsButton: ImageButton
     internal lateinit var dtmf: EditText
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
@@ -70,7 +72,8 @@ class MainActivity : AppCompatActivity() {
         securityButton = findViewById(R.id.securityButton) as ImageButton
         callButton = findViewById(R.id.callButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
-        historyButton = findViewById(R.id.historyButton) as ImageButton
+        messagesButton = findViewById(R.id.messagesButton) as ImageButton
+        callsButton = findViewById(R.id.callsButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -83,8 +86,7 @@ class MainActivity : AppCompatActivity() {
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 handleServiceEvent(intent.getStringExtra("event"),
-                        intent.getStringExtra("uap"),
-                        intent.getStringExtra("callp"))
+                        intent.getStringArrayListExtra("params"))
             }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
@@ -114,11 +116,6 @@ class MainActivity : AppCompatActivity() {
                     callee.hint = "Callee"
                     callButton.tag = "Call"
                     callButton.setImageResource(R.drawable.call)
-                    if (History.aorHistory(history, aor) > 0) {
-                        historyButton.visibility = View.VISIBLE
-                    } else {
-                        historyButton.visibility = View.INVISIBLE
-                    }
                     securityButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                 } else {
@@ -147,8 +144,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 val view_count = layout.childCount
                 // Log.d("Baresip", "View count is $view_count")
-                if (view_count > 7)
-                    layout.removeViews(7, view_count - 7)
+                if (view_count > 8)
+                    layout.removeViews(8, view_count - 8)
                 for (c in Call.uaCalls(calls, ua, "in"))
                     for (call_index in Call.uaCalls(calls, ua, "in").indices) {
                         val startIndex = (call_index + 1) * 10
@@ -294,8 +291,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        historyButton.visibility = View.INVISIBLE
-        historyButton.setOnClickListener {
+        messagesButton.setOnClickListener {
+            val i = Intent(this@MainActivity, MessagesActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+            i.putExtras(b)
+            startActivityForResult(i, MESSAGES_CODE)
+        }
+
+        callsButton.visibility = View.VISIBLE
+        callsButton.setOnClickListener {
             val i = Intent(this@MainActivity, HistoryActivity::class.java)
             val b = Bundle()
             b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
@@ -313,16 +318,17 @@ class MainActivity : AppCompatActivity() {
             moveTaskToBack(true)
     }
 
-    private fun handleServiceEvent(event: String, uap: String, callp: String) {
+    private fun handleServiceEvent(event: String, params: ArrayList<String>) {
+        val uap = params[0]
         val ua = UserAgent.find(uas, uap)
         if (ua == null) {
             Log.w("Baresip", "handleServiceEvent '$event' did not find ua $uap")
             return
         }
+        val ev = event.split(",")
+        Log.d("Baresip", "Handling service event ${ev[0]} for $uap")
         val aor = ua.account.aor
         val acc = ua.account
-        val ev = event.split(",")
-        Log.d("Baresip", "Handling service event ${ev[0]} for $uap/$callp/$aor")
         for (account_index in uas.indices) {
             if (uas[account_index].account.aor == aor) {
                 when (ev[0]) {
@@ -334,6 +340,7 @@ class MainActivity : AppCompatActivity() {
                         uaAdapter.notifyDataSetChanged()
                     }
                     "call incoming" -> {
+                        val callp = params[1]
                         val peer_uri = Api.call_peeruri(callp)
                         val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
                         if (ONE_CALL_ONLY && (calls.size > 0)) {
@@ -359,6 +366,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call established" -> {
+                        val callp = params[1]
                         val call = Call.find(calls, callp)
                         if (call == null) {
                             Log.e("Baresip", "Established call $callp not found")
@@ -424,6 +432,7 @@ class MainActivity : AppCompatActivity() {
                             History.aorRemoveHistory(history, aor)
                     }
                     "call verify" -> {
+                        val callp = params[1]
                         val call = Call.find(calls, callp)
                         if (call == null) {
                             Log.e("Baresip", "Call $callp to be verified is not found")
@@ -478,6 +487,7 @@ class MainActivity : AppCompatActivity() {
                         verifyDialog.create().show()
                     }
                     "call verified", "call secure" -> {
+                        val callp = params[1]
                         val call = Call.find(calls, callp)
                         if (call == null) {
                             Log.e("Baresip", "Call $callp that is verified is not found")
@@ -509,6 +519,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call closed" -> {
+                        val callp = params[1]
                         val call = Call.find(calls, callp)
                         if (call == null) {
                             Log.d("Baresip", "Call $callp that is closed is not found")
@@ -534,7 +545,7 @@ class MainActivity : AppCompatActivity() {
                                         addCallViews(ua, callsIn[i], (i + 1) * 10)
                                     }
                                 }
-                                historyButton.visibility = View.VISIBLE
+                                callsButton.visibility = View.VISIBLE
                             }
                             if (!call.hasHistory) {
                                 if (History.aorHistory(history, aor) > HISTORY_SIZE)
@@ -558,7 +569,8 @@ class MainActivity : AppCompatActivity() {
                                 securityButton.visibility = View.INVISIBLE
                                 dtmf.removeTextChangedListener(call.dtmfWatcher)
                                 dtmf.visibility = View.INVISIBLE
-                                historyButton.visibility = View.VISIBLE
+                                messagesButton.visibility = View.VISIBLE
+                                callsButton.visibility = View.VISIBLE
                             }
                             calls.remove(call)
                             if (!call.hasHistory) {
@@ -569,6 +581,25 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
+                    }
+                    "message" -> {
+                        val peer_uri = params[1]
+                        val msg = params[2]
+                        val time = params[3]
+                        val new_message = Message(aor, peer_uri, R.drawable.arrow_down_green, msg,
+                                time.toLong(), true)
+                        Log.d("Baresip", "Incoming message $aor/$peer_uri/$msg")
+                        messages.add(new_message)
+                        if (Utils.isVisible()) {
+                            if (ua != uas[aorSpinner.selectedItemPosition])
+                                aorSpinner.setSelection(account_index)
+                            val i = Intent(applicationContext, MessagesActivity::class.java)
+                            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            val b = Bundle()
+                            b.putString("aor", ua.account.aor)
+                            i.putExtras(b)
+                            startActivity(i)
+                        }
                     }
                     else -> Log.w("Baresip", "Unknown event '${ev[0]}'")
                 }
@@ -581,15 +612,51 @@ class MainActivity : AppCompatActivity() {
         setIntent(intent)
         val action = intent.getStringExtra("action")
         Log.d("Baresip", "Got onNewIntent action $action")
-        if (action == null) return
-        val callp = intent.getStringExtra("callp")
         when (action) {
             "answer" -> {
-                answerCall = callp
+                answerCall = intent.getStringExtra("callp")
             }
             "reject" -> {
-                rejectCall = callp
+                rejectCall = intent.getStringExtra("callp")
                 moveTaskToBack(true)
+            }
+            "reply", "archive", "delete" -> {
+                val uap = intent.getStringExtra("uap")
+                val ua = UserAgent.find(MainActivity.uas, uap)
+                if (ua == null) {
+                    Log.e("Baresip", "onNewIntent did not find ua $uap")
+                    return
+                }
+                val aor = ua.account.aor
+                when (action) {
+                    "reply" -> {
+                        val i = Intent(this@MainActivity, MessagesActivity::class.java)
+                        val b = Bundle()
+                        if (ua != uas[aorSpinner.selectedItemPosition]) {
+                            for (account_index in uas.indices) {
+                                if (uas[account_index].account.aor == aor) {
+                                    aorSpinner.setSelection(account_index)
+                                    break
+                                }
+                            }
+                        }
+                        b.putString("aor", aor)
+                        b.putString("peer", intent.getStringExtra("peer"))
+                        i.putExtras(b)
+                        startActivityForResult(i, MESSAGES_CODE)
+                    }
+                    "archive" -> {
+                        MessagesActivity.archiveUaMessage(ua.account.aor,
+                                intent.getStringExtra("time").toLong())
+                        moveTaskToBack(true)
+                    }
+                    "delete" -> {
+                        MessagesActivity.deleteUaMessage(ua.account.aor,
+                                intent.getStringExtra("time").toLong())
+                        moveTaskToBack(true)
+                    }
+                }
+                nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
             }
         }
     }
@@ -605,13 +672,13 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
         visible = true
-        if ((answerCall != "") && (layout.childCount > 7)) {
+        if ((answerCall != "") && (layout.childCount > 8)) {
             answerCall = ""
             /* if multiple calls, right answer button needs to be searched */
             val answerButton = layout.findViewById(10 + 5) as ImageButton
             answerButton.performClick()
         }
-        if ((rejectCall != "") && (layout.childCount > 7)) {
+        if ((rejectCall != "") && (layout.childCount > 8)) {
             rejectCall = ""
             /* if multiple calls, right reject button needs to be searched */
             val rejectButton = layout.findViewById(10 + 6) as ImageButton
@@ -996,6 +1063,7 @@ class MainActivity : AppCompatActivity() {
         internal var images = ArrayList<Int>()
         var history: ArrayList<History> = ArrayList()
         internal var calls = ArrayList<Call>()
+        internal var messages = ArrayList<Message>()
         var filesPath = ""
         var visible = true
         var answerCall = ""
@@ -1008,9 +1076,12 @@ class MainActivity : AppCompatActivity() {
         const val ABOUT_CODE = 5
         const val ACCOUNT_CODE = 6
         const val CONTACT_CODE = 7
+        const val MESSAGES_CODE = 8
+        const val MESSAGE_CODE = 9
 
         const val RECORD_AUDIO_PERMISSION = 1
         const val HISTORY_SIZE = 100
+        const val MESSAGE_HISTORY_SIZE = 100
         const val ONE_CALL_ONLY = true
 
     }

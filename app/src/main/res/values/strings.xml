@@ -36,4 +36,5 @@
         EMPTY value means that media encryption is not supported and that media transport protocol
         thus is RTP/AVP.
     </string>
+    <string name="title_activity_message">MessageActivity</string>
 </resources>
