@@ -91,7 +91,7 @@ class Account(val accp: String) {
             return null
         }
 
-        fun findUA(aor: String): UserAgent? {
+        fun findUa(aor: String): UserAgent? {
             for (ua in MainActivity.uas) {
                 if (ua.account.aor == aor) return ua
             }

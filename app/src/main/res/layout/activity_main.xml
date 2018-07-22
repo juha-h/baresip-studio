@@ -100,16 +100,30 @@
         </EditText>
 
         <ImageButton
-            android:id="@+id/historyButton"
+            android:id="@+id/messagesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/calleeRow"
+            android:layout_toStartOf="@id/callsButton"
+            android:padding="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@null"
+            android:src="@drawable/messages"
+            android:visibility="visible" >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/callsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/calleeRow"
             android:padding="0dp"
             android:background="@null"
-            android:src="@drawable/clock"
+            android:src="@drawable/calls"
             android:layout_marginEnd="0dp"
             android:layout_alignParentEnd="true"
-            android:visibility="invisible" >
+            android:visibility="visible" >
         </ImageButton>
 
     </RelativeLayout>

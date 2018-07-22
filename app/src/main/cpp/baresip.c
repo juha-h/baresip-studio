@@ -166,7 +166,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         }
     }
     jmethodID statusId = (*env)->GetMethodID(env, pctx->mainActivityClz,
-                                             "updateStatus",
+                                             "uaEvent",
                                              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     sprintf(ua_buf, "%lu", (unsigned long)ua);
     jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
@@ -180,16 +180,71 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     (*env)->DeleteLocalRef(env, javaEvent);
 }
 
-static void message_handler(const struct pl *peer, const struct pl *ctype,
+static void message_handler(struct ua *ua, const struct pl *peer, const struct pl *ctype,
                             struct mbuf *body, void *arg)
 {
     (void)ctype;
     (void)arg;
+    char ua_buf[32];
+    char peer_buf[256];
+    char msg_buf[1024];
+    char utf_buf[2048];
+    char *in, *out;
+    int size;
 
     LOGD("got message '%.*s' from peer '%.*s'", mbuf_get_left(body), mbuf_buf(body),
         peer->l, peer->p);
 
-    (void)play_file(NULL, baresip_player(), "message.wav", 0);
+    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    JavaVM *javaVM = pctx->javaVM;
+    JNIEnv *env;
+    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
+    if (res != JNI_OK) {
+        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+        if (JNI_OK != res) {
+            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            return;
+        }
+    }
+    jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
+                                             "messageEvent",
+                                             "(Ljava/lang/String;Ljava/lang/String;[B)V");
+    sprintf(ua_buf, "%lu", (unsigned long)ua);
+    jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
+    sprintf(peer_buf, "%.*s", peer->l, peer->p);
+    jstring javaPeer = (*env)->NewStringUTF(env, peer_buf);
+    jbyteArray javaMsg;
+    size = mbuf_get_left(body);
+    javaMsg = (*env)->NewByteArray(env, size);
+    if ((*env)->GetArrayLength(env, javaMsg) != size) {
+        (*env)->DeleteLocalRef(env, javaMsg);
+        javaMsg = (*env)->NewByteArray(env, size);
+    }
+    void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)javaMsg, 0);
+    memcpy(temp, mbuf_buf(body), size);
+    (*env)->ReleasePrimitiveArrayCritical(env, javaMsg, temp, 0);
+    LOGD("sending message %s/%s/%.*s\n", ua_buf, peer_buf, size, mbuf_buf(body));
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, javaUA, javaPeer, javaMsg);
+    (*env)->DeleteLocalRef(env, javaUA);
+    (*env)->DeleteLocalRef(env, javaPeer);
+    (*env)->DeleteLocalRef(env, javaMsg);
+}
+
+static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
+{
+    (void)arg;
+
+    LOGD("received message response %u\n", msg->scode);
+
+    if (err) {
+        (void)re_fprintf(stderr, " \x1b[31m%m\x1b[;m\n", err);
+        return;
+    }
+
+    if (msg->scode >= 300) {
+        (void)re_fprintf(stderr, " \x1b[31m%u %r\x1b[;m\n",
+                         msg->scode, &msg->reason);
+    }
 }
 
 #include <unistd.h>
@@ -332,7 +387,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         sprintf(ua_buf, "%lu", (unsigned long) ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
         LOGD("adding UA for AoR %s/%s\n", ua_aor(ua), ua_buf);
-        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "addUA",
+        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "uaAdd",
                                                   "(Ljava/lang/String;)V");
         (*env)->CallVoidMethod(env, pctx->mainActivityObj, accountId, javaUA);
         (*env)->DeleteLocalRef(env, javaUA);
@@ -907,6 +962,27 @@ Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz
     int res = call_send_digit(call, (char)native_digit);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_MessageActivity_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
+                                                      jstring javaPeer, jstring javaMsg) {
+    struct ua *ua;
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
+    const char *native_msg = (*env)->GetStringUTFChars(env, javaMsg, 0);
+
+    LOGD("sending message from ua %s to %s\n", native_ua, native_peer);
+    ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    int err = message_send(ua, native_peer, native_msg, send_resp_handler, NULL);
+    if (err) {
+        LOGW("message_send failed with error %d\n", err);
+    }
+
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    (*env)->ReleaseStringUTFChars(env, javaPeer, native_peer);
+    (*env)->ReleaseStringUTFChars(env, javaMsg, native_msg);
+    return err;
 }
 
 JNIEXPORT void JNICALL
