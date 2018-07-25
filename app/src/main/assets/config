@@ -20,8 +20,6 @@ call_max_calls  4
 audio_player            opensles,nil
 audio_source            opensles,nil
 audio_alert             opensles,nil
-audio_srate             8000-48000
-audio_channels          1-2
 #ausrc_srate            48000
 #auplay_srate           48000
 #ausrc_channels         0
