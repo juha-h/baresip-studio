@@ -234,17 +234,30 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
 {
     (void)arg;
 
-    LOGD("received message response %u\n", msg->scode);
-
     if (err) {
-        (void)re_fprintf(stderr, " \x1b[31m%m\x1b[;m\n", err);
+        LOGD("send_response_handler received error %d\n", err);
         return;
     }
 
-    if (msg->scode >= 300) {
-        (void)re_fprintf(stderr, " \x1b[31m%u %r\x1b[;m\n",
-                         msg->scode, &msg->reason);
+    LOGD("send_response_handler received response %u at %s\n", msg->scode, (char *)arg);
+
+    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    JavaVM *javaVM = pctx->javaVM;
+    JNIEnv *env;
+    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
+    if (res != JNI_OK) {
+        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+        if (JNI_OK != res) {
+            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            return;
+        }
     }
+    jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
+                                             "messageResponse", "(ILjava/lang/String;)V");
+    jstring javaTime = (*env)->NewStringUTF(env, (char *)arg);
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, msg->scode, javaTime);
+    (*env)->DeleteLocalRef(env, javaTime);
+
 }
 
 #include <unistd.h>
@@ -966,15 +979,17 @@ Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_MessageActivity_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
-                                                      jstring javaPeer, jstring javaMsg) {
+                                                      jstring javaPeer, jstring javaMsg,
+                                                      jstring javaTime) {
     struct ua *ua;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
     const char *native_msg = (*env)->GetStringUTFChars(env, javaMsg, 0);
+    const char *native_time = (*env)->GetStringUTFChars(env, javaTime, 0);
 
-    LOGD("sending message from ua %s to %s\n", native_ua, native_peer);
+    LOGD("sending message from ua %s to %s at %s\n", native_ua, native_peer, native_time);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    int err = message_send(ua, native_peer, native_msg, send_resp_handler, NULL);
+    int err = message_send(ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
     if (err) {
         LOGW("message_send failed with error %d\n", err);
     }

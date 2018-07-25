@@ -24,6 +24,7 @@ class MessageActivity : AppCompatActivity() {
 
         val aor = intent.extras.getString("aor")
         val peerURI = intent.extras.getString("peer")
+        val reply = intent.extras.getBoolean("reply")
 
         val ua = Account.findUa(aor)
         if (ua == null) {
@@ -38,15 +39,16 @@ class MessageActivity : AppCompatActivity() {
         receiver = findViewById(R.id.receiver) as AutoCompleteTextView
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-        if (peerURI == "") {
+        if (reply)
+            title.text = "Message reply to ..."
+        else
             title.text = "Message to ..."
+        if (peerURI == "") {
             receiver.threshold = 2
             receiver.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                     ContactsActivity.contacts.map { Contact -> Contact.name }))
             receiver.requestFocus()
         } else {
-            title.text = "Reply to ..."
             receiver.setText(ContactsActivity.contactName(peerURI), false)
             message.requestFocus()
         }
@@ -66,14 +68,15 @@ class MessageActivity : AppCompatActivity() {
                 if (msg.length > 0) {
                     imm.hideSoftInputFromWindow(receiver.getWindowToken(), 0)
                     imm.hideSoftInputFromWindow(message.getWindowToken(), 0)
-                    val res = message_send(ua!!.uap, uri, msg)
+                    val time = System.currentTimeMillis()
+                    val res = message_send(ua!!.uap, uri, msg, time.toString())
                     if (res != 0) {
                         Toast.makeText(getApplicationContext(), "Sending of message failed!",
                                 Toast.LENGTH_SHORT).show()
                     } else {
-                        val new_message = Message(aor, uri, R.drawable.arrow_up_green, msg,
-                                System.currentTimeMillis(), false)
-                        MainActivity.messages.add(new_message)
+                        val new_message = Message(aor, uri, R.drawable.arrow_up_yellow, msg, time,
+                                false)
+                        MessagesActivity.addMessage(new_message)
                         MessagesActivity.uaMessages.add(0, new_message)
                         val i = Intent()
                         setResult(Activity.RESULT_OK, i)
@@ -97,6 +100,6 @@ class MessageActivity : AppCompatActivity() {
         return true
     }
 
-    external fun message_send(uap: String, peer_uri: String, message: String) : Int
+    external fun message_send(uap: String, peer_uri: String, message: String, time: String) : Int
 
 }

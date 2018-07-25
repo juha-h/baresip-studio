@@ -1,9 +1,9 @@
 package com.tutpro.baresip
 
 import android.app.Activity
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -22,6 +22,7 @@ class MessagesActivity: AppCompatActivity() {
     internal lateinit var aor: String
     internal lateinit var mlAdapter: MessageListAdapter
     internal lateinit var plusButton: ImageButton
+    internal lateinit var serviceEventReceiver: BroadcastReceiver
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,7 @@ class MessagesActivity: AppCompatActivity() {
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", uaMessages[pos].peerURI)
+            b.putBoolean("reply", uaMessages[pos].direction == R.drawable.arrow_down_green)
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
@@ -89,9 +91,19 @@ class MessagesActivity: AppCompatActivity() {
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", peer)
+            b.putBoolean("reply", true)
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
+
+        serviceEventReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                handleMessageResponse(intent.getIntExtra("response code", 0),
+                        intent.getStringExtra("time"))
+            }
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
+                IntentFilter("message response"))
 
     }
 
@@ -99,6 +111,7 @@ class MessagesActivity: AppCompatActivity() {
         when (item.itemId) {
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Messages")
+                saveMessages()
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
@@ -108,6 +121,7 @@ class MessagesActivity: AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("Baresip", "onActivityResult at Messages")
         when (requestCode) {
             MainActivity.MESSAGE_CODE -> {
                 if (resultCode == RESULT_OK) {
@@ -115,6 +129,22 @@ class MessagesActivity: AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun handleMessageResponse(responseCode: Int, time: String) {
+        if (responseCode < 300)
+            updateMessageDirection(time.toLong(), R.drawable.arrow_up_green)
+        else
+            updateMessageDirection(time.toLong(), R.drawable.arrow_up_red)
+        mlAdapter.notifyDataSetChanged()
+    }
+
+    fun updateMessageDirection(timeStamp: Long, direction: Int) {
+        for (m in uaMessages.reversed())
+            if (m.timeStamp == timeStamp) {
+                m.direction = direction
+                return
+            }
     }
 
     private fun uaMessages(aor: String) : ArrayList<Message> {
@@ -147,6 +177,17 @@ class MessagesActivity: AppCompatActivity() {
                     MainActivity.messages.removeAt(i)
                     return
                 }
+        }
+
+        fun addMessage(message: Message) {
+            if ((MainActivity.messages.filter{it.aor == message.aor}).size >=
+                    MainActivity.MESSAGE_HISTORY_SIZE)
+                for (i in MainActivity.messages.indices)
+                    if (MainActivity.messages[i].aor == message.aor) {
+                        MainActivity.messages.removeAt(i)
+                        break
+                    }
+            MainActivity.messages.add(message)
         }
 
         fun saveMessages() {
