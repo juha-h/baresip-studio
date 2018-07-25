@@ -319,14 +319,13 @@ class BaresipService: Service() {
 
     @Keep
     fun messageEvent(uap: String, peer: String, msg: ByteArray) {
-        Log.d(LOG_TAG, "message event $uap/$peer")
         var s = "Decoding of message failed!"
         try {
             s = String(msg, StandardCharsets.UTF_8)
-            Log.d(LOG_TAG, "UTF-8 $s")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "UTF-8 decode failed")
         }
+        Log.d(LOG_TAG, "Message event $uap/$peer/$s")
         val timeStamp = System.currentTimeMillis().toString()
         if (!Utils.isVisible()) {
             val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
@@ -380,6 +379,15 @@ class BaresipService: Service() {
         val intent = Intent("service event")
         intent.putExtra("event", "message")
         intent.putExtra("params", arrayListOf(uap, peer, s, timeStamp))
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    @Keep
+    fun messageResponse(responseCode: Int, time: String) {
+        Log.d(LOG_TAG, "Message response $responseCode at $time")
+        val intent = Intent("message response")
+        intent.putExtra("response code", responseCode)
+        intent.putExtra("time", time)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 

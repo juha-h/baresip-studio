@@ -589,12 +589,12 @@ class MainActivity : AppCompatActivity() {
                         val new_message = Message(aor, peer_uri, R.drawable.arrow_down_green, msg,
                                 time.toLong(), true)
                         Log.d("Baresip", "Incoming message $aor/$peer_uri/$msg")
-                        messages.add(new_message)
+                        MessagesActivity.addMessage(new_message)
                         if (Utils.isVisible()) {
                             if (ua != uas[aorSpinner.selectedItemPosition])
                                 aorSpinner.setSelection(account_index)
                             val i = Intent(applicationContext, MessagesActivity::class.java)
-                            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             val b = Bundle()
                             b.putString("aor", ua.account.aor)
                             i.putExtras(b)
@@ -642,6 +642,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         b.putString("aor", aor)
                         b.putString("peer", intent.getStringExtra("peer"))
+                        b.putBoolean("reply", true)
                         i.putExtras(b)
                         startActivityForResult(i, MESSAGES_CODE)
                     }
@@ -663,13 +664,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Log.d("Baresip", "Paused")
+        // Log.d("Baresip", "Paused")
         visible = false
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d("Baresip", "Resumed")
+        // Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
         visible = true
         if ((answerCall != "") && (layout.childCount > 8)) {
