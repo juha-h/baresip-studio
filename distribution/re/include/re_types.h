@@ -48,15 +48,13 @@ typedef unsigned long long int    uint64_t;
 
 #endif /* __int8_t_defined */
 #ifndef __ssize_t_defined
-typedef __kernel_ssize_t ssize_t;
-/* typedef long     ssize_t; */
+typedef long     ssize_t;
 #define __ssize_t_defined
 #endif
 
 
 #ifndef WIN32
-typedef __socklen_t socklen_t;
-/* typedef uint32_t socklen_t; */
+typedef uint32_t socklen_t;
 #endif
 #endif
 
