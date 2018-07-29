@@ -10,8 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import java.util.*
 
-class HistoryListAdapter(private val cxt: Context, private val rows: ArrayList<HistoryRow>) :
-        ArrayAdapter<HistoryRow>(cxt, R.layout.history_row, rows) {
+class CallListAdapter(private val cxt: Context, private val rows: ArrayList<CallRow>) :
+        ArrayAdapter<CallRow>(cxt, R.layout.history_row, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val row = rows[position]
@@ -35,7 +35,12 @@ class HistoryListAdapter(private val cxt: Context, private val rows: ArrayList<H
             count++
         }
         val peerURIView = rowView.findViewById(R.id.peer_uri) as TextView
-        peerURIView.text = row.peerURI
+        val contactName = ContactsActivity.contactName(row.peerURI)
+        if (contactName.startsWith("sip:") &&
+                (Utils.uriHostPart(row.peerURI) == Utils.uriHostPart(row.aor)))
+            peerURIView.text = Utils.uriUserPart(row.peerURI)
+        else
+            peerURIView.text = contactName
         val timeView = rowView.findViewById(R.id.time) as TextView
         timeView.text = row.time
         return rowView

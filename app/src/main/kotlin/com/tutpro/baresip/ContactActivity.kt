@@ -17,26 +17,23 @@ class ContactActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact)
 
-        new = intent.extras.getBoolean("new")
-        val name: String
-        val uri: String
-        if (new) {
-            name = intent.extras.getString("name")
-            uri = intent.extras.getString("uri")
+        nameView = findViewById(R.id.Name) as EditText
+        uriView = findViewById(R.id.Uri) as EditText
+
+        if (intent.extras.getBoolean("new")) {
+            setTitle("New Contact")
+            nameView.setText("")
+            nameView.hint = "Contact name"
+            nameView.setSelection(nameView.text.length)
+            uriView.setText("")
+            uriView.hint = "SIP URI"
         } else {
             index = intent.extras.getInt("index")
-            name = ContactsActivity.contacts[index].name
-            uri = ContactsActivity.contacts[index].uri
+            val name = ContactsActivity.contacts[index].name
+            setTitle(name)
+            nameView.setText(name)
+            uriView.setText(ContactsActivity.contacts[index].uri)
         }
-
-        setTitle(name)
-
-        nameView = findViewById(R.id.Name) as EditText
-        nameView.setText(name)
-        if (new) nameView.setSelection(nameView.text.length)
-
-        uriView = findViewById(R.id.Uri) as EditText
-        uriView.setText(uri)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

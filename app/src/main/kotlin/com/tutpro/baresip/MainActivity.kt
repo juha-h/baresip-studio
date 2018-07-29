@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var securityButton: ImageButton
     internal lateinit var callButton: ImageButton
     internal lateinit var holdButton: ImageButton
+    internal lateinit var contactsButton: ImageButton
     internal lateinit var messagesButton: ImageButton
     internal lateinit var callsButton: ImageButton
     internal lateinit var dtmf: EditText
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         securityButton = findViewById(R.id.securityButton) as ImageButton
         callButton = findViewById(R.id.callButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
+        contactsButton = findViewById(R.id.contactsButton) as ImageButton
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
@@ -115,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     callee.text.clear()
                     callee.hint = "Callee"
                     callButton.tag = "Call"
-                    callButton.setImageResource(R.drawable.call)
+                    callButton.setImageResource(R.drawable.call_green)
                     securityButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                 } else {
@@ -123,9 +125,9 @@ class MainActivity : AppCompatActivity() {
                     callButton.tag = callsOut[0].status
                     if (callsOut[0].status == "Hangup") {
                         if (callsOut[0].hold) {
-                            holdButton.setImageResource(R.drawable.resume)
+                            holdButton.setImageResource(R.drawable.play)
                         } else {
-                            holdButton.setImageResource(R.drawable.hold)
+                            holdButton.setImageResource(R.drawable.pause)
                         }
                         holdButton.visibility = View.VISIBLE
                         securityButton.setImageResource(callsOut[0].security)
@@ -144,8 +146,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 val view_count = layout.childCount
                 // Log.d("Baresip", "View count is $view_count")
-                if (view_count > 8)
-                    layout.removeViews(8, view_count - 8)
+                if (view_count > 6)
+                    layout.removeViews(6, view_count - 6)
                 for (c in Call.uaCalls(calls, ua, "in"))
                     for (call_index in Call.uaCalls(calls, ua, "in").indices) {
                         val startIndex = (call_index + 1) * 10
@@ -191,10 +193,6 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
-
-        callee.threshold = 2
-        callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                ContactsActivity.contacts.map { Contact -> Contact.name }))
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -248,7 +246,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             call(ua, uri)
                         } else {
-                            val latest = History.aorLatestHistory(history, aor)
+                            val latest = CallHistory.aorLatestHistory(history, aor)
                             if (latest != null)
                                 if (Utils.uriHostPart(latest.peerURI) == Utils.uriHostPart(aor))
                                     callee.setText(Utils.uriUserPart(latest.peerURI))
@@ -286,9 +284,14 @@ class MainActivity : AppCompatActivity() {
                     call_unhold(call.callp)
                     call.hold = false
                     holdButton.tag = "Hold"
-                    holdButton.setImageResource(R.drawable.hold)
+                    holdButton.setImageResource(R.drawable.pause)
                 }
             }
+        }
+
+        contactsButton.setOnClickListener {
+            val i = Intent(this@MainActivity, ContactsActivity::class.java)
+            startActivityForResult(i, CONTACTS_CODE)
         }
 
         messagesButton.setOnClickListener {
@@ -299,9 +302,8 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, MESSAGES_CODE)
         }
 
-        callsButton.visibility = View.VISIBLE
         callsButton.setOnClickListener {
-            val i = Intent(this@MainActivity, HistoryActivity::class.java)
+            val i = Intent(this@MainActivity, CallsActivity::class.java)
             val b = Bundle()
             b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
             i.putExtras(b)
@@ -314,11 +316,26 @@ class MainActivity : AppCompatActivity() {
             startService(baresipService)
         }
 
+        callee.threshold = 2
+        callee.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                ContactsActivity.contacts.map { Contact -> Contact.name }))
+
         if (intent.hasExtra("onStartup"))
             moveTaskToBack(true)
     }
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
+        if (event == "exit") {
+            if (BaresipService.IS_SERVICE_RUNNING) {
+                baresipService.setAction("Stop");
+                startService(baresipService)
+            }
+            Toast.makeText(getApplicationContext(),
+                    "Baresip has stopped! Check your network connectivity.",
+                    Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
         val uap = params[0]
         val ua = UserAgent.find(uas, uap)
         if (ua == null) {
@@ -346,9 +363,9 @@ class MainActivity : AppCompatActivity() {
                         if (ONE_CALL_ONLY && (calls.size > 0)) {
                             Log.d("Baresip", "Auto-rejecting incoming call $uap/$callp/$peer_uri")
                             ua_hangup(uap, callp, 486, "Busy Here")
-                            if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                                History.aorRemoveHistory(history, aor)
-                            history.add(History(aor, peer_uri, "in", false))
+                            if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                                CallHistory.aorRemoveHistory(history, aor)
+                            history.add(CallHistory(aor, peer_uri, "in", false))
                         } else {
                             Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
                             calls.add(new_call)
@@ -381,7 +398,7 @@ class MainActivity : AppCompatActivity() {
                                 callButton.tag = "Hangup"
                                 callButton.setImageResource(R.drawable.hangup)
                                 holdButton.tag = "Hold"
-                                holdButton.setImageResource(R.drawable.hold)
+                                holdButton.setImageResource(R.drawable.pause)
                                 holdButton.visibility = View.VISIBLE
                                 if (acc.mediaenc == "") {
                                     securityButton.visibility = View.INVISIBLE
@@ -396,7 +413,7 @@ class MainActivity : AppCompatActivity() {
                                 dtmf.requestFocus()
                                 dtmf.addTextChangedListener(call.dtmfWatcher)
                             }
-                            history.add(History(aor, call.peerURI, "out", true))
+                            history.add(CallHistory(aor, call.peerURI, "out", true))
                             call.hasHistory = true
                         } else {
                             Log.d("Baresip", "Inbound call $callp established")
@@ -412,10 +429,10 @@ class MainActivity : AppCompatActivity() {
                                     securityButton.visibility = View.VISIBLE
                                     val rejectButton = findViewById(view_id + 3) as ImageButton
                                     rejectButton.tag = "Hold"
-                                    rejectButton.setImageResource(R.drawable.hold)
+                                    rejectButton.setImageResource(R.drawable.pause)
                                 }
                             }
-                            history.add(History(aor, call.peerURI, "in", true))
+                            history.add(CallHistory(aor, call.peerURI, "in", true))
                             call.hasHistory = true
                         }
                         if (rtTimer != null) {
@@ -428,8 +445,8 @@ class MainActivity : AppCompatActivity() {
                         // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                         //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
                         //        AudioManager.STREAM_VOICE_CALL)
-                        if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                            History.aorRemoveHistory(history, aor)
+                        if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                            CallHistory.aorRemoveHistory(history, aor)
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -545,12 +562,11 @@ class MainActivity : AppCompatActivity() {
                                         addCallViews(ua, callsIn[i], (i + 1) * 10)
                                     }
                                 }
-                                callsButton.visibility = View.VISIBLE
                             }
                             if (!call.hasHistory) {
-                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                                    History.aorRemoveHistory(history, aor)
-                                history.add(History(aor, call.peerURI, "in", false))
+                                if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                                    CallHistory.aorRemoveHistory(history, aor)
+                                history.add(CallHistory(aor, call.peerURI, "in", false))
                             }
                             stopRinging()
                         } else {
@@ -558,7 +574,7 @@ class MainActivity : AppCompatActivity() {
                                     call.peerURI)
                             if (ua == uas[aorSpinner.selectedItemPosition]) {
                                 callButton.tag = "Call"
-                                callButton.setImageResource(R.drawable.call)
+                                callButton.setImageResource(R.drawable.call_green)
                                 callButton.isEnabled = true
                                 callee.setText("")
                                 callee.hint = "Callee"
@@ -569,14 +585,12 @@ class MainActivity : AppCompatActivity() {
                                 securityButton.visibility = View.INVISIBLE
                                 dtmf.removeTextChangedListener(call.dtmfWatcher)
                                 dtmf.visibility = View.INVISIBLE
-                                messagesButton.visibility = View.VISIBLE
-                                callsButton.visibility = View.VISIBLE
                             }
                             calls.remove(call)
                             if (!call.hasHistory) {
-                                if (History.aorHistory(history, aor) > HISTORY_SIZE)
-                                    History.aorRemoveHistory(history, aor)
-                                history.add(History(aor, call.peerURI, "out",
+                                if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                                    CallHistory.aorRemoveHistory(history, aor)
+                                history.add(CallHistory(aor, call.peerURI, "out",
                                         false))
                             }
                         }
@@ -613,6 +627,29 @@ class MainActivity : AppCompatActivity() {
         val action = intent.getStringExtra("action")
         Log.d("Baresip", "Got onNewIntent action $action")
         when (action) {
+            "call" -> {
+                if (!calls.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "You already have an active call!",
+                            Toast.LENGTH_SHORT).show()
+                    return
+                }
+                val uap = intent.getStringExtra("uap")
+                val ua = UserAgent.find(MainActivity.uas, uap)
+                if (ua == null) {
+                    Log.e("Baresip", "onNewIntent did not find ua $uap")
+                    return
+                }
+                val aor = ua.account.aor
+                if (ua != uas[aorSpinner.selectedItemPosition]) {
+                    for (account_index in uas.indices) {
+                        if (uas[account_index].account.aor == aor) {
+                            aorSpinner.setSelection(account_index)
+                            break
+                        }
+                    }
+                }
+                makeCall = intent.getStringExtra("peer")
+            }
             "answer" -> {
                 answerCall = intent.getStringExtra("callp")
             }
@@ -673,17 +710,22 @@ class MainActivity : AppCompatActivity() {
         // Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callee.windowToken, 0)
         visible = true
-        if ((answerCall != "") && (layout.childCount > 8)) {
+        if ((answerCall != "") && (layout.childCount > 6)) {
             answerCall = ""
             /* if multiple calls, right answer button needs to be searched */
             val answerButton = layout.findViewById(10 + 5) as ImageButton
             answerButton.performClick()
         }
-        if ((rejectCall != "") && (layout.childCount > 8)) {
+        if ((rejectCall != "") && (layout.childCount > 6)) {
             rejectCall = ""
             /* if multiple calls, right reject button needs to be searched */
             val rejectButton = layout.findViewById(10 + 6) as ImageButton
             rejectButton.performClick()
+        }
+        if (makeCall != "") {
+            callee.setText(makeCall)
+            makeCall = ""
+            callButton.performClick()
         }
     }
 
@@ -789,7 +831,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
-                    if (History.aorHistory(history, uas[aorSpinner.selectedItemPosition].account.aor) == 0) {
+                    if (CallHistory.aorHistory(history, uas[aorSpinner.selectedItemPosition].account.aor) == 0) {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
@@ -922,9 +964,10 @@ class MainActivity : AppCompatActivity() {
         val answer_button = ImageButton(applicationContext)
         answer_button.tag = call.status
         if (call.status == "Answer")
-            answer_button.setImageResource(R.drawable.call)
+            answer_button.setImageResource(R.drawable.call_green)
         else
             answer_button.setImageResource(R.drawable.hangup)
+        answer_button.background = null
         answer_button.id = answer_row.id + 1
         answer_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
@@ -938,7 +981,7 @@ class MainActivity : AppCompatActivity() {
                         answer_button.setImageResource(R.drawable.hangup)
                         val reject_button = layout.findViewById(answer_button.id + 1) as ImageButton
                         reject_button.tag = "Hold"
-                        reject_button.setImageResource(R.drawable.hold)
+                        reject_button.setImageResource(R.drawable.pause)
                     }
                 }
                 "Hangup" -> {
@@ -964,12 +1007,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             if (call.hold) {
                 reject_button.tag = "Resume"
-                reject_button.setImageResource(R.drawable.resume)
+                reject_button.setImageResource(R.drawable.play)
             } else {
                 reject_button.tag = "Hold"
-                reject_button.setImageResource(R.drawable.hold)
+                reject_button.setImageResource(R.drawable.pause)
             }
         }
+        reject_button.background = null
         reject_button.id = answer_button.id + 1
         reject_button.setOnClickListener { v ->
             when ((v as ImageButton).tag) {
@@ -985,7 +1029,7 @@ class MainActivity : AppCompatActivity() {
                 "Resume" -> {
                     call_unhold(call.callp)
                     v.tag = "Hold"
-                    reject_button.setImageResource(R.drawable.hold)
+                    reject_button.setImageResource(R.drawable.pause)
                     call.hold = false
                 }
             }
@@ -1023,7 +1067,7 @@ class MainActivity : AppCompatActivity() {
         call_hold(call.callp)
         call.hold = true
         button.tag = "Resume"
-        button.setImageResource(R.drawable.resume)
+        button.setImageResource(R.drawable.play)
     }
 
     private fun startRinging() {
@@ -1062,11 +1106,12 @@ class MainActivity : AppCompatActivity() {
 
         var uas = ArrayList<UserAgent>()
         internal var images = ArrayList<Int>()
-        var history: ArrayList<History> = ArrayList()
+        var history: ArrayList<CallHistory> = ArrayList()
         internal var calls = ArrayList<Call>()
         internal var messages = ArrayList<Message>()
         var filesPath = ""
         var visible = true
+        var makeCall = ""
         var answerCall = ""
         var rejectCall = ""
 

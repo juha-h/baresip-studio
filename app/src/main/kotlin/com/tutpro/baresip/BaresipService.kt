@@ -115,7 +115,7 @@ class BaresipService: Service() {
                         val fis = FileInputStream(file)
                         val ois = ObjectInputStream(fis)
                         @SuppressWarnings("unchecked")
-                        MainActivity.history = ois.readObject() as ArrayList<History>
+                        MainActivity.history = ois.readObject() as ArrayList<CallHistory>
                         Log.d(LOG_TAG, "Restored History of ${MainActivity.history.size} entries")
                         ois.close()
                         fis.close()
@@ -233,6 +233,13 @@ class BaresipService: Service() {
     fun uaEvent(event: String, uap: String, callp: String) {
         Log.d(LOG_TAG, "updateStatus got event $event/$uap/$callp")
         if (!IS_SERVICE_RUNNING) return
+        if (event == "exit") {
+            val intent = Intent("service event")
+            intent.putExtra("event", event)
+            intent.putExtra("params", arrayListOf<String>())
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+            return
+        }
         val ua = UserAgent.find(MainActivity.uas, uap)
         if (ua == null) {
             Log.w(LOG_TAG, "updateStatus did not find ua $uap")
@@ -411,7 +418,7 @@ class BaresipService: Service() {
     }
 
     private fun cleanStop() {
-        HistoryActivity.saveHistory()
+        CallsActivity.saveHistory()
         MessagesActivity.saveMessages()
         MainActivity.uas.clear()
         MainActivity.images.clear()

@@ -3,14 +3,14 @@ package com.tutpro.baresip
 import java.io.Serializable
 import java.util.GregorianCalendar
 
-class History(val aor: String, val peerURI: String, val direction: String,
+class CallHistory(val aor: String, val peerURI: String, val direction: String,
               val connected: Boolean) : Serializable {
 
     val time: GregorianCalendar = GregorianCalendar()
 
     companion object {
 
-        fun aorHistory(history: ArrayList<History>, aor: String): Int {
+        fun aorHistory(history: ArrayList<CallHistory>, aor: String): Int {
             var size = 0;
             for (h in history) {
                 if (h.aor == aor) size++
@@ -18,7 +18,7 @@ class History(val aor: String, val peerURI: String, val direction: String,
             return size
         }
 
-        fun aorRemoveHistory(history: ArrayList<History>, aor: String) {
+        fun aorRemoveHistory(history: ArrayList<CallHistory>, aor: String) {
             for (h in history) {
                 if (h.aor == aor) {
                     history.remove(h)
@@ -27,7 +27,7 @@ class History(val aor: String, val peerURI: String, val direction: String,
             }
         }
 
-        fun aorLatestHistory(history: ArrayList<History>, aor: String): History? {
+        fun aorLatestHistory(history: ArrayList<CallHistory>, aor: String): CallHistory? {
             for (h in history.reversed())
                 if (h.aor == aor) return h
             return null
