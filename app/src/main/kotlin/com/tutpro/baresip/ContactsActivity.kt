@@ -1,55 +1,61 @@
 package com.tutpro.baresip
 
 import android.app.Activity
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
-import android.os.SystemClock
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ImageButton
+import android.widget.ListView
 
 import java.io.File
 import java.util.ArrayList
 
 class ContactsActivity : AppCompatActivity() {
 
-    internal lateinit var layout: LinearLayout
-    internal var name: String = ""
-    lateinit var clAdapter: ContactListAdapter
+    internal lateinit var clAdapter: ContactListAdapter
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
-        val listview = findViewById(R.id.contacts) as ListView
+        val listView = findViewById(R.id.contacts) as ListView
         Log.d("Baresip", "Got ${contacts.size} contacts")
         clAdapter = ContactListAdapter(this, contacts)
-        listview.adapter = clAdapter
+        listView.adapter = clAdapter
 
-        val addContactButton = findViewById(R.id.addContact) as ImageButton
-        val newNameView = findViewById(R.id.newName) as EditText
-        addContactButton.setOnClickListener{
-            val name = newNameView.text.toString().trim()
-            if (!Utils.checkName(name)) {
-                Log.e("Baresip", "Invalid contact name $name")
-                Utils.alertView(this, "Notice",
-                        "Invalid contact name: $name")
-            } else if (nameExists(name)) {
-                Utils.alertView(this, "Notice",
-                        "Contact $name already exists")
-            } else {
-                newNameView.setText("")
-                newNameView.hint = "Contact name"
-                newNameView.clearFocus()
-                val i = Intent(this, ContactActivity::class.java)
-                val b = Bundle()
-                b.putBoolean("new", true)
-                b.putString("name", name)
-                b.putString("uri", "")
-                i.putExtras(b)
-                startActivityForResult(i, MainActivity.CONTACT_CODE)
+        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
+            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                when (which) {
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        ContactsActivity.contacts.removeAt(pos)
+                        ContactsActivity.saveContacts()
+                        clAdapter.notifyDataSetChanged()
+                    }
+                    DialogInterface.BUTTON_POSITIVE -> {
+                    }
+                }
             }
+            val builder = AlertDialog.Builder(this@ContactsActivity,
+                    R.style.Theme_AppCompat)
+            builder.setMessage("Do you want to delete ${contacts[pos].name}?")
+                    .setPositiveButton("Cancel", dialogClickListener)
+                    .setNegativeButton("Delete Contact", dialogClickListener)
+                    .show()
+            true
+        }
+
+        val plusButton = findViewById(R.id.plusButton) as ImageButton
+        plusButton.setOnClickListener {
+            val i = Intent(this, ContactActivity::class.java)
+            val b = Bundle()
+            b.putBoolean("new", true)
+            b.putString("uri", "")
+            i.putExtras(b)
+            startActivityForResult(i, MainActivity.CONTACT_CODE)
         }
     }
 

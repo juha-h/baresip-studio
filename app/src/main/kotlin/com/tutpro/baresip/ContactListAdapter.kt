@@ -34,23 +34,6 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
         }
-        val actionView = rowView.findViewById(R.id.contactAction) as ImageButton
-        actionView.setImageResource(R.drawable.action_remove)
-        actionView.setOnClickListener { _ ->
-            Log.d("Baresip", "Delete button clicked")
-            val deleteDialog = AlertDialog.Builder(cxt)
-            deleteDialog.setMessage("Do you want to delete contact ${row.name}")
-            deleteDialog.setPositiveButton("Delete") { dialog, _ ->
-                ContactsActivity.contacts.removeAt(position)
-                ContactsActivity.saveContacts()
-                this.notifyDataSetChanged()
-                dialog.dismiss()
-            }
-            deleteDialog.setNegativeButton("No") { dialog, _ ->
-                dialog.dismiss()
-            }
-            deleteDialog.create().show()
-        }
         return rowView
     }
 }

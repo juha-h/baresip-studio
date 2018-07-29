@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,7 +23,12 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         val directionView = messageView.findViewById(R.id.direction) as ImageView
         directionView.setImageResource(message.direction)
         val peerView = messageView.findViewById(R.id.peer) as TextView
-        peerView.text = ContactsActivity.contactName(message.peerURI)
+        val contactName = ContactsActivity.contactName(message.peerURI)
+        if (contactName.startsWith("sip:") &&
+                (Utils.uriHostPart(message.peerURI) == Utils.uriHostPart(message.aor)))
+            peerView.text = Utils.uriUserPart(message.peerURI)
+        else
+            peerView.text = contactName
         val timeView = messageView.findViewById(R.id.time) as TextView
         val time: String
         val cal = GregorianCalendar()

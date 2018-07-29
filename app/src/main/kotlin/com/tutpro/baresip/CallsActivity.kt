@@ -20,9 +20,9 @@ import java.util.ArrayList
 import java.util.Calendar
 import java.util.GregorianCalendar
 
-class HistoryActivity : AppCompatActivity() {
+class CallsActivity : AppCompatActivity() {
 
-    internal var uaHistory = ArrayList<HistoryRow>()
+    internal var uaHistory = ArrayList<CallRow>()
     internal var aor: String = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,15 +34,16 @@ class HistoryActivity : AppCompatActivity() {
         aor = intent.extras.getString("aor")
         aorGenerateHistory(aor)
 
-        val adapter = HistoryListAdapter(this, uaHistory)
+        val adapter = CallListAdapter(this, uaHistory)
         listview.adapter = adapter
-        listview.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val i = Intent()
-            i.putExtra("peer_uri", uaHistory[position].peerURI)
-            setResult(Activity.RESULT_OK, i)
-            finish()
+        listview.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
+            val i = Intent(this@CallsActivity, MessageActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", aor)
+            b.putString("peer", uaHistory[pos].peerURI)
+            i.putExtras(b)
+            startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
-
         listview.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
@@ -51,11 +52,7 @@ class HistoryActivity : AppCompatActivity() {
                         val b = Bundle()
                         b.putBoolean("new", true)
                         b.putString("name", "New Name")
-                        if (uaHistory[pos].peerDomain == "")
-                            b.putString("uri", uaHistory[pos].peerURI)
-                        else
-                            b.putString("uri", "sip:${uaHistory[pos].peerURI}@" +
-                                    uaHistory[pos].peerDomain)
+                        b.putString("uri", uaHistory[pos].peerURI)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }
@@ -72,14 +69,19 @@ class HistoryActivity : AppCompatActivity() {
                     }
                 }
             }
-            val builder = AlertDialog.Builder(this@HistoryActivity,
-                    R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to add ${uaHistory[pos].peerURI} to contacs or " +
-                    "delete it from call history?")
-                    .setPositiveButton("Cancel", dialogClickListener)
-                    .setNegativeButton("Delete History", dialogClickListener)
-                    .setNeutralButton("Add Contact", dialogClickListener)
-                    .show()
+            val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
+            if (ContactsActivity.contactName(uaHistory[pos].peerURI).startsWith("sip:"))
+                builder.setMessage("Do you want to add ${uaHistory[pos].peerURI} to contacs or " +
+                    "delete call(s) from history?")
+                        .setPositiveButton("Cancel", dialogClickListener)
+                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNeutralButton("Add Contact", dialogClickListener)
+                        .show()
+            else
+                builder.setMessage("Do you want to delete call(s) from history?")
+                        .setPositiveButton("Cancel", dialogClickListener)
+                        .setNegativeButton("Delete History", dialogClickListener)
+                        .show()
             true
         }
 
@@ -89,7 +91,7 @@ class HistoryActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at History")
+                Log.d("Baresip", "Back array was pressed at Calls")
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
@@ -103,12 +105,6 @@ class HistoryActivity : AppCompatActivity() {
         for (i in MainActivity.history.indices.reversed()) {
             val h = MainActivity.history[i]
             if (h.aor == aor) {
-                var peer_uri = h.peerURI
-                var peer_domain = ""
-                if (Utils.uriHostPart(peer_uri) == Utils.uriHostPart(aor)) {
-                    peer_uri = Utils.uriUserPart(peer_uri)
-                    peer_domain = Utils.uriHostPart(aor)
-                }
                 var direction: Int
                 if (h.direction == "in")
                     if (h.connected)
@@ -120,7 +116,7 @@ class HistoryActivity : AppCompatActivity() {
                         direction = R.drawable.arrow_up_green
                     else
                         direction = R.drawable.arrow_up_red
-                if (uaHistory.isNotEmpty() && (uaHistory.last().peerURI == peer_uri)) {
+                if (uaHistory.isNotEmpty() && (uaHistory.last().peerURI == h.peerURI)) {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
@@ -132,7 +128,7 @@ class HistoryActivity : AppCompatActivity() {
                         val fmt = SimpleDateFormat("dd.MM")
                         time = fmt.format(h.time.time)
                     }
-                    uaHistory.add(HistoryRow(peer_uri, peer_domain, direction, time, i))
+                    uaHistory.add(CallRow(h.aor, h.peerURI, direction, time, i))
                 }
             }
         }

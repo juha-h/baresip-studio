@@ -15,6 +15,7 @@ class MessageActivity : AppCompatActivity() {
     internal lateinit var receiver: AutoCompleteTextView
     internal lateinit var message: EditText
     internal lateinit var sendButton: ImageButton
+    internal lateinit var callButton: ImageButton
     internal lateinit var imm: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +25,7 @@ class MessageActivity : AppCompatActivity() {
 
         val aor = intent.extras.getString("aor")
         val peerURI = intent.extras.getString("peer")
-        val reply = intent.extras.getBoolean("reply")
+        Log.d("Baresip", "peerURI is $peerURI")
 
         val ua = Account.findUa(aor)
         if (ua == null) {
@@ -39,10 +40,7 @@ class MessageActivity : AppCompatActivity() {
         receiver = findViewById(R.id.receiver) as AutoCompleteTextView
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (reply)
-            title.text = "Message reply to ..."
-        else
-            title.text = "Message to ..."
+        title.text = "Message or call to ..."
         if (peerURI == "") {
             receiver.threshold = 2
             receiver.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
@@ -52,7 +50,6 @@ class MessageActivity : AppCompatActivity() {
             receiver.setText(ContactsActivity.contactName(peerURI), false)
             message.requestFocus()
         }
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
         sendButton = findViewById(R.id.sendButton) as ImageButton
         sendButton.setOnClickListener {
@@ -85,6 +82,20 @@ class MessageActivity : AppCompatActivity() {
                 }
             }
         }
+
+        callButton = findViewById(R.id.callButton) as ImageButton
+        callButton.setOnClickListener {
+            imm.hideSoftInputFromWindow(receiver.getWindowToken(), 0)
+            imm.hideSoftInputFromWindow(message.getWindowToken(), 0)
+            val callIntent = Intent(this, MainActivity::class.java)
+            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            callIntent.putExtra("action", "call")
+            callIntent.putExtra("uap", ua!!.uap)
+            callIntent.putExtra("peer", ContactsActivity.contactName(peerURI))
+            startActivity(callIntent)
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

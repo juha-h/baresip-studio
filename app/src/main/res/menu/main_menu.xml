@@ -3,9 +3,6 @@
   <item android:id="@+id/accounts"
         android:title="Accounts" />
 
-  <item android:id="@+id/contacts"
-        android:title="Contacts" />
-
   <item android:id="@+id/config"
       android:title="Config" />
 

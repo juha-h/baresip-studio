@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ListView
+
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -28,7 +29,7 @@ class MessagesActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messages)
 
-        val listView = findViewById(R.id.message) as ListView
+        val listView = findViewById(R.id.messages) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
         aor = intent.extras.getString("aor")
@@ -43,7 +44,6 @@ class MessagesActivity: AppCompatActivity() {
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", uaMessages[pos].peerURI)
-            b.putBoolean("reply", uaMessages[pos].direction == R.drawable.arrow_down_green)
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
@@ -51,6 +51,15 @@ class MessagesActivity: AppCompatActivity() {
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
+                    DialogInterface.BUTTON_NEUTRAL -> {
+                        val i = Intent(this, ContactActivity::class.java)
+                        val b = Bundle()
+                        b.putBoolean("new", true)
+                        b.putString("name", "New Name")
+                        b.putString("uri", uaMessages[pos].peerURI)
+                        i.putExtras(b)
+                        startActivityForResult(i, MainActivity.CONTACT_CODE)
+                    }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         MainActivity.messages.remove(uaMessages[pos])
                         uaMessages.removeAt(pos)
@@ -68,11 +77,18 @@ class MessagesActivity: AppCompatActivity() {
 
             val builder = AlertDialog.Builder(this@MessagesActivity,
                     R.style.Theme_AppCompat)
-            builder.setMessage("Delete message from " +
-                    ContactsActivity.contactName(uaMessages[pos].peerURI) + "?")
-                    .setPositiveButton("Cancel", dialogClickListener)
-                    .setNegativeButton("Delete", dialogClickListener)
-                    .show()
+            if (ContactsActivity.contactName(uaMessages[pos].peerURI).startsWith("sip:"))
+                builder.setMessage("Do you want to add ${uaMessages[pos].peerURI} to contacs or " +
+                        "delete message from history?")
+                        .setPositiveButton("Cancel", dialogClickListener)
+                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNeutralButton("Add Contact", dialogClickListener)
+                        .show()
+            else
+                builder.setMessage("Do you want to delete message from history?")
+                        .setPositiveButton("Cancel", dialogClickListener)
+                        .setNegativeButton("Delete History", dialogClickListener)
+                        .show()
             true
         }
 
@@ -91,7 +107,6 @@ class MessagesActivity: AppCompatActivity() {
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", peer)
-            b.putBoolean("reply", true)
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }

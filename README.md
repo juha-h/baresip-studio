@@ -6,9 +6,10 @@ PCMU/PCMA and opus voice codecs, as well as ZRTP and (DTLS) SRTP media
 encapsulation.
 
 The static libraries and include files in distribution directory have
-been produced using https://github.com/alfredh/baresip-android after
-applying reg.c-patch to re/src/sipreg/reg.c.  The patch is needed due to
-re timer sometimes firing too late.
+been produced using https://github.com/alfredh/baresip-android.  Use
+latest versions of baresip, re, and rem.  Then apply reg.c-patch to
+re/src/sipreg/reg.c.  The patch is needed due to re timer sometimes
+firing too late.
 
 After cloning the project, in android-studio:
 

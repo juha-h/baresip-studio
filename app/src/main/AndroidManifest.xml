@@ -93,7 +93,7 @@
                 android:value="com.tutpro.baresip.MainActivity" />
         </activity>
         <activity
-            android:name=".HistoryActivity"
+            android:name=".CallsActivity"
             android:label="Call History"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -110,7 +110,7 @@
         </activity>
         <activity
             android:name=".MessageActivity"
-            android:label="Message"
+            android:label="Message or Call"
             android:parentActivityName=".MessagesActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
