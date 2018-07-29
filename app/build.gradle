@@ -12,6 +12,7 @@ android {
         versionName = '2.0'
         ndk {
             abiFilters 'armeabi-v7a'
+            cFlags '-DHAVE_INTTYPES_H'
         }
     }
     buildTypes {
