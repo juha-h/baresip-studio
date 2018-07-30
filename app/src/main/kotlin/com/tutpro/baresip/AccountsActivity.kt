@@ -29,7 +29,7 @@ class AccountsActivity : AppCompatActivity() {
         val addAccountButton = findViewById(R.id.addAccount) as ImageButton
         val newAorView = findViewById(R.id.newAor) as EditText
         addAccountButton.setOnClickListener{
-            var aor = newAorView.text.toString()
+            var aor = newAorView.text.toString().trim()
             if (!aor.startsWith("sip:")) aor = "sip:$aor"
             if (!checkSipUri(aor)) {
                 Log.e("Baresip", "Invalid SIP URI $aor")

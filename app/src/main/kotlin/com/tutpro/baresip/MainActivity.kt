@@ -237,6 +237,7 @@ class MainActivity : AppCompatActivity() {
                 "Call" -> {
                     if (!ONE_CALL_ONLY || calls.isEmpty()) {
                         val calleeText = (findViewById(R.id.callee) as EditText).text.toString()
+                                .trim()
                         if (calleeText.length > 0) {
                             var uri = ContactsActivity.findContactURI(calleeText)
                             if (!uri.startsWith("sip:")) uri = "sip:$uri"
