@@ -20,13 +20,18 @@ class ContactActivity : AppCompatActivity() {
         nameView = findViewById(R.id.Name) as EditText
         uriView = findViewById(R.id.Uri) as EditText
 
+        val uri = intent.extras.getString("uri")
         if (intent.extras.getBoolean("new")) {
             setTitle("New Contact")
             nameView.setText("")
             nameView.hint = "Contact name"
             nameView.setSelection(nameView.text.length)
-            uriView.setText("")
-            uriView.hint = "SIP URI"
+            if (uri == "") {
+                uriView.setText("")
+                uriView.hint = "SIP URI"
+            } else {
+                uriView.setText(uri)
+            }
         } else {
             index = intent.extras.getInt("index")
             val name = ContactsActivity.contacts[index].name
