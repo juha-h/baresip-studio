@@ -51,7 +51,6 @@ class CallsActivity : AppCompatActivity() {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
-                        b.putString("name", "New Name")
                         b.putString("uri", uaHistory[pos].peerURI)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
@@ -72,15 +71,15 @@ class CallsActivity : AppCompatActivity() {
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
             if (ContactsActivity.contactName(uaHistory[pos].peerURI).startsWith("sip:"))
                 builder.setMessage("Do you want to add ${uaHistory[pos].peerURI} to contacs or " +
-                    "delete call(s) from history?")
+                    "delete call from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNegativeButton("Delete Call", dialogClickListener)
                         .setNeutralButton("Add Contact", dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete call(s) from history?")
+                builder.setMessage("Do you want to delete call from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNegativeButton("Delete Call", dialogClickListener)
                         .show()
             true
         }

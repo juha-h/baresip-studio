@@ -55,7 +55,6 @@ class MessagesActivity: AppCompatActivity() {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
-                        b.putString("name", "New Name")
                         b.putString("uri", uaMessages[pos].peerURI)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
@@ -81,13 +80,13 @@ class MessagesActivity: AppCompatActivity() {
                 builder.setMessage("Do you want to add ${uaMessages[pos].peerURI} to contacs or " +
                         "delete message from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNegativeButton("Delete Message", dialogClickListener)
                         .setNeutralButton("Add Contact", dialogClickListener)
                         .show()
             else
                 builder.setMessage("Do you want to delete message from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete History", dialogClickListener)
+                        .setNegativeButton("Delete Message", dialogClickListener)
                         .show()
             true
         }
