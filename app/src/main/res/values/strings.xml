@@ -8,6 +8,7 @@
         <b>Usage Hints</b>\n\n
         - start by creating an account (click item titles for help)\n
         - usually there is no need to edit the config\n
+        - in config, dns_server by default points to 8.8.8.8:53 for Android 8+ usage\n
         - contacts and history entries can be removed and added to contacts by long clicks\n
         - contacts can be removed by long clicks\n
         - call click when callee has not been given can be used for re-dial\n\n
