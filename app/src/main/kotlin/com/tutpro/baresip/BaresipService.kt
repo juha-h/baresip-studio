@@ -258,17 +258,14 @@ class BaresipService: Service() {
                         else
                             MainActivity.images[account_index] = R.drawable.dot_green
                         updateStatusNotification()
-                        if (!Utils.isVisible()) return
                     }
                     "registering failed" -> {
                         MainActivity.images[account_index] = R.drawable.dot_red
                         updateStatusNotification()
-                        if (!Utils.isVisible()) return
                     }
                     "unregistering" -> {
                         MainActivity.images[account_index] = R.drawable.dot_yellow
                         updateStatusNotification()
-                        if (!Utils.isVisible()) return
                     }
                     "call ringing" -> {
                         return
