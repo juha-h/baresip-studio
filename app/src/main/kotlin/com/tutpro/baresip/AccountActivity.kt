@@ -263,9 +263,9 @@ class AccountActivity : AppCompatActivity() {
                 AccountsActivity.saveAccounts()
                 if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
                     Log.e("Baresip", "Failed to update UA with AoR $aor")
-                if (newRegint > 0)
-                    UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
             }
+
+            if (newRegint > 0) UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
 
             setResult(RESULT_OK, intent)
             finish()
