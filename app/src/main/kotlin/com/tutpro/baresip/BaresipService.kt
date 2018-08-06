@@ -22,9 +22,8 @@ import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import java.nio.charset.StandardCharsets
-import kotlin.experimental.and
-import android.R.attr.name
-import java.nio.charset.Charset
+import android.net.Uri
+import android.provider.Settings
 
 class BaresipService: Service() {
 
@@ -68,6 +67,13 @@ class BaresipService: Service() {
                 }
             }
         }
+
+        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        } */
 
         super.onCreate()
     }
@@ -441,7 +447,7 @@ class BaresipService: Service() {
         val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
         val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
         var disconnected = false
-        val RUN_FOREGROUNG = false
+        val RUN_FOREGROUNG = true
 
     }
 
