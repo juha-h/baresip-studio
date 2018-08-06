@@ -331,7 +331,7 @@ class MainActivity : AppCompatActivity() {
                 baresipService.setAction("Stop");
                 startService(baresipService)
             }
-            Toast.makeText(getApplicationContext(),
+            Toast.makeText(applicationContext,
                     "Baresip has stopped! Check your network connectivity.",
                     Toast.LENGTH_SHORT).show()
             finish()
@@ -359,6 +359,15 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val callp = params[1]
+                        if (ContextCompat.checkSelfPermission(applicationContext,
+                                        Manifest.permission.RECORD_AUDIO) ==
+                                PackageManager.PERMISSION_DENIED) {
+                            Toast.makeText(applicationContext,
+                                    "You have not granted microphone permission.",
+                                    Toast.LENGTH_SHORT).show()
+                            ua_hangup(uap, callp, 486, "Busy Here")
+                            return
+                        }
                         val peer_uri = Api.call_peeruri(callp)
                         val new_call = Call(callp, ua, peer_uri, "in", "Answer", null)
                         if (ONE_CALL_ONLY && (calls.size > 0)) {
@@ -630,7 +639,7 @@ class MainActivity : AppCompatActivity() {
         when (action) {
             "call" -> {
                 if (!calls.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "You already have an active call!",
+                    Toast.makeText(applicationContext, "You already have an active call!",
                             Toast.LENGTH_SHORT).show()
                     return
                 }
@@ -844,6 +853,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String) {
+        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(applicationContext,
+                    "You have not granted microphone permission.", Toast.LENGTH_SHORT).show()
+            return
+        }
         (findViewById(R.id.callee) as EditText).setText(uri)
         val call = ua_connect(ua.uap, uri)
         if (call != "") {
