@@ -292,6 +292,12 @@ class MainActivity : AppCompatActivity() {
 
         contactsButton.setOnClickListener {
             val i = Intent(this@MainActivity, ContactsActivity::class.java)
+                val b = Bundle()
+                if (aorSpinner.selectedItemPosition >= 0)
+                    b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+                else
+                    b.putString("aor", "")
+                i.putExtras(b)
             startActivityForResult(i, CONTACTS_CODE)
         }
 
@@ -785,11 +791,6 @@ class MainActivity : AppCompatActivity() {
             R.id.accounts -> {
                 i = Intent(this, AccountsActivity::class.java)
                 startActivityForResult(i, ACCOUNTS_CODE)
-                return true
-            }
-            R.id.contacts -> {
-                i = Intent(this, ContactsActivity::class.java)
-                startActivityForResult(i, CONTACTS_CODE)
                 return true
             }
             R.id.config -> {

@@ -23,8 +23,10 @@ class ContactsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_contacts)
 
         val listView = findViewById(R.id.contacts) as ListView
+
         Log.d("Baresip", "Got ${contacts.size} contacts")
-        clAdapter = ContactListAdapter(this, contacts)
+        val aor = intent.extras.getString("aor")
+        clAdapter = ContactListAdapter(this, contacts, aor)
         listView.adapter = clAdapter
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->

@@ -23,7 +23,6 @@ import java.util.GregorianCalendar
 class CallsActivity : AppCompatActivity() {
 
     internal var uaHistory = ArrayList<CallRow>()
-    internal var aor: String = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +30,7 @@ class CallsActivity : AppCompatActivity() {
 
         val listview = findViewById(R.id.history) as ListView
 
-        aor = intent.extras.getString("aor")
+        val aor = intent.extras.getString("aor")
         aorGenerateHistory(aor)
 
         val adapter = CallListAdapter(this, uaHistory)

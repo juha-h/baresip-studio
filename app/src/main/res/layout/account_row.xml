@@ -21,7 +21,7 @@
         android:layout_alignParentEnd="true"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:layout_marginLeft="6dp"
+        android:layout_marginStart="6dp"
         android:icon="@android:drawable/ic_menu_delete"
         android:scaleType="centerCrop" >
     </ImageButton>
