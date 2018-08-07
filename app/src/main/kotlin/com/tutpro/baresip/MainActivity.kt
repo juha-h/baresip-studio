@@ -296,19 +296,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         messagesButton.setOnClickListener {
-            val i = Intent(this@MainActivity, MessagesActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
-            i.putExtras(b)
-            startActivityForResult(i, MESSAGES_CODE)
+            if (aorSpinner.selectedItemPosition >= 0) {
+                val i = Intent(this@MainActivity, MessagesActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+                i.putExtras(b)
+                startActivityForResult(i, MESSAGES_CODE)
+            }
         }
 
         callsButton.setOnClickListener {
-            val i = Intent(this@MainActivity, CallsActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
-            i.putExtras(b)
-            startActivityForResult(i, HISTORY_CODE)
+            if (aorSpinner.selectedItemPosition >= 0) {
+                val i = Intent(this@MainActivity, CallsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+                i.putExtras(b)
+                startActivityForResult(i, HISTORY_CODE)
+            }
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
