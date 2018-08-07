@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -12,9 +13,9 @@ class AboutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
-        val aboutView = findViewById(R.id.aboutText) as TextView
-        aboutView.isEnabled = false
-        aboutView.text = getText(R.string.aboutText)
+        val aboutText = findViewById(R.id.aboutText) as TextView
+        aboutText.text = getText(R.string.aboutText)
+        aboutText.setTextColor(Color.BLACK)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
