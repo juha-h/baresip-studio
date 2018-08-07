@@ -26,9 +26,9 @@ class CallsActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
+        setContentView(R.layout.activity_calls)
 
-        val listview = findViewById(R.id.history) as ListView
+        val listview = findViewById(R.id.calls) as ListView
 
         val aor = intent.extras.getString("aor")
         aorGenerateHistory(aor)

@@ -11,12 +11,12 @@ import android.widget.TextView
 import java.util.*
 
 class CallListAdapter(private val cxt: Context, private val rows: ArrayList<CallRow>) :
-        ArrayAdapter<CallRow>(cxt, R.layout.history_row, rows) {
+        ArrayAdapter<CallRow>(cxt, R.layout.call_row, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val row = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.history_row, parent, false)
+        val rowView = inflater.inflate(R.layout.call_row, parent, false)
         val directions = rowView.findViewById(R.id.directions) as LinearLayout
         var count = 1
         for (d in row.directions) {
