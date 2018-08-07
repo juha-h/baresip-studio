@@ -10,7 +10,7 @@
     tools:context=".CallsActivity">
 
     <ListView
-        android:id="@+id/history"
+        android:id="@+id/calls"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
