@@ -605,6 +605,12 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
+                        if (am.isSpeakerphoneOn) {
+                            am.isSpeakerphoneOn = false
+                            val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
+                            speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
+                                    R.color.colorPrimary))
+                        }
                     }
                     "message" -> {
                         val peer_uri = params[1]
