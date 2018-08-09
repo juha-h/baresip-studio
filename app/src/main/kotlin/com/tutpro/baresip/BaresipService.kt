@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.IBinder
@@ -54,16 +55,20 @@ class BaresipService: Service() {
 
         nr = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val intentExtras = intent.extras
-                val info = intentExtras.getParcelable<NetworkInfo>("networkInfo")
-                Log.d("Baresip", "Got event $info")
-                if (info.isConnected) {
-                    if (disconnected) {
-                        UserAgent.register(MainActivity.uas)
-                        disconnected = false
+                if (intent.action == ConnectivityManager.CONNECTIVITY_ACTION) {
+                    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+                    val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
+                    if (isConnected) {
+                        Log.d(LOG_TAG, "Network is connected/connecting")
+                        if (disconnected) {
+                            UserAgent.register(MainActivity.uas)
+                            disconnected = false
+                        }
+                    } else {
+                        Log.d(LOG_TAG, "Network is NOT connected/connecting")
+                        disconnected = true
                     }
-                } else {
-                    disconnected = true
                 }
             }
         }
@@ -93,7 +98,7 @@ class BaresipService: Service() {
                 fl = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
 
                 val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
-                        "error.wav", "message.wav", "notfound.wav", "ring.wav", "ringback.wav")
+                        "error.wav", "notfound.wav", "ring.wav", "ringback.wav")
                 val path = applicationContext.filesDir.path
                 var file = File(path)
                 if (!file.exists()) {
