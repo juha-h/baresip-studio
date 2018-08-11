@@ -21,7 +21,9 @@ class ContactActivity : AppCompatActivity() {
         uriView = findViewById(R.id.Uri) as EditText
 
         val uri = intent.extras.getString("uri")
-        if (intent.extras.getBoolean("new")) {
+        new = intent.extras.getBoolean("new")
+
+        if (new) {
             setTitle("New Contact")
             nameView.setText("")
             nameView.hint = "Contact name"
@@ -70,7 +72,7 @@ class ContactActivity : AppCompatActivity() {
             var newUri = uriView.text.toString().trim()
             if (!newUri.startsWith("<")) {
                 if (!newUri.startsWith("sip:")) newUri = "sip:$newUri"
-                if (!Utils.checkUri(newUri)) {
+                if (!Utils.checkSipUri(newUri)) {
                     Utils.alertView(this, "Notice","Invalid contact URI: $newUri")
                     return false
                 }

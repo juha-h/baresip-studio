@@ -31,10 +31,10 @@ class AccountsActivity : AppCompatActivity() {
         addAccountButton.setOnClickListener{
             var aor = newAorView.text.toString().trim()
             if (!aor.startsWith("sip:")) aor = "sip:$aor"
-            if (!checkSipUri(aor)) {
-                Log.e("Baresip", "Invalid SIP URI $aor")
+            if (!Utils.checkAorUri(aor)) {
+                Log.e("Baresip", "Invalid SIP Address of Record $aor")
                 Utils.alertView(this, "Notice",
-                        "Invalid SIP URI: $aor")
+                        "Invalid SIP Address of Record: $aor")
             } else if (Account.exists(MainActivity.uas, aor)) {
                 Log.e("Baresip", "Account $aor already exists")
             } else {
@@ -73,15 +73,6 @@ class AccountsActivity : AppCompatActivity() {
             }
         }
         return true
-    }
-
-    private fun checkSipUri(uri: String): Boolean {
-        if (!uri.startsWith("sip:")) return false
-        val userDomain = uri.replace("sip:", "").split("@")
-        if (userDomain.size != 2) return false
-        if (!Utils.checkUserID(userDomain[0]) && !Utils.checkTelNo(userDomain[0]))
-            return false
-        return Utils.checkDomain(userDomain[1]) || Utils.checkIP(userDomain[1])
     }
 
     companion object {

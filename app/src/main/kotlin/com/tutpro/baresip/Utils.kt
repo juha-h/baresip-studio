@@ -121,12 +121,53 @@ object Utils {
         return true
     }
 
-    fun checkUri(uri: String): Boolean {
+    fun checkPort(p: String) : Boolean {
+        val number = p.toIntOrNull()
+        if (number == null) return false
+        return (number > 0) and (number < 65536)
+    }
+
+    fun checkHostPort(hp: String) : Boolean {
+        val parts = hp.split(":")
+        if (parts.size == 1) return checkIP(parts[0]) || checkDomain(parts[0])
+        return checkPort(parts[1]) && (checkIP(parts[0]) || checkDomain(parts[0]))
+    }
+
+    fun checkParams(p: String) : Boolean {
+        /* todo: proper check */
+        return true
+    }
+
+    fun checkHostPortParams(hpp: String) : Boolean {
+        val restParams = hpp.split(";", limit = 2)
+        if (restParams.size == 1)
+            return checkHostPort(restParams[0])
+        else
+            return checkHostPort(restParams[0]) && checkParams(restParams[1])
+    }
+
+    fun checkSipUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
-        val parts = uri.substring(4).split("@")
-        val hostParams = parts[1].split(";", limit = 2)
-        // todo: check also possible params
-        return checkUriUser(parts[0]) && (checkDomain(hostParams[0]) || checkIP(hostParams[0]))
+        val userRest = uri.substring(4).split("@")
+        if (userRest.size == 1) {
+            return checkHostPortParams(userRest[0])
+        } else if (userRest.size == 2) {
+            return checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
+        } else
+            return false
+    }
+
+    fun checkAorUri(uri: String): Boolean {
+        if (!uri.startsWith("sip:")) return false
+        val userDomain = uri.replace("sip:", "").split("@")
+        if (userDomain.size != 2) return false
+        if (!checkUserID(userDomain[0]) && !checkTelNo(userDomain[0])) return false
+        return checkDomain(userDomain[1]) || checkIP(userDomain[1])
+    }
+
+    fun checkOutboundUri(uri: String): Boolean {
+        if (!uri.startsWith("sip:")) return false
+        return checkHostPortParams(uri.substring(4))
     }
 
     fun checkPrintASCII(s: String): Boolean {

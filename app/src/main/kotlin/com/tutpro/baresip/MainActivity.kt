@@ -240,12 +240,18 @@ class MainActivity : AppCompatActivity() {
                                 .trim()
                         if (calleeText.length > 0) {
                             var uri = ContactsActivity.findContactURI(calleeText)
-                            if (!uri.startsWith("sip:")) uri = "sip:$uri"
-                            if (!uri.contains("@")) {
-                                val host = aor.substring(aor.indexOf("@") + 1)
-                                uri = "$uri@$host"
+                            if (!uri.startsWith("sip:")) {
+                                uri = "sip:$uri"
+                                if (!uri.contains("@")) {
+                                    val host = aor.substring(aor.indexOf("@") + 1)
+                                    uri = "$uri@$host"
+                                }
                             }
-                            call(ua, uri)
+                            if (!Utils.checkSipUri(uri))
+                                Utils.alertView(this,"Notice",
+                                        "Invalid SIP URI '$uri'")
+                            else
+                                call(ua, uri)
                         } else {
                             val latest = CallHistory.aorLatestHistory(history, aor)
                             if (latest != null)
@@ -344,7 +350,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext,
                     "Baresip has stopped! Check your network connectivity.",
                     Toast.LENGTH_SHORT).show()
-            finish()
+            // finish()
             return
         }
         val uap = params[0]
