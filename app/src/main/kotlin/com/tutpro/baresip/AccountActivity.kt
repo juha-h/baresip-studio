@@ -186,7 +186,7 @@ class AccountActivity : AppCompatActivity() {
             if (ob != acc.outbound) {
                 val outbound = ArrayList<String>()
                 for (i in ob.indices) {
-                    if ((ob[i] == "") || Api.uri_decode(ob[i])) {
+                    if ((ob[i] == "") || Utils.checkOutboundUri(ob[i])) {
                         if (account_set_outbound(acc.accp, ob[i], i) == 0) {
                             if (ob[i] != "")
                                 outbound.add(account_outbound(acc.accp, i))
@@ -196,7 +196,7 @@ class AccountActivity : AppCompatActivity() {
                         }
                     } else {
                         Utils.alertView(this, "Notice",
-                                "Invalid Outbound Proxy: ${ob[i]}")
+                                "Invalid Proxy Server URI: ${ob[i]}")
                         return false
                     }
                 }
