@@ -350,7 +350,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext,
                     "Baresip has stopped! Check your network connectivity.",
                     Toast.LENGTH_SHORT).show()
-            // finish()
+            finish()
             return
         }
         val uap = params[0]
