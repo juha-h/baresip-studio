@@ -149,6 +149,19 @@ void          call_enable_rtp_timeout(struct call *call, uint32_t timeout_ms);
 uint32_t      call_linenum(const struct call *call);
 struct call  *call_find_linenum(const struct list *calls, uint32_t linenum);
 void call_set_current(struct list *calls, struct call *call);
+const struct list *call_get_custom_hdrs(const struct call *call);
+
+
+/*
+* Custom headers
+*/
+typedef int (custom_hdrs_h)(const struct pl *name, const struct pl *val,
+	void *arg);     /* returns error code if any */
+
+int custom_hdrs_add(struct list *hdrs, const char *name,
+	const char *fmt, ...);
+int custom_hdrs_apply(const struct list *hdrs,
+	custom_hdrs_h *h, void *arg);
 
 
 /*
@@ -217,8 +230,6 @@ struct config_audio {
 	char play_dev[128];     /**< Audio playback device          */
 	char alert_mod[16];     /**< Audio alert module             */
 	char alert_dev[128];    /**< Audio alert device             */
-	struct range srate;     /**< Audio sampling rate in [Hz]    */
-	struct range channels;  /**< Nr. of audio channels (1=mono) */
 	uint32_t srate_play;    /**< Opt. sampling rate for player  */
 	uint32_t srate_src;     /**< Opt. sampling rate for source  */
 	uint32_t channels_play; /**< Opt. channels for player       */
@@ -364,6 +375,24 @@ struct media_ctx {
 
 
 /*
+ * Media Device
+ */
+
+struct mediadev;
+
+/** Defines a media device */
+struct mediadev {
+	struct le   le;
+	char  *name;
+};
+
+int mediadev_add(struct list *dev_list, const char *name);
+struct mediadev *mediadev_find(const struct list *dev_list, const char *name);
+struct mediadev *mediadev_get_default(const struct list *dev_list);
+int mediadev_print(struct re_printf *pf, const struct list *dev_list);
+
+
+/*
  * Message
  */
 
@@ -466,19 +495,20 @@ struct aufilt_prm {
 	uint32_t srate;       /**< Sampling rate in [Hz]        */
 	uint8_t  ch;          /**< Number of channels           */
 	uint32_t ptime;       /**< Wanted packet-time in [ms]   */
+	int      fmt;         /**< Sample format (enum aufmt)   */
 };
 
 typedef int (aufilt_encupd_h)(struct aufilt_enc_st **stp, void **ctx,
 			      const struct aufilt *af, struct aufilt_prm *prm,
 			      const struct audio *au);
 typedef int (aufilt_encode_h)(struct aufilt_enc_st *st,
-			      int16_t *sampv, size_t *sampc);
+			      void *sampv, size_t *sampc);
 
 typedef int (aufilt_decupd_h)(struct aufilt_dec_st **stp, void **ctx,
 			      const struct aufilt *af, struct aufilt_prm *prm,
 			      const struct audio *au);
 typedef int (aufilt_decode_h)(struct aufilt_dec_st *st,
-			      int16_t *sampv, size_t *sampc);
+			      void *sampv, size_t *sampc);
 
 struct aufilt {
 	struct le le;
@@ -675,6 +705,8 @@ void ua_set_media_af(struct ua *ua, int af_media);
 void ua_set_catchall(struct ua *ua, bool enabled);
 void ua_event(struct ua *ua, enum ua_event ev, struct call *call,
 	      const char *fmt, ...);
+int ua_add_xhdr_filter(struct ua *ua, const char *hdr_name);
+void ua_set_custom_hdrs(struct ua *ua, struct list *custom_hdrs);
 
 
 /* One instance */
@@ -824,6 +856,7 @@ typedef void (vidsrc_update_h)(struct vidsrc_st *st, struct vidsrc_prm *prm,
 struct vidsrc {
 	struct le         le;
 	const char       *name;
+	struct list      dev_list;
 	vidsrc_alloc_h   *alloch;
 	vidsrc_update_h  *updateh;
 };
@@ -923,6 +956,7 @@ struct aucodec {
 	uint32_t srate;             /* Audio samplerate */
 	uint32_t crate;             /* RTP Clock rate   */
 	uint8_t ch;
+	uint8_t pch;                /* RTP packet channels */
 	const char *fmtp;
 	auenc_update_h *encupdh;
 	auenc_encode_h *ench;
