@@ -17,6 +17,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioManager
+import android.media.AudioManager.STREAM_RING
+import android.media.AudioManager.STREAM_VOICE_CALL
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.support.v4.content.LocalBroadcastManager
@@ -360,7 +362,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val ev = event.split(",")
-        Log.d("Baresip", "Handling service event ${ev[0]} for $uap")
+        Log.d("Baresip", "Handling service event '${ev[0]}' for $uap")
         val aor = ua.account.aor
         val acc = ua.account
         for (account_index in uas.indices) {
@@ -372,6 +374,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     "registered", "registering failed", "unregistering" -> {
                         uaAdapter.notifyDataSetChanged()
+                    }
+                    "call ringing" -> {
+                        requestAudioFocus(STREAM_VOICE_CALL)
                     }
                     "call incoming" -> {
                         val callp = params[1]
@@ -467,6 +472,7 @@ class MainActivity : AppCompatActivity() {
                             if (rt.isPlaying) rt.stop()
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus(STREAM_VOICE_CALL)
                         am.isSpeakerphoneOn = false
                         // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                         //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
@@ -627,6 +633,10 @@ class MainActivity : AppCompatActivity() {
                             speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
                                     R.color.colorPrimary))
                         }
+                        if (audioFocused) {
+                            am.abandonAudioFocus(null)
+                            audioFocused = false
+                        }
                     }
                     "message" -> {
                         val peer_uri = params[1]
@@ -657,7 +667,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         setIntent(intent)
         val action = intent.getStringExtra("action")
-        Log.d("Baresip", "Got onNewIntent action $action")
+        Log.d("Baresip", "Got onNewIntent action '$action'")
         when (action) {
             "call" -> {
                 if (!calls.isEmpty()) {
@@ -1103,8 +1113,22 @@ class MainActivity : AppCompatActivity() {
         button.setImageResource(R.drawable.play)
     }
 
+    private fun requestAudioFocus(stream: Int) {
+        if (!audioFocused) {
+            val res = am.requestAudioFocus(null, stream, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+            if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                Log.d("Baresip", "Audio focus granted")
+                audioFocused = true
+            } else {
+                Log.d("Baresip", "Audio focus denied")
+                audioFocused = false
+            }
+        }
+    }
+
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
+        requestAudioFocus(STREAM_RING)
         rt.play()
         rtTimer = Timer()
         rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
@@ -1142,6 +1166,7 @@ class MainActivity : AppCompatActivity() {
         var history: ArrayList<CallHistory> = ArrayList()
         internal var calls = ArrayList<Call>()
         internal var messages = ArrayList<Message>()
+        internal var audioFocused = false
         var filesPath = ""
         var visible = true
         var makeCall = ""

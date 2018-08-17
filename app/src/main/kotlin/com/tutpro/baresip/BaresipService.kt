@@ -279,7 +279,6 @@ class BaresipService: Service() {
                         updateStatusNotification()
                     }
                     "call ringing" -> {
-                        return
                     }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
