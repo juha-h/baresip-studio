@@ -83,11 +83,19 @@ class BaresipService: Service() {
         super.onCreate()
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        Log.d(LOG_TAG, "Received onStartCommand action ${intent.getAction()}")
+        val action: String
 
-        when (intent.getAction()) {
+        if (intent == null) {
+            action = "Start"
+            Log.d(LOG_TAG, "Received onStartCommand with null intent")
+        } else {
+            action = intent.getAction()
+            Log.d(LOG_TAG, "Received onStartCommand action $action")
+        }
+
+        when (action) {
 
             "Start" -> {
                 val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
