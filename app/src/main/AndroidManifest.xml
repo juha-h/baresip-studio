@@ -140,6 +140,7 @@
                 <action android:name="com.tutpro.baresip.Restart" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
