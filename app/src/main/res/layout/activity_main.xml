@@ -31,7 +31,7 @@
                 android:spinnerMode="dropdown"/>
 
             <TextView
-                android:id="@+id/outTitle"
+                android:id="@+id/callTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/AoRList"
@@ -43,14 +43,14 @@
             </TextView>
 
             <LinearLayout
-                android:id="@+id/calleeRow"
+                android:id="@+id/uriRow"
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/outTitle" >
+                android:layout_below="@id/callTitle" >
 
                 <AutoCompleteTextView
-                    android:id="@+id/callee"
+                    android:id="@+id/uri"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight = "1"
@@ -76,21 +76,60 @@
                 android:id="@+id/callButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/calleeRow"
+                android:layout_below="@id/uriRow"
                 android:padding="0dp"
                 android:background="@null"
                 android:src="@drawable/call_green" >
             </ImageButton>
 
             <ImageButton
+                android:id="@+id/hangupButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/uriRow"
+                android:padding="0dp"
+                android:background="@null"
+                android:src="@drawable/hangup"
+                android:clickable="false"
+                android:visibility="invisible" >
+            </ImageButton>
+
+
+            <ImageButton
+                android:id="@+id/answerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/uriRow"
+                android:padding="0dp"
+                android:background="@null"
+                android:src="@drawable/call_green"
+                android:clickable="false"
+                android:visibility="invisible" >
+            </ImageButton>
+
+            <ImageButton
+                android:id="@+id/rejectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/uriRow"
+                android:padding="0dp"
+                android:background="@null"
+                android:layout_marginStart="70dp"
+                android:src="@drawable/hangup"
+                android:clickable="false"
+                android:visibility="invisible" >
+            </ImageButton>
+
+            <ImageButton
                 android:id="@+id/holdButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/calleeRow"
+                android:layout_below="@id/uriRow"
                 android:padding="0dp"
                 android:src="@drawable/pause"
                 android:background="@null"
                 android:layout_marginStart="70dp"
+                android:clickable="false"
                 android:visibility="invisible" >
             </ImageButton>
 
@@ -98,7 +137,7 @@
                 android:id="@+id/dtmf"
                 android:layout_width="@dimen/button_width"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/calleeRow"
+                android:layout_below="@id/uriRow"
                 android:layout_marginStart="140dp"
                 android:inputType="phone"
                 android:textSize="20sp"
