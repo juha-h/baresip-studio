@@ -8,8 +8,8 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode = 18
-        versionName = '2.3.2'
+        versionCode = 19
+        versionName = '2.4.0'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H'

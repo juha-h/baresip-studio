@@ -801,25 +801,12 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_MainActivity_uag_1current_1set(JNIEnv *env, jobject thiz,
                                                        jstring javaUA)
 {
-    struct ua *new_current_ua;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     LOGD("running uag_current_set on %s\n", native_ua);
     uag_current_set(ua);
     return;
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_uag_1current(JNIEnv *env, jobject thiz)
-{
-    struct ua *current_ua = uag_current();
-    char ua_buf[256];
-    if (current_ua == NULL)
-        ua_buf[0] = '\0';
-    else
-        sprintf(ua_buf, "%lu", (unsigned long)current_ua);
-    return (*env)->NewStringUTF(env, ua_buf);
 }
 
 JNIEXPORT jstring JNICALL
