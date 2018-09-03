@@ -5,6 +5,9 @@ Currently supports voice calls and messages with TLS transport,
 PCMU/PCMA and opus voice codecs, as well as ZRTP and (DTLS) SRTP media
 encapsulation.
 
+Motivated by need for secure SIP user agent for Android that does not
+depend on third party push notification services.
+
 The static libraries and include files in distribution directory have
 been produced using https://github.com/alfredh/baresip-android.  Use
 latest versions of baresip, re, and rem.  Then apply reg.c-patch to
