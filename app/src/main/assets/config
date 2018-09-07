@@ -138,7 +138,6 @@ module_app              contact.so
 module_app              debug_cmd.so
 #module_app             dtmfio.so
 #module_app             echo.so
-#module_app             menu.so
 #module_app             mwi.so
 #module_app             natbd.so
 #module_app             presence.so
@@ -147,7 +146,6 @@ module_app              debug_cmd.so
 
 #------------------------------------------------------------------------------
 # Module parameters
-
 
 cons_listen             0.0.0.0:5555
 
@@ -170,7 +168,5 @@ ice_debug               no
 ice_nomination          regular # {regular,aggressive}
 ice_mode                full    # {full,lite}
 
-# Menu
-statmode_default        off
-#redial_attempts        3 # Num or <inf>
-#redial_delay           5 # Delay in seconds
+# ZRTP
+zrtp_hash		        yes
