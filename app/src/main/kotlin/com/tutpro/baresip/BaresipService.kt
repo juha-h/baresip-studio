@@ -23,8 +23,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import java.nio.charset.StandardCharsets
-import android.net.Uri
-import android.provider.Settings
+import java.io.InputStream
 
 class BaresipService: Service() {
 
@@ -125,6 +124,25 @@ class BaresipService: Service() {
                         Utils.copyAssetToFile(applicationContext, a, "$path/$a")
                     } else {
                         Log.d(LOG_TAG, "Asset $a already copied")
+                        if (a == "config") {
+                            val inputStream: InputStream = file.inputStream()
+                            var contents = inputStream.bufferedReader().use { it.readText() }
+                            inputStream.close()
+                            var write = false
+                            if (!contents.contains("zrtp_hash")) {
+                                contents = "${contents}zrtp_hash    yes\n"
+                                write = true
+                            }
+                            if (contents.contains(Regex("#module_app[ ]+mwi.so"))) {
+                                contents = contents.replace(Regex("#module_app[ ]+mwi.so"),
+                                        "module_app    mwi.so")
+                                write = true
+                            }
+                            if (write) {
+                                Log.d(LOG_TAG, "Writing $contents")
+                                Utils.putFileContents(file, contents)
+                            }
+                        }
                     }
                 }
 
@@ -239,7 +257,7 @@ class BaresipService: Service() {
         } else {
             Log.d(LOG_TAG, "Ua ${ua.account.aor} is NOT registered")
             MainActivity.images.add(R.drawable.dot_yellow)
-            ua.register()
+            // ua.register()
         }
         val intent = Intent("service event")
         intent.putExtra("event", "ua added")

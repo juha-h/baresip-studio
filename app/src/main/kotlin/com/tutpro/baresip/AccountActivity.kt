@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout.LayoutParams
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_account.*
 
 class AccountActivity : AppCompatActivity() {
 
@@ -21,6 +22,7 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var outbound2: EditText
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
+    internal lateinit var vmUri: EditText
 
     private var newCodecs = ArrayList<String>()
     private var save = false
@@ -113,6 +115,10 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        vmUri = findViewById(R.id.voicemailUri) as EditText
+        vmUri.setText(acc.vmUri)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -259,6 +265,24 @@ class AccountActivity : AppCompatActivity() {
                 }
             }
 
+            var vmUri = voicemailUri.text.toString().trim()
+            if (vmUri != acc.vmUri) {
+                if (vmUri != "") {
+                    if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
+                    if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
+                    if (!Utils.checkSipUri(vmUri)) {
+                        Utils.alertView(this, "Notice",
+                                "Invalid Voicemail URI: $vmUri")
+                        return false
+                    }
+                    account_set_mwi(acc.accp, "yes")
+                } else {
+                    account_set_mwi(acc.accp, "no")
+                }
+                acc.vmUri = vmUri
+                save = true
+            }
+
             if (save) {
                 AccountsActivity.saveAccounts()
                 if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
@@ -307,6 +331,10 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.MediaEncTitle) as TextView -> {
                 Utils.alertView(this, "Media Encryption",
                         getText(R.string.mediaEnc).toString())
+            }
+            findViewById(R.id.VoicemailUriTitle) as TextView -> {
+                Utils.alertView(this, "Voicemail URI",
+                        getText(R.string.vmUri).toString())
             }
         }
     }

@@ -150,6 +150,18 @@
     </ScrollView>
 
     <ImageButton
+        android:id="@+id/voicemailButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:src="@drawable/voicemail"
+        android:layout_toStartOf="@id/contactsButton"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" >
+    </ImageButton>
+
+    <ImageButton
         android:id="@+id/contactsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

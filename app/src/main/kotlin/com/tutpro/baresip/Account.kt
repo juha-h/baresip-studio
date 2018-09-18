@@ -10,6 +10,10 @@ class Account(val accp: String) {
     var audioCodec = ArrayList<String>()
     var regint = account_regint(accp)
     var mediaenc = account_mediaenc(accp)
+    var vmUri = account_vm_uri(accp)
+    var vmNew = 0
+    var vmOld = 0
+    var missedCalls = false
 
     init {
         var i = 0
@@ -69,11 +73,45 @@ class Account(val accp: String) {
 
         if (mediaenc != "") res = res + ";mediaenc=${mediaenc}"
 
+        if (vmUri == "")
+            res = res + ";mwi=no"
+        else
+            res = res + ";vm_uri=\"$vmUri\""
+
         res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual"
 
         return res
     }
 
+    fun vmMessage() : String {
+        var new = ""
+        var old = ""
+        if (vmNew > 0)
+            if (vmNew == 1)
+                new = "$vmNew new message"
+            else
+                new = "$vmNew new messages"
+        if (vmOld > 0)
+            if (vmOld == 1)
+                old = "$vmOld old message"
+            else
+                old = "$vmOld old messages"
+        var msg = "You have"
+        if (new != "") {
+            msg = "$msg $new"
+            if (old != "") msg = "$msg and $old"
+        } else {
+            if (old != "")
+                msg = "$msg $old"
+            else
+                msg = "$msg no messages"
+        }
+        return "$msg."
+    }
+
+    fun host() : String {
+        return aor.split("@")[1]
+    }
     companion object {
 
         fun accounts(): ArrayList<Account> {
@@ -125,3 +163,5 @@ external fun account_set_regint(acc: String, regint: Int): Int
 external fun account_mediaenc(acc: String): String
 external fun account_set_mediaenc(acc: String, mencid: String): Int
 external fun account_set_audio_codecs(acc: String, codecs: String): Int
+external fun account_set_mwi(acc: String, value: String): Int
+external fun account_vm_uri(acc: String): String

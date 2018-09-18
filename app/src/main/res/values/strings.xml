@@ -38,5 +38,8 @@
         EMPTY value means that media encryption is not supported and that media transport protocol
         thus is RTP/AVP.
     </string>
+    <string name="vmUri">SIP URI for checking of voicemail messages. If left empty, voicemail
+        messages (Message Waiting Indications) are not subscribed to.
+    </string>>
     <string name="title_activity_message">MessageActivity</string>
 </resources>
