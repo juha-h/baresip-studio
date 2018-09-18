@@ -31,6 +31,8 @@ class CallsActivity : AppCompatActivity() {
         val listview = findViewById(R.id.calls) as ListView
 
         val aor = intent.extras.getString("aor")
+        val ua = Account.findUa(aor)
+
         aorGenerateHistory(aor)
 
         val adapter = CallListAdapter(this, uaHistory)
@@ -84,6 +86,7 @@ class CallsActivity : AppCompatActivity() {
         }
 
         listview.isLongClickable = true
+        ua!!.account.missedCalls = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

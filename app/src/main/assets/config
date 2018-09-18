@@ -58,7 +58,6 @@ dns_server             8.8.8.8:53
 #module                 stdio.so
 #module                 cons.so
 #module                 evdev.so
-#module                 httpd.so
 
 # Audio codec Modules (in order)
 module                  opus.so
@@ -138,7 +137,7 @@ module_app              contact.so
 module_app              debug_cmd.so
 #module_app             dtmfio.so
 #module_app             echo.so
-#module_app             mwi.so
+module_app              mwi.so
 #module_app             natbd.so
 #module_app             presence.so
 #module_app             vidloop.so

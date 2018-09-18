@@ -2,8 +2,7 @@ package com.tutpro.baresip
 
 import android.Manifest
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Intent
+import android.content.*
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -12,8 +11,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.content.Context
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioManager
@@ -46,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var answerButton: ImageButton
     internal lateinit var rejectButton: ImageButton
     internal lateinit var holdButton: ImageButton
+    internal lateinit var voicemailButton: ImageButton
     internal lateinit var contactsButton: ImageButton
     internal lateinit var messagesButton: ImageButton
     internal lateinit var callsButton: ImageButton
@@ -84,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         rejectButton = findViewById(R.id.rejectButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
+        voicemailButton = findViewById(R.id.voicemailButton) as ImageButton
         contactsButton = findViewById(R.id.contactsButton) as ImageButton
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
@@ -196,6 +195,19 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+                if (acc.vmUri != "") {
+                    if (acc.vmNew > 0)
+                        voicemailButton.setImageResource(R.drawable.voicemail_new)
+                    else
+                        voicemailButton.setImageResource(R.drawable.voicemail)
+                    voicemailButton.visibility = View.VISIBLE
+                } else {
+                    voicemailButton.visibility = View.INVISIBLE
+                }
+                if (acc.missedCalls)
+                    callsButton.setImageResource(R.drawable.calls_missed)
+                else
+                    callsButton.setImageResource(R.drawable.calls)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -339,14 +351,45 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        voicemailButton.setOnClickListener {
+            if (aorSpinner.selectedItemPosition >= 0) {
+                val ua = uas[aorSpinner.selectedItemPosition]
+                val acc = ua.account
+                if (acc.vmUri != "") {
+                    val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        when (which) {
+                            DialogInterface.BUTTON_NEGATIVE -> {
+                                val callIntent = Intent(this, MainActivity::class.java)
+                                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                callIntent.putExtra("action", "call")
+                                callIntent.putExtra("uap", ua.uap)
+                                callIntent.putExtra("peer", acc.vmUri)
+                                startActivity(callIntent)
+                            }
+                            DialogInterface.BUTTON_POSITIVE -> {
+                            }
+                        }
+                    }
+                    val builder = AlertDialog.Builder(this@MainActivity,
+                            R.style.Theme_AppCompat)
+                    builder.setTitle("Voicemail Messages")
+                    builder.setMessage(acc.vmMessage())
+                            .setPositiveButton("Cancel", dialogClickListener)
+                            .setNegativeButton("Check", dialogClickListener)
+                            .show()
+                }
+            }
+        }
+
         contactsButton.setOnClickListener {
             val i = Intent(this@MainActivity, ContactsActivity::class.java)
-                val b = Bundle()
-                if (aorSpinner.selectedItemPosition >= 0)
-                    b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
-                else
-                    b.putString("aor", "")
-                i.putExtras(b)
+            val b = Bundle()
+            if (aorSpinner.selectedItemPosition >= 0)
+                b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+            else
+                b.putString("aor", "")
+            i.putExtras(b)
             startActivityForResult(i, CONTACTS_CODE)
         }
 
@@ -366,7 +409,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
                 i.putExtras(b)
-                startActivityForResult(i, HISTORY_CODE)
+                startActivityForResult(i, CALLS_CODE)
             }
         }
 
@@ -439,6 +482,10 @@ class MainActivity : AppCompatActivity() {
                             if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
                                 CallHistory.aorRemoveHistory(history, aor)
                             history.add(CallHistory(aor, peer_uri, "in", false))
+                            acc.missedCalls = true
+                            if (ua == uas[aorSpinner.selectedItemPosition]) {
+                                callsButton.setImageResource(R.drawable.calls_missed)
+                            }
                         } else {
                             Log.d("Baresip", "Incoming call $uap/$callp/$peer_uri")
                             calls.add(new_call)
@@ -600,9 +647,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         calls.remove(call)
                         if (!call.hasHistory) {
-                                if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
-                                    CallHistory.aorRemoveHistory(history, aor)
-                                history.add(CallHistory(aor, call.peerURI, call.dir,false))
+                            if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                                CallHistory.aorRemoveHistory(history, aor)
+                            history.add(CallHistory(aor, call.peerURI, call.dir,false))
+                            if (call.dir == "in") {
+                                acc.missedCalls = true
+                                if (ua == uas[aorSpinner.selectedItemPosition])
+                                    callsButton.setImageResource(R.drawable.calls_missed)
+                            }
                         }
                         if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
                         if (am.isSpeakerphoneOn) {
@@ -634,6 +686,22 @@ class MainActivity : AppCompatActivity() {
                             i.putExtras(b)
                             startActivity(i)
                         }
+                    }
+                    "mwi notify" -> {
+                        val lines = ev[1].split("\n")
+                        for (line in lines) {
+                            if (line.startsWith("Voice-Message:")) {
+                                val counts = (line.split(" ")[1]).split("/")
+                                acc.vmNew = counts[0].toInt()
+                                acc.vmOld = counts[1].toInt()
+                                break
+                            }
+                        }
+                        if (ua == uas[aorSpinner.selectedItemPosition])
+                            if (acc.vmNew > 0)
+                                voicemailButton.setImageResource(R.drawable.voicemail_new)
+                            else
+                                voicemailButton.setImageResource(R.drawable.voicemail)
                     }
                     else -> Log.w("Baresip", "Unknown event '${ev[0]}'")
                 }
@@ -727,7 +795,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Log.d("Baresip", "Resumed")
+        Log.d("Baresip", "Resumed")
         imm.hideSoftInputFromWindow(callUri.windowToken, 0)
         visible = true
         if (answerCall != "") {
@@ -814,8 +882,31 @@ class MainActivity : AppCompatActivity() {
 
             ACCOUNTS_CODE -> {
                 uaAdapter.notifyDataSetChanged()
+                val acc = uas[aorSpinner.selectedItemPosition].account
+                if (acc.vmUri != "") {
+                    if (acc.vmNew > 0)
+                        voicemailButton.setImageResource(R.drawable.voicemail_new)
+                    else
+                        voicemailButton.setImageResource(R.drawable.voicemail)
+                    voicemailButton.visibility = View.VISIBLE
+                } else {
+                    voicemailButton.visibility = View.INVISIBLE
+                }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
+            }
+
+            ACCOUNT_CODE -> {
+                val acc = uas[aorSpinner.selectedItemPosition].account
+                if (acc.vmUri != "") {
+                    if (acc.vmNew > 0)
+                        voicemailButton.setImageResource(R.drawable.voicemail_new)
+                    else
+                        voicemailButton.setImageResource(R.drawable.voicemail)
+                    voicemailButton.visibility = View.VISIBLE
+                } else {
+                    voicemailButton.visibility = View.INVISIBLE
+                }
             }
 
             CONTACTS_CODE -> {
@@ -834,7 +925,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            HISTORY_CODE -> {
+            CALLS_CODE -> {
+                val acc = uas[aorSpinner.selectedItemPosition].account
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         (findViewById(R.id.uri) as EditText).setText(data.getStringExtra("peer_uri"))
@@ -842,10 +934,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
-                    if (CallHistory.aorHistory(history, uas[aorSpinner.selectedItemPosition].account.aor) == 0) {
+                    if (CallHistory.aorHistory(history, acc.aor) == 0) {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
+                callsButton.setImageResource(R.drawable.calls)
             }
 
             ABOUT_CODE -> {
@@ -972,7 +1065,7 @@ class MainActivity : AppCompatActivity() {
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
         const val EDIT_CONFIG_CODE = 3
-        const val HISTORY_CODE = 4
+        const val CALLS_CODE = 4
         const val ABOUT_CODE = 5
         const val ACCOUNT_CODE = 6
         const val CONTACT_CODE = 7
