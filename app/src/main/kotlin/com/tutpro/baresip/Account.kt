@@ -78,7 +78,7 @@ class Account(val accp: String) {
         else
             res = res + ";vm_uri=\"$vmUri\""
 
-        res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual"
+        res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual;call_transfer=no"
 
         return res
     }
