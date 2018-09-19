@@ -18,17 +18,15 @@
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, "Baresip", __VA_ARGS__))
 
-typedef struct update_context {
+typedef struct baresip_context {
     JavaVM  *javaVM;
     jclass   jniHelperClz;
     jobject  jniHelperObj;
     jclass   mainActivityClz;
     jobject  mainActivityObj;
-    pthread_mutex_t  lock;
-    int      done;
-} UpdateContext;
+} BaresipContext;
 
-UpdateContext g_ctx;
+BaresipContext g_ctx;
 
 struct play *play = NULL;
 struct message_lsnr *message;
@@ -156,7 +154,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     }
     event = event_buf;
 
-    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -194,7 +192,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     LOGD("got message '%.*s' from peer '%.*s'", mbuf_get_left(body), mbuf_buf(body),
         peer->l, peer->p);
 
-    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -240,7 +238,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
 
     LOGD("send_response_handler received response %u at %s\n", msg->scode, (char *)arg);
 
-    UpdateContext *pctx = (UpdateContext*)(&g_ctx);
+    BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -316,11 +314,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     g_ctx.jniHelperObj = (*env)->NewGlobalRef(env, handler);
 
     g_ctx.mainActivityObj = NULL;
-    return  JNI_VERSION_1_6;
+    return JNI_VERSION_1_6;
 }
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring javaPath) {
+
+    BaresipContext *pctx = (BaresipContext *)(&g_ctx);
+    JavaVM *javaVM = pctx->javaVM;
+    jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
+    if (res != JNI_OK) {
+        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+        if (JNI_OK != res) {
+            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            return;
+        }
+    }
+
     int err;
     const char *path = (*env)->GetStringUTFChars(env, javaPath, 0);
     struct le *le;
@@ -380,17 +390,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    UpdateContext *pctx = (UpdateContext *) (&g_ctx);
-    JavaVM *javaVM = pctx->javaVM;
-    jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
-    if (res != JNI_OK) {
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
-            return;
-        }
-    }
-
     LOGD("Adding %u accounts", list_count(uag_list()));
     char ua_buf[256];
     struct ua *ua;
@@ -430,6 +429,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
+
     LOGD("Closing upon stop");
     ua_stop_all(false);
     play = mem_deref(play);
@@ -440,6 +440,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
     // libre_close();
     // tmr_debug();
     // mem_debug();
+
     return;
 }
 
