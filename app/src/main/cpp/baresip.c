@@ -161,11 +161,11 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     if (res != JNI_OK) {
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
-            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d", res);
             return;
         }
     }
-    jmethodID statusId = (*env)->GetMethodID(env, pctx->mainActivityClz,
+    jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
                                              "uaEvent",
                                              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     sprintf(ua_buf, "%lu", (unsigned long)ua);
@@ -174,7 +174,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     jstring javaCall = (*env)->NewStringUTF(env, call_buf);
     jstring javaEvent = (*env)->NewStringUTF(env, event);
     LOGD("sending ua/call %s/%s event %s\n", ua_buf, call_buf, event);
-    (*env)->CallVoidMethod(env, pctx->mainActivityObj, statusId, javaEvent, javaUA, javaCall);
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, javaEvent, javaUA, javaCall);
     (*env)->DeleteLocalRef(env, javaUA);
     (*env)->DeleteLocalRef(env, javaCall);
     (*env)->DeleteLocalRef(env, javaEvent);
@@ -314,6 +314,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     g_ctx.jniHelperObj = (*env)->NewGlobalRef(env, handler);
 
     g_ctx.mainActivityObj = NULL;
+
     return JNI_VERSION_1_6;
 }
 
@@ -324,20 +325,16 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     JavaVM *javaVM = pctx->javaVM;
     jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
-            return;
-        }
+        LOGE("failed to GetEnv, ErrorCode = %d", res);
+        goto stopped;
     }
+    jclass clz = (*env)->GetObjectClass(env, instance);
+    g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
+    g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
 
     int err;
     const char *path = (*env)->GetStringUTFChars(env, javaPath, 0);
     struct le *le;
-
-    jclass clz = (*env)->GetObjectClass(env, instance);
-    g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
-    g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
 
     runLoggingThread();
 
@@ -390,7 +387,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    LOGD("Adding %u accounts", list_count(uag_list()));
+    LOGD("adding %u accounts", list_count(uag_list()));
     char ua_buf[256];
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
@@ -398,49 +395,53 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         sprintf(ua_buf, "%lu", (unsigned long) ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
         LOGD("adding UA for AoR %s/%s\n", ua_aor(ua), ua_buf);
-        jmethodID accountId = (*env)->GetMethodID(env, pctx->mainActivityClz, "uaAdd",
+        jmethodID uaAddId = (*env)->GetMethodID(env, pctx->mainActivityClz, "uaAdd",
                                                   "(Ljava/lang/String;)V");
-        (*env)->CallVoidMethod(env, pctx->mainActivityObj, accountId, javaUA);
+        (*env)->CallVoidMethod(env, pctx->mainActivityObj, uaAddId, javaUA);
         (*env)->DeleteLocalRef(env, javaUA);
     }
 
-    LOGI("Running main loop\n");
+    LOGI("running main loop ...\n");
     err = re_main(signal_handler);
 
     out:
 
     if (err) {
-        LOGE("Closing upon re_main error: (%d)\n", err);
+        LOGE("stopping UAs due to error: (%d)\n", err);
         ua_stop_all(true);
-        play = mem_deref(play);
-        message = mem_deref(message);
-        //ua_close();
-        conf_close();
-        baresip_close();
-        mod_close();
-        //libre_close();
     }
+
+    play = mem_deref(play);
+    message = mem_deref(message);
+
+    LOGD("closing ...");
+    ua_close();
+    conf_close();
+    baresip_close();
+
+    uag_event_unregister(ua_event_handler);
+
+    LOGD("unloading modules ...");
+    mod_close();
+
+    libre_close();
 
     // tmr_debug();
     // mem_debug();
+
+    stopped:
+
+    LOGD("tell app about baresip stop");
+    jmethodID stoppedId = (*env)->GetMethodID(env, pctx->mainActivityClz, "stopped", "()V");
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, stoppedId);
 
     return;
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz) {
-
-    LOGD("Closing upon stop");
-    ua_stop_all(false);
-    play = mem_deref(play);
-    // ua_close();
-    conf_close();
-    baresip_close();
-    mod_close();
-    // libre_close();
-    // tmr_debug();
-    // mem_debug();
-
+Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
+    LOGD("ua_stop_all upon baresipStop");
+    ua_stop_all(force);
     return;
 }
 

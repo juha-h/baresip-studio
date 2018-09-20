@@ -182,7 +182,6 @@ class BaresipService: Service() {
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
                 showStatusNotification()
-                if (!RUN_FOREGROUNG) super.onStartCommand(intent, flags, startId)
             }
 
             "UpdateNotification" -> {
@@ -190,13 +189,12 @@ class BaresipService: Service() {
             }
 
             "Stop" -> {
-                cleanStop()
-                if (RUN_FOREGROUNG) stopForeground(true)
-                stopSelf()
+                stop()
             }
 
             "Kill" -> {
-                stopSelf()
+                RESTARTING = true
+                stop()
             }
         }
 
@@ -208,14 +206,11 @@ class BaresipService: Service() {
     }
 
     override fun onDestroy() {
-        Log.i(LOG_TAG, "In onDestroy")
+        Log.d(LOG_TAG, "In onDestroy")
         super.onDestroy()
-        if (IS_SERVICE_RUNNING) {
-            Log.i(LOG_TAG, "Restart baresip killed by Android")
-            cleanStop()
-            val broadcastIntent = Intent("com.tutpro.baresip.Restart")
-            sendBroadcast(broadcastIntent)
-        }
+        Log.i(LOG_TAG, "Restart baresip killed by Android")
+        RESTARTING = true
+        stop()
     }
 
     private fun createNotificationChannels() {
@@ -240,10 +235,7 @@ class BaresipService: Service() {
                 .setContentIntent(npi)
                 .setOngoing(true)
                 .setContent(RemoteViews(packageName, R.layout.status_notification))
-        if (RUN_FOREGROUNG)
-            startForeground(STATUS_NOTIFICATION_ID, snb.build())
-        else
-            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+        startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     @Keep
@@ -270,13 +262,8 @@ class BaresipService: Service() {
     fun uaEvent(event: String, uap: String, callp: String) {
         Log.d(LOG_TAG, "updateStatus got event $event/$uap/$callp")
         if (!IS_SERVICE_RUNNING) return
-        if (event == "exit") {
-            val intent = Intent("service event")
-            intent.putExtra("event", event)
-            intent.putExtra("params", arrayListOf<String>())
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        if (event == "exit")
             return
-        }
         val ua = UserAgent.find(MainActivity.uas, uap)
         if (ua == null) {
             Log.w(LOG_TAG, "updateStatus did not find ua $uap")
@@ -431,6 +418,19 @@ class BaresipService: Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
+    @Keep
+    fun stopped() {
+        Log.d(LOG_TAG, "got event 'stopped'")
+        IS_SERVICE_RUNNING = false
+        val intent = Intent("service event")
+        intent.putExtra("event", "stopped")
+        intent.putExtra("params", arrayListOf<String>())
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        stopForeground(true)
+        stopSelf()
+        if (RESTARTING) restart()
+    }
+
     private fun updateStatusNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
         for (i: Int in 0 .. 5)  {
@@ -450,34 +450,42 @@ class BaresipService: Service() {
         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
-    private fun cleanStop() {
+    private fun stop() {
         CallsActivity.saveHistory()
         MessagesActivity.saveMessages()
         MainActivity.uas.clear()
         MainActivity.images.clear()
         MainActivity.history.clear()
         MainActivity.messages.clear()
-        baresipStop()
-        BaresipService.IS_SERVICE_RUNNING = false
         unregisterReceiver(nr)
         nm.cancelAll()
         if (wl.isHeld) wl.release()
         if (fl.isHeld) fl.release()
+        if (IS_SERVICE_RUNNING)
+            baresipStop(false)
+        else if (RESTARTING)
+            restart()
+    }
+
+    private fun restart() {
+        RESTARTING = false
+        val broadcastIntent = Intent("com.tutpro.baresip.Restart")
+        sendBroadcast(broadcastIntent)
     }
 
     external fun baresipStart(path: String)
-    external fun baresipStop()
+    external fun baresipStop(force: Boolean)
 
     companion object {
 
         var IS_SERVICE_RUNNING = false
+        var RESTARTING = false
         val STATUS_NOTIFICATION_ID = 101
         val CALL_NOTIFICATION_ID = 102
         val MESSAGE_NOTIFICATION_ID = 103
         val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
         val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
         var disconnected = false
-        val RUN_FOREGROUNG = true
 
     }
 
