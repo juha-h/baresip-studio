@@ -428,15 +428,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
-        if (event == "exit") {
-            if (BaresipService.IS_SERVICE_RUNNING) {
-                baresipService.setAction("Stop");
-                startService(baresipService)
-            }
-            Toast.makeText(applicationContext,
-                    "Baresip has stopped! Check your network connectivity.",
-                    Toast.LENGTH_SHORT).show()
-            finish()
+        if (event == "stopped") {
+            Log.d("Baresip", "Handling service event 'stopped'")
+            finishAndRemoveTask()
+            System.exit(0)
             return
         }
         val uap = params[0]
@@ -868,7 +863,6 @@ class MainActivity : AppCompatActivity() {
                     baresipService.setAction("Stop");
                     startService(baresipService)
                 }
-                finish()
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
