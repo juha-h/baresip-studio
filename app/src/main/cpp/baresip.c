@@ -865,7 +865,7 @@ Java_com_tutpro_baresip_MainActivity_ua_1connect(JNIEnv *env, jobject thiz,
     LOGD("connecting ua %s to %s\n", native_ua, native_uri);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     re_thread_enter();
-    err = ua_connect(ua, &call, NULL, native_uri, NULL, VIDMODE_OFF);
+    err = ua_connect(ua, &call, NULL, native_uri, VIDMODE_OFF);
     re_thread_leave();
     if (err) {
         LOGW("connecting to %s failed with error %d\n", native_uri, err);

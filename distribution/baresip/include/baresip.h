@@ -694,8 +694,8 @@ typedef void (ua_exit_h)(void *arg);
 /* Multiple instances */
 int  ua_alloc(struct ua **uap, const char *aor);
 int  ua_connect(struct ua *ua, struct call **callp,
-		const char *from_uri, const char *uri,
-		const char *params, enum vidmode vmode);
+		const char *from_uri, const char *to_uri,
+		enum vidmode vmode);
 void ua_hangup(struct ua *ua, struct call *call,
 	       uint16_t scode, const char *reason);
 int  ua_answer(struct ua *ua, struct call *call);
@@ -728,6 +728,7 @@ void ua_event(struct ua *ua, enum ua_event ev, struct call *call,
 	      const char *fmt, ...);
 int ua_add_xhdr_filter(struct ua *ua, const char *hdr_name);
 void ua_set_custom_hdrs(struct ua *ua, struct list *custom_hdrs);
+int  ua_uri_complete(struct ua *ua, struct mbuf *buf, const char *uri);
 
 
 /* One instance */
@@ -915,7 +916,7 @@ typedef int  (vidisp_alloc_h)(struct vidisp_st **vp,
 typedef int  (vidisp_update_h)(struct vidisp_st *st, bool fullscreen,
 			       int orient, const struct vidrect *window);
 typedef int  (vidisp_disp_h)(struct vidisp_st *st, const char *title,
-			     const struct vidframe *frame);
+			     const struct vidframe *frame, uint64_t timestamp);
 typedef void (vidisp_hide_h)(struct vidisp_st *st);
 
 /** Defines a Video display */
@@ -936,7 +937,7 @@ int vidisp_alloc(struct vidisp_st **stp, struct list *vidispl,
 		 struct vidisp_prm *prm, const char *dev,
 		 vidisp_resize_h *resizeh, void *arg);
 int vidisp_display(struct vidisp_st *st, const char *title,
-		   const struct vidframe *frame);
+		   const struct vidframe *frame, uint64_t timestamp);
 const struct vidisp *vidisp_find(const struct list *vidispl, const char *name);
 struct vidisp *vidisp_get(struct vidisp_st *st);
 

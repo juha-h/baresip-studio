@@ -23,7 +23,6 @@ import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.RelativeLayout.LayoutParams
 import android.widget.RelativeLayout
 import android.widget.*
 import android.view.*
