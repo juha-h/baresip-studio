@@ -986,6 +986,7 @@ Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
     int res = call_send_digit(call, (char)native_digit);
+    if (!res) res = call_send_digit(call, KEYCODE_REL);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
 }

@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         appContext = applicationContext
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         callTitle = findViewById(R.id.callTitle) as TextView
-        callUri = findViewById(R.id.uri) as AutoCompleteTextView
+        callUri = findViewById(R.id.callUri) as AutoCompleteTextView
         securityButton = findViewById(R.id.securityButton) as ImageButton
         callButton = findViewById(R.id.callButton) as ImageButton
         hangupButton = findViewById(R.id.hangupButton) as ImageButton
@@ -276,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             if (!ONE_CALL_ONLY || calls.isEmpty()) {
-                val uriText = (findViewById(R.id.uri) as EditText).text.toString().trim()
+                val uriText = callUri.text.toString().trim()
                 if (uriText.length > 0) {
                     var uri = ContactsActivity.findContactURI(uriText)
                     if (!uri.startsWith("sip:")) {
@@ -305,8 +305,7 @@ class MainActivity : AppCompatActivity() {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val callp = Call.uaCalls(calls, ua,"")[0].callp
-            Log.d("Baresip", "AoR $aor hanging up call $callp with " +
-                    (findViewById(R.id.uri) as EditText).text)
+            Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
             hangupButton.isEnabled = false
             ua_hangup(ua.uap, callp, 0, "")
         }
@@ -315,8 +314,7 @@ class MainActivity : AppCompatActivity() {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val callp = Call.uaCalls(calls, ua,"in")[0].callp
-            Log.d("Baresip", "AoR $aor answering call $callp from " +
-                    (findViewById(R.id.uri) as EditText).text)
+            Log.d("Baresip", "AoR $aor answering call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             ua_answer(ua.uap, callp)
         }
@@ -325,8 +323,7 @@ class MainActivity : AppCompatActivity() {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val callp = Call.uaCalls(calls, ua,"in")[0].callp
-            Log.d("Baresip", "AoR $aor rejecting call $callp from " +
-                    (findViewById(R.id.uri) as EditText).text)
+            Log.d("Baresip", "AoR $aor rejecting call $callp from ${callUri.text}")
             rejectButton.isEnabled = false
             ua_hangup(ua.uap, callp, 486, "Rejected")
         }
@@ -336,14 +333,12 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             val call = Call.uaCalls(calls, ua,"")[0]
             if (call.onhold) {
-                Log.d("Baresip", "AoR $aor resuming call ${call.callp} with " +
-                        (findViewById(R.id.uri) as EditText).text)
+                Log.d("Baresip", "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call_unhold(call.callp)
                 call.onhold = false
                 holdButton.setImageResource(R.drawable.pause)
             } else {
-                Log.d("Baresip", "AoR $aor holding call ${call.callp} with " +
-                        (findViewById(R.id.uri) as EditText).text)
+                Log.d("Baresip", "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call_hold(call.callp)
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
@@ -921,9 +916,8 @@ class MainActivity : AppCompatActivity() {
             CALLS_CODE -> {
                 val acc = uas[aorSpinner.selectedItemPosition].account
                 if (resultCode == RESULT_OK) {
-                    if (data != null) {
-                        (findViewById(R.id.uri) as EditText).setText(data.getStringExtra("peer_uri"))
-                    }
+                    if (data != null)
+                        callUri.setText(data.getStringExtra("peer_uri"))
                 }
                 if (resultCode == RESULT_CANCELED) {
                     Log.d("Baresip", "History canceled")
@@ -946,7 +940,7 @@ class MainActivity : AppCompatActivity() {
                     "You have not granted microphone permission.", Toast.LENGTH_SHORT).show()
             return
         }
-        (findViewById(R.id.uri) as EditText).setText(uri)
+        callUri.setText(uri)
         callButton.visibility = View.INVISIBLE
         val callp = ua_connect(ua.uap, uri)
         if (callp != "") {
@@ -971,13 +965,17 @@ class MainActivity : AppCompatActivity() {
         return object : TextWatcher {
             override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
-                val digit = sequence.subSequence(start, start + count).toString()
-                Log.d("Baresip", "Got DTMF digit '" + digit + "'")
-                if (digit.isNotEmpty()) call_send_digit(callp, digit[0])
+                val text = sequence.subSequence(start, start + count).toString()
+                if (text.length > 0) {
+                    val digit = text[0]
+                    Log.d("Baresip", "Got DTMF digit '$digit'")
+                    if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
+                        call_send_digit(callp, digit)
+                }
             }
-
             override fun afterTextChanged(sequence: Editable) {
-                call_send_digit(callp, 4.toChar())
+                // KEYCODE_REL
+                // call_send_digit(callp, 4.toChar())
             }
         }
     }
