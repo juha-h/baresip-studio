@@ -50,7 +50,7 @@
                 android:layout_below="@id/callTitle" >
 
                 <AutoCompleteTextView
-                    android:id="@+id/uri"
+                    android:id="@+id/callUri"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight = "1"
