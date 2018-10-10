@@ -457,7 +457,11 @@ class BaresipService: Service() {
         MainActivity.images.clear()
         MainActivity.history.clear()
         MainActivity.messages.clear()
-        unregisterReceiver(nr)
+        try {
+            unregisterReceiver(nr)
+        } catch (e: Exception) {
+            Log.d(LOG_TAG, "Receiver nr has not been registered")
+        }
         nm.cancelAll()
         if (wl.isHeld) wl.release()
         if (fl.isHeld) fl.release()
