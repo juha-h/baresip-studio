@@ -145,6 +145,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MWI_NOTIFY:
             re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
+        case UA_EVENT_AUDIO_ERROR:
+            mem_deref(call);
+            return;
         case UA_EVENT_EXIT:
             re_snprintf(event_buf, sizeof event_buf, "%s", "exit");
             break;
