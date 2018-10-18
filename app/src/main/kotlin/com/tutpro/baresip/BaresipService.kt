@@ -451,8 +451,6 @@ class BaresipService: Service() {
     }
 
     private fun stop() {
-        CallsActivity.saveHistory()
-        MessagesActivity.saveMessages()
         MainActivity.uas.clear()
         MainActivity.images.clear()
         MainActivity.history.clear()

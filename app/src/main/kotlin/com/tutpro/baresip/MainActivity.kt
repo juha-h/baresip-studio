@@ -471,6 +471,7 @@ class MainActivity : AppCompatActivity() {
                             if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
                                 CallHistory.aorRemoveHistory(history, aor)
                             history.add(CallHistory(aor, peer_uri, "in", false))
+                            CallsActivity.saveHistory()
                             acc.missedCalls = true
                             if (ua == uas[aorSpinner.selectedItemPosition]) {
                                 callsButton.setImageResource(R.drawable.calls_missed)
@@ -534,7 +535,10 @@ class MainActivity : AppCompatActivity() {
                             dtmf.requestFocus()
                             dtmf.addTextChangedListener(call.dtmfWatcher)
                         }
+                        if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
+                            CallHistory.aorRemoveHistory(history, aor)
                         history.add(CallHistory(aor, call.peerURI, call.dir, true))
+                        CallsActivity.saveHistory()
                         call.hasHistory = true
                         if (rtTimer != null) {
                             rtTimer!!.cancel()
@@ -547,8 +551,6 @@ class MainActivity : AppCompatActivity() {
                         // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                         //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
                         //        AudioManager.STREAM_VOICE_CALL)
-                        if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
-                            CallHistory.aorRemoveHistory(history, aor)
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -639,6 +641,7 @@ class MainActivity : AppCompatActivity() {
                             if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
                                 CallHistory.aorRemoveHistory(history, aor)
                             history.add(CallHistory(aor, call.peerURI, call.dir,false))
+                            CallsActivity.saveHistory()
                             if (call.dir == "in") {
                                 acc.missedCalls = true
                                 if (ua == uas[aorSpinner.selectedItemPosition])
