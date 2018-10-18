@@ -60,7 +60,8 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        Log.d("Baresip", "At onCreate")
+        Log.d("Baresip", "onCreate with intent action " +
+                intent.getStringExtra("action"))
 
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
@@ -419,6 +420,11 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.hasExtra("onStartup"))
             moveTaskToBack(true)
+
+        if (intent.hasExtra("action")) {
+            // MainActivity was not running when call or message came in
+            handleIntent(intent)
+        }
     }
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
@@ -703,9 +709,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
-        setIntent(intent)
+        super.onNewIntent(intent)
         val action = intent.getStringExtra("action")
-        Log.d("Baresip", "Got onNewIntent action '$action'")
+        Log.d("Baresip", "onNewIntent action '$action'")
+        if (action != null)
+            handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val action = intent.getStringExtra("action")
+        Log.d("Baresip", "Handling intent '$action'")
         when (action) {
             "call" -> {
                 if (!calls.isEmpty()) {
