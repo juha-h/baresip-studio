@@ -61,6 +61,7 @@ class MessagesActivity: AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         MainActivity.messages.remove(uaMessages[pos])
+                        saveMessages()
                         uaMessages.removeAt(pos)
                         if (uaMessages.size == 0) {
                             val i = Intent()
@@ -180,6 +181,7 @@ class MessagesActivity: AppCompatActivity() {
                 if ((MainActivity.messages[i].aor == aor) &&
                         (MainActivity.messages[i].timeStamp == time)) {
                     MainActivity.messages[i].new = false
+                    saveMessages()
                     return
                 }
         }
@@ -189,6 +191,7 @@ class MessagesActivity: AppCompatActivity() {
                 if ((MainActivity.messages[i].aor == aor) &&
                         (MainActivity.messages[i].timeStamp == time)) {
                     MainActivity.messages.removeAt(i)
+                    saveMessages()
                     return
                 }
         }
@@ -202,6 +205,7 @@ class MessagesActivity: AppCompatActivity() {
                         break
                     }
             MainActivity.messages.add(message)
+            saveMessages()
         }
 
         fun saveMessages() {
