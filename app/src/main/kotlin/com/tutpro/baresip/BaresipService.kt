@@ -72,6 +72,9 @@ class BaresipService: Service() {
             }
         }
 
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
+
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent()
             intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
@@ -97,10 +100,6 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
-                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-                wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
-                wl.acquire()
-
                 val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
                 fl = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
 
@@ -178,6 +177,7 @@ class BaresipService: Service() {
 
                 ContactsActivity.generateContacts(path + "/contacts")
 
+                wl.acquire()
                 Thread(Runnable { baresipStart(path) }).start()
                 BaresipService.IS_SERVICE_RUNNING = true
                 registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
