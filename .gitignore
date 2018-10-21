@@ -12,4 +12,5 @@ build
 /captures
 .externalNativeBuild
 app/release
+gradle/wrapper/gradle-wrapper.jar
 
