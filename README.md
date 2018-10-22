@@ -21,5 +21,5 @@ After cloning the project, in android-studio:
 
 Now available also in Google Play store.
 
-Copyright (c) 2018 TutPro Inc. Distributed under BSD license.
+Copyright (c) 2018 TutPro Inc. Distributed under BSD ((BSD-3-Clause) license.
 
