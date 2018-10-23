@@ -121,80 +121,7 @@ class MainActivity : AppCompatActivity() {
                 val ua = uas[position]
                 Log.d("Baresip", "Setting $aor current")
                 uag_current_set(uas[position].uap)
-                val callsOut = Call.uaCalls(calls, ua, "out")
-                val callsIn = Call.uaCalls(calls, ua, "in")
-                if ((callsOut.size == 0) && (callsIn.size == 0)) {
-                    callTitle.text = "Outgoing call to ..."
-                    callUri.text.clear()
-                    callUri.hint = "Callee"
-                    securityButton.visibility = View.INVISIBLE
-                    callButton.visibility = View.VISIBLE
-                    hangupButton.visibility = View.INVISIBLE
-                    answerButton.visibility = View.INVISIBLE
-                    rejectButton.visibility = View.INVISIBLE
-                    dtmf.visibility = View.INVISIBLE
-                } else {
-                    val call: Call
-                    if (callsOut.size > 0) {
-                        callTitle.text = "Outgoing call to ..."
-                        call = callsOut[0]
-                    } else {
-                        callTitle.text = "Incoming call from ..."
-                        call = callsIn[0]
-                    }
-                    callUri.setText(call.peerURI)
-                    when (call.status) {
-                        "outgoing" -> {
-                            securityButton.visibility = View.INVISIBLE
-                            callButton.visibility = View.INVISIBLE
-                            hangupButton.visibility = View.VISIBLE
-                            answerButton.visibility = View.INVISIBLE
-                            rejectButton.visibility = View.INVISIBLE
-                            holdButton.visibility = View.INVISIBLE
-                            dtmf.visibility = View.INVISIBLE
-                        }
-                        "incoming" -> {
-                            securityButton.visibility = View.INVISIBLE
-                            callButton.visibility = View.INVISIBLE
-                            hangupButton.visibility = View.INVISIBLE
-                            answerButton.visibility = View.VISIBLE
-                            answerButton.isEnabled = true
-                            rejectButton.visibility = View.VISIBLE
-                            rejectButton.isEnabled = true
-                            holdButton.visibility = View.INVISIBLE
-                            dtmf.visibility = View.INVISIBLE
-                            if (answerCall == call.callp) {
-                                answerCall = ""
-                                answerButton.performClick()
-                            }
-                            if (rejectCall == call.callp) {
-                                rejectCall = ""
-                                rejectButton.performClick()
-                                moveTaskToBack(true)
-                            }
-                        }
-                        "connected" -> {
-                            securityButton.setImageResource(call.security)
-                            setSecurityButtonTag(securityButton, call.security)
-                            if ((acc.mediaenc == "zrtp") || (acc.mediaenc == "dtls_srtpf"))
-                                securityButton.visibility = View.VISIBLE
-                            else
-                                securityButton.visibility = View.INVISIBLE
-                            callButton.visibility = View.INVISIBLE
-                            hangupButton.visibility = View.VISIBLE
-                            answerButton.visibility = View.INVISIBLE
-                            rejectButton.visibility = View.INVISIBLE
-                            if (call.onhold) {
-                                holdButton.setImageResource(R.drawable.play)
-                            } else {
-                                holdButton.setImageResource(R.drawable.pause)
-                            }
-                            holdButton.visibility = View.VISIBLE
-                            dtmf.visibility = View.VISIBLE
-                            dtmf.requestFocus()
-                        }
-                    }
-                }
+                showCall(ua)
                 if (acc.vmUri != "") {
                     if (acc.vmNew > 0)
                         voicemailButton.setImageResource(R.drawable.voicemail_new)
@@ -305,10 +232,13 @@ class MainActivity : AppCompatActivity() {
         hangupButton.setOnClickListener {
             val ua = uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = Call.uaCalls(calls, ua,"")[0].callp
-            Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
-            hangupButton.isEnabled = false
-            ua_hangup(ua.uap, callp, 0, "")
+            val uaCalls = Call.uaCalls(calls, ua, "")
+            if (uaCalls.size > 0) {
+                val callp = uaCalls[uaCalls.size - 1].callp
+                Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
+                hangupButton.isEnabled = false
+                ua_hangup(ua.uap, callp, 0, "")
+            }
         }
 
         answerButton.setOnClickListener {
@@ -521,6 +451,10 @@ class MainActivity : AppCompatActivity() {
                         call.onhold = false
                         call.security = R.drawable.box_red
                         if (ua == uas[aorSpinner.selectedItemPosition]) {
+                            if (call.dir == "in")
+                                callTitle.text = "Incoming call from ..."
+                            else
+                                callTitle.text = "Outgoing call to ..."
                             if (acc.mediaenc == "") {
                                 securityButton.visibility = View.INVISIBLE
                             } else {
@@ -619,6 +553,29 @@ class MainActivity : AppCompatActivity() {
                             securityButton.visibility = View.VISIBLE
                         }
                     }
+                    "call transfer" -> {
+                        val callp = params[1]
+                        val call = Call.find(calls, callp)
+                        if (call == null) {
+                            Log.e("Baresip", "Call $callp to be transfered is not found")
+                            return
+                        }
+                        val transferDialog = AlertDialog.Builder(this)
+                        transferDialog.setMessage("Do you want to transfer this call to ${ev[1]}?")
+                        transferDialog.setPositiveButton("Yes") { dialog, _ ->
+                            if (call in calls)
+                                transfer(ua, call, ev[1])
+                            else
+                                call(ua, ev[1])
+                            dialog.dismiss()
+                        }
+                        transferDialog.setNegativeButton("No") { dialog, _ ->
+                            if (call in calls)
+                                call_notify_sipfrag(callp, 603, "Decline")
+                            dialog.dismiss()
+                        }
+                        transferDialog.create().show()
+                    }
                     "call closed" -> {
                         val callp = params[1]
                         val call = Call.find(calls, callp)
@@ -629,20 +586,12 @@ class MainActivity : AppCompatActivity() {
                         Log.d("Baresip", "Removing call ${uap}/${callp}/" + call.peerURI)
                         stopRinging()
                         if (ua == uas[aorSpinner.selectedItemPosition]) {
-                            callTitle.text = "Outgoing call to ..."
-                            callUri.setText("")
-                            callUri.hint = "Callee"
-                            securityButton.visibility = View.INVISIBLE
-                            callButton.visibility = View.VISIBLE
-                            hangupButton.visibility = View.INVISIBLE
-                            answerButton.visibility = View.INVISIBLE
-                            rejectButton.visibility = View.INVISIBLE
-                            holdButton.visibility = View.INVISIBLE
-                            dtmf.visibility = View.INVISIBLE
-                            imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                             dtmf.removeTextChangedListener(call.dtmfWatcher)
                         }
                         calls.remove(call)
+                        if (ua == uas[aorSpinner.selectedItemPosition]) {
+                            showCall(ua)
+                        }
                         if (!call.hasHistory) {
                             if (CallHistory.aorHistory(history, aor) > HISTORY_SIZE)
                                 CallHistory.aorRemoveHistory(history, aor)
@@ -654,7 +603,12 @@ class MainActivity : AppCompatActivity() {
                                     callsButton.setImageResource(R.drawable.calls_missed)
                             }
                         }
-                        if (calls.size == 0) am.mode = AudioManager.MODE_NORMAL
+                        if (calls.size == 0) {
+                            am.mode = AudioManager.MODE_NORMAL
+                        } else {
+                            val uaCalls = Call.uaCalls(calls, ua, "")
+                            if (uaCalls.size > 0) call_start_audio(uaCalls[uaCalls.size - 1].callp)
+                        }
                         if (am.isSpeakerphoneOn) {
                             am.isSpeakerphoneOn = false
                             val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
@@ -977,6 +931,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun transfer(ua: UserAgent, call: Call, uri: String) {
+        val newCallp = ua_call_alloc(ua.uap, call.callp)
+        if (newCallp != "") {
+            Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
+            val newCall = Call(newCallp, ua, uri, "out", "transferring",
+                    dtmfWatcher(newCallp))
+            calls.add(newCall)
+            call_stop_audio(call.callp)
+            call_start_audio(newCallp)
+            val err = call_connect(newCallp, uri)
+            if (err == 0) {
+                if (ua == uas[aorSpinner.selectedItemPosition]) showCall(ua)
+            } else {
+                call_start_audio(call.callp)
+                Log.w("Baresip", "call_connect $newCallp failed with error $err")
+                call_notify_sipfrag(call.callp, 500, "Call Error")
+            }
+        } else {
+            Log.w("Baresip", "ua_call_alloc ${ua.uap}/${call.callp} failed")
+            call_notify_sipfrag(call.callp, 500, "Call Error")
+        }
+    }
+
     private fun dtmfWatcher(callp: String): TextWatcher {
         return object : TextWatcher {
             override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
@@ -1006,6 +983,88 @@ class MainActivity : AppCompatActivity() {
             }
             R.drawable.box_green -> {
                 button.tag = "green"
+            }
+        }
+    }
+
+    private fun showCall(ua: UserAgent) {
+        if (Call.uaCalls(calls, ua, "").size == 0) {
+            callTitle.text = "Outgoing call to ..."
+            callUri.text.clear()
+            callUri.hint = "Callee"
+            securityButton.visibility = View.INVISIBLE
+            callButton.visibility = View.VISIBLE
+            hangupButton.visibility = View.INVISIBLE
+            answerButton.visibility = View.INVISIBLE
+            rejectButton.visibility = View.INVISIBLE
+            holdButton.visibility = View.INVISIBLE
+            dtmf.visibility = View.INVISIBLE
+        } else {
+            val callsOut = Call.uaCalls(calls, ua, "out")
+            val callsIn = Call.uaCalls(calls, ua, "in")
+            val call: Call
+            if (callsOut.size > 0) {
+                call = callsOut[callsOut.size - 1]
+                if (call.status == "transferring")
+                    callTitle.text = "Transferring call to ..."
+                else
+                    callTitle.text = "Outgoing call to ..."
+            } else {
+                callTitle.text = "Incoming call from ..."
+                call = callsIn[callsIn.size - 1]
+            }
+            callUri.setText(call.peerURI)
+            when (call.status) {
+                "outgoing", "transferring" -> {
+                    securityButton.visibility = View.INVISIBLE
+                    callButton.visibility = View.INVISIBLE
+                    hangupButton.visibility = View.VISIBLE
+                    answerButton.visibility = View.INVISIBLE
+                    rejectButton.visibility = View.INVISIBLE
+                    holdButton.visibility = View.INVISIBLE
+                    dtmf.visibility = View.INVISIBLE
+                }
+                "incoming" -> {
+                    securityButton.visibility = View.INVISIBLE
+                    callButton.visibility = View.INVISIBLE
+                    hangupButton.visibility = View.INVISIBLE
+                    answerButton.visibility = View.VISIBLE
+                    answerButton.isEnabled = true
+                    rejectButton.visibility = View.VISIBLE
+                    rejectButton.isEnabled = true
+                    holdButton.visibility = View.INVISIBLE
+                    dtmf.visibility = View.INVISIBLE
+                    if (answerCall == call.callp) {
+                        answerCall = ""
+                        answerButton.performClick()
+                    }
+                    if (rejectCall == call.callp) {
+                        rejectCall = ""
+                        rejectButton.performClick()
+                        moveTaskToBack(true)
+                    }
+                }
+                "connected" -> {
+                    securityButton.setImageResource(call.security)
+                    setSecurityButtonTag(securityButton, call.security)
+                    if ((ua.account.mediaenc == "zrtp") || (ua.account.mediaenc == "dtls_srtpf"))
+                        securityButton.visibility = View.VISIBLE
+                    else
+                        securityButton.visibility = View.INVISIBLE
+                    callButton.visibility = View.INVISIBLE
+                    hangupButton.visibility = View.VISIBLE
+                    hangupButton.isEnabled = true
+                    answerButton.visibility = View.INVISIBLE
+                    rejectButton.visibility = View.INVISIBLE
+                    if (call.onhold) {
+                        holdButton.setImageResource(R.drawable.play)
+                    } else {
+                        holdButton.setImageResource(R.drawable.pause)
+                    }
+                    holdButton.visibility = View.VISIBLE
+                    dtmf.visibility = View.VISIBLE
+                    dtmf.requestFocus()
+                }
             }
         }
     }
@@ -1047,12 +1106,16 @@ class MainActivity : AppCompatActivity() {
 
     external fun uag_current_set(uap: String)
     external fun ua_connect(uap: String, peer_uri: String): String
+    external fun ua_call_alloc(uap: String, xcallp: String): String
     external fun ua_answer(uap: String, callp: String)
-    external fun ua_hold_answer(uap: String, callp: String): Int
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
     external fun call_hold(callp: String): Int
     external fun call_unhold(callp: String): Int
     external fun call_send_digit(callp: String, digit: Char): Int
+    external fun call_connect(callp: String, peer_uri: String): Int
+    external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
+    external fun call_start_audio(callp: String)
+    external fun call_stop_audio(callp: String)
     external fun reload_config(): Int
 
     companion object {
