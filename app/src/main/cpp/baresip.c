@@ -951,7 +951,8 @@ Java_com_tutpro_baresip_MainActivity_call_1start_1audio(JNIEnv *env, jobject thi
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("starting audio of call %s\n", native_call);
     re_thread_enter();
-    audio_start(call_audio(call));
+    struct audio *a = call_audio(call);
+    if (!audio_started(a)) audio_start(a);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return;
@@ -963,7 +964,8 @@ Java_com_tutpro_baresip_MainActivity_call_1stop_1audio(JNIEnv *env, jobject thiz
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("stopping audio of call %s\n", native_call);
     re_thread_enter();
-    audio_stop(call_audio(call));
+    struct audio *a = call_audio(call);
+    if (audio_started(a)) audio_stop(a);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return;
