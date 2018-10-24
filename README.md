@@ -13,7 +13,7 @@ been produced using https://github.com/juha-h/libbaresip-android.
 Before making libbaresip, apply reg.c-patch to re/src/sipreg/reg.c.  The
 patch is needed due to re timer sometimes firing too late.
 
-After cloning the project, in android-studio:
+After cloning the project, in Android Studio 3.2.1:
 
 - Open an existing Android Studio project
 
@@ -21,5 +21,4 @@ After cloning the project, in android-studio:
 
 Available also in Google Play store.
 
-Copyright (c) 2018 TutPro Inc. Distributed under BSD (BSD-3-Clause) license.
-
+Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
