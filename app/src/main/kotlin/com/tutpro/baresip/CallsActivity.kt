@@ -11,8 +11,10 @@ import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 import java.text.SimpleDateFormat
@@ -162,6 +164,24 @@ class CallsActivity : AppCompatActivity() {
                 Log.w("Baresip", "OutputStream exception: " + e.toString())
                 e.printStackTrace()
             }
+        }
+
+        fun restoreHistory(path: String) {
+            val file = File(path + "/history")
+            if (file.exists()) {
+                try {
+                    val fis = FileInputStream(file)
+                    val ois = ObjectInputStream(fis)
+                    @SuppressWarnings("unchecked")
+                    MainActivity.history = ois.readObject() as ArrayList<CallHistory>
+                    Log.d("Baresip", "Restored History of ${MainActivity.history.size} entries")
+                    ois.close()
+                    fis.close()
+                } catch (e: Exception) {
+                    Log.w("Baresip", "InputStream exception: - " + e.toString())
+                }
+            }
+
         }
     }
 }

@@ -3,13 +3,12 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion = 27
-    // buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode = 28
-        versionName = '3.1.1'
+        versionCode = 29
+        versionName = '3.1.2'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H'

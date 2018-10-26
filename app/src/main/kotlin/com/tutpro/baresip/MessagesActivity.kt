@@ -13,8 +13,10 @@ import android.widget.ImageButton
 import android.widget.ListView
 
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.util.*
 
@@ -219,6 +221,23 @@ class MessagesActivity: AppCompatActivity() {
             } catch (e: IOException) {
                 Log.w("Baresip", "OutputStream exception: " + e.toString())
                 e.printStackTrace()
+            }
+        }
+
+        fun restoreMessages(path: String) {
+            val file = File(path, "messages")
+            if (file.exists()) {
+                try {
+                    val fis = FileInputStream(file)
+                    val ois = ObjectInputStream(fis)
+                    @SuppressWarnings("unchecked")
+                    MainActivity.messages = ois.readObject() as ArrayList<Message>
+                    Log.d("Baresip", "Restored ${MainActivity.messages.size} messages")
+                    ois.close()
+                    fis.close()
+                } catch (e: Exception) {
+                    Log.w("Baresip", "InputStream exception: - " + e.toString())
+                }
             }
         }
     }

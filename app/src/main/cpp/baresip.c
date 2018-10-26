@@ -825,18 +825,6 @@ Java_com_tutpro_baresip_UserAgentKt_ua_1account(JNIEnv *env, jobject thiz, jstri
     return (*env)->NewStringUTF(env, acc_buf);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_UserAgentKt_ua_1aor(JNIEnv *env, jobject thiz, jstring javaUA)
-{
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    if (ua)
-        return (*env)->NewStringUTF(env, ua_aor(ua));
-    else
-        return (*env)->NewStringUTF(env, "");
-}
-
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_MainActivity_uag_1current_1set(JNIEnv *env, jobject thiz,
                                                        jstring javaUA)
@@ -1081,34 +1069,6 @@ Java_com_tutpro_baresip_MainActivity_call_1notify_1sipfrag(JNIEnv *env, jobject 
     return;
 }
 
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_ContactsActivity_00024Companion_contacts_1remove(JNIEnv *env, jobject thiz) {
-    struct le *le;
-    le = list_head(contact_list(baresip_contacts()));
-    while ((le = list_head(contact_list(baresip_contacts())))) {
-        struct contact *c = le->data;
-        contact_remove(baresip_contacts(), c);
-    }
-    return;
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_ContactsActivity_00024Companion_contact_1add(JNIEnv *env, jobject thiz,
-                                                                 jstring javaContact) {
-    struct pl pl_addr;
-    const struct list *lst;
-    struct le *le;
-    const char *native_contact = (*env)->GetStringUTFChars(env, javaContact, 0);
-    pl_set_str(&pl_addr, native_contact);
-    if (contact_add(baresip_contacts(), NULL, &pl_addr) != 0) {
-        LOGE("failed to add contact %s\n", native_contact);
-    } else {
-        LOGD("added contact %s\n", native_contact);
-    }
-    return;
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_MainActivity_reload_1config(JNIEnv *env, jobject thiz) {
     int err;
@@ -1158,4 +1118,31 @@ Java_com_tutpro_baresip_Api_audio_1codecs(JNIEnv *env, jobject thiz)
     }
     return (*env)->NewStringUTF(env, codec_buf);
 }
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring javaContact) {
+    struct pl pl_addr;
+    const struct list *lst;
+    struct le *le;
+    const char *native_contact = (*env)->GetStringUTFChars(env, javaContact, 0);
+    pl_set_str(&pl_addr, native_contact);
+    if (contact_add(baresip_contacts(), NULL, &pl_addr) != 0) {
+        LOGE("failed to add contact %s\n", native_contact);
+    } else {
+        LOGD("added contact %s\n", native_contact);
+    }
+    return;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_contacts_1remove(JNIEnv *env, jobject thiz) {
+    struct le *le;
+    le = list_head(contact_list(baresip_contacts()));
+    while ((le = list_head(contact_list(baresip_contacts())))) {
+        struct contact *c = le->data;
+        contact_remove(baresip_contacts(), c);
+    }
+    return;
+}
+
 
