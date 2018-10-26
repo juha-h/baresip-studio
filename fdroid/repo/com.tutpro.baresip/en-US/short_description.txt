@@ -1,0 +1,2 @@
+SIP User Agent app for Android based on baresip
+(https://github.com/alfredh/baresip) library.
