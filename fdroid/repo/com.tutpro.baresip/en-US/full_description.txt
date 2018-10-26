@@ -1,7 +1,10 @@
 Currently baresip app supports SIP voice calls and messages with TLS
 transport, voicemail Message Waiting Indication (MWI), incoming call
 transfers via REFER method, PCMU/PCMA and opus voice codecs, as well as
-ZRTP and (DTLS) SRTP media encapsulation.  Development of baresip app is
-motivated by need for a secure open source SIP User Agent for Android
-that does not depend on proprietary, third party push notification
-services.
+ZRTP and (DTLS) SRTP media encapsulation.
+
+Development of baresip app is motivated by need for a secure open source
+SIP User Agent for Android that does not depend on proprietary, third
+party push notification services.
+
+Source code is available at https://github.com/juha-h/baresip-studio.
