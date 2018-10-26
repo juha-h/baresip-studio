@@ -91,28 +91,28 @@ class ContactsActivity : AppCompatActivity() {
 
         var contacts = ArrayList<Contact>()
 
-        fun generateContacts(path: String) {
-            val content = Utils.getFileContents(File(path))
-            contacts_remove()
+        fun saveContacts() {
+            var contents = ""
+            for (c in contacts)
+                contents += "\"${c.name}\" ${c.uri}\n"
+            val path = MainActivity.filesPath + "/contacts"
+            Utils.putFileContents(File(path), contents)
+            Log.d("Baresip", "Saved contacts '${contents}' to '$path")
+        }
+
+        fun restoreContacts(path: String) {
+            val content = Utils.getFileContents(File(path + "/contacts"))
+            Api.contacts_remove()
             contacts.clear()
             content.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
                     val name = parts[1]
                     val uri = parts[2].trim()
-                    contact_add("\"$name\" $uri")
+                    Api.contact_add("\"$name\" $uri")
                     contacts.add(Contact(name, uri))
                 }
             }
-        }
-
-        fun saveContacts() {
-            var contents = ""
-            for (c in contacts)
-                    contents += "\"${c.name}\" ${c.uri}\n"
-            val path = MainActivity.filesPath + "/contacts"
-            Utils.putFileContents(File(path), contents)
-            Log.d("Baresip", "Saved contacts '${contents}' to '$path")
         }
 
         fun findContactURI(name: String): String {
@@ -137,10 +137,5 @@ class ContactsActivity : AppCompatActivity() {
                     return c.name
             return uri
         }
-
-        external fun contacts_remove()
-        external fun contact_add(contact: String)
-
     }
-
 }

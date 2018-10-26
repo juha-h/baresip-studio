@@ -35,5 +35,4 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
 
     }
 
-
 }

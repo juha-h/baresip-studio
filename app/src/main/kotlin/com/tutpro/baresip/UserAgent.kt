@@ -58,5 +58,4 @@ class UserAgent (val uap: String) {
 }
 
 external fun ua_account(ua: String): String
-external fun ua_aor(ua: String): String
 

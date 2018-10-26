@@ -73,7 +73,7 @@ class BaresipService: Service() {
         }
 
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Baresip")
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.tutpro.baresip:wakelog")
 
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent()
@@ -144,38 +144,6 @@ class BaresipService: Service() {
                         }
                     }
                 }
-
-                file = File(path, "history")
-                if (file.exists()) {
-                    try {
-                        val fis = FileInputStream(file)
-                        val ois = ObjectInputStream(fis)
-                        @SuppressWarnings("unchecked")
-                        MainActivity.history = ois.readObject() as ArrayList<CallHistory>
-                        Log.d(LOG_TAG, "Restored History of ${MainActivity.history.size} entries")
-                        ois.close()
-                        fis.close()
-                    } catch (e: Exception) {
-                        Log.w(LOG_TAG, "InputStream exception: - " + e.toString())
-                    }
-                }
-
-                file = File(path, "messages")
-                if (file.exists()) {
-                    try {
-                        val fis = FileInputStream(file)
-                        val ois = ObjectInputStream(fis)
-                        @SuppressWarnings("unchecked")
-                        MainActivity.messages = ois.readObject() as ArrayList<Message>
-                        Log.d(LOG_TAG, "Restored ${MainActivity.messages.size} messages")
-                        ois.close()
-                        fis.close()
-                    } catch (e: Exception) {
-                        Log.w(LOG_TAG, "InputStream exception: - " + e.toString())
-                    }
-                }
-
-                ContactsActivity.generateContacts(path + "/contacts")
 
                 wl.acquire()
                 Thread(Runnable { baresipStart(path) }).start()
@@ -492,6 +460,7 @@ class BaresipService: Service() {
     }
 
     init {
+        Log.d(LOG_TAG, "Loading baresip library")
         System.loadLibrary("baresip")
     }
 }

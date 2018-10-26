@@ -165,6 +165,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        callUri.threshold = 2
+        ContactsActivity.restoreContacts(applicationContext.filesDir.path)
+        callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                ContactsActivity.contacts.map{Contact -> Contact.name}))
+
         securityButton.setOnClickListener {
             when (securityButton.tag) {
                 "red" -> {
@@ -318,6 +323,7 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, CONTACTS_CODE)
         }
 
+        MessagesActivity.restoreMessages(applicationContext.filesDir.path)
         messagesButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, MessagesActivity::class.java)
@@ -328,6 +334,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        CallsActivity.restoreHistory(applicationContext.filesDir.path)
         callsButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, CallsActivity::class.java)
@@ -343,10 +350,6 @@ class MainActivity : AppCompatActivity() {
             baresipService.setAction("Start")
             startService(baresipService)
         }
-
-        callUri.threshold = 2
-        callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                ContactsActivity.contacts.map { Contact -> Contact.name }))
 
         if (intent.hasExtra("onStartup"))
             moveTaskToBack(true)
@@ -833,7 +836,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         when (requestCode) {
@@ -1147,5 +1149,10 @@ class MainActivity : AppCompatActivity() {
         const val MESSAGE_HISTORY_SIZE = 100
         const val ONE_CALL_ONLY = true
 
+    }
+
+    init {
+        Log.d("Baresip", "Loading baresip library")
+        System.loadLibrary("baresip")
     }
 }
