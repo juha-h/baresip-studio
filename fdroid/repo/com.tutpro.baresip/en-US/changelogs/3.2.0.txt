@@ -1,0 +1,2 @@
+- Added dialpad button for choosing between phone number and text soft keyboard.
+- Fixed auto completion of callee based on contacts.
