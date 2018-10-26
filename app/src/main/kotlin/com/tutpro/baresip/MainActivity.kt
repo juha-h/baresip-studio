@@ -22,6 +22,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.widget.RelativeLayout
 import android.widget.*
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var contactsButton: ImageButton
     internal lateinit var messagesButton: ImageButton
     internal lateinit var callsButton: ImageButton
+    internal lateinit var dialpadButton: ImageButton
     internal lateinit var dtmf: EditText
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
@@ -86,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         contactsButton = findViewById(R.id.contactsButton) as ImageButton
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
+        dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
@@ -342,6 +345,20 @@ class MainActivity : AppCompatActivity() {
                 b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
                 i.putExtras(b)
                 startActivityForResult(i, CALLS_CODE)
+            }
+        }
+
+        dialpadButton.tag = "off"
+        dialpadButton.setOnClickListener {
+            if (dialpadButton.tag == "off") {
+                callUri.inputType = InputType.TYPE_CLASS_PHONE
+                dialpadButton.setImageResource(R.drawable.dialpad_on)
+                dialpadButton.tag = "on"
+            } else {
+                callUri.inputType = InputType.TYPE_CLASS_TEXT +
+                        InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                dialpadButton.setImageResource(R.drawable.dialpad_off)
+                dialpadButton.tag = "off"
             }
         }
 
