@@ -259,8 +259,6 @@ class BaresipService: Service() {
                         MainActivity.images[account_index] = R.drawable.dot_yellow
                         updateStatusNotification()
                     }
-                    "call ringing" -> {
-                    }
                     "call incoming" -> {
                         if (!Utils.isVisible()) {
                             val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)

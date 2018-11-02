@@ -134,6 +134,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CALL_TRANSFER:
             re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
             break;
+        case UA_EVENT_CALL_TRANSFER_FAILED:
+            re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
+            break;
         case UA_EVENT_CALL_CLOSED:
             play = mem_deref(play);
             if (call_scode(call)) {
@@ -155,7 +158,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             re_snprintf(event_buf, sizeof event_buf, "%s", "exit");
             break;
         default:
-            re_snprintf(event_buf, sizeof event_buf, "%s", "unknown event");
             return;
     }
     event = event_buf;
