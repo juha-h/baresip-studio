@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.NotificationManager
 import android.content.*
 import android.support.v4.app.ActivityCompat
@@ -13,11 +14,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.media.AudioManager
-import android.media.AudioManager.STREAM_RING
-import android.media.AudioManager.STREAM_VOICE_CALL
-import android.media.Ringtone
-import android.media.RingtoneManager
+import android.media.*
+import android.os.Build
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
@@ -405,7 +403,6 @@ class MainActivity : AppCompatActivity() {
                         uaAdapter.notifyDataSetChanged()
                     }
                     "call ringing" -> {
-                        requestAudioFocus(STREAM_VOICE_CALL)
                     }
                     "call incoming" -> {
                         val callp = params[1]
@@ -505,8 +502,8 @@ class MainActivity : AppCompatActivity() {
                             rtTimer = null
                             if (rt.isPlaying) rt.stop()
                         }
-                        am.mode = AudioManager . MODE_IN_COMMUNICATION
-                        requestAudioFocus(STREAM_VOICE_CALL)
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus( AudioManager.STREAM_VOICE_CALL)
                         am.isSpeakerphoneOn = false
                         // am.setStreamVolume(AudioManager.STREAM_VOICE_CALL,
                         //        (am.getStreamMaxVolume(STREAM_VOICE_CALL) / 2) + 1,
@@ -596,6 +593,11 @@ class MainActivity : AppCompatActivity() {
                         }
                         transferDialog.create().show()
                     }
+                    "transfer failed" -> {
+                        val callp = params[1]
+                        Log.d("Baresip", "AoR $aor hanging up call $callp with ${ev[1]}")
+                        ua_hangup(ua.uap, callp, 0, "")
+                    }
                     "call closed" -> {
                         val callp = params[1]
                         val call = Call.find(calls, callp)
@@ -636,8 +638,7 @@ class MainActivity : AppCompatActivity() {
                                     R.color.colorPrimary))
                         }
                         if (audioFocused) {
-                            am.abandonAudioFocus(null)
-                            audioFocused = false
+                            abandonAudioFocus()
                         }
                     }
                     "message" -> {
@@ -1088,9 +1089,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestAudioFocus(stream: Int) {
-        if (!audioFocused) {
-            val res = am.requestAudioFocus(null, stream, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+    private fun requestAudioFocus(streamType: Int) {
+        val res: Int
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) && (audioFocusRequest == null)) {
+            val playbackAttributes = AudioAttributes.Builder()
+                    .setLegacyStreamType(streamType)
+                    .build()
+            @TargetApi(26)
+            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                    .setAudioAttributes(playbackAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .build()
+            @TargetApi(26)
+            res = am.requestAudioFocus(audioFocusRequest)
+            if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                Log.d("Baresip", "Audio focus granted")
+            } else {
+                Log.d("Baresip", "Audio focus denied")
+                audioFocusRequest = null
+            }
+        } else {
+            res = am.requestAudioFocus(null, streamType,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d("Baresip", "Audio focus granted")
                 audioFocused = true
@@ -1101,9 +1121,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun abandonAudioFocus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (audioFocusRequest != null) {
+                am.abandonAudioFocusRequest(audioFocusRequest)
+                audioFocusRequest = null
+            }
+        } else {
+            if (audioFocused) {
+                am.abandonAudioFocus(null)
+                audioFocused = false
+            }
+        }
+    }
+
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
-        requestAudioFocus(STREAM_RING)
+        requestAudioFocus(AudioManager.STREAM_RING)
         rt.play()
         rtTimer = Timer()
         rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
@@ -1145,6 +1179,7 @@ class MainActivity : AppCompatActivity() {
         internal var calls = ArrayList<Call>()
         internal var messages = ArrayList<Message>()
         internal var audioFocused = false
+        internal var audioFocusRequest: AudioFocusRequest? = null
         var filesPath = ""
         var visible = true
         var makeCall = ""
