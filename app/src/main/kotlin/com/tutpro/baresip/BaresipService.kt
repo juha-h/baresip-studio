@@ -426,9 +426,9 @@ class BaresipService: Service() {
         } catch (e: Exception) {
             Log.d(LOG_TAG, "Receiver nr has not been registered")
         }
-        nm.cancelAll()
-        if (wl.isHeld) wl.release()
-        if (fl.isHeld) fl.release()
+        if (this::nm.isInitialized) nm.cancelAll()
+        if (this::wl.isInitialized && wl.isHeld) wl.release()
+        if (this::fl.isInitialized && fl.isHeld) fl.release()
         if (IS_SERVICE_RUNNING)
             baresipStop(false)
         else if (RESTARTING)
