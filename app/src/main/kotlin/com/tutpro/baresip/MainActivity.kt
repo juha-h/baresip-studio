@@ -1098,7 +1098,6 @@ class MainActivity : AppCompatActivity() {
             @TargetApi(26)
             audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
                     .setAudioAttributes(playbackAttributes)
-                    .setAcceptsDelayedFocusGain(true)
                     .build()
             @TargetApi(26)
             res = am.requestAudioFocus(audioFocusRequest)
