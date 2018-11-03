@@ -860,15 +860,19 @@ class MainActivity : AppCompatActivity() {
 
             ACCOUNTS_CODE -> {
                 uaAdapter.notifyDataSetChanged()
-                val acc = uas[aorSpinner.selectedItemPosition].account
-                if (acc.vmUri != "") {
-                    if (acc.vmNew > 0)
-                        voicemailButton.setImageResource(R.drawable.voicemail_new)
-                    else
-                        voicemailButton.setImageResource(R.drawable.voicemail)
-                    voicemailButton.visibility = View.VISIBLE
-                } else {
-                    voicemailButton.visibility = View.INVISIBLE
+                if ((aorSpinner.selectedItemPosition == -1) && (uas.size > 0))
+                    aorSpinner.setSelection(0)
+                if (aorSpinner.selectedItemPosition >= 0) {
+                    val acc = uas[aorSpinner.selectedItemPosition].account
+                    if (acc.vmUri != "") {
+                        if (acc.vmNew > 0)
+                            voicemailButton.setImageResource(R.drawable.voicemail_new)
+                        else
+                            voicemailButton.setImageResource(R.drawable.voicemail)
+                        voicemailButton.visibility = View.VISIBLE
+                    } else {
+                        voicemailButton.visibility = View.INVISIBLE
+                    }
                 }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
