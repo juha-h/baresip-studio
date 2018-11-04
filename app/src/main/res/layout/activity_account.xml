@@ -174,7 +174,7 @@
             android:layout_height="wrap_content"
             android:hint="SIP URI"
             android:textSize="18sp"
-            android:inputType="textUri"
+            android:inputType="textEmailAddress"
             android:layout_width="fill_parent">
         </EditText>
 

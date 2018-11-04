@@ -17,8 +17,6 @@ import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
@@ -184,7 +182,7 @@ class BaresipService: Service() {
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
-                    NotificationManager.IMPORTANCE_DEFAULT)
+                    NotificationManager.IMPORTANCE_LOW)
             defaultChannel.description = "Tells that baresip is running"
             defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             nm.createNotificationChannel(defaultChannel)
