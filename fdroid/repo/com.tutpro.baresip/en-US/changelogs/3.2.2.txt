@@ -1,0 +1,5 @@
+- Added handling of call transfer failed event.
+- Avoided crash at device (re)start.
+- Avoided crash when coming first time back from accounts to main activity.
+- Used "textEmailAddress" input type for account URIs.
+- Changed importance of default notification channel to low.
