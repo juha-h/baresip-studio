@@ -860,9 +860,10 @@ class MainActivity : AppCompatActivity() {
 
             ACCOUNTS_CODE -> {
                 uaAdapter.notifyDataSetChanged()
-                if ((aorSpinner.selectedItemPosition == -1) && (uas.size > 0))
-                    aorSpinner.setSelection(0)
-                if (aorSpinner.selectedItemPosition >= 0) {
+                if (uas.size > 0) {
+                    if ((aorSpinner.selectedItemPosition == -1) ||
+                            (aorSpinner.selectedItemPosition >= uas.size))
+                            aorSpinner.setSelection(0)
                     val acc = uas[aorSpinner.selectedItemPosition].account
                     if (acc.vmUri != "") {
                         if (acc.vmNew > 0)
@@ -873,6 +874,8 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         voicemailButton.visibility = View.INVISIBLE
                     }
+                } else {
+                    aorSpinner.setSelection(-1)
                 }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
