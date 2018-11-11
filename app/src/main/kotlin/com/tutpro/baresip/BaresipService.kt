@@ -427,9 +427,10 @@ class BaresipService: Service() {
         if (this::nm.isInitialized) nm.cancelAll()
         if (this::wl.isInitialized && wl.isHeld) wl.release()
         if (this::fl.isInitialized && fl.isHeld) fl.release()
-        if (IS_SERVICE_RUNNING)
-            baresipStop(false)
-        else if (RESTARTING)
+        if (IS_SERVICE_RUNNING) {
+            baresipStop(forceStop)
+            if (!forceStop) forceStop = true
+        } else if (RESTARTING)
             restart()
     }
 
@@ -452,6 +453,7 @@ class BaresipService: Service() {
         val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
         val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
         var disconnected = false
+        var forceStop = false
 
     }
 
