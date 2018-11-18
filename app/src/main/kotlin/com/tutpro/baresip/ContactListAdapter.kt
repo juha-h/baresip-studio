@@ -31,7 +31,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
         nameView.setPadding(6, 6, 0, 6)
         if (aor != "") {
             nameView.setOnClickListener {_ ->
-                val i = Intent(cxt, MessageActivity::class.java)
+                val i = Intent(cxt, ChatActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aor)
                 b.putString("peer", ContactsActivity.contacts[position].uri)

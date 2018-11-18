@@ -77,18 +77,12 @@ class AccountsActivity : AppCompatActivity() {
     companion object {
 
         var accounts = ArrayList<AccountRow>()
-        var posAtAccounts = ArrayList<Int>()
 
         fun generateAccounts() {
             accounts.clear()
-            posAtAccounts.clear()
-            var i = 0;
-            for (ua in MainActivity.uas) {
+            for (ua in MainActivity.uas)
                 accounts.add(AccountRow(ua.account.aor.replace("sip:", ""),
                         R.drawable.action_remove))
-                posAtAccounts.add(i)
-                i++
-            }
         }
 
         fun saveAccounts() {

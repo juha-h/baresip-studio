@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:hint="SIP URI of Proxy Server"
             android:textSize="18sp"
-            android:inputType="textUri"
+            android:inputType="textEmailAddress"
             android:layout_width="fill_parent">
         </EditText>
 
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:hint="SIP URI of another Proxy Server"
             android:textSize="18sp"
-            android:inputType="textUri"
+            android:inputType="textEmailAddress"
             android:layout_width="fill_parent">
         </EditText>
 

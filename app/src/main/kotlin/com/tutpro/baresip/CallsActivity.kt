@@ -40,7 +40,7 @@ class CallsActivity : AppCompatActivity() {
         val adapter = CallListAdapter(this, uaHistory)
         listview.adapter = adapter
         listview.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
-            val i = Intent(this@CallsActivity, MessageActivity::class.java)
+            val i = Intent(this@CallsActivity, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", uaHistory[pos].peerURI)

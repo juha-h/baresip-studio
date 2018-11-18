@@ -13,7 +13,7 @@ import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<Message>) :
+class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Message>) :
         ArrayAdapter<Message>(cxt, R.layout.message, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -22,6 +22,13 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         val messageView = inflater.inflate(R.layout.message, parent, false)
         val directionView = messageView.findViewById(R.id.direction) as ImageView
         directionView.setImageResource(message.direction)
+        val peerView = messageView.findViewById(R.id.peer) as TextView
+        val contactName = ContactsActivity.contactName(message.peerUri)
+        if (contactName.startsWith("sip:") &&
+                (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
+            peerView.text = Utils.uriUserPart(message.peerUri)
+        else
+            peerView.text = contactName
         val timeView = messageView.findViewById(R.id.time) as TextView
         val time: String
         val cal = GregorianCalendar()
@@ -36,7 +43,10 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         timeView.text = time
         val textView = messageView.findViewById(R.id.text) as TextView
         textView.text = message.message
-        if (message.new) textView.setTypeface(null, Typeface.BOLD)
+        if (message.new) {
+            textView.setTypeface(null, Typeface.BOLD)
+            message.new = false
+        }
         return messageView
     }
 

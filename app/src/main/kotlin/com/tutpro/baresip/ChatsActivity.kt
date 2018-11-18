@@ -3,14 +3,11 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.widget.AdapterView
-import android.widget.ImageButton
-import android.widget.ListView
+import android.widget.*
 
 import java.io.File
 import java.io.FileInputStream
@@ -20,32 +17,34 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.util.*
 
-class MessagesActivity: AppCompatActivity() {
+class ChatsActivity: AppCompatActivity() {
 
+    internal lateinit var uaMessages: ArrayList<Message>
     internal lateinit var aor: String
-    internal lateinit var mlAdapter: MessageListAdapter
+    internal lateinit var listView: ListView
+    internal lateinit var clAdapter: ChatListAdapter
+    internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
-    internal lateinit var serviceEventReceiver: BroadcastReceiver
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_messages)
+        setContentView(R.layout.activity_chats)
 
-        val listView = findViewById(R.id.messages) as ListView
+        listView = findViewById(R.id.chats) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
         aor = intent.extras.getString("aor")
         uaMessages = uaMessages(aor)
 
-        mlAdapter = MessageListAdapter(this, uaMessages)
-        listView.adapter = mlAdapter
+        clAdapter = ChatListAdapter(this, uaMessages)
+        listView.adapter = clAdapter
         listView.isLongClickable = true
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
-            val i = Intent(this@MessagesActivity, MessageActivity::class.java)
+            val i = Intent(this, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
-            b.putString("peer", uaMessages[pos].peerURI)
+            b.putString("peer", uaMessages[pos].peerUri)
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
@@ -57,55 +56,77 @@ class MessagesActivity: AppCompatActivity() {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
-                        b.putString("uri", uaMessages[pos].peerURI)
+                        b.putString("uri", uaMessages[pos].peerUri)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
-                        MainActivity.messages.remove(uaMessages[pos])
-                        saveMessages()
-                        uaMessages.removeAt(pos)
-                        if (uaMessages.size == 0) {
-                            val i = Intent()
-                            setResult(Activity.RESULT_CANCELED, i)
-                            finish()
-                        }
-                        mlAdapter.notifyDataSetChanged()
+                        val peerUri = uaMessages[pos].peerUri
+                        val msgs = ArrayList<Message>()
+                        for (m in MainActivity.messages)
+                            if ((m.aor != aor) || (m.peerUri != peerUri))
+                                msgs.add(m)
+                            else
+                                clAdapter.remove(m)
+                        clAdapter.notifyDataSetChanged()
+                        MainActivity.messages = msgs
+                        uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                     }
                 }
             }
 
-            val builder = AlertDialog.Builder(this@MessagesActivity,
-                    R.style.Theme_AppCompat)
-            if (ContactsActivity.contactName(uaMessages[pos].peerURI).startsWith("sip:"))
-                builder.setMessage("Do you want to add ${uaMessages[pos].peerURI} to contacs or " +
-                        "delete message from history?")
+            val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
+            val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
+            if (peer.startsWith("sip:"))
+                builder.setMessage("Do you want to delete chat with $peer or add peer to contacts?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Message", dialogClickListener)
+                        .setNegativeButton("Delete Chat", dialogClickListener)
                         .setNeutralButton("Add Contact", dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete message from history?")
+                builder.setMessage("Do you want to delete chat with $peer?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Message", dialogClickListener)
+                        .setNegativeButton("Delete Chat", dialogClickListener)
                         .show()
             true
         }
 
+        peerUri = findViewById(R.id.peerUri) as AutoCompleteTextView
+        peerUri.threshold = 2
+        peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                ContactsActivity.contacts.map{Contact -> Contact.name}))
+
         plusButton.setOnClickListener {
-            val i = Intent(this@MessagesActivity, MessageActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", aor)
-            b.putString("peer", "")
-            i.putExtras(b)
-            startActivityForResult(i, MainActivity.MESSAGE_CODE)
+            val uriText = peerUri.text.toString().trim()
+            if (uriText.length > 0) {
+                var uri = ContactsActivity.findContactURI(uriText)
+                if (!uri.startsWith("sip:")) {
+                    uri = "sip:$uri"
+                    if (!uri.contains("@")) {
+                        val host = aor.substring(aor.indexOf("@") + 1)
+                        uri = "$uri@$host"
+                    }
+                }
+                if (!Utils.checkSipUri(uri)) {
+                    Utils.alertView(this, "Notice", "Invalid SIP URI '$uri'")
+                } else {
+                    peerUri.text.clear()
+                    peerUri.isCursorVisible = false
+                    val i = Intent(this@ChatsActivity, ChatActivity::class.java)
+                    val b = Bundle()
+                    b.putString("aor", aor)
+                    b.putString("peer", uri)
+                    i.putExtras(b)
+                    startActivityForResult(i, MainActivity.MESSAGE_CODE)
+                }
+            }
         }
 
         val peer = intent.extras.getString("peer")
-        if (peer != null) {
-            val i = Intent(this@MessagesActivity, MessageActivity::class.java)
+        if (peer != "") {
+            val i = Intent(this, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", peer)
@@ -113,22 +134,17 @@ class MessagesActivity: AppCompatActivity() {
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }
 
-        serviceEventReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                handleMessageResponse(intent.getIntExtra("response code", 0),
-                        intent.getStringExtra("time"))
-            }
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
-                IntentFilter("message response"))
+    }
 
+    override fun onPause() {
+        saveMessages()
+        super.onPause()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at Messages")
-                saveMessages()
+                Log.d("Baresip", "Back array was pressed at Chats")
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
@@ -138,45 +154,31 @@ class MessagesActivity: AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("Baresip", "onActivityResult at Messages")
-        when (requestCode) {
-            MainActivity.MESSAGE_CODE -> {
-                if (resultCode == RESULT_OK) {
-                    mlAdapter.notifyDataSetChanged()
-                }
-            }
+        Log.d("Baresip", "onActivityResult $requestCode $resultCode")
+        if ((requestCode == MainActivity.MESSAGE_CODE) && (resultCode == Activity.RESULT_OK)) {
+            clAdapter.clear()
+            uaMessages = uaMessages(aor)
+            clAdapter = ChatListAdapter(this, uaMessages)
+            listView.adapter = clAdapter
         }
-    }
-
-    private fun handleMessageResponse(responseCode: Int, time: String) {
-        if (responseCode < 300)
-            updateMessageDirection(time.toLong(), R.drawable.arrow_up_green)
-        else
-            updateMessageDirection(time.toLong(), R.drawable.arrow_up_red)
-        mlAdapter.notifyDataSetChanged()
-    }
-
-    fun updateMessageDirection(timeStamp: Long, direction: Int) {
-        for (m in uaMessages.reversed())
-            if (m.timeStamp == timeStamp) {
-                m.direction = direction
-                return
-            }
     }
 
     private fun uaMessages(aor: String) : ArrayList<Message> {
         val res = ArrayList<Message>()
         for (m in MainActivity.messages.reversed()) {
-            if (m.aor == aor) {
-                res.add(m)
-            }
+            if (m.aor != aor) continue
+            var found = false
+            for (r in res)
+                if (r.peerUri == m.peerUri) {
+                    found = true
+                    break
+                }
+            if (!found) res.add(m)
         }
         return res
     }
 
     companion object {
-
-        var uaMessages = ArrayList<Message>()
 
         fun archiveUaMessage(aor: String, time: Long) {
             for (i in MainActivity.messages.indices.reversed())
@@ -196,18 +198,6 @@ class MessagesActivity: AppCompatActivity() {
                     saveMessages()
                     return
                 }
-        }
-
-        fun addMessage(message: Message) {
-            if ((MainActivity.messages.filter{it.aor == message.aor}).size >=
-                    MainActivity.MESSAGE_HISTORY_SIZE)
-                for (i in MainActivity.messages.indices)
-                    if (MainActivity.messages[i].aor == message.aor) {
-                        MainActivity.messages.removeAt(i)
-                        break
-                    }
-            MainActivity.messages.add(message)
-            saveMessages()
         }
 
         fun saveMessages() {

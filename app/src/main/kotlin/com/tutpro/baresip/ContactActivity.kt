@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -87,14 +88,15 @@ class ContactActivity : AppCompatActivity() {
             ContactsActivity.contacts.sortBy { Contact -> Contact.name }
             ContactsActivity.saveContacts()
 
-            setResult(RESULT_OK, i)
+            i.putExtra("name", newName)
+            setResult(Activity.RESULT_OK, i)
             finish()
             return true
 
         } else if (item.itemId == android.R.id.home) {
 
             Log.d("Baresip", "Back array was pressed at Contact")
-            setResult(RESULT_CANCELED, i)
+            setResult(Activity.RESULT_CANCELED, i)
             finish()
             return true
 
