@@ -14,7 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:transcriptMode="alwaysScroll"
-        android:layout_above="@id/text">
+        android:layout_above="@id/text" >
     </ListView>
 
     <EditText
