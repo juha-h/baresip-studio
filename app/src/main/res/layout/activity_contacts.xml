@@ -12,7 +12,9 @@
     <ListView
         android:id="@+id/contacts"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/plusButton" >
+    </ListView>
 
     <ImageButton
         android:id="@+id/plusButton"

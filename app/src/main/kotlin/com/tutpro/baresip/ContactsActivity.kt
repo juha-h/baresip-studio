@@ -3,11 +3,9 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ListView
 
@@ -28,27 +26,7 @@ class ContactsActivity : AppCompatActivity() {
         val aor = intent.extras.getString("aor")
         clAdapter = ContactListAdapter(this, contacts, aor)
         listView.adapter = clAdapter
-
-        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
-            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                when (which) {
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        ContactsActivity.contacts.removeAt(pos)
-                        ContactsActivity.saveContacts()
-                        clAdapter.notifyDataSetChanged()
-                    }
-                    DialogInterface.BUTTON_POSITIVE -> {
-                    }
-                }
-            }
-            val builder = AlertDialog.Builder(this@ContactsActivity,
-                    R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to delete ${contacts[pos].name}?")
-                    .setPositiveButton("Cancel", dialogClickListener)
-                    .setNegativeButton("Delete Contact", dialogClickListener)
-                    .show()
-            true
-        }
+        listView.isLongClickable = true
 
         val plusButton = findViewById(R.id.plusButton) as ImageButton
         plusButton.setOnClickListener {
@@ -62,10 +40,7 @@ class ContactsActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == RESULT_OK) {
-            Log.d("Baresip", "Notifying clAdapter")
-            clAdapter.notifyDataSetChanged()
-        }
+        if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
