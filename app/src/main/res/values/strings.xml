@@ -3,15 +3,15 @@
     <string name="app_name">baresip</string>
     <string name="aboutText">
         <b>Baresip based Android application</b>\n\n
-        Work in progress\n
         Juha Heinanen jh@tutpro.com\n\n
         <b>Usage Hints</b>\n\n
         - start by creating an account (click item titles for help)\n
         - usually there is no need to edit the config\n
         - in config, dns_server by default points to 8.8.8.8:53 for Android 8+ usage\n
         - peers of calls and messages can be added to contacts by long clicks\n
-        - long clicks can also be used to remove calls, messages, and contacts\n
+        - long clicks can also be used to remove calls, chats, messages, and contacts\n
         - call click when callee has not been given can be used for re-dial\n
+        - quit without network connectivity needs to be forced by selecting it twice\n
     </string>
     <string name="noAccounts">No accounts</string>
     <string name="dispName">Name (if any) used in From URI of outbound requests.</string>
