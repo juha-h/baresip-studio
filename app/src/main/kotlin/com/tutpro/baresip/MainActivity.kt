@@ -729,7 +729,7 @@ class MainActivity : AppCompatActivity() {
                 rejectCall = intent.getStringExtra("callp")
                 moveTaskToBack(true)
             }
-            "reply", "archive", "delete" -> {
+            "reply", "save", "delete" -> {
                 val uap = intent.getStringExtra("uap")
                 val ua = UserAgent.find(MainActivity.uas, uap)
                 if (ua == null) {
@@ -755,8 +755,8 @@ class MainActivity : AppCompatActivity() {
                         i.putExtras(b)
                         startActivityForResult(i, MESSAGE_CODE)
                     }
-                    "archive" -> {
-                        ChatsActivity.archiveUaMessage(ua.account.aor,
+                    "save" -> {
+                        ChatsActivity.saveUaMessage(ua.account.aor,
                                 intent.getStringExtra("time").toLong())
                         moveTaskToBack(true)
                     }

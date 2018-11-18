@@ -343,14 +343,14 @@ class BaresipService: Service() {
             replyIntent.putExtra("peer", peer)
             val replyPendingIntent = PendingIntent.getActivity(this,
                     0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            val archiveIntent = Intent(this, MainActivity::class.java)
-            archiveIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+            val saveIntent = Intent(this, MainActivity::class.java)
+            saveIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            archiveIntent.putExtra("action", "archive")
-            archiveIntent.putExtra("uap", uap)
-            archiveIntent.putExtra("time", timeStamp)
-            val archivePendingIntent = PendingIntent.getActivity(this,
-                    1, archiveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            saveIntent.putExtra("action", "save")
+            saveIntent.putExtra("uap", uap)
+            saveIntent.putExtra("time", timeStamp)
+            val savePendingIntent = PendingIntent.getActivity(this,
+                    1, saveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val deleteIntent = Intent(this, MainActivity::class.java)
             deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -363,7 +363,7 @@ class BaresipService: Service() {
             view.setOnClickPendingIntent(R.id.rejectButton, rejectPendingIntent)
             cnb.setCustomBigContentView(view) */
             cnb.addAction(R.drawable.ic_stat, "Reply", replyPendingIntent)
-            cnb.addAction(R.drawable.ic_stat, "Archive", archivePendingIntent)
+            cnb.addAction(R.drawable.ic_stat, "Save", savePendingIntent)
             cnb.addAction(R.drawable.ic_stat, "Delete", deletePendingIntent)
             nm.notify(MESSAGE_NOTIFICATION_ID, cnb.build())
         }
