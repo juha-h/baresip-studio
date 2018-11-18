@@ -47,76 +47,49 @@
             android:name=".AccountsActivity"
             android:label="Accounts"
             android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
         </activity>
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Account"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:parentActivityName=".AccountsActivity">
         </activity>
         <activity
             android:name=".ContactsActivity"
             android:label="Contacts"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".ContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Contact"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:parentActivityName=".ContactsActivity" >
         </activity>
         <activity
             android:name=".EditConfigActivity"
             android:label="Edit Config"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".CallsActivity"
             android:label="Call History"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
-            android:name=".MessagesActivity"
-            android:label="Message History"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:name=".ChatsActivity"
+            android:label="Chat History"
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
-            android:name=".MessageActivity"
-            android:label="Message or Call"
-            android:parentActivityName=".MessagesActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
+            android:name=".ChatActivity"
+            android:label="Messages of a Chat"
+            android:parentActivityName=".ChatsActivity" >
         </activity>
         <activity
             android:name=".AboutActivity"
             android:label="About"
             android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tutpro.baresip.MainActivity" />
         </activity>
 
         <service

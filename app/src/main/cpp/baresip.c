@@ -1033,7 +1033,7 @@ Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MessageActivity_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
+Java_com_tutpro_baresip_ChatActivity_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
                                                       jstring javaPeer, jstring javaMsg,
                                                       jstring javaTime) {
     struct ua *ua;

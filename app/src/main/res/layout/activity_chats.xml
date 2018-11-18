@@ -7,12 +7,27 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MessagesActivity">
+    tools:context=".ChatsActivity" >
 
     <ListView
-        android:id="@+id/messages"
+        android:id="@+id/chats"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent" >
+    </ListView>
+
+    <AutoCompleteTextView
+        android:id="@+id/peerUri"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textSize="18sp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_toStartOf="@+id/plusButton"
+        android:inputType="textEmailAddress"
+        android:hint="Chat Peer" >
+    </AutoCompleteTextView>
 
     <ImageButton
         android:id="@+id/plusButton"
@@ -25,5 +40,3 @@
     </ImageButton>
 
 </RelativeLayout>
-
-

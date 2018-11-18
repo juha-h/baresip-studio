@@ -324,12 +324,13 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, CONTACTS_CODE)
         }
 
-        MessagesActivity.restoreMessages(applicationContext.filesDir.path)
+        ChatsActivity.restoreMessages(applicationContext.filesDir.path)
         messagesButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
-                val i = Intent(this@MainActivity, MessagesActivity::class.java)
+                val i = Intent(this@MainActivity, ChatsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
+                b.putString("peer", "")
                 i.putExtras(b)
                 startActivityForResult(i, MESSAGES_CODE)
             }
@@ -642,20 +643,22 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "message" -> {
-                        val peer_uri = params[1]
-                        val msg = params[2]
+                        val peerUri = params[1]
+                        val msgText = params[2]
                         val time = params[3]
-                        val new_message = Message(aor, peer_uri, R.drawable.arrow_down_green, msg,
+                        val newMsg = Message(aor, peerUri, R.drawable.arrow_down_green, msgText,
                                 time.toLong(), true)
-                        Log.d("Baresip", "Incoming message $aor/$peer_uri/$msg")
-                        MessagesActivity.addMessage(new_message)
+                        Log.d("Baresip", "Incoming message $aor/$peerUri/$msgText")
+                        messages.add(newMsg)
+                        ChatsActivity.saveMessages()
                         if (Utils.isVisible()) {
                             if (ua != uas[aorSpinner.selectedItemPosition])
                                 aorSpinner.setSelection(account_index)
-                            val i = Intent(applicationContext, MessagesActivity::class.java)
+                            val i = Intent(applicationContext, ChatsActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             val b = Bundle()
                             b.putString("aor", ua.account.aor)
+                            b.putString("peer", peerUri)
                             i.putExtras(b)
                             startActivity(i)
                         }
@@ -670,7 +673,8 @@ class MainActivity : AppCompatActivity() {
                                 break
                             }
                         }
-                        if (ua == uas[aorSpinner.selectedItemPosition])
+                        if ((aorSpinner.selectedItemPosition >= 0) &&
+                                (ua == uas[aorSpinner.selectedItemPosition]))
                             if (acc.vmNew > 0)
                                 voicemailButton.setImageResource(R.drawable.voicemail_new)
                             else
@@ -735,7 +739,7 @@ class MainActivity : AppCompatActivity() {
                 val aor = ua.account.aor
                 when (action) {
                     "reply" -> {
-                        val i = Intent(this@MainActivity, MessagesActivity::class.java)
+                        val i = Intent(this@MainActivity, ChatActivity::class.java)
                         val b = Bundle()
                         if (ua != uas[aorSpinner.selectedItemPosition]) {
                             for (account_index in uas.indices) {
@@ -749,15 +753,15 @@ class MainActivity : AppCompatActivity() {
                         b.putString("peer", intent.getStringExtra("peer"))
                         b.putBoolean("reply", true)
                         i.putExtras(b)
-                        startActivityForResult(i, MESSAGES_CODE)
+                        startActivityForResult(i, MESSAGE_CODE)
                     }
                     "archive" -> {
-                        MessagesActivity.archiveUaMessage(ua.account.aor,
+                        ChatsActivity.archiveUaMessage(ua.account.aor,
                                 intent.getStringExtra("time").toLong())
                         moveTaskToBack(true)
                     }
                     "delete" -> {
-                        MessagesActivity.deleteUaMessage(ua.account.aor,
+                        ChatsActivity.deleteUaMessage(ua.account.aor,
                                 intent.getStringExtra("time").toLong())
                         moveTaskToBack(true)
                     }
