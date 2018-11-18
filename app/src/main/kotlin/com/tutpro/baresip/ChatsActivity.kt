@@ -180,7 +180,7 @@ class ChatsActivity: AppCompatActivity() {
 
     companion object {
 
-        fun archiveUaMessage(aor: String, time: Long) {
+        fun saveUaMessage(aor: String, time: Long) {
             for (i in MainActivity.messages.indices.reversed())
                 if ((MainActivity.messages[i].aor == aor) &&
                         (MainActivity.messages[i].timeStamp == time)) {
