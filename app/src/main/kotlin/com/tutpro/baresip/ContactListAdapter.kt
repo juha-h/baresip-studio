@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +20,8 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                          private val aor: String) :
         ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val row = rows[position]
+    override fun getView(pos: Int, convertView: View?, parent: ViewGroup): View {
+        val row = rows[pos]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.contact_row, parent, false)
         val nameView = rowView.findViewById(R.id.contactName) as TextView
@@ -31,31 +32,30 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             nameView.setOnClickListener { _ ->
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
-                        DialogInterface.BUTTON_NEUTRAL -> {
-                            val intent = Intent(cxt, MainActivity::class.java)
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                        DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE -> {
+                            val i = Intent(cxt, MainActivity::class.java)
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            intent.putExtra("action", "call")
-                            intent.putExtra("uap", Account.findUa(aor)!!.uap)
-                            intent.putExtra("peer", ContactsActivity.contacts[position].uri)
-                            (cxt as Activity).startActivity(intent)
-                        }
-                        DialogInterface.BUTTON_NEGATIVE -> {
-                            val intent = Intent(cxt, ChatsActivity::class.java)
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            val b = Bundle()
-                            b.putString("aor", aor)
-                            b.putString("peer", ContactsActivity.contacts[position].uri)
-                            intent.putExtras(b)
-                            (cxt as Activity).startActivity(intent)
+                            if (which == DialogInterface.BUTTON_NEUTRAL)
+                                i.putExtra("action", "call")
+                            else
+                                i.putExtra("action", "message")
+                            val ua = Account.findUa(aor)
+                            if (ua == null) {
+                                Log.e("Baresip", "onClickListener did not find AoR $aor")
+                            } else {
+                                i.putExtra("uap", ua.uap)
+                                i.putExtra("peer", ContactsActivity.contacts[pos].uri)
+                                (cxt as Activity).startActivity(i)
+                            }
                         }
                         DialogInterface.BUTTON_POSITIVE -> {
                         }
                     }
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                builder.setMessage("Do you want to call or send message to " +
-                        "${ContactsActivity.contacts[position].name}?")
+                builder.setMessage("Do you want to call or send message to '" +
+                        "${ContactsActivity.contacts[pos].name}'?")
                         .setNeutralButton("Call", dialogClickListener)
                         .setNegativeButton("Send Message", dialogClickListener)
                         .setPositiveButton("Cancel", dialogClickListener)
@@ -66,7 +66,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEGATIVE -> {
-                        ContactsActivity.contacts.removeAt(position)
+                        ContactsActivity.contacts.removeAt(pos)
                         ContactsActivity.saveContacts()
                         this.notifyDataSetChanged()
                     }
@@ -75,7 +75,8 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to delete ${ContactsActivity.contacts[position].name}?")
+            builder.setMessage("Do you want to delete contact '" +
+                    "${ContactsActivity.contacts[pos].name}'?")
                     .setPositiveButton("Cancel", dialogClickListener)
                     .setNegativeButton("Delete Contact", dialogClickListener)
                     .show()
@@ -86,7 +87,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val i = Intent(cxt, ContactActivity::class.java)
             val b = Bundle()
             b.putBoolean("new", false)
-            b.putInt("index", position)
+            b.putInt("index", pos)
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
         }

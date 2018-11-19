@@ -331,6 +331,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", uas[aorSpinner.selectedItemPosition].account.aor)
                 b.putString("peer", "")
+                b.putBoolean("focus", false)
                 i.putExtras(b)
                 startActivityForResult(i, MESSAGES_CODE)
             }
@@ -659,6 +660,7 @@ class MainActivity : AppCompatActivity() {
                             val b = Bundle()
                             b.putString("aor", ua.account.aor)
                             b.putString("peer", peerUri)
+                            b.putBoolean("focus", false)
                             i.putExtras(b)
                             startActivity(i)
                         }
@@ -739,7 +741,7 @@ class MainActivity : AppCompatActivity() {
                 val aor = ua.account.aor
                 when (action) {
                     "reply" -> {
-                        val i = Intent(this@MainActivity, ChatActivity::class.java)
+                        val i = Intent(this@MainActivity, ChatsActivity::class.java)
                         val b = Bundle()
                         if (ua != uas[aorSpinner.selectedItemPosition]) {
                             for (account_index in uas.indices) {
@@ -751,9 +753,9 @@ class MainActivity : AppCompatActivity() {
                         }
                         b.putString("aor", aor)
                         b.putString("peer", intent.getStringExtra("peer"))
-                        b.putBoolean("reply", true)
+                        b.putBoolean("focus", true)
                         i.putExtras(b)
-                        startActivityForResult(i, MESSAGE_CODE)
+                        startActivityForResult(i, MESSAGES_CODE)
                     }
                     "save" -> {
                         ChatsActivity.saveUaMessage(ua.account.aor,
@@ -767,6 +769,16 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
+            }
+            "message" -> {
+                val ua = UserAgent.find(MainActivity.uas, intent.getStringExtra("uap"))!!
+                val i = Intent(applicationContext, ChatsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", ua.account.aor)
+                b.putString("peer", intent.getStringExtra("peer"))
+                b.putBoolean("focus", true)
+                i.putExtras(b)
+                startActivity(i)
             }
         }
     }

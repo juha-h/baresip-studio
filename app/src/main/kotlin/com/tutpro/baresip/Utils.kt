@@ -94,6 +94,16 @@ object Utils {
         return uri.substringAfter(":").substringBefore("@")
     }
 
+    fun friendlyUri(uri: String, domain: String): String {
+        val user = uriUserPart(uri)
+        val host = uriHostPart(uri)
+        if (host == domain) return user else return "$user@$host"
+    }
+
+    fun aorDomain(aor: String): String {
+        return aor.substringAfter("@")
+    }
+
     fun checkUserID(id: String): Boolean {
         return Regex("^[a-zA-Z]([._-]|[a-zA-Z0-9]){1,49}\$").matches(id)
     }

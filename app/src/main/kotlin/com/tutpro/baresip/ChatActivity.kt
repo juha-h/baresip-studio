@@ -33,7 +33,7 @@ class ChatActivity : AppCompatActivity() {
 
         aor = intent.extras.getString("aor")
         peerUri = intent.extras.getString("peer")
-        val reply = intent.extras.getBoolean("reply")
+        val focus = intent.extras.getBoolean("focus")
 
         val userAgent = Account.findUa(aor)
         if (userAgent == null) {
@@ -106,7 +106,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         newMessage = findViewById(R.id.text) as EditText
-        if (reply) newMessage.requestFocus()
+        if (focus) newMessage.requestFocus()
 
         sendButton = findViewById(R.id.sendButton) as ImageButton
         sendButton.setOnClickListener {
