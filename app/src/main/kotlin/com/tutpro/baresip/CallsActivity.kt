@@ -30,31 +30,57 @@ class CallsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calls)
 
-        val listview = findViewById(R.id.calls) as ListView
+        val listView = findViewById(R.id.calls) as ListView
 
         val aor = intent.extras.getString("aor")
-        val ua = Account.findUa(aor)
+        val ua = Account.findUa(aor)!!
 
         aorGenerateHistory(aor)
 
         val adapter = CallListAdapter(this, uaHistory)
-        listview.adapter = adapter
-        listview.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
-            val i = Intent(this@CallsActivity, ChatActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", aor)
-            b.putString("peer", uaHistory[pos].peerURI)
-            i.putExtras(b)
-            startActivityForResult(i, MainActivity.MESSAGE_CODE)
+        listView.adapter = adapter
+        listView.isLongClickable = true
+
+        listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
+            val peerUri = uaHistory[pos].peerURI
+            var peerName = ContactsActivity.contactName(peerUri)
+            if (peerName.startsWith("sip:"))
+                peerName = Utils.friendlyUri(peerName, Utils.aorDomain(aor))
+            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                when (which) {
+                    DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE -> {
+                        val i = Intent(this@CallsActivity, MainActivity::class.java)
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        if (which == DialogInterface.BUTTON_NEUTRAL)
+                            i.putExtra("action", "call")
+                        else
+                            i.putExtra("action", "message")
+                        i.putExtra("uap", ua.uap)
+                        i.putExtra("peer", peerUri)
+                        startActivity(i)
+                    }
+                    DialogInterface.BUTTON_POSITIVE -> {
+                    }
+                }
+            }
+            val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
+            builder.setMessage("Do you want to call or send message to '$peerName'?")
+                    .setNeutralButton("Call", dialogClickListener)
+                    .setNegativeButton("Send Message", dialogClickListener)
+                    .setPositiveButton("Cancel", dialogClickListener)
+                    .show()
         }
-        listview.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
+        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
+            val peerUri = uaHistory[pos].peerURI
+            var peerName = ContactsActivity.contactName(peerUri)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEUTRAL -> {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
-                        b.putString("uri", uaHistory[pos].peerURI)
+                        b.putString("uri", peerUri)
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }
@@ -71,23 +97,25 @@ class CallsActivity : AppCompatActivity() {
                     }
                 }
             }
+            val callText: String
+            if (uaHistory[pos].directions.size > 1) callText = "Calls" else callText = "Call"
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
-            if (ContactsActivity.contactName(uaHistory[pos].peerURI).startsWith("sip:"))
-                builder.setMessage("Do you want to add ${uaHistory[pos].peerURI} to contacs or " +
-                    "delete call from history?")
+            if (peerName.startsWith("sip:"))
+                builder.setMessage("Do you want to add '" +
+                        "${Utils.friendlyUri(peerName, Utils.aorDomain(aor))}' to contacts " +
+                        "or delete ${callText.toLowerCase()} from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Call", dialogClickListener)
+                        .setNegativeButton("Delete $callText", dialogClickListener)
                         .setNeutralButton("Add Contact", dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete call from history?")
+                builder.setMessage("Do you want to delete ${callText.toLowerCase()} from history?")
                         .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Call", dialogClickListener)
+                        .setNegativeButton("Delete $callText", dialogClickListener)
                         .show()
             true
         }
 
-        listview.isLongClickable = true
         ua!!.account.missedCalls = false
     }
 

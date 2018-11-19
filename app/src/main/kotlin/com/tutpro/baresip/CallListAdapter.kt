@@ -36,9 +36,8 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
         }
         val peerURIView = rowView.findViewById(R.id.peer_uri) as TextView
         val contactName = ContactsActivity.contactName(row.peerURI)
-        if (contactName.startsWith("sip:") &&
-                (Utils.uriHostPart(row.peerURI) == Utils.uriHostPart(row.aor)))
-            peerURIView.text = Utils.uriUserPart(row.peerURI)
+        if (contactName.startsWith("sip:"))
+            peerURIView.text = Utils.friendlyUri(contactName, Utils.aorDomain(row.aor))
         else
             peerURIView.text = contactName
         val timeView = rowView.findViewById(R.id.time) as TextView
