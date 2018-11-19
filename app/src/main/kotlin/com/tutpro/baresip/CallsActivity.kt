@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
+import android.widget.TextView
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -28,15 +29,18 @@ class CallsActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_calls)
 
-        val listView = findViewById(R.id.calls) as ListView
+        setContentView(R.layout.activity_calls)
 
         val aor = intent.extras.getString("aor")
         val ua = Account.findUa(aor)!!
 
-        aorGenerateHistory(aor)
+        val headerView = findViewById(R.id.account) as TextView
+        val headerText = "Account ${aor.substringAfter(":")}"
+        headerView.text = headerText
 
+        val listView = findViewById(R.id.calls) as ListView
+        aorGenerateHistory(aor)
         val adapter = CallListAdapter(this, uaHistory)
         listView.adapter = adapter
         listView.isLongClickable = true
