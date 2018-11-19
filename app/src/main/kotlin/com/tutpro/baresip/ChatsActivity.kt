@@ -34,8 +34,12 @@ class ChatsActivity: AppCompatActivity() {
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
         aor = intent.extras.getString("aor")
-        uaMessages = uaMessages(aor)
 
+        val headerView = findViewById(R.id.account) as TextView
+        val headerText = "Account ${aor.substringAfter(":")}"
+        headerView.text = headerText
+
+        uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
         listView.adapter = clAdapter
         listView.isLongClickable = true

@@ -57,9 +57,12 @@ class ChatActivity : AppCompatActivity() {
         }
         setTitle("Chat with $chatPeer")
 
-        chatMessages = uaPeerMessages(aor, peerUri)
+        val headerView = findViewById(R.id.account) as TextView
+        val headerText = "Account ${aor.substringAfter(":")}"
+        headerView.text = headerText
 
         val listView = findViewById(R.id.messages) as ListView
+        chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
         listView.isLongClickable = true
