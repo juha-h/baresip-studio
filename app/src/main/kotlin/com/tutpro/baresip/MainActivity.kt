@@ -63,15 +63,6 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        if (ContextCompat.checkSelfPermission(applicationContext,
-                        Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(applicationContext,"You have not granted microphone permission.",
-                    Toast.LENGTH_SHORT).show()
-            finishAndRemoveTask()
-            System.exit(0)
-            return
-        }
-
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         callTitle = findViewById(R.id.callTitle) as TextView
         callUri = findViewById(R.id.callUri) as AutoCompleteTextView
@@ -166,12 +157,11 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
-        callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map{Contact -> Contact.name}))
-        callUri.threshold = 2
+
         ContactsActivity.restoreContacts(applicationContext.filesDir.absolutePath)
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))
+        callUri.threshold = 2
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -417,6 +407,15 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val callp = params[1]
+                        if (ContextCompat.checkSelfPermission(applicationContext,
+                                        Manifest.permission.RECORD_AUDIO) ==
+                                PackageManager.PERMISSION_DENIED) {
+                            Toast.makeText(applicationContext,
+                                    "You have not granted microphone permission.",
+                                    Toast.LENGTH_SHORT).show()
+                            Api.ua_hangup(uap, callp, 486, "Busy Here")
+                            return
+                        }
                         val call = Call.find(callp)
                         if (call == null) {
                             Log.e("Baresip", "Incoming call $callp not found")
@@ -426,6 +425,7 @@ class MainActivity : AppCompatActivity() {
                             aorSpinner.setSelection(account_index)
                         } else {
                             callTitle.text = "Incoming call from ..."
+                            callUri.setAdapter(null)
                             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                                     Utils.aorDomain(ua.account.aor)))
                             securityButton.visibility = View.INVISIBLE
@@ -1086,7 +1086,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     init {
-        Log.d("Baresip", "Loading baresip library")
-        System.loadLibrary("baresip")
+        if (!BaresipService.libraryLoaded) {
+            Log.d("Baresip", "Loading baresip library")
+            System.loadLibrary("baresip")
+            BaresipService.libraryLoaded = true
+        }
     }
+
 }

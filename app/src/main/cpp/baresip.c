@@ -329,6 +329,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring javaPath) {
 
+    LOGD("Starting baresip\n");
+
     BaresipContext *pctx = (BaresipContext *)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
