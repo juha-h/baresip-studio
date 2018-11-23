@@ -10,7 +10,6 @@ import android.widget.ImageButton
 import android.widget.ListView
 
 import java.io.File
-import java.util.ArrayList
 
 class ContactsActivity : AppCompatActivity() {
 
@@ -20,22 +19,29 @@ class ContactsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
+        filesPath = applicationContext.filesDir.absolutePath
+
         val listView = findViewById(R.id.contacts) as ListView
 
-        Log.d("Baresip", "Got ${contacts.size} contacts")
         val aor = intent.extras.getString("aor")
-        clAdapter = ContactListAdapter(this, contacts, aor)
+        clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
         val plusButton = findViewById(R.id.plusButton) as ImageButton
         plusButton.setOnClickListener {
-            val i = Intent(this, ContactActivity::class.java)
-            val b = Bundle()
-            b.putBoolean("new", true)
-            b.putString("uri", "")
-            i.putExtras(b)
-            startActivityForResult(i, MainActivity.CONTACT_CODE)
+            if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
+                Utils.alertView(this, "Notice",
+                        "Your maximum number of contacts " +
+                                "(${Contact.CONTACTS_SIZE}) has been exceeded.")
+            } else {
+                val i = Intent(this, ContactActivity::class.java)
+                val b = Bundle()
+                b.putBoolean("new", true)
+                b.putString("uri", "")
+                i.putExtras(b)
+                startActivityForResult(i, MainActivity.CONTACT_CODE)
+            }
         }
     }
 
@@ -64,34 +70,32 @@ class ContactsActivity : AppCompatActivity() {
 
     companion object {
 
-        var contacts = ArrayList<Contact>()
+        internal var filesPath = ""
 
-        fun saveContacts() {
+        fun saveContacts(path: String = filesPath) {
             var contents = ""
-            for (c in contacts)
+            for (c in Contact.contacts())
                 contents += "\"${c.name}\" ${c.uri}\n"
-            val path = MainActivity.filesPath + "/contacts"
-            Utils.putFileContents(File(path), contents)
-            Log.d("Baresip", "Saved contacts '${contents}' to '$path")
+            Utils.putFileContents(File(path + "/contacts"), contents)
         }
 
-        fun restoreContacts(path: String) {
+        fun restoreContacts(path: String = filesPath) {
             val content = Utils.getFileContents(File(path + "/contacts"))
             Api.contacts_remove()
-            contacts.clear()
+            Contact.contacts().clear()
             content.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
                     val name = parts[1]
                     val uri = parts[2].trim()
                     Api.contact_add("\"$name\" $uri")
-                    contacts.add(Contact(name, uri))
+                    Contact.contacts().add(Contact(name, uri))
                 }
             }
         }
 
         fun findContactURI(name: String): String {
-            for (c in contacts)
+            for (c in Contact.contacts())
                 if (c.name == name)
                     return c.uri.removePrefix("<")
                             .replaceAfter(">", "")
@@ -100,13 +104,13 @@ class ContactsActivity : AppCompatActivity() {
         }
 
         fun nameExists(name: String): Boolean {
-            for (c in contacts)
+            for (c in Contact.contacts())
                 if (c.name.equals(name, ignoreCase = true)) return true
             return false
         }
 
         fun contactName(uri: String): String {
-            for (c in contacts)
+            for (c in Contact.contacts())
                 if ((Utils.uriUserPart(c.uri) == Utils.uriUserPart(uri)) &&
                         (Utils.uriHostPart(c.uri) == Utils.uriHostPart(uri)))
                     return c.name

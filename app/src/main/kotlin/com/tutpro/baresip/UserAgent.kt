@@ -4,37 +4,51 @@ import android.util.Log
 
 class UserAgent (val uap: String) {
 
-    val account = Account(ua_account(uap))
+    val account = Account(Api.ua_account(uap))
 
     fun register() {
         if (account.regint > 0) {
             Log.d("Baresip", "Registering ${account.aor} UA ${uap}")
-            if (ua_register(uap) != 0)
+            if (Api.ua_register(uap) != 0)
                 Log.e("Baresip", "Registering failed")
         }
     }
 
     fun destroy() {
-        ua_destroy(uap)
+        Api.ua_destroy(uap)
     }
 
     companion object {
 
-        external fun ua_alloc(uri: String): String
-        external fun ua_update_account(ua: String): Int
-        external fun ua_destroy(ua: String)
-        external fun ua_register(ua: String): Int
-        external fun ua_isregistered(ua: String): Boolean
-        external fun ua_unregister(ua: String)
+        fun uas(): ArrayList<UserAgent> {
+            return BaresipService.uas
+        }
+
+        fun status(): ArrayList<Int> {
+            return BaresipService.status
+        }
+
+        fun add(ua: UserAgent, status: Int) {
+            BaresipService.uas.add(ua)
+            BaresipService.status.add(status)
+        }
+
+        fun remove(ua: UserAgent) {
+            val index = BaresipService.uas.indexOf(ua)
+            if (index != -1) {
+                BaresipService.uas[index].destroy()
+                BaresipService.status.removeAt(index)
+            }
+        }
 
         fun uaAlloc(uri: String): UserAgent? {
-            val uap = ua_alloc(uri)
+            val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)
             return null
         }
 
-        fun find(uas: ArrayList<UserAgent>, uap: String): UserAgent? {
-            for (ua in uas) {
+        fun find(uap: String): UserAgent? {
+            for (ua in BaresipService.uas) {
                 if (ua.uap == uap) return ua
             }
             return null
@@ -50,12 +64,10 @@ class UserAgent (val uap: String) {
         fun register(uas: ArrayList<UserAgent>) {
             for (ua in uas) {
                 if (ua.account.regint > 0)
-                    if (ua_register(ua.uap) != 0)
+                    if (Api.ua_register(ua.uap) != 0)
                         Log.e("Baresip", "Failed to register ${ua.account.aor}")
             }
         }
     }
 }
-
-external fun ua_account(ua: String): String
 

@@ -116,28 +116,28 @@ class Account(val accp: String) {
 
         fun accounts(): ArrayList<Account> {
             val res = ArrayList<Account>()
-            for (ua in MainActivity.uas) {
+            for (ua in UserAgent.uas()) {
                 res.add(ua.account)
             }
             return res
         }
 
-        fun find(uas: ArrayList<UserAgent>, accp: String): Account? {
-            for (ua in uas) {
+        fun find(accp: String): Account? {
+            for (ua in UserAgent.uas()) {
                 if (ua.account.accp == accp) return ua.account
             }
             return null
         }
 
         fun findUa(aor: String): UserAgent? {
-            for (ua in MainActivity.uas) {
+            for (ua in UserAgent.uas()) {
                 if (ua.account.aor == aor) return ua
             }
             return null
         }
 
-        fun exists(uas: ArrayList<UserAgent>, aor: String): Boolean {
-            for (ua in uas) {
+        fun exists(aor: String): Boolean {
+            for (ua in UserAgent.uas()) {
                 if (ua.account.aor == aor) return true
             }
             return false
@@ -155,7 +155,6 @@ external fun account_auth_pass(acc: String): String
 external fun account_set_auth_pass(acc: String, pass: String): Int
 external fun account_outbound(acc: String, ix: Int): String
 external fun account_set_outbound(acc: String, ob: String, ix: Int): Int
-external fun account_sipnat(acc: String): String
 external fun account_set_sipnat(acc: String, sipnat: String): Int
 external fun account_audio_codec(acc: String, ix: Int): String
 external fun account_regint(acc: String): Int

@@ -6,6 +6,8 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.os.PowerManager
 import android.app.KeyguardManager
+import android.text.Editable
+import android.text.TextWatcher
 
 import java.io.*
 
@@ -95,9 +97,13 @@ object Utils {
     }
 
     fun friendlyUri(uri: String, domain: String): String {
-        val user = uriUserPart(uri)
-        val host = uriHostPart(uri)
-        if (host == domain) return user else return "$user@$host"
+        if (uri.contains("@")) {
+            val user = uriUserPart(uri)
+            val host = uriHostPart(uri)
+            if (host == domain) return user else return "$user@$host"
+        } else {
+            return uri
+        }
     }
 
     fun aorDomain(aor: String): String {
@@ -231,6 +237,25 @@ object Utils {
 
         Log.d("Baresip", "Now device is ${if (isLocked) "locked" else "unlocked"}")
         return isLocked
+    }
+
+    fun dtmfWatcher(callp: String): TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
+                val text = sequence.subSequence(start, start + count).toString()
+                if (text.length > 0) {
+                    val digit = text[0]
+                    Log.d("Baresip", "Got DTMF digit '$digit'")
+                    if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
+                        Api.call_send_digit(callp, digit)
+                }
+            }
+            override fun afterTextChanged(sequence: Editable) {
+                // KEYCODE_REL
+                // call_send_digit(callp, 4.toChar())
+            }
+        }
     }
 
 }

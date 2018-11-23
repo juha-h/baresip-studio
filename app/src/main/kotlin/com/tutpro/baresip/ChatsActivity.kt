@@ -30,6 +30,8 @@ class ChatsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chats)
 
+        filesPath = applicationContext.filesDir.absolutePath
+
         listView = findViewById(R.id.chats) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
@@ -67,13 +69,13 @@ class ChatsActivity: AppCompatActivity() {
                     DialogInterface.BUTTON_NEGATIVE -> {
                         val peerUri = uaMessages[pos].peerUri
                         val msgs = ArrayList<Message>()
-                        for (m in MainActivity.messages)
+                        for (m in Message.messages())
                             if ((m.aor != aor) || (m.peerUri != peerUri))
                                 msgs.add(m)
                             else
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
-                        MainActivity.messages = msgs
+                        Message.messages(msgs)
                         uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -84,8 +86,8 @@ class ChatsActivity: AppCompatActivity() {
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
             val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
-                builder.setMessage("Do you want to delete chat with peer '" +
-                        "${Utils.friendlyUri(peer, Utils.aorDomain(aor))}' or add peer to contacts?")
+                builder.setMessage("Do you want to delete chat with peer " +
+                        "${Utils.friendlyUri(peer, Utils.aorDomain(aor))} or add peer to contacts?")
                         .setPositiveButton("Cancel", dialogClickListener)
                         .setNegativeButton("Delete Chat", dialogClickListener)
                         .setNeutralButton("Add Contact", dialogClickListener)
@@ -101,7 +103,7 @@ class ChatsActivity: AppCompatActivity() {
         peerUri = findViewById(R.id.peerUri) as AutoCompleteTextView
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                ContactsActivity.contacts.map{Contact -> Contact.name}))
+                Contact.contacts().map{Contact -> Contact.name}))
 
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
@@ -143,7 +145,7 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onPause() {
-        saveMessages()
+        saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 
@@ -171,7 +173,7 @@ class ChatsActivity: AppCompatActivity() {
 
     private fun uaMessages(aor: String) : ArrayList<Message> {
         val res = ArrayList<Message>()
-        for (m in MainActivity.messages.reversed()) {
+        for (m in Message.messages().reversed()) {
             if (m.aor != aor) continue
             var found = false
             for (r in res)
@@ -186,32 +188,34 @@ class ChatsActivity: AppCompatActivity() {
 
     companion object {
 
-        fun saveUaMessage(aor: String, time: Long) {
-            for (i in MainActivity.messages.indices.reversed())
-                if ((MainActivity.messages[i].aor == aor) &&
-                        (MainActivity.messages[i].timeStamp == time)) {
-                    MainActivity.messages[i].new = false
-                    saveMessages()
+        var filesPath = ""
+
+        fun saveUaMessage(aor: String, time: Long, path: String) {
+            for (i in Message.messages().indices.reversed())
+                if ((Message.messages()[i].aor == aor) &&
+                        (Message.messages()[i].timeStamp == time)) {
+                    Message.messages()[i].new = false
+                    saveMessages(path)
                     return
                 }
         }
 
-        fun deleteUaMessage(aor: String, time: Long) {
-            for (i in MainActivity.messages.indices.reversed())
-                if ((MainActivity.messages[i].aor == aor) &&
-                        (MainActivity.messages[i].timeStamp == time)) {
-                    MainActivity.messages.removeAt(i)
-                    saveMessages()
+        fun deleteUaMessage(aor: String, time: Long, path: String) {
+            for (i in Message.messages().indices.reversed())
+                if ((Message.messages()[i].aor == aor) &&
+                        (Message.messages()[i].timeStamp == time)) {
+                    Message.messages().removeAt(i)
+                    saveMessages(path)
                     return
                 }
         }
 
-        fun saveMessages() {
-            val file = File(MainActivity.filesPath, "messages")
+        fun saveMessages(path: String = filesPath) {
+            val file = File(path, "messages")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
-                oos.writeObject(MainActivity.messages)
+                oos.writeObject(Message.messages())
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
@@ -220,15 +224,13 @@ class ChatsActivity: AppCompatActivity() {
             }
         }
 
-        fun restoreMessages(path: String) {
+        fun restoreMessages(path: String = filesPath) {
             val file = File(path, "messages")
             if (file.exists()) {
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
-                    @SuppressWarnings("unchecked")
-                    MainActivity.messages = ois.readObject() as ArrayList<Message>
-                    Log.d("Baresip", "Restored ${MainActivity.messages.size} messages")
+                    Message.messages(ois.readObject() as ArrayList<Message>)
                     ois.close()
                     fis.close()
                 } catch (e: Exception) {
@@ -236,5 +238,6 @@ class ChatsActivity: AppCompatActivity() {
                 }
             }
         }
+
     }
 }

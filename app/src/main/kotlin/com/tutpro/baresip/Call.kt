@@ -13,6 +13,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     companion object {
 
+        fun calls(): ArrayList<Call> {
+            return BaresipService.calls
+        }
+
         fun calls(calls: ArrayList<Call>, dir: String): ArrayList<Call> {
             val result = ArrayList<Call>()
             for (i in calls.indices) {
@@ -21,17 +25,24 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
             return result
         }
 
-        fun uaCalls(calls: ArrayList<Call>, ua: UserAgent, dir: String): ArrayList<Call> {
+        fun calls(dir: String): ArrayList<Call> {
             val result = ArrayList<Call>()
-            for (i in calls.indices)
-                if ((calls[i].ua == ua) && ((dir == "") || calls[i].dir == dir)) result.add(calls[i])
+            for (c in BaresipService.calls) {
+                if (c.dir == dir) result.add(c)
+            }
             return result
         }
 
-        fun find(calls: ArrayList<Call>, callp: String): Call? {
-            for (c in calls) {
+        fun uaCalls(ua: UserAgent, dir: String): ArrayList<Call> {
+            val result = ArrayList<Call>()
+            for (c in BaresipService.calls)
+                if ((c.ua == ua) && ((dir == "") || c.dir == dir)) result.add(c)
+            return result
+        }
+
+        fun find(callp: String): Call? {
+            for (c in BaresipService.calls)
                 if (c.callp == callp) return c
-            }
             return null
         }
 

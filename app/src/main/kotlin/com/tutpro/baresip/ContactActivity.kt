@@ -37,10 +37,10 @@ class ContactActivity : AppCompatActivity() {
             }
         } else {
             index = intent.extras.getInt("index")
-            val name = ContactsActivity.contacts[index].name
+            val name = Contact.contacts()[index].name
             setTitle(name)
             nameView.setText(name)
-            uriView.setText(ContactsActivity.contacts[index].uri)
+            uriView.setText(Contact.contacts()[index].uri)
         }
     }
 
@@ -63,7 +63,7 @@ class ContactActivity : AppCompatActivity() {
                         "Invalid contact name: $newName")
                 return false
             }
-            if ((new || (ContactsActivity.contacts[index].name != newName)) &&
+            if ((new || (Contact.contacts()[index].name != newName)) &&
                     ContactsActivity.nameExists(newName)) {
                 Utils.alertView(this, "Notice",
                         "Contact $newName already exists")
@@ -73,20 +73,27 @@ class ContactActivity : AppCompatActivity() {
             var newUri = uriView.text.toString().trim()
             if (!newUri.startsWith("<")) {
                 if (!newUri.startsWith("sip:")) newUri = "sip:$newUri"
-                if (!Utils.checkSipUri(newUri)) {
+                if (!Utils.checkAorUri(newUri)) {
                     Utils.alertView(this, "Notice","Invalid contact URI: $newUri")
                     return false
                 }
             }
 
             if (new) {
-                ContactsActivity.contacts.add(Contact(newName, newUri))
+                if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
+                    Utils.alertView(this,
+                            "Notice", "Maximum number of contacts exceeded")
+                    return true
+                } else {
+                    Contact.contacts().add(Contact(newName, newUri))
+                }
             } else {
-                ContactsActivity.contacts[index].uri = newUri
-                ContactsActivity.contacts[index].name = newName
+                Contact.contacts()[index].uri = newUri
+                Contact.contacts()[index].name = newName
             }
-            ContactsActivity.contacts.sortBy { Contact -> Contact.name }
-            ContactsActivity.saveContacts()
+
+            Contact.contacts().sortBy { Contact -> Contact.name }
+            ContactsActivity.saveContacts(applicationContext.filesDir.absolutePath)
 
             i.putExtra("name", newName)
             setResult(Activity.RESULT_OK, i)
@@ -104,8 +111,10 @@ class ContactActivity : AppCompatActivity() {
     }
 
     companion object {
+
         internal var index = 0
         internal var new = false
+
     }
 
 }

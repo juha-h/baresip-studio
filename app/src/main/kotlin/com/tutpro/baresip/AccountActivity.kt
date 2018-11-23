@@ -32,9 +32,9 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        acc = Account.find(MainActivity.uas, intent.extras.getString("accp"))!!
+        acc = Account.find(intent.extras.getString("accp"))!!
         aor = acc.aor
-        uaIndex = UserAgent.findAorIndex(MainActivity.uas, aor)!!
+        uaIndex = UserAgent.findAorIndex(UserAgent.uas(), aor)!!
 
         setTitle(aor.replace("sip:", ""))
 
@@ -220,7 +220,7 @@ class AccountActivity : AppCompatActivity() {
                 if (acc.regint != 3600) newRegint = 3600
             } else {
                 if (acc.regint != 0) {
-                    UserAgent.ua_unregister(MainActivity.uas[uaIndex].uap)
+                    Api.ua_unregister(UserAgent.uas()[uaIndex].uap)
                     newRegint = 0
                 }
             }
@@ -285,20 +285,18 @@ class AccountActivity : AppCompatActivity() {
 
             if (save) {
                 AccountsActivity.saveAccounts()
-                if (UserAgent.ua_update_account(MainActivity.uas[uaIndex].uap) != 0)
+                if (Api.ua_update_account(UserAgent.uas()[uaIndex].uap) != 0)
                     Log.e("Baresip", "Failed to update UA with AoR $aor")
             }
 
-            if (regCheck.isChecked) UserAgent.ua_register(MainActivity.uas[uaIndex].uap)
+            if (regCheck.isChecked) Api.ua_register(UserAgent.uas()[uaIndex].uap)
 
-            setResult(RESULT_OK, intent)
             finish()
             return true
 
         } else if (item.itemId == android.R.id.home) {
 
             Log.d("Baresip", "Back array was pressed at Account")
-            setResult(RESULT_CANCELED, intent)
             finish()
             return true
 

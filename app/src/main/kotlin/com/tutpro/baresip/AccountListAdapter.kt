@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,22 +29,21 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         aorView.setOnClickListener { _ ->
             val i = Intent(cxt, AccountActivity::class.java)
             val b = Bundle()
-            b.putString("accp", MainActivity.uas[position].account.accp)
+            b.putString("accp", UserAgent.uas()[position].account.accp)
             i.putExtras(b)
-            cxt.startActivity(i)
+            (cxt as Activity).startActivity(i)
         }
+        val ua = UserAgent.uas()[position]
         val actionView = rowView.findViewById(R.id.action) as ImageButton
         actionView.setImageResource(row.action)
         actionView.setOnClickListener { _ ->
             Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
-            deleteDialog.setMessage("Do you want to delete account ${MainActivity.uas[position].account.aor}?")
+            deleteDialog.setMessage("Do you want to delete account ${ua.account.aor}?")
             deleteDialog.setPositiveButton("Delete") { dialog, _ ->
-                MainActivity.uas[position].destroy()
-                MainActivity.uas.remove(MainActivity.uas[position])
-                MainActivity.images.removeAt(position)
-                AccountsActivity.saveAccounts()
+                UserAgent.remove(ua)
                 AccountsActivity.generateAccounts()
+                AccountsActivity.saveAccounts()
                 this.notifyDataSetChanged()
                 dialog.dismiss()
             }
