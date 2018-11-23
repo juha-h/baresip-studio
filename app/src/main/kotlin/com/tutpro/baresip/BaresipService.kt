@@ -218,7 +218,7 @@ class BaresipService: Service() {
 
     @Keep
     fun uaAdd(uap: String) {
-        Log.d(LOG_TAG, "addUA at BaresipService")
+        Log.d(LOG_TAG, "uaAdd at BaresipService")
         val ua = UserAgent(uap)
         uas.add(ua)
         if (Api.ua_isregistered(uap)) {
@@ -641,6 +641,7 @@ class BaresipService: Service() {
         var isServiceRunning = false
         var disconnected = false
         var forceStop = false
+        var libraryLoaded = false
 
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
@@ -655,7 +656,10 @@ class BaresipService: Service() {
     }
 
     init {
-        Log.d(LOG_TAG, "Loading baresip library")
-        System.loadLibrary("baresip")
+        if (!libraryLoaded) {
+            Log.d("Baresip", "Loading baresip library")
+            System.loadLibrary("baresip")
+            libraryLoaded = true
+        }
     }
 }
