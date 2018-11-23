@@ -45,7 +45,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 Log.e("Baresip", "onClickListener did not find AoR $aor")
                             } else {
                                 i.putExtra("uap", ua.uap)
-                                i.putExtra("peer", ContactsActivity.contacts[pos].uri)
+                                i.putExtra("peer", Contact.contacts()[pos].uri)
                                 (cxt as Activity).startActivity(i)
                             }
                         }
@@ -55,7 +55,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
                 builder.setMessage("Do you want to call or send message to '" +
-                        "${ContactsActivity.contacts[pos].name}'?")
+                        "${Contact.contacts()[pos].name}'?")
                         .setNeutralButton("Call", dialogClickListener)
                         .setNegativeButton("Send Message", dialogClickListener)
                         .setPositiveButton("Cancel", dialogClickListener)
@@ -66,7 +66,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEGATIVE -> {
-                        ContactsActivity.contacts.removeAt(pos)
+                        Contact.contacts().removeAt(pos)
                         ContactsActivity.saveContacts()
                         this.notifyDataSetChanged()
                     }
@@ -76,7 +76,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
             builder.setMessage("Do you want to delete contact '" +
-                    "${ContactsActivity.contacts[pos].name}'?")
+                    "${Contact.contacts()[pos].name}'?")
                     .setPositiveButton("Cancel", dialogClickListener)
                     .setNegativeButton("Delete Contact", dialogClickListener)
                     .show()

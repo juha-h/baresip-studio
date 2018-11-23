@@ -13,17 +13,20 @@ import java.util.ArrayList
 
 class AccountsActivity : AppCompatActivity() {
 
-    internal var aor: String = ""
     internal lateinit var alAdapter: AccountListAdapter
+
+    internal var aor = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
 
-        val listview = findViewById(R.id.accounts) as ListView
+        filesPath = applicationContext.filesDir.absolutePath
+
+        val listView = findViewById(R.id.accounts) as ListView
         generateAccounts()
         alAdapter = AccountListAdapter(this, accounts)
-        listview.adapter = alAdapter
+        listView.adapter = alAdapter
 
         val addAccountButton = findViewById(R.id.addAccount) as ImageButton
         val newAorView = findViewById(R.id.newAor) as EditText
@@ -34,7 +37,7 @@ class AccountsActivity : AppCompatActivity() {
                 Log.e("Baresip", "Invalid SIP Address of Record $aor")
                 Utils.alertView(this, "Notice",
                         "Invalid SIP Address of Record: $aor")
-            } else if (Account.exists(MainActivity.uas, aor)) {
+            } else if (Account.exists(aor)) {
                 Log.e("Baresip", "Account $aor already exists")
             } else {
                 val ua = UserAgent.uaAlloc("<$aor>;regq=0.5;pubint=0;regint=0")
@@ -46,8 +49,7 @@ class AccountsActivity : AppCompatActivity() {
                     newAorView.setText("")
                     newAorView.hint = "SIP URI user@domain"
                     newAorView.clearFocus()
-                    MainActivity.uas.add(ua)
-                    MainActivity.images.add(R.drawable.dot_yellow)
+                    UserAgent.add(ua, R.drawable.dot_yellow)
                     generateAccounts()
                     alAdapter.notifyDataSetChanged()
                     saveAccounts()
@@ -56,9 +58,17 @@ class AccountsActivity : AppCompatActivity() {
                     b.putString("accp", ua.account.accp)
                     i.putExtras(b)
                     startActivity(i)
-                    // recreate()
                 }
             }
+        }
+
+        val accp = intent.extras.getString("accp")
+        if (accp != "") {
+            val i = Intent(this, AccountActivity::class.java)
+            val b = Bundle()
+            b.putString("accp", accp)
+            i.putExtras(b)
+            startActivity(i)
         }
     }
 
@@ -76,11 +86,13 @@ class AccountsActivity : AppCompatActivity() {
 
     companion object {
 
+        internal var filesPath = ""
+
         var accounts = ArrayList<AccountRow>()
 
         fun generateAccounts() {
             accounts.clear()
-            for (ua in MainActivity.uas)
+            for (ua in UserAgent.uas())
                 accounts.add(AccountRow(ua.account.aor.replace("sip:", ""),
                         R.drawable.action_remove))
         }
@@ -88,9 +100,8 @@ class AccountsActivity : AppCompatActivity() {
         fun saveAccounts() {
             var accounts = ""
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
-            val path = MainActivity.filesPath + "/accounts"
-            Utils.putFileContents(File(path), accounts)
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '$path")
+            Utils.putFileContents(File(filesPath + "/accounts"), accounts)
+            // Log.d("Baresip", "Saved accounts '${accounts}' to '${filesPath}/accounts")
         }
     }
 

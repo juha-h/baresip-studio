@@ -82,7 +82,7 @@ class ChatActivity : AppCompatActivity() {
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
-                        MainActivity.messages.remove(chatMessages[pos])
+                        Message.messages().remove(chatMessages[pos])
                         chatMessages.removeAt(pos)
                         mlAdapter.notifyDataSetChanged()
                         if (chatMessages.size == 0) {
@@ -118,10 +118,10 @@ class ChatActivity : AppCompatActivity() {
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val time = System.currentTimeMillis()
                 val msg = Message(aor, peerUri, R.drawable.arrow_up_yellow, msgText, time,true)
-                MainActivity.messages.add(msg)
+                Message.add(msg)
                 chatMessages.add(msg)
                 mlAdapter.notifyDataSetChanged()
-                if (message_send(ua!!.uap, peerUri, msgText, time.toString()) != 0)
+                if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0)
                     Toast.makeText(getApplicationContext(), "Sending of message failed!",
                             Toast.LENGTH_SHORT).show()
                 else
@@ -146,7 +146,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        ChatsActivity.saveMessages()
+        ChatsActivity.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 
@@ -169,7 +169,7 @@ class ChatActivity : AppCompatActivity() {
                         Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 intent.putExtra("action", "call")
                 intent.putExtra("uap", ua.uap)
-                intent.putExtra("peer", ContactsActivity.contactName(peerUri))
+                intent.putExtra("peer", peerUri)
                 startActivity(intent)
             }
         }
@@ -185,7 +185,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun uaPeerMessages(aor: String, peerUri: String): ArrayList<Message> {
         val res = ArrayList<Message>()
-        for (m in MainActivity.messages)
+        for (m in Message.messages())
             if ((m.aor == aor) && (m.peerUri == peerUri)) res.add(m)
         return res
     }
@@ -202,7 +202,5 @@ class ChatActivity : AppCompatActivity() {
                 return
             }
     }
-
-    external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
 
 }

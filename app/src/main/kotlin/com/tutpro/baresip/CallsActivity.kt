@@ -11,12 +11,6 @@ import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 
 import java.text.SimpleDateFormat
 import java.util.ArrayList
@@ -120,7 +114,12 @@ class CallsActivity : AppCompatActivity() {
             true
         }
 
-        ua!!.account.missedCalls = false
+        ua.account.missedCalls = false
+    }
+
+    override fun onPause() {
+        CallHistory.save(applicationContext.filesDir.absolutePath)
+        super.onPause()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -137,8 +136,8 @@ class CallsActivity : AppCompatActivity() {
 
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
-        for (i in MainActivity.history.indices.reversed()) {
-            val h = MainActivity.history[i]
+        for (i in CallHistory.history().indices.reversed()) {
+            val h = CallHistory.history()[i]
             if (h.aor == aor) {
                 var direction: Int
                 if (h.direction == "in")
@@ -171,7 +170,7 @@ class CallsActivity : AppCompatActivity() {
 
     private fun removeUaHistoryAt(i: Int) {
         for (index in uaHistory[i].indexes)
-            MainActivity.history.removeAt(index)
+            CallHistory.history().removeAt(index)
         uaHistory.removeAt(i)
     }
 
@@ -182,38 +181,4 @@ class CallsActivity : AppCompatActivity() {
                 now.get(Calendar.DAY_OF_MONTH) == time.get(Calendar.DAY_OF_MONTH)
     }
 
-    companion object {
-
-        fun saveHistory() {
-            val file = File(MainActivity.filesPath, "history")
-            try {
-                val fos = FileOutputStream(file)
-                val oos = ObjectOutputStream(fos)
-                oos.writeObject(MainActivity.history)
-                oos.close()
-                fos.close()
-            } catch (e: IOException) {
-                Log.w("Baresip", "OutputStream exception: " + e.toString())
-                e.printStackTrace()
-            }
-        }
-
-        fun restoreHistory(path: String) {
-            val file = File(path + "/history")
-            if (file.exists()) {
-                try {
-                    val fis = FileInputStream(file)
-                    val ois = ObjectInputStream(fis)
-                    @SuppressWarnings("unchecked")
-                    MainActivity.history = ois.readObject() as ArrayList<CallHistory>
-                    Log.d("Baresip", "Restored History of ${MainActivity.history.size} entries")
-                    ois.close()
-                    fis.close()
-                } catch (e: Exception) {
-                    Log.w("Baresip", "InputStream exception: - " + e.toString())
-                }
-            }
-
-        }
-    }
 }

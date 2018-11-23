@@ -700,7 +700,7 @@ Java_com_tutpro_baresip_AccountKt_account_1sipnat(JNIEnv *env, jobject thiz, jst
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1set_1sipnat(JNIEnv *env, jobject thiz,
-                                                         jstring javaAcc, jstring javaSipNat) {
+                                                       jstring javaAcc, jstring javaSipNat) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
@@ -716,7 +716,7 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1sipnat(JNIEnv *env, jobject thiz
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1set_1mwi(JNIEnv *env, jobject thiz,
-                                                              jstring javaAcc, jstring javaValue) {
+                                                    jstring javaAcc, jstring javaValue) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
@@ -748,8 +748,7 @@ Java_com_tutpro_baresip_AccountKt_account_1vm_1uri(JNIEnv *env, jobject thiz, js
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1alloc(JNIEnv *env, jobject thiz,
-                                                           jstring javaUri) {
+Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring javaUri) {
     const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
@@ -762,8 +761,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1alloc(JNIEnv *env, jobject 
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1register(JNIEnv *env, jobject thiz,
-                                                              jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -772,8 +770,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1register(JNIEnv *env, jobje
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1unregister(JNIEnv *env, jobject thiz,
-                                                                jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -782,8 +779,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1unregister(JNIEnv *env, job
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1isregistered(JNIEnv *env, jobject thiz,
-                                                                  jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -792,8 +788,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1isregistered(JNIEnv *env, j
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1update_1account(JNIEnv *env, jobject thiz,
-                                                                    jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -802,8 +797,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1update_1account(JNIEnv *env
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1destroy(JNIEnv *env, jobject thiz,
-                                                             jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -812,7 +806,7 @@ Java_com_tutpro_baresip_UserAgent_00024Companion_ua_1destroy(JNIEnv *env, jobjec
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_UserAgentKt_ua_1account(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -828,8 +822,7 @@ Java_com_tutpro_baresip_UserAgentKt_ua_1account(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_uag_1current_1set(JNIEnv *env, jobject thiz,
-                                                       jstring javaUA)
+Java_com_tutpro_baresip_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring javaUA)
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
@@ -849,9 +842,47 @@ Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring jav
     return (*env)->NewStringUTF(env, call_peeruri(call));
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
+                                              jchar digit) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    const uint16_t native_digit = digit;
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
+    re_thread_enter();
+    int res = call_send_digit(call, (char)native_digit);
+    if (!res) res = call_send_digit(call, KEYCODE_REL);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
+                                                jstring javaUA, jstring javaCall, jint code,
+                                                jstring reason) {
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    const uint16_t native_code = code;
+    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
+    LOGD("hanging up call %s/%s\n", native_ua, native_call);
+    re_thread_enter();
+    if (strlen(native_reason) == 0)
+        ua_hangup(ua, call, native_code, NULL);
+    else
+        ua_hangup(ua, call, native_code, native_reason);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
+    return;
+}
+
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1connect(JNIEnv *env, jobject thiz,
-                                                jstring javaUA, jstring javaURI) {
+Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaUA,
+                                        jstring javaURI) {
     struct call *call;
     struct ua *ua;
     int err;
@@ -875,8 +906,8 @@ Java_com_tutpro_baresip_MainActivity_ua_1connect(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1call_1alloc(JNIEnv *env, jobject thiz,
-                                                 jstring javaUA, jstring javaXCall) {
+Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
+                                            jstring javaXCall) {
     struct call *xcall, *call = NULL;
     struct ua *ua;
     int err;
@@ -901,8 +932,8 @@ Java_com_tutpro_baresip_MainActivity_ua_1call_1alloc(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
-                                                jstring javaUA, jstring javaCall) {
+Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA,
+                                       jstring javaCall) {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     LOGD("answering call %s/%s\n", native_ua, native_call);
@@ -918,8 +949,8 @@ Java_com_tutpro_baresip_MainActivity_ua_1answer(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
-                                                   jstring javaPeer) {
+Java_com_tutpro_baresip_Api_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
+                                          jstring javaPeer) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
@@ -936,7 +967,23 @@ Java_com_tutpro_baresip_MainActivity_call_1connect(JNIEnv *env, jobject thiz, js
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1start_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Api_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jstring javaCall,
+                                                  jint code, jstring reason) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    const uint16_t native_code = code;
+    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
+    LOGD("notifying call %s/%s\n", native_call, native_reason);
+    re_thread_enter();
+    (void)call_notify_sipfrag(call, native_code, native_reason);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
+    return;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_call_1start_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("starting audio of call %s\n", native_call);
@@ -949,7 +996,7 @@ Java_com_tutpro_baresip_MainActivity_call_1start_1audio(JNIEnv *env, jobject thi
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Api_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("stopping audio of call %s\n", native_call);
@@ -962,8 +1009,7 @@ Java_com_tutpro_baresip_MainActivity_call_1stop_1audio(JNIEnv *env, jobject thiz
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
-                                                jstring javaCall) {
+Java_com_tutpro_baresip_Api_call_1hold(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     int ret;
@@ -979,7 +1025,7 @@ Java_com_tutpro_baresip_MainActivity_call_1hold(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Api_call_1unhold(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     int ret;
@@ -994,48 +1040,9 @@ Java_com_tutpro_baresip_MainActivity_call_1unhold(JNIEnv *env, jobject thiz, jst
     return ret;
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_ua_1hangup(JNIEnv *env, jobject thiz,
-                                                jstring javaUA, jstring javaCall, jint code,
-                                                jstring reason) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    const uint16_t native_code = code;
-    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("hanging up call %s/%s\n", native_ua, native_call);
-    re_thread_enter();
-    if (strlen(native_reason) == 0)
-        ua_hangup(ua, call, native_code, NULL);
-    else
-        ua_hangup(ua, call, native_code, native_reason);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
-    return;
-}
-
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1send_1digit(JNIEnv *env, jobject thiz,
-                                                  jstring javaCall, jchar digit) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    const uint16_t native_digit = digit;
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
-    re_thread_enter();
-    int res = call_send_digit(call, (char)native_digit);
-    if (!res) res = call_send_digit(call, KEYCODE_REL);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return res;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_ChatActivity_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
-                                                      jstring javaPeer, jstring javaMsg,
-                                                      jstring javaTime) {
+Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
+                                          jstring javaPeer, jstring javaMsg, jstring javaTime) {
     struct ua *ua;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
@@ -1055,24 +1062,8 @@ Java_com_tutpro_baresip_ChatActivity_message_1send(JNIEnv *env, jobject thiz, js
     return err;
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_MainActivity_call_1notify_1sipfrag(JNIEnv *env, jobject thiz,
-                                                jstring javaCall, jint code, jstring reason) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    const uint16_t native_code = code;
-    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("notifying call %s/%s\n", native_call, native_reason);
-    re_thread_enter();
-    (void)call_notify_sipfrag(call, native_code, native_reason);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
-    return;
-}
-
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_MainActivity_reload_1config(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz) {
     int err;
     err = conf_configure();
     if (err) {

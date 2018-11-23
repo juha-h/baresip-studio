@@ -7,10 +7,10 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
+
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -27,8 +27,7 @@ class EditConfigActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_config)
 
         editText = findViewById(R.id.editConfig) as EditText
-        path = applicationContext.filesDir.absolutePath + "/config"
-        // path = "/sdcard/baresip/config";
+        path = "${applicationContext.filesDir.absolutePath}/config"
         file = File(path!!)
         var content: String
 
