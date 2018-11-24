@@ -239,8 +239,6 @@ class BaresipService: Service() {
     fun uaEvent(event: String, uap: String, callp: String) {
         Log.d(LOG_TAG, "uaEvent got event $event/$uap/$callp")
         if (!isServiceRunning) return
-        if (event == "exit")
-            return
         val ua = UserAgent.find(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "uaEvent did not find ua $uap")

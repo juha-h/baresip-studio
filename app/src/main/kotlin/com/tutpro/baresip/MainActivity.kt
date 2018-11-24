@@ -22,6 +22,7 @@ import android.text.TextWatcher
 import android.widget.RelativeLayout
 import android.widget.*
 import android.view.*
+
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -138,6 +139,9 @@ class MainActivity : AppCompatActivity() {
             if (event.action == MotionEvent.ACTION_DOWN) {
                 if (aorSpinner.selectedItemPosition == -1) {
                     val i = Intent(this, AccountsActivity::class.java)
+                    val b = Bundle()
+                    b.putString("accp", "")
+                    i.putExtras(b)
                     startActivityForResult(i, ACCOUNTS_CODE)
                     true
                 } else {

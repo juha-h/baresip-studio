@@ -154,9 +154,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_AUDIO_ERROR:
             mem_deref(call);
             return;
-        case UA_EVENT_EXIT:
-            re_snprintf(event_buf, sizeof event_buf, "%s", "exit");
-            break;
         default:
             return;
     }
@@ -419,6 +416,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     if (err) {
         LOGE("stopping UAs due to error: (%d)\n", err);
         ua_stop_all(true);
+    } else {
+        LOGI("main loop exit\n");
     }
 
     play = mem_deref(play);
