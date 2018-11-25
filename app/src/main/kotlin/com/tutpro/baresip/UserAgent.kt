@@ -54,15 +54,15 @@ class UserAgent (val uap: String) {
             return null
         }
 
-        fun findAorIndex(uas: ArrayList<UserAgent>, aor: String): Int? {
-            for (i in uas.indices) {
-                if (uas[i].account.aor == aor) return i
+        fun findAorIndex(aor: String): Int? {
+            for (i in BaresipService.uas.indices) {
+                if (BaresipService.uas[i].account.aor == aor) return i
             }
             return null
         }
 
-        fun register(uas: ArrayList<UserAgent>) {
-            for (ua in uas) {
+        fun register() {
+            for (ua in BaresipService.uas) {
                 if (ua.account.regint > 0)
                     if (Api.ua_register(ua.uap) != 0)
                         Log.e("Baresip", "Failed to register ${ua.account.aor}")

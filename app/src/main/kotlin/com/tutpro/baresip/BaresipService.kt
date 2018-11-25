@@ -15,10 +15,11 @@ import android.support.v4.app.NotificationCompat
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
-import java.io.File
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
+
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
@@ -38,7 +39,6 @@ class BaresipService: Service() {
 
     internal var rtTimer: Timer? = null
     internal var filesPath = ""
-    internal var restarting = false
 
     override fun onCreate() {
 
@@ -72,7 +72,7 @@ class BaresipService: Service() {
                     if (isConnected) {
                         Log.d(LOG_TAG, "Network is connected/connecting")
                         if (disconnected) {
-                            UserAgent.register(uas)
+                            UserAgent.register()
                             disconnected = false
                         }
                     } else {
@@ -166,13 +166,13 @@ class BaresipService: Service() {
                 updateStatusNotification()
             }
 
-            "Stop" -> {
-                stop()
+            "Stop", "Stop Force" -> {
+                if (action == "Stop") cleanService()
+                if (isServiceRunning) baresipStop(action == "Stop Force")
             }
 
             "Kill" -> {
-                restarting = true
-                stop()
+                stopped()
             }
         }
 
@@ -184,11 +184,11 @@ class BaresipService: Service() {
     }
 
     override fun onDestroy() {
-        Log.d(LOG_TAG, "In onDestroy")
+        Log.d(LOG_TAG, "In onDestroy restart baresip killed by Android")
         super.onDestroy()
-        Log.i(LOG_TAG, "Restart baresip killed by Android")
-        restarting = true
-        stop()
+        cleanService()
+        val broadcastIntent = Intent("com.tutpro.baresip.Restart")
+        sendBroadcast(broadcastIntent)
     }
 
     private fun createNotificationChannels() {
@@ -337,13 +337,13 @@ class BaresipService: Service() {
                             if (rt.isPlaying) rt.stop()
                         }
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus( AudioManager.STREAM_VOICE_CALL)
+                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                         am.isSpeakerphoneOn = false
                     }
                     "call transfer" -> {
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.d("Baresip","AoR $aor call $callp to be transferred is not found")
+                            Log.d("Baresip", "AoR $aor call $callp to be transferred is not found")
                             return
                         }
                         if (!Utils.isVisible()) {
@@ -388,7 +388,7 @@ class BaresipService: Service() {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.d("Baresip","AoR $aor call $callp that is closed is not found")
+                            Log.d("Baresip", "AoR $aor call $callp that is closed is not found")
                             return
                         }
                         Log.d("Baresip", "AoR $aor call $callp is closed")
@@ -501,7 +501,7 @@ class BaresipService: Service() {
 
     @Keep
     fun stopped() {
-        Log.d(LOG_TAG, "got event 'stopped'")
+        Log.d(LOG_TAG, "'stopped' from baresip or 'Kill' from MainActivity")
         isServiceRunning = false
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")
@@ -509,12 +509,11 @@ class BaresipService: Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         stopForeground(true)
         stopSelf()
-        if (restarting) restart()
     }
 
     private fun updateStatusNotification() {
         val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
-        for (i: Int in 0 .. 5)  {
+        for (i: Int in 0..5) {
             val resID = resources.getIdentifier("status$i", "id", packageName)
             if (i < status.size) {
                 contentView.setImageViewResource(resID, status[i])
@@ -598,7 +597,7 @@ class BaresipService: Service() {
         }
     }
 
-    private fun stop() {
+    private fun cleanService() {
         uas.clear()
         status.clear()
         history.clear()
@@ -611,17 +610,6 @@ class BaresipService: Service() {
         if (this::nm.isInitialized) nm.cancelAll()
         if (this::wl.isInitialized && wl.isHeld) wl.release()
         if (this::fl.isInitialized && fl.isHeld) fl.release()
-        if (isServiceRunning) {
-            baresipStop(forceStop)
-            if (!forceStop) forceStop = true
-        } else if (restarting)
-            restart()
-    }
-
-    private fun restart() {
-        restarting = false
-        val broadcastIntent = Intent("com.tutpro.baresip.Restart")
-        sendBroadcast(broadcastIntent)
     }
 
     external fun baresipStart(path: String)
@@ -638,7 +626,6 @@ class BaresipService: Service() {
 
         var isServiceRunning = false
         var disconnected = false
-        var forceStop = false
         var libraryLoaded = false
 
         var uas = ArrayList<UserAgent>()

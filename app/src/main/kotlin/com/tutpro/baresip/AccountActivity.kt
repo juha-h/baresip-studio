@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout.LayoutParams
 import android.widget.*
+
 import kotlinx.android.synthetic.main.activity_account.*
 
 class AccountActivity : AppCompatActivity() {
@@ -34,7 +35,7 @@ class AccountActivity : AppCompatActivity() {
 
         acc = Account.find(intent.extras.getString("accp"))!!
         aor = acc.aor
-        uaIndex = UserAgent.findAorIndex(UserAgent.uas(), aor)!!
+        uaIndex = UserAgent.findAorIndex(aor)!!
 
         setTitle(aor.replace("sip:", ""))
 
