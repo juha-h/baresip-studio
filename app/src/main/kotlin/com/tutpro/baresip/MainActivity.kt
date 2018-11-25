@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.*
+import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
@@ -50,6 +51,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var serviceEventReceiver: BroadcastReceiver
+    internal lateinit var quitTimer: CountDownTimer
+    internal lateinit var stopState: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -95,6 +98,27 @@ class MainActivity : AppCompatActivity() {
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
                 IntentFilter("service event"))
+
+        stopState = "initial"
+        quitTimer = object: CountDownTimer(5000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                Log.d("Baresip", "seconds remaining: ${millisUntilFinished/1000}")
+            }
+            override fun onFinish() {
+                when (stopState) {
+                    "initial" -> {
+                        baresipService.setAction("Stop Force");
+                        startService(baresipService)
+                        stopState = "force"
+                        quitTimer.start()
+                    }
+                    "force" -> {
+                        baresipService.setAction("Kill");
+                        startService(baresipService)
+                    }
+                }
+            }
+        }
 
         if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -378,6 +402,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (event == "stopped") {
             Log.d("Baresip", "Handling service event 'stopped'")
+            quitTimer.cancel()
             finishAndRemoveTask()
             System.exit(0)
             return
@@ -814,10 +839,16 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.quit -> {
-                Log.d("Baresip", "Quiting")
-                if (BaresipService.isServiceRunning) {
-                    baresipService.setAction("Stop");
-                    startService(baresipService)
+                if (stopState == "initial") {
+                    Log.d("Baresip", "Quiting")
+                    if (BaresipService.isServiceRunning) {
+                        baresipService.setAction("Stop");
+                        startService(baresipService)
+                        quitTimer.start()
+                    } else {
+                        finishAndRemoveTask()
+                        System.exit(0)
+                    }
                 }
                 return true
             }
