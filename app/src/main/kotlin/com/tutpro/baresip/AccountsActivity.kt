@@ -40,7 +40,7 @@ class AccountsActivity : AppCompatActivity() {
             } else if (Account.exists(aor)) {
                 Log.e("Baresip", "Account $aor already exists")
             } else {
-                val ua = UserAgent.uaAlloc("<$aor>;regq=0.5;pubint=0;regint=0")
+                val ua = UserAgent.uaAlloc("<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {
                     Log.e("Baresip", "Failed to allocate UA for $aor")
                     Utils.alertView(this, "Notice",
@@ -101,7 +101,7 @@ class AccountsActivity : AppCompatActivity() {
             var accounts = ""
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             Utils.putFileContents(File(filesPath + "/accounts"), accounts)
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '${filesPath}/accounts")
+            // Log.d("Baresip", "Saved accounts '${accounts}' to '${filesPath}/accounts'")
         }
     }
 

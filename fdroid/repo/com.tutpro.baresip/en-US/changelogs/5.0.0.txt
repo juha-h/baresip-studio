@@ -1,0 +1,6 @@
+- Replaced text mode EditConfigActivity with graphical Config activity
+- Current configuration items are Auto Start, DNS Servers, Opus Bit Rate,
+  and ICE Lite
+- Added ICE and Stun Server account options
+- Fixed bug in deleting of an account
+- Updated libbaresip.a and baresip.h to latest baresip master

@@ -36,7 +36,7 @@ class UserAgent (val uap: String) {
         fun remove(ua: UserAgent) {
             val index = BaresipService.uas.indexOf(ua)
             if (index != -1) {
-                BaresipService.uas[index].destroy()
+                BaresipService.uas.removeAt(index)
                 BaresipService.status.removeAt(index)
             }
         }

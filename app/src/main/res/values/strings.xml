@@ -5,9 +5,8 @@
         <b>Baresip based Android application</b>\n\n
         Juha Heinanen jh@tutpro.com\n\n
         <b>Usage Hints</b>\n\n
-        - start by creating an account (click item titles for help)\n
-        - usually there is no need to edit the config\n
-        - in config, dns_server by default points to 8.8.8.8:53 for Android 8+ usage\n
+        - check that config default values meet your needs (click item titles for help)\n
+        - then create one or more accounts (again click item titles for help)\n
         - peers of calls and messages can be added to contacts by long clicks\n
         - long clicks can also be used to remove calls, chats, messages, and contacts\n
         - call click when callee has not been given can be used for re-dial\n
@@ -25,6 +24,13 @@
     <string name="register">If checked, registration is enabled and REGISTER requests are sent at
         12 minute intervals.
     </string>
+    <string name="ice">If checked, ICE (Interactive Connectivity Establishment) is enabled for NAT
+        traversal.
+    </string>
+    <string name="stunServer">A specific Stun Server used by ICE of form host[:port].
+        Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
+        Username and password are currently not supported.
+    </string>
     <string name="auCodecs">List of supported audio codecs in priority order.</string>
     <string name="mediaEnc">Selects media transport encryption protocol.\n
         ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
@@ -41,5 +47,10 @@
     <string name="vmUri">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
     </string>>
-    <string name="title_activity_message">MessageActivity</string>
+    <string name="autoStart">If checked, baresip starts automatically after device (re)start.</string>
+    <string name="dnsServers">Comma separated list of DNS servers.  Each DNS server is of form
+        server:port. Factory default value is \'8.8.8.8:53\' pointing to public Google DNS server.</string>
+    <string name="opusBitRate">Average maximum bit rate used by Opus audio stream.
+        Valid value are 6000-510000. Factory default is 28000.</string>
+    <string name="iceLite">If checked, ICE Lite Mode is used.</string>
 </resources>

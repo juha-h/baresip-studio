@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -67,8 +66,8 @@
             android:parentActivityName=".ContactsActivity" >
         </activity>
         <activity
-            android:name=".EditConfigActivity"
-            android:label="Edit Config"
+            android:name=".ConfigActivity"
+            android:label="Config"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity

@@ -7,15 +7,25 @@ class Account(val accp: String) {
     var authUser = account_auth_user(accp)
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
+    var mediaNat = account_medianat(accp)
+    var stunServer = ""
     var audioCodec = ArrayList<String>()
     var regint = account_regint(accp)
-    var mediaenc = account_mediaenc(accp)
+    var mediaEnc = account_mediaenc(accp)
     var vmUri = account_vm_uri(accp)
     var vmNew = 0
     var vmOld = 0
     var missedCalls = false
 
     init {
+        val stunHost = account_stun_host(accp)
+        if (stunHost != "") {
+            val stunPort = account_stun_port(accp)
+            if (stunPort == 0)
+                stunServer = stunHost
+            else
+                stunServer = "$stunHost:$stunPort"
+        }
         var i = 0
         while (true) {
             val ob = account_outbound(accp, i)
@@ -59,6 +69,10 @@ class Account(val accp: String) {
             res = res + ";sipnat=outbound"
         }
 
+        if (mediaNat != "") res = res + ";medianat=${mediaNat}"
+
+        if (stunServer != "") res = res + ";stunserver=\"stun:@${stunServer}\""
+
         if (audioCodec.size > 0) {
             var first = true
             res = res + ";audio_codecs="
@@ -71,7 +85,7 @@ class Account(val accp: String) {
                 }
         }
 
-        if (mediaenc != "") res = res + ";mediaenc=${mediaenc}"
+        if (mediaEnc != "") res = res + ";mediaenc=${mediaEnc}"
 
         if (vmUri == "")
             res = res + ";mwi=no"
@@ -159,8 +173,14 @@ external fun account_set_sipnat(acc: String, sipnat: String): Int
 external fun account_audio_codec(acc: String, ix: Int): String
 external fun account_regint(acc: String): Int
 external fun account_set_regint(acc: String, regint: Int): Int
+external fun account_stun_host(acc: String): String
+external fun account_stun_port(acc: String): Int
+external fun account_set_stun_host(acc: String, host: String): Int
+external fun account_set_stun_port(acc: String, port: Int): Int
 external fun account_mediaenc(acc: String): String
-external fun account_set_mediaenc(acc: String, mencid: String): Int
+external fun account_set_mediaenc(acc: String, mediaenc: String): Int
+external fun account_medianat(acc: String): String
+external fun account_set_medianat(acc: String, medianat: String): Int
 external fun account_set_audio_codecs(acc: String, codecs: String): Int
 external fun account_set_mwi(acc: String, value: String): Int
 external fun account_vm_uri(acc: String): String

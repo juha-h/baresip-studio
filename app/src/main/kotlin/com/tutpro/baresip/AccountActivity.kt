@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -21,6 +20,8 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var authPass: EditText
     internal lateinit var outbound1: EditText
     internal lateinit var outbound2: EditText
+    internal lateinit var iceCheck: CheckBox
+    internal lateinit var stunServer: EditText
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
     internal lateinit var vmUri: EditText
@@ -55,6 +56,16 @@ class AccountActivity : AppCompatActivity() {
             if (acc.outbound.size > 1)
                 outbound2.setText(acc.outbound[1])
         }
+
+        iceCheck = findViewById(R.id.Ice) as CheckBox
+        iceCheck.isChecked = acc.mediaNat == "ice"
+        iceCheck.setOnClickListener {
+            stunServer.isEnabled = iceCheck.isChecked
+        }
+
+        stunServer = findViewById(R.id.StunServer) as EditText
+        stunServer.setText(acc.stunServer)
+        stunServer.isEnabled = iceCheck.isChecked
 
         regCheck = findViewById(R.id.Register) as CheckBox
         regCheck.isChecked = acc.regint > 0
@@ -95,15 +106,15 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        mediaEnc = acc.mediaenc
+        mediaEnc = acc.mediaEnc
         val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
         val mediaEncKeys = arrayListOf("zrtp", "dtls_srtpf", "srtp-mand", "srtp", "")
         val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MAND", "SRTP", "")
-        val keyIx = mediaEncKeys.indexOf(acc.mediaenc)
+        val keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
         val keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)
         mediaEncVals.removeAt(keyIx)
-        mediaEncKeys.add(0, acc.mediaenc)
+        mediaEncKeys.add(0, acc.mediaEnc)
         mediaEncVals.add(0, keyVal)
         val mediaEncAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
                 mediaEncVals)
@@ -130,8 +141,6 @@ class AccountActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val intent = Intent(this, MainActivity::class.java)
 
         if (item.itemId == R.id.checkIcon) {
             
@@ -170,7 +179,7 @@ class AccountActivity : AppCompatActivity() {
 
             val ap = authPass.text.toString().trim()
             if (ap != acc.authPass) {
-                if (Utils.checkPrintASCII(ap)) {
+                if (Utils.checkPrintAscii(ap)) {
                     if (account_set_auth_pass(acc.accp, ap) == 0) {
                         acc.authPass = account_auth_pass(acc.accp)
                         // Log.d("Baresip", "New auth password is ${acc.authPass}")
@@ -234,6 +243,46 @@ class AccountActivity : AppCompatActivity() {
                     Log.e("Baresip", "Setting of regint failed")
                 }
 
+            var newMediaNat = ""
+            if (iceCheck.isChecked) newMediaNat = "ice"
+            if (acc.mediaNat != newMediaNat)
+                if (account_set_medianat(acc.accp, newMediaNat) == 0) {
+                    acc.mediaNat = account_medianat(acc.accp)
+                    Log.d("Baresip", "New medianat is ${acc.mediaNat}")
+                    save = true
+                } else {
+                    Log.e("Baresip", "Setting of medianat failed")
+                }
+
+            if (iceCheck.isChecked) {
+                val newStunServer = stunServer.text.toString().trim()
+                if (acc.stunServer != newStunServer) {
+                    if ((newStunServer != "") &&
+                            !Utils.checkHostPort(newStunServer, false)) {
+                        Utils.alertView(this, "Notice",
+                                "Invalid STUN Server: $newStunServer")
+                        return false
+                    }
+                    var host = ""
+                    var port = ""
+                    if (newStunServer != "") {
+                        val hostPort = newStunServer.split(":")
+                        host = hostPort[0]
+                        if (hostPort.size == 2) port = hostPort[1]
+                    }
+                    if ((account_set_stun_host(acc.accp, host) == 0) &&
+                            (account_set_stun_port(acc.accp, port.toInt()) == 0)) {
+                        acc.stunServer = account_stun_host(acc.accp)
+                        if (port != "")
+                            acc.stunServer += ":" + account_stun_port(acc.accp).toString()
+                        Log.d("Baresip", "New StunServer is ${acc.stunServer}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of StunServer failed")
+                    }
+                }
+            }
+
             val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "" } as ArrayList<String>))
             if (ac != acc.audioCodec) {
                 Log.d("Baresip", "New codecs ${newCodecs.filter { it != "" }}")
@@ -256,10 +305,10 @@ class AccountActivity : AppCompatActivity() {
                 }
             }
 
-            if (mediaEnc != acc.mediaenc) {
+            if (mediaEnc != acc.mediaEnc) {
                 if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                    acc.mediaenc = account_mediaenc(acc.accp)
-                    Log.d("Baresip", "New mediaenc is ${acc.mediaenc}")
+                    acc.mediaEnc = account_mediaenc(acc.accp)
+                    Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
                     save = true
                 } else {
                     Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
@@ -323,6 +372,12 @@ class AccountActivity : AppCompatActivity() {
             }
             findViewById(R.id.RegTitle) as TextView -> {
                 Utils.alertView(this, "Register", getString(R.string.register))
+            }
+            findViewById(R.id.IceTitle) as TextView -> {
+                Utils.alertView(this, "Use ICE", getString(R.string.ice))
+            }
+            findViewById(R.id.StunServerTitle) as TextView -> {
+                Utils.alertView(this, "STUN Server", getString(R.string.stunServer))
             }
             findViewById(R.id.AudioCodecsTitle) as TextView -> {
                 Utils.alertView(this, "Audio Codecs", getString(R.string.auCodecs))
