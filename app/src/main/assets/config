@@ -1,171 +1,42 @@
-#
-# baresip configuration
-#
+auto_start no
+poll_method epoll
+sip_trans_bsize 128
+call_local_timeout 120
+call_max_calls 4
+audio_player opensles,nil
+audio_source opensles,nil
+audio_alert opensles,nil
+audio_srate		8000-48000
+audio_channels		1-2
+audio_level no
+rtp_tos 184
+rtcp_enable yes
+rtcp_mux no
+jitter_buffer_delay 5-10
+rtp_stats no
+dns_server 8.8.8.8:53
+module opus.so
+module g711.so
+module opensles.so
+module stun.so
+module turn.so
+module ice.so
+module srtp.so
+module dtls_srtp.so
+module zrtp.so
+module_tmp uuid.so
+module_tmp account.so
+module_app auloop.so
+module_app contact.so
+module_app debug_cmd.so
+module_app mwi.so
+evdev_device /dev/input/event0
+opus_bitrate 28000
+opus_cbr no
+opus_inbandfec yes
+ice_turn no
+ice_debug no
+ice_nomination regular
+ice_mode full
+zrtp_hash yes
 
-#------------------------------------------------------------------------------
-
-# Core
-poll_method             epoll           # poll, select, epoll ..
-
-# SIP
-sip_trans_bsize         128
-#sip_listen             0.0.0.0:5060
-#sip_certificate        cert.pem
-
-# Call
-call_local_timeout      120
-call_max_calls  4
-
-# Audio
-audio_player            opensles,nil
-audio_source            opensles,nil
-audio_alert             opensles,nil
-#ausrc_srate            48000
-#auplay_srate           48000
-#ausrc_channels         0
-#auplay_channels        0
-audio_level             no
-
-# Video
-#video_source           v4l2,/dev/video0
-#video_display          x11,nil
-video_size              352x288
-video_bitrate           500000
-video_fps               25
-video_fullscreen        yes
-
-# AVT - Audio/Video Transport
-rtp_tos                 184
-#rtp_ports              10000-20000
-#rtp_bandwidth          512-1024 # [kbit/s]
-rtcp_enable             yes
-rtcp_mux                no
-jitter_buffer_delay     5-10            # frames
-rtp_stats               no
-#rtp_timeout            60
-
-# Network
-dns_server             8.8.8.8:53
-#net_interface          ^
-
-# BFCP
-#bfcp_proto             udp
-
-#------------------------------------------------------------------------------
-# Modules
-
-# UI Modules
-#module                 stdio.so
-#module                 cons.so
-#module                 evdev.so
-
-# Audio codec Modules (in order)
-module                  opus.so
-#module                  g7221.so
-#module                 amr.so
-#module                 g722.so
-#module                 g726.so
-module                  g711.so
-#module                 l16.so
-#module                 bv32.so
-#module                 mpa.so
-#module                 codec2.so
-
-# Audio filter Modules (in encoding order)
-#module                 vumeter.so
-#module                 sndfile.so
-#module                 plc.so
-
-# Audio driver Modules
-module                  opensles.so
-#module                 aubridge.so
-#module                 aufile.so
-
-# Video codec Modules (in order)
-#module                 avcodec.so
-#module                 vp8.so
-#module                 vp9.so
-#module                 h265.so
-
-# Video filter Modules (in encoding order)
-#module                 selfview.so
-#module                 snapshot.so
-#module                 swscale.so
-#module                 vidinfo.so
-
-# Video source modules
-#module                 v4l.so
-#module                 v4l2.so
-#module                 v4l2_codec.so
-#module                 cairo.so
-#module                 vidbridge.so
-
-# Video display modules
-#module                 directfb.so
-#module                 sdl2.so
-#module                 fakevideo.so
-
-# Audio/Video source modules
-#module                 rst.so
-#module                 gst1.so
-#module                 gst_video1.so
-
-# Media NAT modules
-module                  stun.so
-module                  turn.so
-module                  ice.so
-#module                 natpmp.so
-
-# Media encryption modules
-module                  srtp.so
-module                  dtls_srtp.so
-module                  zrtp.so
-
-
-#------------------------------------------------------------------------------
-# Temporary Modules (loaded then unloaded)
-
-module_tmp              uuid.so
-module_tmp              account.so
-
-
-#------------------------------------------------------------------------------
-# Application Modules
-
-module_app              auloop.so
-module_app              contact.so
-module_app              debug_cmd.so
-#module_app             dtmfio.so
-#module_app             echo.so
-module_app              mwi.so
-#module_app             natbd.so
-#module_app             presence.so
-#module_app             vidloop.so
-
-
-#------------------------------------------------------------------------------
-# Module parameters
-
-cons_listen             0.0.0.0:5555
-
-http_listen             0.0.0.0:8000
-
-evdev_device            /dev/input/event0
-
-# Opus codec parameters
-opus_bitrate            28000 # 6000-510000
-opus_cbr                no
-opus_inbandfec          yes
-
-# Selfview
-#video_selfview         window # {window,pip}
-#selfview_size          64x64
-
-# ICE
-ice_turn                no
-ice_debug               no
-ice_nomination          regular # {regular,aggressive}
-ice_mode                full    # {full,lite}
-
-# ZRTP
-zrtp_hash		        yes

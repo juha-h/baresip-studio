@@ -18,7 +18,6 @@ object Utils {
             Log.e("Baresip", "Failed to find file: " + file.path)
             return ""
         } else {
-            Log.e("Baresip", "Found file: " + file.path)
             val length = file.length().toInt()
             val bytes = ByteArray(length)
             try {
@@ -54,6 +53,23 @@ object Utils {
             Log.e("Baresip", "Failed to find contents file: " + e.toString())
         }
 
+    }
+
+    fun getNameValue(string: String, name: String): ArrayList<String> {
+        val lines = string.split("\n")
+        val result = ArrayList<String>()
+        for (line in lines) {
+            if (line.startsWith(name))
+                result.add((line.substring(name.length).trim()).split(" \t")[0])
+        }
+        return result
+    }
+
+    fun removeLinesStartingWithName(string: String, name: String): String {
+        var result = ""
+        for (line in string.split("\n"))
+            if (!line.startsWith(name)) result += line + "\n"
+        return result
     }
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
@@ -131,35 +147,49 @@ object Utils {
     fun checkDomain(domain: String): Boolean {
         val parts = domain.split(".")
         for (p in parts) {
-            if (p.length == 0 || p.endsWith("-") || !Regex("^[a-zA-z]([-]|[a-zA-Z0-9])+\$").matches(p))
+            if ((p.length == 0) || p.endsWith("-") ||
+                    !Regex("^[a-zA-z]([-a-zA-Z0-9])*\$").matches(p))
                 return false
         }
         return true
     }
 
-    fun checkPort(p: String) : Boolean {
-        val number = p.toIntOrNull()
+    fun checkPort(port: String): Boolean {
+        val number = port.toIntOrNull()
         if (number == null) return false
-        return (number > 0) and (number < 65536)
+        return (number > 0) && (number < 65536)
     }
 
-    fun checkHostPort(hp: String) : Boolean {
+    fun checkHostPort(hp: String, portMandatory: Boolean) : Boolean {
         val parts = hp.split(":")
+        if (portMandatory && (parts.size != 2)) return false
         if (parts.size == 1) return checkIP(parts[0]) || checkDomain(parts[0])
         return checkPort(parts[1]) && (checkIP(parts[0]) || checkDomain(parts[0]))
     }
 
-    fun checkParams(p: String) : Boolean {
-        /* todo: proper check */
+    fun checkParams(params: String): Boolean {
+        for (param in params.split(";"))
+            if (!checkParam(param)) return false
         return true
+    }
+
+    fun checkParam(param: String): Boolean {
+        val nameValue = param.split("=")
+        if (nameValue.size == 1)
+            /* Todo: do proper check */
+            return true
+        if (nameValue.size == 2)
+            /* Todo: do proper check */
+            return true
+        return false
     }
 
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
         if (restParams.size == 1)
-            return checkHostPort(restParams[0])
+            return checkHostPort(restParams[0], false)
         else
-            return checkHostPort(restParams[0]) && checkParams(restParams[1])
+            return checkHostPort(restParams[0], false) && checkParams(restParams[1])
     }
 
     fun checkSipUri(uri: String): Boolean {
@@ -186,15 +216,9 @@ object Utils {
         return checkHostPortParams(uri.substring(4))
     }
 
-    fun checkPrintASCII(s: String): Boolean {
+    fun checkPrintAscii(s: String): Boolean {
         if (s == "") return true
-        val printASCIIRegex = Regex("^[ -~]*\$")
-        return printASCIIRegex.matches(s)
-    }
-
-    fun checkUint(s: String): Boolean {
-        val uintRegex = Regex("^[0-9]+\$")
-        return uintRegex.matches(s)
+        return Regex("^[ -~]*\$").matches(s)
     }
 
     fun checkName(name: String): Boolean {

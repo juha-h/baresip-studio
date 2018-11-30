@@ -486,7 +486,7 @@ class MainActivity : AppCompatActivity() {
                                 callTitle.text = "Incoming call from ..."
                             else
                                 callTitle.text = "Outgoing call to ..."
-                            if (acc.mediaenc == "") {
+                            if (acc.mediaEnc == "") {
                                 securityButton.visibility = View.INVISIBLE
                             } else {
                                 securityButton.setImageResource(R.drawable.box_red)
@@ -819,17 +819,17 @@ class MainActivity : AppCompatActivity() {
                             R.color.colorPrimary))
                 return true
             }
+            R.id.config -> {
+                i = Intent(this, ConfigActivity::class.java)
+                startActivityForResult(i, CONFIG_CODE)
+                return true
+            }
             R.id.accounts -> {
                 i = Intent(this, AccountsActivity::class.java)
                 val b = Bundle()
                 b.putString("accp", "")
                 i.putExtras(b)
                 startActivityForResult(i, ACCOUNTS_CODE)
-                return true
-            }
-            R.id.config -> {
-                i = Intent(this, EditConfigActivity::class.java)
-                startActivityForResult(i, EDIT_CONFIG_CODE)
                 return true
             }
             R.id.about -> {
@@ -901,15 +901,12 @@ class MainActivity : AppCompatActivity() {
                         Contact.contacts().map{Contact -> Contact.name}))
             }
 
-            EDIT_CONFIG_CODE -> {
-                if (resultCode == RESULT_OK) {
+            CONFIG_CODE -> {
+                if (resultCode == RESULT_OK)
                     Utils.alertView(this, "Notice",
                             "You need to restart baresip in order to activate saved config!")
-                    Api.reload_config()
-                }
-                if (resultCode == RESULT_CANCELED) {
-                    Log.d("Baresip", "Edit config canceled")
-                }
+                if (resultCode == RESULT_CANCELED)
+                    Log.d("Baresip", "Config canceled")
             }
 
             CALLS_CODE -> {
@@ -1078,7 +1075,7 @@ class MainActivity : AppCompatActivity() {
                 "connected" -> {
                     securityButton.setImageResource(call.security)
                     setSecurityButtonTag(securityButton, call.security)
-                    if ((ua.account.mediaenc == "zrtp") || (ua.account.mediaenc == "dtls_srtpf"))
+                    if ((ua.account.mediaEnc == "zrtp") || (ua.account.mediaEnc == "dtls_srtpf"))
                         securityButton.visibility = View.VISIBLE
                     else
                         securityButton.visibility = View.INVISIBLE
@@ -1109,7 +1106,7 @@ class MainActivity : AppCompatActivity() {
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
-        const val EDIT_CONFIG_CODE = 3
+        const val CONFIG_CODE = 3
         const val CALLS_CODE = 4
         const val ABOUT_CODE = 5
         const val ACCOUNT_CODE = 6
