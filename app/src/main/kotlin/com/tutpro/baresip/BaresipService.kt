@@ -634,6 +634,7 @@ class BaresipService: Service() {
         var history = ArrayList<CallHistory>()
         var messages = ArrayList<Message>()
         var contacts = ArrayList<Contact>()
+        var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
 
         var audioFocused = false
         var audioFocusRequest: AudioFocusRequest? = null
