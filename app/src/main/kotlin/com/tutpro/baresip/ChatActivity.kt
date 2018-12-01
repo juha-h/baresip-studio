@@ -117,15 +117,17 @@ class ChatActivity : AppCompatActivity() {
             if (msgText.length > 0) {
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val time = System.currentTimeMillis()
-                val msg = Message(aor, peerUri, R.drawable.arrow_up_yellow, msgText, time,true)
+                val msg = Message(aor, peerUri, R.drawable.arrow_up_yellow, msgText, time, true)
                 Message.add(msg)
                 chatMessages.add(msg)
                 mlAdapter.notifyDataSetChanged()
-                if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0)
+                if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
                     Toast.makeText(getApplicationContext(), "Sending of message failed!",
                             Toast.LENGTH_SHORT).show()
-                else
+                } else {
                     newMessage.text.clear()
+                    BaresipService.chatTexts.remove("$aor::$peerUri")
+                }
             }
         }
 
@@ -146,8 +148,23 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        if (newMessage.text.toString() != "") {
+            Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
+            BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
+        }
         ChatsActivity.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
+    }
+
+    override fun onResume() {
+        val chatText = BaresipService.chatTexts.get("$aor::$peerUri")
+        if (chatText != null) {
+            Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
+            newMessage.setText(chatText)
+            newMessage.requestFocus()
+            BaresipService.chatTexts.remove("$aor::$peerUri")
+        }
+        super.onResume()
     }
 
     override fun onDestroy() {

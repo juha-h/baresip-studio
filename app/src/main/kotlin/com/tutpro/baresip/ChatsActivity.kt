@@ -162,7 +162,6 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("Baresip", "onActivityResult $requestCode $resultCode")
         if ((requestCode == MainActivity.MESSAGE_CODE) && (resultCode == Activity.RESULT_OK)) {
             clAdapter.clear()
             uaMessages = uaMessages(aor)
