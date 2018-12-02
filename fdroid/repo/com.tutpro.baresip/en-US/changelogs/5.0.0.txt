@@ -3,4 +3,5 @@
   and ICE Lite
 - Added ICE and Stun Server account options
 - Fixed bug in deleting of an account
+- Do not loose unsent message when chat activity is interrupted
 - Updated libbaresip.a and baresip.h to latest baresip master
