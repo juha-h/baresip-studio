@@ -139,12 +139,16 @@ class BaresipService: Service() {
                             inputStream.close()
                             var write = false
                             if (!contents.contains("zrtp_hash")) {
-                                contents = "${contents}zrtp_hash    yes\n"
+                                contents = "${contents}zrtp_hash yes\n"
                                 write = true
                             }
                             if (contents.contains(Regex("#module_app[ ]+mwi.so"))) {
                                 contents = contents.replace(Regex("#module_app[ ]+mwi.so"),
-                                        "module_app    mwi.so")
+                                        "module_app mwi.so")
+                                write = true
+                            }
+                            if (!contents.contains("opus_application")) {
+                                contents = "${contents}opus_application voip\n"
                                 write = true
                             }
                             if (write) {
