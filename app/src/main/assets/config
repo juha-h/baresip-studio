@@ -34,6 +34,7 @@ evdev_device /dev/input/event0
 opus_bitrate 28000
 opus_cbr no
 opus_inbandfec yes
+opus_application voip
 ice_turn no
 ice_debug no
 ice_nomination regular
