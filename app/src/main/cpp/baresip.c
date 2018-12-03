@@ -425,6 +425,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGD("closing ...");
     ua_close();
+    module_app_unload();
     conf_close();
     baresip_close();
 
