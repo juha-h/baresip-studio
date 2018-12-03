@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        ContactsActivity.restoreContacts(applicationContext.filesDir.absolutePath)
+        ContactsActivity.restoreContacts(applicationContext.filesDir)
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))
         callUri.threshold = 2
@@ -657,8 +657,7 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         val action = intent.getStringExtra("action")
         Log.d("Baresip", "onNewIntent action '$action'")
-        if (action != null)
-            handleIntent(intent)
+        if (action != null) handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent) {

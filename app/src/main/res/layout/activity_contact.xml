@@ -22,7 +22,7 @@
     <EditText
         android:id="@+id/Name"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
+        android:inputType="textPersonName|textCapWords"
         android:textSize="18sp"
         android:layout_width="fill_parent">
     </EditText>
