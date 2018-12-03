@@ -153,9 +153,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             break;
         case UA_EVENT_AUDIO_ERROR:
             mem_deref(call);
-            return;
+            goto out;
         default:
-            return;
+            goto out;
     }
     event = event_buf;
 
@@ -166,8 +166,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     if (res != JNI_OK) {
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
-            LOGE("failed to AttachCurrentThread, ErrorCode = %d", res);
-            return;
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
+            goto out;
         }
     }
     jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
@@ -183,6 +183,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     (*env)->DeleteLocalRef(env, javaUA);
     (*env)->DeleteLocalRef(env, javaCall);
     (*env)->DeleteLocalRef(env, javaEvent);
+
+    out:
+    return;
 }
 
 static void message_handler(struct ua *ua, const struct pl *peer, const struct pl *ctype,
@@ -204,7 +207,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     if (res != JNI_OK) {
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
-            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
             return;
         }
     }
@@ -250,7 +253,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     if (res != JNI_OK) {
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
-            LOGE("Failed to AttachCurrentThread, ErrorCode = %d", res);
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
             return;
         }
     }
@@ -260,6 +263,21 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, msg->scode, javaTime);
     (*env)->DeleteLocalRef(env, javaTime);
 
+}
+
+enum {
+    ID_UA_STOP_ALL
+};
+
+static struct mqueue *mq;
+
+static void mqueue_handler(int id, void *data, void *arg)
+{
+    switch (id) {
+        case ID_UA_STOP_ALL:
+            LOGD("calling ua_stop_all with force %u\n", (unsigned)data);
+            ua_stop_all((bool)data);
+    }
 }
 
 #include <unistd.h>
@@ -408,6 +426,11 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         (*env)->DeleteLocalRef(env, javaUA);
     }
 
+    LOGI("allocating mqeue\n");
+    err = mqueue_alloc(&mq, mqueue_handler, NULL);
+    if (err)
+        goto out;
+
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
 
@@ -422,6 +445,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     play = mem_deref(play);
     message = mem_deref(message);
+    mq = mem_deref(mq);
 
     LOGD("closing ...");
     ua_close();
@@ -451,7 +475,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
     LOGD("ua_stop_all upon baresipStop");
-    ua_stop_all(force);
+    mqueue_push(mq, ID_UA_STOP_ALL, (void *)force);
     return;
 }
 
