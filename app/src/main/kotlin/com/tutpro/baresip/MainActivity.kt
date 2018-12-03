@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         stopState = "initial"
         quitTimer = object: CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                Log.d("Baresip", "seconds remaining: ${millisUntilFinished/1000}")
+                Log.d("Baresip", "Seconds remaining: ${millisUntilFinished/1000}")
             }
             override fun onFinish() {
                 when (stopState) {

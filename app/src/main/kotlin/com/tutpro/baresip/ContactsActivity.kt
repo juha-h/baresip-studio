@@ -115,7 +115,8 @@ class ContactsActivity : AppCompatActivity() {
                 if (parts.size == 3) {
                     val name = parts[1]
                     val uri = parts[2].trim()
-                    Api.contact_add("\"$name\" $uri")
+                    // Currently no need to make baresip aware of the contact
+                    // Api.contact_add("\"$name\" $uri")
                     Contact.contacts().add(Contact(name, uri))
                 }
             }
