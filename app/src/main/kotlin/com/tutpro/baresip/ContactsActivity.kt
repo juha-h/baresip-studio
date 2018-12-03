@@ -3,8 +3,10 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.ListView
@@ -18,8 +20,6 @@ class ContactsActivity : AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
-
-        filesPath = applicationContext.filesDir.absolutePath
 
         val listView = findViewById(R.id.contacts) as ListView
 
@@ -49,8 +49,35 @@ class ContactsActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.contacts_menu, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         when (item.itemId) {
+            R.id.export_contacts -> {
+                if (saveContacts(dir))
+                    Utils.alertView(this,"",
+                        "Exported contacts to Download folder.")
+                else
+                    Utils.alertView(this,"Error",
+                            "Failed to export contacts to Download folder. " +
+                    "Check Apps -> baresip -> Permissions -> Storage.")
+            }
+            R.id.import_contacts -> {
+                if (restoreContacts(dir)) {
+                    Utils.alertView(this, "",
+                            "Imported contacts from Download folder.")
+                    clAdapter.notifyDataSetChanged()
+                    saveContacts(applicationContext.filesDir)
+                } else
+                    Utils.alertView(this,"Error",
+                            "Failed to import contacts from Download folder. " +
+                                    "Check Apps -> baresip -> Permissions -> Storage and that " +
+                                    "the file exists in the folder.")
+            }
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Contacts")
                 val i = Intent()
@@ -70,17 +97,17 @@ class ContactsActivity : AppCompatActivity() {
 
     companion object {
 
-        internal var filesPath = ""
 
-        fun saveContacts(path: String = filesPath) {
+        fun saveContacts(path: File): Boolean {
             var contents = ""
             for (c in Contact.contacts())
                 contents += "\"${c.name}\" ${c.uri}\n"
-            Utils.putFileContents(File(path + "/contacts"), contents)
+            return Utils.putFileContents(File(path, "contacts"), contents)
         }
 
-        fun restoreContacts(path: String = filesPath) {
-            val content = Utils.getFileContents(File(path + "/contacts"))
+        fun restoreContacts(path: File): Boolean {
+            val content = Utils.getFileContents(File(path, "contacts"))
+            if (content == "Failed") return false
             Api.contacts_remove()
             Contact.contacts().clear()
             content.lines().forEach {
@@ -92,6 +119,7 @@ class ContactsActivity : AppCompatActivity() {
                     Contact.contacts().add(Contact(name, uri))
                 }
             }
+            return true
         }
 
         fun findContactURI(name: String): String {

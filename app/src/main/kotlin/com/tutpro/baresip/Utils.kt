@@ -16,7 +16,7 @@ object Utils {
     fun getFileContents(file: File): String {
         if (!file.exists()) {
             Log.e("Baresip", "Failed to find file: " + file.path)
-            return ""
+            return "Failed"
         } else {
             val length = file.length().toInt()
             val bytes = ByteArray(length)
@@ -31,13 +31,13 @@ object Utils {
             } catch (e: java.io.IOException) {
                 Log.e("Baresip", "Failed to read file: " + file.path + ": " +
                         e.toString())
-                return ""
+                return "Failed"
             }
 
         }
     }
 
-    fun putFileContents(file: File, contents: String) {
+    fun putFileContents(file: File, contents: String): Boolean {
         try {
             val fOut = FileOutputStream(file.absoluteFile, false)
             val fWriter = OutputStreamWriter(fOut)
@@ -47,12 +47,14 @@ object Utils {
                 fOut.close()
             } catch (e: java.io.IOException) {
                 Log.e("Baresip", "Failed to put contents to file: " + e.toString())
+                return false
             }
 
         } catch (e: java.io.FileNotFoundException) {
             Log.e("Baresip", "Failed to find contents file: " + e.toString())
+            return false
         }
-
+        return true
     }
 
     fun getNameValue(string: String, name: String): ArrayList<String> {

@@ -67,7 +67,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 when (which) {
                     DialogInterface.BUTTON_NEGATIVE -> {
                         Contact.contacts().removeAt(pos)
-                        ContactsActivity.saveContacts()
+                        ContactsActivity.saveContacts(cxt.applicationContext.filesDir)
                         this.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
