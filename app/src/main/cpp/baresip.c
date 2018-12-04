@@ -475,7 +475,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
     LOGD("ua_stop_all upon baresipStop");
-    mqueue_push(mq, ID_UA_STOP_ALL, (void *)force);
+    mqueue_push(mq, ID_UA_STOP_ALL, (void *)((int)force));
     return;
 }
 
