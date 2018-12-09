@@ -1146,6 +1146,27 @@ Java_com_tutpro_baresip_Api_call_1unhold(JNIEnv *env, jobject thiz, jstring java
     return ret;
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    const struct aucodec *tx = audio_codec(call_audio(call), true);
+    const struct aucodec *rx = audio_codec(call_audio(call), false);
+    char codec_buf[256];
+    char *start = &(codec_buf[0]);
+    unsigned int left = sizeof codec_buf;
+    int len = -1;
+    if (tx && rx)
+        len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", tx->name, tx->srate, tx->ch,
+                          rx->name, rx->srate, rx->ch);
+    if (len == -1) {
+        LOGE("failed to get call audio codecs\n");
+        codec_buf[0] = '\0';
+    }
+    return (*env)->NewStringUTF(env, codec_buf);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
                                           jstring javaPeer, jstring javaMsg, jstring javaTime) {
