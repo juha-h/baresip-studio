@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var callsButton: ImageButton
     internal lateinit var dialpadButton: ImageButton
     internal lateinit var dtmf: EditText
+    internal lateinit var infoButton: ImageButton
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
     internal lateinit var am: AudioManager
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         rejectButton = findViewById(R.id.rejectButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
+        infoButton = findViewById(R.id.info) as ImageButton
         voicemailButton = findViewById(R.id.voicemailButton) as ImageButton
         contactsButton = findViewById(R.id.contactsButton) as ImageButton
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
@@ -304,6 +306,27 @@ class MainActivity : AppCompatActivity() {
 
         dtmf.tag = ArrayList<TextWatcher>()
 
+        infoButton.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val calls = Call.uaCalls(ua,"")
+            if (calls.size > 0) {
+                val status = Api.call_status(calls[0].callp)
+                val codecs = Api.call_audio_codecs(calls[0].callp)
+                if (status.contains('[') && status.contains(']') &&
+                        status.contains('=') && codecs.contains(',')) {
+                    val duration = status.split("[")[1].split("]")[0]
+                    val rate = status.split('=')[1]
+                    val txCodec = codecs.split(',')[0].split("/")
+                    val rxCodec = codecs.split(',')[1].split("/")
+                    Utils.alertView(this, "Call Info",
+                            "Duration: $duration\n" +
+                                    "Codecs: ${txCodec[0]} ch ${txCodec[2]}/" +
+                                    "${rxCodec[0]} ch ${rxCodec[2]}\n" +
+                                    "Rate: $rate")
+                }
+            }
+        }
+
         voicemailButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
@@ -466,6 +489,7 @@ class MainActivity : AppCompatActivity() {
                             rejectButton.isEnabled = true
                             holdButton.visibility = View.INVISIBLE
                             dtmf.visibility = View.INVISIBLE
+                            infoButton.visibility = View.INVISIBLE
                         }
                         if (Utils.isVisible()) {
                                 Log.d("Baresip", "Baresip is visible")
@@ -504,6 +528,7 @@ class MainActivity : AppCompatActivity() {
                             dtmf.hint = "DTMF"
                             dtmf.visibility = View.VISIBLE
                             dtmf.requestFocus()
+                            infoButton.visibility = View.VISIBLE
                         }
                         (dtmf.tag as ArrayList<TextWatcher>).add(call.dtmfWatcher!!)
                         dtmf.addTextChangedListener(call.dtmfWatcher)
@@ -965,6 +990,8 @@ class MainActivity : AppCompatActivity() {
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
+            infoButton.visibility = View.INVISIBLE
+
         } else {
             Log.w("Baresip", "ua_connect ${ua.uap}/$uri failed")
             callButton.visibility = View.VISIBLE
@@ -1025,6 +1052,7 @@ class MainActivity : AppCompatActivity() {
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
+            infoButton.visibility = View.INVISIBLE
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1050,6 +1078,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
+                    infoButton.visibility = View.INVISIBLE
                 }
                 "incoming" -> {
                     securityButton.visibility = View.INVISIBLE
@@ -1061,6 +1090,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.isEnabled = true
                     holdButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
+                    infoButton.visibility = View.INVISIBLE
                     if (answerCall == call.callp) {
                         answerCall = ""
                         answerButton.performClick()
@@ -1091,6 +1121,7 @@ class MainActivity : AppCompatActivity() {
                     holdButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
                     dtmf.requestFocus()
+                    infoButton.visibility = View.VISIBLE
                 }
             }
         }
