@@ -24,6 +24,7 @@ object Api {
     external fun call_start_audio(callp: String)
     external fun call_stop_audio(callp: String)
     external fun call_audio_codecs(callp: String): String
+    external fun call_status(callp: String): String
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
     external fun reload_config(): Int
     external fun cmd_exec(cmd: String): Int

@@ -1167,6 +1167,25 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    char status_buf[256];
+    int len = re_snprintf(&(status_buf[0]), 256, "%H", call_status, call);
+    if (len != -1) {
+        if (len < 256)
+            status_buf[len] = '\0';
+        else
+            status_buf[255] = '\0';
+    } else {
+        LOGE("failed to get call status\n");
+        status_buf[0] = '\0';
+    }
+    return (*env)->NewStringUTF(env, status_buf);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
                                           jstring javaPeer, jstring javaMsg, jstring javaTime) {
