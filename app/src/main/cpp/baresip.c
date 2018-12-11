@@ -1173,12 +1173,9 @@ Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring java
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     char status_buf[256];
-    int len = re_snprintf(&(status_buf[0]), 256, "%H", call_status, call);
+    int len = re_snprintf(&(status_buf[0]), 255, "%H", call_status, call);
     if (len != -1) {
-        if (len < 256)
-            status_buf[len] = '\0';
-        else
-            status_buf[255] = '\0';
+        status_buf[len] = '\0';
     } else {
         LOGE("failed to get call status\n");
         status_buf[0] = '\0';
