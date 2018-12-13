@@ -13,7 +13,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.media.*
 import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.view.menu.ActionMenuItemView
@@ -47,8 +46,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var infoButton: ImageButton
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
-    internal lateinit var am: AudioManager
-    internal lateinit var rt: Ringtone
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var serviceEventReceiver: BroadcastReceiver
@@ -85,10 +82,6 @@ class MainActivity : AppCompatActivity() {
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
 
-        am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
-                RingtoneManager.TYPE_RINGTONE)
-        rt = RingtoneManager.getRingtone(applicationContext, rtUri)
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -834,13 +827,14 @@ class MainActivity : AppCompatActivity() {
         val i: Intent
         when (item.itemId) {
             R.id.speakerIcon -> {
-                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
                 val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
-                if (am.isSpeakerphoneOn)
-                    speakerIcon.setBackgroundColor(Color.rgb(0x04, 0xb4, 0x04))
-                else
+                if (BaresipService.speakerPhone)
                     speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
                             R.color.colorPrimary))
+                else
+                    speakerIcon.setBackgroundColor(Color.rgb(0x04, 0xb4, 0x04))
+                baresipService.setAction("ToggleSpeaker")
+                startService(baresipService)
                 return true
             }
             R.id.config -> {
