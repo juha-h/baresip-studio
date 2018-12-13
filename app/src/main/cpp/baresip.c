@@ -99,8 +99,10 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
-        case UA_EVENT_REGISTER_FAIL:
             re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
+            break;
+        case UA_EVENT_REGISTER_FAIL:
+            re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
             if (list_count(ua_calls(ua)) > 1) {
