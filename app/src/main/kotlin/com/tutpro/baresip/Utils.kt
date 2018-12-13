@@ -149,8 +149,8 @@ object Utils {
     fun checkDomain(domain: String): Boolean {
         val parts = domain.split(".")
         for (p in parts) {
-            if ((p.length == 0) || p.endsWith("-") ||
-                    !Regex("^[a-zA-z]([-a-zA-Z0-9])*\$").matches(p))
+            if (p.endsWith("-") || p.startsWith("-") ||
+                    !Regex("^[-a-zA-Z0-9]+\$").matches(p))
                 return false
         }
         return true
