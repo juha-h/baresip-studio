@@ -440,8 +440,14 @@ class MainActivity : AppCompatActivity() {
                         uaAdapter.notifyDataSetChanged()
                         if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
                     }
-                    "registered", "registering failed", "unregistering" -> {
+                    "registered", "unregistering" -> {
                         uaAdapter.notifyDataSetChanged()
+                    }
+                    "registering failed" -> {
+                        uaAdapter.notifyDataSetChanged()
+                        Toast.makeText(applicationContext,
+                                "Registering of $aor failed: ${ev[1]}",
+                                Toast.LENGTH_LONG).show()
                     }
                     "call ringing" -> {
                     }
