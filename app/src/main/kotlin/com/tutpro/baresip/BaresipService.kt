@@ -39,6 +39,8 @@ class BaresipService: Service() {
 
     internal var rtTimer: Timer? = null
     internal var filesPath = ""
+    internal var audioFocusRequest: AudioFocusRequest? = null
+    internal var audioFocused = false
 
     override fun onCreate() {
 
@@ -168,6 +170,12 @@ class BaresipService: Service() {
 
             "UpdateNotification" -> {
                 updateStatusNotification()
+            }
+
+            "ToggleSpeaker" -> {
+                Log.d(LOG_TAG, "Toggling speakerphone from $speakerPhone")
+                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
+                speakerPhone = am.isSpeakerphoneOn
             }
 
             "Stop", "Stop Force" -> {
@@ -335,11 +343,7 @@ class BaresipService: Service() {
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                         CallHistory.save(filesPath)
                         call.hasHistory = true
-                        if (rtTimer != null) {
-                            rtTimer!!.cancel()
-                            rtTimer = null
-                            if (rt.isPlaying) rt.stop()
-                        }
+                        stopRinging()
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                         am.isSpeakerphoneOn = false
@@ -537,13 +541,14 @@ class BaresipService: Service() {
     private fun requestAudioFocus(streamType: Int) {
         val res: Int
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) && (audioFocusRequest == null)) {
-            val playbackAttributes = AudioAttributes.Builder()
-                    .setLegacyStreamType(streamType)
-                    .build()
             @TargetApi(26)
-            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
-                    .setAudioAttributes(playbackAttributes)
-                    .build()
+            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
+                setAudioAttributes(AudioAttributes.Builder().run {
+                    setLegacyStreamType(streamType)
+                    build()
+                })
+                build()
+            }
             @TargetApi(26)
             res = am.requestAudioFocus(audioFocusRequest)
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -553,8 +558,7 @@ class BaresipService: Service() {
                 audioFocusRequest = null
             }
         } else {
-            res = am.requestAudioFocus(null, streamType,
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+            res = am.requestAudioFocus(null, streamType, AudioManager.AUDIOFOCUS_GAIN)
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d("Baresip", "Audio focus granted")
                 audioFocused = true
@@ -598,6 +602,7 @@ class BaresipService: Service() {
             rtTimer!!.cancel()
             rtTimer = null
             if (rt.isPlaying) rt.stop()
+            abandonAudioFocus()
         }
     }
 
@@ -640,8 +645,7 @@ class BaresipService: Service() {
         var contacts = ArrayList<Contact>()
         var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
 
-        var audioFocused = false
-        var audioFocusRequest: AudioFocusRequest? = null
+        var speakerPhone = false
 
     }
 
