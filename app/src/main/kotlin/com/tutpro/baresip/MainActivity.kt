@@ -626,6 +626,10 @@ class MainActivity : AppCompatActivity() {
                         val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
                         speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
                                     R.color.colorPrimary))
+                        if (BaresipService.speakerPhone) {
+                            baresipService.setAction("ToggleSpeaker")
+                            startService(baresipService)
+                        }
                     }
                     "message" -> {
                         val peerUri = params[1]
