@@ -143,7 +143,7 @@ class AccountActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (item.itemId == R.id.checkIcon) {
-            
+
             val dn = displayName.text.toString().trim()
             if (dn != acc.displayName) {
                 if (checkDisplayName(dn)) {
@@ -195,10 +195,17 @@ class AccountActivity : AppCompatActivity() {
             }
 
             val ob = ArrayList<String>()
-            if (outbound1.text.toString().trim() != "")
-                ob.add(outbound1.text.toString().trim().replace(" ", ""))
-            if (outbound2.text.toString().trim() != "")
-                ob.add(outbound2.text.toString().trim().replace(" ", ""))
+            var uri: String
+            if (outbound1.text.toString().trim() != "") {
+                uri = outbound1.text.toString().trim().replace(" ", "")
+                if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                ob.add(uri)
+            }
+            if (outbound2.text.toString().trim() != "") {
+                uri = outbound2.text.toString().trim().replace(" ", "")
+                if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                ob.add(uri)
+            }
             if (ob != acc.outbound) {
                 val outbound = ArrayList<String>()
                 for (i in ob.indices) {
