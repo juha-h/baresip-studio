@@ -4,6 +4,7 @@
     <string name="aboutText">
         <b>Baresip based Android application</b>\n\n
         Juha Heinanen jh@tutpro.com\n\n
+        Version %1$s\n\n
         <b>Usage Hints</b>\n\n
         - check that config default values meet your needs (click item titles for help)\n
         - then create one or more accounts (again click item titles for help)\n
