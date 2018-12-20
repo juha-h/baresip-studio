@@ -19,6 +19,6 @@ After cloning the project, in Android Studio 3.2.1:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
-Available also in Google Play store.
+Available also in F-Droid and Google Play stores.
 
 Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
