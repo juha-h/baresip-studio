@@ -402,14 +402,14 @@ class AccountActivity : AppCompatActivity() {
 
     private fun checkDisplayName(dn: String): Boolean {
         if (dn == "") return true
-        val dnRegex = Regex("^[a-zA-Z]([ ._-]|[a-zA-Z0-9]){1,63}\$")
+        val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
         return dnRegex.matches(dn)
     }
 
     private fun checkAuthUser(au: String): Boolean {
         if (au == "") return true
         val ud = au.split("@")
-        val userIDRegex = Regex("^[a-zA-Z]([._-]|[a-zA-Z0-9]){1,63}\$")
+        val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
         val telnoRegex = Regex("^[+]?[0-9]{1,16}\$")
         if (ud.size == 1) {
             return userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])
