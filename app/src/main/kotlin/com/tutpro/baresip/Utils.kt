@@ -115,7 +115,7 @@ object Utils {
     }
 
     fun friendlyUri(uri: String, domain: String): String {
-        if (uri.contains("@")) {
+        if (uri.contains("@") && !uri.contains(":") && !uri.contains(";")) {
             val user = uriUserPart(uri)
             val host = uriHostPart(uri)
             if (host == domain) return user else return "$user@$host"
