@@ -58,6 +58,7 @@ int account_set_auth_user(struct account *acc, const char *user);
 int account_set_auth_pass(struct account *acc, const char *pass);
 int account_set_outbound(struct account *acc, const char *ob, unsigned ix);
 int account_set_sipnat(struct account *acc, const char *sipnat);
+int account_set_answermode(struct account *acc, enum answermode mode);
 int account_set_display_name(struct account *acc, const char *dname);
 int account_set_regint(struct account *acc, uint32_t regint);
 int account_set_stun_host(struct account *acc, const char *host);
@@ -388,8 +389,6 @@ struct media_ctx {
  * Media Device
  */
 
-struct mediadev;
-
 /** Defines a media device */
 struct mediadev {
 	struct le   le;
@@ -459,6 +458,7 @@ int ausrc_alloc(struct ausrc_st **stp, struct list *ausrcl,
 		const char *name,
 		struct ausrc_prm *prm, const char *device,
 		ausrc_read_h *rh, ausrc_error_h *errh, void *arg);
+struct ausrc *ausrc_get(struct ausrc_st *st);
 
 
 /*
@@ -497,6 +497,7 @@ int auplay_alloc(struct auplay_st **stp, struct list *auplayl,
 		 const char *name,
 		 struct auplay_prm *prm, const char *device,
 		 auplay_write_h *wh, void *arg);
+struct auplay *auplay_get(struct auplay_st *st);
 
 
 /*
@@ -735,7 +736,7 @@ void ua_set_catchall(struct ua *ua, bool enabled);
 void ua_event(struct ua *ua, enum ua_event ev, struct call *call,
 	      const char *fmt, ...);
 int ua_add_xhdr_filter(struct ua *ua, const char *hdr_name);
-void ua_set_custom_hdrs(struct ua *ua, struct list *custom_hdrs);
+int  ua_set_custom_hdrs(struct ua *ua, struct list *custom_hdrs);
 int  ua_uri_complete(struct ua *ua, struct mbuf *buf, const char *uri);
 int  ua_call_alloc(struct call **callp, struct ua *ua,
 		   enum vidmode vidmode, const struct sip_msg *msg,
@@ -1309,7 +1310,7 @@ static inline bool h264_is_keyframe(int type)
 #endif
 
 
-int module_preload(const char *module);
+int  module_preload(const char *module);
 int  module_load(const char *name);
 void module_unload(const char *name);
 void module_app_unload(void);
