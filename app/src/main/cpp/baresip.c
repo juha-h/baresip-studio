@@ -148,7 +148,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 				    (void)play_file(&play, player, tone, 1);
 			    }
 		    }
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call closed");
+            re_snprintf(event_buf, sizeof event_buf, "call closed,%s", prm);
             break;
         case UA_EVENT_MWI_NOTIFY:
             re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
@@ -853,6 +853,42 @@ Java_com_tutpro_baresip_AccountKt_account_1vm_1uri(JNIEnv *env, jobject thiz, js
         }
     } else
         return (*env)->NewStringUTF(env, "");
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1answermode(JNIEnv *env, jobject thiz, jstring javaAcc)
+{
+    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    if (acc) {
+        enum answermode am = account_answermode(acc);
+        if (am == ANSWERMODE_EARLY)
+            return (*env)->NewStringUTF(env, "early");
+        if (am == ANSWERMODE_AUTO)
+            return (*env)->NewStringUTF(env, "auto");
+        return (*env)->NewStringUTF(env, "manual");
+    }
+    return (*env)->NewStringUTF(env, "");
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1set_1answermode(JNIEnv *env, jobject thiz,
+                                                       jstring javaAcc, jstring javaAnswerMode) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    const char *mode = (*env)->GetStringUTFChars(env, javaAnswerMode, 0);
+    int res, am;
+    if (strcmp(mode, "early") == 0)
+	    am = ANSWERMODE_EARLY;
+    else if (strcmp(mode, "auto") == 0)
+	    am = ANSWERMODE_AUTO;
+    else
+	    am = ANSWERMODE_MANUAL;
+    (*env)->ReleaseStringUTFChars(env, javaAnswerMode, mode);
+    res = account_set_answermode(acc, am);
+    return res;
 }
 
 JNIEXPORT jstring JNICALL
