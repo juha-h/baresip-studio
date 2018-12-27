@@ -636,6 +636,15 @@ class MainActivity : AppCompatActivity() {
                             baresipService.setAction("ToggleSpeaker")
                             startService(baresipService)
                         }
+                        val param = ev[1].trim()
+                        if (param != "") {
+                            if (param.get(0).isDigit())
+                                Toast.makeText(applicationContext, "Call failed: $param",
+                                        Toast.LENGTH_LONG).show()
+                            else
+                                Toast.makeText(applicationContext, "Call closed: $param",
+                                        Toast.LENGTH_LONG).show()
+                        }
                     }
                     "message" -> {
                         val peerUri = params[1]
