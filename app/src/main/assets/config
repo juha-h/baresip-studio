@@ -10,7 +10,6 @@ audio_srate		8000-48000
 audio_channels		1-2
 audio_level no
 rtp_tos 184
-rtcp_enable yes
 rtcp_mux no
 jitter_buffer_delay 5-10
 rtp_stats no
