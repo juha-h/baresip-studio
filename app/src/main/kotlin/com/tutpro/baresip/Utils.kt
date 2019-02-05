@@ -129,10 +129,6 @@ object Utils {
         return aor.substringAfter("@")
     }
 
-    fun checkUserID(id: String): Boolean {
-        return Regex("^[a-zA-Z]([._-]|[a-zA-Z0-9]){1,49}\$").matches(id)
-    }
-
     fun checkTelNo(no: String): Boolean {
         return Regex("^[+]?[0-9]{1,16}\$").matches(no)
     }
@@ -144,7 +140,7 @@ object Utils {
     fun checkUriUser(user: String): Boolean {
         for (c in user)
             if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
-        return true
+        return user.length > 0
     }
 
     fun checkDomain(domain: String): Boolean {
@@ -210,7 +206,7 @@ object Utils {
         if (!uri.startsWith("sip:")) return false
         val userDomain = uri.replace("sip:", "").split("@")
         if (userDomain.size != 2) return false
-        if (!checkUserID(userDomain[0]) && !checkTelNo(userDomain[0])) return false
+        if (!checkUriUser(userDomain[0])) return false
         return checkDomain(userDomain[1]) || checkIP(userDomain[1])
     }
 
