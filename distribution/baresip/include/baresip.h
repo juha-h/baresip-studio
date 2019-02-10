@@ -120,12 +120,6 @@ enum call_event {
 	CALL_EVENT_MENC,
 };
 
-enum menc_event {
-	MENC_EVENT_SECURE,
-	MENC_EVENT_VERIFY_REQUEST,
-	MENC_EVENT_PEER_VERIFIED,
-};
-
 struct call;
 
 typedef void (call_event_h)(struct call *call, enum call_event ev,
@@ -276,7 +270,6 @@ struct config_avt {
 	uint8_t rtp_tos;        /**< Type-of-Service for outg. RTP  */
 	struct range rtp_ports; /**< RTP port range                 */
 	struct range rtp_bw;    /**< RTP Bandwidth range [bit/s]    */
-	bool rtcp_enable;       /**< RTCP is enabled                */
 	bool rtcp_mux;          /**< RTP/RTCP multiplexing          */
 	struct range jbuf_del;  /**< Delay, number of frames        */
 	bool rtp_stats;         /**< Enable RTP statistics          */
@@ -589,6 +582,13 @@ struct menc;
 struct menc_sess;
 struct menc_media;
 
+/** Defines a media encryption event */
+enum menc_event {
+	MENC_EVENT_SECURE,          /**< Media is secured               */
+	MENC_EVENT_VERIFY_REQUEST,  /**< Request user to verify a code  */
+	MENC_EVENT_PEER_VERIFIED,   /**< Peer was verified successfully */
+};
+
 
 typedef void (menc_error_h)(int err, void *arg);
 
@@ -614,6 +614,7 @@ struct menc {
 void menc_register(struct list *mencl, struct menc *menc);
 void menc_unregister(struct menc *menc);
 const struct menc *menc_find(const struct list *mencl, const char *id);
+const char *menc_event_name(enum menc_event event);
 
 
 /*
