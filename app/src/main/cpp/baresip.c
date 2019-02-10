@@ -199,8 +199,8 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     char peer_buf[256];
     size_t size;
 
-    LOGD("got message '%.*s' from peer '%.*s'", mbuf_get_left(body), mbuf_buf(body),
-        peer->l, peer->p);
+    LOGD("got message '%.*s' from peer '%.*s'", (int)mbuf_get_left(body), mbuf_buf(body),
+         (int)peer->l, peer->p);
 
     BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
@@ -218,7 +218,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
                                              "(Ljava/lang/String;Ljava/lang/String;[B)V");
     sprintf(ua_buf, "%lu", (unsigned long)ua);
     jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-    sprintf(peer_buf, "%.*s", peer->l, peer->p);
+    sprintf(peer_buf, "%.*s", (int)peer->l, peer->p);
     jstring javaPeer = (*env)->NewStringUTF(env, peer_buf);
     jbyteArray javaMsg;
     size = mbuf_get_left(body);
@@ -230,7 +230,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)javaMsg, 0);
     memcpy(temp, mbuf_buf(body), size);
     (*env)->ReleasePrimitiveArrayCritical(env, javaMsg, temp, 0);
-    LOGD("sending message %s/%s/%.*s\n", ua_buf, peer_buf, size, mbuf_buf(body));
+    LOGD("sending message %s/%s/%.*s\n", ua_buf, peer_buf, (int)size, mbuf_buf(body));
     (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, javaUA, javaPeer, javaMsg);
     (*env)->DeleteLocalRef(env, javaUA);
     (*env)->DeleteLocalRef(env, javaPeer);
@@ -477,7 +477,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
     LOGD("ua_stop_all upon baresipStop");
-    mqueue_push(mq, ID_UA_STOP_ALL, (void *)((int)force));
+    mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
     return;
 }
 
