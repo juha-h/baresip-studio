@@ -7,8 +7,8 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode = 41
-        versionName = '5.3.0'
+        versionCode = 42
+        versionName = '5.3.1'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H'
@@ -16,6 +16,12 @@ android {
         }
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+    splits {
+        abi {
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a'
         }
     }
     buildTypes {
