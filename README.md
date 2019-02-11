@@ -1,3 +1,5 @@
+<a href="https://f-droid.org/app/com.tutpro.baresip"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="100"></a>
+
 This is very basic Android Studio project implementing baresip
 (https://github.com/alfredh/baresip) based SIP User Agent.
 
