@@ -1,4 +1,4 @@
-<a href="https://f-droid.org/app/com.tutpro.baresip"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="100"></a>
+<a href="https://f-droid.org/app/com.tutpro.baresip"><img src="https://f-droid.org/badge/get-it-on.png" alt="F-Droid" height="100"></a>
 
 This is very basic Android Studio project implementing baresip
 (https://github.com/alfredh/baresip) based SIP User Agent.
@@ -21,6 +21,6 @@ After cloning the project, in Android Studio 3.2.1:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
-Available also in F-Droid and Google Play stores.
+Available also on <a href="https://f-droid.org/app/com.tutpro.baresip"><img src="https://f-droid.org/badge/get-it-on.png" alt="F-Droid"></a> and Google Play store.
 
 Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
