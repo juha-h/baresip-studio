@@ -33,16 +33,16 @@
     </string>
     <string name="auCodecs">List of supported audio codecs in priority order.</string>
     <string name="mediaEnc">Selects media transport encryption protocol.\n
-        ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
-        the call has been established.\n
-        DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
-        RTP/SAVPF, UDP/TLS/RTP/SAVP, or UDP/TLS/RTP/SAVPF is used if offered in incoming call.\n
-        SRTP-MAND means that RTP/SAVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF
-        is used if offered in incoming call.\n
-        SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
-        if offered in incoming call.\n
-        EMPTY value means that media encryption is not supported and that media transport protocol
-        thus is RTP/AVP.
+        &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
+            the call has been established.\n
+        &#8226; DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
+            RTP/SAVPF, UDP/TLS/RTP/SAVP, or UDP/TLS/RTP/SAVPF is used if offered in incoming call.\n
+        &#8226; SRTP-MANDF means that RTP/SAVPF is offered in outgoing call and required in incoming call.\n
+        &#8226; SRTP-MAND means that RTP/SAVP is offered in outgoing call and required in incoming call.\n
+        &#8226; SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
+            if offered in incoming call.\n
+        &#8226; None means that media encryption is not supported and that media transport protocol
+            thus is RTP/AVP.
     </string>
     <string name="vmUri">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
