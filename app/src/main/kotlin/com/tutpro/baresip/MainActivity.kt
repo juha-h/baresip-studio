@@ -512,8 +512,13 @@ class MainActivity : AppCompatActivity() {
                             if (acc.mediaEnc == "") {
                                 securityButton.visibility = View.INVISIBLE
                             } else {
-                                securityButton.setImageResource(R.drawable.box_red)
-                                securityButton.tag = "red"
+                                if ((acc.mediaEnc == "srtp-mand") || (acc.mediaEnc == "srtp-mandf")) {
+                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.tag = "yellow"
+                                } else {
+                                    securityButton.setImageResource(R.drawable.box_red)
+                                    securityButton.tag = "red"
+                                }
                                 securityButton.visibility = View.VISIBLE
                             }
                             callButton.visibility = View.INVISIBLE

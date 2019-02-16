@@ -108,8 +108,8 @@ class AccountActivity : AppCompatActivity() {
 
         mediaEnc = acc.mediaEnc
         val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
-        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtpf", "srtp-mand", "srtp", "")
-        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MAND", "SRTP", "")
+        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtpf", "srtp-mandf", "srtp-mand", "srtp", "")
+        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "None")
         val keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
         val keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)

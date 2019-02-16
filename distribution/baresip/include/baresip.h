@@ -13,7 +13,7 @@ extern "C" {
 
 
 /** Defines the Baresip version string */
-#define BARESIP_VERSION "0.6.0"
+#define BARESIP_VERSION "0.6.1"
 
 
 #ifndef NET_MAX_NS
@@ -349,6 +349,7 @@ int  contact_init(struct contacts **contactsp);
 int  contact_add(struct contacts *contacts,
 		 struct contact **contactp, const struct pl *addr);
 void contact_remove(struct contacts *contacts, struct contact *c);
+void contacts_enable_presence(struct contacts *contacts, bool enabled);
 void contact_set_update_handler(struct contacts *contacs,
 				contact_update_h *updateh, void *arg);
 int  contact_print(struct re_printf *pf, const struct contact *cnt);
@@ -813,9 +814,6 @@ int  ui_password_prompt(char **passwordp);
 /** Command flags */
 enum {
 	CMD_PRM  = (1<<0),              /**< Command with parameter */
-	CMD_PROG = (1<<1),              /**< Show progress          */
-
-	CMD_IPRM = CMD_PRM | CMD_PROG,  /**< Interactive parameter  */
 };
 
 /** Command arguments */
@@ -1119,7 +1117,20 @@ int vidfilt_dec_append(struct list *filtl, void **ctx,
  */
 
 struct audio;
+struct stream_param;
+struct mnat;
+struct mnat_sess;
 
+typedef void (audio_event_h)(int key, bool end, void *arg);
+typedef void (audio_err_h)(int err, const char *str, void *arg);
+
+int audio_alloc(struct audio **ap, const struct stream_param *stream_prm,
+		const struct config *cfg,
+		struct call *call, struct sdp_session *sdp_sess, int label,
+		const struct mnat *mnat, struct mnat_sess *mnat_sess,
+		const struct menc *menc, struct menc_sess *menc_sess,
+		uint32_t ptime, const struct list *aucodecl, bool offerer,
+		audio_event_h *eventh, audio_err_h *errh, void *arg);
 void audio_mute(struct audio *a, bool muted);
 bool audio_ismuted(const struct audio *a);
 void audio_set_devicename(struct audio *a, const char *src, const char *play);
@@ -1135,6 +1146,10 @@ int  audio_start(struct audio *a);
 void audio_stop(struct audio *a);
 bool audio_started(const struct audio *a);
 void audio_set_hold(struct audio *au, bool hold);
+int  audio_encoder_set(struct audio *a, const struct aucodec *ac,
+		       int pt_tx, const char *params);
+int  audio_decoder_set(struct audio *a, const struct aucodec *ac,
+		       int pt_rx, const char *params);
 const struct aucodec *audio_codec(const struct audio *au, bool tx);
 
 
@@ -1164,15 +1179,23 @@ uint64_t video_calc_timebase_timestamp(uint64_t rtp_ts);
  * Generic stream
  */
 
+/** Common parameters for media stream */
+struct stream_param {
+	bool use_rtp;
+	int af;
+	const char *cname;
+};
+void stream_update(struct stream *s);
 const struct rtcp_stats *stream_rtcp_stats(const struct stream *strm);
 struct call *stream_call(const struct stream *strm);
-const struct sdp_media *stream_sdp(const struct stream *strm);
+struct sdp_media *stream_sdpmedia(const struct stream *s);
 uint32_t stream_metric_get_tx_n_packets(const struct stream *strm);
 uint32_t stream_metric_get_tx_n_bytes(const struct stream *strm);
 uint32_t stream_metric_get_tx_n_err(const struct stream *strm);
 uint32_t stream_metric_get_rx_n_packets(const struct stream *strm);
 uint32_t stream_metric_get_rx_n_bytes(const struct stream *strm);
 uint32_t stream_metric_get_rx_n_err(const struct stream *strm);
+
 
 /*
  * Media NAT
