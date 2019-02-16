@@ -21,8 +21,6 @@ After cloning the project, in Android Studio 3.2.1:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
-Available also on <a href="https://f-droid.org/app/com.tutpro.baresip"><img
- src="https://f-droid.org/badge/get-it-on.png" alt="F-Droid"></a> and
-<a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip&hl=en_US">Google Play store</a>.
+Available also on <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a> and <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip&hl=en_US">Google Play</a>.
 
 Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
