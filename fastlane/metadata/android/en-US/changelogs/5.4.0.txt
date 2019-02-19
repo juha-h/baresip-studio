@@ -1,0 +1,3 @@
+- Added SRTP-MANDF media encryption protocol.
+- Security button color now changes from red to yellow also when call is
+  secured by an SRTP* media encyption protocol.
