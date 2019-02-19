@@ -1259,9 +1259,6 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
-    if (strcmp(native_cmd, "audio_debug") == 0) {
-        re_printf("Baresip audio debug '%H\n", audio_debug, call_audio(ua_call(uag_current())));
-    }
     int res = cmd_process_long(baresip_commands(), native_cmd, strlen(native_cmd), &pf_null, NULL);
     (*env)->ReleaseStringUTFChars(env, javaCmd, native_cmd);
     return res;
