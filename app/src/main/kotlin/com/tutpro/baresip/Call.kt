@@ -11,6 +11,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var zid = ""
     var hasHistory = false
 
+    init {
+        if (ua.account.mediaEnc != "") security = R.drawable.box_red
+    }
+
     companion object {
 
         fun calls(): ArrayList<Call> {

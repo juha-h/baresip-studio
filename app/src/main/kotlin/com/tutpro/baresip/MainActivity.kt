@@ -512,13 +512,8 @@ class MainActivity : AppCompatActivity() {
                             if (acc.mediaEnc == "") {
                                 securityButton.visibility = View.INVISIBLE
                             } else {
-                                if ((acc.mediaEnc == "srtp-mand") || (acc.mediaEnc == "srtp-mandf")) {
-                                    securityButton.setImageResource(R.drawable.box_yellow)
-                                    securityButton.tag = "yellow"
-                                } else {
-                                    securityButton.setImageResource(R.drawable.box_red)
-                                    securityButton.tag = "red"
-                                }
+                                securityButton.setImageResource(call.security)
+                                setSecurityButtonTag(securityButton, call.security)
                                 securityButton.visibility = View.VISIBLE
                             }
                             callButton.visibility = View.INVISIBLE
@@ -595,7 +590,6 @@ class MainActivity : AppCompatActivity() {
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
                             securityButton.setImageResource(call.security)
                             securityButton.tag = tag
-                            securityButton.visibility = View.VISIBLE
                         }
                     }
                     "call transfer" -> {
@@ -875,7 +869,6 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.about -> {
-                Api.cmd_exec("audio_debug")
                 i = Intent(this, AboutActivity::class.java)
                 startActivityForResult(i, ABOUT_CODE)
                 return true
@@ -1122,10 +1115,10 @@ class MainActivity : AppCompatActivity() {
                 "connected" -> {
                     securityButton.setImageResource(call.security)
                     setSecurityButtonTag(securityButton, call.security)
-                    if ((ua.account.mediaEnc == "zrtp") || (ua.account.mediaEnc == "dtls_srtpf"))
-                        securityButton.visibility = View.VISIBLE
-                    else
+                    if (ua.account.mediaEnc == "")
                         securityButton.visibility = View.INVISIBLE
+                    else
+                        securityButton.visibility = View.VISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true

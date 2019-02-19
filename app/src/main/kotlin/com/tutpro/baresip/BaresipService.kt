@@ -339,7 +339,6 @@ class BaresipService: Service() {
                         Log.d("Baresip", "AoR $aor call $callp established")
                         call.status = "connected"
                         call.onhold = false
-                        call.security = R.drawable.box_red
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                         CallHistory.save(filesPath)
                         call.hasHistory = true
