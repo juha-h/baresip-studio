@@ -29,7 +29,6 @@ typedef struct baresip_context {
 BaresipContext g_ctx;
 
 struct play *play = NULL;
-struct message_lsnr *message;
 
 static int vprintf_null(const char *p, size_t size, void *arg)
 {
@@ -446,7 +445,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     play = mem_deref(play);
-    message = mem_deref(message);
     mq = mem_deref(mq);
 
     LOGD("closing ...");
