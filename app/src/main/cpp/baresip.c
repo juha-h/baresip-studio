@@ -402,7 +402,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    err = message_listen(&message, baresip_message(), message_handler, NULL);
+    err = message_listen(baresip_message(), message_handler, NULL);
     if (err) {
         LOGE("message_listen() failed (%d)\n", err);
         goto out;
