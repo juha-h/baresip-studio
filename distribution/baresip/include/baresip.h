@@ -215,7 +215,6 @@ enum audio_mode {
 
 /** SIP User-Agent */
 struct config_sip {
-	uint32_t trans_bsize;   /**< SIP Transaction bucket size    */
 	char uuid[64];          /**< Universally Unique Identifier  */
 	char local[64];         /**< Local SIP Address              */
 	char cert[256];         /**< SIP Certificate                */
@@ -250,7 +249,6 @@ struct config_audio {
 	int dec_fmt;            /**< Audio decoder sample format    */
 };
 
-#ifdef USE_VIDEO
 /** Video */
 struct config_video {
 	char src_mod[16];       /**< Video source module            */
@@ -263,7 +261,6 @@ struct config_video {
 	bool fullscreen;        /**< Enable fullscreen display      */
 	int enc_fmt;            /**< Encoder pixelfmt (enum vidfmt) */
 };
-#endif
 
 /** Audio/Video Transport */
 struct config_avt {
@@ -285,12 +282,10 @@ struct config_net {
 	size_t nsc;             /**< Number of DNS nameservers      */
 };
 
-#ifdef USE_VIDEO
-/* BFCP */
+/** BFCP Configuration */
 struct config_bfcp {
 	char proto[16];         /**< BFCP Transport (optional)      */
 };
-#endif
 
 /** SDP */
 struct config_sdp {
@@ -307,16 +302,12 @@ struct config {
 
 	struct config_audio audio;
 
-#ifdef USE_VIDEO
 	struct config_video video;
-#endif
 	struct config_avt avt;
 
 	struct config_net net;
 
-#ifdef USE_VIDEO
 	struct config_bfcp bfcp;
-#endif
 
 	struct config_sdp sdp;
 };
@@ -404,11 +395,11 @@ typedef void (message_recv_h)(struct ua *ua, const struct pl *peer,
 			      struct mbuf *body, void *arg);
 
 struct message;
-struct message_lsnr;
 
 int  message_init(struct message **messagep);
-int  message_listen(struct message_lsnr **lsnrp, struct message *message,
+int  message_listen(struct message *message,
 		    message_recv_h *h, void *arg);
+void message_unlisten(struct message *message, message_recv_h *recvh);
 int  message_send(struct ua *ua, const char *peer, const char *msg,
 		  sip_resp_h *resph, void *arg);
 
@@ -564,6 +555,9 @@ struct log {
 
 void log_register_handler(struct log *logh);
 void log_unregister_handler(struct log *logh);
+void log_level_set(enum log_level level);
+enum log_level log_level_get(void);
+const char *log_level_name(enum log_level level);
 void log_enable_debug(bool enable);
 void log_enable_info(bool enable);
 void log_enable_stdout(bool enable);
@@ -820,7 +814,6 @@ enum {
 struct cmd_arg {
 	char key;         /**< Which key was pressed  */
 	char *prm;        /**< Optional parameter     */
-	bool complete;    /**< True if complete       */
 	void *data;       /**< Application data       */
 };
 
