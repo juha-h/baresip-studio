@@ -25,7 +25,6 @@ module dtls_srtp.so
 module zrtp.so
 module_tmp uuid.so
 module_tmp account.so
-module_app auloop.so
 module_app contact.so
 module_app debug_cmd.so
 module_app mwi.so
@@ -39,4 +38,3 @@ ice_debug no
 ice_nomination regular
 ice_mode full
 zrtp_hash yes
-
