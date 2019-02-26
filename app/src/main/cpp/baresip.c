@@ -465,7 +465,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     stopped:
 
-    LOGD("tell app about baresip stop");
+    LOGD("tell main that baresip has stopped");
     jmethodID stoppedId = (*env)->GetMethodID(env, pctx->mainActivityClz, "stopped", "()V");
     (*env)->CallVoidMethod(env, pctx->mainActivityObj, stoppedId);
 

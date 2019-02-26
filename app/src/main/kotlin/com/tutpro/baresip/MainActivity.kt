@@ -110,6 +110,8 @@ class MainActivity : AppCompatActivity() {
                     "force" -> {
                         baresipService.setAction("Kill");
                         startService(baresipService)
+                        finishAndRemoveTask()
+                        System.exit(0)
                     }
                 }
             }

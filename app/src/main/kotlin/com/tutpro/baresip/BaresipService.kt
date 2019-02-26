@@ -179,12 +179,15 @@ class BaresipService: Service() {
             }
 
             "Stop", "Stop Force" -> {
-                if (action == "Stop") cleanService()
+                if (!isServiceClean) cleanService()
                 if (isServiceRunning) baresipStop(action == "Stop Force")
             }
 
             "Kill" -> {
-                stopped()
+                if (!isServiceClean) cleanService()
+                isServiceRunning = false
+                stopForeground(true)
+                stopSelf()
             }
         }
 
@@ -508,7 +511,7 @@ class BaresipService: Service() {
 
     @Keep
     fun stopped() {
-        Log.d(LOG_TAG, "'stopped' from baresip or 'Kill' from MainActivity")
+        Log.d(LOG_TAG, "'stopped' from baresip")
         isServiceRunning = false
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")
@@ -618,6 +621,7 @@ class BaresipService: Service() {
         if (this::nm.isInitialized) nm.cancelAll()
         if (this::wl.isInitialized && wl.isHeld) wl.release()
         if (this::fl.isInitialized && fl.isHeld) fl.release()
+        isServiceClean = true
     }
 
     external fun baresipStart(path: String)
@@ -635,6 +639,7 @@ class BaresipService: Service() {
         var isServiceRunning = false
         var disconnected = false
         var libraryLoaded = false
+        var isServiceClean = false
 
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
