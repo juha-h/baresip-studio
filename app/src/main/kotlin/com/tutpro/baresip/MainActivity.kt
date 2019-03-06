@@ -474,7 +474,8 @@ class MainActivity : AppCompatActivity() {
                             Log.e("Baresip", "Incoming call $callp not found")
                             return
                         }
-                        if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                        if ((aorSpinner.selectedItemPosition == -1) ||
+                                (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])) {
                             aorSpinner.setSelection(account_index)
                         } else {
                             callTitle.text = "Incoming call from ..."
@@ -655,7 +656,8 @@ class MainActivity : AppCompatActivity() {
                         Message.add(Message(aor, peerUri, R.drawable.arrow_down_green, msgText,
                                 time.toLong(), true))
                         if (Utils.isVisible()) {
-                            if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
+                            if ((aorSpinner.selectedItemPosition == -1) ||
+                                    (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
                                 aorSpinner.setSelection(account_index)
                             val i = Intent(applicationContext, ChatsActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -678,11 +680,12 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         if ((aorSpinner.selectedItemPosition >= 0) &&
-                                (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                                (ua == UserAgent.uas()[aorSpinner.selectedItemPosition])) {
                             if (acc.vmNew > 0)
                                 voicemailButton.setImageResource(R.drawable.voicemail_new)
                             else
                                 voicemailButton.setImageResource(R.drawable.voicemail)
+                        }
                     }
                     else -> Log.w("Baresip", "Unknown event '${ev[0]}'")
                 }
