@@ -13,6 +13,7 @@
         android:id="@+id/account"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:gravity="center_horizontal" >
     </TextView>
 
@@ -21,7 +22,10 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"
         android:layout_below="@id/account"
+        android:divider="#00000000"
+        android:dividerHeight="15dp"
         android:layout_above="@id/text" >
     </ListView>
 
