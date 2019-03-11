@@ -50,7 +50,8 @@ class ChatActivity : AppCompatActivity() {
 
         var chatPeer = ContactsActivity.contactName(peerUri)
         if (chatPeer.startsWith("sip:")) {
-            if (Utils.checkTelNo(Utils.uriUserPart(peerUri)))
+            if (Utils.checkTelNo(Utils.uriUserPart(peerUri)) ||
+                    (Utils.uriHostPart(peerUri) == Utils.aorDomain(aor)))
                 chatPeer = Utils.uriUserPart(peerUri)
             else
                 chatPeer = chatPeer.substring(4)
@@ -68,7 +69,7 @@ class ChatActivity : AppCompatActivity() {
         listView.isLongClickable = true
         val footerView = View(applicationContext)
         listView.addFooterView(footerView)
-        listView.smoothScrollToPosition(mlAdapter.count)
+        listView.smoothScrollToPosition(mlAdapter.count - 1)
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
