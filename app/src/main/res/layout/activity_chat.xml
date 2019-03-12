@@ -21,11 +21,11 @@
         android:id="@+id/messages"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/account"
         android:transcriptMode="alwaysScroll"
         android:stackFromBottom="true"
-        android:layout_below="@id/account"
         android:divider="#00000000"
-        android:dividerHeight="15dp"
+        android:dividerHeight="10dp"
         android:layout_above="@id/text" >
     </ListView>
 
@@ -38,7 +38,6 @@
         android:scrollHorizontally="false"
         android:importantForAutofill="no"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
         android:layout_toStartOf="@id/sendButton"
         android:hint="New message" >
     </EditText>
@@ -51,7 +50,6 @@
         android:background="@null"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="2dp" >
     </ImageButton>
 
