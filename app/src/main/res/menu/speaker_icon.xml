@@ -6,7 +6,7 @@
         android:id="@+id/speakerIcon"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_speaker"
+        android:icon="@drawable/speaker_off"
         />
 
 </menu>
