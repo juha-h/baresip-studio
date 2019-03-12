@@ -12,10 +12,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.view.menu.ActionMenuItemView
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
 import android.text.TextWatcher
@@ -51,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
+    internal lateinit var speakerIcon: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -631,9 +630,7 @@ class MainActivity : AppCompatActivity() {
                             if (ua.account.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
-                        val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
-                        speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
-                                    R.color.colorPrimary))
+                        speakerIcon.setIcon(R.drawable.speaker_off)
                         if (BaresipService.speakerPhone) {
                             baresipService.setAction("ToggleSpeaker")
                             startService(baresipService)
@@ -838,6 +835,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
+        speakerIcon = menu.findItem(R.id.speakerIcon)
         return true
     }
 
@@ -845,12 +843,10 @@ class MainActivity : AppCompatActivity() {
         val i: Intent
         when (item.itemId) {
             R.id.speakerIcon -> {
-                val speakerIcon = findViewById(R.id.speakerIcon) as ActionMenuItemView
                 if (BaresipService.speakerPhone)
-                    speakerIcon.setBackgroundColor(ContextCompat.getColor(applicationContext,
-                            R.color.colorPrimary))
+                    item.setIcon(R.drawable.speaker_off)
                 else
-                    speakerIcon.setBackgroundColor(Color.rgb(0x04, 0xb4, 0x04))
+                    item.setIcon(R.drawable.speaker_on)
                 baresipService.setAction("ToggleSpeaker")
                 startService(baresipService)
                 return true
