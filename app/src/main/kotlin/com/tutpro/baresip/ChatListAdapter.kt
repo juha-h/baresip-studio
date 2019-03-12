@@ -1,7 +1,9 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
@@ -53,6 +55,10 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
         }
         if (info.length < 6) info = "Today $info"
         infoView.text = "$info - $sender"
+        if (message.direction == R.drawable.arrow_up_red) {
+            infoView.text = "${infoView.text} - Message Delivery Failed"
+            infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
+        }
         val textView = chatView.findViewById(R.id.text) as TextView
         textView.text = message.message
         if (message.new) {
