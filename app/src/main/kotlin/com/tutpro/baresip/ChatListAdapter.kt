@@ -56,7 +56,11 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
         if (info.length < 6) info = "Today $info"
         infoView.text = "$info - $sender"
         if (message.direction == R.drawable.arrow_up_red) {
-            infoView.text = "${infoView.text} - Message Delivery Failed"
+            if (message.responseCode != 0)
+                infoView.text = "${infoView.text} - Failed: ${message.responseCode} " +
+                        "${message.responseReason}"
+            else
+                infoView.text = "${infoView.text} - Sending of message failed!"
             infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
         }
         val textView = chatView.findViewById(R.id.text) as TextView
