@@ -7,6 +7,6 @@
     <color name="colorSecondaryDark">#1c9588</color>
     <color name="colorSecondaryLight">#93d3cd</color>
     <color name="colorGray">#9e9e9e</color>
-    <color name="colorGrayLight">#eeeeee</color>
+    <color name="colorGrayLight">#e0e0e0</color>
     <color name="colorAccent">#b00020</color>
 </resources>

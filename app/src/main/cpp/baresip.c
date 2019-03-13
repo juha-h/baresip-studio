@@ -239,13 +239,16 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
 {
     (void)arg;
+    char reason_buf[64];
 
     if (err) {
         LOGD("send_response_handler received error %d\n", err);
         return;
     }
 
-    LOGD("send_response_handler received response %u at %s\n", msg->scode, (char *)arg);
+    pl_strcpy(&(msg->reason), reason_buf, 64);
+    LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode,
+            reason_buf, (char *)arg);
 
     BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
@@ -259,11 +262,13 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
         }
     }
     jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
-                                             "messageResponse", "(ILjava/lang/String;)V");
+                                             "messageResponse",
+                                             "(ILjava/lang/String;Ljava/lang/String;)V");
+    jstring javaReason = (*env)->NewStringUTF(env, reason_buf);
     jstring javaTime = (*env)->NewStringUTF(env, (char *)arg);
-    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, msg->scode, javaTime);
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, msg->scode, javaReason, javaTime);
+    (*env)->DeleteLocalRef(env, javaReason);
     (*env)->DeleteLocalRef(env, javaTime);
-
 }
 
 enum {

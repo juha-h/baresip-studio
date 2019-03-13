@@ -650,8 +650,9 @@ class MainActivity : AppCompatActivity() {
                         val msgText = params[2]
                         val time = params[3]
                         Log.d("Baresip", "Incoming message $aor/$peerUri/$msgText")
-                        Message.add(Message(aor, peerUri, R.drawable.arrow_down_green, msgText,
-                                time.toLong(), true))
+                        Message.add(Message(aor, peerUri, msgText, time.toLong(),
+                                R.drawable.arrow_down_green, 0, "",
+                                true))
                         if (Utils.isVisible()) {
                             if ((aorSpinner.selectedItemPosition == -1) ||
                                     (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))

@@ -501,10 +501,11 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun messageResponse(responseCode: Int, time: String) {
-        Log.d(LOG_TAG, "Message response $responseCode at $time")
+    fun messageResponse(responseCode: Int, responseReason: String, time: String) {
+        Log.d(LOG_TAG, "Message response '$responseCode $responseReason' at $time")
         val intent = Intent("message response")
         intent.putExtra("response code", responseCode)
+        intent.putExtra("response reason", responseReason)
         intent.putExtra("time", time)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }

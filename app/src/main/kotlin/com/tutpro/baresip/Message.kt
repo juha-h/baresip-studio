@@ -3,8 +3,9 @@ package com.tutpro.baresip
 import java.io.*
 import java.util.ArrayList
 
-class Message(val aor: String, val peerUri: String, var direction: Int, val message: String,
-              val timeStamp: Long, var new: Boolean): Serializable {
+class Message(val aor: String, val peerUri: String, val message: String, val timeStamp: Long,
+              var direction: Int, var responseCode: Int, var responseReason: String,
+              var new: Boolean): Serializable {
 
     companion object {
 

@@ -118,23 +118,27 @@ class ChatActivity : AppCompatActivity() {
             if (msgText.length > 0) {
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val time = System.currentTimeMillis()
-                val msg = Message(aor, peerUri, R.drawable.arrow_up_yellow, msgText, time, true)
+                val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
+                        0, "", true)
                 Message.add(msg)
                 chatMessages.add(msg)
-                mlAdapter.notifyDataSetChanged()
                 if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
                     Toast.makeText(getApplicationContext(), "Sending of message failed!",
                             Toast.LENGTH_SHORT).show()
+                    msg.direction = R.drawable.arrow_up_red
+                    msg.responseReason = "Sending of message failed"
                 } else {
                     newMessage.text.clear()
                     BaresipService.chatTexts.remove("$aor::$peerUri")
                 }
+                mlAdapter.notifyDataSetChanged()
             }
         }
 
         messageResponseReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 handleMessageResponse(intent.getIntExtra("response code", 0),
+                        intent.getStringExtra("response reason"),
                         intent.getStringExtra("time"))
             }
         }
@@ -208,14 +212,17 @@ class ChatActivity : AppCompatActivity() {
         return res
     }
 
-    private fun handleMessageResponse(responseCode: Int, time: String) {
+    private fun handleMessageResponse(responseCode: Int, responseReason: String, time: String) {
         val timeStamp = time.toLong()
         for (m in chatMessages.reversed())
             if (m.timeStamp == timeStamp) {
-                if (responseCode < 300)
+                if (responseCode < 300) {
                     m.direction = R.drawable.arrow_up_green
-                else
+                } else {
                     m.direction = R.drawable.arrow_up_red
+                    m.responseCode = responseCode
+                    m.responseReason = responseReason
+                }
                 mlAdapter.notifyDataSetChanged()
                 return
             }
