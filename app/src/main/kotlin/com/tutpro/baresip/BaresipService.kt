@@ -126,7 +126,6 @@ class BaresipService: Service() {
                     } catch (e: Error) {
                         Log.e(LOG_TAG, "Failed to create directory: " + e.toString())
                     }
-
                 }
                 for (a in assets) {
                     file = File("${filesPath}/$a")
@@ -160,7 +159,7 @@ class BaresipService: Service() {
                         }
                     }
                 }
-
+                ContactsActivity.restoreContacts(applicationContext.filesDir)
                 wl.acquire()
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 BaresipService.isServiceRunning = true
