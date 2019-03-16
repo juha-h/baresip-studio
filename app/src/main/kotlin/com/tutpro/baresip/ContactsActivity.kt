@@ -97,7 +97,6 @@ class ContactsActivity : AppCompatActivity() {
 
     companion object {
 
-
         fun saveContacts(path: File): Boolean {
             var contents = ""
             for (c in Contact.contacts())

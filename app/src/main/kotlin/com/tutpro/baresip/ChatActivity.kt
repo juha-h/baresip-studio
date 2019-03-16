@@ -18,6 +18,7 @@ class ChatActivity : AppCompatActivity() {
 
     internal lateinit var chatMessages: ArrayList<Message>
     internal lateinit var mlAdapter: MessageListAdapter
+    internal lateinit var listView: ListView
     internal lateinit var newMessage: EditText
     internal lateinit var sendButton: ImageButton
     internal lateinit var imm: InputMethodManager
@@ -27,7 +28,10 @@ class ChatActivity : AppCompatActivity() {
     internal lateinit var messageResponseReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
+        Log.d("Baresip", "Chat created")
 
         setContentView(R.layout.activity_chat)
 
@@ -62,7 +66,7 @@ class ChatActivity : AppCompatActivity() {
         val headerText = "Account ${aor.substringAfter(":")}"
         headerView.text = headerText
 
-        val listView = findViewById(R.id.messages) as ListView
+        listView = findViewById(R.id.messages) as ListView
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
@@ -161,7 +165,14 @@ class ChatActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    /*override fun onStop() {
+        super.onStop()
+        Log.d("Baresip", "Chat Stopped")
+    }*/
+
     override fun onResume() {
+        super.onResume()
+        Log.d("Baresip", "Chat resumed")
         val chatText = BaresipService.chatTexts.get("$aor::$peerUri")
         if (chatText != null) {
             Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
@@ -169,7 +180,10 @@ class ChatActivity : AppCompatActivity() {
             newMessage.requestFocus()
             BaresipService.chatTexts.remove("$aor::$peerUri")
         }
-        super.onResume()
+        mlAdapter.clear()
+        chatMessages = uaPeerMessages(aor, peerUri)
+        mlAdapter = MessageListAdapter(this, chatMessages)
+        listView.adapter = mlAdapter
     }
 
     override fun onDestroy() {

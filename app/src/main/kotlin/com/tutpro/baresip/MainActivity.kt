@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        Log.d("Baresip", "onCreate with intent action " +
+        Log.d("Baresip", "Main created with action " +
                 intent.getStringExtra("action"))
 
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
@@ -182,7 +182,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        ContactsActivity.restoreContacts(applicationContext.filesDir)
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))
         callUri.threshold = 2
@@ -800,13 +799,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        // Log.d("Baresip", "Paused")
+        // Log.d("Baresip", "Main paused")
         visible = false
     }
 
+    /*override fun onStop() {
+        super.onStop()
+        Log.d("Baresip", "Main stopped")
+    }*/
+
     override fun onResume() {
         super.onResume()
-        Log.d("Baresip", "Resumed")
+        Log.d("Baresip", "Main resumed")
         imm.hideSoftInputFromWindow(callUri.windowToken, 0)
         visible = true
         if (answerCall != "") {

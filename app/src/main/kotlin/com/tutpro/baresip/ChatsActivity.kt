@@ -27,7 +27,11 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var plusButton: ImageButton
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
+        Log.d("Baresip", "Chats created")
+
         setContentView(R.layout.activity_chats)
 
         filesPath = applicationContext.filesDir.absolutePath
@@ -147,6 +151,20 @@ class ChatsActivity: AppCompatActivity() {
     override fun onPause() {
         saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
+    }
+
+    /*override fun onStop() {
+        super.onStop()
+        Log.d("Baresip", "Chats stopped")
+    }*/
+
+    override fun onResume() {
+        super.onResume()
+        // Log.d("Baresip", "Chats resumed")
+        clAdapter.clear()
+        uaMessages = uaMessages(aor)
+        clAdapter = ChatListAdapter(this, uaMessages)
+        listView.adapter = clAdapter
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
