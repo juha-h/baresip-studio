@@ -114,6 +114,12 @@ class ChatActivity : AppCompatActivity() {
         }
 
         newMessage = findViewById(R.id.text) as EditText
+        newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            }
+        })
+
         if (focus) newMessage.requestFocus()
 
         sendButton = findViewById(R.id.sendButton) as ImageButton
