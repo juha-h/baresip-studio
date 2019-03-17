@@ -318,14 +318,14 @@ class BaresipService: Service() {
                             answerIntent.putExtra("action", "answer")
                             answerIntent.putExtra("callp", callp)
                             val answerPendingIntent = PendingIntent.getActivity(this,
-                                    0, answerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                                    1, answerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val rejectIntent = Intent(this, MainActivity::class.java)
                             rejectIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             rejectIntent.putExtra("action", "reject")
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getActivity(this,
-                                    1, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                                    2, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             cnb.addAction(R.drawable.ic_stat, "Answer", answerPendingIntent)
                             cnb.addAction(R.drawable.ic_stat, "Reject", rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, cnb.build())
@@ -379,14 +379,14 @@ class BaresipService: Service() {
                             acceptIntent.putExtra("callp", callp)
                             acceptIntent.putExtra("uri", ev[1])
                             val acceptPendingIntent = PendingIntent.getActivity(this,
-                                    0, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                                    3, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val rejectIntent = Intent(this, MainActivity::class.java)
                             rejectIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             rejectIntent.putExtra("action", "deny")
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getActivity(this,
-                                    1, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                                    4, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             cnb.addAction(R.drawable.ic_stat, "Accept", acceptPendingIntent)
                             cnb.addAction(R.drawable.ic_stat, "Deny", rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, cnb.build())
@@ -471,7 +471,7 @@ class BaresipService: Service() {
             replyIntent.putExtra("uap", uap)
             replyIntent.putExtra("peer", peer)
             val replyPendingIntent = PendingIntent.getActivity(this,
-                    0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    5, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val saveIntent = Intent(this, MainActivity::class.java)
             saveIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -479,7 +479,7 @@ class BaresipService: Service() {
             saveIntent.putExtra("uap", uap)
             saveIntent.putExtra("time", timeStamp)
             val savePendingIntent = PendingIntent.getActivity(this,
-                    1, saveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    6, saveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val deleteIntent = Intent(this, MainActivity::class.java)
             deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -487,7 +487,7 @@ class BaresipService: Service() {
             deleteIntent.putExtra("uap", uap)
             deleteIntent.putExtra("time", timeStamp)
             val deletePendingIntent = PendingIntent.getActivity(this,
-                    2, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    7, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             cnb.addAction(R.drawable.ic_stat, "Reply", replyPendingIntent)
             cnb.addAction(R.drawable.ic_stat, "Save", savePendingIntent)
             cnb.addAction(R.drawable.ic_stat, "Delete", deletePendingIntent)
