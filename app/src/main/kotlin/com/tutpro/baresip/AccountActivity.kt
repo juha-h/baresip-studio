@@ -264,25 +264,24 @@ class AccountActivity : AppCompatActivity() {
             if (iceCheck.isChecked) {
                 val newStunServer = stunServer.text.toString().trim()
                 if (acc.stunServer != newStunServer) {
-                    if ((newStunServer != "") &&
-                            !Utils.checkHostPort(newStunServer, false)) {
+                    if (!Utils.checkHostPort(newStunServer, false)) {
                         Utils.alertView(this, "Notice",
-                                "Invalid STUN Server: $newStunServer")
+                                "Invalid STUN Server '$newStunServer'")
                         return false
                     }
                     var host = ""
-                    var port = ""
+                    var port = 0
                     if (newStunServer != "") {
                         val hostPort = newStunServer.split(":")
                         host = hostPort[0]
-                        if (hostPort.size == 2) port = hostPort[1]
+                        if (hostPort.size == 2) port = hostPort[1].toInt()
                     }
                     if ((account_set_stun_host(acc.accp, host) == 0) &&
-                            (account_set_stun_port(acc.accp, port.toInt()) == 0)) {
+                            (account_set_stun_port(acc.accp, port) == 0)) {
                         acc.stunServer = account_stun_host(acc.accp)
-                        if (port != "")
+                        if (port != 0)
                             acc.stunServer += ":" + account_stun_port(acc.accp).toString()
-                        Log.d("Baresip", "New StunServer is ${acc.stunServer}")
+                        Log.d("Baresip", "New StunServer is '${acc.stunServer}'")
                         save = true
                     } else {
                         Log.e("Baresip", "Setting of StunServer failed")

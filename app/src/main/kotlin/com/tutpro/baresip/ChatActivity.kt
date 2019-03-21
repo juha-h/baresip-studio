@@ -114,7 +114,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         newMessage = findViewById(R.id.text) as EditText
-        newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { v, hasFocus ->
+        newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             }
