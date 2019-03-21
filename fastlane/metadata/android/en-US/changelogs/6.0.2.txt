@@ -1,0 +1,1 @@
+- Fixed crash when stun server is defined without port number.
