@@ -749,7 +749,7 @@ class MainActivity : AppCompatActivity() {
                     Api.call_notify_sipfrag(callp, 603, "Decline")
                 moveTaskToBack(true)
             }
-            "reply", "save", "delete" -> {
+            "show", "reply", "save", "delete" -> {
                 val uap = intent.getStringExtra("uap")
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
@@ -758,14 +758,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 val aor = ua.account.aor
                 when (action) {
-                    "reply" -> {
+                    "show", "reply" -> {
                         val i = Intent(this@MainActivity, ChatsActivity::class.java)
                         val b = Bundle()
                         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
                             spinToAor(aor)
                         b.putString("aor", aor)
                         b.putString("peer", intent.getStringExtra("peer"))
-                        b.putBoolean("focus", true)
+                        b.putBoolean("focus", action == "reply")
                         i.putExtras(b)
                         startActivityForResult(i, MESSAGES_CODE)
                     }
