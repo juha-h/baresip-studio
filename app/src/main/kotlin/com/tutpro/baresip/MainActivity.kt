@@ -635,7 +635,7 @@ class MainActivity : AppCompatActivity() {
                             startService(baresipService)
                         }
                         val param = ev[1].trim()
-                        if (param != "") {
+                        if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param.get(0).isDigit())
                                 Toast.makeText(applicationContext, "Call failed: $param",
                                         Toast.LENGTH_LONG).show()
@@ -1018,9 +1018,9 @@ class MainActivity : AppCompatActivity() {
                     Utils.dtmfWatcher(newCallp))
             Call.calls().add(newCall)
             Api.call_stop_audio(call.callp)
-            Api.call_start_audio(newCallp)
             val err = Api.call_connect(newCallp, uri)
             if (err == 0) {
+                Api.call_start_audio(newCallp)
                 if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
                     spinToAor(ua.account.aor)
                 showCall(ua)
