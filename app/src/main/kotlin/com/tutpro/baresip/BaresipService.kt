@@ -18,6 +18,7 @@ import android.widget.RemoteViews
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
+import android.support.v4.content.ContextCompat
 
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -32,7 +33,6 @@ class BaresipService: Service() {
     internal lateinit var rt: Ringtone
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
-    internal lateinit var npi: PendingIntent
     internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
@@ -59,11 +59,6 @@ class BaresipService: Service() {
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
-
-        val ni = Intent(this, MainActivity::class.java)
-                .setAction(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_LAUNCHER)
-        npi = PendingIntent.getActivity(this, 0, ni, 0)
 
         nr = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -205,31 +200,6 @@ class BaresipService: Service() {
         sendBroadcast(broadcastIntent)
     }
 
-    private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
-                    NotificationManager.IMPORTANCE_LOW)
-            defaultChannel.description = "Tells that baresip is running"
-            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            nm.createNotificationChannel(defaultChannel)
-            val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
-                    NotificationManager.IMPORTANCE_HIGH)
-            highChannel.description = "Tells about incoming call or message"
-            highChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            highChannel.enableVibration(true)
-            nm.createNotificationChannel(highChannel)
-        }
-    }
-
-    private fun showStatusNotification() {
-        snb.setVisibility(VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_stat)
-                .setContentIntent(npi)
-                .setOngoing(true)
-                .setContent(RemoteViews(packageName, R.layout.status_notification))
-        startForeground(STATUS_NOTIFICATION_ID, snb.build())
-    }
-
     @Keep
     fun uaAdd(uap: String) {
         Log.d(LOG_TAG, "uaAdd at BaresipService")
@@ -298,17 +268,23 @@ class BaresipService: Service() {
                             startRinging()
                         }
                         if ((newEvent == null) && !Utils.isVisible()) {
-                            val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                            val intent = Intent(this, MainActivity::class.java)
+                                    .setAction(Intent.ACTION_MAIN)
+                                    .addCategory(Intent.CATEGORY_LAUNCHER)
+                            val pi = PendingIntent.getActivity(this,
+                                    System.currentTimeMillis().toInt(), intent, 0)
+                            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val caller = Utils.friendlyUri(ContactsActivity.contactName(peerUri),
                                     Utils.aorDomain(aor))
                             val title = "Incoming call from $caller"
-                            cnb.setSmallIcon(R.drawable.ic_stat)
-                                    .setColor(0x0ca1fd)
-                                    .setContentIntent(npi)
+                            nb.setSmallIcon(R.drawable.ic_stat)
+                                    .setColor(ContextCompat.getColor(this,
+                                            R.color.colorBaresip))
+                                    .setContentIntent(pi)
                                     .setAutoCancel(true)
                                     .setContentTitle(title)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                cnb.setVibrate(LongArray(0))
+                                nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
@@ -326,9 +302,9 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getActivity(this,
                                     2, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            cnb.addAction(R.drawable.ic_stat, "Answer", answerPendingIntent)
-                            cnb.addAction(R.drawable.ic_stat, "Reject", rejectPendingIntent)
-                            nm.notify(CALL_NOTIFICATION_ID, cnb.build())
+                            nb.addAction(R.drawable.ic_stat, "Answer", answerPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, "Reject", rejectPendingIntent)
+                            nm.notify(CALL_NOTIFICATION_ID, nb.build())
                         }
                     }
                     "call established" -> {
@@ -356,18 +332,24 @@ class BaresipService: Service() {
                             return
                         }
                         if (!Utils.isVisible()) {
-                            val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                            val intent = Intent(this, MainActivity::class.java)
+                                    .setAction(Intent.ACTION_MAIN)
+                                    .addCategory(Intent.CATEGORY_LAUNCHER)
+                            val pi = PendingIntent.getActivity(this,
+                                    System.currentTimeMillis().toInt(), intent, 0)
+                            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                     Utils.aorDomain(aor))
                             val title = "Call transfer request to $target"
-                            cnb.setSmallIcon(R.drawable.ic_stat)
-                                    .setColor(0x0ca1fd)
-                                    .setContentIntent(npi)
+                            nb.setSmallIcon(R.drawable.ic_stat)
+                                    .setColor(ContextCompat.getColor(this,
+                                            R.color.colorBaresip))
+                                    .setContentIntent(pi)
                                     .setDefaults(Notification.DEFAULT_SOUND)
                                     .setAutoCancel(true)
                                     .setContentTitle(title)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                cnb.setVibrate(LongArray(0))
+                                nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
@@ -387,9 +369,9 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getActivity(this,
                                     4, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            cnb.addAction(R.drawable.ic_stat, "Accept", acceptPendingIntent)
-                            cnb.addAction(R.drawable.ic_stat, "Deny", rejectPendingIntent)
-                            nm.notify(CALL_NOTIFICATION_ID, cnb.build())
+                            nb.addAction(R.drawable.ic_stat, "Accept", acceptPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, "Deny", rejectPendingIntent)
+                            nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
                     }
@@ -449,18 +431,26 @@ class BaresipService: Service() {
         }
         val timeStamp = System.currentTimeMillis().toString()
         if (!Utils.isVisible()) {
-            val cnb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+            val intent = Intent(this, MainActivity::class.java)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .putExtra("action", "show")
+                    .putExtra("uap", uap)
+                    .putExtra("peer", peer)
+            val pi = PendingIntent.getActivity(this,
+                    System.currentTimeMillis().toInt(), intent, 0)
+            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
             val sender = Utils.friendlyUri(ContactsActivity.contactName(peer),
                     Utils.aorDomain(ua.account.aor))
-            cnb.setSmallIcon(R.drawable.ic_stat)
-                    .setColor(0x0ca1fd)
-                    .setContentIntent(npi)
+            nb.setSmallIcon(R.drawable.ic_stat)
+                    .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                    .setContentIntent(pi)
                     .setDefaults(Notification.DEFAULT_SOUND)
                     .setAutoCancel(true)
                     .setContentTitle("Message from $sender")
                     .setContentText(s)
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                cnb.setVibrate(LongArray(0))
+                nb.setVibrate(LongArray(0))
                         .setVisibility(VISIBILITY_PRIVATE)
                         .setPriority(Notification.PRIORITY_HIGH)
             }
@@ -488,10 +478,10 @@ class BaresipService: Service() {
             deleteIntent.putExtra("time", timeStamp)
             val deletePendingIntent = PendingIntent.getActivity(this,
                     7, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            cnb.addAction(R.drawable.ic_stat, "Reply", replyPendingIntent)
-            cnb.addAction(R.drawable.ic_stat, "Save", savePendingIntent)
-            cnb.addAction(R.drawable.ic_stat, "Delete", deletePendingIntent)
-            nm.notify(MESSAGE_NOTIFICATION_ID, cnb.build())
+            nb.addAction(R.drawable.ic_stat, "Reply", replyPendingIntent)
+            nb.addAction(R.drawable.ic_stat, "Save", savePendingIntent)
+            nb.addAction(R.drawable.ic_stat, "Delete", deletePendingIntent)
+            nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
         }
         val intent = Intent("service event")
         intent.putExtra("event", "message")
@@ -519,6 +509,35 @@ class BaresipService: Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
+                    NotificationManager.IMPORTANCE_LOW)
+            defaultChannel.description = "Tells that baresip is running"
+            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            nm.createNotificationChannel(defaultChannel)
+            val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
+                    NotificationManager.IMPORTANCE_HIGH)
+            highChannel.description = "Tells about incoming call or message"
+            highChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            highChannel.enableVibration(true)
+            nm.createNotificationChannel(highChannel)
+        }
+    }
+
+    private fun showStatusNotification() {
+        val intent = Intent(this, MainActivity::class.java)
+                .setAction(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
+        val pi = PendingIntent.getActivity(this, 0, intent, 0)
+        snb.setVisibility(VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_stat)
+                .setContentIntent(pi)
+                .setOngoing(true)
+                .setContent(RemoteViews(packageName, R.layout.status_notification))
+        startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     private fun updateStatusNotification() {
