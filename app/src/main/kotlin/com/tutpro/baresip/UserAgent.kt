@@ -6,18 +6,6 @@ class UserAgent (val uap: String) {
 
     val account = Account(Api.ua_account(uap))
 
-    fun register() {
-        if (account.regint > 0) {
-            Log.d("Baresip", "Registering ${account.aor} UA ${uap}")
-            if (Api.ua_register(uap) != 0)
-                Log.e("Baresip", "Registering failed")
-        }
-    }
-
-    fun destroy() {
-        Api.ua_destroy(uap)
-    }
-
     companion object {
 
         fun uas(): ArrayList<UserAgent> {
