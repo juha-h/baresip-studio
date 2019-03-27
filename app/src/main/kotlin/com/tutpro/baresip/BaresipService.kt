@@ -314,7 +314,7 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Established AoR $aor call $callp is not found")
                             return
                         }
-                        Log.d("Baresip", "AoR $aor call $callp established")
+                        Log.d(LOG_TAG, "AoR $aor call $callp established")
                         call.status = "connected"
                         call.onhold = false
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
@@ -328,7 +328,7 @@ class BaresipService: Service() {
                     "call transfer" -> {
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.d("Baresip", "AoR $aor call $callp to be transferred is not found")
+                            Log.d(LOG_TAG, "AoR $aor call $callp to be transferred is not found")
                             return
                         }
                         if (!Utils.isVisible()) {
@@ -379,10 +379,10 @@ class BaresipService: Service() {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.d("Baresip", "AoR $aor call $callp that is closed is not found")
+                            Log.d(LOG_TAG, "AoR $aor call $callp that is closed is not found")
                             return
                         }
-                        Log.d("Baresip", "AoR $aor call $callp is closed")
+                        Log.d(LOG_TAG, "AoR $aor call $callp is closed")
                         stopRinging()
                         calls.remove(call)
                         if (!call.hasHistory) {
@@ -568,18 +568,18 @@ class BaresipService: Service() {
             @TargetApi(26)
             res = am.requestAudioFocus(audioFocusRequest)
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d("Baresip", "Audio focus granted")
+                Log.d(LOG_TAG, "Audio focus granted")
             } else {
-                Log.d("Baresip", "Audio focus denied")
+                Log.d(LOG_TAG, "Audio focus denied")
                 audioFocusRequest = null
             }
         } else {
             res = am.requestAudioFocus(null, streamType, AudioManager.AUDIOFOCUS_GAIN)
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d("Baresip", "Audio focus granted")
+                Log.d(LOG_TAG, "Audio focus granted")
                 audioFocused = true
             } else {
-                Log.d("Baresip", "Audio focus denied")
+                Log.d(LOG_TAG, "Audio focus denied")
                 audioFocused = false
             }
         }
@@ -681,7 +681,7 @@ class BaresipService: Service() {
 
     init {
         if (!libraryLoaded) {
-            Log.d("Baresip", "Loading baresip library")
+            Log.d(LOG_TAG, "Loading baresip library")
             System.loadLibrary("baresip")
             libraryLoaded = true
         }
