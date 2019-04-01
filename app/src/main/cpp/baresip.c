@@ -948,6 +948,7 @@ Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaU
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    LOGD("destroying ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     mem_deref(ua);
 }
