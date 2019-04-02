@@ -8,14 +8,11 @@ opus voice codecs, as well as ZRTP and (DTLS) SRTP media encapsulation.
 Motivated by need for secure SIP user agent for Android that does not
 depend on third party push notification services.
 
-The static libraries and include files in distribution directory have
-been produced using <a
-href="https://github.com/juha-h/libbaresip-android">
-libbaresip-android</a>.
-Before making libbaresip, apply reg.c-patch to re/src/sipreg/reg.c.  The
-patch is needed due to re timer sometimes firing too late.
+After cloning the project, generate static libraries and include files
+to distribution directory using master branch of
+https://github.com/juha-h/libbaresip-android.
 
-After cloning the project, in Android Studio 3.2.1:
+Then in Android Studio 3.3.x:
 
 - Open an existing Android Studio project
 
