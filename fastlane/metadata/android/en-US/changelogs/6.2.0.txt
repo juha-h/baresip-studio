@@ -1,0 +1,6 @@
+- Upgraded target Android API level to 28 (Android 9)
+- Moved some non-UI functionality from main activity to baresip service
+- Simplified implementation of call transfer
+- Updated baresip launcher and status bar images
+- Un-REGISTERed UA when account is deleted
+
