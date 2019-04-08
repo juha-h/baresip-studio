@@ -39,7 +39,7 @@ class ChatsActivity: AppCompatActivity() {
         listView = findViewById(R.id.chats) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
-        aor = intent.extras.getString("aor")
+        aor = intent.extras!!.getString("aor")!!
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "Account ${aor.substringAfter(":")}"
@@ -206,6 +206,14 @@ class ChatsActivity: AppCompatActivity() {
     companion object {
 
         var filesPath = ""
+
+        fun findUaMessage(aor: String, timeStamp: Long): Message? {
+            for (i in Message.messages().indices.reversed())
+                if ((Message.messages()[i].aor == aor) &&
+                        (Message.messages()[i].timeStamp == timeStamp))
+                    return Message.messages()[i]
+            return null
+        }
 
         fun saveUaMessage(aor: String, time: Long, path: String) {
             for (i in Message.messages().indices.reversed())

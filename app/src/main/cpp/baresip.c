@@ -977,7 +977,6 @@ Java_com_tutpro_baresip_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     LOGD("running uag_current_set on %s\n", native_ua);
     uag_current_set(ua);
-    return;
 }
 
 JNIEXPORT jstring JNICALL

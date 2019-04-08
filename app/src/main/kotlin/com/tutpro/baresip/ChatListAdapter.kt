@@ -65,10 +65,8 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
         }
         val textView = chatView.findViewById(R.id.text) as TextView
         textView.text = message.message
-        if (message.new) {
+        if (message.new)
             textView.setTypeface(null, Typeface.BOLD)
-            message.new = false
-        }
         return chatView
     }
 

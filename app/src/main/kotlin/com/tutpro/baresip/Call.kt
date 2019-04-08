@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.text.TextWatcher
+import android.util.Log
 import java.util.ArrayList
 
 class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: String,
@@ -49,6 +50,5 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
                 if (c.callp == callp) return c
             return null
         }
-
     }
 }

@@ -6,6 +6,8 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.os.PowerManager
 import android.app.KeyguardManager
+import android.content.Intent
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 
@@ -115,10 +117,13 @@ object Utils {
     }
 
     fun friendlyUri(uri: String, domain: String): String {
-        if (uri.contains("@") && !uri.substring(4).contains(":") &&
-                !uri.contains(";")) {
-            val user = uriUserPart(uri)
-            val host = uriHostPart(uri)
+        var u = uri
+        if (uri.startsWith("<") && (uri.endsWith(">")))
+            u = uri.substring(1).substringBeforeLast(">")
+        if (u.contains("@") && !u.substring(4).contains(":") &&
+                !u.contains(";")) {
+            val user = uriUserPart(u)
+            val host = uriHostPart(u)
             if (host == domain) return user else return "$user@$host"
         } else {
             return uri
@@ -279,6 +284,24 @@ object Utils {
                 // call_send_digit(callp, 4.toChar())
             }
         }
+    }
+
+    fun dumpIntent(intent: Intent) {
+
+        val bundle: Bundle = intent.extras ?: return
+
+        val keys = bundle.keySet()
+        val it = keys.iterator()
+
+        Log.d("Baresip", "Dumping intent start")
+
+        while (it.hasNext()) {
+            val key = it.next()
+            Log.d("Baresip","[" + key + "=" + bundle.get(key)+"]");
+        }
+
+        Log.d("Baresip", "Dumping intent finish")
+
     }
 
 }

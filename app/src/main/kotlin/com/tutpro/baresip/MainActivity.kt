@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                     if (!Utils.checkSipUri(uri))
                         Utils.alertView(this,"Notice","Invalid SIP URI '$uri'")
                     else
-                        call(ua, uri)
+                        call(ua, uri, "outgoing")
                 } else {
                     val latest = CallHistory.aorLatestHistory(aor)
                     if (latest != null)
@@ -409,18 +409,126 @@ class MainActivity : AppCompatActivity() {
         if (intent.hasExtra("onStartup"))
             moveTaskToBack(true)
 
-        if (intent.hasExtra("action")) {
+        if (intent.hasExtra("action"))
             // MainActivity was not visible when call, message, or transfer request came in
             handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        // Called when MainActivity already exists at the top of current task
+        super.onNewIntent(intent)
+        val action = intent.getStringExtra("action")
+        Log.d("Baresip", "onNewIntent action '$action'")
+        if (action != null) handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val action = intent.getStringExtra("action")
+        Log.d("Baresip", "Handling intent '$action'")
+        when (action) {
+            "call" -> {
+                if (!Call.calls().isEmpty()) {
+                    Toast.makeText(applicationContext, "You already have an active call!",
+                            Toast.LENGTH_SHORT).show()
+                    return
+                }
+                val uap = intent.getStringExtra("uap")
+                val ua = UserAgent.find(uap)
+                if (ua == null) {
+                    Log.e("Baresip", "handleIntent 'call' did not find ua $uap")
+                    return
+                }
+                if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
+                    spinToAor(ua.account.aor)
+                resumeAction = action
+                resumeUri = intent.getStringExtra("peer")
+            }
+            "call show", "call answer" -> {
+                val callp = intent.getStringExtra("callp")
+                val call = Call.find(callp)
+                if (call == null) {
+                    Log.e("Baresip", "handleIntent '$action' did not find call $callp")
+                    return
+                }
+                val ua = call.ua
+                if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
+                    spinToAor(ua.account.aor)
+                resumeAction = action
+                resumeCall = call
+            }
+            "transfer show", "transfer accept" -> {
+                val callp = intent.getStringExtra("callp")
+                val call = Call.find(callp)
+                if (call == null) {
+                    Log.e("Baresip", "handleIntent '$action' did not find call $callp")
+                    moveTaskToBack(true)
+                    return
+                }
+                resumeAction = action
+                resumeCall = call
+                resumeUri = intent.getStringExtra("uri")
+            }
+            "message show", "message reply" -> {
+                val uap = intent.getStringExtra("uap")
+                val ua = UserAgent.find(uap)
+                if (ua == null) {
+                    Log.e("Baresip", "onNewIntent did not find ua $uap")
+                    return
+                }
+                if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
+                    spinToAor(ua.account.aor)
+                resumeAction = action
+                resumeUap = uap
+                resumeTime = intent.getStringExtra("time")
+            }
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d("Baresip", "Main resumed with action '$resumeAction'")
+        // imm.hideSoftInputFromWindow(callUri.windowToken, 0)
+        visible = true
+        when (resumeAction) {
+            "call show" ->
+                handleServiceEvent("call incoming",
+                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "call answer" ->
+                answerButton.performClick()
+            "call reject" ->
+                rejectButton.performClick()
+            "call" ->
+                callButton.performClick()
+            "transfer show", "transfer accept" ->
+                handleServiceEvent("$resumeAction,$resumeUri",
+                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "message show", "message reply" ->
+                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeTime))
+            else -> {
+                uaAdapter.notifyDataSetChanged()
+                if (aorSpinner.selectedItemPosition != -1)
+                    showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
+            }
+        }
+        resumeAction = ""
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Log.d("Baresip", "Main paused")
+        visible = false
+    }
+
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
+        if (taskId == -1) {
+            Log.d("Baresip", "Omit service event '$event' for task -1")
+            return
+        }
         if (event == "stopped") {
             Log.d("Baresip", "Handling service event 'stopped'")
             quitTimer.cancel()
             finishAndRemoveTask()
-            System.exit(0)
+            // System.exit(0)
             return
         }
         val uap = params[0]
@@ -491,11 +599,10 @@ class MainActivity : AppCompatActivity() {
                             dtmf.visibility = View.INVISIBLE
                             infoButton.visibility = View.INVISIBLE
                         }
-                        if (Utils.isVisible()) {
-                                Log.d("Baresip", "Baresip is visible")
-                                val i = Intent(applicationContext, MainActivity::class.java)
-                                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                                startActivity(i)
+                        if (!visible) {
+                            val i = Intent(applicationContext, MainActivity::class.java)
+                            i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            startActivity(i)
                         }
                     }
                     "call established" -> {
@@ -528,10 +635,10 @@ class MainActivity : AppCompatActivity() {
                             dtmf.hint = "DTMF"
                             dtmf.visibility = View.VISIBLE
                             dtmf.requestFocus()
+                            (dtmf.tag as ArrayList<TextWatcher>).add(call.dtmfWatcher!!)
+                            dtmf.addTextChangedListener(call.dtmfWatcher)
                             infoButton.visibility = View.VISIBLE
                         }
-                        (dtmf.tag as ArrayList<TextWatcher>).add(call.dtmfWatcher!!)
-                        dtmf.addTextChangedListener(call.dtmfWatcher)
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -570,7 +677,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             dialog.dismiss()
                         }
-                        verifyDialog.create().show()
+                        if (!isFinishing()) verifyDialog.create().show()
                     }
                     "call verified", "call secure" -> {
                         val callp = params[1]
@@ -580,20 +687,16 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         val tag: String
-                        if (ev[0] == "call secure") {
-                            call.security = R.drawable.box_yellow
+                        if (call.security == R.drawable.box_yellow)
                             tag = "yellow"
-                        } else {
-                            call.security = R.drawable.box_green
+                        else
                             tag = "green"
-                            call.zid = ev[1]
-                        }
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
                             securityButton.setImageResource(call.security)
                             securityButton.tag = tag
                         }
                     }
-                    "call transfer" -> {
+                    "call transfer", "transfer show" -> {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
@@ -606,9 +709,9 @@ class MainActivity : AppCompatActivity() {
                         transferDialog.setMessage("Do you accept to transfer call to $target?")
                         transferDialog.setPositiveButton("Yes") { dialog, _ ->
                             if (call in Call.calls())
-                                transfer(ua, call, ev[1])
-                            else
-                                call(ua, ev[1])
+                                Api.ua_hangup(uap, callp, 0, "")
+                            call(ua, ev[1], "transferring")
+                            showCall(ua)
                             dialog.dismiss()
                         }
                         transferDialog.setNegativeButton("No") { dialog, _ ->
@@ -617,6 +720,18 @@ class MainActivity : AppCompatActivity() {
                             dialog.dismiss()
                         }
                         transferDialog.create().show()
+                    }
+                    "transfer accept" -> {
+                        val callp = params[1]
+                        val call = Call.find(callp)
+                        if (call == null) {
+                            Log.e("Baresip", "Call $callp to be transferred is not found")
+                            return
+                        }
+                        if (call in Call.calls())
+                            Api.ua_hangup(uap, callp, 0, "")
+                        call(ua, ev[1], "transferring")
+                        showCall(ua)
                     }
                     "call closed" -> {
                         val watchers = dtmf.tag as ArrayList<TextWatcher>
@@ -630,10 +745,6 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
-                        if (BaresipService.speakerPhone) {
-                            baresipService.setAction("ToggleSpeaker")
-                            startService(baresipService)
-                        }
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param.get(0).isDigit())
@@ -644,27 +755,25 @@ class MainActivity : AppCompatActivity() {
                                         Toast.LENGTH_LONG).show()
                         }
                     }
-                    "message" -> {
-                        val peerUri = params[1]
-                        val msgText = params[2]
-                        val time = params[3]
-                        Log.d("Baresip", "Incoming message $aor/$peerUri/$msgText")
-                        Message.add(Message(aor, peerUri, msgText, time.toLong(),
-                                R.drawable.arrow_down_green, 0, "",
-                                true))
-                        if (Utils.isVisible()) {
-                            if ((aorSpinner.selectedItemPosition == -1) ||
-                                    (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
-                                aorSpinner.setSelection(account_index)
-                            val i = Intent(applicationContext, ChatsActivity::class.java)
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            val b = Bundle()
-                            b.putString("aor", ua.account.aor)
-                            b.putString("peer", peerUri)
-                            b.putBoolean("focus", false)
-                            i.putExtras(b)
-                            startActivity(i)
+                    "message show", "message reply" -> {
+                        val timeStamp = params[1].toLong()
+                        val msg = ChatsActivity.findUaMessage(ua.account.aor, timeStamp)
+                        if (msg == null) {
+                            Log.e("Baresip", "Message $aor/$timeStamp is not found")
+                            return
                         }
+                        Log.d("Baresip", "Message for $aor from ${msg.peerUri}")
+                        if ((aorSpinner.selectedItemPosition == -1) ||
+                                (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                            aorSpinner.setSelection(account_index)
+                        val i = Intent(applicationContext, ChatsActivity::class.java)
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        val b = Bundle()
+                        b.putString("aor", aor)
+                        b.putString("peer", msg.peerUri)
+                        b.putBoolean("focus", ev[0] == "message reply")
+                        i.putExtras(b)
+                        startActivity(i)
                     }
                     "mwi notify" -> {
                         val lines = ev[1].split("\n")
@@ -691,142 +800,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        val action = intent.getStringExtra("action")
-        Log.d("Baresip", "onNewIntent action '$action'")
-        if (action != null) handleIntent(intent)
-    }
-
-    private fun handleIntent(intent: Intent) {
-        val action = intent.getStringExtra("action")
-        Log.d("Baresip", "Handling intent '$action'")
-        when (action) {
-            "call" -> {
-                if (!Call.calls().isEmpty()) {
-                    Toast.makeText(applicationContext, "You already have an active call!",
-                            Toast.LENGTH_SHORT).show()
-                    return
-                }
-                val uap = intent.getStringExtra("uap")
-                val ua = UserAgent.find(uap)
-                if (ua == null) {
-                    Log.e("Baresip", "handleIntent 'call' did not find ua $uap")
-                    return
-                }
-                if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
-                    spinToAor(ua.account.aor)
-                makeCall = intent.getStringExtra("peer")
-            }
-            "answer" -> {
-                answerCall = intent.getStringExtra("callp")
-            }
-            "reject" -> {
-                rejectCall = intent.getStringExtra("callp")
-                moveTaskToBack(true)
-            }
-            "transfer" -> {
-                val callp = intent.getStringExtra("callp")
-                val call = Call.find(callp)
-                val uap = intent.getStringExtra("uap")
-                val ua = UserAgent.find(uap)
-                if (ua == null) {
-                    Log.e("Baresip", "Ua $uap of call transfer target does not exist")
-                    moveTaskToBack(true)
-                    return
-                }
-                if (call == null)
-                    call(ua, intent.getStringExtra("uri"))
-                else
-                    transfer(ua, call, intent.getStringExtra("uri"))
-            }
-            "deny" -> {
-                val callp = intent.getStringExtra("callp")
-                val call = Call.find(callp)
-                if (call == null)
-                    Log.d("Baresip", "Call $callp denied transfer does not exist anymore")
-                else
-                    Api.call_notify_sipfrag(callp, 603, "Decline")
-                moveTaskToBack(true)
-            }
-            "show", "reply", "save", "delete" -> {
-                val uap = intent.getStringExtra("uap")
-                val ua = UserAgent.find(uap)
-                if (ua == null) {
-                    Log.e("Baresip", "onNewIntent did not find ua $uap")
-                    return
-                }
-                val aor = ua.account.aor
-                when (action) {
-                    "show", "reply" -> {
-                        val i = Intent(this@MainActivity, ChatsActivity::class.java)
-                        val b = Bundle()
-                        if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
-                            spinToAor(aor)
-                        b.putString("aor", aor)
-                        b.putString("peer", intent.getStringExtra("peer"))
-                        b.putBoolean("focus", action == "reply")
-                        i.putExtras(b)
-                        startActivityForResult(i, MESSAGES_CODE)
-                    }
-                    "save" -> {
-                        ChatsActivity.saveUaMessage(ua.account.aor,
-                                intent.getStringExtra("time").toLong(),
-                                applicationContext.filesDir.absolutePath)
-                        moveTaskToBack(true)
-                    }
-                    "delete" -> {
-                        ChatsActivity.deleteUaMessage(ua.account.aor,
-                                intent.getStringExtra("time").toLong(),
-                                applicationContext.filesDir.absolutePath)
-                        moveTaskToBack(true)
-                    }
-                }
-                nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
-            }
-            "message" -> {
-                val ua = UserAgent.find(intent.getStringExtra("uap"))!!
-                val i = Intent(applicationContext, ChatsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", ua.account.aor)
-                b.putString("peer", intent.getStringExtra("peer"))
-                b.putBoolean("focus", true)
-                i.putExtras(b)
-                startActivity(i)
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Log.d("Baresip", "Main paused")
-        visible = false
-    }
-
     /*override fun onStop() {
         super.onStop()
         Log.d("Baresip", "Main stopped")
     }*/
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("Baresip", "Main resumed")
-        imm.hideSoftInputFromWindow(callUri.windowToken, 0)
-        visible = true
-        if (answerCall != "") {
-            answerCall = ""
-            answerButton.performClick()
-        }
-        if (rejectCall != "") {
-            rejectCall = ""
-            rejectButton.performClick()
-        }
-        if (makeCall != "") {
-            callUri.setText(makeCall)
-            makeCall = ""
-            callButton.performClick()
-        }
-    }
 
     override fun onBackPressed() {
         moveTaskToBack(true)
@@ -976,7 +953,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun call(ua: UserAgent, uri: String) {
+    private fun call(ua: UserAgent, uri: String, status: String) {
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(applicationContext,
@@ -991,8 +968,7 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_connect(ua.uap, uri)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call.calls().add(Call(callp, ua, uri, "out", "outgoing",
-                    Utils.dtmfWatcher(callp)))
+            Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.INVISIBLE
@@ -1010,6 +986,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Currently transfer is implemented by first closing existing call and the making the new one
     private fun transfer(ua: UserAgent, call: Call, uri: String) {
         val newCallp = Api.ua_call_alloc(ua.uap, call.callp)
         if (newCallp != "") {
@@ -1017,7 +994,8 @@ class MainActivity : AppCompatActivity() {
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))
             Call.calls().add(newCall)
-            Api.call_stop_audio(call.callp)
+            Api.ua_hangup(ua.uap, call.callp, 0, "")
+            // Api.call_stop_audio(call.callp)
             val err = Api.call_connect(newCallp, uri)
             if (err == 0) {
                 Api.call_start_audio(newCallp)
@@ -1103,15 +1081,6 @@ class MainActivity : AppCompatActivity() {
                     holdButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                     infoButton.visibility = View.INVISIBLE
-                    if (answerCall == call.callp) {
-                        answerCall = ""
-                        answerButton.performClick()
-                    }
-                    if (rejectCall == call.callp) {
-                        rejectCall = ""
-                        rejectButton.performClick()
-                        moveTaskToBack(true)
-                    }
                 }
                 "connected" -> {
                     securityButton.setImageResource(call.security)
@@ -1141,10 +1110,13 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
-        var visible = true
-        var makeCall = ""
-        var answerCall = ""
-        var rejectCall = ""
+        var visible = false
+
+        var resumeAction = ""
+        var resumeUap = ""
+        var resumeCall: Call? = null
+        var resumeUri = ""
+        var resumeTime = ""
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
