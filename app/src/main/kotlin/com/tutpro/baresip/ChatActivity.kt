@@ -219,12 +219,6 @@ class ChatActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if ((requestCode == MainActivity.CONTACT_CODE) && (resultCode == Activity.RESULT_OK)) {
-            setTitle("Chat with ${data.getStringExtra("name")}")
-        }
-    }
-
     private fun uaPeerMessages(aor: String, peerUri: String): ArrayList<Message> {
         val res = ArrayList<Message>()
         for (m in Message.messages())
