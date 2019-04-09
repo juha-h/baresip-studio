@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.Manifest
+import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
 import android.support.v4.app.ActivityCompat
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
@@ -58,9 +60,17 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Main created with action " +
                 intent.getStringExtra("action"))
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            keyguardManager.requestDismissKeyguard(this, null)
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(R.layout.activity_main)
 
