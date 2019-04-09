@@ -35,9 +35,9 @@ class ChatActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_chat)
 
-        aor = intent.extras.getString("aor")
-        peerUri = intent.extras.getString("peer")
-        val focus = intent.extras.getBoolean("focus")
+        aor = intent.getStringExtra("aor")!!
+        peerUri = intent.getStringExtra("peer")!!
+        val focus = intent.getBooleanExtra("focus", false)
 
         val userAgent = Account.findUa(aor)
         if (userAgent == null) {

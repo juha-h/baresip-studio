@@ -62,7 +62,7 @@ class AccountsActivity : AppCompatActivity() {
             }
         }
 
-        val accp = intent.extras.getString("accp")
+        val accp = intent.getStringExtra("accp")
         if (accp != "") {
             val i = Intent(this, AccountActivity::class.java)
             val b = Bundle()

@@ -667,7 +667,6 @@ class BaresipService: Service() {
     }
 
     private fun requestAudioFocus(streamType: Int) {
-        val res: Int
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) && (audioFocusRequest == null)) {
             @TargetApi(26)
             audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
@@ -678,16 +677,15 @@ class BaresipService: Service() {
                 build()
             }
             @TargetApi(26)
-            res = am.requestAudioFocus(audioFocusRequest)
-            if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(LOG_TAG, "Audio focus granted")
             } else {
                 Log.d(LOG_TAG, "Audio focus denied")
                 audioFocusRequest = null
             }
         } else {
-            res = am.requestAudioFocus(null, streamType, AudioManager.AUDIOFOCUS_GAIN)
-            if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            if (am.requestAudioFocus(null, streamType, AudioManager.AUDIOFOCUS_GAIN) ==
+                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(LOG_TAG, "Audio focus granted")
                 audioFocused = true
             } else {
@@ -700,7 +698,7 @@ class BaresipService: Service() {
     private fun abandonAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (audioFocusRequest != null) {
-                am.abandonAudioFocusRequest(audioFocusRequest)
+                am.abandonAudioFocusRequest(audioFocusRequest!!)
                 audioFocusRequest = null
             }
         } else {

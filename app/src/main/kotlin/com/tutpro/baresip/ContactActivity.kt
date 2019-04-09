@@ -21,8 +21,8 @@ class ContactActivity : AppCompatActivity() {
         nameView = findViewById(R.id.Name) as EditText
         uriView = findViewById(R.id.Uri) as EditText
 
-        val uri = intent.extras.getString("uri")
-        new = intent.extras.getBoolean("new")
+        val uri = intent.getStringExtra("uri")
+        new = intent.getBooleanExtra("new", false)
 
         if (new) {
             setTitle("New Contact")
@@ -36,7 +36,7 @@ class ContactActivity : AppCompatActivity() {
                 uriView.setText(uri)
             }
         } else {
-            index = intent.extras.getInt("index")
+            index = intent.getIntExtra("index", 0)
             val name = Contact.contacts()[index].name
             setTitle(name)
             nameView.setText(name)
