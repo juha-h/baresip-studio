@@ -6,7 +6,6 @@ import android.app.Notification.VISIBILITY_PUBLIC
 import android.content.*
 import android.media.*
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.os.PowerManager
@@ -26,9 +25,6 @@ import java.io.InputStream
 import java.util.*
 import android.net.Network
 import android.net.NetworkRequest
-import android.content.Context.CONNECTIVITY_SERVICE
-
-
 
 class BaresipService: Service() {
 
