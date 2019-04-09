@@ -24,6 +24,11 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
+import android.net.Network
+import android.net.NetworkRequest
+import android.content.Context.CONNECTIVITY_SERVICE
+
+
 
 class BaresipService: Service() {
 
@@ -33,7 +38,6 @@ class BaresipService: Service() {
     internal lateinit var rt: Ringtone
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
-    internal lateinit var nr: BroadcastReceiver
     internal lateinit var wl: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
 
@@ -60,25 +64,26 @@ class BaresipService: Service() {
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
 
-        nr = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == ConnectivityManager.CONNECTIVITY_ACTION) {
-                    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-                    val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
-                    if (isConnected) {
-                        Log.d(LOG_TAG, "Network is connected/connecting")
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val builder = NetworkRequest.Builder()
+        connectivityManager.registerNetworkCallback(
+                builder.build(),
+                object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        super.onAvailable(network)
+                        Log.d(LOG_TAG, "Network $network is available")
                         if (disconnected) {
                             UserAgent.register()
                             disconnected = false
                         }
-                    } else {
-                        Log.d(LOG_TAG, "Network is NOT connected/connecting")
+                    }
+                    override fun onLost(network: Network) {
+                        super.onLost(network)
+                        Log.d(LOG_TAG, "Network $network is lost")
                         disconnected = true
                     }
                 }
-            }
-        }
+        )
 
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.tutpro.baresip:wakelog")
@@ -159,7 +164,6 @@ class BaresipService: Service() {
                 wl.acquire()
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 BaresipService.isServiceRunning = true
-                registerReceiver(nr, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
                 showStatusNotification()
             }
 
@@ -737,11 +741,6 @@ class BaresipService: Service() {
         status.clear()
         history.clear()
         messages.clear()
-        try {
-            unregisterReceiver(nr)
-        } catch (e: Exception) {
-            Log.d(LOG_TAG, "Receiver nr has not been registered")
-        }
         if (this::nm.isInitialized) nm.cancelAll()
         if (this::wl.isInitialized && wl.isHeld) wl.release()
         if (this::fl.isInitialized && fl.isHeld) fl.release()
