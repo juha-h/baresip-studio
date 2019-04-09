@@ -34,7 +34,7 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        acc = Account.find(intent.extras.getString("accp"))!!
+        acc = Account.find(intent.getStringExtra("accp"))!!
         aor = acc.aor
         uaIndex = UserAgent.findAorIndex(aor)!!
 

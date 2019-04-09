@@ -26,7 +26,7 @@ class CallsActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_calls)
 
-        val aor = intent.extras.getString("aor")
+        val aor = intent.getStringExtra("aor")!!
         val ua = Account.findUa(aor)!!
 
         val headerView = findViewById(R.id.account) as TextView
@@ -71,7 +71,7 @@ class CallsActivity : AppCompatActivity() {
         }
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerURI
-            var peerName = ContactsActivity.contactName(peerUri)
+            val peerName = ContactsActivity.contactName(peerUri)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEUTRAL -> {

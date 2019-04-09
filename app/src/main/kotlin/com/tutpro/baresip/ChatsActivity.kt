@@ -135,13 +135,13 @@ class ChatsActivity: AppCompatActivity() {
             }
         }
 
-        val peer = intent.extras.getString("peer")
+        val peer = intent.getStringExtra("peer")
         if (peer != "") {
             val i = Intent(this, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", peer)
-            b.putBoolean("focus", intent.extras.getBoolean("focus"))
+            b.putBoolean("focus", intent.getBooleanExtra("focus", false))
             i.putExtras(b)
             startActivityForResult(i, MainActivity.MESSAGE_CODE)
         }

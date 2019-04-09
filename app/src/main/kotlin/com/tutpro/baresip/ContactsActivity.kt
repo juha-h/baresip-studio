@@ -23,7 +23,7 @@ class ContactsActivity : AppCompatActivity() {
 
         val listView = findViewById(R.id.contacts) as ListView
 
-        val aor = intent.extras.getString("aor")
+        val aor = intent.getStringExtra("aor")!!
         clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
         listView.adapter = clAdapter
         listView.isLongClickable = true
