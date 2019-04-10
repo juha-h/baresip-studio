@@ -42,7 +42,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 i.putExtra("action", "message")
                             val ua = Account.findUa(aor)
                             if (ua == null) {
-                                Log.e("Baresip", "onClickListener did not find AoR $aor")
+                                Log.w("Baresip", "onClickListener did not find AoR $aor")
                             } else {
                                 i.putExtra("uap", ua.uap)
                                 i.putExtra("peer", Contact.contacts()[pos].uri)

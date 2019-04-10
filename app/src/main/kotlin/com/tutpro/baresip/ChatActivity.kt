@@ -41,7 +41,7 @@ class ChatActivity : AppCompatActivity() {
 
         val userAgent = Account.findUa(aor)
         if (userAgent == null) {
-            Log.e("Baresip", "MessageActivity did not find ua of $aor")
+            Log.w("Baresip", "MessageActivity did not find ua of $aor")
             val i = Intent()
             setResult(Activity.RESULT_CANCELED, i)
             finish()

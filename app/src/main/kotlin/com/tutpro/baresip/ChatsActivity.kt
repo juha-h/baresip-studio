@@ -244,7 +244,7 @@ class ChatsActivity: AppCompatActivity() {
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
-                Log.w("Baresip", "OutputStream exception: " + e.toString())
+                Log.e("Baresip", "OutputStream exception: " + e.toString())
                 e.printStackTrace()
             }
         }
@@ -259,7 +259,7 @@ class ChatsActivity: AppCompatActivity() {
                     ois.close()
                     fis.close()
                 } catch (e: Exception) {
-                    Log.w("Baresip", "InputStream exception: - " + e.toString())
+                    Log.e("Baresip", "InputStream exception: - " + e.toString())
                 }
             }
         }
