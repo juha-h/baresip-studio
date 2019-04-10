@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.Build
 import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
@@ -568,6 +569,7 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing" -> {
+                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
                     }
                     "call rejected" -> {
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
@@ -590,6 +592,7 @@ class MainActivity : AppCompatActivity() {
                             Log.e("Baresip", "Incoming call $callp not found")
                             return
                         }
+                        setVolumeControlStream(AudioManager.STREAM_RING)
                         if ((aorSpinner.selectedItemPosition == -1) ||
                                 (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])) {
                             aorSpinner.setSelection(account_index)
@@ -622,6 +625,7 @@ class MainActivity : AppCompatActivity() {
                             Log.e("Baresip", "Established call $callp not found")
                             return
                         }
+                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
                             if (call.dir == "in")
                                 callTitle.text = "Incoming call from ..."

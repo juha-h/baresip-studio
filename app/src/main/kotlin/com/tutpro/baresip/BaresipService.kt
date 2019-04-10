@@ -330,20 +330,18 @@ class BaresipService: Service() {
                         else
                             status[account_index] = R.drawable.dot_green
                         updateStatusNotification()
-                        if (!Utils.isVisible())
-                           return
                     }
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
-                        if (!Utils.isVisible())
-                           return
                     }
                     "unregistering" -> {
                         status[account_index] = R.drawable.dot_yellow
                         updateStatusNotification()
-                        if (!Utils.isVisible())
-                           return
+                    }
+                    "call ringing" -> {
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -412,12 +410,12 @@ class BaresipService: Service() {
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                         CallHistory.save(filesPath)
                         call.hasHistory = true
-                        stopRinging()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
-                        am.isSpeakerphoneOn = false
-                        if (!Utils.isVisible())
-                            return
+                        if (call.dir == "in")
+                            stopRinging()
+                        if (!isAudioFocused()) {
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
+                            requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
+                        }
                     }
                     "call verified", "call secure" -> {
                         val call = Call.find(callp)
@@ -431,8 +429,6 @@ class BaresipService: Service() {
                             call.security = R.drawable.box_green
                             call.zid = ev[1]
                         }
-                        if (!Utils.isVisible())
-                            return
                     }
                     "call transfer" -> {
                         val call = Call.find(callp)
@@ -489,7 +485,8 @@ class BaresipService: Service() {
                             return
                         }
                         Log.d(LOG_TAG, "AoR $aor call $callp is closed")
-                        stopRinging()
+                        if (call.status == "incoming")
+                            stopRinging()
                         calls.remove(call)
                         if (!call.hasHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, false))
@@ -497,16 +494,11 @@ class BaresipService: Service() {
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
                         if (Call.calls().size == 0) {
+                            abandonAudioFocus()
                             am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
-                            if (audioFocused) abandonAudioFocus()
+                            speakerPhone = false
                         }
-                        if (speakerPhone) {
-                            am.isSpeakerphoneOn = !am.isSpeakerphoneOn
-                            speakerPhone = am.isSpeakerphoneOn
-                        }
-                        if (!Utils.isVisible())
-                            return
                     }
                     "transfer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
@@ -516,6 +508,8 @@ class BaresipService: Service() {
                 }
             }
         }
+        if (!Utils.isVisible())
+            return
         if (newEvent == null) newEvent = event
         val intent = Intent("service event")
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -695,6 +689,13 @@ class BaresipService: Service() {
         }
     }
 
+    private fun isAudioFocused(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            return audioFocusRequest != null
+        else
+            return audioFocused
+    }
+
     private fun abandonAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (audioFocusRequest != null) {
@@ -728,8 +729,8 @@ class BaresipService: Service() {
             rtTimer!!.cancel()
             rtTimer = null
             if (rt.isPlaying) rt.stop()
-            abandonAudioFocus()
         }
+        abandonAudioFocus()
     }
 
     private fun cleanService() {
@@ -772,6 +773,7 @@ class BaresipService: Service() {
         var disconnected = false
         var libraryLoaded = false
         var isServiceClean = false
+        var speakerPhone = false
 
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
@@ -780,8 +782,6 @@ class BaresipService: Service() {
         var messages = ArrayList<Message>()
         var contacts = ArrayList<Contact>()
         var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
-
-        var speakerPhone = false
 
     }
 
