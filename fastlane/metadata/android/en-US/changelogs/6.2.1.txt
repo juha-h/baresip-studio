@@ -1,0 +1,8 @@
+- Used ConnectivityManager NetworkCallbacks to detect when network
+  connectivity becomes available or is lost
+- Added Android 8.1+ way of screen handling
+- Set volume controls to apply to current audio stream (may not always
+  work)
+- Fixed possible crash when destroyed baresip app is started again
+- Showed notice when account to be created already exists
+- Added note to About text about Media volume
