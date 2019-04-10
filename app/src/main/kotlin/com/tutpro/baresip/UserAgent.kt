@@ -53,7 +53,7 @@ class UserAgent (val uap: String) {
             for (ua in BaresipService.uas) {
                 if (ua.account.regint > 0)
                     if (Api.ua_register(ua.uap) != 0)
-                        Log.e("Baresip", "Failed to register ${ua.account.aor}")
+                        Log.d("Baresip", "Failed to register ${ua.account.aor}")
             }
         }
     }

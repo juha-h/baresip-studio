@@ -180,7 +180,7 @@ class BaresipService: Service() {
                 } else {
                     val peerUri = call.peerURI
                     val aor = call.ua.account.aor
-                    Log.i(LOG_TAG, "Aor $aor rejected incoming call $callp from $peerUri")
+                    Log.d(LOG_TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
                     CallHistory.add(CallHistory(aor, peerUri, "in", false))
                     CallHistory.save(filesPath)
@@ -280,11 +280,13 @@ class BaresipService: Service() {
     }
 
     override fun onDestroy() {
-        Log.d(LOG_TAG, "In onDestroy restart baresip killed by Android")
+        Log.d(LOG_TAG, "At Baresip Service onDestroy")
         super.onDestroy()
         cleanService()
-        val broadcastIntent = Intent("com.tutpro.baresip.Restart")
-        sendBroadcast(broadcastIntent)
+        if (isServiceRunning) {
+            val broadcastIntent = Intent("com.tutpro.baresip.Restart")
+            sendBroadcast(broadcastIntent)
+        }
     }
 
     @Keep
@@ -346,7 +348,7 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
                         if (Call.calls().size > 0) {
-                            Log.i(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                            Log.d(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             CallHistory.add(CallHistory(aor, peerUri, "in", false))
                             CallHistory.save(filesPath)
@@ -401,7 +403,7 @@ class BaresipService: Service() {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Established AoR $aor call $callp is not found")
+                            Log.w(LOG_TAG, "Call $callp that is established is not found")
                             return
                         }
                         Log.d(LOG_TAG, "AoR $aor call $callp established")
@@ -420,7 +422,7 @@ class BaresipService: Service() {
                     "call verified", "call secure" -> {
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp that is verified is not found")
+                            Log.w("Baresip", "Call $callp that is verified is not found")
                             return
                         }
                         if (ev[0] == "call secure") {
@@ -525,7 +527,7 @@ class BaresipService: Service() {
         try {
             text = String(msg, StandardCharsets.UTF_8)
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "UTF-8 decode failed")
+            Log.w(LOG_TAG, "UTF-8 decode failed")
         }
         Log.d(LOG_TAG, "Message event for $uap from $peer")
         val ua = UserAgent.find(uap)

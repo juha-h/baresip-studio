@@ -34,11 +34,13 @@ class AccountsActivity : AppCompatActivity() {
             var aor = newAorView.text.toString().trim()
             if (!aor.startsWith("sip:")) aor = "sip:$aor"
             if (!Utils.checkAorUri(aor)) {
-                Log.e("Baresip", "Invalid SIP Address of Record $aor")
+                Log.d("Baresip", "Invalid SIP Address of Record $aor")
                 Utils.alertView(this, "Notice",
                         "Invalid SIP Address of Record: $aor")
             } else if (Account.exists(aor)) {
-                Log.e("Baresip", "Account $aor already exists")
+                Log.d("Baresip", "Account $aor already exists")
+                Utils.alertView(this, "Notice",
+                        "Account $aor already exists")
             } else {
                 val ua = UserAgent.uaAlloc("<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {

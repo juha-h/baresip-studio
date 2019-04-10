@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                                 "")
                         if (calls.size > 0) {
                             if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
-                                Log.w("Baresip",
+                                Log.e("Baresip",
                                         "Command 'zrtp_unverify ${calls[0].zid}' failed")
                             } else {
                                 securityButton.setImageResource(R.drawable.box_yellow)
@@ -446,7 +446,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
-                    Log.e("Baresip", "handleIntent 'call' did not find ua $uap")
+                    Log.w("Baresip", "handleIntent 'call' did not find ua $uap")
                     return
                 }
                 if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
@@ -458,7 +458,7 @@ class MainActivity : AppCompatActivity() {
                 val callp = intent.getStringExtra("callp")
                 val call = Call.find(callp)
                 if (call == null) {
-                    Log.e("Baresip", "handleIntent '$action' did not find call $callp")
+                    Log.w("Baresip", "handleIntent '$action' did not find call $callp")
                     return
                 }
                 val ua = call.ua
@@ -471,7 +471,7 @@ class MainActivity : AppCompatActivity() {
                 val callp = intent.getStringExtra("callp")
                 val call = Call.find(callp)
                 if (call == null) {
-                    Log.e("Baresip", "handleIntent '$action' did not find call $callp")
+                    Log.w("Baresip", "handleIntent '$action' did not find call $callp")
                     moveTaskToBack(true)
                     return
                 }
@@ -483,7 +483,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
-                    Log.e("Baresip", "onNewIntent did not find ua $uap")
+                    Log.w("Baresip", "onNewIntent did not find ua $uap")
                     return
                 }
                 if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
@@ -516,8 +516,9 @@ class MainActivity : AppCompatActivity() {
             "message show", "message reply" ->
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeTime))
             else -> {
-                uaAdapter.notifyDataSetChanged()
-                if (aorSpinner.selectedItemPosition != -1)
+                if ((aorSpinner.selectedItemPosition == -1) && (UserAgent.uas().size > 0))
+                    aorSpinner.setSelection(0)
+                if (aorSpinner.selectedItemPosition >= 0)
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
             }
         }
@@ -589,7 +590,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Incoming call $callp not found")
+                            Log.w("Baresip", "Incoming call $callp not found")
                             return
                         }
                         setVolumeControlStream(AudioManager.STREAM_RING)
@@ -622,7 +623,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Established call $callp not found")
+                            Log.w("Baresip", "Established call $callp not found")
                             return
                         }
                         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
@@ -658,7 +659,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp to be verified is not found")
+                            Log.w("Baresip", "Call $callp to be verified is not found")
                             return
                         }
                         val verifyDialog = AlertDialog.Builder(this@MainActivity)
@@ -667,7 +668,7 @@ class MainActivity : AppCompatActivity() {
                         verifyDialog.setPositiveButton("Yes") { dialog, _ ->
                             val security: Int
                             if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                                Log.w("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
+                                Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
                                 security = R.drawable.box_yellow
                             } else {
                                 security = R.drawable.box_green
@@ -697,7 +698,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp that is verified is not found")
+                            Log.w("Baresip", "Call $callp that is verified is not found")
                             return
                         }
                         val tag: String
@@ -714,7 +715,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp to be transferred is not found")
+                            Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
                         }
                         val transferDialog = AlertDialog.Builder(this)
@@ -739,7 +740,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.find(callp)
                         if (call == null) {
-                            Log.e("Baresip", "Call $callp to be transferred is not found")
+                            Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
                         }
                         if (call in Call.calls())
@@ -773,7 +774,7 @@ class MainActivity : AppCompatActivity() {
                         val timeStamp = params[1].toLong()
                         val msg = ChatsActivity.findUaMessage(ua.account.aor, timeStamp)
                         if (msg == null) {
-                            Log.e("Baresip", "Message $aor/$timeStamp is not found")
+                            Log.w("Baresip", "Message ${ua.uap}/$timeStamp is not found")
                             return
                         }
                         Log.d("Baresip", "Message for $aor from ${msg.peerUri}")
@@ -807,7 +808,7 @@ class MainActivity : AppCompatActivity() {
                                 voicemailButton.setImageResource(R.drawable.voicemail)
                         }
                     }
-                    else -> Log.w("Baresip", "Unknown event '${ev[0]}'")
+                    else -> Log.e("Baresip", "Unknown event '${ev[0]}'")
                 }
                 break
             }
@@ -995,7 +996,7 @@ class MainActivity : AppCompatActivity() {
             infoButton.visibility = View.INVISIBLE
 
         } else {
-            Log.w("Baresip", "ua_connect ${ua.uap}/$uri failed")
+            Log.e("Baresip", "ua_connect ${ua.uap}/$uri failed")
             callButton.visibility = View.VISIBLE
         }
     }
@@ -1018,11 +1019,11 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
             } else {
                 Api.call_start_audio(call.callp)
-                Log.w("Baresip", "call_connect $newCallp failed with error $err")
+                Log.e("Baresip", "call_connect $newCallp failed with error $err")
                 Api.call_notify_sipfrag(call.callp, 500, "Call Error")
             }
         } else {
-            Log.w("Baresip", "ua_call_alloc ${ua.uap}/${call.callp} failed")
+            Log.e("Baresip", "ua_call_alloc ${ua.uap}/${call.callp} failed")
             Api.call_notify_sipfrag(call.callp, 500, "Call Error")
         }
     }

@@ -58,7 +58,7 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
-                Log.w("Baresip", "OutputStream exception: " + e.toString())
+                Log.e("Baresip", "OutputStream exception: " + e.toString())
                 e.printStackTrace()
             }
         }
@@ -73,7 +73,7 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
                     ois.close()
                     fis.close()
                 } catch (e: Exception) {
-                    Log.w("Baresip", "InputStream exception: - " + e.toString())
+                    Log.e("Baresip", "InputStream exception: - " + e.toString())
                 }
             }
 
