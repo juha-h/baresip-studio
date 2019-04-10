@@ -11,6 +11,7 @@
         - peers of calls and messages can be added to contacts by long clicks\n
         - long clicks can also be used to remove calls, chats, messages, and contacts\n
         - call click when callee has not been given can be used for re-dial\n
+        - if you cannot hear the other party of a call, try to increase Media volume\n
     </string>
     <string name="noAccounts">No accounts</string>
     <string name="dispName">Name (if any) used in From URI of outbound requests.</string>
