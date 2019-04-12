@@ -1,7 +1,5 @@
 package com.tutpro.baresip
 
-import android.util.Log
-
 class UserAgent (val uap: String) {
 
     val account = Account(Api.ua_account(uap))

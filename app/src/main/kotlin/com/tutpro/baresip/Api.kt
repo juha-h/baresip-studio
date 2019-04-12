@@ -30,5 +30,6 @@ object Api {
     external fun cmd_exec(cmd: String): Int
     external fun contact_add(contact: String)
     external fun contacts_remove()
+    external fun log_level_set(level: Int)
 
 }

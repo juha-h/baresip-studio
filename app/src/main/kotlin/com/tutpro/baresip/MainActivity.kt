@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.content.pm.PackageManager
@@ -930,7 +929,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             CONFIG_CODE -> {
-                if (resultCode == RESULT_OK)
+                if ((resultCode == RESULT_OK) &&
+                        (data!!.getBooleanExtra("restart", true)))
                     Utils.alertView(this, "Notice",
                             "You need to restart baresip in order to activate saved config!")
                 if (resultCode == RESULT_CANCELED)

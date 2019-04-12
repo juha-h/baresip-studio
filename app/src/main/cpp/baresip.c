@@ -7,16 +7,18 @@
 #include <baresip.h>
 
 #define LOGD(...) \
-  ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip", __VA_ARGS__))
+    if (log_level_get() < LEVEL_INFO) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
 
 #define LOGI(...) \
-  ((void)__android_log_print(ANDROID_LOG_INFO, "Baresip", __VA_ARGS__))
+    if (log_level_get() < LEVEL_WARN) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
 
 #define LOGW(...) \
-  ((void)__android_log_print(ANDROID_LOG_WARN, "Baresip", __VA_ARGS__))
+    if (log_level_get() < LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
 
 #define LOGE(...) \
-  ((void)__android_log_print(ANDROID_LOG_ERROR, "Baresip", __VA_ARGS__))
+    if (log_level_get() <= LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
+
+
 
 typedef struct baresip_context {
     JavaVM  *javaVM;
@@ -1305,7 +1307,6 @@ Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring java
     } else {
         LOGD("added contact %s\n", native_contact);
     }
-    return;
 }
 
 JNIEXPORT void JNICALL
@@ -1316,7 +1317,12 @@ Java_com_tutpro_baresip_Api_contacts_1remove(JNIEnv *env, jobject thiz) {
         struct contact *c = le->data;
         contact_remove(baresip_contacts(), c);
     }
-    return;
 }
 
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint level) {
+    const enum log_level native_level = (enum log_level)level;
+    LOGD("seting log level '%u'\n", native_level);
+    log_level_set(native_level);
+}
 
