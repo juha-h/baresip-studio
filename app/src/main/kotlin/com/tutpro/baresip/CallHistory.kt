@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.util.Log
 import java.io.*
 import java.util.ArrayList
 import java.util.GregorianCalendar

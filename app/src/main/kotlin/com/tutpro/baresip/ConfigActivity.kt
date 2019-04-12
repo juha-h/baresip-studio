@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,12 +18,15 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var dnsServers: EditText
     internal lateinit var opusBitRate: EditText
     internal lateinit var iceLite: CheckBox
+    internal lateinit var debug: CheckBox
 
     private var oldAutoStart = ""
     private var oldDnsServers = ""
     private var oldOpusBitrate = ""
     private var oldIceMode = ""
+    private var oldLogLevel = ""
     private var save = false
+    private var restart = false
     private var config = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +64,14 @@ class ConfigActivity : AppCompatActivity() {
         oldIceMode = if (imCv.size == 0) "full" else imCv[0]
         iceLite.isChecked = oldIceMode == "lite"
 
+        debug = findViewById(R.id.Debug) as CheckBox
+        val dbCv = Utils.getNameValue(config, "log_level")
+        if (dbCv.size == 0)
+            oldLogLevel = "2"
+        else
+            oldLogLevel = dbCv[0]
+        debug.isChecked =  oldLogLevel == "0"
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -83,6 +93,7 @@ class ConfigActivity : AppCompatActivity() {
                 config = Utils.removeLinesStartingWithName(config, "auto_start")
                 config += "\nauto_start $autoStartString\n"
                 save = true
+                restart = false
             }
 
             val dnsServers = dnsServers.text.toString().trim()
@@ -95,6 +106,7 @@ class ConfigActivity : AppCompatActivity() {
                 for (server in dnsServers.split(","))
                     config += "\ndns_server ${server.trim()}\n"
                 save = true
+                restart = true
             }
 
             val opusBitRate = opusBitRate.text.toString().trim()
@@ -106,6 +118,7 @@ class ConfigActivity : AppCompatActivity() {
                 config = Utils.removeLinesStartingWithName(config, "opus_bitrate")
                 config += "\nopus_bitrate $opusBitRate\n"
                 save = true
+                restart = true
             }
 
             var iceModeString = "full"
@@ -113,6 +126,17 @@ class ConfigActivity : AppCompatActivity() {
             if (oldIceMode != iceModeString) {
                 config = Utils.removeLinesStartingWithName(config, "ice_mode")
                 config += "\nice_mode $iceModeString\n"
+                save = true
+                restart = true
+            }
+
+            var logLevelString = "2"
+            if (debug.isChecked) logLevelString = "0"
+            if (oldLogLevel != logLevelString) {
+                config = Utils.removeLinesStartingWithName(config, "log_level")
+                config += "\nlog_level $logLevelString\n"
+                Api.log_level_set(logLevelString.toInt())
+                Log.logLevelSet(logLevelString.toInt())
                 save = true
             }
 
@@ -127,6 +151,8 @@ class ConfigActivity : AppCompatActivity() {
                 Utils.putFileContents(configFile, newConfig)
                 // Api.reload_config()
             }
+
+            intent.putExtra("restart", restart )
             setResult(RESULT_OK, intent)
             finish()
             return true
@@ -154,6 +180,9 @@ class ConfigActivity : AppCompatActivity() {
             }
             findViewById(R.id.IceLiteTitle) as TextView-> {
                 Utils.alertView(this, "ICE Lite Mode", getString(R.string.iceLite))
+            }
+            findViewById(R.id.DebugTitle) as TextView-> {
+                Utils.alertView(this, "Debug", getString(R.string.debug))
             }
         }
     }

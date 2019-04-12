@@ -11,20 +11,19 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.support.annotation.Keep
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import android.support.v4.content.ContextCompat
+import android.net.Network
+import android.net.NetworkRequest
 
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
-import android.net.Network
-import android.net.NetworkRequest
 
 class BaresipService: Service() {
 
@@ -149,10 +148,21 @@ class BaresipService: Service() {
                                 contents = "${contents}opus_application voip\n"
                                 write = true
                             }
+                            if (!contents.contains("log_level")) {
+                                contents = "${contents}log_level 2\n"
+                                Api.log_level_set(2)
+                                Log.logLevel = Log.LogLevel.WARN
+                                write = true
+                            } else {
+                                val ll = Utils.getNameValue(contents, "log_level")[0].toInt()
+                                Api.log_level_set(ll)
+                                Log.logLevelSet(ll)
+                            }
                             if (write) {
                                 Log.d(LOG_TAG, "Writing $contents")
                                 Utils.putFileContents(file, contents)
                             }
+
                         }
                     }
                 }
