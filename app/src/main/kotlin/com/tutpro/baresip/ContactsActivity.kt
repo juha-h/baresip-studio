@@ -2,7 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.*
-import android.os.Bundle 
+import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
