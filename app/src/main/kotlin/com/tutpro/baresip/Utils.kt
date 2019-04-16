@@ -1,16 +1,32 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.os.PowerManager
 import android.app.KeyguardManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
+import android.util.Base64.encodeToString
+
+import kotlin.collections.ArrayList
+import kotlin.Exception
 
 import java.io.*
+import java.security.SecureRandom
+import java.util.*
+import java.nio.ByteBuffer
+import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.PBEKeySpec
 
 object Utils {
 
@@ -282,6 +298,75 @@ object Utils {
                 // KEYCODE_REL
                 // call_send_digit(callp, 4.toChar())
             }
+        }
+    }
+
+    fun requestPermission(ctx: Context, permission: String) : Boolean {
+        if (ContextCompat.checkSelfPermission(ctx, permission) != PackageManager.PERMISSION_GRANTED) {
+            Log.w("Baresip", "Baresip does not have $permission permission")
+            ActivityCompat.requestPermissions(ctx as Activity, arrayOf(permission),
+                    MainActivity.PERMISSION_REQUEST_CODE)
+            return false
+        }
+        return true
+    }
+
+    fun encrypt(plainText: String, password: String): String {
+        val sr = SecureRandom.getInstance("SHA1PRNG")
+        val salt = ByteArray(16)
+        sr.nextBytes(salt)
+        val iterationCount = Random().nextInt(1024) + 512
+        val spec = PBEKeySpec(password.toCharArray(), salt, iterationCount, 256)
+        val secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec)
+        val iv = ByteArray(12)
+        SecureRandom().nextBytes(iv)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val parameterSpec = GCMParameterSpec(128, iv)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec)
+        val cipherText = cipher.doFinal(plainText.toByteArray())
+        val byteBuffer = ByteBuffer.allocate(Int.SIZE_BYTES + salt.size + Int.SIZE_BYTES +
+                Int.SIZE_BYTES + iv.size + cipherText.size)
+        byteBuffer.putInt(salt.size)
+        byteBuffer.put(salt)
+        byteBuffer.putInt(iterationCount)
+        byteBuffer.putInt(iv.size)
+        byteBuffer.put(iv)
+        byteBuffer.put(cipherText)
+        return encodeToString(byteBuffer.array(), Base64.DEFAULT)
+    }
+
+    fun decrypt(cipherMessage: String, password: String): String {
+        val byteBuffer = ByteBuffer.wrap(Base64.decode(cipherMessage, Base64.DEFAULT))
+        val saltLength = byteBuffer.getInt()
+        if (saltLength != 16) {
+            Log.w("Baresip", "invalid salt length $saltLength")
+            return ""
+        }
+        val salt = ByteArray(saltLength)
+        byteBuffer.get(salt)
+        val iterationCount = byteBuffer.getInt()
+        if ((iterationCount < 512) || (iterationCount > 1023 + 512)) {
+            Log.w("Baresip", "invalid iteratorCount $iterationCount")
+            return ""
+        }
+        val spec = PBEKeySpec(password.toCharArray(), salt, iterationCount, 256)
+        val secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec)
+        val ivLength = byteBuffer.getInt()
+        if (ivLength != 12) {
+            Log.d("Baresip", "invalid iv length $ivLength")
+            return ""
+        }
+        val iv = ByteArray(ivLength)
+        byteBuffer.get(iv)
+        val cipherText = ByteArray(byteBuffer.remaining())
+        byteBuffer.get(cipherText)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+        try {
+            return String(cipher.doFinal(cipherText))
+        } catch (e: Exception) {
+            Log.w("Baresip", "Decryption failed ${e.printStackTrace()}")
+            return ""
         }
     }
 

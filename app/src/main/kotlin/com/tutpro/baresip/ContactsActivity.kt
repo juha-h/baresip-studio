@@ -2,7 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.*
-import android.os.Bundle
+import android.os.Bundle 
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -59,7 +59,7 @@ class ContactsActivity : AppCompatActivity() {
             R.id.export_contacts -> {
                 if (saveContacts(dir))
                     Utils.alertView(this,"",
-                        "Exported contacts to Download folder.")
+                        "Exported contacts to Download folder as 'contacts.bs'.")
                 else
                     Utils.alertView(this,"Error",
                             "Failed to export contacts to Download folder. " +
@@ -100,11 +100,11 @@ class ContactsActivity : AppCompatActivity() {
             var contents = ""
             for (c in Contact.contacts())
                 contents += "\"${c.name}\" ${c.uri}\n"
-            return Utils.putFileContents(File(path, "contacts"), contents)
+            return Utils.putFileContents(File(path, "contacts.bs"), contents)
         }
 
         fun restoreContacts(path: File): Boolean {
-            val content = Utils.getFileContents(File(path, "contacts"))
+            val content = Utils.getFileContents(File(path, "contacts.bs"))
             if (content == "Failed") return false
             Api.contacts_remove()
             Contact.contacts().clear()
