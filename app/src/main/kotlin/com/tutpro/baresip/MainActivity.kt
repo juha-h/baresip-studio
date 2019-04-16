@@ -9,8 +9,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Build
@@ -19,7 +17,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
 import android.text.TextWatcher
-import android.widget.RelativeLayout
 import android.widget.*
 import android.view.*
 
@@ -130,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                         Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             Log.w("Baresip", "Baresip does not have RECORD_AUDIO permission")
             ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION)
+                    arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_CODE)
         }
 
         aorSpinner = findViewById(R.id.AoRList)
@@ -1142,7 +1139,8 @@ class MainActivity : AppCompatActivity() {
         const val CONTACT_CODE = 7
         const val MESSAGES_CODE = 8
         const val MESSAGE_CODE = 9
-        const val RECORD_AUDIO_PERMISSION = 1
+
+        const val PERMISSION_REQUEST_CODE = 1
 
     }
 
