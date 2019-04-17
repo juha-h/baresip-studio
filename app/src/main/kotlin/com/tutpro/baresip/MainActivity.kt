@@ -16,7 +16,6 @@ import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
-import android.text.TextWatcher
 import android.widget.*
 import android.view.*
 
@@ -303,8 +302,6 @@ class MainActivity : AppCompatActivity() {
                 holdButton.setImageResource(R.drawable.play)
             }
         }
-
-        dtmf.tag = ArrayList<TextWatcher>()
 
         infoButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
@@ -646,7 +643,8 @@ class MainActivity : AppCompatActivity() {
                             dtmf.hint = "DTMF"
                             dtmf.visibility = View.VISIBLE
                             dtmf.requestFocus()
-                            (dtmf.tag as ArrayList<TextWatcher>).add(call.dtmfWatcher!!)
+                            for (c in BaresipService.calls)
+                                dtmf.removeTextChangedListener(c.dtmfWatcher)
                             dtmf.addTextChangedListener(call.dtmfWatcher)
                             infoButton.visibility = View.VISIBLE
                         }
@@ -745,11 +743,6 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call closed" -> {
-                        val watchers = dtmf.tag as ArrayList<TextWatcher>
-                        if (watchers.size > 0) {
-                            dtmf.removeTextChangedListener(watchers[0])
-                            watchers.removeAt(0)
-                        }
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
                             showCall(ua)
                             if (ua.account.missedCalls)
@@ -1114,6 +1107,9 @@ class MainActivity : AppCompatActivity() {
                     holdButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
                     dtmf.requestFocus()
+                    for (c in BaresipService.calls)
+                        dtmf.removeTextChangedListener(c.dtmfWatcher)
+                    dtmf.addTextChangedListener(call.dtmfWatcher)
                     infoButton.visibility = View.VISIBLE
                 }
             }
