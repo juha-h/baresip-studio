@@ -33,7 +33,7 @@ class BaresipService: Service() {
     internal lateinit var rt: Ringtone
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
-    internal lateinit var wl: PowerManager.WakeLock
+    internal lateinit var wakeLock: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
 
     internal var rtTimer: Timer? = null
@@ -80,15 +80,11 @@ class BaresipService: Service() {
                 }
         )
 
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.tutpro.baresip:wakelog")
-
-        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val intent = Intent()
-            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-            intent.data = Uri.parse("package:$packageName")
-            startActivity(intent)
-        } */
+        wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.tutpro.baresip:wakelog").apply {
+                acquire()
+            }
+        }
 
         super.onCreate()
     }
@@ -167,9 +163,8 @@ class BaresipService: Service() {
                     }
                 }
                 ContactsActivity.restoreContacts(applicationContext.filesDir)
-                wl.acquire()
                 Thread(Runnable { baresipStart(filesPath) }).start()
-                BaresipService.isServiceRunning = true
+                isServiceRunning = true
                 showStatusNotification()
             }
 
@@ -751,7 +746,7 @@ class BaresipService: Service() {
         history.clear()
         messages.clear()
         if (this::nm.isInitialized) nm.cancelAll()
-        if (this::wl.isInitialized && wl.isHeld) wl.release()
+        if (this::wakeLock.isInitialized && wakeLock.isHeld) wakeLock.release()
         if (this::fl.isInitialized && fl.isHeld) fl.release()
         isServiceClean = true
     }
