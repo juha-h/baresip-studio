@@ -21,7 +21,6 @@ import android.widget.*
 import android.view.*
 
 import kotlin.collections.ArrayList
-import android.view.WindowManager
 
 class MainActivity : AppCompatActivity() {
 
