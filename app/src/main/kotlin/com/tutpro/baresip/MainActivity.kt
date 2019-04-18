@@ -16,10 +16,12 @@ import android.os.CountDownTimer
 import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
+import android.text.TextWatcher
 import android.widget.*
 import android.view.*
 
 import kotlin.collections.ArrayList
+import android.view.WindowManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var callsButton: ImageButton
     internal lateinit var dialpadButton: ImageButton
     internal lateinit var dtmf: EditText
+    internal var dtmfWatcher: TextWatcher? = null
     internal lateinit var infoButton: ImageButton
     internal lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
@@ -191,6 +194,9 @@ class MainActivity : AppCompatActivity() {
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))
         callUri.threshold = 2
+            callUri.setOnFocusChangeListener { view, b ->
+                if (b) imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+            }
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -491,14 +497,15 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.d("Baresip", "Main resumed with action '$resumeAction'")
-        // imm.hideSoftInputFromWindow(callUri.windowToken, 0)
         visible = true
         when (resumeAction) {
             "call show" ->
                 handleServiceEvent("call incoming",
                         arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "call answer" ->
+            "call answer" -> {
                 answerButton.performClick()
+                showCall(resumeCall!!.ua)
+            }
             "call reject" ->
                 rejectButton.performClick()
             "call" ->
@@ -595,6 +602,7 @@ class MainActivity : AppCompatActivity() {
                             callUri.setAdapter(null)
                             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                                     Utils.aorDomain(ua.account.aor)))
+                            callUri.isFocusable = false
                             securityButton.visibility = View.INVISIBLE
                             callButton.visibility = View.INVISIBLE
                             hangupButton.visibility = View.INVISIBLE
@@ -643,9 +651,9 @@ class MainActivity : AppCompatActivity() {
                             dtmf.hint = "DTMF"
                             dtmf.visibility = View.VISIBLE
                             dtmf.requestFocus()
-                            for (c in BaresipService.calls)
-                                dtmf.removeTextChangedListener(c.dtmfWatcher)
-                            dtmf.addTextChangedListener(call.dtmfWatcher)
+                            if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
+                            dtmfWatcher = call.dtmfWatcher
+                            dtmf.addTextChangedListener(dtmfWatcher)
                             infoButton.visibility = View.VISIBLE
                         }
                     }
@@ -975,6 +983,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
             Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
+            callUri.isFocusable = false
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.INVISIBLE
             hangupButton.visibility = View.VISIBLE
@@ -1037,9 +1046,11 @@ class MainActivity : AppCompatActivity() {
             callTitle.text = "Outgoing call to ..."
             callUri.text.clear()
             callUri.hint = "Callee"
+            callUri.isFocusable = true
+            callUri.isFocusableInTouchMode = true
+            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                     Contact.contacts().map{Contact -> Contact.name}))
-            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             hangupButton.visibility = View.INVISIBLE
@@ -1064,6 +1075,7 @@ class MainActivity : AppCompatActivity() {
             }
             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                     Utils.aorDomain(ua.account.aor)))
+            callUri.isFocusable = false
             when (call.status) {
                 "outgoing", "transferring" -> {
                     securityButton.visibility = View.INVISIBLE
@@ -1107,9 +1119,9 @@ class MainActivity : AppCompatActivity() {
                     holdButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
                     dtmf.requestFocus()
-                    for (c in BaresipService.calls)
-                        dtmf.removeTextChangedListener(c.dtmfWatcher)
-                    dtmf.addTextChangedListener(call.dtmfWatcher)
+                    if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
+                    dtmfWatcher = call.dtmfWatcher
+                    dtmf.addTextChangedListener(dtmfWatcher)
                     infoButton.visibility = View.VISIBLE
                 }
             }
