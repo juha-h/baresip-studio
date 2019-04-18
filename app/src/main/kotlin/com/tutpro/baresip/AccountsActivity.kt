@@ -123,14 +123,14 @@ class AccountsActivity : AppCompatActivity() {
                 if (title == "Encrypt Password") {
                     if (exportAccounts(dir, password))
                         Utils.alertView(this, "Info",
-                                "Exported accounts to Download folder as 'accounts.bs'")
+                                "Exported accounts to Download folder file 'accounts.bs'.")
                     else
                         Utils.alertView(this, "Error",
                                 "Failed to export accounts to Download folder.")
                 } else {
                     if (importAccounts(dir, password))
                         Utils.alertView(this, "Info",
-                                "Imported accounts from Download folder " +
+                                "Imported accounts from Download folder file " +
                                         "'accounts.bs'. You need to restart baresip.")
                     else
                         Utils.alertView(this, "Error",
