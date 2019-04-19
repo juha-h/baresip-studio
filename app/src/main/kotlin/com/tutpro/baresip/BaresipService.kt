@@ -24,6 +24,9 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
+import android.content.Intent
+
+
 
 class BaresipService: Service() {
 
@@ -170,8 +173,7 @@ class BaresipService: Service() {
 
             "Call Show", "Call Answer" -> {
                 val newIntent = Intent(this, MainActivity::class.java)
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 newIntent.putExtra("action", action.toLowerCase())
                 newIntent.putExtra("callp", intent!!.getStringExtra("callp"))
                 startActivity(newIntent)
@@ -199,8 +201,7 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find ua $uap")
                 } else {
                     val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     newIntent.putExtra("action", action.toLowerCase())
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
@@ -221,8 +222,7 @@ class BaresipService: Service() {
 
             "Message Show", "Message Reply" -> {
                 val newIntent = Intent(this, MainActivity::class.java)
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 newIntent.putExtra("action", action.toLowerCase())
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 newIntent.putExtra("time", intent.getStringExtra("time"))
@@ -519,8 +519,7 @@ class BaresipService: Service() {
             return
         if (newEvent == null) newEvent = event
         val intent = Intent("service event")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("event", newEvent)
         intent.putExtra("params", arrayListOf(uap, callp))
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
@@ -590,8 +589,7 @@ class BaresipService: Service() {
             return
         }
         val intent = Intent("service event")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("event", "message show")
         intent.putExtra("params", arrayListOf(uap, timeStamp))
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)

@@ -507,8 +507,10 @@ class MainActivity : AppCompatActivity() {
             }
             "call reject" ->
                 rejectButton.performClick()
-            "call" ->
+            "call" -> {
+                callUri.setText(resumeUri)
                 callButton.performClick()
+            }
             "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                         arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))

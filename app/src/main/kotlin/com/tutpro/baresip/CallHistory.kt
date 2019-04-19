@@ -17,10 +17,6 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
             return BaresipService.history
         }
 
-        fun historySet(history: ArrayList<CallHistory>) {
-            BaresipService.history = history
-        }
-
         fun add(history: CallHistory) {
             BaresipService.history.add(history)
             if (aorHistorySize(history.aor) > CALL_HISTORY_SIZE) {
@@ -49,11 +45,12 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
         }
 
         fun save(path: String) {
+            Log.d("Baresip", "Saving history of size ${BaresipService.history.size}")
             val file = File(path, "history")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
-                oos.writeObject(history())
+                oos.writeObject(BaresipService.history)
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
@@ -68,9 +65,10 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
-                    historySet(ois.readObject() as ArrayList<CallHistory>)
+                    BaresipService.history = ois.readObject() as ArrayList<CallHistory>
                     ois.close()
                     fis.close()
+                    Log.d("Baresip", "Restored history of size ${BaresipService.history.size}")
                 } catch (e: Exception) {
                     Log.e("Baresip", "InputStream exception: - " + e.toString())
                 }
