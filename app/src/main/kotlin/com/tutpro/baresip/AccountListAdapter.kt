@@ -40,9 +40,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
             val deleteDialog = AlertDialog.Builder(cxt)
             deleteDialog.setMessage("Do you want to delete account ${ua.account.aor}?")
             deleteDialog.setPositiveButton("Delete") { dialog, _ ->
-                if (Api.ua_isregistered(ua.uap))
-                    Api.ua_unregister(ua.uap)
-                // Api.ua_destroy(ua.uap)
+                Api.ua_destroy(ua.uap)
                 UserAgent.remove(ua)
                 AccountsActivity.generateAccounts()
                 AccountsActivity.saveAccounts()
