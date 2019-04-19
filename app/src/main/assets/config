@@ -6,8 +6,8 @@ call_max_calls 4
 audio_player opensles,nil
 audio_source opensles,nil
 audio_alert opensles,nil
-audio_srate		8000-48000
-audio_channels		1-2
+audio_srate 8000-48000
+audio_channels 1-2
 audio_level no
 rtp_tos 184
 rtcp_mux no

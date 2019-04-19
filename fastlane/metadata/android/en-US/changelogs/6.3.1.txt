@@ -1,0 +1,4 @@
+- Fixed and improved DTMF watcher implementation.
+- Disabled editing of Incoming/Outgoing Call URI when call is in progress.
+- Destroyed User Agent when account is deleted.
+- Removed unused KILL_BACKGROUND_PROCESSES permission.
