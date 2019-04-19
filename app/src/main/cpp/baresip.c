@@ -609,7 +609,7 @@ Java_com_tutpro_baresip_AccountKt_account_1outbound(JNIEnv *env, jobject thiz, j
     }
 }
 
-JNIEXPORT int JNICALL
+JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1set_1outbound(JNIEnv *env, jobject thiz, jstring javaAcc,
                                                          jstring javaOb, jint javaIx) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
@@ -933,7 +933,7 @@ Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jstring 
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    return ua_isregistered(ua);
+    return ua_isregistered(ua)?true:false;
 }
 
 JNIEXPORT jint JNICALL
@@ -952,7 +952,7 @@ Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaU
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("destroying ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    mem_deref(ua);
+    ua_destroy(ua);
 }
 
 JNIEXPORT jstring JNICALL
