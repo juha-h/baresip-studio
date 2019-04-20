@@ -1,0 +1,6 @@
+- Added possibility to set an account as the default account.
+- Show red messages icon when unread messages exist.
+- Ask PIN to release key guard when Callee URI is clicked.
+- Fixed call, message, and call transfer actions when initiated from notifications.
+- Fixed sending a message from contacts or call history.
+- Used SingleTask instead of SingleTop as Main Activity launch mode.
