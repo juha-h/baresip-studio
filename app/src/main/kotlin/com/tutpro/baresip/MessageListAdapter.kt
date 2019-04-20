@@ -63,10 +63,8 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         }
         val textView = messageView.findViewById(R.id.text) as TextView
         textView.text = message.message
-        if (message.new) {
+        if (message.new)
             textView.setTypeface(null, Typeface.BOLD)
-            message.new = false
-        }
         return messageView
     }
 

@@ -166,7 +166,7 @@ class ChatActivity : AppCompatActivity() {
             Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
-        ChatsActivity.saveMessages(applicationContext.filesDir.absolutePath)
+        Message.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 

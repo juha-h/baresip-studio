@@ -8,12 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.*
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.util.*
 
 class ChatsActivity: AppCompatActivity() {
@@ -78,7 +72,7 @@ class ChatsActivity: AppCompatActivity() {
                             else
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
-                        Message.messages(msgs)
+                        BaresipService.messages = msgs
                         uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -148,7 +142,7 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onPause() {
-        saveMessages(applicationContext.filesDir.absolutePath)
+        Message.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 
@@ -206,20 +200,12 @@ class ChatsActivity: AppCompatActivity() {
 
         var filesPath = ""
 
-        fun findUaMessage(aor: String, timeStamp: Long): Message? {
-            for (i in Message.messages().indices.reversed())
-                if ((Message.messages()[i].aor == aor) &&
-                        (Message.messages()[i].timeStamp == timeStamp))
-                    return Message.messages()[i]
-            return null
-        }
-
         fun saveUaMessage(aor: String, time: Long, path: String) {
             for (i in Message.messages().indices.reversed())
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages()[i].new = false
-                    saveMessages(path)
+                    Message.saveMessages(path)
                     return
                 }
         }
@@ -229,38 +215,9 @@ class ChatsActivity: AppCompatActivity() {
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages().removeAt(i)
-                    saveMessages(path)
+                    Message.saveMessages(path)
                     return
                 }
-        }
-
-        fun saveMessages(path: String = filesPath) {
-            val file = File(path, "messages")
-            try {
-                val fos = FileOutputStream(file)
-                val oos = ObjectOutputStream(fos)
-                oos.writeObject(Message.messages())
-                oos.close()
-                fos.close()
-            } catch (e: IOException) {
-                Log.e("Baresip", "OutputStream exception: " + e.toString())
-                e.printStackTrace()
-            }
-        }
-
-        fun restoreMessages(path: String = filesPath) {
-            val file = File(path, "messages")
-            if (file.exists()) {
-                try {
-                    val fis = FileInputStream(file)
-                    val ois = ObjectInputStream(fis)
-                    Message.messages(ois.readObject() as ArrayList<Message>)
-                    ois.close()
-                    fis.close()
-                } catch (e: Exception) {
-                    Log.e("Baresip", "InputStream exception: - " + e.toString())
-                }
-            }
         }
 
     }
