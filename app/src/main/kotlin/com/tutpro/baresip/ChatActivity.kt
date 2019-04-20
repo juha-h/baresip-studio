@@ -92,6 +92,7 @@ class ChatActivity : AppCompatActivity() {
                         if (chatMessages.size == 0) {
                             listView.removeFooterView(footerView)
                         }
+                        Message.saveMessages(applicationContext.filesDir.absolutePath)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                     }
@@ -154,6 +155,8 @@ class ChatActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,
                 IntentFilter("message response"))
 
+        ua.account.unreadMessages = false
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -166,7 +169,6 @@ class ChatActivity : AppCompatActivity() {
             Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
-        Message.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 
@@ -199,7 +201,14 @@ class ChatActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                for (m in chatMessages) if (m.new) m.new = false
+                var save = false
+                for (m in chatMessages) {
+                    if (m.new) {
+                        m.new = false
+                        save = true
+                    }
+                }
+                if (save) Message.saveMessages(applicationContext.filesDir.absolutePath)
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)

@@ -16,6 +16,7 @@ class Account(val accp: String) {
     var vmNew = 0
     var vmOld = 0
     var missedCalls = false
+    var unreadMessages = false
 
     init {
         val stunHost = account_stun_host(accp)

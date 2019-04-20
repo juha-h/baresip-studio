@@ -543,6 +543,8 @@ class BaresipService: Service() {
         Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
         Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true))
+        Message.saveMessages(filesPath)
+        ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
             val intent = Intent(this, BaresipService::class.java)
             intent.action = "Message Show"
