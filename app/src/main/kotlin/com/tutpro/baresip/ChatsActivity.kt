@@ -73,6 +73,7 @@ class ChatsActivity: AppCompatActivity() {
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
                         BaresipService.messages = msgs
+                        Message.saveMessages(filesPath)
                         uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -142,7 +143,6 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onPause() {
-        Message.saveMessages(applicationContext.filesDir.absolutePath)
         super.onPause()
     }
 

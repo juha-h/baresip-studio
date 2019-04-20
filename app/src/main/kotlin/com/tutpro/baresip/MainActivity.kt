@@ -152,10 +152,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     voicemailButton.visibility = View.INVISIBLE
                 }
-                if (acc.missedCalls)
-                    callsButton.setImageResource(R.drawable.calls_missed)
-                else
-                    callsButton.setImageResource(R.drawable.calls)
+                updateIcons(acc)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -522,10 +519,12 @@ class MainActivity : AppCompatActivity() {
             "message show", "message reply" ->
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
-                if ((aorSpinner.selectedItemPosition == -1) && (UserAgent.uas().size > 0))
-                    aorSpinner.setSelection(0)
-                if (aorSpinner.selectedItemPosition >= 0)
+                if (UserAgent.uas().size > 0) {
+                    if (aorSpinner.selectedItemPosition == -1)
+                        aorSpinner.setSelection(0)
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
+                    updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
+                }
             }
         }
         resumeAction = ""
@@ -1128,6 +1127,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateIcons(acc: Account) {
+        if (acc.missedCalls)
+            callsButton.setImageResource(R.drawable.calls_missed)
+        else
+            callsButton.setImageResource(R.drawable.calls)
+        if (acc.unreadMessages)
+            messagesButton.setImageResource(R.drawable.messages_unread)
+        else
+            messagesButton.setImageResource(R.drawable.messages)
     }
 
     companion object {
