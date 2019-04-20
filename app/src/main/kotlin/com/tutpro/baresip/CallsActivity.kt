@@ -47,8 +47,7 @@ class CallsActivity : AppCompatActivity() {
                 when (which) {
                     DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE -> {
                         val i = Intent(this@CallsActivity, MainActivity::class.java)
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         if (which == DialogInterface.BUTTON_NEUTRAL)
                             i.putExtra("action", "call")
                         else

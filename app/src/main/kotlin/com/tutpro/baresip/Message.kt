@@ -15,10 +15,6 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             return BaresipService.messages
         }
 
-        fun messages(messages: ArrayList<Message>) {
-            BaresipService.messages = messages
-        }
-
         fun add(message: Message) {
             BaresipService.messages.add(message)
             var count = 0
@@ -34,6 +30,38 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             if (count > MESSAGE_HISTORY_SIZE)
                 BaresipService.messages.removeAt(firstIndex)
         }
+
+        fun saveMessages(path: String) {
+            val file = File(path, "messages")
+            try {
+                val fos = FileOutputStream(file)
+                val oos = ObjectOutputStream(fos)
+                oos.writeObject(BaresipService.messages)
+                oos.close()
+                fos.close()
+                Log.d("Baresip", "Saved ${BaresipService.messages.size} messages")
+            } catch (e: IOException) {
+                Log.e("Baresip", "OutputStream exception: " + e.toString())
+                e.printStackTrace()
+            }
+        }
+
+        fun restoreMessages(path: String) {
+            val file = File(path, "messages")
+            if (file.exists()) {
+                try {
+                    val fis = FileInputStream(file)
+                    val ois = ObjectInputStream(fis)
+                    BaresipService.messages = ois.readObject() as ArrayList<Message>
+                    ois.close()
+                    fis.close()
+                    Log.d("Baresip", "Restored ${BaresipService.messages.size} messages")
+                } catch (e: Exception) {
+                    Log.e("Baresip", "InputStream exception: - " + e.toString())
+                }
+            }
+        }
+
 
     }
 }

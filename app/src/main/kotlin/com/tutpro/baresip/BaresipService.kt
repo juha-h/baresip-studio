@@ -26,8 +26,6 @@ import java.io.InputStream
 import java.util.*
 import android.content.Intent
 
-
-
 class BaresipService: Service() {
 
     private val LOG_TAG = "Baresip Service"
@@ -173,7 +171,8 @@ class BaresipService: Service() {
 
             "Call Show", "Call Answer" -> {
                 val newIntent = Intent(this, MainActivity::class.java)
-                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NEW_TASK
                 newIntent.putExtra("action", action.toLowerCase())
                 newIntent.putExtra("callp", intent!!.getStringExtra("callp"))
                 startActivity(newIntent)
@@ -201,7 +200,8 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find ua $uap")
                 } else {
                     val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                     newIntent.putExtra("action", action.toLowerCase())
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
@@ -222,10 +222,11 @@ class BaresipService: Service() {
 
             "Message Show", "Message Reply" -> {
                 val newIntent = Intent(this, MainActivity::class.java)
-                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NEW_TASK
                 newIntent.putExtra("action", action.toLowerCase())
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
-                newIntent.putExtra("time", intent.getStringExtra("time"))
+                newIntent.putExtra("peer", intent.getStringExtra("peer"))
                 startActivity(newIntent)
                 nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
             }
@@ -533,20 +534,20 @@ class BaresipService: Service() {
         } catch (e: Exception) {
             Log.w(LOG_TAG, "UTF-8 decode failed")
         }
-        Log.d(LOG_TAG, "Message event for $uap from $peer")
         val ua = UserAgent.find(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "messageEvent did not find ua $uap")
             return
         }
         val timeStamp = System.currentTimeMillis().toString()
+        Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
         Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true))
         if (!Utils.isVisible()) {
             val intent = Intent(this, BaresipService::class.java)
             intent.action = "Message Show"
             intent.putExtra("uap", uap)
-                    .putExtra("time", timeStamp)
+                    .putExtra("peer", peer)
             val pi = PendingIntent.getService(this, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
@@ -567,19 +568,19 @@ class BaresipService: Service() {
             val replyIntent = Intent(this, BaresipService::class.java)
             replyIntent.action = "Message Reply"
             replyIntent.putExtra("uap", uap)
-                    .putExtra("time", timeStamp)
+                    .putExtra("peer", peer)
             val replyPendingIntent = PendingIntent.getService(this,
                     REPLY_REQ_CODE, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
             saveIntent.putExtra("uap", uap)
-                .putExtra("time", timeStamp)
+                    .putExtra("time", timeStamp)
             val savePendingIntent = PendingIntent.getService(this,
                     SAVE_REQ_CODE, saveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
             deleteIntent.putExtra("uap", uap)
-                .putExtra("time", timeStamp)
+                    .putExtra("time", timeStamp)
             val deletePendingIntent = PendingIntent.getService(this,
                     DELETE_REQ_CODE, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             nb.addAction(R.drawable.ic_stat, "Reply", replyPendingIntent)
@@ -591,7 +592,7 @@ class BaresipService: Service() {
         val intent = Intent("service event")
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("event", "message show")
-        intent.putExtra("params", arrayListOf(uap, timeStamp))
+        intent.putExtra("params", arrayListOf(uap, peer))
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 

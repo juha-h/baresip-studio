@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        Log.d("Baresip", "Main created with action " +
-                intent.getStringExtra("action"))
+        val intentAction = intent.getStringExtra("action")
+        Log.d("Baresip", "Main created with action '$intentAction'")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
@@ -102,9 +102,9 @@ class MainActivity : AppCompatActivity() {
                 IntentFilter("service event"))
 
         stopState = "initial"
-        quitTimer = object: CountDownTimer(5000, 1000) {
+        quitTimer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                Log.d("Baresip", "Seconds remaining: ${millisUntilFinished/1000}")
+                Log.d("Baresip", "Seconds remaining: ${millisUntilFinished / 1000}")
             }
             override fun onFinish() {
                 when (stopState) {
@@ -191,11 +191,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map{Contact -> Contact.name}))
+                Contact.contacts().map { Contact -> Contact.name }))
         callUri.threshold = 2
-            callUri.setOnFocusChangeListener { view, b ->
-                if (b) imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-            }
+        callUri.setOnFocusChangeListener { view, b ->
+            if (b) imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     if (!Utils.checkSipUri(uri))
-                        Utils.alertView(this,"Notice","Invalid SIP URI '$uri'")
+                        Utils.alertView(this, "Notice", "Invalid SIP URI '$uri'")
                     else
                         call(ua, uri, "outgoing")
                 } else {
@@ -276,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         answerButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = Call.uaCalls(ua,"in")[0].callp
+            val callp = Call.uaCalls(ua, "in")[0].callp
             Log.d("Baresip", "AoR $aor answering call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             Api.ua_answer(ua.uap, callp)
@@ -285,7 +285,7 @@ class MainActivity : AppCompatActivity() {
         rejectButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = Call.uaCalls(ua,"in")[0].callp
+            val callp = Call.uaCalls(ua, "in")[0].callp
             Log.d("Baresip", "AoR $aor rejecting call $callp from ${callUri.text}")
             rejectButton.isEnabled = false
             Api.ua_hangup(ua.uap, callp, 486, "Rejected")
@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity() {
         holdButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = Call.uaCalls(ua,"")[0]
+            val call = Call.uaCalls(ua, "")[0]
             if (call.onhold) {
                 Log.d("Baresip", "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 Api.call_unhold(call.callp)
@@ -310,7 +310,7 @@ class MainActivity : AppCompatActivity() {
 
         infoButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val calls = Call.uaCalls(ua,"")
+            val calls = Call.uaCalls(ua, "")
             if (calls.size > 0) {
                 val status = Api.call_status(calls[0].callp)
                 val codecs = Api.call_audio_codecs(calls[0].callp)
@@ -371,20 +371,22 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, CONTACTS_CODE)
         }
 
-        ChatsActivity.restoreMessages(applicationContext.filesDir.absolutePath)
+        if (intentAction == null)
+            Message.restoreMessages(applicationContext.filesDir.absolutePath)
         messagesButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, ChatsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
-                b.putString("peer", "")
-                b.putBoolean("focus", false)
+                b.putString("peer", resumeUri)
+                b.putBoolean("focus", resumeUri != "")
                 i.putExtras(b)
                 startActivityForResult(i, MESSAGES_CODE)
             }
         }
 
-        CallHistory.restore(applicationContext.filesDir.absolutePath)
+        if (intentAction == null)
+            CallHistory.restore(applicationContext.filesDir.absolutePath)
         callsButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, CallsActivity::class.java)
@@ -477,7 +479,7 @@ class MainActivity : AppCompatActivity() {
                 resumeCall = call
                 resumeUri = intent.getStringExtra("uri")
             }
-            "message show", "message reply" -> {
+            "message", "message show", "message reply" -> {
                 val uap = intent.getStringExtra("uap")
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
@@ -488,7 +490,7 @@ class MainActivity : AppCompatActivity() {
                     spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeUap = uap
-                resumeTime = intent.getStringExtra("time")
+                resumeUri = intent.getStringExtra("peer")
             }
         }
     }
@@ -514,8 +516,11 @@ class MainActivity : AppCompatActivity() {
             "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                         arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "message" -> {
+                messagesButton.performClick()
+            }
             "message show", "message reply" ->
-                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeTime))
+                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
                 if ((aorSpinner.selectedItemPosition == -1) && (UserAgent.uas().size > 0))
                     aorSpinner.setSelection(0)
@@ -524,6 +529,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         resumeAction = ""
+        resumeUri = ""
     }
 
     override fun onPause() {
@@ -769,13 +775,8 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "message show", "message reply" -> {
-                        val timeStamp = params[1].toLong()
-                        val msg = ChatsActivity.findUaMessage(ua.account.aor, timeStamp)
-                        if (msg == null) {
-                            Log.w("Baresip", "Message ${ua.uap}/$timeStamp is not found")
-                            return
-                        }
-                        Log.d("Baresip", "Message for $aor from ${msg.peerUri}")
+                        val peer = params[1]
+                        Log.d("Baresip", "Message for $aor from $peer")
                         if ((aorSpinner.selectedItemPosition == -1) ||
                                 (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
                             aorSpinner.setSelection(account_index)
@@ -783,7 +784,7 @@ class MainActivity : AppCompatActivity() {
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         val b = Bundle()
                         b.putString("aor", aor)
-                        b.putString("peer", msg.peerUri)
+                        b.putString("peer", peer)
                         b.putBoolean("focus", ev[0] == "message reply")
                         i.putExtras(b)
                         startActivity(i)
