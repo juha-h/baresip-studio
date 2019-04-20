@@ -24,6 +24,7 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
     internal lateinit var vmUri: EditText
+    internal lateinit var defaultCheck: CheckBox
 
     private var newCodecs = ArrayList<String>()
     private var save = false
@@ -129,6 +130,9 @@ class AccountActivity : AppCompatActivity() {
 
         vmUri = findViewById(R.id.voicemailUri) as EditText
         vmUri.setText(acc.vmUri)
+
+        defaultCheck = findViewById(R.id.Default) as CheckBox
+        defaultCheck.isChecked = uaIndex == 0
 
     }
 
@@ -338,6 +342,13 @@ class AccountActivity : AppCompatActivity() {
                 save = true
             }
 
+            if (defaultCheck.isChecked && (uaIndex > 0)) {
+                val tmp = BaresipService.uas[0]
+                BaresipService.uas[0] = BaresipService.uas[uaIndex]
+                BaresipService.uas[uaIndex] = tmp
+                save = true
+            }
+
             if (save) {
                 AccountsActivity.saveAccounts()
                 if (Api.ua_update_account(UserAgent.uas()[uaIndex].uap) != 0)
@@ -394,6 +405,10 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.VoicemailUriTitle) as TextView -> {
                 Utils.alertView(this, "Voicemail URI",
                         getText(R.string.vmUri).toString())
+            }
+            findViewById(R.id.DefaultTitle) as TextView -> {
+                Utils.alertView(this, "Default Account",
+                        getText(R.string.defaultAccount).toString())
             }
         }
     }
