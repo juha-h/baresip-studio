@@ -48,6 +48,8 @@
     <string name="vmUri">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
     </string>>
+    <string name="defaultAccount">If checked, this account is selected when baresip is started.
+    </string>>
     <string name="autoStart">If checked, baresip starts automatically after device (re)start.</string>
     <string name="dnsServers">Comma separated list of DNS servers.  Each DNS server is of form
         server:port. Factory default value is \'8.8.8.8:53\' pointing to public Google DNS server.</string>
