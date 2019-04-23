@@ -943,7 +943,7 @@ class MainActivity : AppCompatActivity() {
                 if ((resultCode == RESULT_OK) &&
                         (data!!.getBooleanExtra("restart", true)))
                     Utils.alertView(this, "Notice",
-                            "You need to restart baresip in order to activate saved config!")
+                            "You need to restart baresip in order to activate the new config!")
                 if (resultCode == RESULT_CANCELED)
                     Log.d("Baresip", "Config canceled")
             }
