@@ -385,7 +385,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    err = baresip_init(conf_config(), false);
+    err = baresip_init(conf_config());
     if (err) {
         LOGW("baresip_init() failed (%d)\n", err);
         goto out;
@@ -394,7 +394,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     play_set_path(baresip_player(), path);
 
     err = ua_init("baresip v" BARESIP_VERSION " (" ARCH "/" OS ")",
-                  true, true, true, false);
+                  true, true, true);
     if (err) {
         LOGE("ua_init() failed (%d)\n", err);
         goto out;
