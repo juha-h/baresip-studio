@@ -157,6 +157,10 @@ object Utils {
         return Regex("^(([0-1]?[0-9]{1,2}\\.)|(2[0-4][0-9]\\.)|(25[0-5]\\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))$").matches(ip)
     }
 
+    fun checkIPv6(ip: String): Boolean {
+        return Regex("^(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4})$").matches(ip)
+    }
+
     fun checkUriUser(user: String): Boolean {
         for (c in user)
             if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
@@ -180,10 +184,20 @@ object Utils {
     }
 
     fun checkHostPort(hp: String, portMandatory: Boolean) : Boolean {
-        val parts = hp.split(":")
-        if (portMandatory && (parts.size != 2)) return false
-        if (parts.size == 1) return checkIP(parts[0]) || checkDomain(parts[0])
-        return checkPort(parts[1]) && (checkIP(parts[0]) || checkDomain(parts[0]))
+        if (hp.startsWith("[")) {
+            val parts = hp.split("]")
+            if (parts.size != 2) return false
+            Log.d("Baresip", "Checking IPv6 '${parts[0].substring(1)}'")
+            if (!checkIPv6(parts[0].substring(1))) return false
+            if (portMandatory && !parts[1].startsWith(":")) return false
+            Log.d("Baresip", "Checking port '${parts[1].substring(1)}'")
+            return checkPort(parts[1].substring(1))
+        } else {
+            val parts = hp.split(":")
+            if (portMandatory && (parts.size != 2)) return false
+            if (parts.size == 1) return checkIP(parts[0]) || checkDomain(parts[0])
+            return checkPort(parts[1]) && (checkIP(parts[0]) || checkDomain(parts[0]))
+        }
     }
 
     fun checkParams(params: String): Boolean {
