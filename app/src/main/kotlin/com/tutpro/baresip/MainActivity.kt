@@ -558,7 +558,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Handling service event 'stopped'")
             quitTimer.cancel()
             finishAndRemoveTask()
-            // System.exit(0)
+            System.exit(0)
             return
         }
         val uap = params[0]
