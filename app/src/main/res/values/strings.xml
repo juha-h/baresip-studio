@@ -6,12 +6,12 @@
         Juha Heinanen jh@tutpro.com\n\n
         Version %1$s\n\n
         <b>Usage Hints</b>\n\n
-        - check that config default values meet your needs (click item titles for help)\n
-        - then create one or more accounts (again click item titles for help)\n
-        - peers of calls and messages can be added to contacts by long clicks\n
-        - long clicks can also be used to remove calls, chats, messages, and contacts\n
-        - call click when callee has not been given can be used for re-dial\n
-        - if you cannot hear the other party of a call, try to increase Media volume\n
+        &#8226; Check that config default values meet your needs (click item titles for help).\n
+        &#8226; Then create one or more accounts (again click item titles for help).\n
+        &#8226; Peers of calls and messages can be added to contacts by long clicks.\n
+        &#8226; Long clicks can also be used to remove calls, chats, messages, and contacts.\n
+        &#8226; Call click when callee has not been given can be used for re-dial.\n
+        &#8226; If you cannot hear the other party of a call, try to increase Media volume.\n
     </string>
     <string name="noAccounts">No accounts</string>
     <string name="dispName">Name (if any) used in From URI of outbound requests.</string>
