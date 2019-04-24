@@ -212,7 +212,7 @@ class AccountActivity : AppCompatActivity() {
             if (ob != acc.outbound) {
                 val outbound = ArrayList<String>()
                 for (i in ob.indices) {
-                    if ((ob[i] == "") || Utils.checkOutboundUri(ob[i])) {
+                    if ((ob[i] == "") || checkOutboundUri(ob[i])) {
                         if (account_set_outbound(acc.accp, ob[i], i) == 0) {
                             if (ob[i] != "")
                                 outbound.add(account_outbound(acc.accp, i))
@@ -411,6 +411,11 @@ class AccountActivity : AppCompatActivity() {
                         getText(R.string.defaultAccount).toString())
             }
         }
+    }
+
+    private fun checkOutboundUri(uri: String): Boolean {
+        if (!uri.startsWith("sip:")) return false
+        return Utils.checkHostPortParams(uri.substring(4))
     }
 
     private fun checkDisplayName(dn: String): Boolean {

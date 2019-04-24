@@ -15,12 +15,14 @@ class ConfigActivity : AppCompatActivity() {
 
     internal lateinit var configFile: File
     internal lateinit var autoStart: CheckBox
+    internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
     internal lateinit var opusBitRate: EditText
     internal lateinit var iceLite: CheckBox
     internal lateinit var debug: CheckBox
 
     private var oldAutoStart = ""
+    private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
     private var oldOpusBitrate = ""
     private var oldIceMode = ""
@@ -46,6 +48,11 @@ class ConfigActivity : AppCompatActivity() {
         val asCv = Utils.getNameValue(config, "auto_start")
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
+
+        preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
+        val piCv = Utils.getNameValue(config, "prefer_ipv6")
+        oldPreferIPv6 = if (piCv.size == 0) "no" else piCv[0]
+        preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
         dnsServers = findViewById(R.id.DnsServers) as EditText
         val dsCv = Utils.getNameValue(config, "dns_server")
@@ -96,7 +103,16 @@ class ConfigActivity : AppCompatActivity() {
                 restart = false
             }
 
-            val dnsServers = dnsServers.text.toString().trim()
+            var preferIPv6String = "no"
+            if (preferIPv6.isChecked) preferIPv6String = "yes"
+            if (oldPreferIPv6 != preferIPv6String) {
+                config = Utils.removeLinesStartingWithName(config, "prefer_ipv6")
+                config = "prefer_ipv6 $preferIPv6String\n$config"
+                save = true
+                restart = true
+            }
+
+            val dnsServers = dnsServers.text.toString().trim().toLowerCase()
             if (dnsServers != oldDnsServers) {
                 if (!checkDnsServers(dnsServers)) {
                     Utils.alertView(this, "Notice", "Invalid DNS Servers: $dnsServers")
@@ -148,6 +164,7 @@ class ConfigActivity : AppCompatActivity() {
                     // Log.d("Baresip", "Config line $trimmedLine")
                     newConfig += trimmedLine.split("#")[0] + "\n"
                 }
+                Log.d("Baresip", "New config '$newConfig'")
                 Utils.putFileContents(configFile, newConfig)
                 // Api.reload_config()
             }
@@ -171,6 +188,9 @@ class ConfigActivity : AppCompatActivity() {
         when (v) {
             findViewById(R.id.AutoStartTitle) as TextView-> {
                 Utils.alertView(this, "Start Automatically", getString(R.string.autoStart))
+            }
+            findViewById(R.id.PreferIPv6Title) as TextView-> {
+                Utils.alertView(this, "Prefer IPv6", getString(R.string.preferIPv6))
             }
             findViewById(R.id.DnsServersTitle) as TextView -> {
                 Utils.alertView(this, "DNS Servers", getString(R.string.dnsServers))

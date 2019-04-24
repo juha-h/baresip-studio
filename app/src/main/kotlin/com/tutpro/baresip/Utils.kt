@@ -244,11 +244,6 @@ object Utils {
         return checkDomain(userDomain[1]) || checkIP(userDomain[1])
     }
 
-    fun checkOutboundUri(uri: String): Boolean {
-        if (!uri.startsWith("sip:")) return false
-        return checkHostPortParams(uri.substring(4))
-    }
-
     fun checkPrintAscii(s: String): Boolean {
         if (s == "") return true
         return Regex("^[ -~]*\$").matches(s)

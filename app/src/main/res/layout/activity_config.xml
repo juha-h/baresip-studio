@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
             <TextView
-                android:id="@+id/DnsServersTitle"
+                android:id="@+id/PreferIPv6Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -55,19 +55,38 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="DNS Servers" >
+                android:text="Prefer IPv6" >
             </TextView>
-            <EditText
-                android:id="@+id/DnsServers"
+            <CheckBox
+                android:id="@+id/PreferIPv6"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:layout_toEndOf="@+id/DnsServersTitle"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                android:textSize="18sp"
-                android:scrollHorizontally="true" >
-            </EditText>
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
         </RelativeLayout>
+
+        <TextView
+            android:id="@+id/DnsServersTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingTop="6dp"
+            android:onClick="onClick"
+            android:text="DNS Servers"
+            android:textColor="@android:color/black"
+            android:textSize="18sp">
+        </TextView>
+
+        <EditText
+            android:id="@+id/DnsServers"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="18sp">
+        </EditText>
 
         <RelativeLayout
             android:layout_width="wrap_content"
