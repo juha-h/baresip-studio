@@ -20,6 +20,7 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var opusBitRate: EditText
     internal lateinit var iceLite: CheckBox
     internal lateinit var debug: CheckBox
+    internal lateinit var reset: CheckBox
 
     private var oldAutoStart = ""
     private var oldPreferIPv6 = ""
@@ -78,6 +79,9 @@ class ConfigActivity : AppCompatActivity() {
         else
             oldLogLevel = dbCv[0]
         debug.isChecked =  oldLogLevel == "0"
+
+        reset = findViewById(R.id.Reset) as CheckBox
+        reset.isChecked = false
 
     }
 
@@ -156,6 +160,13 @@ class ConfigActivity : AppCompatActivity() {
                 save = true
             }
 
+            if (reset.isChecked) {
+                Utils.copyAssetToFile(applicationContext, "config",
+                            applicationContext.filesDir.absolutePath + "/config")
+                save = false
+                restart = true
+            }
+
             if (save) {
                 var newConfig = ""
                 for (line in config.split("\n")) {
@@ -203,6 +214,9 @@ class ConfigActivity : AppCompatActivity() {
             }
             findViewById(R.id.DebugTitle) as TextView-> {
                 Utils.alertView(this, "Debug", getString(R.string.debug))
+            }
+            findViewById(R.id.ResetTitle) as TextView-> {
+                Utils.alertView(this, "Reset", getString(R.string.reset))
             }
         }
     }
