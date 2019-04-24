@@ -19,12 +19,12 @@ import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import android.support.v4.content.ContextCompat
 import android.net.Network
 import android.net.NetworkRequest
+import android.provider.Settings
 
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
-import android.content.Intent
 
 class BaresipService: Service() {
 
@@ -562,7 +562,7 @@ class BaresipService: Service() {
             nb.setSmallIcon(R.drawable.ic_stat)
                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                     .setContentIntent(pi)
-                    .setDefaults(Notification.DEFAULT_SOUND)
+                    .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                     .setAutoCancel(true)
                     .setContentTitle("Message from $sender")
                     .setContentText(text)
