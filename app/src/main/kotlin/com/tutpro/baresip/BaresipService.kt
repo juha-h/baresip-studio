@@ -155,8 +155,12 @@ class BaresipService: Service() {
                                 Api.log_level_set(ll)
                                 Log.logLevelSet(ll)
                             }
+                            if (!contents.contains("prefer_ipv6")) {
+                                contents = "prefer_ipv6 no\n${contents}"
+                                write = true
+                            }
                             if (write) {
-                                Log.d(LOG_TAG, "Writing $contents")
+                                Log.d(LOG_TAG, "Writing '$contents'")
                                 Utils.putFileContents(file, contents)
                             }
 

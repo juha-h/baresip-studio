@@ -439,6 +439,14 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     if (err)
         goto out;
 
+    /* char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    } */
+
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
 
