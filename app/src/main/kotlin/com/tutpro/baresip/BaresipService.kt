@@ -25,6 +25,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.io.InputStream
 import java.util.*
+import kotlin.math.roundToInt
 
 class BaresipService: Service() {
 
@@ -41,6 +42,7 @@ class BaresipService: Service() {
     internal var filesPath = ""
     internal var audioFocusRequest: AudioFocusRequest? = null
     internal var audioFocused = false
+    internal var origCallVolume = 0
 
     override fun onCreate() {
 
@@ -159,11 +161,16 @@ class BaresipService: Service() {
                                 contents = "prefer_ipv6 no\n${contents}"
                                 write = true
                             }
+                            if (!contents.contains("call_volume")) {
+                                contents = "${contents}call_volume 0\n"
+                                write = true
+                            } else {
+                                callVolume = Utils.getNameValue(contents, "call_volume")[0].toInt()
+                            }
                             if (write) {
                                 Log.d(LOG_TAG, "Writing '$contents'")
                                 Utils.putFileContents(file, contents)
                             }
-
                         }
                     }
                 }
@@ -428,6 +435,13 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                             requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                         }
+                        if (callVolume != 0) {
+                            origCallVolume = am.getStreamMaxVolume(am.mode)
+                            am.setStreamVolume(am.mode,
+                                    (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
+                                    0)
+                        }
+                        Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
                     }
                     "call verified", "call secure" -> {
                         val call = Call.find(callp)
@@ -507,6 +521,11 @@ class BaresipService: Service() {
                         }
                         if (Call.calls().size == 0) {
                             abandonAudioFocus()
+                            if (origCallVolume != 0) {
+                                am.setStreamVolume(am.mode, origCallVolume, 0)
+                                origCallVolume = 0
+                            }
+                            Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
                             am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             speakerPhone = false
@@ -786,6 +805,7 @@ class BaresipService: Service() {
         var libraryLoaded = false
         var isServiceClean = false
         var speakerPhone = false
+        var callVolume = 0
 
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
