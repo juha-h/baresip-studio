@@ -62,6 +62,7 @@
     <string name="opusBitRate">Average maximum bit rate used by Opus audio stream.
         Valid value are 6000-510000. Factory default is 28000.</string>
     <string name="iceLite">If checked, ICE Lite Mode is used.</string>
+    <string name="callVolume">If set, default call audio volume at scale 1-10.</string>
     <string name="debug">If checked, debug and info level log messages are available in logcat.</string>
     <string name="reset">If checked, configuration is reset to factory default.</string>
 </resources>

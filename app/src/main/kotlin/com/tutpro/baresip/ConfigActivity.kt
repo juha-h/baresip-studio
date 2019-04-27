@@ -28,6 +28,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldOpusBitrate = ""
     private var oldIceMode = ""
     private var oldLogLevel = ""
+    private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
     private var config = ""
@@ -71,6 +72,27 @@ class ConfigActivity : AppCompatActivity() {
         val imCv = Utils.getNameValue(config, "ice_mode")
         oldIceMode = if (imCv.size == 0) "full" else imCv[0]
         iceLite.isChecked = oldIceMode == "lite"
+
+        val callVolSpinner = findViewById(R.id.VolumeSpinner) as Spinner
+        val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        val volVals = arrayListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        val curVal = callVolume
+        val curKey = volKeys[curVal]
+        volKeys.removeAt(curVal)
+        volVals.removeAt(curVal)
+        volKeys.add(0, curKey)
+        volVals.add(0, curVal)
+        val callVolAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+                volKeys)
+        callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        callVolSpinner.adapter = callVolAdapter
+        callVolSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
 
         debug = findViewById(R.id.Debug) as CheckBox
         val dbCv = Utils.getNameValue(config, "log_level")
@@ -150,6 +172,13 @@ class ConfigActivity : AppCompatActivity() {
                 restart = true
             }
 
+            if (BaresipService.callVolume != callVolume) {
+                BaresipService.callVolume = callVolume
+                config = Utils.removeLinesStartingWithName(config, "call_volume")
+                config += "\ncall_volume $callVolume\n"
+                save = true
+            }
+
             var logLevelString = "2"
             if (debug.isChecked) logLevelString = "0"
             if (oldLogLevel != logLevelString) {
@@ -211,6 +240,9 @@ class ConfigActivity : AppCompatActivity() {
             }
             findViewById(R.id.IceLiteTitle) as TextView-> {
                 Utils.alertView(this, "ICE Lite Mode", getString(R.string.iceLite))
+            }
+            findViewById(R.id.VolumeTitle) as TextView-> {
+                Utils.alertView(this, "Call Volume", getString(R.string.callVolume))
             }
             findViewById(R.id.DebugTitle) as TextView-> {
                 Utils.alertView(this, "Debug", getString(R.string.debug))
