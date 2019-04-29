@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
+        aorSpinner = findViewById(R.id.AoRList)
         callTitle = findViewById(R.id.callTitle) as TextView
         callUri = findViewById(R.id.callUri) as AutoCompleteTextView
         securityButton = findViewById(R.id.securityButton) as ImageButton
@@ -132,7 +133,6 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_CODE)
         }
 
-        aorSpinner = findViewById(R.id.AoRList)
         uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(), UserAgent.status())
         aorSpinner.adapter = uaAdapter
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -531,9 +531,8 @@ class MainActivity : AppCompatActivity() {
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
                 if (UserAgent.uas().size > 0) {
-                    if (aorSpinner.selectedItemPosition == -1)
-                        aorSpinner.setSelection(0)
-                    uaAdapter.notifyDataSetChanged()
+                    if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
+                    if (aorSpinner.isShown) uaAdapter.notifyDataSetChanged()
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                     updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 }
