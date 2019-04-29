@@ -1,1 +1,1 @@
-- Update account spinner also when main activity is resumes without action.
+- Update account spinner also when main activity is resumed without action.
