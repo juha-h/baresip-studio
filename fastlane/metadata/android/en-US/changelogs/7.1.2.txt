@@ -1,0 +1,2 @@
+- Tried to make sure that also account spinner view is updated when
+  account spinner is updated,
