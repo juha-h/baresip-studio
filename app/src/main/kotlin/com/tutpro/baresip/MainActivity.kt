@@ -160,7 +160,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Baresip", "Nothing selected")
             }
         }
-
         aorSpinner.setOnTouchListener { view, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 if (aorSpinner.selectedItemPosition == -1) {
@@ -534,6 +533,7 @@ class MainActivity : AppCompatActivity() {
                 if (UserAgent.uas().size > 0) {
                     if (aorSpinner.selectedItemPosition == -1)
                         aorSpinner.setSelection(0)
+                    uaAdapter.notifyDataSetChanged()
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                     updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 }
