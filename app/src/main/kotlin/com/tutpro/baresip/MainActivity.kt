@@ -531,8 +531,13 @@ class MainActivity : AppCompatActivity() {
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
                 if (UserAgent.uas().size > 0) {
-                    if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
-                    if (aorSpinner.isShown) uaAdapter.notifyDataSetChanged()
+                    uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(), UserAgent.status())
+                    aorSpinner.adapter = uaAdapter
+                    // if (aorSpinner.isShown) uaAdapter.notifyDataSetChanged()
+                    if (aorSpinner.selectedItemPosition == -1)
+                        aorSpinner.setSelection(0)
+                    else
+                        aorSpinner.setSelection(aorSpinner.selectedItemPosition)
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                     updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 }
