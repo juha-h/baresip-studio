@@ -558,11 +558,25 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (event == "stopped") {
-            Log.d("Baresip", "Handling service event 'stopped'")
-            quitTimer.cancel()
-            finishAndRemoveTask()
-            System.exit(0)
-            return
+            Log.d("Baresip", "Handling service event 'stopped' with param ${params[0]}")
+            if (params[0] != "") {
+                val alertDialog = AlertDialog.Builder(this).create()
+                alertDialog.setTitle("Notice")
+                alertDialog.setMessage("Baresip failed to start! Listen Address was reset. Restart baresip.")
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    quitTimer.cancel()
+                    finishAndRemoveTask()
+                    System.exit(0)
+                }
+                alertDialog.show()
+            } else {
+                quitTimer.cancel()
+                finishAndRemoveTask()
+                System.exit(0)
+                return
+            }
         }
         val uap = params[0]
         val ua = UserAgent.find(uap)

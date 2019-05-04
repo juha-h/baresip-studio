@@ -127,6 +127,7 @@ class Account(val accp: String) {
     fun host() : String {
         return aor.split("@")[1]
     }
+
     companion object {
 
         fun accounts(): ArrayList<Account> {

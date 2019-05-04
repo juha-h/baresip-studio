@@ -54,6 +54,12 @@
     <string name="defaultAccount">If checked, this account is selected when baresip is started.
     </string>>
     <string name="autoStart">If checked, baresip starts automatically after device (re)start.</string>
+    <string name="listenAddress">IP address and port of form \'address:port\' at which baresip listens
+        for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside
+        brackets [].  IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all
+        available addresses. If left empty (factory default), baresip listens at port 5060 of
+        all available addresses.
+    </string>
     <string name="preferIPv6">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
     <string name="dnsServers">Comma separated list of DNS servers.  Each DNS server is of form
         \'server:port\'.  If server is an IPv6 address, the address must be written inside brackets [].

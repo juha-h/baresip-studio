@@ -354,6 +354,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGD("Starting baresip\n");
 
+    char start_error[64] = "";
+
     BaresipContext *pctx = (BaresipContext *)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     jint res = (*javaVM)->GetEnv(javaVM, (void **) &env, JNI_VERSION_1_6);
@@ -382,12 +384,14 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     err = conf_configure();
     if (err) {
         LOGW("conf_configure() failed: (%d)\n", err);
+        strcpy(start_error, "conf_configure");
         goto out;
     }
 
     err = baresip_init(conf_config());
     if (err) {
         LOGW("baresip_init() failed (%d)\n", err);
+        strcpy(start_error, "baresip_init");
         goto out;
     }
 
@@ -397,6 +401,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
                   true, true, true);
     if (err) {
         LOGE("ua_init() failed (%d)\n", err);
+        strcpy(start_error, "ua_init");
         goto out;
     }
 
@@ -405,18 +410,21 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     err = uag_event_register(ua_event_handler, NULL);
     if (err) {
         LOGE("uag_event_register() failed (%d)\n", err);
+        strcpy(start_error, "uag_event_register");
         goto out;
     }
 
     err = message_listen(baresip_message(), message_handler, NULL);
     if (err) {
         LOGE("message_listen() failed (%d)\n", err);
+        strcpy(start_error, "message_listen");
         goto out;
     }
 
     err = conf_modules();
     if (err) {
         LOGW("conf_modules() failed (%d)\n", err);
+        strcpy(start_error, "conf_modules");
         goto out;
     }
 
@@ -436,12 +444,20 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGI("allocating mqeue\n");
     err = mqueue_alloc(&mq, mqueue_handler, NULL);
-    if (err)
+    if (err) {
+        LOGW("mqueue_alloc failed (%d)\n", err);
+        strcpy(start_error, "mqueue_alloc");
         goto out;
+    }
 
     /* char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_sip_status);
     if (l != -1) {
         debug_buf[l] = '\0';
         LOGD("%s\n", debug_buf);
@@ -481,8 +497,11 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     stopped:
 
     LOGD("tell main that baresip has stopped");
-    jmethodID stoppedId = (*env)->GetMethodID(env, pctx->mainActivityClz, "stopped", "()V");
-    (*env)->CallVoidMethod(env, pctx->mainActivityObj, stoppedId);
+    jstring javaError = (*env)->NewStringUTF(env, start_error);
+    jmethodID stoppedId = (*env)->GetMethodID(env, pctx->mainActivityClz, "stopped",
+            "(Ljava/lang/String;)V");
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, stoppedId, javaError);
+    (*env)->DeleteLocalRef(env, javaError);
 
     return;
 }
@@ -960,7 +979,7 @@ Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaU
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("destroying ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    ua_destroy(ua);
+    (void)ua_destroy(ua);
 }
 
 JNIEXPORT jstring JNICALL
