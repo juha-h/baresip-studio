@@ -23,13 +23,13 @@ import android.provider.Settings
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.io.InputStream
 import java.util.*
 import kotlin.math.roundToInt
 
 class BaresipService: Service() {
 
     private val LOG_TAG = "Baresip Service"
+
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
     internal lateinit var rt: Ringtone
@@ -39,7 +39,6 @@ class BaresipService: Service() {
     internal lateinit var fl: WifiManager.WifiLock
 
     internal var rtTimer: Timer? = null
-    internal var filesPath = ""
     internal var audioFocusRequest: AudioFocusRequest? = null
     internal var audioFocused = false
     internal var origCallVolume = 0
@@ -51,7 +50,8 @@ class BaresipService: Service() {
         intent = Intent("com.tutpro.baresip.EVENT")
         intent.setPackage("com.tutpro.baresip")
 
-        filesPath = applicationContext.filesDir.absolutePath
+        filesPath = filesDir.absolutePath
+        context = applicationContext
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
@@ -129,49 +129,7 @@ class BaresipService: Service() {
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
                         Log.d(LOG_TAG, "Asset $a already copied")
-                        if (a == "config") {
-                            val inputStream: InputStream = file.inputStream()
-                            var contents = inputStream.bufferedReader().use { it.readText() }
-                            inputStream.close()
-                            var write = false
-                            if (!contents.contains("zrtp_hash")) {
-                                contents = "${contents}zrtp_hash yes\n"
-                                write = true
-                            }
-                            if (contents.contains(Regex("#module_app[ ]+mwi.so"))) {
-                                contents = contents.replace(Regex("#module_app[ ]+mwi.so"),
-                                        "module_app mwi.so")
-                                write = true
-                            }
-                            if (!contents.contains("opus_application")) {
-                                contents = "${contents}opus_application voip\n"
-                                write = true
-                            }
-                            if (!contents.contains("log_level")) {
-                                contents = "${contents}log_level 2\n"
-                                Api.log_level_set(2)
-                                Log.logLevel = Log.LogLevel.WARN
-                                write = true
-                            } else {
-                                val ll = Utils.getNameValue(contents, "log_level")[0].toInt()
-                                Api.log_level_set(ll)
-                                Log.logLevelSet(ll)
-                            }
-                            if (!contents.contains("prefer_ipv6")) {
-                                contents = "prefer_ipv6 no\n${contents}"
-                                write = true
-                            }
-                            if (!contents.contains("call_volume")) {
-                                contents = "${contents}call_volume 0\n"
-                                write = true
-                            } else {
-                                callVolume = Utils.getNameValue(contents, "call_volume")[0].toInt()
-                            }
-                            if (write) {
-                                Log.d(LOG_TAG, "Writing '$contents'")
-                                Utils.putFileContents(file, contents)
-                            }
-                        }
+                        if (a == "config") Config.initialize()
                     }
                 }
                 ContactsActivity.restoreContacts(applicationContext.filesDir)
@@ -632,12 +590,13 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun stopped() {
-        Log.d(LOG_TAG, "'stopped' from baresip")
+    fun stopped(error: String) {
+        Log.d(LOG_TAG, "'stopped' from baresip with error $error")
         isServiceRunning = false
+        if (error == "ua_init") Config.remove("sip_listen")
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")
-        intent.putExtra("params", arrayListOf<String>())
+        intent.putExtra("params", arrayListOf(error))
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         stopForeground(true)
         stopSelf()
@@ -807,6 +766,8 @@ class BaresipService: Service() {
         var speakerPhone = false
         var callVolume = 0
 
+        var filesPath = ""
+        var context: Context? = null
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
         var calls = ArrayList<Call>()

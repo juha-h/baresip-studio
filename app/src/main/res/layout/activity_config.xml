@@ -42,6 +42,27 @@
             </CheckBox>
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/ListenAddressTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:onClick="onClick"
+            android:text="Listen Address"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/ListenAddress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="12dp"
+            android:textSize="18sp"
+            android:hint="0.0.0.0:5060" >
+        </EditText>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

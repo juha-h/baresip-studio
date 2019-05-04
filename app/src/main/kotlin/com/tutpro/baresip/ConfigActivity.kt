@@ -9,12 +9,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 
-import java.io.File
-
 class ConfigActivity : AppCompatActivity() {
 
-    internal lateinit var configFile: File
     internal lateinit var autoStart: CheckBox
+    internal lateinit var listenAddr: EditText
     internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
     internal lateinit var opusBitRate: EditText
@@ -23,6 +21,7 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var reset: CheckBox
 
     private var oldAutoStart = ""
+    private var oldListenAddr = ""
     private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
     private var oldOpusBitrate = ""
@@ -38,38 +37,35 @@ class ConfigActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config)
 
-        configFile = File(applicationContext.filesDir.absolutePath + "/config")
-        config = Utils.getFileContents(configFile)
-        if (config.length <= 100) {
-            Utils.alertView(this, "Internal Error", "Failed to read config file")
-            finish()
-            return
-        }
-
         autoStart = findViewById(R.id.AutoStart) as CheckBox
-        val asCv = Utils.getNameValue(config, "auto_start")
+        val asCv = Config.variable("auto_start")
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
 
+        listenAddr = findViewById(R.id.ListenAddress) as EditText
+        val laCv = Config.variable("sip_listen")
+        oldListenAddr = if (laCv.size == 0) "" else laCv[0]
+        listenAddr.setText(oldListenAddr)
+
         preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
-        val piCv = Utils.getNameValue(config, "prefer_ipv6")
+        val piCv = Config.variable("prefer_ipv6")
         oldPreferIPv6 = if (piCv.size == 0) "no" else piCv[0]
         preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
         dnsServers = findViewById(R.id.DnsServers) as EditText
-        val dsCv = Utils.getNameValue(config, "dns_server")
+        val dsCv = Config.variable("dns_server")
         var dsTv = ""
         for (ds in dsCv) dsTv += ", $ds"
         oldDnsServers = dsTv.trimStart(',').trimStart(' ')
         dnsServers.setText(oldDnsServers)
 
         opusBitRate = findViewById(R.id.OpusBitRate) as EditText
-        val obCv = Utils.getNameValue(config, "opus_bitrate")
+        val obCv = Config.variable("opus_bitrate")
         oldOpusBitrate = if (obCv.size == 0) "28000" else obCv[0]
         opusBitRate.setText(oldOpusBitrate)
 
         iceLite = findViewById(R.id.IceLite) as CheckBox
-        val imCv = Utils.getNameValue(config, "ice_mode")
+        val imCv = Config.variable("ice_mode")
         oldIceMode = if (imCv.size == 0) "full" else imCv[0]
         iceLite.isChecked = oldIceMode == "lite"
 
@@ -95,7 +91,7 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         debug = findViewById(R.id.Debug) as CheckBox
-        val dbCv = Utils.getNameValue(config, "log_level")
+        val dbCv = Config.variable("log_level")
         if (dbCv.size == 0)
             oldLogLevel = "2"
         else
@@ -123,17 +119,28 @@ class ConfigActivity : AppCompatActivity() {
             var autoStartString = "no"
             if (autoStart.isChecked) autoStartString = "yes"
             if (oldAutoStart != autoStartString) {
-                config = Utils.removeLinesStartingWithName(config, "auto_start")
-                config += "\nauto_start $autoStartString\n"
+                Config.replace("auto_start", autoStartString)
                 save = true
                 restart = false
+            }
+
+            val listenAddr = listenAddr.text.toString().trim()
+            if (listenAddr != oldListenAddr) {
+                if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
+                    Utils.alertView(this, "Notice",
+                            "Invalid Listen Address '$listenAddr'")
+                    return false
+                }
+                Config.remove("sip_listen")
+                if (listenAddr != "") Config.add("sip_listen", listenAddr)
+                save = true
+                restart = true
             }
 
             var preferIPv6String = "no"
             if (preferIPv6.isChecked) preferIPv6String = "yes"
             if (oldPreferIPv6 != preferIPv6String) {
-                config = Utils.removeLinesStartingWithName(config, "prefer_ipv6")
-                config = "prefer_ipv6 $preferIPv6String\n$config"
+                Config.replace("prefer_ipv6", preferIPv6String)
                 save = true
                 restart = true
             }
@@ -144,9 +151,9 @@ class ConfigActivity : AppCompatActivity() {
                     Utils.alertView(this, "Notice", "Invalid DNS Servers: $dnsServers")
                     return false
                 }
-                config = Utils.removeLinesStartingWithName(config, "dns_server")
+                Config.remove("dns_server")
                 for (server in dnsServers.split(","))
-                    config += "\ndns_server ${server.trim()}\n"
+                    Config.add("dns_server", server)
                 save = true
                 restart = true
             }
@@ -157,8 +164,7 @@ class ConfigActivity : AppCompatActivity() {
                     Utils.alertView(this, "Notice", "Invalid Opus Bit Rate: $opusBitRate")
                     return false
                 }
-                config = Utils.removeLinesStartingWithName(config, "opus_bitrate")
-                config += "\nopus_bitrate $opusBitRate\n"
+                Config.replace("opus_bitrate", opusBitRate)
                 save = true
                 restart = true
             }
@@ -166,48 +172,33 @@ class ConfigActivity : AppCompatActivity() {
             var iceModeString = "full"
             if (iceLite.isChecked) iceModeString = "lite"
             if (oldIceMode != iceModeString) {
-                config = Utils.removeLinesStartingWithName(config, "ice_mode")
-                config += "\nice_mode $iceModeString\n"
+                Config.replace("ice_mode", iceModeString)
                 save = true
                 restart = true
             }
 
             if (BaresipService.callVolume != callVolume) {
                 BaresipService.callVolume = callVolume
-                config = Utils.removeLinesStartingWithName(config, "call_volume")
-                config += "\ncall_volume $callVolume\n"
+                Config.replace("call_volume", callVolume.toString())
                 save = true
             }
 
             var logLevelString = "2"
             if (debug.isChecked) logLevelString = "0"
             if (oldLogLevel != logLevelString) {
-                config = Utils.removeLinesStartingWithName(config, "log_level")
-                config += "\nlog_level $logLevelString\n"
+                Config.replace("log_level", logLevelString)
                 Api.log_level_set(logLevelString.toInt())
                 Log.logLevelSet(logLevelString.toInt())
                 save = true
             }
 
             if (reset.isChecked) {
-                Utils.copyAssetToFile(applicationContext, "config",
-                            applicationContext.filesDir.absolutePath + "/config")
+                Config.reset()
                 save = false
                 restart = true
             }
 
-            if (save) {
-                var newConfig = ""
-                for (line in config.split("\n")) {
-                    val trimmedLine = line.trim()
-                    if (trimmedLine.startsWith("#") || (trimmedLine.length == 0)) continue
-                    // Log.d("Baresip", "Config line $trimmedLine")
-                    newConfig += trimmedLine.split("#")[0] + "\n"
-                }
-                Log.d("Baresip", "New config '$newConfig'")
-                Utils.putFileContents(configFile, newConfig)
-                // Api.reload_config()
-            }
+            if (save) Config.save()
 
             intent.putExtra("restart", restart )
             setResult(RESULT_OK, intent)
@@ -228,6 +219,9 @@ class ConfigActivity : AppCompatActivity() {
         when (v) {
             findViewById(R.id.AutoStartTitle) as TextView-> {
                 Utils.alertView(this, "Start Automatically", getString(R.string.autoStart))
+            }
+            findViewById(R.id.ListenAddressTitle) as TextView-> {
+                Utils.alertView(this, "Listen Address", getString(R.string.listenAddress))
             }
             findViewById(R.id.PreferIPv6Title) as TextView-> {
                 Utils.alertView(this, "Prefer IPv6", getString(R.string.preferIPv6))

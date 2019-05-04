@@ -153,12 +153,16 @@ object Utils {
         return Regex("^[+]?[0-9]{1,16}\$").matches(no)
     }
 
-    fun checkIP(ip: String): Boolean {
+    fun checkIpV4(ip: String): Boolean {
         return Regex("^(([0-1]?[0-9]{1,2}\\.)|(2[0-4][0-9]\\.)|(25[0-5]\\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))$").matches(ip)
     }
 
-    fun checkIPv6(ip: String): Boolean {
+    fun checkIpV6(ip: String): Boolean {
         return Regex("^(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4})$").matches(ip)
+    }
+
+    fun checkIp(ip: String): Boolean {
+        return checkIpV4(ip) || checkIpV6(ip)
     }
 
     fun checkUriUser(user: String): Boolean {
@@ -183,21 +187,25 @@ object Utils {
         return (number > 0) && (number < 65536)
     }
 
-    fun checkHostPort(hp: String, portMandatory: Boolean) : Boolean {
-        if (hp.startsWith("[")) {
-            val parts = hp.split("]")
-            if (parts.size != 2) return false
-            Log.d("Baresip", "Checking IPv6 '${parts[0].substring(1)}'")
-            if (!checkIPv6(parts[0].substring(1))) return false
-            if (portMandatory && !parts[1].startsWith(":")) return false
-            Log.d("Baresip", "Checking port '${parts[1].substring(1)}'")
-            return checkPort(parts[1].substring(1))
+    fun checkHost(host: String): Boolean {
+        return checkIp(host) || checkDomain(host)
+    }
+
+    fun checkHostPort(hostPort: String, portMandatory: Boolean): Boolean {
+        if (portMandatory) {
+            return checkHost(hostPort.substringBeforeLast(":")) &&
+                    checkPort(hostPort.substringAfterLast(":"))
         } else {
-            val parts = hp.split(":")
-            if (portMandatory && (parts.size != 2)) return false
-            if (parts.size == 1) return checkIP(parts[0]) || checkDomain(parts[0])
-            return checkPort(parts[1]) && (checkIP(parts[0]) || checkDomain(parts[0]))
+            if (hostPort.substringAfterLast(":").contains(Regex("^[0-9]+\$")))
+                return checkHostPort(hostPort, true)
+            else
+                return checkHost(hostPort)
         }
+    }
+
+    fun checkIpPort(ipPort: String): Boolean {
+        return checkIp(ipPort.substringBeforeLast(":")) &&
+                checkPort(ipPort.substringAfterLast(":"))
     }
 
     fun checkParams(params: String): Boolean {
@@ -241,7 +249,7 @@ object Utils {
         val userDomain = uri.replace("sip:", "").split("@")
         if (userDomain.size != 2) return false
         if (!checkUriUser(userDomain[0])) return false
-        return checkDomain(userDomain[1]) || checkIP(userDomain[1])
+        return checkDomain(userDomain[1]) || checkIp(userDomain[1])
     }
 
     fun checkPrintAscii(s: String): Boolean {
