@@ -72,7 +72,7 @@ class Account(val accp: String) {
 
         if (mediaNat != "") res = res + ";medianat=${mediaNat}"
 
-        if (stunServer != "") res = res + ";stunserver=\"stun:@${stunServer}\""
+        if (stunServer != "") res = res + ";stunserver=\"stun:${stunServer}\""
 
         if (audioCodec.size > 0) {
             var first = true
