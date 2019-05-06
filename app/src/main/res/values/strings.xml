@@ -28,10 +28,11 @@
     <string name="register">If checked, registration is enabled and REGISTER requests are sent at
         12 minute intervals.
     </string>
-    <string name="ice">If checked, ICE (Interactive Connectivity Establishment) is enabled for NAT
-        traversal.
+    <string name="mediaNat">Selects media NAT traversal protocol (if any).  Possible choices are STUN
+        (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
+        Establishment, RFC 5245).
     </string>
-    <string name="stunServer">A specific Stun Server used by ICE of form host[:port].
+    <string name="stunServer">A STUN Server of form host[:port].
         Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
         Username and password are currently not supported.
     </string>

@@ -27,6 +27,13 @@ class UserAgent (val uap: String) {
             }
         }
 
+        fun updateStatus(ua: UserAgent, status: Int) {
+            val index = BaresipService.uas.indexOf(ua)
+            if (index != -1) {
+                BaresipService.status[index] = status
+            }
+        }
+
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)

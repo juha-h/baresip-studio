@@ -89,7 +89,7 @@
             android:hint="SIP URI of Proxy Server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
-            android:layout_width="fill_parent">
+            android:layout_width="fill_parent" >
         </EditText>
 
         <EditText
@@ -125,51 +125,6 @@
             </CheckBox>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-            <TextView
-                android:id="@+id/IceTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:textSize="18sp"
-                android:textColor="@android:color/black"
-                android:onClick="onClick"
-                android:text="Use ICE" >
-            </TextView>
-            <CheckBox
-                android:id="@+id/Ice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="end"
-                android:checked="false" >
-            </CheckBox>
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/StunServerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:text="STUN Server"
-            android:onClick="onClick" >
-        </TextView>
-
-        <EditText
-            android:id="@+id/StunServer"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:layout_marginStart="10dp"
-            android:textSize="18sp"
-            android:scrollHorizontally="true"
-            android:inputType="textEmailAddress" >
-        </EditText>
-
         <TextView
             android:id="@+id/AudioCodecsTitle"
             android:layout_width="wrap_content"
@@ -183,9 +138,49 @@
         <LinearLayout
             android:id="@+id/CodecSpinners"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/MediaNatTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:onClick="onClick"
+            android:text="Media NAT Traversal" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/mediaNatSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:popupBackground="@drawable/spinner_background" >
+        </Spinner>
+
+        <TextView
+            android:id="@+id/StunServerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:onClick="onClick"
+            android:text="STUN Server" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/StunServer"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:textSize="18sp"
+            android:paddingTop="0dp"
+            android:paddingStart="10dp"
+            android:scrollHorizontally="true"
+            android:inputType="textEmailAddress" >
+        </EditText>
 
         <TextView
             android:id="@+id/MediaEncTitle"
