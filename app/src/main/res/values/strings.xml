@@ -54,6 +54,7 @@
         Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
         Username and password are currently not supported.
     </string>
+    <string name="stun_server_default">stun.l.google.com:19302</string>
     <string name="media_encryption">Media Encryption</string>
     <string name="media_encryption_help">Selects media transport encryption protocol.\n
         &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
