@@ -100,7 +100,7 @@ class ChatActivity : AppCompatActivity() {
             }
             val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
             if (ContactsActivity.contactName(peerUri) == peerUri)
-                builder.setMessage(String.format(getText(R.string.long_message_question).toString(),
+                builder.setMessage(String.format(getString(R.string.long_message_question),
                         chatPeer))
                         .setPositiveButton(getString(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getString(R.string.delete_message), dialogClickListener)

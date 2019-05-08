@@ -602,8 +602,8 @@ class MainActivity : AppCompatActivity() {
                     "registering failed" -> {
                         uaAdapter.notifyDataSetChanged()
                         Toast.makeText(applicationContext,
-                                String.format(getText(R.string.registering_failed).toString(),
-                                        aor) + ": ${ev[1]}",
+                                String.format(getString(R.string.registering_failed), aor) +
+                                        ": ${ev[1]}",
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing" -> {
