@@ -84,16 +84,16 @@ class ChatsActivity: AppCompatActivity() {
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
             val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
-                builder.setMessage("Do you want to delete chat with peer " +
-                        "${Utils.friendlyUri(peer, Utils.aorDomain(aor))} or add peer to contacts?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Chat", dialogClickListener)
-                        .setNeutralButton("Add Contact", dialogClickListener)
+                builder.setMessage(String.format(getString(R.string.long_chat_question),
+                        Utils.friendlyUri(peer, Utils.aorDomain(aor))))
+                        .setPositiveButton(getText(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
+                        .setNeutralButton(getText(R.string.add_contact), dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete chat with '$peer'?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Chat", dialogClickListener)
+                builder.setMessage("${getString(R.string.short_chat_question)} '$peer'?")
+                        .setPositiveButton(getText(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
                         .show()
             true
         }

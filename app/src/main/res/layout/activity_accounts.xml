@@ -27,8 +27,9 @@
             android:textSize="20sp"
             android:layout_alignParentStart="true"
             android:layout_marginStart="0dp"
-            android:layout_toLeftOf="@+id/addAccount"
+            android:layout_toStartOf="@+id/addAccount"
             android:inputType="textEmailAddress"
+            android:autofillHints="username"
             android:hint="@string/sip_uri_user_domain" >
         </EditText>
 
@@ -38,8 +39,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginLeft="6dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="6dp"
             android:src="@drawable/action_add"
+            android:contentDescription="@string/add"
             android:scaleType="centerCrop" >
         </ImageButton>
 

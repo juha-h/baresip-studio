@@ -103,13 +103,13 @@ class ChatActivity : AppCompatActivity() {
                 builder.setMessage(String.format(getString(R.string.long_message_question),
                         chatPeer))
                         .setPositiveButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete_message), dialogClickListener)
+                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
                         .setNeutralButton(getString(R.string.add_contact), dialogClickListener)
                         .show()
             else
                 builder.setMessage(getText(R.string.short_message_question))
                         .setPositiveButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete_message), dialogClickListener)
+                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
                         .show()
             true
         }
