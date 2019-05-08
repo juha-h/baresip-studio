@@ -30,7 +30,6 @@ class ConfigActivity : AppCompatActivity() {
     private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
-    private var config = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
