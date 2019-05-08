@@ -26,7 +26,7 @@
             android:layout_gravity="center"
             android:textSize="15dp"
             android:textColor="#000000"
-            android:text="Baresip "
+            android:text="@string/app_name"
             style = "@android:style/TextAppearance.Medium" />
 
     </LinearLayout>
@@ -49,7 +49,7 @@
         android:layout_marginBottom="14dp"
         android:layout_marginStart="16dp"
         android:layout_gravity="center"
-        android:text="Answer" />
+        android:text="@string/answer" />
 
     <Button android:id="@+id/rejectButton"
         android:layout_width="wrap_content"
@@ -60,6 +60,6 @@
         android:layout_marginBottom="14dp"
         android:layout_marginStart="20dp"
         android:layout_gravity="center"
-        android:text="Reject" />
+        android:text="@string/reject" />
     
 </RelativeLayout>

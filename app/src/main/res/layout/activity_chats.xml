@@ -41,7 +41,7 @@
         android:layout_toStartOf="@+id/plusButton"
         android:textSize="18sp"
         android:inputType="textEmailAddress"
-        android:hint="New Chat Peer" >
+        android:hint="@string/new_chat_peer" >
     </AutoCompleteTextView>
 
     <ImageButton

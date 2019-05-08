@@ -59,10 +59,10 @@ class ChatActivity : AppCompatActivity() {
             else
                 chatPeer = chatPeer.substring(4)
         }
-        setTitle("Chat with $chatPeer")
+        setTitle("${getString(R.string.chat_with)} $chatPeer")
 
         val headerView = findViewById(R.id.account) as TextView
-        val headerText = "Account ${aor.substringAfter(":")}"
+        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
         headerView.text = headerText
 
         listView = findViewById(R.id.messages) as ListView
@@ -99,16 +99,17 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
             val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
-            if (chatPeer.contains("@") || Utils.checkTelNo(chatPeer))
-                builder.setMessage("Do you want to delete message or add peer $chatPeer to contacts?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Message", dialogClickListener)
-                        .setNeutralButton("Add Contact", dialogClickListener)
+            if (ContactsActivity.contactName(peerUri) == peerUri)
+                builder.setMessage(String.format(getText(R.string.long_message_question).toString(),
+                        chatPeer))
+                        .setPositiveButton(getString(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getString(R.string.delete_message), dialogClickListener)
+                        .setNeutralButton(getString(R.string.add_contact), dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete message?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete Message", dialogClickListener)
+                builder.setMessage(getText(R.string.short_message_question))
+                        .setPositiveButton(getString(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getString(R.string.delete_message), dialogClickListener)
                         .show()
             true
         }
@@ -133,10 +134,10 @@ class ChatActivity : AppCompatActivity() {
                 Message.add(msg)
                 chatMessages.add(msg)
                 if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
-                    Toast.makeText(getApplicationContext(), "Sending of message failed!",
+                    Toast.makeText(getApplicationContext(), "${getString(R.string.message_failed)}!",
                             Toast.LENGTH_SHORT).show()
                     msg.direction = R.drawable.arrow_up_red
-                    msg.responseReason = "Sending of message failed"
+                    msg.responseReason = getString(R.string.message_failed)
                 } else {
                     newMessage.text.clear()
                     BaresipService.chatTexts.remove("$aor::$peerUri")

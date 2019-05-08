@@ -1,15 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
   <item android:id="@+id/config"
-      android:title="Config" />
+      android:title="@string/configuration" />
 
   <item android:id="@+id/accounts"
-      android:title="Accounts" />
+      android:title="@string/accounts" />
 
   <item android:id="@+id/about"
-        android:title="About" />
+        android:title="@string/about" />
 
   <item android:id="@+id/quit"
-      android:title="Quit" />
+      android:title="@string/quit" />
 
 </menu>

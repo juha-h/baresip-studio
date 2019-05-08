@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">baresip</string>
-    <string name="aboutText">
-        <b>Baresip based Android application</b>\n\n
+
+    <!-- About Activity -->
+    <string name="about_title">About baresip</string>
+    <string name="about_text">
+        <b>Baresip library based Android application</b>\n\n
         Juha Heinanen jh@tutpro.com\n\n
         Version %1$s\n\n
         <b>Usage Hints</b>\n\n
-        &#8226; Check that config default values meet your needs (click item titles for help).\n
+        &#8226; Check that configuration default values meet your needs (click item titles for help).\n
         &#8226; Then create one or more accounts (again click item titles for help).\n
         &#8226; Peers of calls and messages can be added to contacts by long clicks.\n
         &#8226; Long clicks can also be used to remove calls, chats, messages, and contacts.\n
         &#8226; Call click when callee has not been given can be used for re-dial.\n
         &#8226; If you cannot hear the other party of a call, try to increase Media volume.\n
     </string>
-    <string name="noAccounts">No accounts</string>
-    <string name="dispName">Name (if any) used in From URI of outbound requests.</string>
-    <string name="authUser">Authentication username if required by outbound proxy.</string>
-    <string name="authPass">Authentication password if required by outbound proxy.</string>
-    <string name="obProxies">SIP URI of one or two proxies that must be used when sending requests.
+
+    <!-- Account Activity -->
+    <string name="account">Account</string>
+    <string name="display_name">Display Name</string>
+    <string name="your_name">Your Name</string>
+    <string name="display_name_help">Name (if any) used in From URI of outbound requests.</string>
+    <string name="authentication_username">Authentication Username</string>
+    <string name="authentication_username_help">Authentication username if required by outbound proxy.</string>
+    <string name="authentication_password">Authentication Password</string>
+    <string name="authentication_password_help">Authentication password if required by outbound proxy.</string>
+    <string name="outbound_proxies">Outbound Proxies</string>
+    <string name="outbound_proxies_help">SIP URI of one or two proxies that must be used when sending requests.
         If two is given, REGISTER requests are sent to both and other requests are sent to
         one that responds.  If no outbound proxy is given, requests are sent based on
         DNS NAPTR/SRV/A record lookup of callee URI hostpart. If hostpart of SIP URI is an IPv6
@@ -25,19 +36,26 @@
         &#8226; sip:foo.com:5060;transport=tls\n
         &#8226; sip:[2001:67c:223:777::10]:5060;transport=tcp
     </string>
-    <string name="register">If checked, registration is enabled and REGISTER requests are sent at
+    <string name="sip_uri_of_proxy_server">SIP URI of Proxy Server</string>
+    <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
+    <string name="register">Register</string>
+    <string name="register_help">If checked, registration is enabled and REGISTER requests are sent at
         12 minute intervals.
     </string>
-    <string name="mediaNat">Selects media NAT traversal protocol (if any).  Possible choices are STUN
+    <string name="audio_codecs">Audio Codecs</string>
+    <string name="audio_codecs_help">List of supported audio codecs in priority order.</string>
+    <string name="media_nat">Media NAT Traversal</string>
+    <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
         Establishment, RFC 5245).
     </string>
-    <string name="stunServer">A STUN Server of form host[:port].
+    <string name="stun_server">STUN Server</string>
+    <string name="stun_server_help">A STUN Server of form host[:port].
         Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
         Username and password are currently not supported.
     </string>
-    <string name="auCodecs">List of supported audio codecs in priority order.</string>
-    <string name="mediaEnc">Selects media transport encryption protocol.\n
+    <string name="media_encryption">Media Encryption</string>
+    <string name="media_encryption_help">Selects media transport encryption protocol.\n
         &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
             the call has been established.\n
         &#8226; DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
@@ -49,27 +67,130 @@
         &#8226; None means that media encryption is not supported and that media transport protocol
             thus is RTP/AVP.
     </string>
-    <string name="vmUri">SIP URI for checking of voicemail messages. If left empty, voicemail
+    <string name="voicemail_uri">Voicemail URI</string>
+    <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
-    </string>>
-    <string name="defaultAccount">If checked, this account is selected when baresip is started.
-    </string>>
-    <string name="autoStart">If checked, baresip starts automatically after device (re)start.</string>
-    <string name="listenAddress">IP address and port of form \'address:port\' at which baresip listens
+    </string>
+    <string name="default_account">Default Account</string>
+    <string name="default_account_help">If checked, this account is selected when baresip is started.
+    </string>
+
+    <!-- Accounts Activity -->
+    <string name="accounts">Accounts</string>
+    <string name="sip_uri_user_domain">SIP URI user@domain</string>
+    <string name="export_accounts">Export</string>
+    <string name="import_accounts">Import</string>
+
+    <!-- Baresip Service -->
+    <string name="answer">Answer</string>
+    <string name="reject">Reject</string>
+    <string name="incoming_call_from">Incoming call from</string>
+    <string name="transfer_request">Call transfer request to</string>
+    <string name="message_from">Message from</string>
+
+    <!-- Calls Activity -->
+    <string name="calls">Call History</string>
+
+    <!-- Chat Activity -->
+    <string name="chat">Chat Messages</string>
+    <string name="chat_with">Chat with</string>
+    <string name="new_message">New message</string>
+    <string name="long_message_question">Do you want to delete message or add peer %1$s to contacts?</string>
+    <string name="short_message_question">Do you want to delete message?</string>
+    <string name="delete_message">Delete Message</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="message_failed">Sending of message failed</string>
+
+
+    <!-- Chats Activity -->
+    <string name="chats">Chat History</string>
+    <string name="new_chat_peer">New Chat Peer</string>
+
+    <!-- Config Activity -->
+    <string name="configuration">Configuration</string>
+    <string name="start_automatically">Start Automatically</string>
+    <string name="start_automatically_help">If checked, baresip starts automatically after device (re)start.</string>
+    <string name="listen_address">Listen Address</string>
+    <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside
         brackets [].  IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all
         available addresses. If left empty (factory default), baresip listens at port 5060 of
         all available addresses.
     </string>
-    <string name="preferIPv6">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
-    <string name="dnsServers">Comma separated list of DNS servers.  Each DNS server is of form
+    <string name="_0_0_0_0_5060">0.0.0.0:5060</string>
+    <string name="prefer_ipv6">Prefer IPv6</string>
+    <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
+    <string name="dns_servers">DNS Servers</string>
+    <string name="dns_servers_help">Comma separated list of DNS servers.  Each DNS server is of form
         \'server:port\'.  If server is an IPv6 address, the address must be written inside brackets [].
         Factory default value is \'8.8.8.8:53,[2001:4860:4860::8888]:53\' pointing to public Google
         DNS servers.</string>
-    <string name="opusBitRate">Average maximum bit rate used by Opus audio stream.
+    <string name="opus_bit_rate">Opus Bit Rate</string>
+    <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid value are 6000-510000. Factory default is 28000.</string>
-    <string name="iceLite">If checked, ICE Lite Mode is used.</string>
-    <string name="callVolume">If set, default call audio volume at scale 1-10.</string>
-    <string name="debug">If checked, debug and info level log messages are available in logcat.</string>
-    <string name="reset">If checked, configuration is reset to factory default.</string>
+    <string name="ice_lite_mode">ICE Lite Mode</string>
+    <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
+    <string name="default_call_volume">Default Call Volume</string>
+    <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
+    <string name="debug">Debug</string>
+    <string name="debug_help">If checked, debug and info level log messages are available in logcat.</string>
+    <string name="reset_config">Reset to Factory Default</string>
+    <string name="reset_config_help">If checked, configuration is reset to factory default.</string>
+
+    <!-- Contact Activity -->
+    <string name="contact">Contact</string>
+    <string name="contact_name">Contact Name</string>
+    <string name="export_contacts">Export</string>
+    <string name="import_contacts">Import</string>
+
+    <!-- Contacts Activity -->
+    <string name="contacts">Contacts</string>
+
+    <!-- Generic -->
+    <string name="alert">Alert</string>
+    <string name="info">Info</string>
+    <string name="notice">Notice</string>
+    <string name="cancel">Cancel</string>
+    <string name="check">Check</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="accept">Accept</string>
+    <string name="deny">Deny</string>
+    <string name="user_id">User ID</string>
+    <string name="password">Password</string>
+    <string name="sip_uri">SIP URI</string>
+    <string name="dots">&#8230;</string>
+
+    <!-- Main Activity -->
+    <string name="about">About</string>
+    <string name="quit">Quit</string>
+    <string name="outgoing_call_to_dots">Outgoing call to &#8230;</string>
+    <string name="incoming_call_from_dots">Incoming call from &#8230;</string>
+    <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
+    <string name="invalid_sip_uri">Invalid SIP URI</string>
+    <string name="callee">Callee</string>
+    <string name="dtmf">DTMF</string>
+    <string name="call_info">Call Info</string>
+    <string name="duration">Duration</string>
+    <string name="codecs">Codecs</string>
+    <string name="rate">Rate</string>
+    <string name="voicemail_messages">Voicemail Messages</string>
+    <string name="call_already_active">You already have an active call!</string>
+    <string name="start_failed">Baresip failed to start! Listen Address was reset.
+        Restart baresip.</string>
+    <string name="registering_failed">Registering of %1$s failed</string>
+    <string name="no_microphone_permission">You have not granted microphone permission.</string>
+    <string name="verify">Verify</string>
+    <string name="verify_sas">Do you want to verify SAS</string>
+    <string name="transfer_query">Do you accept to transfer call to</string>
+    <string name="call_failed">Call failed</string>
+    <string name="call_closed">Call closed</string>
+    <string name="restart_needed">You need to restart baresip in order to activate the new config!</string>
+    <string name="call_not_secure">This call is NOT secure!</string>
+    <string name="peer_not_verified">This call is SECURE, but peer is NOT verified!</string>
+    <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
+        Do you want to unverify the peer?</string>
+    <string name="unverify">Unverify</string>
+
 </resources>
