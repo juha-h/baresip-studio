@@ -32,6 +32,7 @@
             android:hint="@string/your_name"
             android:inputType="textPersonName|textCapWords"
             android:textSize="18sp"
+            android:autofillHints="name"
             android:layout_width="fill_parent">
         </EditText>
 
@@ -51,6 +52,7 @@
             android:hint="@string/user_id"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
+            android:autofillHints="username"
             android:layout_width="fill_parent">
         </EditText>
 
@@ -70,6 +72,7 @@
             android:hint="@string/password"
             android:textSize="18sp"
             android:inputType="textPassword"
+            android:importantForAutofill="no"
             android:layout_width="fill_parent">
         </EditText>
 
@@ -89,6 +92,7 @@
             android:hint="@string/sip_uri_of_proxy_server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
+            android:importantForAutofill="no"
             android:layout_width="fill_parent" >
         </EditText>
 
@@ -98,6 +102,7 @@
             android:hint="@string/sip_uri_of_another_proxy_server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
+            android:importantForAutofill="no"
             android:layout_width="fill_parent" >
         </EditText>
 
@@ -110,6 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/Register"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -178,7 +184,10 @@
             android:textSize="18sp"
             android:paddingTop="0dp"
             android:paddingStart="10dp"
+            android:paddingEnd="0dp"
             android:scrollHorizontally="true"
+            android:hint="@string/stun_server_default"
+            android:importantForAutofill="no"
             android:inputType="textEmailAddress" >
         </EditText>
 
@@ -216,7 +225,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/sip_uri"
             android:textSize="18sp"
-            android:inputType="textEmailAddress"
+            android:inputType="textUri"
+            android:importantForAutofill="no"
             android:layout_width="fill_parent">
         </EditText>
 
@@ -229,6 +239,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/Default"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"

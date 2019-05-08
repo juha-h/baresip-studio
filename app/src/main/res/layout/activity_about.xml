@@ -11,10 +11,10 @@
     tools:context=".AboutActivity">
 
     <ScrollView
-        android:id="@+id/aboutView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
+        tools:ignore="UselessParent"
         android:fillViewport="true" >
 
     <TextView

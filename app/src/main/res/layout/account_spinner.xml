@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/spinnerLayout"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <TableRow
-        android:id="@+id/spinnerRow"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dip" >
+        tools:ignore="UselessParent"
+        android:padding="5sp" >
 
         <ImageView
             android:id="@+id/spinnerImage"
-            android:contentDescription="@string/app_name" />
+            android:contentDescription="@string/account" />
 
         <TextView
             android:id="@+id/spinnerText"
-            android:textSize="18dp"
-            android:paddingLeft="6dip"
+            android:textSize="18sp"
+            android:paddingStart="8sp"
+            android:paddingEnd="0sp"
             android:textColor="@android:color/black" />
 
     </TableRow>
