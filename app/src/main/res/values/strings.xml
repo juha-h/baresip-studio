@@ -81,6 +81,7 @@
     <string name="sip_uri_user_domain">SIP URI user@domain</string>
     <string name="export_accounts">Export</string>
     <string name="import_accounts">Import</string>
+    <string name="delete_account">Do you want to delete account</string>
 
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
@@ -98,14 +99,15 @@
     <string name="new_message">New message</string>
     <string name="long_message_question">Do you want to delete message or add peer %1$s to contacts?</string>
     <string name="short_message_question">Do you want to delete message?</string>
-    <string name="delete_message">Delete Message</string>
     <string name="add_contact">Add Contact</string>
     <string name="message_failed">Sending of message failed</string>
-
 
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
     <string name="new_chat_peer">New Chat Peer</string>
+    <string name="long_chat_question">Do you want to delete chat with peer %1$s or
+        add peer to contacts?</string>
+    <string name="short_chat_question">Do you want to delete chat with</string>
 
     <!-- Config Activity -->
     <string name="configuration">Configuration</string>
@@ -161,6 +163,8 @@
     <string name="user_id">User ID</string>
     <string name="password">Password</string>
     <string name="sip_uri">SIP URI</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
     <string name="dots">&#8230;</string>
 
     <!-- Main Activity -->
