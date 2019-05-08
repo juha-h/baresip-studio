@@ -430,7 +430,7 @@ class AccountActivity : AppCompatActivity() {
             }
             findViewById(R.id.DefaultTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.default_account),
-                        getText(R.string.default_account_help).toString())
+                        getString(R.string.default_account_help))
             }
         }
     }
