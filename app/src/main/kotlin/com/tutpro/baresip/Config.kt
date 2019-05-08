@@ -1,13 +1,12 @@
 package com.tutpro.baresip
 
+import android.content.Context
 import java.io.File
 
 object Config {
 
     private val path = BaresipService.filesPath + "/config"
     private val file = File(path)
-    private val context = BaresipService.context
-
     private var config = Utils.getFileContents(file)
 
     fun initialize() {
@@ -75,8 +74,8 @@ object Config {
         add(variable, value)
     }
 
-    fun reset() {
-        Utils.copyAssetToFile(context!!, "config", path)
+    fun reset(ctx: Context) {
+        Utils.copyAssetToFile(ctx, "config", path)
     }
 
     fun save() {

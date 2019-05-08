@@ -193,7 +193,7 @@ class ConfigActivity : AppCompatActivity() {
             }
 
             if (reset.isChecked) {
-                Config.reset()
+                Config.reset(this)
                 save = false
                 restart = true
             }

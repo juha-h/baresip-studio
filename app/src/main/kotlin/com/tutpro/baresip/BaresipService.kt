@@ -51,7 +51,6 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip")
 
         filesPath = filesDir.absolutePath
-        context = applicationContext
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
@@ -771,7 +770,6 @@ class BaresipService: Service() {
         var callVolume = 0
 
         var filesPath = ""
-        var context: Context? = null
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
         var calls = ArrayList<Call>()
