@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@android:color/black"
-        android:text="Contact Name" >
+        android:text="@string/contact_name" >
     </TextView>
 
     <EditText
@@ -34,13 +34,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:paddingTop="10dp"
-            android:text="SIP URI" >
+            android:text="@string/sip_uri" >
     </TextView>
 
     <EditText
             android:id="@+id/Uri"
             android:layout_height="wrap_content"
-            android:hint="SIP URI"
+            android:hint="@string/sip_uri"
             android:inputType="textUri"
             android:textSize="18sp"
             android:layout_width="fill_parent">

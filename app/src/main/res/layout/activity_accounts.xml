@@ -29,7 +29,7 @@
             android:layout_marginStart="0dp"
             android:layout_toLeftOf="@+id/addAccount"
             android:inputType="textEmailAddress"
-            android:hint="SIP URI user@domain" >
+            android:hint="@string/sip_uri_user_domain" >
         </EditText>
 
         <ImageButton

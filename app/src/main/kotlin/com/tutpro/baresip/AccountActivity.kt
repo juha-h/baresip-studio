@@ -390,43 +390,47 @@ class AccountActivity : AppCompatActivity() {
     fun onClick(v: View) {
         when (v) {
             findViewById(R.id.DisplayNameTitle) as TextView-> {
-                Utils.alertView(this, "Display Name", getString(R.string.dispName))
+                Utils.alertView(this, getString(R.string.display_name),
+                        getString(R.string.display_name_help))
             }
             findViewById(R.id.AuthUserTitle) as TextView -> {
-                Utils.alertView(this, "Authentication Username",
-                        getString(R.string.authUser))
+                Utils.alertView(this, getString(R.string.authentication_username),
+                        getString(R.string.authentication_username_help))
             }
             findViewById(R.id.AuthPassTitle) as TextView-> {
-                Utils.alertView(this, "Authentication Password",
-                        getString(R.string.authPass))
+                Utils.alertView(this, getString(R.string.authentication_password),
+                        getString(R.string.authentication_password_help))
             }
             findViewById(R.id.OutboundProxyTitle) as TextView -> {
-                Utils.alertView(this, "Outbound Proxies",
-                        getString(R.string.obProxies))
+                Utils.alertView(this, getString(R.string.outbound_proxies),
+                        getString(R.string.outbound_proxies_help))
             }
             findViewById(R.id.RegTitle) as TextView -> {
-                Utils.alertView(this, "Register", getString(R.string.register))
-            }
-            findViewById(R.id.MediaNatTitle) as TextView -> {
-                Utils.alertView(this, "Media NAT Traversal", getString(R.string.mediaNat))
-            }
-            findViewById(R.id.StunServerTitle) as TextView -> {
-                Utils.alertView(this, "STUN Server", getString(R.string.stunServer))
+                Utils.alertView(this, "Register", getString(R.string.register_help))
             }
             findViewById(R.id.AudioCodecsTitle) as TextView -> {
-                Utils.alertView(this, "Audio Codecs", getString(R.string.auCodecs))
+                Utils.alertView(this, getString(R.string.audio_codecs),
+                        getString(R.string.audio_codecs_help))
+            }
+            findViewById(R.id.MediaNatTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.media_nat),
+                        getString(R.string.media_nat_help))
+            }
+            findViewById(R.id.StunServerTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.stun_server),
+                        getString(R.string.stun_server_help))
             }
             findViewById(R.id.MediaEncTitle) as TextView -> {
-                Utils.alertView(this, "Media Encryption",
-                        getText(R.string.mediaEnc).toString())
+                Utils.alertView(this, getString(R.string.media_encryption),
+                        getString(R.string.media_encryption_help))
             }
             findViewById(R.id.VoicemailUriTitle) as TextView -> {
-                Utils.alertView(this, "Voicemail URI",
-                        getText(R.string.vmUri).toString())
+                Utils.alertView(this, getString(R.string.voicemail_uri),
+                        getString(R.string.voicemain_uri_help))
             }
             findViewById(R.id.DefaultTitle) as TextView -> {
-                Utils.alertView(this, "Default Account",
-                        getText(R.string.defaultAccount).toString())
+                Utils.alertView(this, getString(R.string.default_account),
+                        getText(R.string.default_account_help).toString())
             }
         }
     }

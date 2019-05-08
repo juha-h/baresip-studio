@@ -1,9 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/export_accounts"
-        android:title="Export" />
+        android:title="@string/export_accounts" />
 
     <item android:id="@+id/import_accounts"
-        android:title="Import" />
+        android:title="@string/import_accounts" />
 
 </menu>

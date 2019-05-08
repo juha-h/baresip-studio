@@ -14,7 +14,7 @@ class AboutActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
         val aboutText = findViewById(R.id.aboutText) as TextView
-        aboutText.text = String.format(getText(R.string.aboutText).toString(),
+        aboutText.text = String.format(getText(R.string.about_text).toString(),
                 BuildConfig.VERSION_NAME)
         aboutText.setTextColor(Color.BLACK)
     }

@@ -218,31 +218,39 @@ class ConfigActivity : AppCompatActivity() {
     fun onClick(v: View) {
         when (v) {
             findViewById(R.id.AutoStartTitle) as TextView-> {
-                Utils.alertView(this, "Start Automatically", getString(R.string.autoStart))
+                Utils.alertView(this, getString(R.string.start_automatically),
+                        getString(R.string.start_automatically_help))
             }
             findViewById(R.id.ListenAddressTitle) as TextView-> {
-                Utils.alertView(this, "Listen Address", getString(R.string.listenAddress))
+                Utils.alertView(this, getString(R.string.listen_address),
+                        getString(R.string.listen_address_help))
             }
             findViewById(R.id.PreferIPv6Title) as TextView-> {
-                Utils.alertView(this, "Prefer IPv6", getString(R.string.preferIPv6))
+                Utils.alertView(this, getString(R.string.prefer_ipv6),
+                        getString(R.string.prefer_ipv6_help))
             }
             findViewById(R.id.DnsServersTitle) as TextView -> {
-                Utils.alertView(this, "DNS Servers", getString(R.string.dnsServers))
+                Utils.alertView(this, getString(R.string.dns_servers),
+                        getString(R.string.dns_servers_help))
             }
             findViewById(R.id.OpusBitRateTitle) as TextView-> {
-                Utils.alertView(this, "Opus Bit Rate", getString(R.string.opusBitRate))
+                Utils.alertView(this, getString(R.string.opus_bit_rate),
+                        getString(R.string.opus_bit_rate_help))
             }
             findViewById(R.id.IceLiteTitle) as TextView-> {
-                Utils.alertView(this, "ICE Lite Mode", getString(R.string.iceLite))
+                Utils.alertView(this, getString(R.string.ice_lite_mode),
+                        getString(R.string.ice_lite_mode_help))
             }
             findViewById(R.id.VolumeTitle) as TextView-> {
-                Utils.alertView(this, "Call Volume", getString(R.string.callVolume))
+                Utils.alertView(this, getString(R.string.default_call_volume),
+                        getString(R.string.default_call_volume_help))
             }
             findViewById(R.id.DebugTitle) as TextView-> {
-                Utils.alertView(this, "Debug", getString(R.string.debug))
+                Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
             }
             findViewById(R.id.ResetTitle) as TextView-> {
-                Utils.alertView(this, "Reset", getString(R.string.reset))
+                Utils.alertView(this, getString(R.string.reset_config),
+                        getString(R.string.reset_config_help))
             }
         }
     }

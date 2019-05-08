@@ -29,7 +29,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Start Automatically" >
+                android:text="@string/start_automatically" >
             </TextView>
             <CheckBox
                 android:id="@+id/AutoStart"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:onClick="onClick"
-            android:text="Listen Address"
+            android:text="@string/listen_address"
             android:textColor="@android:color/black"
             android:textSize="18sp" >
         </TextView>
@@ -60,7 +60,7 @@
             android:layout_centerVertical="true"
             android:layout_marginBottom="12dp"
             android:textSize="18sp"
-            android:hint="0.0.0.0:5060" >
+            android:hint="@string/_0_0_0_0_5060" >
         </EditText>
 
         <RelativeLayout
@@ -77,7 +77,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Prefer IPv6" >
+                android:text="@string/prefer_ipv6" >
             </TextView>
             <CheckBox
                 android:id="@+id/PreferIPv6"
@@ -96,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:onClick="onClick"
-            android:text="DNS Servers"
+            android:text="@string/dns_servers"
             android:textColor="@android:color/black"
             android:textSize="18sp">
         </TextView>
@@ -124,7 +124,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Opus Bit Rate" >
+                android:text="@string/opus_bit_rate" >
             </TextView>
             <EditText
                 android:id="@+id/OpusBitRate"
@@ -153,7 +153,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="ICE Lite Mode" >
+                android:text="@string/ice_lite_mode" >
             </TextView>
             <CheckBox
                 android:id="@+id/IceLite"
@@ -180,7 +180,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Default Call Volume" >
+                android:text="@string/default_call_volume" >
             </TextView>
             <Spinner
                 android:id="@+id/VolumeSpinner"
@@ -207,7 +207,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Debug" >
+                android:text="@string/debug" >
             </TextView>
             <CheckBox
                 android:id="@+id/Debug"
@@ -234,7 +234,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Reset to Factory Default" >
+                android:text="@string/reset_config" >
             </TextView>
             <CheckBox
                 android:id="@+id/Reset"

@@ -351,7 +351,7 @@ class BaresipService: Service() {
                                             R.color.colorBaresip))
                                     .setContentIntent(pi)
                                     .setAutoCancel(true)
-                                    .setContentTitle("Incoming call from")
+                                    .setContentTitle(getString(R.string.incoming_call_from))
                                     .setContentText(caller)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 nb.setVibrate(LongArray(0))
@@ -368,8 +368,10 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getService(this,
                                     REJECT_REQ_CODE, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat, "Answer", answerPendingIntent)
-                            nb.addAction(R.drawable.ic_stat, "Reject", rejectPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.answer),
+                                    answerPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.reject),
+                                    rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -436,7 +438,7 @@ class BaresipService: Service() {
                                     .setContentIntent(pi)
                                     .setDefaults(Notification.DEFAULT_SOUND)
                                     .setAutoCancel(true)
-                                    .setContentTitle("Call transfer request to")
+                                    .setContentTitle(getString(R.string.transfer_request))
                                     .setContentText(target)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                 nb.setVibrate(LongArray(0))
@@ -455,8 +457,10 @@ class BaresipService: Service() {
                             denyIntent.putExtra("callp", callp)
                             val denyPendingIntent = PendingIntent.getService(this,
                                     DENY_REQ_CODE, denyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat, "Accept", acceptPendingIntent)
-                            nb.addAction(R.drawable.ic_stat, "Deny", denyPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.accept),
+                                    acceptPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.deny),
+                                    denyPendingIntent)
                             nm.notify(TRANSFER_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -541,7 +545,7 @@ class BaresipService: Service() {
                     .setContentIntent(pi)
                     .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                     .setAutoCancel(true)
-                    .setContentTitle("Message from $sender")
+                    .setContentTitle(getString(R.string.message_from) + " " + sender)
                     .setContentText(text)
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 nb.setVibrate(LongArray(0))

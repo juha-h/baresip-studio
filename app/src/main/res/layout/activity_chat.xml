@@ -39,7 +39,7 @@
         android:importantForAutofill="no"
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@id/sendButton"
-        android:hint="New message" >
+        android:hint="@string/new_message" >
     </EditText>
 
     <ImageButton

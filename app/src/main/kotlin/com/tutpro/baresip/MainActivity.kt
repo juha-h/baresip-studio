@@ -208,18 +208,18 @@ class MainActivity : AppCompatActivity() {
         securityButton.setOnClickListener {
             when (securityButton.tag) {
                 "red" -> {
-                    Utils.alertView(this, "Alert", "This call is NOT secure!")
+                    Utils.alertView(this, getString(R.string.alert),
+                            getString(R.string.call_not_secure))
                 }
                 "yellow" -> {
-                    Utils.alertView(this, "Alert",
-                            "This call is SECURE, but peer is NOT verified!")
+                    Utils.alertView(this, getString(R.string.alert),
+                            getString(R.string.peer_not_verified))
                 }
                 "green" -> {
                     val unverifyDialog = AlertDialog.Builder(this)
-                    unverifyDialog.setTitle("Info")
-                    unverifyDialog.setMessage("This call is SECURE and peer is VERIFIED! " +
-                            "Do you want to unverify the peer?")
-                    unverifyDialog.setPositiveButton("Unverify") { dialog, _ ->
+                    unverifyDialog.setTitle(getString(R.string.info))
+                    unverifyDialog.setMessage(getString(R.string.call_is_secure))
+                    unverifyDialog.setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
                         val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition],
                                 "")
                         if (calls.size > 0) {
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         dialog.dismiss()
                     }
-                    unverifyDialog.setNegativeButton("No") { dialog, _ ->
+                    unverifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                         dialog.dismiss()
                     }
                     unverifyDialog.create().show()
@@ -257,7 +257,8 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     if (!Utils.checkSipUri(uri))
-                        Utils.alertView(this, "Notice", "Invalid SIP URI '$uri'")
+                        Utils.alertView(this, getString(R.string.notice),
+                                "${getString(R.string.invalid_sip_uri)} '$uri'")
                     else
                         call(ua, uri, "outgoing")
                 } else {
@@ -328,11 +329,11 @@ class MainActivity : AppCompatActivity() {
                     val rate = status.split('=')[1]
                     val txCodec = codecs.split(',')[0].split("/")
                     val rxCodec = codecs.split(',')[1].split("/")
-                    Utils.alertView(this, "Call Info",
-                            "Duration: $duration\n" +
-                                    "Codecs: ${txCodec[0]} ch ${txCodec[2]}/" +
+                    Utils.alertView(this, getString(R.string.call_info),
+                            "${getString(R.string.duration)}: $duration\n" +
+                                    "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "Rate: $rate")
+                                    "${getString(R.string.rate)}: $rate")
                 }
             }
         }
@@ -359,10 +360,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     val builder = AlertDialog.Builder(this@MainActivity,
                             R.style.Theme_AppCompat)
-                    builder.setTitle("Voicemail Messages")
+                    builder.setTitle(getString(R.string.voicemail_messages))
                     builder.setMessage(acc.vmMessage())
-                            .setPositiveButton("Cancel", dialogClickListener)
-                            .setNegativeButton("Check", dialogClickListener)
+                            .setPositiveButton(getString(R.string.cancel), dialogClickListener)
+                            .setNegativeButton(getString(R.string.check), dialogClickListener)
                             .show()
                 }
             }
@@ -447,7 +448,7 @@ class MainActivity : AppCompatActivity() {
         when (action) {
             "call" -> {
                 if (!Call.calls().isEmpty()) {
-                    Toast.makeText(applicationContext, "You already have an active call!",
+                    Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return
                 }
@@ -561,9 +562,9 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Handling service event 'stopped' with param ${params[0]}")
             if (params[0] != "") {
                 val alertDialog = AlertDialog.Builder(this).create()
-                alertDialog.setTitle("Notice")
-                alertDialog.setMessage("Baresip failed to start! Listen Address was reset. Restart baresip.")
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+                alertDialog.setTitle(getString(R.string.notice))
+                alertDialog.setMessage(getString(R.string.start_failed))
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok)
                 ) { dialog, _ ->
                     dialog.dismiss()
                     quitTimer.cancel()
@@ -601,7 +602,8 @@ class MainActivity : AppCompatActivity() {
                     "registering failed" -> {
                         uaAdapter.notifyDataSetChanged()
                         Toast.makeText(applicationContext,
-                                "Registering of $aor failed: ${ev[1]}",
+                                String.format(getText(R.string.registering_failed).toString(),
+                                        aor) + ": ${ev[1]}",
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing" -> {
@@ -618,7 +620,7 @@ class MainActivity : AppCompatActivity() {
                                         Manifest.permission.RECORD_AUDIO) ==
                                 PackageManager.PERMISSION_DENIED) {
                             Toast.makeText(applicationContext,
-                                    "You have not granted microphone permission.",
+                                    getString(R.string.no_microphone_permission),
                                     Toast.LENGTH_SHORT).show()
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
@@ -633,7 +635,7 @@ class MainActivity : AppCompatActivity() {
                                 (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])) {
                             aorSpinner.setSelection(account_index)
                         } else {
-                            callTitle.text = "Incoming call from ..."
+                            callTitle.text = getString(R.string.incoming_call_from_dots)
                             callUri.setAdapter(null)
                             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                                     Utils.aorDomain(ua.account.aor)))
@@ -665,9 +667,9 @@ class MainActivity : AppCompatActivity() {
                         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
                             if (call.dir == "in")
-                                callTitle.text = "Incoming call from ..."
+                                callTitle.text = getString(R.string.incoming_call_from_dots)
                             else
-                                callTitle.text = "Outgoing call to ..."
+                                callTitle.text = getString(R.string.outgoing_call_to_dots)
                             if (acc.mediaEnc == "") {
                                 securityButton.visibility = View.INVISIBLE
                             } else {
@@ -683,7 +685,7 @@ class MainActivity : AppCompatActivity() {
                             holdButton.setImageResource(R.drawable.pause)
                             holdButton.visibility = View.VISIBLE
                             dtmf.setText("")
-                            dtmf.hint = "DTMF"
+                            dtmf.hint = getString(R.string.dtmf)
                             dtmf.visibility = View.VISIBLE
                             dtmf.requestFocus()
                             if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
@@ -700,9 +702,9 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         val verifyDialog = AlertDialog.Builder(this@MainActivity)
-                        verifyDialog.setTitle("Verify")
-                        verifyDialog.setMessage("Do you want to verify SAS <${ev[1]}> <${ev[2]}>?")
-                        verifyDialog.setPositiveButton("Yes") { dialog, _ ->
+                        verifyDialog.setTitle(getString(R.string.verify))
+                        verifyDialog.setMessage("${getString(R.string.verify_sas)} <${ev[1]}> <${ev[2]}>?")
+                        verifyDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                             val security: Int
                             if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                                 Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
@@ -719,7 +721,7 @@ class MainActivity : AppCompatActivity() {
                                 dialog.dismiss()
                             }
                         }
-                        verifyDialog.setNegativeButton("No") { dialog, _ ->
+                        verifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             call.security = R.drawable.box_yellow
                             call.zid = ev[3]
                             if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
@@ -758,15 +760,15 @@ class MainActivity : AppCompatActivity() {
                         val transferDialog = AlertDialog.Builder(this)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        transferDialog.setMessage("Do you accept to transfer call to $target?")
-                        transferDialog.setPositiveButton("Yes") { dialog, _ ->
+                        transferDialog.setMessage("${getString(R.string.transfer_query)} $target?")
+                        transferDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                             if (call in Call.calls())
                                 Api.ua_hangup(uap, callp, 0, "")
                             call(ua, ev[1], "transferring")
                             showCall(ua)
                             dialog.dismiss()
                         }
-                        transferDialog.setNegativeButton("No") { dialog, _ ->
+                        transferDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             if (call in Call.calls())
                                 Api.call_notify_sipfrag(callp, 603, "Decline")
                             dialog.dismiss()
@@ -795,10 +797,12 @@ class MainActivity : AppCompatActivity() {
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param.get(0).isDigit())
-                                Toast.makeText(applicationContext, "Call failed: $param",
+                                Toast.makeText(applicationContext,
+                                        "${getString(R.string.call_failed)}: $param",
                                         Toast.LENGTH_LONG).show()
                             else
-                                Toast.makeText(applicationContext, "Call closed: $param",
+                                Toast.makeText(applicationContext,
+                                        "${getString(R.string.call_closed)}: $param",
                                         Toast.LENGTH_LONG).show()
                         }
                     }
@@ -959,8 +963,8 @@ class MainActivity : AppCompatActivity() {
             CONFIG_CODE -> {
                 if ((resultCode == RESULT_OK) &&
                         (data!!.getBooleanExtra("restart", true)))
-                    Utils.alertView(this, "Notice",
-                            "You need to restart baresip in order to activate the new config!")
+                    Utils.alertView(this, getString(R.string.notice),
+                            getString(R.string.restart_needed))
                 if (resultCode == RESULT_CANCELED)
                     Log.d("Baresip", "Config canceled")
             }
@@ -1000,7 +1004,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(applicationContext,
-                    "You have not granted microphone permission.", Toast.LENGTH_SHORT).show()
+                    getString(R.string.no_microphone_permission), Toast.LENGTH_SHORT).show()
             return
         }
         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
@@ -1073,9 +1077,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
-            callTitle.text = "Outgoing call to ..."
+            callTitle.text = getString(R.string.outgoing_call_to_dots)
             callUri.text.clear()
-            callUri.hint = "Callee"
+            callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
             callUri.isFocusableInTouchMode = true
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
@@ -1096,11 +1100,11 @@ class MainActivity : AppCompatActivity() {
             if (callsOut.size > 0) {
                 call = callsOut[callsOut.size - 1]
                 if (call.status == "transferring")
-                    callTitle.text = "Transferring call to ..."
+                    callTitle.text = getString(R.string.transferring_call_to_dots)
                 else
-                    callTitle.text = "Outgoing call to ..."
+                    callTitle.text = getString(R.string.outgoing_call_to_dots)
             } else {
-                callTitle.text = "Incoming call from ..."
+                callTitle.text = getString(R.string.incoming_call_from_dots)
                 call = callsIn[callsIn.size - 1]
             }
             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),

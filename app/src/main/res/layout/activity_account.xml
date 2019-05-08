@@ -23,13 +23,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Display Name" >
+            android:text="@string/display_name" >
         </TextView>
 
         <EditText
             android:id="@+id/DisplayName"
             android:layout_height="wrap_content"
-            android:hint="Your Name"
+            android:hint="@string/your_name"
             android:inputType="textPersonName|textCapWords"
             android:textSize="18sp"
             android:layout_width="fill_parent">
@@ -42,13 +42,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Authentication Username" >
+            android:text="@string/authentication_username" >
         </TextView>
 
         <EditText
             android:id="@+id/AuthUser"
             android:layout_height="wrap_content"
-            android:hint="User ID"
+            android:hint="@string/user_id"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:layout_width="fill_parent">
@@ -61,13 +61,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Authentication Password" >
+            android:text="@string/authentication_password" >
         </TextView>
 
         <EditText
             android:id="@+id/AuthPass"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="@string/password"
             android:textSize="18sp"
             android:inputType="textPassword"
             android:layout_width="fill_parent">
@@ -80,13 +80,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Outbound Proxies" >
+            android:text="@string/outbound_proxies" >
         </TextView>
 
         <EditText
             android:id="@+id/Outbound1"
             android:layout_height="wrap_content"
-            android:hint="SIP URI of Proxy Server"
+            android:hint="@string/sip_uri_of_proxy_server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:layout_width="fill_parent" >
@@ -95,7 +95,7 @@
         <EditText
             android:id="@+id/Outbound2"
             android:layout_height="wrap_content"
-            android:hint="SIP URI of another Proxy Server"
+            android:hint="@string/sip_uri_of_another_proxy_server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:layout_width="fill_parent" >
@@ -113,7 +113,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Register" >
+                android:text="@string/register" >
             </TextView>
             <CheckBox
                 android:id="@+id/Register"
@@ -132,7 +132,7 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Audio Codecs" >
+            android:text="@string/audio_codecs" >
         </TextView>
 
         <LinearLayout
@@ -150,7 +150,7 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Media NAT Traversal" >
+            android:text="@string/media_nat" >
         </TextView>
 
         <Spinner
@@ -168,7 +168,7 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="STUN Server" >
+            android:text="@string/stun_server" >
         </TextView>
 
         <EditText
@@ -190,7 +190,7 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Media Encryption" >
+            android:text="@string/media_encryption" >
         </TextView>
 
         <Spinner
@@ -208,13 +208,13 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="Voicemail URI" >
+            android:text="@string/voicemail_uri" >
         </TextView>
 
         <EditText
             android:id="@+id/voicemailUri"
             android:layout_height="wrap_content"
-            android:hint="SIP URI"
+            android:hint="@string/sip_uri"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:layout_width="fill_parent">
@@ -232,7 +232,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="Default Account" >
+                android:text="@string/default_account" >
             </TextView>
             <CheckBox
                 android:id="@+id/Default"
