@@ -37,6 +37,7 @@
                 android:layout_below="@id/AoRList"
                 android:paddingTop="16dp"
                 android:paddingStart="3dp"
+                android:paddingEnd="0dp"
                 android:textSize="20sp"
                 android:textColor="@android:color/black"
                 android:text="@string/outgoing_call_to_dots" >
@@ -79,7 +80,8 @@
                 android:layout_below="@id/uriRow"
                 android:padding="0dp"
                 android:background="@null"
-                android:src="@drawable/call_green" >
+                android:src="@drawable/call_green"
+                android:contentDescription="@string/call" >
             </ImageButton>
 
             <ImageButton
@@ -91,7 +93,8 @@
                 android:background="@null"
                 android:src="@drawable/hangup"
                 android:clickable="false"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:contentDescription="@string/hangup" >
             </ImageButton>
 
             <ImageButton
@@ -103,7 +106,8 @@
                 android:background="@null"
                 android:src="@drawable/call_green"
                 android:clickable="false"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:contentDescription="@string/answer" >
             </ImageButton>
 
             <ImageButton
@@ -116,7 +120,8 @@
                 android:layout_marginStart="70dp"
                 android:src="@drawable/hangup"
                 android:clickable="false"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:contentDescription="@string/reject" >
             </ImageButton>
 
             <ImageButton
@@ -129,7 +134,8 @@
                 android:background="@null"
                 android:layout_marginStart="70dp"
                 android:clickable="false"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:contentDescription="@string/hold" >
             </ImageButton>
 
             <EditText
@@ -141,7 +147,8 @@
                 android:inputType="phone"
                 android:textSize="20sp"
                 android:hint="@string/dtmf"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:importantForAutofill="no" >
             </EditText>
 
             <ImageButton
@@ -155,7 +162,8 @@
                 android:layout_marginTop="6dp"
                 android:background="@null"
                 android:clickable="false"
-                android:visibility="invisible" >
+                android:visibility="invisible"
+                android:contentDescription="@string/call_info" >
             </ImageButton>
 
         </RelativeLayout>
@@ -171,7 +179,8 @@
         android:layout_toStartOf="@id/contactsButton"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
-        android:visibility="invisible" >
+        android:visibility="invisible"
+        android:contentDescription="@string/voicemail" >
     </ImageButton>
 
     <ImageButton
@@ -182,7 +191,8 @@
         android:src="@drawable/contacts"
         android:layout_toStartOf="@id/messagesButton"
         android:layout_marginEnd="10dp"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/contacts" >
     </ImageButton>
 
     <ImageButton
@@ -193,31 +203,34 @@
         android:src="@drawable/messages"
         android:layout_toStartOf="@id/callsButton"
         android:layout_marginEnd="10dp"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/messages" >
     </ImageButton>
 
     <ImageButton
         android:id="@+id/callsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/dialpadButton"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentBottom="true"
         android:padding="0dp"
         android:background="@null"
         android:src="@drawable/calls"
-        android:layout_toStartOf="@id/dialpadButton"
-        android:layout_marginEnd="10dp"
-        android:layout_alignParentBottom="true" >
+        android:contentDescription="@string/calls" >
     </ImageButton>
 
     <ImageButton
         android:id="@+id/dialpadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/dialpad_off"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="2dp"
-        android:layout_alignParentEnd="true" >
+        android:layout_alignParentEnd="true"
+        android:background="@null"
+        android:src="@drawable/dialpad_off"
+        android:contentDescription="@string/dialpad" >
     </ImageButton>
 
 </RelativeLayout>

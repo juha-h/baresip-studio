@@ -15,7 +15,7 @@
     </TextView>
 
     <ImageButton
-        android:id="@+id/action"
+        android:id="@+id/edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -25,7 +25,8 @@
         android:layout_marginStart="10dp"
         android:src="@drawable/edit"
         android:background="@null"
-        android:scaleType="centerCrop" >
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/edit" >
     </ImageButton>
 
 </RelativeLayout>

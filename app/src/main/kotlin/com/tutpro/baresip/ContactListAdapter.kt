@@ -53,11 +53,11 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                     }
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                builder.setMessage("Do you want to call or send message to '" +
-                        "${Contact.contacts()[pos].name}'?")
-                        .setNeutralButton("Call", dialogClickListener)
-                        .setNegativeButton("Send Message", dialogClickListener)
-                        .setPositiveButton("Cancel", dialogClickListener)
+                builder.setMessage(cxt.getString(R.string.contact_action_question) +
+                        " '${Contact.contacts()[pos].name}'?")
+                        .setNeutralButton(cxt.getText(R.string.call), dialogClickListener)
+                        .setNegativeButton(cxt.getText(R.string.send_message), dialogClickListener)
+                        .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
                         .show()
             }
         }
@@ -74,14 +74,14 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to delete contact '" +
-                    "${Contact.contacts()[pos].name}'?")
-                    .setPositiveButton("Cancel", dialogClickListener)
-                    .setNegativeButton("Delete Contact", dialogClickListener)
+            builder.setMessage(cxt.getString(R.string.contact_delete_question) +
+                    " '${Contact.contacts()[pos].name}'?")
+                    .setNegativeButton(cxt.getText(R.string.delete), dialogClickListener)
+                    .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
                     .show()
             true
         }
-        val actionView = rowView.findViewById(R.id.action) as ImageButton
+        val actionView = rowView.findViewById(R.id.edit) as ImageButton
         actionView.setOnClickListener { _ ->
             val i = Intent(cxt, ContactActivity::class.java)
             val b = Bundle()

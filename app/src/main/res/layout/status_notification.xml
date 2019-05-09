@@ -9,49 +9,59 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp"
-        android:paddingRight="5dp"
-        android:src="@drawable/baresip" />
+        android:paddingStart="10dp"
+        android:paddingEnd="5dp"
+        android:src="@drawable/baresip"
+        android:contentDescription="@string/app_name" />
 
     <TextView android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="15dp"
-        android:textColor="#000000"
+        android:textSize="15sp"
+        android:textColor="@color/colorBaresip"
         android:text="@string/app_name"
-        style = "@android:style/TextAppearance.Medium" />
+        style = "@android:style/TextAppearance.DeviceDefault.Small" />
 
     <ImageView android:id="@+id/status0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp" />
+        android:paddingStart="10dp"
+        android:paddingEnd="0dp"
+        android:contentDescription="@string/status" />
 
     <ImageView android:id="@+id/status1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp" />
+        android:paddingStart="10dp"
+        android:paddingEnd="0dp"
+        android:contentDescription="@string/status" />
 
     <ImageView android:id="@+id/status2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp" />
+        android:paddingStart="10dp"
+        android:paddingEnd="0dp"
+        android:contentDescription="@string/status" />
 
     <ImageView android:id="@+id/status3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp" />
+        android:paddingStart="10dp"
+        android:paddingEnd="0dp"
+        android:contentDescription="@string/status" />
 
     <TextView android:id="@+id/etc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="14dp"
-        android:paddingLeft="5dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="0dp"
         android:text="@string/dots"
         android:textColor="#000000"
         style = "@android:style/TextAppearance.Medium" />

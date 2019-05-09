@@ -99,11 +99,11 @@
         <EditText
             android:id="@+id/Outbound2"
             android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
             android:hint="@string/sip_uri_of_another_proxy_server"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
-            android:importantForAutofill="no"
-            android:layout_width="fill_parent" >
+            android:importantForAutofill="no" >
         </EditText>
 
         <RelativeLayout

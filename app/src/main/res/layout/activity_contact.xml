@@ -39,11 +39,12 @@
 
     <EditText
             android:id="@+id/Uri"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sip_uri"
             android:inputType="textUri"
             android:textSize="18sp"
-            android:layout_width="fill_parent">
+            android:importantForAutofill="no" >
     </EditText>
 
 </LinearLayout>
