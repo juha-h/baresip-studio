@@ -98,7 +98,7 @@ class ChatsActivity: AppCompatActivity() {
             true
         }
 
-        peerUri = findViewById(R.id.peerUri) as AutoCompleteTextView
+        peerUri = findViewById(R.id.peer) as AutoCompleteTextView
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))

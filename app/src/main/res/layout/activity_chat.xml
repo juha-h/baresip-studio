@@ -33,12 +33,12 @@
         android:id="@+id/text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/sendButton"
         android:textSize="18sp"
         android:inputType="textMultiLine"
         android:scrollHorizontally="false"
-        android:importantForAutofill="no"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@id/sendButton"
+        android:autofillHints="text"
         android:hint="@string/new_message" >
     </EditText>
 
@@ -46,11 +46,13 @@
         android:id="@+id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/send"
-        android:background="@null"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="2dp" >
+        android:layout_marginBottom="2dp"
+        android:paddingTop="10dp"
+        android:src="@drawable/send"
+        android:background="@null"
+        android:contentDescription="@string/send" >
     </ImageButton>
 
 </RelativeLayout>

@@ -23,7 +23,8 @@
         android:src="@drawable/plus"
         android:background="@null"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/add" >
     </ImageButton>
 
 </RelativeLayout>

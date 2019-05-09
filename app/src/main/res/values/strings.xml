@@ -128,9 +128,11 @@
         \'server:port\'.  If server is an IPv6 address, the address must be written inside brackets [].
         Factory default value is \'8.8.8.8:53,[2001:4860:4860::8888]:53\' pointing to public Google
         DNS servers.</string>
+    <string name="_8_8_8_8_53">8.8.8.8:53</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid value are 6000-510000. Factory default is 28000.</string>
+    <string name="_28000">28000</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
@@ -148,6 +150,9 @@
 
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
+    <string name="contact_action_question">Do you want to call or send message to</string>
+    <string name="send_message">Send Message</string>
+    <string name="contact_delete_question">Do you want to delete contact</string>
 
     <!-- Generic -->
     <string name="alert">Alert</string>
@@ -165,6 +170,9 @@
     <string name="sip_uri">SIP URI</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="send">Send</string>
+    <string name="status">Status</string>
     <string name="dots">&#8230;</string>
 
     <!-- Main Activity -->
@@ -175,12 +183,18 @@
     <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
     <string name="invalid_sip_uri">Invalid SIP URI</string>
     <string name="callee">Callee</string>
+    <string name="call">Call</string>
+    <string name="hangup">Hangup</string>
+    <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
     <string name="duration">Duration</string>
     <string name="codecs">Codecs</string>
     <string name="rate">Rate</string>
+    <string name="voicemail">Voicemail</string>
     <string name="voicemail_messages">Voicemail Messages</string>
+    <string name="messages">Messages</string>
+    <string name="dialpad">Dialpad</string>
     <string name="call_already_active">You already have an active call!</string>
     <string name="start_failed">Baresip failed to start! Listen Address was reset.
         Restart baresip.</string>

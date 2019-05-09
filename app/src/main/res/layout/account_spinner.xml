@@ -13,7 +13,7 @@
 
         <ImageView
             android:id="@+id/spinnerImage"
-            android:contentDescription="@string/account" />
+            android:contentDescription="@string/status" />
 
         <TextView
             android:id="@+id/spinnerText"

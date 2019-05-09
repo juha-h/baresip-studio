@@ -26,6 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/AutoStart"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -46,7 +47,6 @@
             android:id="@+id/ListenAddressTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:onClick="onClick"
             android:text="@string/listen_address"
             android:textColor="@android:color/black"
@@ -57,10 +57,11 @@
             android:id="@+id/ListenAddress"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginBottom="12dp"
             android:textSize="18sp"
-            android:hint="@string/_0_0_0_0_5060" >
+            android:hint="@string/_0_0_0_0_5060"
+            android:inputType="textUri"
+            android:importantForAutofill="no" >
         </EditText>
 
         <RelativeLayout
@@ -74,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/PreferIPv6"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -94,7 +96,6 @@
             android:id="@+id/DnsServersTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:onClick="onClick"
             android:text="@string/dns_servers"
             android:textColor="@android:color/black"
@@ -105,9 +106,11 @@
             android:id="@+id/DnsServers"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginBottom="12dp"
-            android:textSize="18sp">
+            android:textSize="18sp"
+            android:inputType="textUri"
+            android:hint="@string/_8_8_8_8_53"
+            android:importantForAutofill="no" >
         </EditText>
 
         <RelativeLayout
@@ -135,7 +138,9 @@
                 android:layout_marginStart="10dp"
                 android:textSize="18sp"
                 android:scrollHorizontally="true"
-                android:inputType="numberDecimal" >
+                android:inputType="numberDecimal"
+                android:hint="@string/_28000"
+                android:importantForAutofill="no" >
             </EditText>
         </RelativeLayout>
 
@@ -150,6 +155,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/IceLite"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -177,6 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/VolumeSpinner"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -204,6 +211,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/Debug"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
@@ -231,6 +239,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/Reset"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
