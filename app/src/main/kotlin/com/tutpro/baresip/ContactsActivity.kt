@@ -30,9 +30,8 @@ class ContactsActivity : AppCompatActivity() {
         val plusButton = findViewById(R.id.plusButton) as ImageButton
         plusButton.setOnClickListener {
             if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
-                Utils.alertView(this, "Notice",
-                        "Your maximum number of contacts " +
-                                "(${Contact.CONTACTS_SIZE}) has been exceeded.")
+                Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.contacts_exceeded), Contact.CONTACTS_SIZE))
             } else {
                 val i = Intent(this, ContactActivity::class.java)
                 val b = Bundle()
@@ -58,12 +57,10 @@ class ContactsActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.export_contacts -> {
                 if (saveContacts(dir))
-                    Utils.alertView(this,"",
-                        "Exported contacts to Download folder as 'contacts.bs'.")
+                    Utils.alertView(this,"", getString(R.string.exported_contacts))
                 else
-                    Utils.alertView(this,"Error",
-                            "Failed to export contacts to Download folder. " +
-                    "Check Apps -> baresip -> Permissions -> Storage.")
+                    Utils.alertView(this,getString(R.string.error),
+                            getString(R.string.export_error))
             }
             R.id.import_contacts -> {
                 if (restoreContacts(dir)) {
@@ -72,10 +69,8 @@ class ContactsActivity : AppCompatActivity() {
                     clAdapter.notifyDataSetChanged()
                     saveContacts(applicationContext.filesDir)
                 } else
-                    Utils.alertView(this,"Error",
-                            "Failed to import contacts from Download folder. " +
-                                    "Check Apps -> baresip -> Permissions -> Storage and that " +
-                                    "the file exists in the folder.")
+                    Utils.alertView(this,getString(R.string.error),
+                            getString(R.string.import_error))
             }
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Contacts")

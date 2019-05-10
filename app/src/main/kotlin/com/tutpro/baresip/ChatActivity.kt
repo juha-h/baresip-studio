@@ -59,7 +59,7 @@ class ChatActivity : AppCompatActivity() {
             else
                 chatPeer = chatPeer.substring(4)
         }
-        setTitle("${getString(R.string.chat_with)} $chatPeer")
+        setTitle(String.format(getString(R.string.chat_with), chatPeer))
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"

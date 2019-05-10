@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">baresip</string>
+    <string name="app_name" translatable="false">baresip</string>
 
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
@@ -78,10 +78,25 @@
 
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
-    <string name="sip_uri_user_domain">SIP URI user@domain</string>
+    <string name="sip_uri_user_domain">SIP Address user@domain</string>
+    <string name="invalid_aor">Invalid SIP Addess \'%1$s\'.</string>
+    <string name="account_exists">Account \'%1$s\' already exists.</string>
+    <string name="account_allocation_failure">"Failed to allocate new account.</string>
+    <string name="encrypt_password">Encrypt Password</string>
+    <string name="decrypt_password">Decrypt Password</string>
     <string name="export_accounts">Export</string>
+    <string name="exported_accounts">Exported accounts to Download folder file \'accounts.bs\'.</string>
+    <string name="export_accounts_error">"Failed to export accounts to Download folder.
+        Check Apps -> baresip -> Permissions -> Storage."
+    </string>
     <string name="import_accounts">Import</string>
-    <string name="delete_account">Do you want to delete account</string>
+    <string name="imported_accounts">Imported accounts from Download folder.  You need to restart
+        baresip.</string>
+    <string name="import_accounts_error">Failed to import accounts from Download folder file.
+    Check Apps -> baresip -> Permissions -> Storage and that file \'contacts.bs\' exists in
+        the folder and, if so, you gave correct Decrypt Password."
+    </string>
+    <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
 
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
@@ -95,9 +110,9 @@
 
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
-    <string name="chat_with">Chat with</string>
+    <string name="chat_with">Chat with %1$s</string>
     <string name="new_message">New message</string>
-    <string name="long_message_question">Do you want to delete message or add peer %1$s to contacts?</string>
+    <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts?</string>
     <string name="short_message_question">Do you want to delete message?</string>
     <string name="add_contact">Add Contact</string>
     <string name="message_failed">Sending of message failed</string>
@@ -105,9 +120,9 @@
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
     <string name="new_chat_peer">New Chat Peer</string>
-    <string name="long_chat_question">Do you want to delete chat with peer %1$s or
+    <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
-    <string name="short_chat_question">Do you want to delete chat with</string>
+    <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
 
     <!-- Config Activity -->
     <string name="configuration">Configuration</string>
@@ -120,7 +135,7 @@
         available addresses. If left empty (factory default), baresip listens at port 5060 of
         all available addresses.
     </string>
-    <string name="_0_0_0_0_5060">0.0.0.0:5060</string>
+    <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
     <string name="prefer_ipv6">Prefer IPv6</string>
     <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
     <string name="dns_servers">DNS Servers</string>
@@ -128,11 +143,11 @@
         \'server:port\'.  If server is an IPv6 address, the address must be written inside brackets [].
         Factory default value is \'8.8.8.8:53,[2001:4860:4860::8888]:53\' pointing to public Google
         DNS servers.</string>
-    <string name="_8_8_8_8_53">8.8.8.8:53</string>
+    <string name="_8_8_8_8_53" translatable="false">8.8.8.8:53</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid value are 6000-510000. Factory default is 28000.</string>
-    <string name="_28000">28000</string>
+    <string name="_28000" translatable="false">28000</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
@@ -150,9 +165,18 @@
 
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
-    <string name="contact_action_question">Do you want to call or send message to</string>
+    <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
     <string name="send_message">Send Message</string>
-    <string name="contact_delete_question">Do you want to delete contact</string>
+    <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
+    <string name="contacts_exceeded">Your maximum number of contacts %1%d has been exceeded.</string>
+    <string name="exported_contacts">Exported contacts to Download folder file \'contacts.bs\'.</string>
+    <string name="export_error">"Failed to export contacts to Download folder.
+        Check Apps -> baresip -> Permissions -> Storage."
+    </string>
+    <string name="imported_contacts">Imported contacts from Download folder.</string>
+    <string name="import_error">Failed to import contacts from Download folder. Check Apps ->
+        baresip -> Permissions -> Storage and that file \'contacts.bs\' exists in the folder.
+    </string>
 
     <!-- Generic -->
     <string name="alert">Alert</string>
@@ -167,13 +191,14 @@
     <string name="deny">Deny</string>
     <string name="user_id">User ID</string>
     <string name="password">Password</string>
-    <string name="sip_uri">SIP URI</string>
+    <string name="sip_uri" translatable="false">SIP URI</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="send">Send</string>
     <string name="status">Status</string>
-    <string name="dots">&#8230;</string>
+    <string name="error">Error</string>
+    <string name="dots" translatable="false">&#8230;</string>
 
     <!-- Main Activity -->
     <string name="about">About</string>
@@ -198,11 +223,11 @@
     <string name="call_already_active">You already have an active call!</string>
     <string name="start_failed">Baresip failed to start! Listen Address was reset.
         Restart baresip.</string>
-    <string name="registering_failed">Registering of %1$s failed</string>
+    <string name="registering_failed">Registering of \`%1$s\` failed.</string>
     <string name="no_microphone_permission">You have not granted microphone permission.</string>
     <string name="verify">Verify</string>
-    <string name="verify_sas">Do you want to verify SAS</string>
-    <string name="transfer_query">Do you accept to transfer call to</string>
+    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
+    <string name="transfer_query">Do you accept to transfer call to \'%1$s\'?</string>
     <string name="call_failed">Call failed</string>
     <string name="call_closed">Call closed</string>
     <string name="restart_needed">You need to restart baresip in order to activate the new config!</string>

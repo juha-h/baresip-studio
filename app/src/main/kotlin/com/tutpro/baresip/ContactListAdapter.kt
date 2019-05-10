@@ -53,8 +53,8 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                     }
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                builder.setMessage(cxt.getString(R.string.contact_action_question) +
-                        " '${Contact.contacts()[pos].name}'?")
+                builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
+                        Contact.contacts()[pos].name))
                         .setNeutralButton(cxt.getText(R.string.call), dialogClickListener)
                         .setNegativeButton(cxt.getText(R.string.send_message), dialogClickListener)
                         .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
@@ -74,8 +74,8 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-            builder.setMessage(cxt.getString(R.string.contact_delete_question) +
-                    " '${Contact.contacts()[pos].name}'?")
+            builder.setMessage(String.format(cxt.getString(R.string.contact_delete_question),
+                    Contact.contacts()[pos].name))
                     .setNegativeButton(cxt.getText(R.string.delete), dialogClickListener)
                     .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
                     .show()
