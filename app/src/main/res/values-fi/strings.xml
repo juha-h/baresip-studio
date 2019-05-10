@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- About Activity -->
+    <string name="about_title">baresip Sovellus</string>
+    <string name="about_text"><b>Baresip-kirjastoon perustuva Android sovellus</b>\\n\\n Juha Heinanen jh@tutpro.com\\n\\n Versio %1$s\\n\\n <b>Käyttövihjeitä</b>\\n\\n &#8226; Tarkista, että konfiguraation oletusarvot vastaavat tarpeitasi. Kunkin otsikon painallus tarjoaa apua.\\n &#8226; Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon painallus tarjoaa apua.\\n Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä painalluksella.\\n &#8226; Pitkillä painalluksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.\\n &#8226; Voit soittaa edellisen puhelun uudelleen painamalla virheää luuria silloin, kun puhelun kohde on tyhjä.\\n &#8226; Jos et kuule, mitä toinen sanoo, yritä kasvattaa media-volyymia.\\n</string>
+
+    <!-- Account Activity -->
+    <string name="account">Tili</string>
+    <string name="display_name">Tilin käyttäjän nimi</string>
+    <string name="your_name">Tilin käyttäjän nimi</string>
+    <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
+    SIP-sanomien From URI:ssa (vapaaehtoinen).</string>
+    <string name="authentication_username">Käyttäjätunnus</string>
+    <string name="authentication_username_help">Todentamiseen käytettävä
+    käyttäjätunnus, jos välityspalvelin vaatii sellaisen.</string>
+    <string name="authentication_password">Todentamiseen käytettävä salasana</string>
+    <string name="authentication_password_help">Todentamiseen käytettävä
+    salasana, jos välityspalvelin vaatii sellaisen.</string>
+    <string name="outbound_proxies">Välityspalvelimet</string>
+    <string name="outbound_proxies_help">Yhden tai kahden
+    välityspalvelimen SIP URI, joille SIP-sanomat lähetetään. Jos
+    välityspalvelimia on annettu kaksi, REGISTER-sanomat yritetään
+    lähettää molemmille välityspalvelimille ja muut sanomat yhdelle
+    toiminnassa olevalle välityspalvelimelle, Jos välityspalvelimia ei
+    ole annettu, SIP-sanomat lähetetään palvelimelle, mikä selviää
+    kohde-URI:n domainille tehtävän NAPTR/SRV/A-tietueiden
+    nimipalvelukyselyiden perusteella.  Jos välityspalvelimen osoite SIP
+    URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
+    \nEsimerkkejä:\n&#8226; sip:foo.com:5060;transport=tls\n&#8226;
+    sip:[2001:67c:223:777::10]:5060;transport=tcp\n
+    </string>
+    <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
+    <string name="sip_uri_of_another_proxy_server">Toisen
+    välityspalvelimem SIP URI</string>
+    <string name="register">Rekisteröi</string>
+    <string name="register_help">Jos merkitty, rekisteröinti on
+    aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
+    </string>
+    <string name="audio_codecs">Äänen koodausmenetelmät</string>
+    <string name="audio_codecs_help">Luettelo käytössä olevista äänen
+    koodausmenetelmistä prioriteettijärjestyksessä,</string>
+    <string name="media_nat">Media NAT:n hallinta</string>
+    <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
+    (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
+    for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment,
+    RFC 5245).
+    </string>
+    <string name="stun_server">STUN-palvelin</string>
+    <string name="stun_server_help">STUN-palvelimen muotoa palvelin[:portti]
+    oleva osoite. Oletusarvo on \'stun.l.google.com:19302\', joka
+    osoittaa Google:n julkiseen STUN-palvelimeen.  Käyttäjätunnusta ja
+    salasanaa ei voi tällä hetkellä antaa.
+    </string>
+    <string name="stun_server_default">stun.l.google.com:19302</string>
+    <string name="media_encryption">Median salaus</string>
+    <string name="media_encryption_help">Valitsee median
+    salausprotokollan.\n
+    &#8226; ZRTP (suositeltu) tarkoittaa, että
+    ZRTP-salausta yritetään neuvotella sen jälkeen, kun puhelu on
+    alkanut.\n
+    &#8226; DTLS-SRTPF tarkoittaa, että
+    UDP/TLS/RTP/SAVPF-protokollaa tarjotaan lähteviin puheluihin
+    ja että RTP/SAVP-, RTP/SAVPF-, UDP/TLS/RTP/SAVP- tai
+    UDP/TLS/RTP/SAVPF-protokollaa käytetään, jos sellaista tarjotaan
+    tulevassa puhelussa.\n
+    &#8226; SRTP-MANDF tarkoittaa, että RTP/SAVPF-protokollaa tarjotaan
+    lähtevissä puheluissa ja että se vaaditaan tulevissa puheluissa.\n
+    &#8226; SRTP-MAND takoittaa, että RTP/SAVP-protokollaa tarjotaan
+    lähteviin puheluihin ja että se vaaditaan tulevissa puheluissa.\n
+    &#8226; SRTP tarkoittaa, että RTP/AVP-protokollaa tarjotaan
+    lähteviin puheluihin ja että RTP/SAVP- tai RTP/SAVPF-protokollaa
+    käytetään, jos sellaista tarjotaan tulevissa puheluissa.\n
+    &#8226; Ei mitään tarkoittaa, että mediaa ei salata.
+    </string>
+    <string name="voicemail_uri">Puheposti-URI</string>
+    <string name="voicemain_uri_help">SIP URI, jota käytetään
+    puhepostiviestien kuunteluun.  Jos URI:a ei ole annettu, tietoa
+    mahdollista puhepostiviesteistä (Message Waiting Indications) ei
+    tilata.
+    </string>
+    <string name="default_account">Oletustili</string>
+    <string name="default_account_help">Jos merkitty, niin tämä tili on
+    valittuna, kun baresip käynnistetään.
+    </string>
+
+    <!-- Accounts Activity -->
+    <string name="accounts">Tilit</string>
+    <string name="sip_uri_user_domain">SIP osoite käyttäjä@domain</string>
+    <string name="invalid_aor">Virheellinen SIP osoite \'%1$s\'.</string>
+    <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
+    <string name="account_allocation_failure">"Uuden tilin luonti
+    epäonnistui.
+    </string>
+    <string name="encrypt_password">Salasana</string>
+    <string name="decrypt_password">Salasana</string>    
+    <string name="export_accounts">Tallenna</string>
+    <string name="exported_accounts">Tilit tallennettiin
+    Download-kansion tiedostoon \'accounts.bs\'.
+    </string>
+    <string name="export_accounts_error">"Tilien tallennus
+    Download-kansioon epäonnistui. Tarkista Sovellukset -> baresip ->
+    Käyttöluvat -> Tallennustila.
+    </string>
+    <string name="import_accounts">Palauta</string>
+    <string name="imported_accounts">Tilit palautettiin
+    Download-kansiosta. Sinun pitää käynnistää baresip uudelleen.
+    </string>
+    <string name="import_accounts_error">Tilien palauttaminen
+    Download-kansiosta epäonnistui. Tarkista Sovellukset -> baresip ->
+    Käyttöluvat -> Tallennustila ja että tiedosto \'accounts.bs\' on
+    kansiossa ja (jos on) että annoit oikean salasanan.
+    </string>
+    <string name="delete_account">Haluatko poistaa tilin
+    \'%1$s\'?
+    </string>
+
+    <!-- Baresip Service -->
+    <string name="answer">Vastaa</string>
+    <string name="reject">Hylkää</string>
+    <string name="incoming_call_from">Tuleva puhelu soittajalta</string>
+    <string name="transfer_request">Puhelun siirtopyyntö kohteeseen</string>
+    <string name="message_from">Viesti lähettäjältä</string>
+
+    <!-- Calls Activity -->
+    <string name="calls">Call History</string>
+
+    <!-- Chat Activity -->
+    <string name="chat">Viestiketju</string>
+    <string name="chat_with">%1$s viestit</string>
+    <string name="new_message">Uusi viesti</string>
+    <string name="long_message_question">Haluatko poistaa viestin tai
+    lisätä kohteen \'%1$s\' kontakteihin?</string>
+    <string name="short_message_question">Haluatko poistaa viestin?</string>
+    <string name="add_contact">Lisää kontakti</string>
+    <string name="message_failed">Viestin lähetys epäonnistui</string>
+
+    <!-- Chats Activity -->
+    <string name="chats">Viestiketjut</string>
+    <string name="new_chat_peer">Uusi viestiketju</string>
+    <string name="long_chat_question">Haluatko poistaa viestiketjun tai
+    lisätä URI:n \'%1$s\' kontakteihin?</string>
+    <string name="short_chat_question">Haluatko poistaa viestiketjun
+    \'%1$s\'?
+    </string>
+
+    <!-- Config Activity -->
+    <string name="configuration">Konfiguraatio</string>
+    <string name="start_automatically">Käynnistä automaattisesti</string>
+    <string name="start_automatically_help">Jos merkitty, baresip
+    käynnistyy automaattisesti, kun laite käynnistyy.</string>
+    <string name="listen_address">Kuunteluosoite</string>
+    <string name="listen_address_help">IP-osoite ja portti muotoa
+    \'osoite:portti\', missä baresip ottaa vastaan sisään tulevat
+    SIP-sanomat. Jos IP-osoite on IPv6-osoite, se täytyy kirjoittaa
+    sulkujen [] sisään. IPv4-osoite 0.0.0.0 tai IPv6-osoite [::]
+    tarkoittaa kaikkia käytössä olevia osoitteita.  Oletusarvo on tyhjä,
+    jolloin baresip kuuntelee porttia 5060 kaikilla käytössä olevilla
+    osoitteilla.
+    </string>
+    <string name="prefer_ipv6">Suosi IPv6-protokollaa</string>
+    <string name="prefer_ipv6_help">Jos merkitty, baresip suosii
+    IPv6-protokollaa, jos sekä IPv4 että IPv6 ovat käytettävissä.</string>
+    <string name="dns_servers">DNS-palvelimet</string>
+    <string name="dns_servers_help">Pilkuilla toisistaan erotettu
+    luettelo DNS-palvelijoita. Kukin DNS-palvelija on muotoa
+    \'palvelin:portti\'.  If palvelin on IPv6-osoite, osoite pitää
+    kirjoittaa sulkujen [] sisään. Oletusarvo on
+    \'8.8.8.8:53,[2001:4860:4860::8888]:53\', mikä osoittaa Googlen
+    julkisiin DNS-palvelijoihin.</string>
+    <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
+    <string name="opus_bit_rate_help">Opus-koodekin käyttämä
+    keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
+    6000-510000. Oletusarvo on 28000.
+    </string>
+    <string name="ice_lite_mode">ICE Lite-moodi</string>
+    <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
+    käytössä.
+    </string> 
+    <string name="default_call_volume">Oletus äänen voimakkuus</string>
+    <string name="default_call_volume_help">Jos valittu, puhelun oletus
+    äänen voimakkuus asteikolla 1&#8211;10.
+    </string>
+    <string name="debug">Lokiviestit</string>
+    <string name="debug_help">Jos valittu, baresip tuottaa debug- ja
+    info-tason logcat lokiviestejä.
+    </string>
+    <string name="reset_config">Palauta oletuskonfiguraatio</string>
+    <string name="reset_config_help">Jos valittu, palautetaan
+    oletuskonfiguraatio.
+    </string>
+
+    <!-- Contact Activity -->
+    <string name="contact">Kontakti</string>
+    <string name="contact_name">Kontaktin nimi</string>
+    <string name="export_contacts">Tallenna</string>
+    <string name="import_contacts">Palauta</string>
+
+    <!-- Contacts Activity -->
+    <string name="contacts">Kontaktit</string>
+    <string name="contact_action_question">Haluatko soittaa tai lähettää
+    viestin kontaktille \'%1$s\'?</string>
+    <string name="send_message">Lähetä viesti</string>
+    <string name="contact_delete_question">Haluatko poistaa kontaktin
+    \'%1$s\'?
+    </string>
+    <string name="contacts_exceeded">Kontaktiesi enimmäismäärä %1$d on
+    ylittynyt.
+    </string>
+    <string name="exported_contacts">Kontaktit tallennettiin
+    Download-kansion tiedostoon \'contacts.bs\'.
+    </string>
+    <string name="export_error">"Kontaktien tallennus Download kansioon
+    epäonnistui. Tarkista Sovellukset -> baresip -> Käyttöluvat ->
+    Tallennustila.
+    </string>
+    <string name="imported_contacts">Palautettiin kontaktit
+    Download-kansiosta.
+    </string>
+    <string name="import_error">Kontantien palauttaminen
+    Download-kansiosta epäonnistui. Tarkista Sovellukset -> baresip ->
+    Käyttöluvat -> Tallennustila ja että tiedosto \'contacts.bs\' on
+    kansiossa.
+    </string>
+    
+    <!-- Generic -->
+    <string name="alert">Varoitus</string>
+    <string name="info">Tieto</string>
+    <string name="notice">Huomio</string>
+    <string name="cancel">Peruuta</string>
+    <string name="check">Tarkista</string>
+    <string name="ok">OK</string>
+    <string name="yes">Kyllä</string>
+    <string name="no">Ei</string>
+    <string name="accept">Hyväksy</string>
+    <string name="deny">Hylkää</string>
+    <string name="user_id">Käyttäjätunnus</string>
+    <string name="password">Salasana</string>
+    <string name="add">Lisää</string>
+    <string name="delete">Poista</string>
+    <string name="edit">Muokkaa</string>
+    <string name="send">Lähetä</string>
+    <string name="status">Tila</string>
+    <string name="error">Virhe</string>
+
+    <!-- Main Activity -->
+    <string name="about">Tietoja</string>
+    <string name="quit">Lopeta</string>
+    <string name="outgoing_call_to_dots">Lähtevä puhelu &#8230;</string>
+    <string name="incoming_call_from_dots">Tuleva puhelu &#8230;</string>
+    <string name="transferring_call_to_dots">Puhelun siirto &#8230;</string>
+    <string name="invalid_sip_uri">Virheellinen SIP URI</string>
+    <string name="callee">Puhelun kohde</string>
+    <string name="call">Puhelu</string>
+    <string name="hangup">Lopeta</string>
+    <string name="hold">Aseta puhelu pitoon</string>
+    <string name="dtmf">DTMF</string>
+    <string name="call_info">Puhelutiedot</string>
+    <string name="duration">Kesto</string>
+    <string name="codecs">Koodekit</string>
+    <string name="rate">Nopeus</string>
+    <string name="voicemail">Puheposti</string>
+    <string name="voicemail_messages">Puhepostiviestit</string>
+    <string name="messages">Viestit</string>
+    <string name="dialpad">Numeronäppäimistö</string>
+    <string name="call_already_active">Sinulla on jo puhelu käynnissä
+    !</string>
+    <string name="start_failed">Sovelluksen käynnistäminen ei
+    onnistunut!  Kuunteluosoiteen oletusarvo palautettu. Käynnistä
+    baresip uudelleen.
+    </string>
+    <string name="registering_failed">Tilin \'%1$s\' rekisteröinti
+    epäonnistui.</string>
+    <string name="no_microphone_permission">Et ole sallinut mikrofonin
+    käyttöä.
+    </string>
+    <string name="verify">Todenna</string>
+    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;
+    &lt;%2$s&gt;?
+    </string>
+    <string name="transfer_query">Hyväksytkö puhelun siirron kohteeseen
+    \'%1$s\'?
+    </string>
+    <string name="call_failed">Puhelu epäonnistui</string>
+    <string name="call_closed">Puhelu on päättynyt</string>
+    <string name="restart_needed">Sinun pitää käynnistää baresip
+    uudelleen, jotta saat uuden konfiguraation käyttöön!</string>
+    <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
+    <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta
+    kohdetta ei ole todennettu!
+    </string>
+    <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
+    todennettu! Haluatko poistaa todennuksen?</string>
+    <string name="unverify">Poista todennus</string>
+
+</resources>
