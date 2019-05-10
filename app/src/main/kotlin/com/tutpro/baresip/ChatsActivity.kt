@@ -91,7 +91,7 @@ class ChatsActivity: AppCompatActivity() {
                         .setNeutralButton(getText(R.string.add_contact), dialogClickListener)
                         .show()
             else
-                builder.setMessage("${getString(R.string.short_chat_question)} '$peer'?")
+                builder.setMessage(String.format(getString(R.string.short_chat_question), peer))
                         .setPositiveButton(getText(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getText(R.string.delete), dialogClickListener)
                         .show()

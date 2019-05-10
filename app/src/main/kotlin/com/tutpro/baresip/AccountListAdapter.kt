@@ -39,7 +39,8 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         actionView.setOnClickListener { _ ->
             Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
-            deleteDialog.setMessage("${cxt.getString(R.string.delete_account)} ${ua.account.aor}?")
+            deleteDialog.setMessage(String.format(cxt.getString(R.string.delete_account),
+                    ua.account.aor))
             deleteDialog.setPositiveButton(cxt.getText(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }

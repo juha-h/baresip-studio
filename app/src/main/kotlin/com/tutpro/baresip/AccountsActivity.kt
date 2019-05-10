@@ -39,21 +39,21 @@ class AccountsActivity : AppCompatActivity() {
             if (!aor.startsWith("sip:")) aor = "sip:$aor"
             if (!Utils.checkAorUri(aor)) {
                 Log.d("Baresip", "Invalid SIP Address of Record $aor")
-                Utils.alertView(this, "Notice",
-                        "Invalid SIP Address of Record: $aor")
+                Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_aor), aor))
             } else if (Account.exists(aor)) {
                 Log.d("Baresip", "Account $aor already exists")
-                Utils.alertView(this, "Notice",
-                        "Account $aor already exists")
+                Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.account_exists), aor))
             } else {
                 val ua = UserAgent.uaAlloc("<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {
                     Log.e("Baresip", "Failed to allocate UA for $aor")
-                    Utils.alertView(this, "Notice",
-                            "Failed to allocate new account.")
+                    Utils.alertView(this, getString(R.string.notice),
+                            getString(R.string.account_allocation_failure))
                 } else {
                     newAorView.setText("")
-                    newAorView.hint = "SIP URI user@domain"
+                    newAorView.hint = getString(R.string.sip_uri_user_domain)
                     newAorView.clearFocus()
                     UserAgent.add(ua, R.drawable.dot_yellow)
                     generateAccounts()
@@ -88,14 +88,13 @@ class AccountsActivity : AppCompatActivity() {
             R.id.export_accounts -> {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    askPassword("Encrypt Password")
+                    askPassword(getString(R.string.encrypt_password))
             }
             R.id.import_accounts -> {
                 if (Utils.requestPermission(this,
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    askPassword("Decrypt Password")
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                    askPassword(getString(R.string.decrypt_password))
 
-                }
             }
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Accounts")
@@ -120,23 +119,20 @@ class AccountsActivity : AppCompatActivity() {
             dialog.dismiss()
             password = input.text.toString()
             if (password != "") {
-                if (title == "Encrypt Password") {
+                if (title == getString(R.string.encrypt_password)) {
                     if (exportAccounts(dir, password))
-                        Utils.alertView(this, "Info",
-                                "Exported accounts to Download folder file 'accounts.bs'.")
+                        Utils.alertView(this, getString(R.string.info),
+                                getString(R.string.exported_accounts))
                     else
-                        Utils.alertView(this, "Error",
-                                "Failed to export accounts to Download folder.")
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.export_accounts_error))
                 } else {
                     if (importAccounts(dir, password))
-                        Utils.alertView(this, "Info",
-                                "Imported accounts from Download folder file " +
-                                        "'accounts.bs'. You need to restart baresip.")
+                        Utils.alertView(this, getString(R.string.info),
+                                getString(R.string.imported_accounts))
                     else
-                        Utils.alertView(this, "Error",
-                                "Failed to import accounts from Download folder. " +
-                                        "Either file 'accounts.bs' doesn't exist or " +
-                                        "you gave wrong Decrypt Password.")
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.import_accounts_error))
                 }
             }
         }

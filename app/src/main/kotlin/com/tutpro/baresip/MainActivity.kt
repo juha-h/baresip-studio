@@ -703,7 +703,8 @@ class MainActivity : AppCompatActivity() {
                         }
                         val verifyDialog = AlertDialog.Builder(this@MainActivity)
                         verifyDialog.setTitle(getString(R.string.verify))
-                        verifyDialog.setMessage("${getString(R.string.verify_sas)} <${ev[1]}> <${ev[2]}>?")
+                        verifyDialog.setMessage(String.format(getString(R.string.verify_sas),
+                                ev[1], ev[2]))
                         verifyDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                             val security: Int
                             if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
@@ -760,7 +761,8 @@ class MainActivity : AppCompatActivity() {
                         val transferDialog = AlertDialog.Builder(this)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        transferDialog.setMessage("${getString(R.string.transfer_query)} $target?")
+                        transferDialog.setMessage(String.format(getString(R.string.transfer_query),
+                                target))
                         transferDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                             if (call in Call.calls())
                                 Api.ua_hangup(uap, callp, 0, "")
