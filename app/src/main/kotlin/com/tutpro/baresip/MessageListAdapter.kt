@@ -28,7 +28,7 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         if (up) {
             lp.setMargins(75, 10, 0, 10)
             layout.setBackgroundResource(R.drawable.you_bg)
-            peer = "You"
+            peer = cxt.getString(R.string.you)
         } else {
             lp.setMargins(0, 10, 75, 10)
             layout.setBackgroundResource(R.drawable.peer_bg)
@@ -51,14 +51,14 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
             val fmt = SimpleDateFormat("dd/MM, HH:mm")
             info = fmt.format(cal.time)
         }
-        if (info.length < 6) info = "Today $info"
+        if (info.length < 6) info = "${cxt.getString(R.string.today)} $info"
         infoView.text = "$info - $peer"
         if (message.direction == R.drawable.arrow_up_red) {
             if (message.responseCode != 0)
-                infoView.text = "${infoView.text} - Failed: ${message.responseCode} " +
-                    "${message.responseReason}"
+                infoView.text = "${infoView.text} - ${cxt.getString(R.string.message_failed)}: " +
+                        "${message.responseCode} ${message.responseReason}"
             else
-                infoView.text = "${infoView.text} - Sending of message failed!"
+                infoView.text = "${infoView.text} - ${cxt.getString(R.string.sending_failed)}"
             infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
         }
         val textView = messageView.findViewById(R.id.text) as TextView

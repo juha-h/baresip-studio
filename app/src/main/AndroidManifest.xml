@@ -74,7 +74,7 @@
         </activity>
         <activity
             android:name=".CallsActivity"
-            android:label="@string/calls"
+            android:label="@string/call_history"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity

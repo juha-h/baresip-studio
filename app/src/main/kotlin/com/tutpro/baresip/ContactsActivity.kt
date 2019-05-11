@@ -31,7 +31,8 @@ class ContactsActivity : AppCompatActivity() {
         plusButton.setOnClickListener {
             if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
                 Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.contacts_exceeded), Contact.CONTACTS_SIZE))
+                        String.format(getString(R.string.contacts_exceeded),
+                                Contact.CONTACTS_SIZE))
             } else {
                 val i = Intent(this, ContactActivity::class.java)
                 val b = Bundle()
@@ -57,7 +58,8 @@ class ContactsActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.export_contacts -> {
                 if (saveContacts(dir))
-                    Utils.alertView(this,"", getString(R.string.exported_contacts))
+                    Utils.alertView(this, "",
+                            getString(R.string.exported_contacts))
                 else
                     Utils.alertView(this,getString(R.string.error),
                             getString(R.string.export_error))
@@ -65,7 +67,7 @@ class ContactsActivity : AppCompatActivity() {
             R.id.import_contacts -> {
                 if (restoreContacts(dir)) {
                     Utils.alertView(this, "",
-                            "Imported contacts from Download folder.")
+                            getString(R.string.imported_contacts))
                     clAdapter.notifyDataSetChanged()
                     saveContacts(applicationContext.filesDir)
                 } else

@@ -56,7 +56,7 @@
     </string>
     <string name="stun_server_default">stun.l.google.com:19302</string>
     <string name="media_encryption">Media Encryption</string>
-    <string name="media_encryption_help">Selects media transport encryption protocol.\n
+    <string name="media_encryption_help">Selects media transport encryption protocol (if any).\n
         &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
             the call has been established.\n
         &#8226; DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
@@ -64,9 +64,7 @@
         &#8226; SRTP-MANDF means that RTP/SAVPF is offered in outgoing call and required in incoming call.\n
         &#8226; SRTP-MAND means that RTP/SAVP is offered in outgoing call and required in incoming call.\n
         &#8226; SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
-            if offered in incoming call.\n
-        &#8226; None means that media encryption is not supported and that media transport protocol
-            thus is RTP/AVP.
+            if offered in incoming call.
     </string>
     <string name="voicemail_uri">Voicemail URI</string>
     <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
@@ -78,8 +76,8 @@
 
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
-    <string name="sip_uri_user_domain">SIP Address user@domain</string>
-    <string name="invalid_aor">Invalid SIP Addess \'%1$s\'.</string>
+    <string name="user_domain">user@domain</string>
+    <string name="invalid_aor">Invalid user@domain \'%1$s\'</string>
     <string name="account_exists">Account \'%1$s\' already exists.</string>
     <string name="account_allocation_failure">"Failed to allocate new account.</string>
     <string name="encrypt_password">Encrypt Password</string>
@@ -101,12 +99,21 @@
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
-    <string name="incoming_call_from">Incoming call from</string>
+    <string name="incoming_call_from">Call from</string>
     <string name="transfer_request">Call transfer request to</string>
     <string name="message_from">Message from</string>
 
     <!-- Calls Activity -->
-    <string name="calls">Call History</string>
+    <string name="call_history">Call History</string>
+    <string name="call">Call</string>
+    <string name="calls_calls">calls</string>
+    <string name="calls_call">call</string>
+    <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'?</string>
+    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
+        %2$s from call history?
+    </string>
+    <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history?
+    </string>
 
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
@@ -115,11 +122,15 @@
     <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts?</string>
     <string name="short_message_question">Do you want to delete message?</string>
     <string name="add_contact">Add Contact</string>
-    <string name="message_failed">Sending of message failed</string>
+    <string name="sending_failed">Sending of message failed</string>
+    <string name="message_failed">Failed</string>
 
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
+    <string name="today">Today</string>
+    <string name="you">You</string>
     <string name="new_chat_peer">New Chat Peer</string>
+    <string name="invalid_chat_peer_uri">Invalid SIP URI</string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
@@ -159,9 +170,13 @@
 
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
-    <string name="contact_name">Contact Name</string>
+    <string name="new_contact">New Contact</string>
+    <string name="contact_name">Name</string>
     <string name="export_contacts">Export</string>
     <string name="import_contacts">Import</string>
+    <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
+    <string name="contact_already_exists">Contact \'%1$s\' already exists</string>
+    <string name="invalid_contact_uri">Invalid SIP URI</string>
 
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
@@ -183,7 +198,6 @@
     <string name="info">Info</string>
     <string name="notice">Notice</string>
     <string name="cancel">Cancel</string>
-    <string name="check">Check</string>
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -208,7 +222,6 @@
     <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
     <string name="invalid_sip_uri">Invalid SIP URI</string>
     <string name="callee">Callee</string>
-    <string name="call">Call</string>
     <string name="hangup">Hangup</string>
     <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
@@ -218,6 +231,14 @@
     <string name="rate">Rate</string>
     <string name="voicemail">Voicemail</string>
     <string name="voicemail_messages">Voicemail Messages</string>
+    <string name="you_have">You have</string>
+    <string name="one_new_message">one new message</string>
+    <string name="new_messages">new messages</string>
+    <string name="one_old_message">one old message</string>
+    <string name="old_messages">old messages</string>
+    <string name="and">and</string>
+    <string name="no_messages">You have no messages</string>
+    <string name="listen">Listen</string>
     <string name="messages">Messages</string>
     <string name="dialpad">Dialpad</string>
     <string name="call_already_active">You already have an active call!</string>

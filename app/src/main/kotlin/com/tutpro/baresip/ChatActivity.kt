@@ -77,7 +77,7 @@ class ChatActivity : AppCompatActivity() {
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_NEUTRAL -> {
+                    DialogInterface.BUTTON_POSITIVE -> {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
@@ -94,7 +94,7 @@ class ChatActivity : AppCompatActivity() {
                         }
                         Message.saveMessages(applicationContext.filesDir.absolutePath)
                     }
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
@@ -102,13 +102,13 @@ class ChatActivity : AppCompatActivity() {
             if (ContactsActivity.contactName(peerUri) == peerUri)
                 builder.setMessage(String.format(getString(R.string.long_message_question),
                         chatPeer))
-                        .setPositiveButton(getString(R.string.cancel), dialogClickListener)
+                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getString(R.string.delete), dialogClickListener)
-                        .setNeutralButton(getString(R.string.add_contact), dialogClickListener)
+                        .setPositiveButton(getString(R.string.add_contact), dialogClickListener)
                         .show()
             else
                 builder.setMessage(getText(R.string.short_message_question))
-                        .setPositiveButton(getString(R.string.cancel), dialogClickListener)
+                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getString(R.string.delete), dialogClickListener)
                         .show()
             true

@@ -24,13 +24,13 @@ class ContactActivity : AppCompatActivity() {
         new = intent.getBooleanExtra("new", false)
 
         if (new) {
-            setTitle("New Contact")
+            setTitle(getString(R.string.new_contact))
             nameView.setText("")
-            nameView.hint = "Contact name"
+            nameView.hint = getString(R.string.contact_name)
             nameView.setSelection(nameView.text.length)
             if (uri == "") {
                 uriView.setText("")
-                uriView.hint = "SIP URI"
+                uriView.hint = getString(R.string.sip_uri)
             } else {
                 uriView.setText(uri)
             }
@@ -58,30 +58,32 @@ class ContactActivity : AppCompatActivity() {
 
             val newName = nameView.text.toString().trim()
             if (!Utils.checkName(newName)) {
-                Utils.alertView(this, "Notice",
-                        "Invalid contact name: $newName")
+                Utils.alertView(this, getString(R.string.error),
+                        String.format(getString(R.string.invalid_contact), newName))
                 return false
             }
             if ((new || (Contact.contacts()[index].name != newName)) &&
                     ContactsActivity.nameExists(newName)) {
-                Utils.alertView(this, "Notice",
-                        "Contact $newName already exists")
+                Utils.alertView(this, getString(R.string.error),
+                        String.format(getString(R.string.contact_already_exists), newName))
                 return false
             }
 
             var newUri = uriView.text.toString().trim()
             if (!newUri.startsWith("<")) {
                 if (!newUri.startsWith("sip:")) newUri = "sip:$newUri"
-                if (!Utils.checkAorUri(newUri)) {
-                    Utils.alertView(this, "Notice","Invalid contact URI: $newUri")
+                if (!Utils.checkAor(newUri.substringAfter("sip:"))) {
+                    Utils.alertView(this, getString(R.string.error),
+                            String.format(getString(R.string.invalid_contact_uri), newUri))
                     return false
                 }
             }
 
             if (new) {
                 if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
-                    Utils.alertView(this,
-                            "Notice", "Maximum number of contacts exceeded")
+                    Utils.alertView(this, getString(R.string.notice),
+                            String.format(getString(R.string.contacts_exceeded),
+                                    Contact.CONTACTS_SIZE))
                     return true
                 } else {
                     Contact.contacts().add(Contact(newName, newUri))

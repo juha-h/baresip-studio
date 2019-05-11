@@ -41,15 +41,15 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
             val deleteDialog = AlertDialog.Builder(cxt)
             deleteDialog.setMessage(String.format(cxt.getString(R.string.delete_account),
                     ua.account.aor))
-            deleteDialog.setPositiveButton(cxt.getText(R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            deleteDialog.setNegativeButton(cxt.getText(R.string.delete)) { dialog, _ ->
+            deleteDialog.setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
                 Api.ua_destroy(ua.uap)
                 UserAgent.remove(ua)
                 AccountsActivity.generateAccounts()
                 AccountsActivity.saveAccounts()
                 this.notifyDataSetChanged()
+                dialog.dismiss()
+            }
+            deleteDialog.setNegativeButton(cxt.getText(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             deleteDialog.create().show()

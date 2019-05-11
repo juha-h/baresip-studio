@@ -29,7 +29,7 @@ class CallsActivity : AppCompatActivity() {
         val ua = Account.findUa(aor)!!
 
         val headerView = findViewById(R.id.account) as TextView
-        val headerText = "Account ${aor.substringAfter(":")}"
+        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
         headerView.text = headerText
 
         val listView = findViewById(R.id.calls) as ListView
@@ -45,10 +45,10 @@ class CallsActivity : AppCompatActivity() {
                 peerName = Utils.friendlyUri(peerName, Utils.aorDomain(aor))
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE -> {
+                    DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
                         val i = Intent(this@CallsActivity, MainActivity::class.java)
                         i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        if (which == DialogInterface.BUTTON_NEUTRAL)
+                        if (which == DialogInterface.BUTTON_NEGATIVE)
                             i.putExtra("action", "call")
                         else
                             i.putExtra("action", "message")
@@ -56,15 +56,16 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtra("peer", peerUri)
                         startActivity(i)
                     }
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
-            builder.setMessage("Do you want to call or send message to '$peerName'?")
-                    .setNeutralButton("Call", dialogClickListener)
-                    .setNegativeButton("Send Message", dialogClickListener)
-                    .setPositiveButton("Cancel", dialogClickListener)
+            builder.setMessage(String.format(getString(R.string.calls_call_message_question),
+                    peerName))
+                    .setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    .setNegativeButton(getString(R.string.call), dialogClickListener)
+                    .setPositiveButton(getString(R.string.send_message), dialogClickListener)
                     .show()
         }
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
@@ -72,7 +73,7 @@ class CallsActivity : AppCompatActivity() {
             val peerName = ContactsActivity.contactName(peerUri)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_NEUTRAL -> {
+                    DialogInterface.BUTTON_NEGATIVE -> {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
@@ -80,7 +81,7 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtras(b)
                         startActivityForResult(i, MainActivity.CONTACT_CODE)
                     }
-                    DialogInterface.BUTTON_NEGATIVE -> {
+                    DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
                         if (uaHistory.size == 0) {
                             val i = Intent()
@@ -89,25 +90,30 @@ class CallsActivity : AppCompatActivity() {
                         }
                         adapter.notifyDataSetChanged()
                     }
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
             val callText: String
-            if (uaHistory[pos].directions.size > 1) callText = "Calls" else callText = "Call"
+            if (uaHistory[pos].directions.size > 1)
+                callText = getString(R.string.calls_calls)
+            else
+                callText = getString(R.string.calls_call)
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
             if (peerName.startsWith("sip:"))
-                builder.setMessage("Do you want to add '" +
-                        "${Utils.friendlyUri(peerName, Utils.aorDomain(aor))}' to contacts " +
-                        "or delete ${callText.toLowerCase()} from history?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete $callText", dialogClickListener)
-                        .setNeutralButton("Add Contact", dialogClickListener)
+                builder.setMessage(String.format(getString(R.string.calls_add_delete_question),
+                        Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
+                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getString(R.string.add_contact), dialogClickListener)
+                        .setPositiveButton(String.format(getString(R.string.delete), callText),
+                                dialogClickListener)
                         .show()
             else
-                builder.setMessage("Do you want to delete ${callText.toLowerCase()} from history?")
-                        .setPositiveButton("Cancel", dialogClickListener)
-                        .setNegativeButton("Delete $callText", dialogClickListener)
+                builder.setMessage(String.format(getString(R.string.calls_delete_question),
+                        Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
+                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                        .setPositiveButton(String.format(getString(R.string.delete), callText),
+                                dialogClickListener)
                         .show()
             true
         }

@@ -38,7 +38,7 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
             sender = peer
         } else {
             layout.setBackgroundResource(R.drawable.you_bg)
-            sender = "You"
+            sender = cxt.getString(R.string.you)
         }
         val peerView = chatView.findViewById(R.id.peer) as TextView
         peerView.setText(peer)
@@ -53,14 +53,14 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
             val fmt = SimpleDateFormat("dd/MM, HH:mm")
             info = fmt.format(cal.time)
         }
-        if (info.length < 6) info = "Today $info"
+        if (info.length < 6) info = "${cxt.getString(R.string.today)} $info"
         infoView.text = "$info - $sender"
         if (message.direction == R.drawable.arrow_up_red) {
             if (message.responseCode != 0)
-                infoView.text = "${infoView.text} - Failed: ${message.responseCode} " +
-                        "${message.responseReason}"
+                infoView.text = "${infoView.text} - ${cxt.getString(R.string.message_failed)}: " +
+                        "${message.responseCode} ${message.responseReason}"
             else
-                infoView.text = "${infoView.text} - Sending of message failed!"
+                infoView.text = "${infoView.text} - ${cxt.getString(R.string.sending_failed)}"
             infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
         }
         val textView = chatView.findViewById(R.id.text) as TextView

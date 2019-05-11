@@ -30,7 +30,7 @@
             android:layout_toStartOf="@+id/addAccount"
             android:inputType="textEmailAddress"
             android:autofillHints="username"
-            android:hint="@string/sip_uri_user_domain" >
+            android:hint="@string/user_domain" >
         </EditText>
 
         <ImageButton
