@@ -57,33 +57,6 @@ class AccountActivity : AppCompatActivity() {
                 outbound2.setText(acc.outbound[1])
         }
 
-        mediaNat = acc.mediaNat
-        val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
-        val mediaNatKeys = arrayListOf("stun", "ice", "")
-        val mediaNatVals = arrayListOf("STUN", "ICE", "None")
-        var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
-        var keyVal = mediaNatVals.elementAt(keyIx)
-        mediaNatKeys.removeAt(keyIx)
-        mediaNatVals.removeAt(keyIx)
-        mediaNatKeys.add(0, acc.mediaNat)
-        mediaNatVals.add(0, keyVal)
-        val mediaNatAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
-                mediaNatVals)
-        mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        mediaNatSpinner.adapter = mediaNatAdapter
-        mediaNatSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
-                stunServer.isEnabled = mediaNat != ""
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        stunServer = findViewById(R.id.StunServer) as EditText
-        stunServer.setText(acc.stunServer)
-        stunServer.isEnabled = mediaNat != ""
-
         regCheck = findViewById(R.id.Register) as CheckBox
         regCheck.isChecked = acc.regint > 0
 
@@ -123,10 +96,37 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
+        mediaNat = acc.mediaNat
+        val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
+        val mediaNatKeys = arrayListOf("stun", "ice", "")
+        val mediaNatVals = arrayListOf("STUN", "ICE", "-")
+        var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
+        var keyVal = mediaNatVals.elementAt(keyIx)
+        mediaNatKeys.removeAt(keyIx)
+        mediaNatVals.removeAt(keyIx)
+        mediaNatKeys.add(0, acc.mediaNat)
+        mediaNatVals.add(0, keyVal)
+        val mediaNatAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+                mediaNatVals)
+        mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        mediaNatSpinner.adapter = mediaNatAdapter
+        mediaNatSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
+                stunServer.isEnabled = mediaNat != ""
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+
+        stunServer = findViewById(R.id.StunServer) as EditText
+        stunServer.setText(acc.stunServer)
+        stunServer.isEnabled = mediaNat != ""
+
         mediaEnc = acc.mediaEnc
         val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
         val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
-        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "None")
+        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
         keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
         keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)

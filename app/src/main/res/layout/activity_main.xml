@@ -217,7 +217,7 @@
         android:padding="0dp"
         android:background="@null"
         android:src="@drawable/calls"
-        android:contentDescription="@string/calls" >
+        android:contentDescription="@string/call_history" >
     </ImageButton>
 
     <ImageButton

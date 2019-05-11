@@ -36,10 +36,9 @@ class AccountsActivity : AppCompatActivity() {
         val newAorView = findViewById(R.id.newAor) as EditText
         addAccountButton.setOnClickListener{
             var aor = newAorView.text.toString().trim()
-            if (!aor.startsWith("sip:")) aor = "sip:$aor"
-            if (!Utils.checkAorUri(aor)) {
-                Log.d("Baresip", "Invalid SIP Address of Record $aor")
-                Utils.alertView(this, getString(R.string.notice),
+            if (!Utils.checkAor(aor)) {
+                Log.d("Baresip", "Invalid Address of Record $aor")
+                Utils.alertView(this, getString(R.string.error),
                         String.format(getString(R.string.invalid_aor), aor))
             } else if (Account.exists(aor)) {
                 Log.d("Baresip", "Account $aor already exists")
@@ -53,7 +52,7 @@ class AccountsActivity : AppCompatActivity() {
                             getString(R.string.account_allocation_failure))
                 } else {
                     newAorView.setText("")
-                    newAorView.hint = getString(R.string.sip_uri_user_domain)
+                    newAorView.hint = getString(R.string.user_domain)
                     newAorView.clearFocus()
                     UserAgent.add(ua, R.drawable.dot_yellow)
                     generateAccounts()

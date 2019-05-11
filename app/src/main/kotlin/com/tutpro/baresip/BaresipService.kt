@@ -690,6 +690,7 @@ class BaresipService: Service() {
     }
 
     private fun abandonAudioFocus() {
+        Log.d(LOG_TAG, "Abandonin audio focus")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (audioFocusRequest != null) {
                 am.abandonAudioFocusRequest(audioFocusRequest!!)

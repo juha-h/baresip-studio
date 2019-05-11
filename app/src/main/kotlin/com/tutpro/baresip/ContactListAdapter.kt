@@ -31,11 +31,11 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             nameView.setOnClickListener { _ ->
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
-                        DialogInterface.BUTTON_NEUTRAL, DialogInterface.BUTTON_NEGATIVE -> {
+                        DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
                             val i = Intent(cxt, MainActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            if (which == DialogInterface.BUTTON_NEUTRAL)
+                            if (which == DialogInterface.BUTTON_NEGATIVE)
                                 i.putExtra("action", "call")
                             else
                                 i.putExtra("action", "message")
@@ -48,36 +48,36 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 (cxt as Activity).startActivity(i)
                             }
                         }
-                        DialogInterface.BUTTON_POSITIVE -> {
+                        DialogInterface.BUTTON_NEUTRAL -> {
                         }
                     }
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
                 builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
                         Contact.contacts()[pos].name))
-                        .setNeutralButton(cxt.getText(R.string.call), dialogClickListener)
-                        .setNegativeButton(cxt.getText(R.string.send_message), dialogClickListener)
-                        .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
+                        .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
+                        .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
                         .show()
             }
         }
         nameView.setOnLongClickListener { _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_NEGATIVE -> {
+                    DialogInterface.BUTTON_POSITIVE -> {
                         Contact.contacts().removeAt(pos)
                         ContactsActivity.saveContacts(cxt.applicationContext.filesDir)
                         this.notifyDataSetChanged()
                     }
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEGATIVE -> {
                     }
                 }
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
             builder.setMessage(String.format(cxt.getString(R.string.contact_delete_question),
                     Contact.contacts()[pos].name))
-                    .setNegativeButton(cxt.getText(R.string.delete), dialogClickListener)
-                    .setPositiveButton(cxt.getText(R.string.cancel), dialogClickListener)
+                    .setNegativeButton(cxt.getText(R.string.cancel), dialogClickListener)
+                    .setPositiveButton(cxt.getText(R.string.delete), dialogClickListener)
                     .show()
             true
         }

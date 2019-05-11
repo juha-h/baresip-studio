@@ -145,8 +145,18 @@ object Utils {
         }
     }
 
+    fun aorUser(aor: String): String {
+        val user = aor.substringBefore("@")
+        return if (user == aor) "" else user
+    }
+
     fun aorDomain(aor: String): String {
-        return aor.substringAfter("@")
+        val domain = aor.substringAfter("@")
+        return if (domain == aor) "" else domain
+    }
+
+    fun checkAor(aor: String): Boolean {
+        return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
     }
 
     fun checkTelNo(no: String): Boolean {
@@ -242,14 +252,6 @@ object Utils {
             return checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
         } else
             return false
-    }
-
-    fun checkAorUri(uri: String): Boolean {
-        if (!uri.startsWith("sip:")) return false
-        val userDomain = uri.replace("sip:", "").split("@")
-        if (userDomain.size != 2) return false
-        if (!checkUriUser(userDomain[0])) return false
-        return checkDomain(userDomain[1]) || checkIp(userDomain[1])
     }
 
     fun checkPrintAscii(s: String): Boolean {

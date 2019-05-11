@@ -35,7 +35,7 @@ class ChatsActivity: AppCompatActivity() {
         aor = intent.extras!!.getString("aor")!!
 
         val headerView = findViewById(R.id.account) as TextView
-        val headerText = "Account ${aor.substringAfter(":")}"
+        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
         headerView.text = headerText
 
         uaMessages = uaMessages(aor)
@@ -55,7 +55,7 @@ class ChatsActivity: AppCompatActivity() {
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
-                    DialogInterface.BUTTON_NEUTRAL -> {
+                    DialogInterface.BUTTON_POSITIVE -> {
                         val i = Intent(this, ContactActivity::class.java)
                         val b = Bundle()
                         b.putBoolean("new", true)
@@ -76,7 +76,7 @@ class ChatsActivity: AppCompatActivity() {
                         Message.saveMessages(filesPath)
                         uaMessages = uaMessages(aor)
                     }
-                    DialogInterface.BUTTON_POSITIVE -> {
+                    DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
@@ -86,13 +86,13 @@ class ChatsActivity: AppCompatActivity() {
             if (peer.startsWith("sip:"))
                 builder.setMessage(String.format(getString(R.string.long_chat_question),
                         Utils.friendlyUri(peer, Utils.aorDomain(aor))))
-                        .setPositiveButton(getText(R.string.cancel), dialogClickListener)
+                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getText(R.string.delete), dialogClickListener)
-                        .setNeutralButton(getText(R.string.add_contact), dialogClickListener)
+                        .setPositiveButton(getText(R.string.add_contact), dialogClickListener)
                         .show()
             else
                 builder.setMessage(String.format(getString(R.string.short_chat_question), peer))
-                        .setPositiveButton(getText(R.string.cancel), dialogClickListener)
+                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
                         .setNegativeButton(getText(R.string.delete), dialogClickListener)
                         .show()
             true
@@ -115,7 +115,8 @@ class ChatsActivity: AppCompatActivity() {
                     }
                 }
                 if (!Utils.checkSipUri(uri)) {
-                    Utils.alertView(this, "Notice", "Invalid SIP URI '$uri'")
+                    Utils.alertView(this, getString(R.string.error),
+                            getString(R.string.invalid_chat_peer_uri))
                 } else {
                     peerUri.text.clear()
                     peerUri.isCursorVisible = false

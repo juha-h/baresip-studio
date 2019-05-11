@@ -345,7 +345,7 @@ class MainActivity : AppCompatActivity() {
                 if (acc.vmUri != "") {
                     val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                         when (which) {
-                            DialogInterface.BUTTON_NEGATIVE -> {
+                            DialogInterface.BUTTON_POSITIVE -> {
                                 val callIntent = Intent(this, MainActivity::class.java)
                                 callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                         Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -354,16 +354,16 @@ class MainActivity : AppCompatActivity() {
                                 callIntent.putExtra("peer", acc.vmUri)
                                 startActivity(callIntent)
                             }
-                            DialogInterface.BUTTON_POSITIVE -> {
+                            DialogInterface.BUTTON_NEGATIVE -> {
                             }
                         }
                     }
                     val builder = AlertDialog.Builder(this@MainActivity,
                             R.style.Theme_AppCompat)
                     builder.setTitle(getString(R.string.voicemail_messages))
-                    builder.setMessage(acc.vmMessage())
-                            .setPositiveButton(getString(R.string.cancel), dialogClickListener)
-                            .setNegativeButton(getString(R.string.check), dialogClickListener)
+                    builder.setMessage(acc.vmMessages(this))
+                            .setPositiveButton(getString(R.string.listen), dialogClickListener)
+                            .setNegativeButton(getString(R.string.cancel), dialogClickListener)
                             .show()
                 }
             }

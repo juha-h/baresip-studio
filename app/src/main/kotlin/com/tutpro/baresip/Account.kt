@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import android.content.Context
+
 class Account(val accp: String) {
 
     var displayName = account_display_name(accp)
@@ -98,28 +100,28 @@ class Account(val accp: String) {
         return res
     }
 
-    fun vmMessage() : String {
+    fun vmMessages(cxt: Context) : String {
         var new = ""
         var old = ""
         if (vmNew > 0)
             if (vmNew == 1)
-                new = "$vmNew new message"
+                new = cxt.getString(R.string.one_new_message)
             else
-                new = "$vmNew new messages"
+                new = "$vmNew ${cxt.getString(R.string.new_messages)}"
         if (vmOld > 0)
             if (vmOld == 1)
-                old = "$vmOld old message"
+                old = cxt.getString(R.string.one_old_message)
             else
-                old = "$vmOld old messages"
-        var msg = "You have"
+                old = "$vmOld ${cxt.getString(R.string.old_messages)}"
+        var msg = cxt.getString(R.string.you_have)
         if (new != "") {
             msg = "$msg $new"
-            if (old != "") msg = "$msg and $old"
+            if (old != "") msg = "$msg ${cxt.getString(R.string.and)} $old"
         } else {
             if (old != "")
                 msg = "$msg $old"
             else
-                msg = "$msg no messages"
+                msg = cxt.getString(R.string.no_messages)
         }
         return "$msg."
     }
