@@ -1,0 +1,4 @@
+- Aligned alerts with material design guidelines.
+- Improved language string handling.
+- Added Finnish language translation as an example.
+
