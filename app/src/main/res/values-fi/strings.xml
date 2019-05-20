@@ -15,7 +15,8 @@
         viestejä ja kontakteja.\n
         &#8226; Voit soittaa edellisen puhelun uudelleen painamalla virheää luuria silloin,
         kun puhelun kohde on tyhjä.\n
-        &#8226; Jos et puhelun aikana kuule, mitä toinen sanoo, yritä kasvattaa media-volyymia.\n
+        &#8226; Jos et puhelun aikana kuule, mitä toinen sanoo, yritä kasvattaa median volyymia.\n
+        &#8226; Kaiun poisto ei ole tällä hetkellä tuettu, jos puhelu on Opus-koodattu.\n
     </string>
 
     <!-- Account Activity -->
