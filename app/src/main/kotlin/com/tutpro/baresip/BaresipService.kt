@@ -367,10 +367,8 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getService(this,
                                     REJECT_REQ_CODE, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.answer),
-                                    answerPendingIntent)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.reject),
-                                    rejectPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.answer), answerPendingIntent)
+                            nb.addAction(R.drawable.ic_stat, getString(R.string.reject), rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -609,13 +607,11 @@ class BaresipService: Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
                     NotificationManager.IMPORTANCE_LOW)
-            defaultChannel.description = "Tells that baresip is running"
-            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            defaultChannel.lockscreenVisibility = VISIBILITY_PUBLIC
             nm.createNotificationChannel(defaultChannel)
             val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
                     NotificationManager.IMPORTANCE_HIGH)
-            highChannel.description = "Tells about incoming call or message"
-            highChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            highChannel.lockscreenVisibility = VISIBILITY_PUBLIC
             highChannel.enableVibration(true)
             nm.createNotificationChannel(highChannel)
         }

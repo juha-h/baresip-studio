@@ -16,6 +16,7 @@
         &#8226; Long clicks can also be used to remove calls, chats, messages, and contacts.\n
         &#8226; Call click when callee has not been given can be used for re-dial.\n
         &#8226; If you cannot hear the other party of a call, try to increase Media volume.\n
+        &#8226; Audio echo cancellation is currently not supported when call uses Opus codec.\n
     </string>
 
     <!-- Account Activity -->

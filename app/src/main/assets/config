@@ -10,6 +10,10 @@ audio_alert opensles,nil
 audio_srate 8000-48000
 audio_channels 1-2
 audio_level no
+ausrc_format s16
+auenc_format s16
+auplay_format s16
+audec_format s16
 rtp_tos 184
 rtcp_mux no
 jitter_buffer_delay 5-10
@@ -19,6 +23,8 @@ dns_server [2001:4860:4860::8888]:53
 prefer_ipv6 no
 module opus.so
 module g711.so
+module g7221.so
+module webrtc_aec.so
 module opensles.so
 module stun.so
 module turn.so
