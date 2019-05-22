@@ -41,7 +41,7 @@ class BaresipService: Service() {
     internal var rtTimer: Timer? = null
     internal var audioFocusRequest: AudioFocusRequest? = null
     internal var audioFocused = false
-    internal var origCallVolume = 0
+    internal var origCallVolume = -1
 
     override fun onCreate() {
 
@@ -393,7 +393,7 @@ class BaresipService: Service() {
                             requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                         }
                         if (callVolume != 0) {
-                            origCallVolume = am.getStreamMaxVolume(am.mode)
+                            origCallVolume = am.getStreamVolume(am.mode)
                             am.setStreamVolume(am.mode,
                                     (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
                                     0)
@@ -480,9 +480,9 @@ class BaresipService: Service() {
                         }
                         if (Call.calls().size == 0) {
                             abandonAudioFocus()
-                            if (origCallVolume != 0) {
+                            if (origCallVolume != -1) {
                                 am.setStreamVolume(am.mode, origCallVolume, 0)
-                                origCallVolume = 0
+                                origCallVolume = -1
                             }
                             Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
                             am.mode = AudioManager.MODE_NORMAL

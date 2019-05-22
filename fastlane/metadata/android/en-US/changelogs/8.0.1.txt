@@ -1,0 +1,1 @@
+- Fixed restoring of volume to original level if default call volume is in use.
