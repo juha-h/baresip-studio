@@ -35,7 +35,7 @@ class AccountsActivity : AppCompatActivity() {
         val addAccountButton = findViewById(R.id.addAccount) as ImageButton
         val newAorView = findViewById(R.id.newAor) as EditText
         addAccountButton.setOnClickListener{
-            var aor = newAorView.text.toString().trim()
+            val aor = newAorView.text.toString().trim()
             if (!Utils.checkAor(aor)) {
                 Log.d("Baresip", "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.error),
@@ -45,7 +45,7 @@ class AccountsActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor))
             } else {
-                val ua = UserAgent.uaAlloc("<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
+                val ua = UserAgent.uaAlloc("<sip:$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {
                     Log.e("Baresip", "Failed to allocate UA for $aor")
                     Utils.alertView(this, getString(R.string.notice),
