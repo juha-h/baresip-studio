@@ -6,6 +6,7 @@ import android.app.Notification.VISIBILITY_PUBLIC
 import android.content.*
 import android.media.*
 import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.os.PowerManager
@@ -22,6 +23,7 @@ import android.net.NetworkRequest
 import android.provider.Settings
 
 import java.io.File
+import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.math.roundToInt
@@ -35,6 +37,7 @@ class BaresipService: Service() {
     internal lateinit var rt: Ringtone
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
+    internal lateinit var cm: ConnectivityManager
     internal lateinit var wakeLock: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
 
@@ -61,9 +64,9 @@ class BaresipService: Service() {
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
 
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val builder = NetworkRequest.Builder()
-        connectivityManager.registerNetworkCallback(
+        cm.registerNetworkCallback(
                 builder.build(),
                 object : ConnectivityManager.NetworkCallback() {
                     override fun onAvailable(network: Network) {
@@ -73,11 +76,25 @@ class BaresipService: Service() {
                             UserAgent.register()
                             disconnected = false
                         }
+                        if (dynDns) {
+                            val dnsServers = cm.getLinkProperties(network).getDnsServers()
+                            if (Config.updateDnsServers(dnsServers) != 0)
+                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers")
+                        }
                     }
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(LOG_TAG, "Network $network is lost")
                         disconnected = true
+                    }
+                    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                        super.onLinkPropertiesChanged(network, linkProperties)
+                        Log.d(LOG_TAG, "Network $network link properties changed")
+                        if (dynDns) {
+                            val dnsServers = linkProperties.getDnsServers()
+                            if (Config.updateDnsServers(dnsServers) != 0)
+                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers")
+                        }
                     }
                 }
         )
@@ -128,13 +145,31 @@ class BaresipService: Service() {
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
                         Log.d(LOG_TAG, "Asset $a already copied")
-                        if (a == "config") Config.initialize()
+                        if (a == "config") {
+                            var dnsServers = listOf<InetAddress>()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                val activeNetwork = cm.activeNetwork
+                                if (activeNetwork != null) {
+                                    dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
+                                    Log.d(LOG_TAG, "DNS Servers = $dnsServers")
+                                } else {
+                                    Log.d(LOG_TAG, "No active network!")
+                                }
+                            }
+                            Config.initialize(dnsServers)
+                        }
                     }
                 }
+
                 ContactsActivity.restoreContacts(applicationContext.filesDir)
+
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 isServiceRunning = true
                 showStatusNotification()
+
+                if (Config.variable("dyn_dns")[0] == "yes")
+                    Config.remove("dns_server")
+
             }
 
             "Call Show", "Call Answer" -> {
@@ -397,8 +432,9 @@ class BaresipService: Service() {
                             am.setStreamVolume(am.mode,
                                     (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
                                     0)
+                            Log.d(LOG_TAG, "Original/new call volume of stream ${am.mode} is " +
+                                    "$origCallVolume/${am.getStreamVolume(am.mode)}")
                         }
-                        Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
                     }
                     "call verified", "call secure" -> {
                         val call = Call.find(callp)
@@ -765,6 +801,7 @@ class BaresipService: Service() {
         var isServiceClean = false
         var speakerPhone = false
         var callVolume = 0
+        var dynDns = false
 
         var filesPath = ""
         var uas = ArrayList<UserAgent>()

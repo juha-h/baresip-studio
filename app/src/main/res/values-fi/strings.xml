@@ -186,12 +186,12 @@
     <string name="prefer_ipv6_help">Jos merkitty, baresip suosii
     IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä.</string>
     <string name="dns_servers">DNS-palvelimet</string>
-    <string name="dns_servers_help">Pilkulla toisistaan erotettu
-    luettelo DNS-palvelijoita. Kukin DNS-palvelija on muotoa
-    \'palvelin:portti\'.  Jos palvelin on IPv6-osoite, osoite pitää
-    kirjoittaa sulkujen [] sisään. Oletusarvo on
-    \'8.8.8.8:53,[2001:4860:4860::8888]:53\', mikä osoittaa Googlen
-    julkisiin DNS-palvelijoihin.</string>
+    <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
+        osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.
+        Kukin osoite on muotoa \'ip:portti\' tai \'ip\', missä ip on IPv4 tai IPv6 osoite. Jos ip
+        on IPv6-osoite ja myös portti annetaan, pitää osoite kirjoittaa sulkujen [] sisään.
+        Esimerkiksi luettelo \'8.8.8.8:53,[2001:4860:4860::8888]:53\' osoittaa Googlen julkisiin
+        DNS-palvelijoihin.</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat

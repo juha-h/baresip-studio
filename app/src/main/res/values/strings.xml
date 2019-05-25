@@ -151,10 +151,12 @@
     <string name="prefer_ipv6">Prefer IPv6</string>
     <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
     <string name="dns_servers">DNS Servers</string>
-    <string name="dns_servers_help">Comma separated list of DNS servers.  Each DNS server is of form
-        \'server:port\'.  If server is an IPv6 address, the address must be written inside brackets [].
-        Factory default value is \'8.8.8.8:53,[2001:4860:4860::8888]:53\' pointing to public Google
-        DNS servers.</string>
+    <string name="dns_servers_help">Comma separated list of addresses of DNS servers.  If not given,
+        DNS server addresses are obtained dynamically from the system. Each DNS address is of form
+        \'ip:port\' or \'ip\'. If port is omitted, it defaults to 53.  If ip is an IPv6 address and
+        also port is given, ip must
+        be written inside brackets [].  As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
+        points to IPv4 and IPv6 addresses of public Google DNS servers.</string>
     <string name="_8_8_8_8_53" translatable="false">8.8.8.8:53</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.

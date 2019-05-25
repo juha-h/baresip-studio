@@ -18,8 +18,7 @@ rtp_tos 184
 rtcp_mux no
 jitter_buffer_delay 5-10
 rtp_stats no
-dns_server 8.8.8.8:53
-dns_server [2001:4860:4860::8888]:53
+dyn_dns yes
 prefer_ipv6 no
 module opus.so
 module g711.so

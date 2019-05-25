@@ -1,7 +1,10 @@
 package com.tutpro.baresip
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -52,10 +55,15 @@ class ConfigActivity : AppCompatActivity() {
         preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
         dnsServers = findViewById(R.id.DnsServers) as EditText
-        val dsCv = Config.variable("dns_server")
-        var dsTv = ""
-        for (ds in dsCv) dsTv += ", $ds"
-        oldDnsServers = dsTv.trimStart(',').trimStart(' ')
+        val ddCv = Config.variable("dyn_dns")
+        if (ddCv[0] == "yes") {
+            oldDnsServers = ""
+        } else {
+            val dsCv = Config.variable("dns_server")
+            var dsTv = ""
+            for (ds in dsCv) dsTv += ", $ds"
+            oldDnsServers = dsTv.trimStart(',').trimStart(' ')
+        }
         dnsServers.setText(oldDnsServers)
 
         opusBitRate = findViewById(R.id.OpusBitRate) as EditText
@@ -144,17 +152,35 @@ class ConfigActivity : AppCompatActivity() {
                 restart = true
             }
 
-            val dnsServers = dnsServers.text.toString().trim().toLowerCase()
+            val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
             if (dnsServers != oldDnsServers) {
                 if (!checkDnsServers(dnsServers)) {
-                    Utils.alertView(this, "Notice", "Invalid DNS Servers: $dnsServers")
+                    Utils.alertView(this, "Notice",
+                            "Invalid DNS Servers: $dnsServers")
                     return false
                 }
+                Config.remove("dyn_dns")
                 Config.remove("dns_server")
-                for (server in dnsServers.split(","))
-                    Config.add("dns_server", server)
+                if (dnsServers.isNotEmpty()) {
+                    for (server in dnsServers.split(","))
+                        Config.add("dns_server", server)
+                    Config.add("dyn_dns", "no")
+                    if (Api.dnsc_srv_set(dnsServers) != 0) {
+                        Utils.alertView(this, "Notice",
+                                "Failed to set DNS servers '$dnsServers'")
+                        return false
+                    }
+                } else {
+                    Config.add("dyn_dns", "yes")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                        Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
+                    } else {
+                        restart = true
+                    }
+                }
+                Api.net_debug()
                 save = true
-                restart = true
             }
 
             val opusBitRate = opusBitRate.text.toString().trim()
@@ -265,6 +291,21 @@ class ConfigActivity : AppCompatActivity() {
         val number = opusBitRate.toIntOrNull()
         if (number == null) return false
         return (number >=6000) && (number <= 510000)
+    }
+
+    private fun addMissingPorts(addressList: String): String {
+        if (addressList == "") return ""
+        var result = ""
+        for (addr in addressList.split(","))
+            if (Utils.checkIpPort(addr)) {
+                result = "$result,$addr"
+            } else {
+                if (Utils.checkIpV4(addr))
+                    result = "$result,$addr:53"
+                else
+                    result = "$result,[$addr]:53"
+            }
+        return result.substring(1)
     }
 
 }
