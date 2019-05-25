@@ -12,7 +12,7 @@ After cloning the project, generate static libraries and include files
 to distribution directory using master branch of
 https://github.com/juha-h/libbaresip-android.
 
-Then in Android Studio 3.3.x:
+Then in Android Studio 3.4.1:
 
 - Open an existing Android Studio project
 
