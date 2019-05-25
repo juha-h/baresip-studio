@@ -19,7 +19,6 @@
     if (log_level_get() <= LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
 
 
-
 typedef struct baresip_context {
     JavaVM  *javaVM;
     jclass   jniHelperClz;
@@ -38,6 +37,26 @@ static int vprintf_null(const char *p, size_t size, void *arg)
     (void)size;
     (void)arg;
     return 0;
+}
+
+static net_debug_log() {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
+static ua_print_sip_status_log() {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_sip_status);
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
 }
 
 static struct re_printf pf_null = {vprintf_null, 0};
@@ -379,7 +398,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     conf_path_set(path);
 
-    // log_enable_debug(true);
+    log_enable_debug(true);
 
     err = conf_configure();
     if (err) {
@@ -450,18 +469,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    /* char debug_buf[2048];
-    int l;
-    l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
-    if (l != -1) {
-        debug_buf[l] = '\0';
-        LOGD("%s\n", debug_buf);
-    }
-    l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_sip_status);
-    if (l != -1) {
-        debug_buf[l] = '\0';
-        LOGD("%s\n", debug_buf);
-    } */
+    net_debug_log();
+    ua_print_sip_status_log();
 
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
@@ -1053,7 +1062,6 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
-    return;
 }
 
 JNIEXPORT jstring JNICALL
@@ -1121,7 +1129,6 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return;
 }
 
 JNIEXPORT jint JNICALL
@@ -1155,7 +1162,6 @@ Java_com_tutpro_baresip_Api_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jst
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
-    return;
 }
 
 JNIEXPORT void JNICALL
@@ -1168,7 +1174,6 @@ Java_com_tutpro_baresip_Api_call_1start_1audio(JNIEnv *env, jobject thiz, jstrin
     if (!audio_started(a)) audio_start(a);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return;
 }
 
 JNIEXPORT void JNICALL
@@ -1181,7 +1186,6 @@ Java_com_tutpro_baresip_Api_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring
     if (audio_started(a)) audio_stop(a);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return;
 }
 
 JNIEXPORT jint JNICALL
@@ -1334,6 +1338,7 @@ Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring java
     } else {
         LOGD("added contact %s\n", native_contact);
     }
+    (*env)->ReleaseStringUTFChars(env, javaContact, native_contact);
 }
 
 JNIEXPORT void JNICALL
@@ -1353,3 +1358,46 @@ Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint leve
     log_level_set(native_level);
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_dnsc_1srv_1set(JNIEnv *env, jobject thiz, jstring javaServers) {
+    const char *native_servers = (*env)->GetStringUTFChars(env, javaServers, 0);
+    char servers[256];
+    char *server;
+    struct sa nsv[NET_MAX_NS];
+	uint32_t count = 0;
+	char *comma;
+    int err;
+    LOGD("setting dns servers '%s'\n", native_servers);
+    if (str_len(native_servers) > 255) {
+        LOGW("dnsc_srv_set: too long servers list (%s)\n", native_servers);
+        return 1;
+    }
+    str_ncpy(servers, native_servers, 256);
+    (*env)->ReleaseStringUTFChars(env, javaServers, native_servers);
+    server = &(servers[0]);
+    while((count < NET_MAX_NS) && ((comma = strchr(server, ',')) != NULL)) {
+        *comma = '\0';
+        err = sa_decode(&(nsv[count]), server, str_len(server));
+        if (err) {
+            LOGW("dnsc_srv_set: could not decode '%s' (%u)\n", server, err);
+            return err;
+        }
+        server = ++comma;
+        count++;
+    }
+    if ((count < NET_MAX_NS) && (str_len(server) > 0)) {
+        err = sa_decode(&(nsv[count]), server, str_len(server));
+        if (err) {
+            LOGW("dnsc_srv_set: could not decode `%s' (%u)\n", server, err);
+            return err;
+        }
+        count++;
+    }
+    (void)dnsc_srv_set(net_dnsc(baresip_network()), nsv, count);
+    return 0;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz) {
+    net_debug_log();
+}

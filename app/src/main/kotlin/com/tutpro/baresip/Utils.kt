@@ -87,7 +87,7 @@ object Utils {
     fun removeLinesStartingWithName(string: String, name: String): String {
         var result = ""
         for (line in string.split("\n"))
-            if (!line.startsWith(name)) result += line + "\n"
+            if (!line.startsWith(name) && (line.length > 0)) result += line + "\n"
         return result
     }
 
@@ -171,6 +171,11 @@ object Utils {
         return Regex("^(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4})$").matches(ip)
     }
 
+    fun checkIpv6InBrackets(bracketedIp: String): Boolean {
+        return bracketedIp.startsWith("[") && bracketedIp.endsWith("]") &&
+                checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
+    }
+
     fun checkIp(ip: String): Boolean {
         return checkIpV4(ip) || checkIpV6(ip)
     }
@@ -214,8 +219,12 @@ object Utils {
     }
 
     fun checkIpPort(ipPort: String): Boolean {
-        return checkIp(ipPort.substringBeforeLast(":")) &&
-                checkPort(ipPort.substringAfterLast(":"))
+        if (ipPort.startsWith("["))
+            return checkIpv6InBrackets(ipPort.substringBeforeLast(":")) &&
+                    checkPort(ipPort.substringAfterLast(":"))
+        else
+            return checkIpV4(ipPort.substringBeforeLast(":")) &&
+                    checkPort(ipPort.substringAfterLast(":"))
     }
 
     fun checkParams(params: String): Boolean {
