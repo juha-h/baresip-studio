@@ -70,13 +70,17 @@ class ContactActivity : AppCompatActivity() {
             }
 
             var newUri = uriView.text.toString().trim()
-            if (!newUri.startsWith("<")) {
-                if (!newUri.startsWith("sip:")) newUri = "sip:$newUri"
-                if (!Utils.checkAor(newUri.substringAfter("sip:"))) {
-                    Utils.alertView(this, getString(R.string.error),
-                            String.format(getString(R.string.invalid_contact_uri), newUri))
-                    return false
+            if (!newUri.startsWith("sip:")) {
+                if (newUri.contains("@") || (BaresipService.uas.size != 1)) {
+                    newUri = "sip:$newUri"
+                } else {
+                    newUri = "sip:$newUri@${Utils.aorDomain(BaresipService.uas[0].account.aor)}"
                 }
+            }
+            if (!Utils.checkSipUri(newUri)) {
+                Utils.alertView(this, getString(R.string.error),
+                        String.format(getString(R.string.invalid_contact_uri), newUri))
+                return false
             }
 
             if (new) {
