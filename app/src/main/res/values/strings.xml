@@ -6,7 +6,7 @@
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
-        <b>Baresip library based Android application</b>\n\n
+        <b>Baresip library based SIP User Agent</b>\n\n
         Juha Heinanen jh@tutpro.com\n\n
         Version %1$s\n\n
         <b>Usage Hints</b>\n\n
