@@ -2,8 +2,8 @@
 <resources>
 
     <!-- About Activity -->
-    <string name="about_title">baresip Sovellus</string>
-    <string name="about_text"><b>Baresip-kirjastoon perustuva Android sovellus</b>\n\n
+    <string name="about_title">baresip sovelluksesta</string>
+    <string name="about_text"><b>Baresip-kirjastoon perustuva SIP-asiakassovellus</b>\n\n
         Juha Heinanen jh@tutpro.com\n\n
         Versio %1$s\n\n
         <b>Käyttövihjeitä</b>\n\n
