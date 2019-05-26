@@ -318,6 +318,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         infoButton.setOnClickListener {
+            Log.d("Baresip", "Info Button was clicked")
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val calls = Call.uaCalls(ua, "")
             if (calls.size > 0) {
@@ -334,6 +335,8 @@ class MainActivity : AppCompatActivity() {
                                     "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
                                     "${getString(R.string.rate)}: $rate")
+                } else {
+                    Utils.alertView(this, "Call Info", "No info available.")
                 }
             }
         }
