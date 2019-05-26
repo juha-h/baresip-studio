@@ -111,13 +111,12 @@ object Utils {
     }
 
     fun alertView(context: Context, title: String, message: String) {
-        // val alertDialog = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert).create()
-        val alertDialog = AlertDialog.Builder(context).create()
-        alertDialog.setTitle(title)
-        alertDialog.setMessage(message)
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
-        ) { dialog, _ -> dialog.dismiss() }
-        alertDialog.show()
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok)
+                { dialog, _ -> dialog.dismiss() }
+                .show()
     }
 
     fun uriHostPart(uri: String): String {
