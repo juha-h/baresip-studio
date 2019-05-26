@@ -1,0 +1,4 @@
+- Obtain DNS server addresses dynamically from the system if DNS Servers
+  are not given in Configuration.
+- If there is only one account, append account's domain to contact URI
+  given without hostpart.
