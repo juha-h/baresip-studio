@@ -72,20 +72,11 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(LOG_TAG, "Network '$network' is available")
-                        if (disconnected) {
-                            UserAgent.register()
-                            disconnected = false
-                        }
-                        if (dynDns) {
-                            val dnsServers = cm.getLinkProperties(network).getDnsServers()
-                            if (Config.updateDnsServers(dnsServers) != 0)
-                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                        }
+                        // This is followed by onLinkPropertiesChanged
                     }
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(LOG_TAG, "Network '$network' is lost")
-                        disconnected = true
                     }
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
@@ -95,6 +86,7 @@ class BaresipService: Service() {
                             if (Config.updateDnsServers(dnsServers) != 0)
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
+                        UserAgent.register()
                     }
                 }
         )
@@ -798,7 +790,6 @@ class BaresipService: Service() {
         val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
 
         var isServiceRunning = false
-        var disconnected = false
         var libraryLoaded = false
         var isServiceClean = false
         var speakerPhone = false
