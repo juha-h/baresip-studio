@@ -72,7 +72,6 @@ class AccountActivity : AppCompatActivity() {
             spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             spinner.setPopupBackgroundResource(R.drawable.spinner_background)
             layout.addView(spinner)
-
             if (acc.audioCodec.size > i) {
                 val codec = acc.audioCodec[i]
                 spinnerList[i].add(codec)
