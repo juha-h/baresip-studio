@@ -71,7 +71,7 @@ class BaresipService: Service() {
                 object : ConnectivityManager.NetworkCallback() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        Log.d(LOG_TAG, "Network $network is available")
+                        Log.d(LOG_TAG, "Network '$network' is available")
                         if (disconnected) {
                             UserAgent.register()
                             disconnected = false
@@ -79,12 +79,12 @@ class BaresipService: Service() {
                         if (dynDns) {
                             val dnsServers = cm.getLinkProperties(network).getDnsServers()
                             if (Config.updateDnsServers(dnsServers) != 0)
-                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers")
+                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
                     }
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        Log.d(LOG_TAG, "Network $network is lost")
+                        Log.d(LOG_TAG, "Network '$network' is lost")
                         disconnected = true
                     }
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
@@ -93,7 +93,7 @@ class BaresipService: Service() {
                         if (dynDns) {
                             val dnsServers = linkProperties.getDnsServers()
                             if (Config.updateDnsServers(dnsServers) != 0)
-                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers")
+                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
                     }
                 }
@@ -141,10 +141,10 @@ class BaresipService: Service() {
                 for (a in assets) {
                     file = File("${filesPath}/$a")
                     if (!file.exists()) {
-                        Log.d(LOG_TAG, "Copying asset $a")
+                        Log.d(LOG_TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
-                        Log.d(LOG_TAG, "Asset $a already copied")
+                        Log.d(LOG_TAG, "Asset '$a' already copied")
                         if (a == "config") {
                             var dnsServers = listOf<InetAddress>()
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -384,7 +384,9 @@ class BaresipService: Service() {
                                     .setColor(ContextCompat.getColor(this,
                                             R.color.colorBaresip))
                                     .setContentIntent(pi)
+                                    .setCategory(Notification.CATEGORY_CALL)
                                     .setAutoCancel(true)
+                                    .setOngoing(true)
                                     .setContentTitle(getString(R.string.incoming_call_from))
                                     .setContentText(caller)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
