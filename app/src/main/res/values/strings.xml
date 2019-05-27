@@ -6,18 +6,26 @@
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
-        <b>Baresip library based SIP User Agent</b>\n\n
-        Juha Heinanen jh@tutpro.com\n\n
-        Version %1$s\n\n
-        <b>Usage Hints</b>\n\n
-        &#8226; Check that configuration default values meet your needs (click item titles for help).\n
-        &#8226; Then create one or more accounts (again click item titles for help).\n
-        &#8226; Peers of calls and messages can be added to contacts by long clicks.\n
-        &#8226; Long clicks can also be used to remove calls, chats, messages, and contacts.\n
-        &#8226; Call click when callee has not been given can be used for re-dial.\n
-        &#8226; If you cannot hear the other party of a call, try to increase Media volume.\n
-        &#8226; Audio echo cancellation is currently not supported when call uses Opus codec.\n
+        <![CDATA[
+        <h1>Baresip library based SIP User Agent</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Version %1$s</p>
+        <h2>Usage Hints</h2>
+        <ul>
+            <li>Check that configuration default values meet your needs (click item titles for help).</li>
+            <li>Then create one or more accounts (again click item titles for help).</li>
+            <li>Peers of calls and messages can be added to contacts by long clicks.</li>
+            <li>Long clicks can also be used to remove calls, chats, messages, and contacts.</li>
+            <li>Call click when callee has not been given can be used for re-dial.</li>
+            <li>If you cannot hear the other party of a call, try to increase Media volume.</li>
+            <li>Audio echo cancellation is currently not supported when call uses Opus codec.</li>
+        </ul>
+        <h2>Source code</h2>
+        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        where also issues can be reported.
+        ]]>
     </string>
+    <string name="baresip_link"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
 
     <!-- Account Activity -->
     <string name="account">Account</string>
