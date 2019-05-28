@@ -1041,7 +1041,6 @@ class MainActivity : AppCompatActivity() {
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
             callTitle.text = getString(R.string.outgoing_call_to_dots)
-            callUri.text.clear()
             callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
             callUri.isFocusableInTouchMode = true
