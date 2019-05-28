@@ -145,16 +145,12 @@ class ChatsActivity: AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        Log.d("Baresip", "Chats paused")
     }
-
-    /*override fun onStop() {
-        super.onStop()
-        Log.d("Baresip", "Chats stopped")
-    }*/
 
     override fun onResume() {
         super.onResume()
-        // Log.d("Baresip", "Chats resumed")
+        Log.d("Baresip", "Chats resumed")
         clAdapter.clear()
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
