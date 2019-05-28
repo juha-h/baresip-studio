@@ -21,6 +21,7 @@ import android.widget.*
 import android.view.*
 
 import kotlin.collections.ArrayList
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
@@ -135,6 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(), UserAgent.status())
         aorSpinner.adapter = uaAdapter
+        aorSpinner.setSelection(-1)
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 Log.d("Baresip", "aorSpinner selecting $position")
@@ -535,12 +537,17 @@ class MainActivity : AppCompatActivity() {
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
                 if (UserAgent.uas().size > 0) {
+                    val currentPosition = aorSpinner.selectedItemPosition
                     uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(), UserAgent.status())
                     aorSpinner.adapter = uaAdapter
-                    if (aorSpinner.selectedItemPosition == -1)
-                        aorSpinner.setSelection(0)
-                    else
-                        aorSpinner.setSelection(aorSpinner.selectedItemPosition)
+                    if (currentPosition == -1) {
+                        if (Call.calls().size > 0)
+                            spinToAor(Call.calls()[0].ua.account.aor)
+                        else
+                            aorSpinner.setSelection(0)
+                    } else {
+                        aorSpinner.setSelection(currentPosition)
+                    }
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                     updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 }
@@ -633,30 +640,18 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Incoming call $callp not found")
                             return
                         }
-                        setVolumeControlStream(AudioManager.STREAM_RING)
-                        if ((aorSpinner.selectedItemPosition == -1) ||
-                                (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])) {
-                            aorSpinner.setSelection(account_index)
+                        volumeControlStream = AudioManager.STREAM_RING
+                        if (visible) {
+                            if ((aorSpinner.selectedItemPosition == -1) ||
+                                    (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                                aorSpinner.setSelection(account_index)
+                            showCall(ua)
                         } else {
-                            callTitle.text = getString(R.string.incoming_call_from_dots)
-                            callUri.setAdapter(null)
-                            callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
-                                    Utils.aorDomain(ua.account.aor)))
-                            callUri.isFocusable = false
-                            securityButton.visibility = View.INVISIBLE
-                            callButton.visibility = View.INVISIBLE
-                            hangupButton.visibility = View.INVISIBLE
-                            answerButton.visibility = View.VISIBLE
-                            answerButton.isEnabled = true
-                            rejectButton.visibility = View.VISIBLE
-                            rejectButton.isEnabled = true
-                            holdButton.visibility = View.INVISIBLE
-                            dtmf.visibility = View.INVISIBLE
-                            infoButton.visibility = View.INVISIBLE
-                        }
-                        if (!visible) {
+                            Log.d("Baresip", "Reordering to front")
                             val i = Intent(applicationContext, MainActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            i.putExtra("action", "call show")
+                            i.putExtra("callp", callp)
                             startActivity(i)
                         }
                     }
@@ -667,34 +662,11 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
-                            if (call.dir == "in")
-                                callTitle.text = getString(R.string.incoming_call_from_dots)
-                            else
-                                callTitle.text = getString(R.string.outgoing_call_to_dots)
-                            if (acc.mediaEnc == "") {
-                                securityButton.visibility = View.INVISIBLE
-                            } else {
-                                securityButton.setImageResource(call.security)
-                                setSecurityButtonTag(securityButton, call.security)
-                                securityButton.visibility = View.VISIBLE
-                            }
-                            callButton.visibility = View.INVISIBLE
-                            hangupButton.visibility = View.VISIBLE
-                            hangupButton.isEnabled = true
-                            answerButton.visibility = View.INVISIBLE
-                            rejectButton.visibility = View.INVISIBLE
-                            holdButton.setImageResource(R.drawable.pause)
-                            holdButton.visibility = View.VISIBLE
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
-                            dtmf.visibility = View.VISIBLE
-                            dtmf.requestFocus()
-                            if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
-                            dtmfWatcher = call.dtmfWatcher
-                            dtmf.addTextChangedListener(dtmfWatcher)
-                            infoButton.visibility = View.VISIBLE
+                            showCall(ua)
                         }
                     }
                     "call verify" -> {
@@ -1014,25 +986,11 @@ class MainActivity : AppCompatActivity() {
         }
         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
             spinToAor(ua.account.aor)
-        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(uri),
-                Utils.aorDomain(Utils.aorDomain(ua.account.aor))))
-        callButton.visibility = View.INVISIBLE
         val callp = Api.ua_connect(ua.uap, uri)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
             Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
-            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
-            callUri.isFocusable = false
-            securityButton.visibility = View.INVISIBLE
-            callButton.visibility = View.INVISIBLE
-            hangupButton.visibility = View.VISIBLE
-            hangupButton.isEnabled = true
-            answerButton.visibility = View.INVISIBLE
-            rejectButton.visibility = View.INVISIBLE
-            holdButton.visibility = View.INVISIBLE
-            dtmf.visibility = View.INVISIBLE
-            infoButton.visibility = View.INVISIBLE
-
+            showCall(ua)
         } else {
             Log.e("Baresip", "ua_connect ${ua.uap}/$uri failed")
             callButton.visibility = View.VISIBLE
@@ -1110,16 +1068,19 @@ class MainActivity : AppCompatActivity() {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)
             } else {
                 callTitle.text = getString(R.string.incoming_call_from_dots)
+                callUri.setAdapter(null)
                 call = callsIn[callsIn.size - 1]
             }
             callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                     Utils.aorDomain(ua.account.aor)))
             callUri.isFocusable = false
+            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
                 "outgoing", "transferring" -> {
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
+                    hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
@@ -1139,12 +1100,13 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
-                    securityButton.setImageResource(call.security)
-                    setSecurityButtonTag(securityButton, call.security)
-                    if (ua.account.mediaEnc == "")
+                    if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
-                    else
+                    } else {
+                        securityButton.setImageResource(call.security)
+                        setSecurityButtonTag(securityButton, call.security)
                         securityButton.visibility = View.VISIBLE
+                    }
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
@@ -1186,7 +1148,6 @@ class MainActivity : AppCompatActivity() {
         var resumeUap = ""
         var resumeCall: Call? = null
         var resumeUri = ""
-        var resumeTime = ""
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
