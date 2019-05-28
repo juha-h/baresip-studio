@@ -1,0 +1,3 @@
+- Improved content and appearance of About page.
+- Always show currently active call (if any) when application is relaunched.
+- Changed location of alert dialog OK button.
