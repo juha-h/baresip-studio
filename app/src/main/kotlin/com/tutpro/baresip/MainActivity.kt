@@ -1123,6 +1123,7 @@ class MainActivity : AppCompatActivity() {
                     dtmfWatcher = call.dtmfWatcher
                     dtmf.addTextChangedListener(dtmfWatcher)
                     infoButton.visibility = View.VISIBLE
+                    infoButton.isEnabled = true
                 }
             }
         }
