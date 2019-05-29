@@ -33,5 +33,7 @@ object Api {
     external fun log_level_set(level: Int)
     external fun dnsc_srv_set(servers: String): Int
     external fun net_debug()
+    external fun module_load(module: String): Int
+    external fun module_unload(module: String)
 
 }
