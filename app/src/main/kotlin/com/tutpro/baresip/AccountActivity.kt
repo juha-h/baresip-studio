@@ -70,7 +70,6 @@ class AccountActivity : AppCompatActivity() {
             val spinner = Spinner(applicationContext)
             spinner.id = i + 100
             spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            spinner.setPopupBackgroundResource(R.drawable.spinner_background)
             layout.addView(spinner)
             if (acc.audioCodec.size > i) {
                 val codec = acc.audioCodec[i]
@@ -82,7 +81,7 @@ class AccountActivity : AppCompatActivity() {
                 spinnerList[i].add(0, "-")
             }
             val codecSpinner = findViewById(spinner.id) as Spinner
-            val adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 spinnerList[i])
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             codecSpinner.adapter = adapter
@@ -105,7 +104,7 @@ class AccountActivity : AppCompatActivity() {
         mediaNatVals.removeAt(keyIx)
         mediaNatKeys.add(0, acc.mediaNat)
         mediaNatVals.add(0, keyVal)
-        val mediaNatAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val mediaNatAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 mediaNatVals)
         mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mediaNatSpinner.adapter = mediaNatAdapter

@@ -145,6 +145,7 @@
             android:id="@+id/CodecSpinners"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="8dp"
             android:orientation="vertical" >
         </LinearLayout>
 
@@ -163,7 +164,7 @@
             android:id="@+id/mediaNatSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:popupBackground="@drawable/spinner_background" >
+            android:paddingTop="8dp" >
         </Spinner>
 
         <TextView
@@ -206,7 +207,7 @@
             android:id="@+id/mediaEncSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:popupBackground="@drawable/spinner_background" >
+            android:paddingTop="8dp" >
         </Spinner>
 
         <TextView
@@ -233,7 +234,8 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
             <TextView
                 android:id="@+id/DefaultTitle"
                 android:layout_width="wrap_content"
