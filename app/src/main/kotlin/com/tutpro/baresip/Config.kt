@@ -24,6 +24,10 @@ object Config {
             config = "${config}module g7221.so\n"
             write = true
         }
+        if (!config.contains(Regex("module[ ]+ilbc.so"))) {
+            config = "${config}module ilbc.so\n"
+            write = true
+        }
         if (config.contains(Regex("#module_app[ ]+mwi.so"))) {
             config = config.replace(Regex("#module_app[ ]+mwi.so"),
                     "module_app mwi.so")
