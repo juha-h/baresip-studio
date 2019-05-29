@@ -1401,3 +1401,19 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz) {
     net_debug_log();
 }
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule) {
+    const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
+    int result = module_load(native_module);
+    (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
+    return result;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring javaModule) {
+    const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
+    module_unload(native_module);
+    LOGD("unloaded module %s\n", native_module);
+    (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
+}

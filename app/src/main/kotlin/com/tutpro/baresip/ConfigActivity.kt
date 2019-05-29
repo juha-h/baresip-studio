@@ -18,6 +18,7 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var listenAddr: EditText
     internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
+    internal lateinit var aec: CheckBox
     internal lateinit var opusBitRate: EditText
     internal lateinit var iceLite: CheckBox
     internal lateinit var debug: CheckBox
@@ -27,6 +28,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldListenAddr = ""
     private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
+    private var oldAec = false
     private var oldOpusBitrate = ""
     private var oldIceMode = ""
     private var oldLogLevel = ""
@@ -65,6 +67,11 @@ class ConfigActivity : AppCompatActivity() {
             oldDnsServers = dsTv.trimStart(',').trimStart(' ')
         }
         dnsServers.setText(oldDnsServers)
+
+        aec = findViewById(R.id.Aec) as CheckBox
+        val aecCv = Config.variable("module")
+        oldAec = aecCv.contains("webrtc_aec.so")
+        aec.isChecked = oldAec
 
         opusBitRate = findViewById(R.id.OpusBitRate) as EditText
         val obCv = Config.variable("opus_bitrate")
@@ -183,6 +190,21 @@ class ConfigActivity : AppCompatActivity() {
                 save = true
             }
 
+            if (aec.isChecked != oldAec) {
+                Config.remove("module webrtc_aec.so")
+                if (aec.isChecked) {
+                    Config.add("module", "webrtc_aec.so")
+                    if (Api.module_load("webrtc_aec.so") != 0) {
+                        Utils.alertView(this, "Notice",
+                                "Failed to load Acoustic Echo Cancellation module")
+                        return false
+                    }
+                } else {
+                    Api.module_unload("webrtc_aec.so")
+                }
+                save = true
+            }
+
             val opusBitRate = opusBitRate.text.toString().trim()
             if (opusBitRate != oldOpusBitrate) {
                 if (!checkOpusBitRate(opusBitRate)) {
@@ -257,6 +279,10 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.DnsServersTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.dns_servers),
                         getString(R.string.dns_servers_help))
+            }
+            findViewById(R.id.AecTitle) as TextView-> {
+                Utils.alertView(this, getString(R.string.aec),
+                        getString(R.string.aec_help))
             }
             findViewById(R.id.OpusBitRateTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.opus_bit_rate),

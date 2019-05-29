@@ -16,8 +16,8 @@ object Config {
             config = "${config}zrtp_hash yes\n"
             write = true
         }
-        if (!config.contains(Regex("module[ ]+webrtc_aec.so"))) {
-            config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
+        if (!config.contains(Regex("ausrc_format s16"))) {
+            config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\n"
             write = true
         }
         if (!config.contains(Regex("module[ ]+g7221.so"))) {
