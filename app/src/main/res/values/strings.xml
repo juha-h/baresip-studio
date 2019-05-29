@@ -178,8 +178,9 @@
     <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, debug and info level log messages are available in logcat.</string>
-    <string name="reset_config">Reset to Factory Default</string>
-    <string name="reset_config_help">If checked, configuration is reset to factory default.</string>
+    <string name="reset_config">Reset to Factory Defaults</string>
+    <string name="reset_config_help">If checked, configuration is reset
+    to factory default values.</string>
 
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
