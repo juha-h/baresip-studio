@@ -76,10 +76,10 @@ class AccountActivity : AppCompatActivity() {
                 val codec = acc.audioCodec[i]
                 spinnerList[i].add(codec)
                 for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
-                spinnerList[i].add("")
+                spinnerList[i].add("-")
             } else {
-                spinnerList[i] = audioCodecs
-                spinnerList[i].add(0, "")
+                spinnerList[i].addAll(audioCodecs)
+                spinnerList[i].add(0, "-")
             }
             val codecSpinner = findViewById(spinner.id) as Spinner
             val adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
@@ -309,16 +309,16 @@ class AccountActivity : AppCompatActivity() {
                 }
             }
 
-            val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "" } as ArrayList<String>))
+            val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
             if (ac != acc.audioCodec) {
-                Log.d("Baresip", "New codecs ${newCodecs.filter { it != "" }}")
+                Log.d("Baresip", "New codecs ${newCodecs.filter { it != "-" }}")
                 val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
                 if (account_set_audio_codecs(acc.accp, acParam) == 0) {
                     var i = 0
                     while (true) {
                         val codec = account_audio_codec(acc.accp, i)
                         if (codec != "") {
-                            Log.d("Baresip", "Found audio codec $codec")
+                            Log.d("Baresip", "Found audio codec '$codec'")
                             i++
                         } else {
                             break
@@ -327,7 +327,7 @@ class AccountActivity : AppCompatActivity() {
                     acc.audioCodec = ac
                     save = true
                 } else {
-                    Log.e("Baresip", "Setting of audio codecs $acParam failed")
+                    Log.e("Baresip", "Setting of audio codecs '$acParam' failed")
                 }
             }
 

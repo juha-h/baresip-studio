@@ -20,9 +20,10 @@ jitter_buffer_delay 5-10
 rtp_stats no
 dyn_dns yes
 prefer_ipv6 no
-module opus.so
-module g711.so
+module ilbc.so
 module g7221.so
+module g711.so
+module opus.so
 module webrtc_aec.so
 module opensles.so
 module stun.so
