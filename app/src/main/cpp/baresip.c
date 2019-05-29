@@ -1223,7 +1223,6 @@ Java_com_tutpro_baresip_Api_call_1unhold(JNIEnv *env, jobject thiz, jstring java
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     const struct aucodec *tx = audio_codec(call_audio(call), true);
     const struct aucodec *rx = audio_codec(call_audio(call), false);
@@ -1235,25 +1234,26 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
         len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", tx->name, tx->srate, tx->ch,
                           rx->name, rx->srate, rx->ch);
     if (len == -1) {
-        LOGE("failed to get call audio codecs\n");
+        LOGE("failed to get audio codecs of call %s\n", native_call);
         codec_buf[0] = '\0';
     }
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     char status_buf[256];
     int len = re_snprintf(&(status_buf[0]), 255, "%H", call_status, call);
     if (len != -1) {
         status_buf[len] = '\0';
     } else {
-        LOGE("failed to get call status\n");
+        LOGE("failed to get status of call %s\n", native_call);
         status_buf[0] = '\0';
     }
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, status_buf);
 }
 
