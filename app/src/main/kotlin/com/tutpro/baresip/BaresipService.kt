@@ -56,6 +56,10 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        // Setting this when call is established, causes on some devices 3-4 sec delay
+        // to hearing of audio
+        am.mode = AudioManager.MODE_IN_COMMUNICATION
+
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_RINGTONE)
         rt = RingtoneManager.getRingtone(applicationContext, rtUri)
@@ -161,6 +165,8 @@ class BaresipService: Service() {
 
                 if (Config.variable("dyn_dns")[0] == "yes")
                     Config.remove("dns_server")
+
+                Log.d(LOG_TAG, "AudioManager mode is ${am.mode}")
 
             }
 
@@ -343,8 +349,6 @@ class BaresipService: Service() {
                         updateStatusNotification()
                     }
                     "call ringing" -> {
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -415,12 +419,8 @@ class BaresipService: Service() {
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                         CallHistory.save(filesPath)
                         call.hasHistory = true
-                        if (call.dir == "in")
-                            stopRinging()
-                        if (!isAudioFocused()) {
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
-                            requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
-                        }
+                        if (call.dir == "in") stopRinging()
+                        if (!isAudioFocused()) requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                         if (callVolume != 0) {
                             origCallVolume = am.getStreamVolume(am.mode)
                             am.setStreamVolume(am.mode,
@@ -500,8 +500,7 @@ class BaresipService: Service() {
                             return
                         }
                         Log.d(LOG_TAG, "AoR $aor call $callp is closed")
-                        if (call.status == "incoming")
-                            stopRinging()
+                        if (call.status == "incoming") stopRinging()
                         calls.remove(call)
                         if (!call.hasHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, false))
@@ -515,7 +514,6 @@ class BaresipService: Service() {
                                 origCallVolume = -1
                             }
                             Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
-                            am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             speakerPhone = false
                         }
@@ -691,7 +689,7 @@ class BaresipService: Service() {
             }
             @TargetApi(26)
             if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(LOG_TAG, "Audio focus granted")
+                Log.d(LOG_TAG, "Audio focus granted for stream $streamType")
             } else {
                 Log.d(LOG_TAG, "Audio focus denied")
                 audioFocusRequest = null
@@ -699,7 +697,7 @@ class BaresipService: Service() {
         } else {
             if (am.requestAudioFocus(null, streamType, AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(LOG_TAG, "Audio focus granted")
+                Log.d(LOG_TAG, "Audio focus granted for stream $streamType")
                 audioFocused = true
             } else {
                 Log.d(LOG_TAG, "Audio focus denied")
@@ -751,6 +749,7 @@ class BaresipService: Service() {
             if (rt.isPlaying) rt.stop()
         }
         abandonAudioFocus()
+        am.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
     private fun cleanService() {
