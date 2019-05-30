@@ -1118,6 +1118,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     holdButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
+                    dtmf.isEnabled = true
                     dtmf.requestFocus()
                     if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
                     dtmfWatcher = call.dtmfWatcher
