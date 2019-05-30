@@ -17,7 +17,7 @@ object Config {
             write = true
         }
         if (!config.contains(Regex("ausrc_format s16"))) {
-            config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\n"
+            config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
             write = true
         }
         if (!config.contains(Regex("module[ ]+g7221.so"))) {
