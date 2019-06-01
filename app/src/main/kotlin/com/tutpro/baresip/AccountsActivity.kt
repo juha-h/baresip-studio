@@ -20,6 +20,7 @@ class AccountsActivity : AppCompatActivity() {
     internal lateinit var alAdapter: AccountListAdapter
     internal var aor = ""
     internal var password = ""
+    internal var fromAorSpinner = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,11 +70,20 @@ class AccountsActivity : AppCompatActivity() {
 
         val accp = intent.getStringExtra("accp")
         if (accp != "") {
+            fromAorSpinner = true
             val i = Intent(this, AccountActivity::class.java)
             val b = Bundle()
             b.putString("accp", accp)
             i.putExtras(b)
-            startActivity(i)
+            startActivityForResult(i, 1)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (fromAorSpinner) {
+            val i = Intent()
+            setResult(Activity.RESULT_OK, i)
+            finish()
         }
     }
 

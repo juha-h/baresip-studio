@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -373,12 +375,16 @@ class AccountActivity : AppCompatActivity() {
 
             if (regCheck.isChecked) Api.ua_register(UserAgent.uas()[uaIndex].uap)
 
+            val i = Intent()
+            setResult(Activity.RESULT_OK, i)
             finish()
             return true
 
         } else if (item.itemId == android.R.id.home) {
 
             Log.d("Baresip", "Back array was pressed at Account")
+            val i = Intent()
+            setResult(Activity.RESULT_OK, i)
             finish()
             return true
 
