@@ -5,8 +5,7 @@ import android.app.*
 import android.app.Notification.VISIBILITY_PUBLIC
 import android.content.*
 import android.media.*
-import android.net.ConnectivityManager
-import android.net.LinkProperties
+import android.net.*
 import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.os.PowerManager
@@ -18,8 +17,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import android.support.v4.content.ContextCompat
-import android.net.Network
-import android.net.NetworkRequest
 import android.provider.Settings
 
 import java.io.File
@@ -731,22 +728,31 @@ class BaresipService: Service() {
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
         requestAudioFocus(AudioManager.STREAM_RING)
-        rt.play()
-        rtTimer = Timer()
-        rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                if (!rt.isPlaying()) {
-                    rt.play()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            rt.isLooping = true
+            rt.play()
+        } else {
+            rt.play()
+            rtTimer = Timer()
+            rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    if (!rt.isPlaying()) {
+                        rt.play()
+                    }
                 }
-            }
-        }, 1000 * 1, 1000 * 1)
+            }, 1000 * 1, 1000 * 1)
+        }
     }
 
     private fun stopRinging() {
-        if (rtTimer != null) {
-            rtTimer!!.cancel()
-            rtTimer = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (rt.isPlaying) rt.stop()
+        } else {
+            if (rtTimer != null) {
+                rtTimer!!.cancel()
+                rtTimer = null
+                if (rt.isPlaying) rt.stop()
+            }
         }
         abandonAudioFocus()
         am.mode = AudioManager.MODE_IN_COMMUNICATION
