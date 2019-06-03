@@ -21,7 +21,6 @@ import android.widget.*
 import android.view.*
 
 import kotlin.collections.ArrayList
-import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
