@@ -1,2 +1,1 @@
-SIP User Agent app for Android based on baresip library
-
+VoIP User Agent app for Android based on baresip SIP library
