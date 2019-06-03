@@ -1236,6 +1236,8 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
     if (len == -1) {
         LOGE("failed to get audio codecs of call %s\n", native_call);
         codec_buf[0] = '\0';
+    } else {
+        codec_buf[len] = '\0';
     }
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, codec_buf);
@@ -1318,11 +1320,12 @@ Java_com_tutpro_baresip_Api_audio_1codecs(JNIEnv *env, jobject thiz)
         if (len == -1) {
             LOGE("failed to print codec to buffer\n");
             codec_buf[0] = '\0';
-            break;
+            return (*env)->NewStringUTF(env, codec_buf);
         }
         start = start + len;
         left = left - len;
     }
+    *start = '\0';
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
