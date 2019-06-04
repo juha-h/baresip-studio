@@ -138,19 +138,19 @@ class BaresipService: Service() {
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
                         Log.d(LOG_TAG, "Asset '$a' already copied")
-                        if (a == "config") {
-                            var dnsServers = listOf<InetAddress>()
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                val activeNetwork = cm.activeNetwork
-                                if (activeNetwork != null) {
-                                    dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
-                                    Log.d(LOG_TAG, "DNS Servers = $dnsServers")
-                                } else {
-                                    Log.d(LOG_TAG, "No active network!")
-                                }
+                    }
+                    if (a == "config") {
+                        var dnsServers = listOf<InetAddress>()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            val activeNetwork = cm.activeNetwork
+                            if (activeNetwork != null) {
+                                dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
+                                Log.d(LOG_TAG, "DNS Servers = $dnsServers")
+                            } else {
+                                Log.d(LOG_TAG, "No active network!")
                             }
-                            Config.initialize(dnsServers)
                         }
+                        Config.initialize(dnsServers)
                     }
                 }
 
