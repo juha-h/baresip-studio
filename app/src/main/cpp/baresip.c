@@ -108,8 +108,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 {
     const char *event;
     char event_buf[256];
-    char ua_buf[256];
-    char call_buf[256];
+    char ua_buf[32];
+    char call_buf[32];
+    int len;
 
     struct player *player = baresip_player();
 
@@ -119,45 +120,45 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
-            re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
             break;
         case UA_EVENT_REGISTER_FAIL:
-            re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
             if (list_count(ua_calls(ua)) > 1) {
                 play = mem_deref(play);
                 (void)play_file(&play, player, "callwaiting.wav", 3);
             }
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
             (void)play_file(&play, player, "ringback.wav", -1);
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
             break;
         case UA_EVENT_CALL_ESTABLISHED:
             play = mem_deref(play);
-            re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '0')
-                re_snprintf(event_buf, sizeof event_buf, "call secure");
+                len = re_snprintf(event_buf, sizeof event_buf, "call secure");
             else if (prm[0] == '1')
-                re_snprintf(event_buf, sizeof event_buf, "call verify,%s", prm+2);
+                len = re_snprintf(event_buf, sizeof event_buf, "call verify,%s", prm+2);
             else if (prm[0] == '2')
-                re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm+2);
+                len = re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm+2);
             else
-                re_snprintf(event_buf, sizeof event_buf, "%s", "unknown menc event");
+                len = re_snprintf(event_buf, sizeof event_buf, "%s", "unknown menc event");
             break;
         case UA_EVENT_CALL_TRANSFER:
-            re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
             break;
         case UA_EVENT_CALL_TRANSFER_FAILED:
-            re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
             break;
         case UA_EVENT_CALL_CLOSED:
             play = mem_deref(play);
@@ -168,10 +169,10 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 				    (void)play_file(&play, player, tone, 1);
 			    }
 		    }
-            re_snprintf(event_buf, sizeof event_buf, "call closed,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s", prm);
             break;
         case UA_EVENT_MWI_NOTIFY:
-            re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
         case UA_EVENT_AUDIO_ERROR:
             mem_deref(call);
@@ -179,6 +180,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         default:
             goto out;
     }
+
+    if (len == -1) {
+        LOGE("failed to print event to buffer\n");
+        goto out;
+    }
+
     event = event_buf;
 
     BaresipContext *pctx = (BaresipContext*)(&g_ctx);
@@ -221,7 +228,10 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
 
     LOGD("got message '%.*s' from peer '%.*s'", (int)mbuf_get_left(body), mbuf_buf(body),
          (int)peer->l, peer->p);
-
+    if (snprintf(peer_buf, 256, "%.*s", (int)peer->l, peer->p) >= 256) {
+        LOGE("message peer is too long (max 255 charcaters)\n");
+        return;
+    }
     BaresipContext *pctx = (BaresipContext*)(&g_ctx);
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
@@ -238,7 +248,6 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
                                              "(Ljava/lang/String;Ljava/lang/String;[B)V");
     sprintf(ua_buf, "%lu", (unsigned long)ua);
     jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-    sprintf(peer_buf, "%.*s", (int)peer->l, peer->p);
     jstring javaPeer = (*env)->NewStringUTF(env, peer_buf);
     jbyteArray javaMsg;
     size = mbuf_get_left(body);
@@ -448,7 +457,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     LOGD("adding %u accounts", list_count(uag_list()));
-    char ua_buf[256];
+    char ua_buf[32];
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
         ua = le->data;
@@ -666,10 +675,11 @@ JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thiz, jstring javaAcc,
                                                     jint ix) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     const struct list *codecl;
     char codec_buf[32];
+    int len;
     struct le *le;
     if (acc) {
         codecl = account_aucodecl(acc);
@@ -680,7 +690,11 @@ Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thi
                 if (i > ix) break;
                 if (i == ix) {
                     const struct aucodec *ac = le->data;
-                    re_snprintf(codec_buf, sizeof codec_buf, "%s/%u/%u", ac->name, ac->srate, ac->ch);
+                    len = re_snprintf(codec_buf, sizeof codec_buf, "%s/%u/%u", ac->name, ac->srate, ac->ch);
+                    if (len == -1) {
+                        LOGE("failed to print audio codec to buffer\n");
+                        codec_buf[0] = '\0';
+                    }
                     break;
                 }
             }
@@ -938,10 +952,15 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring javaUri
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
     int res = ua_alloc(&ua, uri);
-    (*env)->ReleaseStringUTFChars(env, javaUri, uri);
-    char ua_buf[64];
+    char ua_buf[32];
     ua_buf[0] = '\0';
-    if (res == 0) sprintf(ua_buf, "%lu", (unsigned long)ua);
+    if (res == 0) {
+        sprintf(ua_buf, "%lu", (unsigned long)ua);
+        LOGD("allocated ua '%lu'\n", (unsigned long)ua);
+    } else {
+        LOGE("failed to allocate ua '%s'\n", uri);
+    }
+    (*env)->ReleaseStringUTFChars(env, javaUri, uri);
     return (*env)->NewStringUTF(env, ua_buf);
 }
 
@@ -951,6 +970,7 @@ Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jstring java
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    LOGD("registering UA '%s'\n", native_ua);
     return ua_register(ua);
 }
 
@@ -977,6 +997,7 @@ Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jstri
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    LOGD("updating account of ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     return ua_update_account(ua);
 }
@@ -997,7 +1018,7 @@ Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jstring javaU
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     struct account *acc;
-    char acc_buf[64];
+    char acc_buf[32];
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     acc_buf[0] = '\0';
     if (ua) {
@@ -1072,7 +1093,7 @@ Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaU
     int err;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_uri = (*env)->GetStringUTFChars(env, javaURI, 0);
-    char call_buf[64];
+    char call_buf[32];
     LOGD("connecting ua %s to %s\n", native_ua, native_uri);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     re_thread_enter();
@@ -1097,7 +1118,7 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
     int err;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_xcall = (*env)->GetStringUTFChars(env, javaXCall, 0);
-    char call_buf[64];
+    char call_buf[32];
     LOGD("allocating new call for ua %s xcall %s\n", native_ua, native_xcall);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     xcall = (struct call *)strtoul(native_xcall, NULL, 10);
@@ -1236,8 +1257,6 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
     if (len == -1) {
         LOGE("failed to get audio codecs of call %s\n", native_call);
         codec_buf[0] = '\0';
-    } else {
-        codec_buf[len] = '\0';
     }
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, codec_buf);
@@ -1246,12 +1265,10 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     char status_buf[256];
     int len = re_snprintf(&(status_buf[0]), 255, "%H", call_status, call);
-    if (len != -1) {
-        status_buf[len] = '\0';
-    } else {
+    if (len == -1) {
         LOGE("failed to get status of call %s\n", native_call);
         status_buf[0] = '\0';
     }
