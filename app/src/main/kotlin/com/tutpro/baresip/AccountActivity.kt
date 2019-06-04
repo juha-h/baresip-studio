@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_account.*
 class AccountActivity : AppCompatActivity() {
 
     internal lateinit var acc: Account
+    internal lateinit var ua: UserAgent
     internal lateinit var displayName: EditText
     internal lateinit var aor: String
     internal lateinit var authUser: EditText
@@ -39,6 +40,7 @@ class AccountActivity : AppCompatActivity() {
         acc = Account.find(intent.getStringExtra("accp"))!!
         aor = acc.aor
         uaIndex = UserAgent.findAorIndex(aor)!!
+        ua = UserAgent.uas()[uaIndex]
 
         setTitle(aor.replace("sip:", ""))
 
@@ -257,7 +259,6 @@ class AccountActivity : AppCompatActivity() {
                 if (acc.regint != 3600) newRegint = 3600
             } else {
                 if (acc.regint != 0) {
-                    val ua = UserAgent.uas()[uaIndex]
                     Api.ua_unregister(ua.uap)
                     UserAgent.updateStatus(ua, R.drawable.dot_yellow)
                     newRegint = 0
@@ -369,11 +370,11 @@ class AccountActivity : AppCompatActivity() {
 
             if (save) {
                 AccountsActivity.saveAccounts()
-                if (Api.ua_update_account(UserAgent.uas()[uaIndex].uap) != 0)
-                    Log.e("Baresip", "Failed to update UA with AoR $aor")
+                if (Api.ua_update_account(ua.uap) != 0)
+                    Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
             }
 
-            if (regCheck.isChecked) Api.ua_register(UserAgent.uas()[uaIndex].uap)
+            if (regCheck.isChecked) Api.ua_register(ua.uap)
 
             val i = Intent()
             setResult(Activity.RESULT_OK, i)
