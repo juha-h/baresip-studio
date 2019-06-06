@@ -109,7 +109,9 @@ class ContactsActivity : AppCompatActivity() {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
                     val name = parts[1]
-                    val uri = parts[2].trim().substringAfter("<").substringBefore(">")
+                    var uri = parts[2].trim()
+                    if (uri.startsWith("<"))
+                        uri = uri.substringAfter("<").substringBefore(">")
                     // Currently no need to make baresip aware of the contact
                     // Api.contact_add("\"$name\" $uri")
                     Contact.contacts().add(Contact(name, uri))
@@ -127,9 +129,9 @@ class ContactsActivity : AppCompatActivity() {
             return name
         }
 
-        fun nameExists(name: String): Boolean {
+        fun nameExists(name: String, ignoreCase: Boolean): Boolean {
             for (c in Contact.contacts())
-                if (c.name.equals(name, ignoreCase = true)) return true
+                if (c.name.equals(name, ignoreCase = ignoreCase)) return true
             return false
         }
 
