@@ -96,7 +96,7 @@ class ContactsActivity : AppCompatActivity() {
         fun saveContacts(path: File, file: String): Boolean {
             var contents = ""
             for (c in Contact.contacts())
-                contents += "\"${c.name}\" ${c.uri}\n"
+                contents += "\"${c.name}\" <${c.uri}>\n"
             return Utils.putFileContents(File(path, file), contents)
         }
 
@@ -109,7 +109,7 @@ class ContactsActivity : AppCompatActivity() {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
                     val name = parts[1]
-                    val uri = parts[2].trim()
+                    val uri = parts[2].trim().substringAfter("<").substringBefore(">")
                     // Currently no need to make baresip aware of the contact
                     // Api.contact_add("\"$name\" $uri")
                     Contact.contacts().add(Contact(name, uri))
