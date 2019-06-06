@@ -1,0 +1,1 @@
+- Surround contact URIs between < and > only when contacts are saved to file.
