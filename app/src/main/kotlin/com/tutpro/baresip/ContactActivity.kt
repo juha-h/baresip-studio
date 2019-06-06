@@ -62,8 +62,13 @@ class ContactActivity : AppCompatActivity() {
                         String.format(getString(R.string.invalid_contact), newName))
                 return false
             }
-            if ((new || (Contact.contacts()[index].name != newName)) &&
-                    ContactsActivity.nameExists(newName)) {
+            var alert = false
+            if (new)
+                alert = ContactsActivity.nameExists(newName, true)
+            else
+                alert = (Contact.contacts()[index].name != newName) &&
+                        ContactsActivity.nameExists(newName, false)
+            if (alert) {
                 Utils.alertView(this, getString(R.string.error),
                         String.format(getString(R.string.contact_already_exists), newName))
                 return false
