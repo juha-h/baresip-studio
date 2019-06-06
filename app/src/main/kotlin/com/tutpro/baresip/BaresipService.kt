@@ -119,7 +119,7 @@ class BaresipService: Service() {
                 val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
                 fl = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
 
-                val assets = arrayOf("accounts", "contacts", "config", "busy.wav", "callwaiting.wav",
+                val assets = arrayOf("accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
                         "error.wav", "notfound.wav", "ring.wav", "ringback.wav")
                 var file = File(filesPath)
                 if (!file.exists()) {
