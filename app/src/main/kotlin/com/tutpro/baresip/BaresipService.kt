@@ -53,9 +53,6 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        // Setting this when call is established, causes on some devices 3-4 sec delay
-        // to hearing of audio
-        am.mode = AudioManager.MODE_IN_COMMUNICATION
 
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_RINGTONE)
@@ -75,10 +72,12 @@ class BaresipService: Service() {
                         Log.d(LOG_TAG, "Network '$network' is available")
                         // This is followed by onLinkPropertiesChanged
                     }
+
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(LOG_TAG, "Network '$network' is lost")
                     }
+
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
                         Log.d(LOG_TAG, "Network $network link properties changed")
@@ -154,7 +153,7 @@ class BaresipService: Service() {
                     }
                 }
 
-                ContactsActivity.restoreContacts(applicationContext.filesDir)
+                ContactsActivity.restoreContacts(applicationContext.filesDir, "contacts")
 
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 isServiceRunning = true
@@ -162,9 +161,6 @@ class BaresipService: Service() {
 
                 if (Config.variable("dyn_dns")[0] == "yes")
                     Config.remove("dns_server")
-
-                Log.d(LOG_TAG, "AudioManager mode is ${am.mode}")
-
             }
 
             "Call Show", "Call Answer" -> {
@@ -236,8 +232,8 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.saveUaMessage(ua.account.aor,
-                        intent.getStringExtra("time").toLong(),
-                        applicationContext.filesDir.absolutePath)
+                            intent.getStringExtra("time").toLong(),
+                            applicationContext.filesDir.absolutePath)
                 nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
             }
 
@@ -345,7 +341,11 @@ class BaresipService: Service() {
                         status[account_index] = R.drawable.dot_yellow
                         updateStatusNotification()
                     }
-                    "call ringing" -> {
+                    "call progress", "call ringing" -> {
+                        if (!isAudioFocused()) {
+                            requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
+                            setCallVolume()
+                        }
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -356,7 +356,7 @@ class BaresipService: Service() {
                             CallHistory.save(filesPath)
                             ua.account.missedCalls = true
                             if (!Utils.isVisible())
-                               return
+                                return
                             newEvent = "call rejected"
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
@@ -416,15 +416,13 @@ class BaresipService: Service() {
                         CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                         CallHistory.save(filesPath)
                         call.hasHistory = true
-                        if (call.dir == "in") stopRinging()
-                        if (!isAudioFocused()) requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
-                        if (callVolume != 0) {
-                            origCallVolume = am.getStreamVolume(am.mode)
-                            am.setStreamVolume(am.mode,
-                                    (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
-                                    0)
-                            Log.d(LOG_TAG, "Original/new call volume of stream ${am.mode} is " +
-                                    "$origCallVolume/${am.getStreamVolume(am.mode)}")
+                        if (call.dir == "in") {
+                            stopRinging()
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        }
+                        if (!isAudioFocused()) {
+                            requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
+                            setCallVolume()
                         }
                     }
                     "call verified", "call secure" -> {
@@ -450,8 +448,8 @@ class BaresipService: Service() {
                             val intent = Intent(this, BaresipService::class.java)
                             intent.action = "Transfer Show"
                             intent.putExtra("uap", uap)
-                                .putExtra("callp", callp)
-                                .putExtra("uri", ev[1])
+                                    .putExtra("callp", callp)
+                                    .putExtra("uri", ev[1])
                             val pi = PendingIntent.getService(this, TRANSFER_REQ_CODE,
                                     intent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
@@ -472,8 +470,8 @@ class BaresipService: Service() {
                             val acceptIntent = Intent(this, BaresipService::class.java)
                             acceptIntent.action = "Transfer Accept"
                             acceptIntent.putExtra("uap", uap)
-                                .putExtra("callp", callp)
-                                .putExtra("uri", ev[1])
+                                    .putExtra("callp", callp)
+                                    .putExtra("uri", ev[1])
                             val acceptPendingIntent = PendingIntent.getService(this,
                                     ACCEPT_REQ_CODE, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val denyIntent = Intent(this, BaresipService::class.java)
@@ -506,11 +504,8 @@ class BaresipService: Service() {
                         }
                         if (Call.calls().size == 0) {
                             abandonAudioFocus()
-                            if (origCallVolume != -1) {
-                                am.setStreamVolume(am.mode, origCallVolume, 0)
-                                origCallVolume = -1
-                            }
-                            Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
+                            resetCallVolume()
+                            am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             speakerPhone = false
                         }
@@ -711,7 +706,6 @@ class BaresipService: Service() {
     }
 
     private fun abandonAudioFocus() {
-        Log.d(LOG_TAG, "Abandonin audio focus")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (audioFocusRequest != null) {
                 am.abandonAudioFocusRequest(audioFocusRequest!!)
@@ -723,6 +717,8 @@ class BaresipService: Service() {
                 audioFocused = false
             }
         }
+        if (isAudioFocused())
+            Log.w(LOG_TAG, "Failed to abandon audio focus")
     }
 
     private fun startRinging() {
@@ -755,7 +751,25 @@ class BaresipService: Service() {
             }
         }
         abandonAudioFocus()
-        am.mode = AudioManager.MODE_IN_COMMUNICATION
+    }
+
+    private fun setCallVolume() {
+        if (callVolume != 0) {
+            origCallVolume = am.getStreamVolume(am.mode)
+            am.setStreamVolume(am.mode,
+                    (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
+                    0)
+            Log.d(LOG_TAG, "Original/new call volume of stream ${am.mode} is " +
+                    "$origCallVolume/${am.getStreamVolume(am.mode)}")
+        }
+    }
+
+    private fun resetCallVolume() {
+        if (origCallVolume != -1) {
+            am.setStreamVolume(am.mode, origCallVolume, 0)
+            origCallVolume = -1
+        }
+        Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
     }
 
     private fun cleanService() {

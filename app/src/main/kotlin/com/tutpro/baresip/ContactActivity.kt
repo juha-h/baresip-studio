@@ -98,7 +98,7 @@ class ContactActivity : AppCompatActivity() {
             }
 
             Contact.contacts().sortBy { Contact -> Contact.name }
-            ContactsActivity.saveContacts(applicationContext.filesDir)
+            ContactsActivity.saveContacts(applicationContext.filesDir, "contacts")
 
             i.putExtra("name", newName)
             setResult(Activity.RESULT_OK, i)
