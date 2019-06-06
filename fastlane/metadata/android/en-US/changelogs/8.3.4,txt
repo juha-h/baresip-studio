@@ -1,0 +1,5 @@
+- Use communication mode only when call is (being) established.
+- Introduced 2.5 sec delay to placing of a call in order to avoid loss of
+  audio at the beginning of call.
+- Fixed initializing default contacts when baresip is started the first time.
+- Clear call URI when call is closed.

@@ -57,7 +57,7 @@ class ContactsActivity : AppCompatActivity() {
         val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         when (item.itemId) {
             R.id.export_contacts -> {
-                if (saveContacts(dir))
+                if (saveContacts(dir, "contacts.bs"))
                     Utils.alertView(this, "",
                             getString(R.string.exported_contacts))
                 else
@@ -65,11 +65,11 @@ class ContactsActivity : AppCompatActivity() {
                             getString(R.string.export_error))
             }
             R.id.import_contacts -> {
-                if (restoreContacts(dir)) {
+                if (restoreContacts(dir, "contacts.bs")) {
                     Utils.alertView(this, "",
                             getString(R.string.imported_contacts))
                     clAdapter.notifyDataSetChanged()
-                    saveContacts(applicationContext.filesDir)
+                    saveContacts(applicationContext.filesDir, "contacts")
                 } else
                     Utils.alertView(this,getString(R.string.error),
                             getString(R.string.import_error))
@@ -93,15 +93,15 @@ class ContactsActivity : AppCompatActivity() {
 
     companion object {
 
-        fun saveContacts(path: File): Boolean {
+        fun saveContacts(path: File, file: String): Boolean {
             var contents = ""
             for (c in Contact.contacts())
                 contents += "\"${c.name}\" ${c.uri}\n"
-            return Utils.putFileContents(File(path, "contacts.bs"), contents)
+            return Utils.putFileContents(File(path, file), contents)
         }
 
-        fun restoreContacts(path: File): Boolean {
-            val content = Utils.getFileContents(File(path, "contacts.bs"))
+        fun restoreContacts(path: File, file: String): Boolean {
+            val content = Utils.getFileContents(File(path, file))
             if (content == "Failed") return false
             Api.contacts_remove()
             Contact.contacts().clear()

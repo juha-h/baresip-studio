@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.CountDownTimer
+import android.os.Handler
 import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
@@ -257,11 +258,25 @@ class MainActivity : AppCompatActivity() {
                             uri = "$uri@$host"
                         }
                     }
-                    if (!Utils.checkSipUri(uri))
+                    if (!Utils.checkSipUri(uri)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 "${getString(R.string.invalid_sip_uri)} '$uri'")
-                    else
-                        call(ua, uri, "outgoing")
+                    } else {
+                        // Set audio mode to MODE_IN_COMMUNICATION and wait 2.5 sec before
+                        // placing to call in order to avoid missing audio from callee due to
+                        // a bug in many Android devices.
+                        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        callButton.visibility = View.INVISIBLE
+                        hangupButton.visibility = View.VISIBLE
+                        Handler().postDelayed({
+                            if (!call(ua, uri, "outgoing")) {
+                                am.mode = AudioManager.MODE_NORMAL
+                                callButton.visibility = View.VISIBLE
+                                hangupButton.visibility = View.INVISIBLE
+                            }
+                        }, 2500)
+                    }
                 } else {
                     val latest = CallHistory.aorLatestHistory(aor)
                     if (latest != null)
@@ -976,12 +991,12 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun call(ua: UserAgent, uri: String, status: String) {
+    private fun call(ua: UserAgent, uri: String, status: String): Boolean {
         if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(applicationContext,
                     getString(R.string.no_microphone_permission), Toast.LENGTH_SHORT).show()
-            return
+            return false
         }
         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
             spinToAor(ua.account.aor)
@@ -990,9 +1005,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
             Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
             showCall(ua)
+            return true
         } else {
             Log.e("Baresip", "ua_connect ${ua.uap}/$uri failed")
-            callButton.visibility = View.VISIBLE
+            return false
         }
     }
 
@@ -1040,6 +1056,7 @@ class MainActivity : AppCompatActivity() {
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
             callTitle.text = getString(R.string.outgoing_call_to_dots)
+            callUri.text.clear()
             callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
             callUri.isFocusableInTouchMode = true
