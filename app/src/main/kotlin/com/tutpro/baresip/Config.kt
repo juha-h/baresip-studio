@@ -126,6 +126,6 @@ object Config {
             else
                 servers = "${servers},${address}"
         }
-        return Api.dnsc_srv_set(servers)
+        return Api.net_use_nameserver(servers)
     }
 }

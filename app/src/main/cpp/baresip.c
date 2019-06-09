@@ -1379,13 +1379,13 @@ Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint leve
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_dnsc_1srv_1set(JNIEnv *env, jobject thiz, jstring javaServers) {
+Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers) {
     const char *native_servers = (*env)->GetStringUTFChars(env, javaServers, 0);
     char servers[256];
     char *server;
     struct sa nsv[NET_MAX_NS];
-	uint32_t count = 0;
-	char *comma;
+    uint32_t count = 0;
+    char *comma;
     int err;
     LOGD("setting dns servers '%s'\n", native_servers);
     if (str_len(native_servers) > 255) {
@@ -1413,8 +1413,7 @@ Java_com_tutpro_baresip_Api_dnsc_1srv_1set(JNIEnv *env, jobject thiz, jstring ja
         }
         count++;
     }
-    (void)dnsc_srv_set(net_dnsc(baresip_network()), nsv, count);
-    return 0;
+    return net_use_nameserver(net_dnsc(baresip_network()), nsv, count);
 }
 
 JNIEXPORT void JNICALL

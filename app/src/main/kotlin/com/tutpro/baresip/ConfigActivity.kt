@@ -172,7 +172,7 @@ class ConfigActivity : AppCompatActivity() {
                     for (server in dnsServers.split(","))
                         Config.add("dns_server", server)
                     Config.add("dyn_dns", "no")
-                    if (Api.dnsc_srv_set(dnsServers) != 0) {
+                    if (Api.net_use_nameserver(dnsServers) != 0) {
                         Utils.alertView(this, "Notice",
                                 "Failed to set DNS servers '$dnsServers'")
                         return false
