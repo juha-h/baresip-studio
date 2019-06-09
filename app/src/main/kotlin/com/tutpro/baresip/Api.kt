@@ -31,7 +31,7 @@ object Api {
     external fun contact_add(contact: String)
     external fun contacts_remove()
     external fun log_level_set(level: Int)
-    external fun dnsc_srv_set(servers: String): Int
+    external fun net_use_nameserver(servers: String): Int
     external fun net_debug()
     external fun module_load(module: String): Int
     external fun module_unload(module: String)
