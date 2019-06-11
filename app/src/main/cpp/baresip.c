@@ -1413,7 +1413,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
         }
         count++;
     }
-    return net_use_nameserver(net_dnsc(baresip_network()), nsv, count);
+    return net_use_nameserver(baresip_network(), nsv, count);
 }
 
 JNIEXPORT void JNICALL
