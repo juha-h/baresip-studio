@@ -39,7 +39,7 @@ static int vprintf_null(const char *p, size_t size, void *arg)
     return 0;
 }
 
-static net_debug_log() {
+static void net_debug_log() {
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
@@ -49,7 +49,7 @@ static net_debug_log() {
     }
 }
 
-static ua_print_sip_status_log() {
+static void ua_print_sip_status_log() {
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_sip_status);
