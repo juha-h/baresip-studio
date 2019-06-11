@@ -25,7 +25,7 @@
         where also issues can be reported.
         ]]>
     </string>
-    <string name="baresip_link"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
+    <string name="baresip_link" translatable="false"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
 
     <!-- Account Activity -->
     <string name="account">Account</string>
