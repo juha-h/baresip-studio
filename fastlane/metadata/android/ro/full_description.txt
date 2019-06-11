@@ -1,0 +1,12 @@
+Clientul VoIP baresip suportă apeluri vocale și mesaje SIP, notificări căsuță
+vocală în așteptare (Message Waiting Indication - MWI) și transferuri apeluri
+primite prin metoda REFER.  Vocea poate fi transmisă utilizând codecurile
+PCMU/PCMA, opus, G.722.1 și iLBC.  Securizarea conexiunii este realizată
+folosind transportul TLS precum și încapsularea media ZRTP și (DTLS) SRTP.
+
+Dezvoltarea aplicației baresip este motivată de nevoia de a avea un client
+Android SIP securizat, cu sursă deschisă ce nu depinde de servicii terțe
+proprietare de notificare.
+
+Codul sursă este disponibil la https://github.com/juha-h/baresip-studio unde
+de asemenea se pot raporta eventualele probleme.
