@@ -25,7 +25,7 @@
         where also issues can be reported.
         ]]>
     </string>
-    <string name="baresip_link"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
+    <string name="baresip_link" translatable="false"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
 
     <!-- Account Activity -->
     <string name="account">Account</string>
@@ -63,7 +63,7 @@
         Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
         Username and password are currently not supported.
     </string>
-    <string name="stun_server_default">stun.l.google.com:19302</string>
+    <string name="stun_server_default" translatable="false">stun.l.google.com:19302</string>
     <string name="media_encryption">Media Encryption</string>
     <string name="media_encryption_help">Selects media transport encryption protocol (if any).\n
         &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
