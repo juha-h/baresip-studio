@@ -37,6 +37,22 @@ object Config {
             config = "${config}opus_application voip\n"
             write = true
         }
+        if (!config.contains("opus_samplerate")) {
+            config = "${config}opus_samplerate 16000\n"
+            val accountsFile = File(BaresipService.filesPath + "/config")
+            var accounts = Utils.getFileContents(accountsFile)
+            accounts = accounts.replace("opus/48000/1", "opus/16000/1")
+            Utils.putFileContents(accountsFile, accounts)
+            write = true
+        }
+        if (!config.contains("opus_stereo")) {
+            config = "${config}opus_stereo no\n"
+            write = true
+        }
+        if (!config.contains("opus_sprop_stereo")) {
+            config = "${config}opus_sprop_stereo no\n"
+            write = true
+        }
         if (!config.contains("log_level")) {
             config = "${config}log_level 2\n"
             Api.log_level_set(2)
@@ -47,9 +63,16 @@ object Config {
             Api.log_level_set(ll)
             Log.logLevelSet(ll)
         }
-        if (!config.contains("prefer_ipv6")) {
-            config = "prefer_ipv6 no\n${config}"
+        val preferIpv6 = variable("prefer_ipv6")
+        if (preferIpv6.size > 0) {
+            remove("prefer_ipv6")
+            config = "net_prefer_ipv6 ${preferIpv6[0]}\n${config}"
             write = true
+        } else {
+            if (!config.contains("net_prefer_ipv6")) {
+                config = "net_prefer_ipv6 no\n${config}"
+                write = true
+            }
         }
         if (!config.contains("call_volume")) {
             config = "${config}call_volume 0\n"

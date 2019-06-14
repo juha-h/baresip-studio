@@ -19,7 +19,7 @@ rtcp_mux no
 jitter_buffer_delay 5-10
 rtp_stats no
 dyn_dns yes
-prefer_ipv6 no
+net_prefer_ipv6 no
 module ilbc.so
 module g7221.so
 module g711.so
@@ -39,9 +39,12 @@ module_app debug_cmd.so
 module_app mwi.so
 evdev_device /dev/input/event0
 opus_bitrate 28000
+opus_samplerate 16000
 opus_cbr no
 opus_inbandfec yes
 opus_application voip
+opus_stereo no
+opus_sprop_stereo no
 ice_turn no
 ice_debug no
 ice_nomination regular
