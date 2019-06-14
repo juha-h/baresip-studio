@@ -52,7 +52,7 @@ class ConfigActivity : AppCompatActivity() {
         listenAddr.setText(oldListenAddr)
 
         preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
-        val piCv = Config.variable("prefer_ipv6")
+        val piCv = Config.variable("net_prefer_ipv6")
         oldPreferIPv6 = if (piCv.size == 0) "no" else piCv[0]
         preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
@@ -154,7 +154,7 @@ class ConfigActivity : AppCompatActivity() {
             var preferIPv6String = "no"
             if (preferIPv6.isChecked) preferIPv6String = "yes"
             if (oldPreferIPv6 != preferIPv6String) {
-                Config.replace("prefer_ipv6", preferIPv6String)
+                Config.replace("net_prefer_ipv6", preferIPv6String)
                 save = true
                 restart = true
             }
