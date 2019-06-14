@@ -200,8 +200,7 @@
         Esimerkiksi luettelo \'8.8.8.8:53,[2001:4860:4860::8888]:53\' osoittaa Googlen julkisiin
         DNS-palvelijoihin.</string>
     <string name="aec">Akustinen kaiun poisto</string>
-    <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana. Ei ole tällä
-        hetkellä tuettu opus-koodausta käyttävissä puheluissa.</string>
+    <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana.</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
