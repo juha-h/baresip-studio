@@ -26,7 +26,6 @@
         missä voi myös raportoida virheistä.
         ]]>
     </string>
-    <string name="baresip_link"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
 
     <!-- Account Activity -->
     <string name="account">Tili</string>
@@ -74,7 +73,6 @@
         osoittaa Google:n julkiseen STUN-palvelimeen.  Käyttäjätunnusta ja
         salasanaa ei voi tällä hetkellä antaa.
     </string>
-    <string name="stun_server_default">stun.l.google.com:19302</string>
     <string name="media_encryption">Median salaus</string>
     <string name="media_encryption_help">Valitsee median salausprotokollan (vapaaehtoinen).\n
         &#8226; ZRTP (suositeltu) tarkoittaa, että
