@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
@@ -25,8 +23,9 @@
         where also issues can be reported.
         ]]>
     </string>
-    <string name="baresip_link"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
-
+    <string name="baresip_link">
+        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
+    </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
     <string name="display_name">Display Name</string>
@@ -42,8 +41,8 @@
         one that responds.  If no outbound proxy is given, requests are sent based on
         DNS NAPTR/SRV/A record lookup of callee URI hostpart. If hostpart of SIP URI is an IPv6
         address, the address must be written inside brackets [].\nExamples:\n
-        &#8226; sip:foo.com:5060;transport=tls\n
-        &#8226; sip:[2001:67c:223:777::10]:5060;transport=tcp
+        • sip:foo.com:5060;transport=tls\n
+        • sip:[2001:67c:223:777::10]:5060;transport=tcp
     </string>
     <string name="sip_uri_of_proxy_server">SIP URI of Proxy Server</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
@@ -66,13 +65,13 @@
     <string name="stun_server_default">stun.l.google.com:19302</string>
     <string name="media_encryption">Media Encryption</string>
     <string name="media_encryption_help">Selects media transport encryption protocol (if any).\n
-        &#8226; ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
+        • ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
             the call has been established.\n
-        &#8226; DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
+        • DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
             RTP/SAVPF, UDP/TLS/RTP/SAVP, or UDP/TLS/RTP/SAVPF is used if offered in incoming call.\n
-        &#8226; SRTP-MANDF means that RTP/SAVPF is offered in outgoing call and required in incoming call.\n
-        &#8226; SRTP-MAND means that RTP/SAVP is offered in outgoing call and required in incoming call.\n
-        &#8226; SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
+        • SRTP-MANDF means that RTP/SAVPF is offered in outgoing call and required in incoming call.\n
+        • SRTP-MAND means that RTP/SAVP is offered in outgoing call and required in incoming call.\n
+        • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
             if offered in incoming call.
     </string>
     <string name="voicemail_uri">Voicemail URI</string>
@@ -82,7 +81,6 @@
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
-
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="user_domain">user@domain</string>
@@ -94,24 +92,22 @@
     <string name="export_accounts">Export</string>
     <string name="exported_accounts">Exported accounts to Download folder file \'accounts.bs\'.</string>
     <string name="export_accounts_error">"Failed to export accounts to Download folder.
-        Check Apps -> baresip -> Permissions -> Storage."
+        Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage."
     </string>
     <string name="import_accounts">Import</string>
     <string name="imported_accounts">Imported accounts from Download folder.  You need to restart
         baresip.</string>
     <string name="import_accounts_error">Failed to import accounts from Download folder file.
-    Check Apps -> baresip -> Permissions -> Storage and that file \'contacts.bs\' exists in
+    Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage and that file \'contacts.bs\' exists in
         the folder and, if so, you gave correct Decrypt Password."
     </string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
-
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
     <string name="incoming_call_from">Call from</string>
     <string name="transfer_request">Call transfer request to</string>
     <string name="message_from">Message from</string>
-
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call">Call</string>
@@ -123,7 +119,6 @@
     </string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history?
     </string>
-
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
     <string name="chat_with">Chat with %1$s</string>
@@ -133,7 +128,6 @@
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>
     <string name="message_failed">Failed</string>
-
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
     <string name="today">Today</string>
@@ -143,7 +137,6 @@
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
-
     <!-- Config Activity -->
     <string name="configuration">Configuration</string>
     <string name="start_automatically">Start Automatically</string>
@@ -159,15 +152,9 @@
     <string name="prefer_ipv6">Prefer IPv6</string>
     <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
     <string name="dns_servers">DNS Servers</string>
-    <string name="dns_servers_help">Comma separated list of addresses of DNS servers.  If not given,
-        DNS server addresses are obtained dynamically from the system. Each DNS address is of form
-        \'ip:port\' or \'ip\'. If port is omitted, it defaults to 53.  If ip is an IPv6 address and
-        also port is given, ip must
-        be written inside brackets [].  As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
-        points to IPv4 and IPv6 addresses of public Google DNS servers.</string>
+    <string name="dns_servers_help">Comma separated list of addresses of DNS servers. If not given, DNS server addresses are obtained dynamically from the system. Each DNS address is of form \'ip:port\' or \'ip\'. If port is omitted, it defaults to 53. If IP is an IPv6 address and also port is given, IP must be written inside brackets []. As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\' points to IPv4 and IPv6 addresses of public Google DNS servers.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
-    <string name="aec_help">If checked, echo is tried to cancel during calls.  Does not currently
-        apply to calls using opus codec.</string>
+    <string name="aec_help">Attempted cancellation of echo during calls. Does not currently apply to calls using the Opus codec.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid value are 6000-510000. Factory default is 28000.</string>
@@ -175,13 +162,12 @@
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
-    <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
+    <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="debug">Debug</string>
-    <string name="debug_help">If checked, debug and info level log messages are available in logcat.</string>
+    <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, configuration is reset
     to factory default values.</string>
-
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>
@@ -191,7 +177,6 @@
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
@@ -200,13 +185,12 @@
     <string name="contacts_exceeded">Your maximum number of contacts %1%d has been exceeded.</string>
     <string name="exported_contacts">Exported contacts to Download folder file \'contacts.bs\'.</string>
     <string name="export_error">"Failed to export contacts to Download folder.
-        Check Apps -> baresip -> Permissions -> Storage."
+        Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage."
     </string>
     <string name="imported_contacts">Imported contacts from Download folder.</string>
-    <string name="import_error">Failed to import contacts from Download folder. Check Apps ->
-        baresip -> Permissions -> Storage and that file \'contacts.bs\' exists in the folder.
+    <string name="import_error">Failed to import contacts from Download folder. Check Apps -&gt;
+        baresip -&gt; Permissions -&gt; Storage and that file \'contacts.bs\' exists in the folder.
     </string>
-
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -226,14 +210,13 @@
     <string name="send">Send</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-    <string name="dots" translatable="false">&#8230;</string>
-
+    <string name="dots" translatable="false">…</string>
     <!-- Main Activity -->
     <string name="about">About</string>
     <string name="quit">Quit</string>
-    <string name="outgoing_call_to_dots">Outgoing call to &#8230;</string>
-    <string name="incoming_call_from_dots">Incoming call from &#8230;</string>
-    <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
+    <string name="outgoing_call_to_dots">Outgoing call to …</string>
+    <string name="incoming_call_from_dots">Incoming call from …</string>
+    <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
@@ -271,5 +254,4 @@
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
         Do you want to unverify the peer?</string>
     <string name="unverify">Unverify</string>
-
 </resources>
