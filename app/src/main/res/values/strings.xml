@@ -12,13 +12,12 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>Check that configuration default values meet your needs (click item titles for help).</li>
-            <li>Then create one or more accounts (again click item titles for help).</li>
-            <li>Peers of calls and messages can be added to contacts by long clicks.</li>
-            <li>Long clicks can also be used to remove calls, chats, messages, and contacts.</li>
-            <li>Call click when callee has not been given can be used for re-dial.</li>
+            <li>Check that configuration default values meet your needs (touch item titles for help).</li>
+            <li>Then create one or more accounts (again touch item titles for help).</li>
+            <li>Peers of calls and messages can be added to contacts by long touches.</li>
+            <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
+            <li>Touching the call icon will re-dial your last contact even if none selected.</li>
             <li>If you cannot hear the other party of a call, try to increase Media volume.</li>
-            <li>Audio echo cancellation is currently not supported when call uses Opus codec.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
