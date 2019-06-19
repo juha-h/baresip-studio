@@ -94,13 +94,13 @@
     <string name="export_accounts">Export</string>
     <string name="exported_accounts">Exported accounts to Download folder file \'accounts.bs\'.</string>
     <string name="export_accounts_error">"Failed to export accounts to Download folder.
-        Check Apps -> baresip -> Permissions -> Storage."
+        Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage."
     </string>
     <string name="import_accounts">Import</string>
     <string name="imported_accounts">Imported accounts from Download folder.  You need to restart
         baresip.</string>
     <string name="import_accounts_error">Failed to import accounts from Download folder file.
-    Check Apps -> baresip -> Permissions -> Storage and that file \'accounts.bs\' exists in
+    Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage and that file \'contacts.bs\' exists in
         the folder and, if so, you gave correct Decrypt Password."
     </string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
@@ -176,7 +176,7 @@
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
     <string name="debug">Debug</string>
-    <string name="debug_help">If checked, debug and info level log messages are available in logcat.</string>
+    <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, configuration is reset
     to factory default values.</string>
@@ -199,11 +199,11 @@
     <string name="contacts_exceeded">Your maximum number of contacts %1%d has been exceeded.</string>
     <string name="exported_contacts">Exported contacts to Download folder file \'contacts.bs\'.</string>
     <string name="export_error">"Failed to export contacts to Download folder.
-        Check Apps -> baresip -> Permissions -> Storage."
+        Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage."
     </string>
     <string name="imported_contacts">Imported contacts from Download folder.</string>
-    <string name="import_error">Failed to import contacts from Download folder. Check Apps ->
-        baresip -> Permissions -> Storage and that file \'contacts.bs\' exists in the folder.
+    <string name="import_error">Failed to import contacts from Download folder. Check Apps -&gt;
+        baresip -&gt; Permissions -&gt; Storage and that file \'contacts.bs\' exists in the folder.
     </string>
 
     <!-- Generic -->
