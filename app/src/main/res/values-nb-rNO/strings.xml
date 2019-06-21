@@ -132,7 +132,7 @@
     <string name="default_account_help">Velger denne kontoen når baresip startes.</string>
     <string name="export_accounts_error">"Klarte ikke å eksportere kontoer til nedlastingsmappe.
 \n        Sjekk Programmer → baresip → Tilganger → Lagring."</string>
-    <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"contacts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
+    <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"accounts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
     <string name="transfer_request">Samtaleoverføringsforespørsel til</string>
     <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk\?</string>
     <string name="message_failed">Mislyktes</string>
@@ -141,14 +141,14 @@
     <string name="listen_address_help">IP-adresse og port i utførelsen \"adresse:port\" som baresip lytter til for innkommende SIP-forespørsler. Hvis en IP-adresse er en IPv6-adresse, må den skrives i klammeparenteser []. IPv4-adresse 0.0.0.0 eller IPv6-adresse [::] får baresip til å lytte til alle tilgjengelige adresser. Hvis levnet tom (fabrikksforvalg), vil baresip lytte til port 5060 for alle tilgjengelige adresser.</string>
     <string name="dns_servers_help">Kommainndelt liste over adresser til DNS-tjenere. Hvis ikke angitt, vil DNS-tjeneradresser hentes dynamisk fra systemet. Hver DNS-adresse er utførelsen \"ip:port\" eller \"ip\". Hvis porten utelates, brukes forvalget 53. Hvis IP-en er en IPv6-adresse, og port også angis, må IP-en skrives i hakeparenteser []. Som etksempel, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\' peker til en IPv4-adresser og IPv6-adresser for offentlige Google DNS-tjenere.</string>
     <string name="aec">Kansellering av akustisk ekko</string>
-    <string name="aec_help">Prøver å unngå ekko under samtaler. Har foreløpig ikke innvirkning på samtaler som bruker Opus-kodek.</string>
+    <string name="aec_help">Prøver å unngå ekko under samtaler.</string>
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
     <string name="ice_lite_mode">ICE Lite-modus</string>
     <string name="ice_lite_mode_help">Bruker ICE Lite-modus.</string>
     <string name="default_call_volume">Forvalgt samtalelydstyrke</string>
     <string name="default_call_volume_help">Setter samtalelydstyrken på en skala fra 1-10.</string>
     <string name="debug">Feilretting</string>
-    <string name="debug_help">Feilrettings- og infonivå-loggmeldinger er tilgjengelige i Logcat.</string>
+    <string name="debug_help">Gjør feilrettings- og infonivå-loggmeldinger tilgjengelige i Logcat.</string>
     <string name="reset_config_help">Tilbakestiller oppsettet til fabrikkforvalgte verdier.</string>
     <string name="contact_already_exists">Kontakten \"%1$s\" finnes allerede.</string>
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>
