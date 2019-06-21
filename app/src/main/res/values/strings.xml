@@ -100,7 +100,7 @@
     <string name="imported_accounts">Imported accounts from Download folder.  You need to restart
         baresip.</string>
     <string name="import_accounts_error">Failed to import accounts from Download folder file.
-    Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage and that file \'contacts.bs\' exists in
+    Check Apps -&gt; baresip -&gt; Permissions -&gt; Storage and that file \'accounts.bs\' exists in
         the folder and, if so, you gave correct Decrypt Password."
     </string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
