@@ -70,7 +70,13 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(LOG_TAG, "Network '$network' is available")
-                        // This is followed by onLinkPropertiesChanged
+                        if (dynDns) {
+                            val linkProperties = cm.getLinkProperties(network)
+                            val dnsServers = linkProperties.dnsServers
+                            if (Config.updateDnsServers(dnsServers) != 0)
+                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                        }
+                        UserAgent.register()
                     }
 
                     override fun onLost(network: Network) {
@@ -82,7 +88,7 @@ class BaresipService: Service() {
                         super.onLinkPropertiesChanged(network, linkProperties)
                         Log.d(LOG_TAG, "Network $network link properties changed")
                         if (dynDns) {
-                            val dnsServers = linkProperties.getDnsServers()
+                            val dnsServers = linkProperties.dnsServers
                             if (Config.updateDnsServers(dnsServers) != 0)
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
