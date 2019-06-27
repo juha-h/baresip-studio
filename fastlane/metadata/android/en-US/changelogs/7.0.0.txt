@@ -2,4 +2,3 @@
 - Added "Prefer IPv6" configuration option.
 - Added "Reset to Factory Default" configuration option.
 - At Quit, make sure that also baresip task is stopped.
-

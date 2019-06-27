@@ -1,1 +1,1 @@
-- Echo cancellation is now applied also to calls using opus codec.
+- Echo cancellation is now also applied to calls using the Opus codec.

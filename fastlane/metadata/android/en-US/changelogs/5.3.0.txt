@@ -1,2 +1,2 @@
-- Added notification popup telling why call was closed
-- Fixed showing of callee URI if it contains port number or parameters
+- Added notification popup telling why call was closed.
+- Fixed showing of callee URI if it contains port number or parameters.

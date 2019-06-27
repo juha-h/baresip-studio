@@ -1,1 +1,1 @@
-- Several (mostly chat related) User Interface improvements.
+- Several user Interface improvements (mostly chat related).
