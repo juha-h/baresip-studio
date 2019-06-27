@@ -3,4 +3,3 @@
 - Simplified implementation of call transfer
 - Updated baresip launcher and status bar images
 - Un-REGISTERed UA when account is deleted
-

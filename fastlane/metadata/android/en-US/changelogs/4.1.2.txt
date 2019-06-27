@@ -1,1 +1,1 @@
-- fixed crash when empty accounts spinner is clicked
+- Fixed crash when empty accounts spinner is clicked.

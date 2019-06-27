@@ -1,6 +1,6 @@
 - Replaced text mode EditConfigActivity with graphical Config activity
 - Current configuration items are Auto Start, DNS Servers, Opus Bit Rate,
-  and ICE Lite
+and ICE Lite
 - Added ICE and Stun Server account options
 - Fixed bug in deleting of an account
 - Do not loose unsent message when chat activity is interrupted
