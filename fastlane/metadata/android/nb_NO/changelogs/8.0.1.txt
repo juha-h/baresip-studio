@@ -1,0 +1,1 @@
+- Fikset gjenoppretting av lydstyrke til opprinnelig nivå hvis forvalg lydstyrke brukes.

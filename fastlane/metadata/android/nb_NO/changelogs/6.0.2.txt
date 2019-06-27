@@ -1,0 +1,1 @@
+- Fikset kræsj når STUN-tjener er definert uten portnummer.
