@@ -1,0 +1,1 @@
+- Oppdater kontospinner også når hovedaktivitet gjenopptas uten handling.

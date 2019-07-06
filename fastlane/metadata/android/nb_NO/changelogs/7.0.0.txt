@@ -1,0 +1,4 @@
+- Tillagt støtte for IPv6 (ikke testet som følge av mangel på IPv6-nettverk).
+- Tillagt "Foretrekk IPv6"-oppsettsvalg.
+- Tillagt "Tilbakestill til fabrikkforvalg"-oppsettsvalg.
+- Ved avslutning, forsikre at baresip-oppgaven stoppes.

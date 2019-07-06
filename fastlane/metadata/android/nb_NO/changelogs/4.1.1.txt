@@ -1,0 +1,3 @@
+- Fikset kritisk feil i sjekking av lydopptakstilgang som
+forhindret ny baresip-installasjon fra å starte.
+- Små forbedringer.

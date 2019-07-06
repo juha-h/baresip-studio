@@ -1,0 +1,4 @@
+- Gi bruker merknad om mislykket registrering.
+- Tillagt samtaleinfoknapp for aktiv samtale.
+- Ikke krev "sip:"-del i utgående mellomtjener-URI.
+- Tillat domeneetikett å starte med et siffer.
