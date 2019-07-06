@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode = 76
-        versionName = '8.4.2'
+        versionName = '8.4.3'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H'
