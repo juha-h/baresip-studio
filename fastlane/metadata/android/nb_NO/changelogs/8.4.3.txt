@@ -1,0 +1,1 @@
+- Fikset visning av kontostatus, når forvalgt konto endres.

@@ -1,0 +1,6 @@
+- Tillagt mulighet for å sette konto som forvalg.
+- Vis rødt meldingsikon når det finnes uleste meldinger.
+- Spør PIN om å slippe nøkkelvakt når oppringer-URI klikkes.
+- Fikset anrop, melding og anropsvideresendingshandlinger når igangsatt fra merknader.
+- Fikset forsendelse av melding fra kontakter eller samtalehistorikk.
+- Bruk av SingleTask istedenfor SingleTop som oppstartsmodus for hovedaktivitet.

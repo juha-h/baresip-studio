@@ -1,0 +1,6 @@
+- Ikke sett lyd til kommunikasjonsmodus når anrop opprettes,
+fordi på noen enheter legger det til 3-4 sekunders forsinkelse for
+avspilling av lyd.
+- Akustisk ekkokansellering nå justerbar.
+- Skru på samtaleinfoknapp når den blir synlig.
+- Bruk forvalgt enhetsdrakt ved visning av spinnere.

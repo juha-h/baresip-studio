@@ -1,0 +1,2 @@
+- Internett lav bitratekodek (iLBC) lagt til.
+- Forbedret kontokodekutvelgelse.

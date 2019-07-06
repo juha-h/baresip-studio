@@ -1,0 +1,2 @@
+- Tillagt variabel, lytteadresse som tillater spesifisering av IP-adresse
+(eller alle adresser) og en port som baresip lytter til for SIP-forespørsler.
