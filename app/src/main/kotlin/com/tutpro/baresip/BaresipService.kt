@@ -338,19 +338,27 @@ class BaresipService: Service() {
                         else
                             status[account_index] = R.drawable.dot_green
                         updateStatusNotification()
+                        if (!Utils.isVisible())
+                            return
                     }
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
+                        if (!Utils.isVisible())
+                            return
                     }
                     "unregistering" -> {
                         status[account_index] = R.drawable.dot_yellow
                         updateStatusNotification()
+                        if (!Utils.isVisible())
+                            return
                     }
                     "call progress", "call ringing" -> {
                         if (!isAudioFocused()) {
                             requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                             setCallVolume()
+                        } else {
+                            return
                         }
                     }
                     "call incoming" -> {
@@ -430,6 +438,8 @@ class BaresipService: Service() {
                             requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                             setCallVolume()
                         }
+                        if (!Utils.isVisible())
+                            return
                     }
                     "call verified", "call secure" -> {
                         val call = Call.find(callp)
@@ -443,6 +453,8 @@ class BaresipService: Service() {
                             call.security = R.drawable.box_green
                             call.zid = ev[1]
                         }
+                        if (!Utils.isVisible())
+                            return
                     }
                     "call transfer" -> {
                         val call = Call.find(callp)
@@ -515,6 +527,8 @@ class BaresipService: Service() {
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             speakerPhone = false
                         }
+                        if (!Utils.isVisible())
+                            return
                     }
                     "transfer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
@@ -524,8 +538,6 @@ class BaresipService: Service() {
                 }
             }
         }
-        if (!Utils.isVisible())
-            return
         if (newEvent == null) newEvent = event
         val intent = Intent("service event")
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
