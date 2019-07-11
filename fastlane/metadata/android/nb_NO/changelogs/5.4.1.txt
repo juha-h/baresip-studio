@@ -1,0 +1,3 @@
+- Fjernet ubrukt baresip-moduler fra oppsett og bilbiotek.
+- Nå lar baresip-tjenesten baresip-aktivitet dø på egenhånd etter
+å ha mottatt drapsforespørsel fra den.

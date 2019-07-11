@@ -8,5 +8,5 @@ Utvikling av baresip-programmet er motivert av behovet for en sikker og
 fri SIP-brukeragent for Android, som ikke avhenger av proprietære
 dyttingsmerknadstjenester fra tredjeparter.
 
-Kildekoden er tilgjengelig fra https://github.com/juha-h/baresip-studio,
-der problemer også kan innrapporteres.
+Kildekode tilgjengelig fra https://github.com/juha-h/baresip-studio,
+der problemer kan innrapporteres.
