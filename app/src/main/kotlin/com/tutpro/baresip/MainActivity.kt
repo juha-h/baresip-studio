@@ -630,8 +630,8 @@ class MainActivity : AppCompatActivity() {
                                         ": ${ev[1]}",
                                 Toast.LENGTH_LONG).show()
                     }
-                    "call ringing" -> {
-                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL)
+                    "call ringing", "call progress" -> {
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                     }
                     "call rejected" -> {
                         if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
@@ -785,6 +785,7 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
+                        volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param.get(0).isDigit())
