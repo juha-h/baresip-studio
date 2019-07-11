@@ -4,5 +4,5 @@ connectivity becomes available or is lost.
 - Set volume controls to apply to current audio stream (may not always
 work).
 - Fixed possible crash when destroyed baresip app is started again.
-- Showed notice when account to be created already exists.
-- Added note to About text about Media volume.
+- Shown notice when account to be created already exists.
+- Added note to "About" text about media volume.
