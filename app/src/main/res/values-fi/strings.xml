@@ -47,8 +47,9 @@
         kohteen domainille tehtävien NAPTR/SRV/Animipalvelukyselyiden perusteella.
         Jos välityspalvelimen osoite SIP
         URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
-        \nEsimerkkejä:\n&#8226; sip:foo.com:5060;transport=tls\n&#8226;
-        sip:[2001:67c:223:777::10]:5060;transport=tcp\n
+\nEsimerkkejä:
+\n • sip:foo.com:5060;transport=tls
+\n • sip:[2001:67c:223:777::10]:5060;transport=tcp
     </string>
     <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">Toisen
@@ -72,22 +73,18 @@
         salasanaa ei voi tällä hetkellä antaa.
     </string>
     <string name="media_encryption">Median salaus</string>
-    <string name="media_encryption_help">Valitsee median salausprotokollan (vapaaehtoinen).\n
-        &#8226; ZRTP (suositeltu) tarkoittaa, että
-        ZRTP-salausta yritetään neuvotella sen jälkeen, kun puhelu on
-        alkanut.\n
-        &#8226; DTLS-SRTPF tarkoittaa, että
-        UDP/TLS/RTP/SAVPF-protokollaa tarjotaan lähteviin puheluihin
+    <string name="media_encryption_help">Valitsee median salausprotokollan (vapaaehtoinen).
+\n • ZRTP (suositeltu) tarkoittaa, että ZRTP-salausta yritetään neuvotella sen jälkeen, kun puhelu on alkanut.
+\n • DTLS-SRTPF tarkoittaa, että UDP/TLS/RTP/SAVPF-protokollaa tarjotaan lähteviin puheluihin
         ja että RTP/SAVP-, RTP/SAVPF-, UDP/TLS/RTP/SAVP- tai
-        UDP/TLS/RTP/SAVPF-protokollaa käytetään, jos sellaista tarjotaan
-        tulevassa puhelussa.\n
-        &#8226; SRTP-MANDF tarkoittaa, että RTP/SAVPF-protokollaa tarjotaan
-        lähtevissä puheluissa ja että se vaaditaan tulevissa puheluissa.\n
-        &#8226; SRTP-MAND takoittaa, että RTP/SAVP-protokollaa tarjotaan
-        lähteviin puheluihin ja että se vaaditaan tulevissa puheluissa.\n
-        &#8226; SRTP tarkoittaa, että RTP/AVP-protokollaa tarjotaan
+        UDP/TLS/RTP/SAVPF-protokollaa käytetään, jos sellaista tarjotaan tulevassa puhelussa.
+\n • SRTP-MANDF tarkoittaa, että RTP/SAVPF-protokollaa tarjotaan
+        lähtevissä puheluissa ja että se vaaditaan tulevissa puheluissa.
+\n • SRTP-MAND takoittaa, että RTP/SAVP-protokollaa tarjotaan
+        lähteviin puheluihin ja että se vaaditaan tulevissa puheluissa.
+\n • SRTP tarkoittaa, että RTP/AVP-protokollaa tarjotaan
         lähteviin puheluihin ja että RTP/SAVP- tai RTP/SAVPF-protokollaa
-        käytetään, jos sellaista tarjotaan tulevissa puheluissa.\n
+        käytetään, jos sellaista tarjotaan tulevissa puheluissa.
     </string>
     <string name="voicemail_uri">Puhepostin URI</string>
     <string name="voicemain_uri_help">SIP URI, jota käytetään
@@ -114,16 +111,15 @@
     Download-kansion tiedostoon \'accounts.bs\'.
     </string>
     <string name="export_accounts_error">"Tilien tallennus
-    Download-kansioon epäonnistui. Tarkista Sovellukset -> baresip ->
-    Käyttöluvat -> Tallennustila.
+    Download-kansioon epäonnistui. Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.
     </string>
     <string name="import_accounts">Palauta</string>
     <string name="imported_accounts">Tilit palautettiin
     Download-kansiosta. Sinun pitää käynnistää baresip uudelleen.
     </string>
     <string name="import_accounts_error">Tilien palauttaminen
-    Download-kansiosta epäonnistui. Tarkista Sovellukset -> baresip ->
-    Käyttöluvat -> Tallennustila ja että tiedosto \'accounts.bs\' on
+    Download-kansiosta epäonnistui. Tarkista Sovellukset → baresip →
+    Käyttöluvat → Tallennustila ja että tiedosto \'accounts.bs\' on
     kansiossa ja (jos on) että annoit oikean salasanan.
     </string>
     <string name="delete_account">Haluatko poistaa tilin
@@ -244,16 +240,15 @@
     <string name="exported_contacts">Kontaktit tallennettiin
     Download-kansion tiedostoon \'contacts.bs\'.
     </string>
-    <string name="export_error">"Kontaktien tallennus Download kansioon
-    epäonnistui. Tarkista Sovellukset -> baresip -> Käyttöluvat ->
-    Tallennustila.
+    <string name="export_error">"Kontaktien tallennus Download kansioon epäonnistui.
+    Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.
     </string>
     <string name="import_contacts">Palauta</string>
     <string name="imported_contacts">Kontaktit palautettiin Download-kansiosta.
     </string>
     <string name="import_error">Kontantien palauttaminen
-    Download-kansiosta epäonnistui. Tarkista Sovellukset -> baresip ->
-    Käyttöluvat -> Tallennustila ja että tiedosto \'contacts.bs\' on
+    Download-kansiosta epäonnistui.
+    Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tiedosto \'contacts.bs\' on
     kansiossa.
     </string>
     
