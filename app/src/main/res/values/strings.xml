@@ -188,7 +188,7 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="export_contacts">Export</string>
     <string name="import_contacts">Import</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
-    <string name="contact_already_exists">Contact \'%1$s\' already exists</string>
+    <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
 
     <!-- Contacts Activity -->

@@ -222,7 +222,7 @@
     <string name="new_contact">Uusi kontakti</string>
     <string name="contact_name">Nimi</string>
     <string name="invalid_contact">Virheellinen kontaktin nimi \'%1$s\'</string>
-    <string name="contact_already_exists">Kontakti \'%1$s\' on jo olemassa</string>
+    <string name="contact_already_exists">Kontakti \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
 
     <!-- Contacts Activity -->
