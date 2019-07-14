@@ -130,8 +130,8 @@
     <string name="voicemail_uri">Telefonsvarer-URI</string>
     <string name="voicemain_uri_help">SIP-URI for sjekk av telefonsvarermeldinger. Hvis levnet tom, vil telefonsvarermeldinger (melding venter-anvisninger) ikke bli levert.</string>
     <string name="default_account_help">Velger denne kontoen når baresip startes.</string>
-    <string name="export_accounts_error">"Klarte ikke å eksportere kontoer til nedlastingsmappe.
-\n        Sjekk Programmer → baresip → Tilganger → Lagring."</string>
+    <string name="export_accounts_error">Klarte ikke å eksportere kontoer til nedlastingsmappe.
+\n        Sjekk Programmer → baresip → Tilganger → Lagring.</string>
     <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"contacts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
     <string name="transfer_request">Samtaleoverføringsforespørsel til</string>
     <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk\?</string>
@@ -155,8 +155,8 @@
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
     <string name="contacts_exceeded">Ditt har nådd ditt maksimale antall kontakter på %1$d.</string>
     <string name="exported_contacts">Eksporterte kontakter til nedlastingsmappen i forma av filen \"contacts.bs\".</string>
-    <string name="export_error">"Klarte ikke å eksportere kontakter til nedlastingsmappen.
-\n        Sjekk Programmer → baresip → Tilganger → Lagring"</string>
+    <string name="export_error">Klarte ikke å eksportere kontakter til nedlastingsmappen.
+\n        Sjekk Programmer → baresip → Tilganger → Lagring.</string>
     <string name="imported_contacts">Importerte kontakter fra nedlastingsmappen.</string>
     <string name="import_error">Klarte ikke å importere kontakter fra nedlastingsmappen. Sjekk Programmer → baresip → Tilganger → Lagring og at filen \"contacts.bs\" finnes i mappen.</string>
     <string name="invalid_sip_uri">Ugyldig SIP URI</string>
