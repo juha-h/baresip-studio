@@ -84,7 +84,7 @@
     <string name="export_contacts">Export</string>
     <string name="import_contacts">Import</string>
     <string name="invalid_contact">Nume de contact invalid \'%1$s\'</string>
-    <string name="contact_already_exists">Contactul \'%1$s\' deja există</string>
+    <string name="contact_already_exists">Contactul \'%1$s\' deja există.</string>
     <string name="invalid_contact_uri">Adresă SIP invalidă</string>
     <string name="contacts">Contacte</string>
     <string name="contact_action_question">Doriți să apelați sau să trimiteți un mesaj către \'%1$s\'\?</string>
@@ -136,7 +136,7 @@
     <string name="listen">Ascultă</string>
     <string name="messages">Mesaje</string>
     <string name="dialpad">Tastatura virtuală</string>
-    <string name="call_already_active">Aveți deja un apel activ!</string>
+    <string name="call_already_active">Aveți deja un apel activ.</string>
     <string name="registering_failed">Înregistrarea %1$s a eșuat.</string>
     <string name="no_microphone_permission">Nu ați acordat permisiunea de acces la microfon.</string>
     <string name="verify">Verificare</string>
@@ -144,7 +144,7 @@
     <string name="transfer_query">Acceptați să transferați apelul către \'%1$s\'\?</string>
     <string name="call_failed">Apelul a eșuat</string>
     <string name="call_closed">Apel închis</string>
-    <string name="restart_needed">Trebuie să reporniți baresip pentru a activa noua configurație!</string>
+    <string name="restart_needed">Trebuie să reporniți baresip pentru a activa noua configurație.</string>
     <string name="call_not_secure">Acest apel NU este securizat!</string>
     <string name="peer_not_verified">Acest apel este SECURIZAT, dar contactul NU este verificat!</string>
     <string name="call_is_secure">Acest apel este SECURIZAT și contactul este VERIFICAT! Doriți să anulați verificarea\?</string>
