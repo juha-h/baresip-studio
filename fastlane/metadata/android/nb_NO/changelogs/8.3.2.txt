@@ -1,0 +1,4 @@
+- Hvis kontoen åpnes fra AoR-spinneren, gå direkte til hovedaktivitet.
+- Bruk HtmlCompat til konvertering av Om-HTML til tekst (burde virke på
+alle API-nivåer).
+- Bruk ringetone-gjentagelsesmulighet på Android P+.

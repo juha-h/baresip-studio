@@ -108,7 +108,7 @@
     <string name="peer_not_verified">Denne samtalen er SIKKER, men likemannen er IKKE bekreftet!</string>
     <string name="call_is_secure">Denne samtalen er SIKKER, og likemannen er BEKREFTET! Ønsker du å avkrefte likemannen\?</string>
     <string name="unverify">Avkreft</string>
-    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt og kan brukes til å ringe tilbake.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;li&gt;Lyd-ekkokansellering støttes vanligvis ikke når samtalen gjør bruk av Opus-kodeket.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
+    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt for å ringe opp forrige samtalepartner.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
     <string name="outbound_proxies_help">SIP URI-til én eller to mellomtjenere som må brukes ved forsendelse av forespørsler. Hvis to angis, vil REGISTER-forespørsler sendes til begge, og andre forespørsler sendes til den som svarer. Hvis ingen utgående mellomtjener angis, blir forespørsler sent basert på DNS NAPTR/SRV/A-oppføringsoppslag fra ringerens URI-vertspart. Hvis vertsdelen av en SIP URI er en IPv6-adresse, må adressen skrives i hakeparenteser [].
 \nEksempler:
 \n • sip:foo.com:5060;transport=tls
@@ -130,9 +130,9 @@
     <string name="voicemail_uri">Telefonsvarer-URI</string>
     <string name="voicemain_uri_help">SIP-URI for sjekk av telefonsvarermeldinger. Hvis levnet tom, vil telefonsvarermeldinger (melding venter-anvisninger) ikke bli levert.</string>
     <string name="default_account_help">Velger denne kontoen når baresip startes.</string>
-    <string name="export_accounts_error">Klarte ikke å eksportere kontoer til nedlastingsmappe.
-\n        Sjekk Programmer → baresip → Tilganger → Lagring.</string>
-    <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"contacts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
+    <string name="export_accounts_error">"Klarte ikke å eksportere kontoer til nedlastingsmappe.
+\n        Sjekk Programmer → baresip → Tilganger → Lagring."</string>
+    <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"accounts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
     <string name="transfer_request">Samtaleoverføringsforespørsel til</string>
     <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk\?</string>
     <string name="message_failed">Mislyktes</string>
@@ -141,14 +141,14 @@
     <string name="listen_address_help">IP-adresse og port i utførelsen \"adresse:port\" som baresip lytter til for innkommende SIP-forespørsler. Hvis en IP-adresse er en IPv6-adresse, må den skrives i klammeparenteser []. IPv4-adresse 0.0.0.0 eller IPv6-adresse [::] får baresip til å lytte til alle tilgjengelige adresser. Hvis levnet tom (fabrikksforvalg), vil baresip lytte til port 5060 for alle tilgjengelige adresser.</string>
     <string name="dns_servers_help">Kommainndelt liste over adresser til DNS-tjenere. Hvis ikke angitt, vil DNS-tjeneradresser hentes dynamisk fra systemet. Hver DNS-adresse er utførelsen \"ip:port\" eller \"ip\". Hvis porten utelates, brukes forvalget 53. Hvis IP-en er en IPv6-adresse, og port også angis, må IP-en skrives i hakeparenteser []. Som etksempel, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\' peker til en IPv4-adresser og IPv6-adresser for offentlige Google DNS-tjenere.</string>
     <string name="aec">Kansellering av akustisk ekko</string>
-    <string name="aec_help">Prøver å unngå ekko under samtaler. Har foreløpig ikke innvirkning på samtaler som bruker Opus-kodek.</string>
+    <string name="aec_help">Prøver å unngå ekko under samtaler.</string>
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
     <string name="ice_lite_mode">ICE Lite-modus</string>
     <string name="ice_lite_mode_help">Bruker ICE Lite-modus.</string>
     <string name="default_call_volume">Forvalgt samtalelydstyrke</string>
     <string name="default_call_volume_help">Setter samtalelydstyrken på en skala fra 1-10.</string>
     <string name="debug">Feilretting</string>
-    <string name="debug_help">Feilrettings- og infonivå-loggmeldinger er tilgjengelige i Logcat.</string>
+    <string name="debug_help">Gjør feilrettings- og infonivå-loggmeldinger tilgjengelige i Logcat.</string>
     <string name="reset_config_help">Tilbakestiller oppsettet til fabrikkforvalgte verdier.</string>
     <string name="contact_already_exists">Kontakten \"%1$s\" finnes allerede.</string>
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>

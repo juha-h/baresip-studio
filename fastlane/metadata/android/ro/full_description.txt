@@ -9,4 +9,4 @@ Android SIP securizat, cu sursă deschisă ce nu depinde de servicii terțe
 proprietare de notificare.
 
 Codul sursă este disponibil la https://github.com/juha-h/baresip-studio unde
-de asemenea se pot raporta eventualele probleme.
+se și pot raporta eventualele probleme.

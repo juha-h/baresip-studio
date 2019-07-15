@@ -1,0 +1,3 @@
+- Gjenoppta baresip-program til aktiviteten som ble stoppet.
+- Tillagt eksempelkontakt når baresip startes for første gang.
+- Fikset visning av ny melding i sludre- og meldingslisten.

@@ -1,0 +1,3 @@
+- Varslinger nå i henhold til designretningslinjer for materielt design.
+- Forbedret språkstrengshåndtering.
+- Finsk lagt til som språkeksempel.

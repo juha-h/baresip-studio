@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- About Activity -->
     <string name="about_title">baresip sovelluksesta</string>
     <string name="about_text">
@@ -24,7 +23,6 @@
         missä voi myös raportoida virheistä.
         ]]>
     </string>
-
     <!-- Account Activity -->
     <string name="account">Tili</string>
     <string name="display_name">Tilin käyttäjän nimi</string>
@@ -95,17 +93,16 @@
     <string name="default_account_help">Jos merkitty, niin tämä tili on
         valittuna, kun baresip käynnistetään.
     </string>
-
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
     <string name="user_domain">käyttäjä@domain</string>
-    <string name="invalid_aor">Virheellinen käyttäjä@domain \'%1$s\'.</string>
+    <string name="invalid_aor">Virheellinen käyttäjä@domain \'%1$s\'</string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
     <string name="account_allocation_failure">"Uuden tilin luonti
     epäonnistui.
     </string>
     <string name="encrypt_password">Salasana</string>
-    <string name="decrypt_password">Salasana</string>    
+    <string name="decrypt_password">Salasana</string>
     <string name="export_accounts">Tallenna</string>
     <string name="exported_accounts">Tilit tallennettiin
     Download-kansion tiedostoon \'accounts.bs\'.
@@ -125,14 +122,12 @@
     <string name="delete_account">Haluatko poistaa tilin
     \'%1$s\'?
     </string>
-
     <!-- Baresip Service -->
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
     <string name="transfer_request">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
-
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
@@ -145,7 +140,6 @@
         %2$s puheluhistoriasta?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta?</string>
-
     <!-- Chat Activity -->
     <string name="chat">Viestiketju</string>
     <string name="chat_with">Viestiketju %1$s</string>
@@ -156,7 +150,6 @@
     <string name="add_contact">Lisää kontakti</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
-
     <!-- Chats Activity -->
     <string name="chats">Viestiketjut</string>
     <string name="today">Tänään</string>
@@ -168,7 +161,6 @@
     <string name="short_chat_question">Haluatko poistaa viestiketjun
     \'%1$s\'?
     </string>
-
     <!-- Config Activity -->
     <string name="configuration">Konfiguraatio</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
@@ -203,20 +195,17 @@
     <string name="ice_lite_mode">ICE Lite-moodi</string>
     <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
     käytössä.
-    </string> 
+    </string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
-    asteikolla 1&#8211;10.
+    asteikolla 1–10.
     </string>
     <string name="debug">Lokiviestit</string>
-    <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja
-    info-tason logcat lokiviestejä.
-    </string>
+    <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="reset_config">Palauta oletuskonfiguraatio</string>
     <string name="reset_config_help">Jos merkitty, oletuskonfiguraatio palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
-
     <!-- Contact Activity -->
     <string name="contact">Kontakti</string>
     <string name="new_contact">Uusi kontakti</string>
@@ -224,7 +213,6 @@
     <string name="invalid_contact">Virheellinen kontaktin nimi \'%1$s\'</string>
     <string name="contact_already_exists">Kontakti \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Kontaktit</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää
@@ -251,7 +239,6 @@
     Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tiedosto \'contacts.bs\' on
     kansiossa.
     </string>
-    
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
@@ -270,13 +257,12 @@
     <string name="send">Lähetä</string>
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
-
     <!-- Main Activity -->
     <string name="about">Tietoja</string>
     <string name="quit">Lopeta</string>
-    <string name="outgoing_call_to_dots">Lähtevä puhelu &#8230;</string>
-    <string name="incoming_call_from_dots">Tuleva puhelu &#8230;</string>
-    <string name="transferring_call_to_dots">Siirtopuhelu &#8230;</string>
+    <string name="outgoing_call_to_dots">Lähtevä puhelu …</string>
+    <string name="incoming_call_from_dots">Tuleva puhelu …</string>
+    <string name="transferring_call_to_dots">Siirtopuhelu …</string>
     <string name="invalid_sip_uri">Virheellinen SIP URI</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
@@ -326,5 +312,4 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
-
 </resources>

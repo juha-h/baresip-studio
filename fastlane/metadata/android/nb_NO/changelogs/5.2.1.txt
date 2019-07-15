@@ -1,0 +1,2 @@
+- Mindre strikt sjekking av visningsnavn og identitetsbekreftelses-brukernavn
+- Tillagt versjonsnavn i Om-side

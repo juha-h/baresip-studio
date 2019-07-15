@@ -1,0 +1,4 @@
+- Innhenting av DNS-tjeneradresser dynamisk fra systemet hvis DNS-tjenere
+ikke oppgis i oppsettet.
+- Hvis det er kun én konto, legg til kontoens domene i kontakt-URI
+uten gitt vertsdel.

@@ -1,4 +1,4 @@
 - Added SRTP-MANDF media encryption protocol.
 - Security button color now changes from red to yellow also when call is
-  secured by an SRTP* media encyption protocol.
-- Fixed setting of account's media encryption to DTLS-SRTPF.
+secured by an SRTP* media encyption protocol.
+- Fixed setting of account media encryption to DTLS-SRTPF.

@@ -1,0 +1,2 @@
+- Forsøksvis oppdatering av kontospinnervisning når kontospinneren
+oppdateres.

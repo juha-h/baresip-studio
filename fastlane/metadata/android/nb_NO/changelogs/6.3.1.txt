@@ -1,0 +1,4 @@
+- Fikset og forbedret implementasjon av DTMF-tonesignalering.
+- Avskrudd redigering av innkommende/utgående anrops-URI når samtale pågår.
+- Slettet brukeragent når konto slettes.
+- Fjernet ubrukt DREP_BAKGRUNNSPROSESSER-tilgang.

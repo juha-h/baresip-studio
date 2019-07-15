@@ -1,0 +1,1 @@
+- Fikset kræsj når tom kontospinner klikkes.

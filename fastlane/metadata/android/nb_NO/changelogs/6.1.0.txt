@@ -1,0 +1,2 @@
+- Gå til sludrevindu når meldingsmerknad klikkes.
+- Fikset feil i anropsoverføring.
