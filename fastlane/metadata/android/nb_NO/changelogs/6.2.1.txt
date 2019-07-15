@@ -1,0 +1,7 @@
+- ConnectivityManager NetworkCallbacks brukt til å fastsette når nettverks-
+tilgang er tilgjengelig eller tapes.
+- Bruk av Android 8.1+måten å håndtere skjerm.
+- Lydstyrkekontroller satt til å håndtere nåværende lydstrøm (kan fuske).
+- Fikset mulig kræsj når ødelagt baresip-program startes igjen.
+- Notis vist når kontoen som skal opprettes allerede finnes.
+- Tillagt notis i "Om"-tekst om medialydstyrke.

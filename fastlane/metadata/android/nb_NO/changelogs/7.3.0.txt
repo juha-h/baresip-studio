@@ -1,0 +1,2 @@
+- Mulighet for å velge STUN, ICE eller ingen NAT-protokoll.
+- Kontostatus satt til gul umiddelbart når kontoregistrering er av.

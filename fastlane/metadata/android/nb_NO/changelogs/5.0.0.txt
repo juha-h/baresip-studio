@@ -1,0 +1,6 @@
+- Erstattet tekstmodus-EditConfigActivity med grafisk oppsettsaktivitet.
+- Nåværende oppsettselementer er autostart, DNS-tjenere, Opus-bitrate,
+og ICE-Lite.
+- Tillagt ICE og STUN-tjenerkontovalg.
+- Fikset feil i kontosletting.
+- Usendte meldinger går ikke tapt når sludreaktivitet forstyrres.

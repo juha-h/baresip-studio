@@ -1,0 +1,2 @@
+- Tillat endring av kontaktnavn også når det kun er forskjell på små og store bokstaver.
+- Ved gjenoppretting av kontakter, ikke krev at URI-er omkranses av vinkelparenteser.

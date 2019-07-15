@@ -1,0 +1,12 @@
+baresip VoIP-brukeragent støtter nå SIP-stemmeanrop, og meldinger,
+telefonsvar-meldingsventingsindikasjon (MWI), og innkommende androps-
+videresendinger via REFERENT-metode. Stemme kan kodes via PCMU/PCMA, Opus,
+G.722.1, ok iLBC -kodek. Sikkerhets oppnås via TLS-signaleringstransport,
+ZRTP og (DTLS) SRTP mediainnkapsling.
+
+Utvikling av baresip-programmet er motivert av behovet for en sikker og
+fri SIP-brukeragent for Android, som ikke avhenger av proprietære
+dyttingsmerknadstjenester fra tredjeparter.
+
+Kildekode tilgjengelig fra https://github.com/juha-h/baresip-studio,
+der problemer kan innrapporteres.

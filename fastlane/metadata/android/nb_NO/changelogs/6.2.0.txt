@@ -1,0 +1,4 @@
+- Oppgadert mål for Android API-nivå til 28 (Android 9).
+- Flyttet noe funksjonalitet som ikke har med grensesnitt å gjøre fra hovedaktivitet til baresip-tjeneste.
+- Oppdatert baresip-oppstarter og statusfeltbilder.
+- Avregistrert UA når konto slettes.

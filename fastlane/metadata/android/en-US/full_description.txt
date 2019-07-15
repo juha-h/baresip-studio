@@ -1,13 +1,12 @@
 Currently baresip VoIP User Agent app supports SIP voice calls and
 messages, voicemail Message Waiting Indication (MWI), and incoming call
-transfers via REFER method.  Voice can be coded using PCMU/PCMA, opus,
-G.722.1, and iLBC codecs.  Security is achieved via TLS signaling
+transfers via REFER method. Voice can be coded using PCMU/PCMA, Opus,
+G.722.1, and iLBC codecs. Security is achieved via TLS signaling
 transport and ZRTP and (DTLS) SRTP media encapsulation.
 
-Development of this baresip app is motivated by need for a secure open
-source SIP User Agent for Android that does not depend on proprietary,
+Development of this baresip app is motivated by need for a secure libre
+software SIP User Agent for Android that does not depend on proprietary,
 third party push notification services.
 
-Source code is available at https://github.com/juha-h/baresip-studio,
-where also issues can be reported.
-
+Source code available at https://github.com/juha-h/baresip-studio,
+where issues can be reported.
