@@ -1,0 +1,4 @@
+- Upstream fix in opus codec implementation.
+- Volume control stream fixes.
+- Fixed auto-rejecting of new incoming call.
+- Minor string improvements.
