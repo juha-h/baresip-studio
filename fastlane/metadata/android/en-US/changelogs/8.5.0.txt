@@ -1,0 +1,1 @@
+- Preliminary use of proximity sensor to turn off touch screen during call.
