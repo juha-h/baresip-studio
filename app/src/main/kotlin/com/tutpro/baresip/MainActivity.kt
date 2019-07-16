@@ -8,12 +8,9 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
 import android.content.pm.PackageManager
 import android.media.AudioManager
-import android.os.Build
-import android.os.CountDownTimer
-import android.os.Handler
+import android.os.*
 import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
@@ -48,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var kgm: KeyguardManager
+    internal lateinit var pm: PowerManager
+    internal lateinit var proximityWakeLock: PowerManager.WakeLock
     internal lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
@@ -71,6 +70,10 @@ class MainActivity : AppCompatActivity() {
                     WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
+
+        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+                "com.tutpro.baresip:proximity_wakelog")
 
         setContentView(R.layout.activity_main)
 
@@ -785,6 +788,7 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
+                        proximitySensing(false)
                         volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -850,6 +854,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         Log.d("Baresip", "Destroyed")
         super.onDestroy()
+        proximitySensing(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -867,6 +872,8 @@ class MainActivity : AppCompatActivity() {
                     item.setIcon(R.drawable.speaker_off)
                 else
                     item.setIcon(R.drawable.speaker_on)
+                if (Call.calls().size > 0)
+                    proximitySensing(BaresipService.speakerPhone)
                 baresipService.setAction("ToggleSpeaker")
                 startService(baresipService)
                 return true
@@ -1072,6 +1079,7 @@ class MainActivity : AppCompatActivity() {
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
+            proximitySensing(false)
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1091,6 +1099,7 @@ class MainActivity : AppCompatActivity() {
                     Utils.aorDomain(ua.account.aor)))
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
+            proximitySensing(!BaresipService.speakerPhone)
             when (call.status) {
                 "outgoing", "transferring" -> {
                     securityButton.visibility = View.INVISIBLE
@@ -1143,6 +1152,24 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
                 }
+            }
+        }
+    }
+
+    private fun proximitySensing(enable: Boolean) {
+        if (enable) {
+            if (!proximityWakeLock.isHeld()) {
+                Log.d("Baresip", "Acquiring proximity wake lock")
+                proximityWakeLock.acquire()
+            } else {
+                Log.d("Baresip", "Proximity wake lock already acquired")
+            }
+        } else {
+            if (proximityWakeLock.isHeld()) {
+                proximityWakeLock.release()
+                Log.d("Baresip", "Released proximity wake lock")
+            } else {
+                Log.d("Baresip", "Proximity wake lock is not held")
             }
         }
     }
