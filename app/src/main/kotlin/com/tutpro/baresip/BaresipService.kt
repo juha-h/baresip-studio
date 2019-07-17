@@ -35,7 +35,9 @@ class BaresipService: Service() {
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
     internal lateinit var cm: ConnectivityManager
-    internal lateinit var wakeLock: PowerManager.WakeLock
+    internal lateinit var pm: PowerManager
+    internal lateinit var partialWakeLock: PowerManager.WakeLock
+    internal lateinit var proximityWakeLock: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
 
     internal var rtTimer: Timer? = null
@@ -97,11 +99,14 @@ class BaresipService: Service() {
                 }
         )
 
-        wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.tutpro.baresip:wakelog").apply {
-                acquire()
-            }
-        }
+        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        partialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "com.tutpro.baresip:partial_wakelog")
+        partialWakeLock.acquire()
+
+        proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+                "com.tutpro.baresip:proximity_wakelog")
 
         super.onCreate()
     }
@@ -263,6 +268,10 @@ class BaresipService: Service() {
                 Log.d(LOG_TAG, "Toggling speakerphone from $speakerPhone")
                 am.isSpeakerphoneOn = !am.isSpeakerphoneOn
                 speakerPhone = am.isSpeakerphoneOn
+            }
+
+            "ProximitySensing" -> {
+                proximitySensing(intent!!.getBooleanExtra("enable", false))
             }
 
             "Stop", "Stop Force" -> {
@@ -526,6 +535,7 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             speakerPhone = false
+                            proximitySensing(false)
                         }
                         if (!Utils.isVisible())
                             return
@@ -790,14 +800,37 @@ class BaresipService: Service() {
         Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
     }
 
+    private fun proximitySensing(enable: Boolean) {
+        if (enable) {
+            if (!proximityWakeLock.isHeld()) {
+                Log.d(LOG_TAG, "Acquiring proximity wake lock")
+                proximityWakeLock.acquire()
+            } else {
+                Log.d(LOG_TAG, "Proximity wake lock already acquired")
+            }
+        } else {
+            if (proximityWakeLock.isHeld()) {
+                proximityWakeLock.release()
+                Log.d(LOG_TAG, "Released proximity wake lock")
+            } else {
+                Log.d(LOG_TAG, "Proximity wake lock is not held")
+            }
+        }
+    }
+
     private fun cleanService() {
         uas.clear()
         status.clear()
         history.clear()
         messages.clear()
-        if (this::nm.isInitialized) nm.cancelAll()
-        if (this::wakeLock.isInitialized && wakeLock.isHeld) wakeLock.release()
-        if (this::fl.isInitialized && fl.isHeld) fl.release()
+        if (this::nm.isInitialized)
+            nm.cancelAll()
+        if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
+            partialWakeLock.release()
+        if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
+            proximityWakeLock.release()
+        if (this::fl.isInitialized && fl.isHeld)
+            fl.release()
         isServiceClean = true
     }
 
