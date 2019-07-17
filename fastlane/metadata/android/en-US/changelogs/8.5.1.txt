@@ -1,0 +1,2 @@
+- Moved handling of proximity sensing from MainActivity to BaresipService.
+- Fixed crash when call or message comes in and MainActivity is not running.
