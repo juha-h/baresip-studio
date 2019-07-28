@@ -1,0 +1,2 @@
+- Flyttet håndtering av nærhetsføling fra MainActivity til BaresipService.
+- Fikset kræsj ved anrop eller innkommende melding når MainActivity ikke kjører.

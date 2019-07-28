@@ -1,0 +1,1 @@
+- Foreløpig bruk av nærhetsføler for å skru av skjer under samtale.
