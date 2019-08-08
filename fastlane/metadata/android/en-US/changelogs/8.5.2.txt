@@ -1,0 +1,1 @@
+- Fixed checking of Configuration DNS Servers.

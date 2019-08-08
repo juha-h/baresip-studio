@@ -286,7 +286,7 @@ class AccountActivity : AppCompatActivity() {
             if (mediaNat != "") {
                 val newStunServer = stunServer.text.toString().trim()
                 if (acc.stunServer != newStunServer) {
-                    if (!Utils.checkHostPort(newStunServer, false)) {
+                    if (!Utils.checkHostPort(newStunServer)) {
                         Utils.alertView(this, "Notice",
                                 "Invalid STUN Server '$newStunServer'")
                         return false

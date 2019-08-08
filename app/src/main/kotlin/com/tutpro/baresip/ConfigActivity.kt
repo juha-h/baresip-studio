@@ -309,7 +309,7 @@ class ConfigActivity : AppCompatActivity() {
     private fun checkDnsServers(dnsServers: String): Boolean {
         if (dnsServers.length == 0) return true
         for (server in dnsServers.split(","))
-            if (!Utils.checkHostPort(server.trim(), true)) return false
+            if (!Utils.checkIpPort(server.trim())) return false
         return true
     }
 
