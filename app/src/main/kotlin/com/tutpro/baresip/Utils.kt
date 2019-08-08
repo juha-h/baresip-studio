@@ -107,7 +107,6 @@ object Utils {
             Log.e("Baresip", "Failed to read asset " + asset + ": " +
                     e.toString())
         }
-
     }
 
     fun alertView(context: Context, title: String, message: String) {
@@ -201,22 +200,6 @@ object Utils {
         return (number > 0) && (number < 65536)
     }
 
-    fun checkHost(host: String): Boolean {
-        return checkIp(host) || checkDomain(host)
-    }
-
-    fun checkHostPort(hostPort: String, portMandatory: Boolean): Boolean {
-        if (portMandatory) {
-            return checkHost(hostPort.substringBeforeLast(":")) &&
-                    checkPort(hostPort.substringAfterLast(":"))
-        } else {
-            if (hostPort.substringAfterLast(":").contains(Regex("^[0-9]+\$")))
-                return checkHostPort(hostPort, true)
-            else
-                return checkHost(hostPort)
-        }
-    }
-
     fun checkIpPort(ipPort: String): Boolean {
         if (ipPort.startsWith("["))
             return checkIpv6InBrackets(ipPort.substringBeforeLast(":")) &&
@@ -224,6 +207,16 @@ object Utils {
         else
             return checkIpV4(ipPort.substringBeforeLast(":")) &&
                     checkPort(ipPort.substringAfterLast(":"))
+    }
+
+    fun checkDomainPort(domainPort: String): Boolean {
+        return checkDomain(domainPort.substringBeforeLast(":")) &&
+                checkPort(domainPort.substringAfterLast(":"))
+    }
+
+    fun checkHostPort(hostPort: String): Boolean {
+        return checkIp(hostPort) || checkDomain(hostPort) ||
+                checkIpPort(hostPort) || checkDomainPort(hostPort)
     }
 
     fun checkParams(params: String): Boolean {
@@ -246,9 +239,9 @@ object Utils {
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
         if (restParams.size == 1)
-            return checkHostPort(restParams[0], false)
+            return checkHostPort(restParams[0])
         else
-            return checkHostPort(restParams[0], false) && checkParams(restParams[1])
+            return checkHostPort(restParams[0]) && checkParams(restParams[1])
     }
 
     fun checkSipUri(uri: String): Boolean {
