@@ -18,6 +18,7 @@ import android.os.Build
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import android.support.v4.content.ContextCompat
 import android.provider.Settings
+import android.telephony.TelephonyManager
 
 import java.io.File
 import java.net.InetAddress
@@ -36,6 +37,7 @@ class BaresipService: Service() {
     internal lateinit var snb: NotificationCompat.Builder
     internal lateinit var cm: ConnectivityManager
     internal lateinit var pm: PowerManager
+    internal lateinit var tm: TelephonyManager
     internal lateinit var partialWakeLock: PowerManager.WakeLock
     internal lateinit var proximityWakeLock: PowerManager.WakeLock
     internal lateinit var fl: WifiManager.WifiLock
@@ -100,6 +102,8 @@ class BaresipService: Service() {
         )
 
         pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         partialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "com.tutpro.baresip:partial_wakelog")
@@ -372,7 +376,7 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
-                        if (Call.calls().size > 0) {
+                        if ((Call.calls().size > 0) || (tm.callState != TelephonyManager.CALL_STATE_IDLE)) {
                             Log.d(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             CallHistory.add(CallHistory(aor, peerUri, "in", false))
@@ -385,7 +389,13 @@ class BaresipService: Service() {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
                             calls.add(Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)))
-                            startRinging()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                                if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
+                                    startRinging()
+                            } else {
+                                startRinging()
+                            }
                         }
                         if (!Utils.isVisible()) {
                             val intent = Intent(this, BaresipService::class.java)
