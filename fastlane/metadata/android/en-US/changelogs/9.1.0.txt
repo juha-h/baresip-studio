@@ -1,0 +1,2 @@
+- Auto-reject incoming call if phone state is not idle.
+- Supress ring tone of incoming call if device is in no-disturb mode.
