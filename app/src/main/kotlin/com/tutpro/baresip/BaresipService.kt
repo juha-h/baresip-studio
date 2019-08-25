@@ -642,7 +642,11 @@ class BaresipService: Service() {
     fun stopped(error: String) {
         Log.d(LOG_TAG, "'stopped' from baresip with error $error")
         isServiceRunning = false
-        if (error == "ua_init") Config.remove("sip_listen")
+        if (error == "ua_init") {
+            Config.remove("sip_listen")
+            Config.remove("sip_certificate")
+            Config.remove("sip_cafile")
+        }
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")
         intent.putExtra("params", arrayListOf(error))

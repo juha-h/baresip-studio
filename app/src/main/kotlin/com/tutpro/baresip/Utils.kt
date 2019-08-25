@@ -50,7 +50,6 @@ object Utils {
                         e.toString())
                 return "Failed"
             }
-
         }
     }
 
@@ -319,6 +318,10 @@ object Utils {
                 // call_send_digit(callp, 4.toChar())
             }
         }
+    }
+
+    fun checkPermission(ctx: Context, permission: String) : Boolean {
+        return ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
     }
 
     fun requestPermission(ctx: Context, permission: String) : Boolean {

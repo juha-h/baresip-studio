@@ -118,6 +118,62 @@
             android:layout_marginBottom="12dp"
             android:orientation="horizontal" >
             <TextView
+                android:id="@+id/CertificateFileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/CertificateFile"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:onClick="onClick"
+                android:text="@string/tls_certificate_file" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/CertificateFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/CAFileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/CAFile"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:onClick="onClick"
+                android:text="@string/tls_ca_file" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/CAFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal" >
+            <TextView
                 android:id="@+id/AecTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
