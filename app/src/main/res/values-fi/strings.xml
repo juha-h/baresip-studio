@@ -315,8 +315,7 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
-    <string name="no_storage_space_permission">Et ole antanut käyttölupaa tallennustilaan. Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
-    <string name="tls_ca_file">TLS CA-tiedosto</string>
+qqqq    <string name="tls_ca_file">TLS CA-tiedosto</string>
     <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää todennusauktoriteettien TLS-sertifikaatit, on ladattu tai ladataan Download-kansiosta.</string>
     <string name="tls_certificate_file">TLS sertifikaattitiedosto</string>
     <string name="tls_certificate_file_help">"Jos merkitty, tiedosto \'cert.pem\', joka sisältää tämän baresip-sovelluksen TLS-sertifikaatin ja yksityisen avaimen, on ladattu tai ladataan Download-kansiosta."</string>

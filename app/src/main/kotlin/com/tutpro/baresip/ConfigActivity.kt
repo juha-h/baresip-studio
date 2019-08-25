@@ -209,12 +209,9 @@ class ConfigActivity : AppCompatActivity() {
 
             if (certificateFile.isChecked != oldCertificateFile) {
                 if (certificateFile.isChecked) {
-                    if (!Utils.checkPermission(applicationContext,
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.no_storage_space_permission))
+                    if (!Utils.requestPermission(this,
+                                    android.Manifest.permission.READ_EXTERNAL_STORAGE))
                         return false
-                    }
                     val content = Utils.getFileContents(File(downloadsDir, "cert.pem"))
                     if (content == "Failed") {
                         Utils.alertView(this, getString(R.string.error),
@@ -234,12 +231,9 @@ class ConfigActivity : AppCompatActivity() {
 
             if (caFile.isChecked != oldCAFile) {
                 if (caFile.isChecked) {
-                    if (!Utils.checkPermission(applicationContext,
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.no_storage_space_permission))
+                    if (!Utils.requestPermission(this,
+                                    android.Manifest.permission.READ_EXTERNAL_STORAGE))
                         return false
-                    }
                     val content = Utils.getFileContents(File(downloadsDir, "ca_certs.crt"))
                     if (content == "Failed") {
                         Utils.alertView(this, getString(R.string.error),
