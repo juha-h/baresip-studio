@@ -6,11 +6,14 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+
+import java.io.File
 
 class ConfigActivity : AppCompatActivity() {
 
@@ -18,6 +21,8 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var listenAddr: EditText
     internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
+    internal lateinit var certificateFile: CheckBox
+    internal lateinit var caFile: CheckBox
     internal lateinit var aec: CheckBox
     internal lateinit var opusBitRate: EditText
     internal lateinit var iceLite: CheckBox
@@ -28,6 +33,8 @@ class ConfigActivity : AppCompatActivity() {
     private var oldListenAddr = ""
     private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
+    private var oldCertificateFile = false
+    private var oldCAFile = false
     private var oldAec = false
     private var oldOpusBitrate = ""
     private var oldIceMode = ""
@@ -35,6 +42,8 @@ class ConfigActivity : AppCompatActivity() {
     private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
+    private var downloadsDir  =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -67,6 +76,14 @@ class ConfigActivity : AppCompatActivity() {
             oldDnsServers = dsTv.trimStart(',').trimStart(' ')
         }
         dnsServers.setText(oldDnsServers)
+
+        certificateFile = findViewById(R.id.CertificateFile) as CheckBox
+        oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
+        certificateFile.isChecked = oldCertificateFile
+
+        caFile = findViewById(R.id.CAFile) as CheckBox
+        oldCAFile = Config.variable("sip_cafile").isNotEmpty()
+        caFile.isChecked = oldCAFile
 
         aec = findViewById(R.id.Aec) as CheckBox
         val aecCv = Config.variable("module")
@@ -190,6 +207,56 @@ class ConfigActivity : AppCompatActivity() {
                 save = true
             }
 
+            if (certificateFile.isChecked != oldCertificateFile) {
+                if (certificateFile.isChecked) {
+                    if (!Utils.checkPermission(applicationContext,
+                                    android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.no_storage_space_permission))
+                        return false
+                    }
+                    val content = Utils.getFileContents(File(downloadsDir, "cert.pem"))
+                    if (content == "Failed") {
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.read_cert_error))
+                        return false
+                    }
+                    Utils.putFileContents(File(BaresipService.filesPath + "/cert.pem"),
+                            content)
+                    Config.remove("sip_certificate")
+                    Config.add("sip_certificate", BaresipService.filesPath + "/cert.pem")
+                } else {
+                    Config.remove("sip_certificate")
+                }
+                save = true
+                restart = true
+            }
+
+            if (caFile.isChecked != oldCAFile) {
+                if (caFile.isChecked) {
+                    if (!Utils.checkPermission(applicationContext,
+                                    android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.no_storage_space_permission))
+                        return false
+                    }
+                    val content = Utils.getFileContents(File(downloadsDir, "ca_certs.crt"))
+                    if (content == "Failed") {
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.read_ca_certs_error))
+                        return false
+                    }
+                    Utils.putFileContents(File(BaresipService.filesPath + "/ca_certs.crt"),
+                            content)
+                    Config.remove("sip_cafile")
+                    Config.add("sip_cafile", BaresipService.filesPath + "/ca_certs.crt")
+                } else {
+                    Config.remove("sip_cafile")
+                }
+                save = true
+                restart = true
+            }
+
             if (aec.isChecked != oldAec) {
                 Config.remove("module webrtc_aec.so")
                 if (aec.isChecked) {
@@ -279,6 +346,14 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.DnsServersTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.dns_servers),
                         getString(R.string.dns_servers_help))
+            }
+            findViewById(R.id.CertificateFileTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.tls_certificate_file),
+                        getString(R.string.tls_certificate_file_help))
+            }
+            findViewById(R.id.CAFileTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.tls_ca_file),
+                        getString(R.string.tls_ca_file_help))
             }
             findViewById(R.id.AecTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.aec),
