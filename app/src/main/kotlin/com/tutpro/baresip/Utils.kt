@@ -320,10 +320,6 @@ object Utils {
         }
     }
 
-    fun checkPermission(ctx: Context, permission: String) : Boolean {
-        return ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
-    }
-
     fun requestPermission(ctx: Context, permission: String) : Boolean {
         if (ContextCompat.checkSelfPermission(ctx, permission) != PackageManager.PERMISSION_GRANTED) {
             Log.w("Baresip", "Baresip does not have $permission permission")
