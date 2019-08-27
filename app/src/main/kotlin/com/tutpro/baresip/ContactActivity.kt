@@ -62,7 +62,7 @@ class ContactActivity : AppCompatActivity() {
                         String.format(getString(R.string.invalid_contact), newName))
                 return false
             }
-            var alert = false
+            var alert: Boolean
             if (new)
                 alert = ContactsActivity.nameExists(newName, true)
             else
