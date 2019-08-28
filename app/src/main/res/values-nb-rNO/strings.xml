@@ -181,4 +181,10 @@
     <string name="call_failed">Anrop mislyktes</string>
     <string name="call_closed">Samtale lukket</string>
     <string name="restart_needed">Du må starte baresip på ny for å aktivere det nye oppsettet.</string>
+    <string name="tls_certificate_file">TLS-sertifikatsfil</string>
+    <string name="tls_certificate_file_help">Hvis valgt vil eller har filen \"cert.pem\" som inneholder TLS-sertifikatet og den private nøkkelen tilhørende denne baresip-instansen blitt lastet inn fra Nedlastinger. Av sikkerhetshensyn må du slette filen etter innlasting.</string>
+    <string name="tls_ca_file">TLS-CA-fil</string>
+    <string name="tls_ca_file_help">Hvis valgt vil filen \"ca_certs.crt\" inneholdende TLS-sertifikatene tilhørende sertifikatsmyndighetene ha blitt lastet inn fra Nedlastinger.</string>
+    <string name="read_cert_error">Klarte ikke å lese filen \"cert.pem\" fra Nedlastinger</string>
+    <string name="read_ca_certs_error">Klarte ikke å lese filen \"ca_certs.crt\" fra Nedlastinger.</string>
 </resources>
