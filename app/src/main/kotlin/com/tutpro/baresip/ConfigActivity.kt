@@ -25,6 +25,7 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var caFile: CheckBox
     internal lateinit var aec: CheckBox
     internal lateinit var opusBitRate: EditText
+    internal lateinit var opusPacketLoss: EditText
     internal lateinit var iceLite: CheckBox
     internal lateinit var debug: CheckBox
     internal lateinit var reset: CheckBox
@@ -37,6 +38,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldCAFile = false
     private var oldAec = false
     private var oldOpusBitrate = ""
+    private var oldOpusPacketLoss = ""
     private var oldIceMode = ""
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
@@ -94,6 +96,11 @@ class ConfigActivity : AppCompatActivity() {
         val obCv = Config.variable("opus_bitrate")
         oldOpusBitrate = if (obCv.size == 0) "28000" else obCv[0]
         opusBitRate.setText(oldOpusBitrate)
+
+        opusPacketLoss = findViewById(R.id.OpusPacketLoss) as EditText
+        val oplCv = Config.variable("opus_packet_loss")
+        oldOpusPacketLoss = if (oplCv.size == 0) "0" else oplCv[0]
+        opusPacketLoss.setText(oldOpusPacketLoss)
 
         iceLite = findViewById(R.id.IceLite) as CheckBox
         val imCv = Config.variable("ice_mode")
@@ -277,6 +284,23 @@ class ConfigActivity : AppCompatActivity() {
                 restart = true
             }
 
+            val opusPacketLoss = opusPacketLoss.text.toString().trim()
+            if (opusPacketLoss != oldOpusPacketLoss) {
+                if (!checkOpusPacketLoss(opusPacketLoss)) {
+                    Utils.alertView(this, "Notice",
+                            "Invalid Opus Packet Loss Percentage: $opusPacketLoss")
+                    return false
+                }
+                Config.remove("opus_inbandfec")
+                Config.remove("opus_packet_loss")
+                if (opusPacketLoss != "0") {
+                    Config.add("opus_inbandfec", "yes")
+                    Config.add("opus_bitrate", opusPacketLoss)
+                }
+                save = true
+                restart = true
+            }
+
             var iceModeString = "full"
             if (iceLite.isChecked) iceModeString = "lite"
             if (oldIceMode != iceModeString) {
@@ -357,6 +381,10 @@ class ConfigActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.opus_bit_rate),
                         getString(R.string.opus_bit_rate_help))
             }
+            findViewById(R.id.OpusPacketLossTitle) as TextView-> {
+                Utils.alertView(this, getString(R.string.opus_packet_loss),
+                        getString(R.string.opus_packet_loss_help))
+            }
             findViewById(R.id.IceLiteTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.ice_lite_mode),
                         getString(R.string.ice_lite_mode_help))
@@ -385,7 +413,13 @@ class ConfigActivity : AppCompatActivity() {
     private fun checkOpusBitRate(opusBitRate: String): Boolean {
         val number = opusBitRate.toIntOrNull()
         if (number == null) return false
-        return (number >=6000) && (number <= 510000)
+        return (number >= 6000) && (number <= 510000)
+    }
+
+    private fun checkOpusPacketLoss(opusPacketLoss: String): Boolean {
+        val number = opusPacketLoss.toIntOrNull()
+        if (number == null) return false
+        return (number >= 0) && (number <= 100)
     }
 
     private fun addMissingPorts(addressList: String): String {

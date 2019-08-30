@@ -192,6 +192,11 @@
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
     6000-510000. Oletusarvo on 28000.
     </string>
+    <string name="opus_packet_loss">Odotettu Opus pakettihäviö</string>
+    <string name="opus_packet_loss_help">Odotettu Opus audio virran pakettihäviö prosentteina.
+        Mahdolliset arvot ovat 0-100. Oletusarvo on 0, jolloin ennakoiva virheenkorjaus
+        ei ole käytössä.</string>
+    <string name="_0" translatable="false">0</string>
     <string name="ice_lite_mode">ICE Lite-moodi</string>
     <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
     käytössä.
