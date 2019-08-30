@@ -357,6 +357,22 @@ class BaresipService: Service() {
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
+                            if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
+                                // Most likely this error is due to DNS lookup failure
+                                newEvent = "registering failed,DNS lookup failed"
+                                if (dynDns)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        val activeNetwork = cm.activeNetwork
+                                        if (activeNetwork != null) {
+                                            val dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
+                                            Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
+                                            if (Config.updateDnsServers(dnsServers) != 0)
+                                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                        } else {
+                                            Log.d(LOG_TAG, "No active network!")
+                                        }
+                                    }
+                            }
                         if (!Utils.isVisible())
                             return
                     }
