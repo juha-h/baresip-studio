@@ -178,6 +178,11 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
     <string name="_28000" translatable="false">28000</string>
+    <string name="opus_packet_loss">Opus Expected Packet Loss</string>
+    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage.
+        Valid values are 0-100. Factory default is 0, which disables Opus Forward Error
+        Correction (FEC).</string>
+    <string name="_0" translatable="false">0</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
