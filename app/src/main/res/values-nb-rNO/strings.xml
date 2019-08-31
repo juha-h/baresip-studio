@@ -187,4 +187,11 @@
     <string name="tls_ca_file_help">Hvis valgt vil filen \"ca_certs.crt\" inneholdende TLS-sertifikatene tilhørende sertifikatsmyndighetene ha blitt lastet inn fra Nedlastinger.</string>
     <string name="read_cert_error">Klarte ikke å lese filen \"cert.pem\" fra Nedlastinger</string>
     <string name="read_ca_certs_error">Klarte ikke å lese filen \"ca_certs.crt\" fra Nedlastinger.</string>
+    <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0-100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>
+    <string name="invalid_listen_address">Ugyldig lyttadresse</string>
+    <string name="invalid_dns_servers">Ugyldige DNS-tjenere</string>
+    <string name="failed_to_set_dns_servers">Klarte ikke å sette DNS-tjenere</string>
+    <string name="failed_to_load_aec_module">Klarte ikke å laste inn akustisk ekkokanselleringsmodul.</string>
+    <string name="invalid_opus_bitrate">Ugyldig Opus-bitrate</string>
+    <string name="invalid_opus_packet_loss">Ugyldig Opus-pakketapsprosent</string>
 </resources>
