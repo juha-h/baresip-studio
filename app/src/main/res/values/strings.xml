@@ -155,6 +155,7 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         available addresses. If left empty (factory default), baresip listens at port 5060 of
         all available addresses.
     </string>
+    <string name="invalid_listen_address">Invalid Listen Address</string>
     <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
     <string name="prefer_ipv6">Prefer IPv6</string>
     <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
@@ -165,6 +166,8 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         also port is given, ip must
         be written inside brackets [].  As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
         points to IPv4 and IPv6 addresses of public Google DNS servers.</string>
+    <string name="invalid_dns_servers">Invalid DNS Servers</string>
+    <string name="failed_to_set_dns_servers">Failed to set DNS servers</string>
     <string name="tls_certificate_file">TLS Certificate File</string>
     <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing
         TLS certificate and private key of this baresip instance has been or will be loaded from
@@ -174,6 +177,7 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         of Certificate Authorities has been or will be loaded from Download directory.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
     <string name="aec_help">If checked, echo cancellation is attempted on call audio.</string>
+    <string name="failed_to_load_aec_module">Failed to load Acoustic Echo Cancellation module.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
@@ -183,6 +187,8 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         Valid values are 0-100. Factory default is 0, which disables Opus Forward Error
         Correction (FEC).</string>
     <string name="_0" translatable="false">0</string>
+    <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
+    <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>

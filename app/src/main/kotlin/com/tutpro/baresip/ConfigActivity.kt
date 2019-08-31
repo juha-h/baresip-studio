@@ -165,8 +165,8 @@ class ConfigActivity : AppCompatActivity() {
             val listenAddr = listenAddr.text.toString().trim()
             if (listenAddr != oldListenAddr) {
                 if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
-                    Utils.alertView(this, "Notice",
-                            "Invalid Listen Address '$listenAddr'")
+                    Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_listen_address)}: $listenAddr")
                     return false
                 }
                 Config.remove("sip_listen")
@@ -186,8 +186,8 @@ class ConfigActivity : AppCompatActivity() {
             val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
             if (dnsServers != oldDnsServers) {
                 if (!checkDnsServers(dnsServers)) {
-                    Utils.alertView(this, "Notice",
-                            "Invalid DNS Servers: $dnsServers")
+                    Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_dns_servers)}: $dnsServers")
                     return false
                 }
                 Config.remove("dyn_dns")
@@ -197,8 +197,8 @@ class ConfigActivity : AppCompatActivity() {
                         Config.add("dns_server", server)
                     Config.add("dyn_dns", "no")
                     if (Api.net_use_nameserver(dnsServers) != 0) {
-                        Utils.alertView(this, "Notice",
-                                "Failed to set DNS servers '$dnsServers'")
+                        Utils.alertView(this, getString(R.string.error),
+                                "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
                         return false
                     }
                 } else {
@@ -263,8 +263,8 @@ class ConfigActivity : AppCompatActivity() {
                 if (aec.isChecked) {
                     Config.add("module", "webrtc_aec.so")
                     if (Api.module_load("webrtc_aec.so") != 0) {
-                        Utils.alertView(this, "Notice",
-                                "Failed to load Acoustic Echo Cancellation module")
+                        Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.failed_to_load_aec_module))
                         return false
                     }
                 } else {
@@ -276,7 +276,8 @@ class ConfigActivity : AppCompatActivity() {
             val opusBitRate = opusBitRate.text.toString().trim()
             if (opusBitRate != oldOpusBitrate) {
                 if (!checkOpusBitRate(opusBitRate)) {
-                    Utils.alertView(this, "Notice", "Invalid Opus Bit Rate: $opusBitRate")
+                    Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
                     return false
                 }
                 Config.remove("opus_bitrate")
@@ -288,8 +289,8 @@ class ConfigActivity : AppCompatActivity() {
             val opusPacketLoss = opusPacketLoss.text.toString().trim()
             if (opusPacketLoss != oldOpusPacketLoss) {
                 if (!checkOpusPacketLoss(opusPacketLoss)) {
-                    Utils.alertView(this, "Notice",
-                            "Invalid Opus Packet Loss Percentage: $opusPacketLoss")
+                    Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
                     return false
                 }
                 Config.remove("opus_inbandfec")
