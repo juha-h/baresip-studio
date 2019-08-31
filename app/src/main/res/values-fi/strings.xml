@@ -175,6 +175,7 @@
     jolloin baresip kuuntelee porttia 5060 kaikilla käytössä olevilla
     osoitteilla.
     </string>
+    <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
     <string name="prefer_ipv6">Suosi IPv6-protokollaa</string>
     <string name="prefer_ipv6_help">Jos merkitty, baresip suosii
     IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä.</string>
@@ -185,8 +186,11 @@
         on IPv6-osoite ja myös portti annetaan, pitää osoite kirjoittaa sulkujen [] sisään.
         Esimerkiksi luettelo \'8.8.8.8:53,[2001:4860:4860::8888]:53\' osoittaa Googlen julkisiin
         DNS-palvelijoihin.</string>
+    <string name="invalid_dns_servers">Virheelliset DNS-palvelimet</string>
+    <string name="failed_to_set_dns_servers">DNS-palvelinten asetus epäonnistui</string>
     <string name="aec">Akustinen kaiun poisto</string>
     <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana.</string>
+    <string name="failed_to_load_aec_module">Kaiunpoistomodulin lataaminen epäonnistui.</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
@@ -196,7 +200,8 @@
     <string name="opus_packet_loss_help">Odotettu Opus audio virran pakettihäviö prosentteina.
         Mahdolliset arvot ovat 0-100. Oletusarvo on 0, jolloin ennakoiva virheenkorjaus
         ei ole käytössä.</string>
-    <string name="_0" translatable="false">0</string>
+    <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
+    <string name="invalid_opus_packet_loss">Virheellinen Opus-koodekin odotettu pakettihäviö</string>
     <string name="ice_lite_mode">ICE Lite-moodi</string>
     <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
     käytössä.
