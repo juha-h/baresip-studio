@@ -1,0 +1,5 @@
+- Added support for Opus Forward Error Correction (FEC) via Opus
+  Expected Packet Loss configuration variable.
+- Try to update dynamic DNS information if registration fails due to
+  "Invalid argument" error.
+- Use translatable string in all configuration related alert messages.
