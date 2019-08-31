@@ -360,6 +360,7 @@ class BaresipService: Service() {
                             if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
                                 // Most likely this error is due to DNS lookup failure
                                 newEvent = "registering failed,DNS lookup failed"
+                                Api.net_debug()
                                 if (dynDns)
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                         val activeNetwork = cm.activeNetwork
@@ -368,6 +369,8 @@ class BaresipService: Service() {
                                             Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
                                             if (Config.updateDnsServers(dnsServers) != 0)
                                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                            else
+                                                Api.net_debug()
                                         } else {
                                             Log.d(LOG_TAG, "No active network!")
                                         }
