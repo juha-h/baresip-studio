@@ -279,7 +279,8 @@ class ConfigActivity : AppCompatActivity() {
                     Utils.alertView(this, "Notice", "Invalid Opus Bit Rate: $opusBitRate")
                     return false
                 }
-                Config.replace("opus_bitrate", opusBitRate)
+                Config.remove("opus_bitrate")
+                Config.add("opus_bitrate", opusBitRate)
                 save = true
                 restart = true
             }
@@ -295,7 +296,7 @@ class ConfigActivity : AppCompatActivity() {
                 Config.remove("opus_packet_loss")
                 if (opusPacketLoss != "0") {
                     Config.add("opus_inbandfec", "yes")
-                    Config.add("opus_bitrate", opusPacketLoss)
+                    Config.add("opus_packet_loss", opusPacketLoss)
                 }
                 save = true
                 restart = true
