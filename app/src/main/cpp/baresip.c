@@ -1387,7 +1387,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
     int err;
     LOGD("setting dns servers '%s'\n", native_servers);
     if (str_len(native_servers) > 255) {
-        LOGW("dnsc_srv_set: too long servers list (%s)\n", native_servers);
+        LOGW("net_use_nameserver: too long servers list (%s)\n", native_servers);
         return 1;
     }
     str_ncpy(servers, native_servers, 256);
@@ -1397,7 +1397,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
         *comma = '\0';
         err = sa_decode(&(nsv[count]), server, str_len(server));
         if (err) {
-            LOGW("dnsc_srv_set: could not decode '%s' (%u)\n", server, err);
+            LOGW("net_use_nameserver: could not decode '%s' (%u)\n", server, err);
             return err;
         }
         server = ++comma;
@@ -1406,7 +1406,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
     if ((count < NET_MAX_NS) && (str_len(server) > 0)) {
         err = sa_decode(&(nsv[count]), server, str_len(server));
         if (err) {
-            LOGW("dnsc_srv_set: could not decode `%s' (%u)\n", server, err);
+            LOGW("net_use_nameserver: could not decode `%s' (%u)\n", server, err);
             return err;
         }
         count++;
