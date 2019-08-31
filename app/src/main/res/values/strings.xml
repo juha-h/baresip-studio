@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
@@ -24,8 +22,9 @@
         where also issues can be reported.
         ]]>
     </string>
-    <string name="baresip_link" translatable="false"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
-
+    <string name="baresip_link" translatable="false">
+        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
+    </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
     <string name="display_name">Display Name</string>
@@ -86,7 +85,6 @@
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
-
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="user_domain">user@domain</string>
@@ -108,14 +106,12 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         the folder and, if so, you gave correct Decrypt Password."
     </string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
-
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
     <string name="incoming_call_from">Call from</string>
     <string name="transfer_request">Call transfer request to</string>
     <string name="message_from">Message from</string>
-
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call">Call</string>
@@ -127,7 +123,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     </string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history?
     </string>
-
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
     <string name="chat_with">Chat with %1$s</string>
@@ -137,7 +132,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>
     <string name="message_failed">Failed</string>
-
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
     <string name="today">Today</string>
@@ -147,7 +141,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
-
     <!-- Config Activity -->
     <string name="configuration">Configuration</string>
     <string name="start_automatically">Start Automatically</string>
@@ -186,17 +179,15 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
     <string name="_28000" translatable="false">28000</string>
-    <string name="opus_packet_loss">Opus Expected Packet Loss</string>
-    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage.
-        Valid values are 0-100. Factory default is 0, which disables Opus Forward Error
-        Correction (FEC).</string>
+    <string name="opus_packet_loss">Expected Opus packet-loss</string>
+    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage, from 0-100. By default 0, turning off Opus Forward Error Correction (FEC).</string>
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
-    <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
+    <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="debug">Debug</string>
     <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
@@ -204,7 +195,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
         to factory default values.</string>
     <string name="read_cert_error">Failed to read file \'cert.pem\' from Download directory.</string>
     <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\' from Download directory.</string>
-
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>
@@ -214,7 +204,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
@@ -227,7 +216,6 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="imported_contacts">Imported contacts from Download folder.</string>
     <string name="import_error">Failed to import contacts from Download folder. Check Apps →
         baresip → Permissions → Storage and that file \'contacts.bs\' exists in the folder.</string>
-
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -247,15 +235,14 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="send">Send</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-    <string name="dots" translatable="false">&#8230;</string>
-
+    <string name="dots" translatable="false">…</string>
     <!-- Main Activity -->
     <string name="about">About</string>
     <string name="restart">Restart</string>
     <string name="quit">Quit</string>
-    <string name="outgoing_call_to_dots">Outgoing call to &#8230;</string>
-    <string name="incoming_call_from_dots">Incoming call from &#8230;</string>
-    <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
+    <string name="outgoing_call_to_dots">Outgoing call to …</string>
+    <string name="incoming_call_from_dots">Incoming call from …</string>
+    <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
@@ -293,5 +280,4 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
         Do you want to unverify the peer?</string>
     <string name="unverify">Unverify</string>
-
 </resources>
