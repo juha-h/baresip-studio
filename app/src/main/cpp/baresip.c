@@ -49,10 +49,20 @@ static void net_debug_log() {
     }
 }
 
-static void ua_print_sip_status_log() {
+static void net_dns_debug_log() {
     char debug_buf[2048];
     int l;
-    l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_sip_status);
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_dns_debug, baresip_network());
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
+static void ua_print_status_log(struct ua *ua) {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_status, ua);
     if (l != -1) {
         debug_buf[l] = '\0';
         LOGD("%s\n", debug_buf);
@@ -479,7 +489,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     net_debug_log();
-    ua_print_sip_status_log();
+    for (le = list_head(uag_list()); le != NULL; le = le->next)
+        ua_print_status_log(le->data);
 
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
@@ -1417,6 +1428,11 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz) {
     net_debug_log();
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz) {
+    net_dns_debug_log();
 }
 
 JNIEXPORT jint JNICALL

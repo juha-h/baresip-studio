@@ -33,6 +33,7 @@ object Api {
     external fun log_level_set(level: Int)
     external fun net_use_nameserver(servers: String): Int
     external fun net_debug()
+    external fun net_dns_debug()
     external fun module_load(module: String): Int
     external fun module_unload(module: String)
 
