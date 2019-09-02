@@ -160,5 +160,16 @@
     <string name="export_error">"Exportul contactelor în dosarul Descărcări a eșuat.
 \n        Verificați în Aplicații -&gt; baresip -&gt; Permisiuni -&gt; Stocare."</string>
     <string name="import_error">Importul contactelor din dosarul Descărcări a eșuat. Verificați Aplicații -&gt; baresip -&gt; Permisiuni -&gt; Stocare și că fișierul \'contacts.bs\' există în dosar.</string>
-    <string name="start_failed">Baresip nu a putut porni! Adresa de ascultare a fost resetată. Repornire baresip.</string>
+    <string name="start_failed">Baresip nu a putut porni! Aceasta se poate datora unei adrese de ascultare invalidă sau a unui fișier TLS invalid. Aceste setări au fost resetate. Reporniți baresip.</string>
+    <string name="tls_certificate_file">Fișier certificat TLS</string>
+    <string name="tls_ca_file">Fișier CA TLS</string>
+    <string name="read_cert_error">Nu s-a putut citi fișierul \'cert.pem\' din dosarul Download.</string>
+    <string name="read_ca_certs_error">Nu s-a putut citi fișierul \'ca_certs.crt\' din dosarul Download.</string>
+    <string name="opus_packet_loss">Pachete pierdute Opus</string>
+    <string name="invalid_listen_address">Adresă de ascultare invalidă</string>
+    <string name="invalid_dns_servers">Servere DNS invalide</string>
+    <string name="failed_to_set_dns_servers">Nu s-au putut seta serverele DNS</string>
+    <string name="failed_to_load_aec_module">Nu s-a putut încărca modulul de anulare acustică a ecoului (AEC).</string>
+    <string name="invalid_opus_bitrate">Rată de biți Opus invalidă</string>
+    <string name="invalid_opus_packet_loss">Procentaj de pachete pierdute Opus invalid</string>
 </resources>
