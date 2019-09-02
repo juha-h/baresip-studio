@@ -77,7 +77,9 @@ class BaresipService: Service() {
                         if (dynDns) {
                             val linkProperties = cm.getLinkProperties(network)
                             val dnsServers = linkProperties.dnsServers
-                            if (Config.updateDnsServers(dnsServers) != 0)
+                            if (Config.updateDnsServers(dnsServers) == 0)
+                                Api.net_dns_debug()
+                            else
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
                         UserAgent.register()
@@ -93,7 +95,9 @@ class BaresipService: Service() {
                         Log.d(LOG_TAG, "Network $network link properties changed")
                         if (dynDns) {
                             val dnsServers = linkProperties.dnsServers
-                            if (Config.updateDnsServers(dnsServers) != 0)
+                            if (Config.updateDnsServers(dnsServers) == 0)
+                                Api.net_dns_debug()
+                            else
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
                         UserAgent.register()
@@ -360,7 +364,7 @@ class BaresipService: Service() {
                             if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
                                 // Most likely this error is due to DNS lookup failure
                                 newEvent = "registering failed,DNS lookup failed"
-                                Api.net_debug()
+                                Api.net_dns_debug()
                                 if (dynDns)
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                         val activeNetwork = cm.activeNetwork
@@ -370,7 +374,7 @@ class BaresipService: Service() {
                                             if (Config.updateDnsServers(dnsServers) != 0)
                                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                                             else
-                                                Api.net_debug()
+                                                Api.net_dns_debug()
                                         } else {
                                             Log.d(LOG_TAG, "No active network!")
                                         }
