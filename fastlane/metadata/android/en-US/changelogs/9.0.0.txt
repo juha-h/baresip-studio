@@ -1,1 +1,1 @@
--  Added possibility to configure baresip a TLS certificate and CA certificates.
+- Added possibility to set up baresip with a TLS- and CA certificate.
