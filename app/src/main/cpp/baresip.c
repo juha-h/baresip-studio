@@ -52,6 +52,7 @@ static void net_debug_log() {
 static void net_dns_debug_log() {
     char debug_buf[2048];
     int l;
+    LOGD("net_dns_debug_log\n");
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_dns_debug, baresip_network());
     if (l != -1) {
         debug_buf[l] = '\0';
