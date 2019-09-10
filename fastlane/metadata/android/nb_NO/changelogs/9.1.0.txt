@@ -1,0 +1,2 @@
+- Automatisk avslag av innkommende samtale hvis telefontilstand ikke er ledig.
+- Forstum ringetone for innkommende samtale hvis enheten er i "Ikke forstyrr"-modus.

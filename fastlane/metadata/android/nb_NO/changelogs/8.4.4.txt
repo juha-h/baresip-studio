@@ -1,0 +1,4 @@
+- Oppstrømsfiks i implementasjon av Opus-kodek.
+- Fiks for kontroll av lydstyrkestrøm.
+- Fiks for å legge på røret automatisk ved innkommende anrop.
+- Mindre strengforbedringer.

@@ -1,0 +1,1 @@
+- Tillagt mulighet for å sette opp baresip med TLS- og CA-sertifikater.
