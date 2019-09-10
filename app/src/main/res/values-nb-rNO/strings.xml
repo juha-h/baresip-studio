@@ -143,6 +143,8 @@
     <string name="aec">Kansellering av akustisk ekko</string>
     <string name="aec_help">Prøver å unngå ekko under samtaler.</string>
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
+    <string name="opus_packet_loss">Forventet Opus-pakketap</string>
+    <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0-100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>
     <string name="ice_lite_mode">ICE Lite-modus</string>
     <string name="ice_lite_mode_help">Bruker ICE Lite-modus.</string>
     <string name="default_call_volume">Forvalgt samtalelydstyrke</string>
@@ -150,13 +152,14 @@
     <string name="debug">Feilretting</string>
     <string name="debug_help">Gjør feilrettings- og infonivå-loggmeldinger tilgjengelige i Logcat.</string>
     <string name="reset_config_help">Tilbakestiller oppsettet til fabrikkforvalgte verdier.</string>
+    <string name="read_cert_error">Klarte ikke å lese filen "cert.pem" fra Nedlastinger.</string>
+    <string name="read_ca_certs_error">Klarte ikke å lese filen \'ca_certs.crt\' from Download directory.</string>
     <string name="contact_already_exists">Kontakten \"%1$s\" finnes allerede.</string>
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
     <string name="contacts_exceeded">Ditt har nådd ditt maksimale antall kontakter på %1$d.</string>
     <string name="exported_contacts">Eksporterte kontakter til nedlastingsmappen i forma av filen \"contacts.bs\".</string>
-    <string name="export_error">Klarte ikke å eksportere kontakter til nedlastingsmappen.
-\n        Sjekk Programmer → baresip → Tilganger → Lagring.</string>
+    <string name="export_error">Klarte ikke å eksportere kontakter til nedlastingsmappen. Sjekk Programmer → baresip → Tilganger → Lagring.</string>
     <string name="imported_contacts">Importerte kontakter fra nedlastingsmappen.</string>
     <string name="import_error">Klarte ikke å importere kontakter fra nedlastingsmappen. Sjekk Programmer → baresip → Tilganger → Lagring og at filen \"contacts.bs\" finnes i mappen.</string>
     <string name="invalid_sip_uri">Ugyldig SIP URI</string>
