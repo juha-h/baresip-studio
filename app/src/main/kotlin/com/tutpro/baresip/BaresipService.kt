@@ -412,12 +412,22 @@ class BaresipService: Service() {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
                             calls.add(Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)))
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                                if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
+                            if (ua.account.answerMode == "manual") {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                                    if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
+                                        startRinging()
+                                } else {
                                     startRinging()
+                                }
                             } else {
-                                startRinging()
+                                val newIntent = Intent(this, MainActivity::class.java)
+                                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                                newIntent.putExtra("action", "call answer")
+                                newIntent.putExtra("callp", callp)
+                                startActivity(newIntent)
+                                return
                             }
                         }
                         if (!Utils.isVisible()) {

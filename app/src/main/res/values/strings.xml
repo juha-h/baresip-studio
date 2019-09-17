@@ -75,6 +75,10 @@
 \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
             if offered in incoming call.
     </string>
+    <string name="answer_mode">Answer Mode</string>
+    <string name="answer_mode_help">Selects how incoming calls are answered.</string>
+    <string name="manual">Manual</string>
+    <string name="auto">Automatic</string>
     <string name="voicemail_uri">Voicemail URI</string>
     <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.

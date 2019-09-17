@@ -26,6 +26,7 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var stunServer: EditText
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
+    internal lateinit var answerMode: String
     internal lateinit var vmUri: EditText
     internal lateinit var defaultCheck: CheckBox
 
@@ -142,6 +143,28 @@ class AccountActivity : AppCompatActivity() {
         mediaEncSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 mediaEnc = mediaEncKeys[mediaEncVals.indexOf(parent.selectedItem.toString())]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+
+        answerMode = acc.answerMode
+        val answerModeSpinner = findViewById(R.id.answerModeSpinner) as Spinner
+        val answerModeKeys = arrayListOf("manual", "auto")
+        val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
+        keyIx = answerModeKeys.indexOf(acc.answerMode)
+        keyVal = answerModeVals.elementAt(keyIx)
+        answerModeKeys.removeAt(keyIx)
+        answerModeVals.removeAt(keyIx)
+        answerModeKeys.add(0, acc.answerMode)
+        answerModeVals.add(0, keyVal)
+        val answerModeAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+                answerModeVals)
+        answerModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        answerModeSpinner.adapter = answerModeAdapter
+        answerModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                answerMode = answerModeKeys[answerModeVals.indexOf(parent.selectedItem.toString())]
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
@@ -343,6 +366,12 @@ class AccountActivity : AppCompatActivity() {
                 }
             }
 
+            if (answerMode != acc.answerMode) {
+                acc.answerMode = answerMode
+                Log.d("Baresip", "New answermode is ${acc.answerMode}")
+                save = true
+            }
+
             var vmUri = voicemailUri.text.toString().trim()
             if (vmUri != acc.vmUri) {
                 if (vmUri != "") {
@@ -431,6 +460,10 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.MediaEncTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.media_encryption),
                         getString(R.string.media_encryption_help))
+            }
+            findViewById(R.id.AnswerModeTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.answer_mode),
+                        getString(R.string.answer_mode_help))
             }
             findViewById(R.id.VoicemailUriTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.voicemail_uri),

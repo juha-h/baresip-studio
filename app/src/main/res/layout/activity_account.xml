@@ -211,6 +211,24 @@
         </Spinner>
 
         <TextView
+            android:id="@+id/AnswerModeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:onClick="onClick"
+            android:text="@string/answer_mode" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/answerModeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp" >
+        </Spinner>
+
+        <TextView
             android:id="@+id/VoicemailUriTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
