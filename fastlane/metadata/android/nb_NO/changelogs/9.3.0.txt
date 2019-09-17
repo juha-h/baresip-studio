@@ -1,0 +1,2 @@
+- Svarsmodus (manuell eller automatisk) -kontooppsettsvalg lagt til.
+- Strenger for norsk bokmål lagt til, sammen med endringslogger fra Weblate.
