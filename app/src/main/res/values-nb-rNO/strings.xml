@@ -195,4 +195,8 @@
     <string name="invalid_opus_bitrate">Ugyldig Opus-bitrate</string>
     <string name="invalid_opus_packet_loss">Ugyldig Opus-pakketapsprosent</string>
     <string name="opus_packet_loss">Forventet Opus-pakketap</string>
+    <string name="answer_mode">Svarsmodus</string>
+    <string name="answer_mode_help">Angir hvordan innkommende anrop besvares.</string>
+    <string name="manual">Manuell</string>
+    <string name="auto">Automatisk</string>
 </resources>
