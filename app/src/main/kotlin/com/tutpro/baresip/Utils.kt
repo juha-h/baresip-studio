@@ -235,6 +235,17 @@ object Utils {
         return false
     }
 
+    fun paramValue(params: String, name: String): String {
+        if (params == "") return ""
+        for (param in params.split(";")) {
+            val nameValue = param.split("=")
+            if (nameValue.size == 2) {
+                if (nameValue[0] == name) return nameValue[1]
+            }
+        }
+        return ""
+    }
+
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
         if (restParams.size == 1)

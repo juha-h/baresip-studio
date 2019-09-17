@@ -14,6 +14,7 @@ class Account(val accp: String) {
     var audioCodec = ArrayList<String>()
     var regint = account_regint(accp)
     var mediaEnc = account_mediaenc(accp)
+    var answerMode = ""
     var vmUri = account_vm_uri(accp)
     var vmNew = 0
     var vmOld = 0
@@ -49,6 +50,8 @@ class Account(val accp: String) {
                 break
             }
         }
+        answerMode = Utils.paramValue(account_extra(accp),"answer_mode")
+        if (answerMode == "") answerMode = "manual"
     }
 
     fun print() : String {
@@ -95,7 +98,8 @@ class Account(val accp: String) {
         else
             res = res + ";vm_uri=\"$vmUri\""
 
-        res = res + ";ptime=20;regint=${regint};regq=0.5;pubint=0;answermode=manual;call_transfer=yes"
+        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
+        if (answerMode == "auto") res += ";extra=\"answer_mode=auto\""
 
         return res
     }
@@ -188,3 +192,4 @@ external fun account_set_medianat(acc: String, medianat: String): Int
 external fun account_set_audio_codecs(acc: String, codecs: String): Int
 external fun account_set_mwi(acc: String, value: String): Int
 external fun account_vm_uri(acc: String): String
+external fun account_extra(acc: String): String
