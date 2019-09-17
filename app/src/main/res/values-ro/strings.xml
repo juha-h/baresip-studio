@@ -172,4 +172,8 @@
     <string name="failed_to_load_aec_module">Nu s-a putut încărca modulul de anulare acustică a ecoului (AEC).</string>
     <string name="invalid_opus_bitrate">Rată de biți Opus invalidă</string>
     <string name="invalid_opus_packet_loss">Procentaj de pachete pierdute Opus invalid</string>
+    <string name="answer_mode">Mod de răspuns</string>
+    <string name="answer_mode_help">Selectează modul de răspuns al apelurilor primite.</string>
+    <string name="manual">Manual</string>
+    <string name="auto">Automat</string>
 </resources>
