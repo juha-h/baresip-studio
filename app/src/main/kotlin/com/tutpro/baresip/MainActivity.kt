@@ -3,6 +3,8 @@ package com.tutpro.baresip
 import android.Manifest
 import android.app.KeyguardManager
 import android.app.NotificationManager
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.*
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -49,6 +51,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
+
+    internal var restart = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -583,7 +587,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (event == "stopped") {
-            Log.d("Baresip", "Handling service event 'stopped' with param ${params[0]}")
+            Log.d("Baresip", "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
                 val alertDialog = AlertDialog.Builder(this).create()
                 alertDialog.setTitle(getString(R.string.notice))
@@ -599,6 +603,14 @@ class MainActivity : AppCompatActivity() {
             } else {
                 quitTimer.cancel()
                 finishAndRemoveTask()
+                if (restart) {
+                    Log.d("Baresip", "Trigger restart")
+                    val restartActivity = Intent(applicationContext, MainActivity::class.java)
+                    val restartIntent = PendingIntent.getActivity(applicationContext,
+                            RESTART_REQUEST_CODE, restartActivity, PendingIntent.FLAG_CANCEL_CURRENT)
+                    val am = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                    am.set(AlarmManager.RTC,System.currentTimeMillis() + 1000, restartIntent)
+                }
                 System.exit(0)
                 return
             }
@@ -894,10 +906,11 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(i, ABOUT_CODE)
                 return true
             }
-            R.id.quit -> {
+            R.id.restart, R.id.quit -> {
                 if (stopState == "initial") {
                     Log.d("Baresip", "Quiting")
                     if (BaresipService.isServiceRunning) {
+                        if (item.itemId == R.id.restart) restart = true
                         baresipService.setAction("Stop");
                         startService(baresipService)
                         quitTimer.start()
@@ -1189,6 +1202,7 @@ class MainActivity : AppCompatActivity() {
         const val MESSAGE_CODE = 9
 
         const val PERMISSION_REQUEST_CODE = 1
+        const val RESTART_REQUEST_CODE = 2
 
     }
 

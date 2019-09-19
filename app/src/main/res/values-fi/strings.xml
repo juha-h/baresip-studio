@@ -275,6 +275,7 @@
     <string name="error">Virhe</string>
     <!-- Main Activity -->
     <string name="about">Tietoja</string>
+    <string name="restart">Käynnistä uudelleen</string>
     <string name="quit">Lopeta</string>
     <string name="outgoing_call_to_dots">Lähtevä puhelu …</string>
     <string name="incoming_call_from_dots">Tuleva puhelu …</string>

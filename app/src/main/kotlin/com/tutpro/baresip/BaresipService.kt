@@ -354,6 +354,7 @@ class BaresipService: Service() {
                             status[account_index] = R.drawable.dot_yellow
                         else
                             status[account_index] = R.drawable.dot_green
+                        ua.registrationFailed = false
                         updateStatusNotification()
                         if (!Utils.isVisible())
                             return
@@ -361,25 +362,31 @@ class BaresipService: Service() {
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
-                            if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
-                                // Most likely this error is due to DNS lookup failure
-                                newEvent = "registering failed,DNS lookup failed"
-                                Api.net_dns_debug()
-                                if (dynDns)
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        val activeNetwork = cm.activeNetwork
-                                        if (activeNetwork != null) {
-                                            val dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
-                                            Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
-                                            if (Config.updateDnsServers(dnsServers) != 0)
-                                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                                            else
-                                                Api.net_dns_debug()
+                        if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
+                            // Most likely this error is due to DNS lookup failure
+                            newEvent = "registering failed,DNS lookup failed"
+                            Api.net_dns_debug()
+                            if (dynDns)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    val activeNetwork = cm.activeNetwork
+                                    if (activeNetwork != null) {
+                                        val dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
+                                        Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
+                                        if (Config.updateDnsServers(dnsServers) != 0) {
+                                            Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                                         } else {
-                                            Log.d(LOG_TAG, "No active network!")
+                                            Api.net_dns_debug()
+                                            if (!ua.registrationFailed) {
+                                                ua.registrationFailed = true
+                                                Api.ua_register(uap)
+                                            }
                                         }
+
+                                    } else {
+                                        Log.d(LOG_TAG, "No active network!")
                                     }
-                            }
+                                }
+                        }
                         if (!Utils.isVisible())
                             return
                     }
@@ -683,7 +690,7 @@ class BaresipService: Service() {
 
     @Keep
     fun stopped(error: String) {
-        Log.d(LOG_TAG, "'stopped' from baresip with error $error")
+        Log.d(LOG_TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false
         if (error == "ua_init") {
             Config.remove("sip_listen")

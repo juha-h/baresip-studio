@@ -92,7 +92,7 @@ object Config {
             }
         }
         if (write) {
-            Log.e("Baresip", "Writing '$config'")
+            Log.e("Baresip", "Writing config '$config'")
             Utils.putFileContents(file, config)
         }
     }

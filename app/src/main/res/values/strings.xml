@@ -251,6 +251,7 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
 
     <!-- Main Activity -->
     <string name="about">About</string>
+    <string name="restart">Restart</string>
     <string name="quit">Quit</string>
     <string name="outgoing_call_to_dots">Outgoing call to &#8230;</string>
     <string name="incoming_call_from_dots">Incoming call from &#8230;</string>

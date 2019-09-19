@@ -10,6 +10,7 @@ import java.io.File
 class RunOnStartup : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.i("Baresip", "RunOnStartup received intent ${intent.action}")
         if ((intent.action == Intent.ACTION_BOOT_COMPLETED) or
                 (intent.action == "com.tutpro.baresip.Restart")) {
             val configFile = File(context.filesDir.absolutePath + "/config")
