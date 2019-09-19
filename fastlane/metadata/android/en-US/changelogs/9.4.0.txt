@@ -1,0 +1,4 @@
+- Added "Restart" Main Activity menu option.
+- When registration fails due to DNS lookup failure, try registration
+  once more after updating DNS servers.
+- Small logging improvements.
