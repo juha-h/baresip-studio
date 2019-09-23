@@ -19,13 +19,15 @@ import java.util.GregorianCalendar
 class CallsActivity : AppCompatActivity() {
 
     internal var uaHistory = ArrayList<CallRow>()
+    internal var aor = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_calls)
 
-        val aor = intent.getStringExtra("aor")!!
+        aor = intent.getStringExtra("aor")!!
+        BaresipService.activities.add(0, "calls,$aor")
         val ua = Account.findUa(aor)!!
 
         val headerView = findViewById(R.id.account) as TextView
@@ -122,20 +124,32 @@ class CallsActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+
         CallHistory.save(applicationContext.filesDir.absolutePath)
         super.onPause()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when (item.itemId) {
+
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at Calls")
+                BaresipService.activities.removeAt(0)
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
             }
         }
+
         return true
+    }
+
+    override fun onBackPressed() {
+
+        BaresipService.activities.removeAt(0)
+        super.onBackPressed()
+
     }
 
     private fun aorGenerateHistory(aor: String) {

@@ -18,15 +18,18 @@ import java.util.ArrayList
 class AccountsActivity : AppCompatActivity() {
 
     internal lateinit var alAdapter: AccountListAdapter
+
     internal var aor = ""
     internal var password = ""
-    internal var fromAorSpinner = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
 
         filesPath = applicationContext.filesDir.absolutePath
+
+        BaresipService.activities.add(0, "accounts")
 
         val listView = findViewById(R.id.accounts) as ListView
         generateAccounts()
@@ -35,7 +38,7 @@ class AccountsActivity : AppCompatActivity() {
 
         val addAccountButton = findViewById(R.id.addAccount) as ImageButton
         val newAorView = findViewById(R.id.newAor) as EditText
-        addAccountButton.setOnClickListener{
+        addAccountButton.setOnClickListener {
             val aor = newAorView.text.toString().trim()
             if (!Utils.checkAor(aor)) {
                 Log.d("Baresip", "Invalid Address of Record $aor")
@@ -68,52 +71,54 @@ class AccountsActivity : AppCompatActivity() {
                 }
             }
         }
-
-        val accp = intent.getStringExtra("accp")
-        if (accp != "") {
-            fromAorSpinner = true
-            val i = Intent(this, AccountActivity::class.java)
-            val b = Bundle()
-            b.putString("accp", accp)
-            i.putExtras(b)
-            startActivityForResult(i, 1)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (fromAorSpinner) {
-            val i = Intent()
-            setResult(Activity.RESULT_OK, i)
-            finish()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         menuInflater.inflate(R.menu.accounts_menu, menu)
         return true
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when (item.itemId) {
+
             R.id.export_accounts -> {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
                     askPassword(getString(R.string.encrypt_password))
             }
+
             R.id.import_accounts -> {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.READ_EXTERNAL_STORAGE))
                     askPassword(getString(R.string.decrypt_password))
 
             }
+
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Accounts")
+                BaresipService.activities.removeAt(0)
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
                 finish()
             }
+
         }
+
         return true
+
+    }
+
+    override fun onBackPressed() {
+
+        BaresipService.activities.removeAt(0)
+        val i = Intent()
+        setResult(Activity.RESULT_OK, i)
+        finish()
+        super.onBackPressed()
+
     }
 
     private fun askPassword(title: String) {
@@ -187,6 +192,7 @@ class AccountsActivity : AppCompatActivity() {
             if (accounts == "") return false
             return Utils.putFileContents(File(filesPath + "/accounts"), accounts)
         }
+
     }
 
 }

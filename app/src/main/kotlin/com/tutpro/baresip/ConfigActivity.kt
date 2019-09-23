@@ -52,6 +52,8 @@ class ConfigActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config)
 
+        BaresipService.activities.add(0, "config")
+
         autoStart = findViewById(R.id.AutoStart) as CheckBox
         val asCv = Config.variable("auto_start")
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
@@ -142,211 +144,228 @@ class ConfigActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         super.onCreateOptionsMenu(menu)
+
         val inflater = menuInflater
         inflater.inflate(R.menu.check_icon, menu)
         return true
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         val intent = Intent(this, MainActivity::class.java)
 
-        if (item.itemId == R.id.checkIcon) {
+        when (item.itemId) {
 
-            var autoStartString = "no"
-            if (autoStart.isChecked) autoStartString = "yes"
-            if (oldAutoStart != autoStartString) {
-                Config.replace("auto_start", autoStartString)
-                save = true
-                restart = false
-            }
+            R.id.checkIcon -> {
 
-            val listenAddr = listenAddr.text.toString().trim()
-            if (listenAddr != oldListenAddr) {
-                if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_listen_address)}: $listenAddr")
-                    return false
+                var autoStartString = "no"
+                if (autoStart.isChecked) autoStartString = "yes"
+                if (oldAutoStart != autoStartString) {
+                    Config.replace("auto_start", autoStartString)
+                    save = true
+                    restart = false
                 }
-                Config.remove("sip_listen")
-                if (listenAddr != "") Config.add("sip_listen", listenAddr)
-                save = true
-                restart = true
-            }
 
-            var preferIPv6String = "no"
-            if (preferIPv6.isChecked) preferIPv6String = "yes"
-            if (oldPreferIPv6 != preferIPv6String) {
-                Config.replace("net_prefer_ipv6", preferIPv6String)
-                save = true
-                restart = true
-            }
-
-            val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
-            if (dnsServers != oldDnsServers) {
-                if (!checkDnsServers(dnsServers)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_dns_servers)}: $dnsServers")
-                    return false
-                }
-                Config.remove("dyn_dns")
-                Config.remove("dns_server")
-                if (dnsServers.isNotEmpty()) {
-                    for (server in dnsServers.split(","))
-                        Config.add("dns_server", server)
-                    Config.add("dyn_dns", "no")
-                    if (Api.net_use_nameserver(dnsServers) != 0) {
-                        Utils.alertView(this, getString(R.string.error),
-                                "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
+                val listenAddr = listenAddr.text.toString().trim()
+                if (listenAddr != oldListenAddr) {
+                    if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                "${getString(R.string.invalid_listen_address)}: $listenAddr")
                         return false
                     }
-                } else {
-                    Config.add("dyn_dns", "yes")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                        Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
+                    Config.remove("sip_listen")
+                    if (listenAddr != "") Config.add("sip_listen", listenAddr)
+                    save = true
+                    restart = true
+                }
+
+                var preferIPv6String = "no"
+                if (preferIPv6.isChecked) preferIPv6String = "yes"
+                if (oldPreferIPv6 != preferIPv6String) {
+                    Config.replace("net_prefer_ipv6", preferIPv6String)
+                    save = true
+                    restart = true
+                }
+
+                val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
+                if (dnsServers != oldDnsServers) {
+                    if (!checkDnsServers(dnsServers)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                "${getString(R.string.invalid_dns_servers)}: $dnsServers")
+                        return false
+                    }
+                    Config.remove("dyn_dns")
+                    Config.remove("dns_server")
+                    if (dnsServers.isNotEmpty()) {
+                        for (server in dnsServers.split(","))
+                            Config.add("dns_server", server)
+                        Config.add("dyn_dns", "no")
+                        if (Api.net_use_nameserver(dnsServers) != 0) {
+                            Utils.alertView(this, getString(R.string.error),
+                                    "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
+                            return false
+                        }
                     } else {
-                        restart = true
+                        Config.add("dyn_dns", "yes")
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                            Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
+                        } else {
+                            restart = true
+                        }
                     }
+                    Api.net_debug()
+                    save = true
                 }
-                Api.net_debug()
-                save = true
-            }
 
-            if (certificateFile.isChecked != oldCertificateFile) {
-                if (certificateFile.isChecked) {
-                    if (!Utils.requestPermission(this,
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE))
-                        return false
-                    val content = Utils.getFileContents(File(downloadsDir, "cert.pem"))
-                    if (content == "Failed") {
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.read_cert_error))
+                if (certificateFile.isChecked != oldCertificateFile) {
+                    if (certificateFile.isChecked) {
+                        if (!Utils.requestPermission(this,
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                            return false
+                        val content = Utils.getFileContents(File(downloadsDir, "cert.pem"))
+                        if (content == "Failed") {
+                            Utils.alertView(this, getString(R.string.error),
+                                    getString(R.string.read_cert_error))
+                            return false
+                        }
+                        Utils.putFileContents(File(BaresipService.filesPath + "/cert.pem"),
+                                content)
+                        Config.remove("sip_certificate")
+                        Config.add("sip_certificate", BaresipService.filesPath + "/cert.pem")
+                    } else {
+                        Config.remove("sip_certificate")
+                    }
+                    save = true
+                    restart = true
+                }
+
+                if (caFile.isChecked != oldCAFile) {
+                    if (caFile.isChecked) {
+                        if (!Utils.requestPermission(this,
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                            return false
+                        val content = Utils.getFileContents(File(downloadsDir, "ca_certs.crt"))
+                        if (content == "Failed") {
+                            Utils.alertView(this, getString(R.string.error),
+                                    getString(R.string.read_ca_certs_error))
+                            return false
+                        }
+                        Utils.putFileContents(File(BaresipService.filesPath + "/ca_certs.crt"),
+                                content)
+                        Config.remove("sip_cafile")
+                        Config.add("sip_cafile", BaresipService.filesPath + "/ca_certs.crt")
+                    } else {
+                        Config.remove("sip_cafile")
+                    }
+                    save = true
+                    restart = true
+                }
+
+                if (aec.isChecked != oldAec) {
+                    Config.remove("module webrtc_aec.so")
+                    if (aec.isChecked) {
+                        Config.add("module", "webrtc_aec.so")
+                        if (Api.module_load("webrtc_aec.so") != 0) {
+                            Utils.alertView(this, getString(R.string.error),
+                                    getString(R.string.failed_to_load_aec_module))
+                            return false
+                        }
+                    } else {
+                        Api.module_unload("webrtc_aec.so")
+                    }
+                    save = true
+                }
+
+                val opusBitRate = opusBitRate.text.toString().trim()
+                if (opusBitRate != oldOpusBitrate) {
+                    if (!checkOpusBitRate(opusBitRate)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
                         return false
                     }
-                    Utils.putFileContents(File(BaresipService.filesPath + "/cert.pem"),
-                            content)
-                    Config.remove("sip_certificate")
-                    Config.add("sip_certificate", BaresipService.filesPath + "/cert.pem")
-                } else {
-                    Config.remove("sip_certificate")
+                    Config.remove("opus_bitrate")
+                    Config.add("opus_bitrate", opusBitRate)
+                    save = true
+                    restart = true
                 }
-                save = true
-                restart = true
-            }
 
-            if (caFile.isChecked != oldCAFile) {
-                if (caFile.isChecked) {
-                    if (!Utils.requestPermission(this,
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE))
-                        return false
-                    val content = Utils.getFileContents(File(downloadsDir, "ca_certs.crt"))
-                    if (content == "Failed") {
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.read_ca_certs_error))
+                val opusPacketLoss = opusPacketLoss.text.toString().trim()
+                if (opusPacketLoss != oldOpusPacketLoss) {
+                    if (!checkOpusPacketLoss(opusPacketLoss)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
                         return false
                     }
-                    Utils.putFileContents(File(BaresipService.filesPath + "/ca_certs.crt"),
-                            content)
-                    Config.remove("sip_cafile")
-                    Config.add("sip_cafile", BaresipService.filesPath + "/ca_certs.crt")
-                } else {
-                    Config.remove("sip_cafile")
-                }
-                save = true
-                restart = true
-            }
-
-            if (aec.isChecked != oldAec) {
-                Config.remove("module webrtc_aec.so")
-                if (aec.isChecked) {
-                    Config.add("module", "webrtc_aec.so")
-                    if (Api.module_load("webrtc_aec.so") != 0) {
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.failed_to_load_aec_module))
-                        return false
+                    Config.remove("opus_inbandfec")
+                    Config.remove("opus_packet_loss")
+                    if (opusPacketLoss != "0") {
+                        Config.add("opus_inbandfec", "yes")
+                        Config.add("opus_packet_loss", opusPacketLoss)
                     }
-                } else {
-                    Api.module_unload("webrtc_aec.so")
+                    save = true
+                    restart = true
                 }
-                save = true
-            }
 
-            val opusBitRate = opusBitRate.text.toString().trim()
-            if (opusBitRate != oldOpusBitrate) {
-                if (!checkOpusBitRate(opusBitRate)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
-                    return false
+                var iceModeString = "full"
+                if (iceLite.isChecked) iceModeString = "lite"
+                if (oldIceMode != iceModeString) {
+                    Config.replace("ice_mode", iceModeString)
+                    save = true
+                    restart = true
                 }
-                Config.remove("opus_bitrate")
-                Config.add("opus_bitrate", opusBitRate)
-                save = true
-                restart = true
-            }
 
-            val opusPacketLoss = opusPacketLoss.text.toString().trim()
-            if (opusPacketLoss != oldOpusPacketLoss) {
-                if (!checkOpusPacketLoss(opusPacketLoss)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
-                    return false
+                if (BaresipService.callVolume != callVolume) {
+                    BaresipService.callVolume = callVolume
+                    Config.replace("call_volume", callVolume.toString())
+                    save = true
                 }
-                Config.remove("opus_inbandfec")
-                Config.remove("opus_packet_loss")
-                if (opusPacketLoss != "0") {
-                    Config.add("opus_inbandfec", "yes")
-                    Config.add("opus_packet_loss", opusPacketLoss)
+
+                var logLevelString = "2"
+                if (debug.isChecked) logLevelString = "0"
+                if (oldLogLevel != logLevelString) {
+                    Config.replace("log_level", logLevelString)
+                    Api.log_level_set(logLevelString.toInt())
+                    Log.logLevelSet(logLevelString.toInt())
+                    save = true
                 }
-                save = true
-                restart = true
+
+                if (reset.isChecked) {
+                    Config.reset(this)
+                    save = false
+                    restart = true
+                }
+
+                if (save) Config.save()
+
+                intent.putExtra("restart", restart)
+                setResult(RESULT_OK, intent)
+                finish()
+
             }
 
-            var iceModeString = "full"
-            if (iceLite.isChecked) iceModeString = "lite"
-            if (oldIceMode != iceModeString) {
-                Config.replace("ice_mode", iceModeString)
-                save = true
-                restart = true
+            android.R.id.home -> {
+
+                Log.d("Baresip", "Back array was pressed at Config")
+                setResult(Activity.RESULT_CANCELED, intent)
+                finish()
+
             }
+        }
 
-            if (BaresipService.callVolume != callVolume) {
-                BaresipService.callVolume = callVolume
-                Config.replace("call_volume", callVolume.toString())
-                save = true
-            }
+        BaresipService.activities.removeAt(0)
+        return true
 
-            var logLevelString = "2"
-            if (debug.isChecked) logLevelString = "0"
-            if (oldLogLevel != logLevelString) {
-                Config.replace("log_level", logLevelString)
-                Api.log_level_set(logLevelString.toInt())
-                Log.logLevelSet(logLevelString.toInt())
-                save = true
-            }
+    }
 
-            if (reset.isChecked) {
-                Config.reset(this)
-                save = false
-                restart = true
-            }
+    override fun onBackPressed() {
 
-            if (save) Config.save()
+        BaresipService.activities.removeAt(0)
+        super.onBackPressed()
 
-            intent.putExtra("restart", restart )
-            setResult(RESULT_OK, intent)
-            finish()
-            return true
-
-        } else if (item.itemId == android.R.id.home) {
-
-            Log.d("Baresip", "Back array was pressed at Config")
-            setResult(Activity.RESULT_CANCELED, intent)
-            finish()
-            return true
-
-        } else return super.onOptionsItemSelected(item)
     }
 
     fun onClick(v: View) {

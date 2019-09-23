@@ -928,6 +928,7 @@ class BaresipService: Service() {
         var messages = ArrayList<Message>()
         var contacts = ArrayList<Contact>()
         var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
+        var activities = mutableListOf<String>()
 
     }
 

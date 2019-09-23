@@ -13,17 +13,16 @@ import java.util.*
 class ChatsActivity: AppCompatActivity() {
 
     internal lateinit var uaMessages: ArrayList<Message>
-    internal lateinit var aor: String
     internal lateinit var listView: ListView
     internal lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
 
+    internal var aor = ""
+
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
-        Log.d("Baresip", "Chats created")
 
         setContentView(R.layout.activity_chats)
 
@@ -33,6 +32,7 @@ class ChatsActivity: AppCompatActivity() {
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
         aor = intent.extras!!.getString("aor")!!
+        BaresipService.activities.add(0, "chats,$aor")
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
@@ -49,7 +49,7 @@ class ChatsActivity: AppCompatActivity() {
             b.putString("aor", aor)
             b.putString("peer", uaMessages[pos].peerUri)
             i.putExtras(b)
-            startActivityForResult(i, MainActivity.MESSAGE_CODE)
+            startActivityForResult(i, MainActivity.CHAT_CODE)
         }
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
@@ -125,57 +125,60 @@ class ChatsActivity: AppCompatActivity() {
                     b.putString("aor", aor)
                     b.putString("peer", uri)
                     i.putExtras(b)
-                    startActivityForResult(i, MainActivity.MESSAGE_CODE)
+                    startActivityForResult(i, MainActivity.CHAT_CODE)
                 }
             }
         }
 
-        val peer = intent.getStringExtra("peer")
-        if (peer != "") {
-            val i = Intent(this, ChatActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", aor)
-            b.putString("peer", peer)
-            b.putBoolean("focus", intent.getBooleanExtra("focus", false))
-            i.putExtras(b)
-            startActivityForResult(i, MainActivity.MESSAGE_CODE)
-        }
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("Baresip", "Chats paused")
     }
 
     override fun onResume() {
+
         super.onResume()
-        Log.d("Baresip", "Chats resumed")
+
         clAdapter.clear()
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
         listView.adapter = clAdapter
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when (item.itemId) {
+
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at Chats")
+                BaresipService.activities.removeAt(0)
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
             }
+
         }
+
         return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if ((requestCode == MainActivity.MESSAGE_CODE) && (resultCode == Activity.RESULT_OK)) {
-            clAdapter.clear()
-            uaMessages = uaMessages(aor)
-            clAdapter = ChatListAdapter(this, uaMessages)
-            listView.adapter = clAdapter
+
+        if (requestCode == MainActivity.CHAT_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                clAdapter.clear()
+                uaMessages = uaMessages(aor)
+                clAdapter = ChatListAdapter(this, uaMessages)
+                listView.adapter = clAdapter
+            }
         }
+
+    }
+
+    override fun onBackPressed() {
+
+        BaresipService.activities.removeAt(0)
+        val i = Intent()
+        setResult(Activity.RESULT_OK, i)
+        finish()
+
     }
 
     private fun uaMessages(aor: String) : ArrayList<Message> {

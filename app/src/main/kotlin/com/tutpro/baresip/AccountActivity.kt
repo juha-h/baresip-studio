@@ -35,10 +35,14 @@ class AccountActivity : AppCompatActivity() {
     private var uaIndex= -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        acc = Account.find(intent.getStringExtra("accp"))!!
+        val accp = intent.getStringExtra("accp")
+        BaresipService.activities.add(0, "account,$accp")
+
+        acc = Account.find(accp)!!
         aor = acc.aor
         uaIndex = UserAgent.findAorIndex(aor)!!
         ua = UserAgent.uas()[uaIndex]
@@ -179,249 +183,265 @@ class AccountActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
         inflater.inflate(R.menu.check_icon, menu)
         return true
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (item.itemId == R.id.checkIcon) {
+        when (item.itemId) {
 
-            val dn = displayName.text.toString().trim()
-            if (dn != acc.displayName) {
-                if (checkDisplayName(dn)) {
-                    if (account_set_display_name(acc.accp, dn) == 0) {
-                        acc.displayName = account_display_name(acc.accp);
-                        Log.d("Baresip", "New display name is ${acc.displayName}")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of display name failed")
-                    }
-                } else {
-                    Utils.alertView(this, "Notice", "Invalid Display Name: $dn")
-                    return false
-                }
-            }
-
-            val au = authUser.text.toString().trim()
-            if (au != acc.authUser) {
-                if (checkAuthUser(au)) {
-                    if (account_set_auth_user(acc.accp, au) == 0) {
-                        acc.authUser = account_auth_user(acc.accp);
-                        Log.d("Baresip", "New auth user is ${acc.authUser}")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of auth user failed")
-                    }
-                } else {
-                    Utils.alertView(this, "Notice",
-                            "Invalid Authentication UserName: $au")
-                    return false
-                }
-            }
-
-            val ap = authPass.text.toString().trim()
-            if (ap != acc.authPass) {
-                if (Utils.checkPrintAscii(ap)) {
-                    if (account_set_auth_pass(acc.accp, ap) == 0) {
-                        acc.authPass = account_auth_pass(acc.accp)
-                        // Log.d("Baresip", "New auth password is ${acc.authPass}")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of auth pass failed")
-                    }
-                } else {
-                    Utils.alertView(this, "Notice",
-                            "Invalid Authentication Password: $ap")
-                    return false
-                }
-            }
-
-            val ob = ArrayList<String>()
-            var uri: String
-            if (outbound1.text.toString().trim() != "") {
-                uri = outbound1.text.toString().trim().replace(" ", "")
-                if (!uri.startsWith("sip:")) uri = "sip:" + uri
-                ob.add(uri)
-            }
-            if (outbound2.text.toString().trim() != "") {
-                uri = outbound2.text.toString().trim().replace(" ", "")
-                if (!uri.startsWith("sip:")) uri = "sip:" + uri
-                ob.add(uri)
-            }
-            if (ob != acc.outbound) {
-                val outbound = ArrayList<String>()
-                for (i in ob.indices) {
-                    if ((ob[i] == "") || checkOutboundUri(ob[i])) {
-                        if (account_set_outbound(acc.accp, ob[i], i) == 0) {
-                            if (ob[i] != "")
-                                outbound.add(account_outbound(acc.accp, i))
+            R.id.checkIcon -> {
+                val dn = displayName.text.toString().trim()
+                if (dn != acc.displayName) {
+                    if (checkDisplayName(dn)) {
+                        if (account_set_display_name(acc.accp, dn) == 0) {
+                            acc.displayName = account_display_name(acc.accp);
+                            Log.d("Baresip", "New display name is ${acc.displayName}")
+                            save = true
                         } else {
-                            Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
-                            break
+                            Log.e("Baresip", "Setting of display name failed")
+                        }
+                    } else {
+                        Utils.alertView(this, "Notice", "Invalid Display Name: $dn")
+                        return false
+                    }
+                }
+
+                val au = authUser.text.toString().trim()
+                if (au != acc.authUser) {
+                    if (checkAuthUser(au)) {
+                        if (account_set_auth_user(acc.accp, au) == 0) {
+                            acc.authUser = account_auth_user(acc.accp);
+                            Log.d("Baresip", "New auth user is ${acc.authUser}")
+                            save = true
+                        } else {
+                            Log.e("Baresip", "Setting of auth user failed")
                         }
                     } else {
                         Utils.alertView(this, "Notice",
-                                "Invalid Proxy Server URI: ${ob[i]}")
+                                "Invalid Authentication UserName: $au")
                         return false
                     }
                 }
-                Log.d("Baresip", "New outbound proxies are ${outbound}")
-                acc.outbound = outbound
-                if (outbound.isEmpty())
-                    account_set_sipnat(acc.accp, "")
-                else
-                    account_set_sipnat(acc.accp, "outbound")
-                save = true
-            }
 
-            var newRegint = -1
-            if (regCheck.isChecked) {
-                if (acc.regint != 3600) newRegint = 3600
-            } else {
-                if (acc.regint != 0) {
-                    Api.ua_unregister(ua.uap)
-                    UserAgent.updateStatus(ua, R.drawable.dot_yellow)
-                    newRegint = 0
-                }
-            }
-            if (newRegint != -1)
-                if (account_set_regint(acc.accp, newRegint) == 0) {
-                    acc.regint = account_regint(acc.accp)
-                    Log.d("Baresip", "New regint is ${acc.regint}")
-                    save = true
-                } else {
-                    Log.e("Baresip", "Setting of regint failed")
-                }
-
-            if (mediaNat != acc.mediaNat) {
-                if (account_set_medianat(acc.accp, mediaNat) == 0) {
-                    acc.mediaNat = account_medianat(acc.accp)
-                    Log.d("Baresip", "New medianat is ${acc.mediaNat}")
-                    save = true
-                } else {
-                    Log.e("Baresip", "Setting of medianat failed")
-                }
-            }
-
-            if (mediaNat != "") {
-                val newStunServer = stunServer.text.toString().trim()
-                if (acc.stunServer != newStunServer) {
-                    if (!Utils.checkHostPort(newStunServer)) {
-                        Utils.alertView(this, "Notice",
-                                "Invalid STUN Server '$newStunServer'")
-                        return false
-                    }
-                    var host = ""
-                    var port = 0
-                    if (newStunServer != "") {
-                        val hostPort = newStunServer.split(":")
-                        host = hostPort[0]
-                        if (hostPort.size == 2) port = hostPort[1].toInt()
-                    }
-                    if ((account_set_stun_host(acc.accp, host) == 0) &&
-                            (account_set_stun_port(acc.accp, port) == 0)) {
-                        acc.stunServer = account_stun_host(acc.accp)
-                        if (port != 0)
-                            acc.stunServer += ":" + account_stun_port(acc.accp).toString()
-                        Log.d("Baresip", "New StunServer is '${acc.stunServer}'")
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of StunServer failed")
-                    }
-                }
-            }
-
-            val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
-            if (ac != acc.audioCodec) {
-                Log.d("Baresip", "New codecs ${newCodecs.filter { it != "-" }}")
-                val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
-                if (account_set_audio_codecs(acc.accp, acParam) == 0) {
-                    var i = 0
-                    while (true) {
-                        val codec = account_audio_codec(acc.accp, i)
-                        if (codec != "") {
-                            Log.d("Baresip", "Found audio codec '$codec'")
-                            i++
+                val ap = authPass.text.toString().trim()
+                if (ap != acc.authPass) {
+                    if (Utils.checkPrintAscii(ap)) {
+                        if (account_set_auth_pass(acc.accp, ap) == 0) {
+                            acc.authPass = account_auth_pass(acc.accp)
+                            // Log.d("Baresip", "New auth password is ${acc.authPass}")
+                            save = true
                         } else {
-                            break
+                            Log.e("Baresip", "Setting of auth pass failed")
+                        }
+                    } else {
+                        Utils.alertView(this, "Notice",
+                                "Invalid Authentication Password: $ap")
+                        return false
+                    }
+                }
+
+                val ob = ArrayList<String>()
+                var uri: String
+                if (outbound1.text.toString().trim() != "") {
+                    uri = outbound1.text.toString().trim().replace(" ", "")
+                    if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                    ob.add(uri)
+                }
+                if (outbound2.text.toString().trim() != "") {
+                    uri = outbound2.text.toString().trim().replace(" ", "")
+                    if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                    ob.add(uri)
+                }
+                if (ob != acc.outbound) {
+                    val outbound = ArrayList<String>()
+                    for (i in ob.indices) {
+                        if ((ob[i] == "") || checkOutboundUri(ob[i])) {
+                            if (account_set_outbound(acc.accp, ob[i], i) == 0) {
+                                if (ob[i] != "")
+                                    outbound.add(account_outbound(acc.accp, i))
+                            } else {
+                                Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
+                                break
+                            }
+                        } else {
+                            Utils.alertView(this, "Notice",
+                                    "Invalid Proxy Server URI: ${ob[i]}")
+                            return false
                         }
                     }
-                    acc.audioCodec = ac
+                    Log.d("Baresip", "New outbound proxies are ${outbound}")
+                    acc.outbound = outbound
+                    if (outbound.isEmpty())
+                        account_set_sipnat(acc.accp, "")
+                    else
+                        account_set_sipnat(acc.accp, "outbound")
                     save = true
-                } else {
-                    Log.e("Baresip", "Setting of audio codecs '$acParam' failed")
                 }
-            }
 
-            if (mediaEnc != acc.mediaEnc) {
-                if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                    acc.mediaEnc = account_mediaenc(acc.accp)
-                    Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
-                    save = true
+                var newRegint = -1
+                if (regCheck.isChecked) {
+                    if (acc.regint != 3600) newRegint = 3600
                 } else {
-                    Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
-                }
-            }
-
-            if (answerMode != acc.answerMode) {
-                acc.answerMode = answerMode
-                Log.d("Baresip", "New answermode is ${acc.answerMode}")
-                save = true
-            }
-
-            var vmUri = voicemailUri.text.toString().trim()
-            if (vmUri != acc.vmUri) {
-                if (vmUri != "") {
-                    if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
-                    if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
-                    if (!Utils.checkSipUri(vmUri)) {
-                        Utils.alertView(this, "Notice",
-                                "Invalid Voicemail URI: $vmUri")
-                        return false
+                    if (acc.regint != 0) {
+                        Api.ua_unregister(ua.uap)
+                        UserAgent.updateStatus(ua, R.drawable.dot_yellow)
+                        newRegint = 0
                     }
-                    account_set_mwi(acc.accp, "yes")
-                } else {
-                    account_set_mwi(acc.accp, "no")
                 }
-                acc.vmUri = vmUri
-                save = true
+                if (newRegint != -1)
+                    if (account_set_regint(acc.accp, newRegint) == 0) {
+                        acc.regint = account_regint(acc.accp)
+                        Log.d("Baresip", "New regint is ${acc.regint}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of regint failed")
+                    }
+
+                if (mediaNat != acc.mediaNat) {
+                    if (account_set_medianat(acc.accp, mediaNat) == 0) {
+                        acc.mediaNat = account_medianat(acc.accp)
+                        Log.d("Baresip", "New medianat is ${acc.mediaNat}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of medianat failed")
+                    }
+                }
+
+                if (mediaNat != "") {
+                    val newStunServer = stunServer.text.toString().trim()
+                    if (acc.stunServer != newStunServer) {
+                        if (!Utils.checkHostPort(newStunServer)) {
+                            Utils.alertView(this, "Notice",
+                                    "Invalid STUN Server '$newStunServer'")
+                            return false
+                        }
+                        var host = ""
+                        var port = 0
+                        if (newStunServer != "") {
+                            val hostPort = newStunServer.split(":")
+                            host = hostPort[0]
+                            if (hostPort.size == 2) port = hostPort[1].toInt()
+                        }
+                        if ((account_set_stun_host(acc.accp, host) == 0) &&
+                                (account_set_stun_port(acc.accp, port) == 0)) {
+                            acc.stunServer = account_stun_host(acc.accp)
+                            if (port != 0)
+                                acc.stunServer += ":" + account_stun_port(acc.accp).toString()
+                            Log.d("Baresip", "New StunServer is '${acc.stunServer}'")
+                            save = true
+                        } else {
+                            Log.e("Baresip", "Setting of StunServer failed")
+                        }
+                    }
+                }
+
+                val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
+                if (ac != acc.audioCodec) {
+                    Log.d("Baresip", "New codecs ${newCodecs.filter { it != "-" }}")
+                    val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
+                    if (account_set_audio_codecs(acc.accp, acParam) == 0) {
+                        var i = 0
+                        while (true) {
+                            val codec = account_audio_codec(acc.accp, i)
+                            if (codec != "") {
+                                Log.d("Baresip", "Found audio codec '$codec'")
+                                i++
+                            } else {
+                                break
+                            }
+                        }
+                        acc.audioCodec = ac
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of audio codecs '$acParam' failed")
+                    }
+                }
+
+                if (mediaEnc != acc.mediaEnc) {
+                    if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
+                        acc.mediaEnc = account_mediaenc(acc.accp)
+                        Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
+                    }
+                }
+
+                if (answerMode != acc.answerMode) {
+                    acc.answerMode = answerMode
+                    Log.d("Baresip", "New answermode is ${acc.answerMode}")
+                    save = true
+                }
+
+                var vmUri = voicemailUri.text.toString().trim()
+                if (vmUri != acc.vmUri) {
+                    if (vmUri != "") {
+                        if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
+                        if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
+                        if (!Utils.checkSipUri(vmUri)) {
+                            Utils.alertView(this, "Notice",
+                                    "Invalid Voicemail URI: $vmUri")
+                            return false
+                        }
+                        account_set_mwi(acc.accp, "yes")
+                    } else {
+                        account_set_mwi(acc.accp, "no")
+                    }
+                    acc.vmUri = vmUri
+                    save = true
+                }
+
+                if (defaultCheck.isChecked && (uaIndex > 0)) {
+                    val uasTmp = BaresipService.uas[0]
+                    val statusTmp = BaresipService.status[0]
+                    BaresipService.uas[0] = BaresipService.uas[uaIndex]
+                    BaresipService.status[0] = BaresipService.status[uaIndex]
+                    BaresipService.uas[uaIndex] = uasTmp
+                    BaresipService.status[uaIndex] = statusTmp
+                    save = true
+                }
+
+                if (save) {
+                    AccountsActivity.saveAccounts()
+                    if (Api.ua_update_account(ua.uap) != 0)
+                        Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
+                }
+
+                if (regCheck.isChecked) Api.ua_register(ua.uap)
+
+                BaresipService.activities.removeAt(0)
+                val i = Intent()
+                setResult(Activity.RESULT_OK, i)
+                finish()
+
             }
 
-            if (defaultCheck.isChecked && (uaIndex > 0)) {
-                val uasTmp = BaresipService.uas[0]
-                val statusTmp = BaresipService.status[0]
-                BaresipService.uas[0] = BaresipService.uas[uaIndex]
-                BaresipService.status[0] = BaresipService.status[uaIndex]
-                BaresipService.uas[uaIndex] = uasTmp
-                BaresipService.status[uaIndex] = statusTmp
-                save = true
+            android.R.id.home -> {
+
+                BaresipService.activities.removeAt(0)
+                val i = Intent()
+                setResult(Activity.RESULT_OK, i)
+                finish()
+
             }
 
-            if (save) {
-                AccountsActivity.saveAccounts()
-                if (Api.ua_update_account(ua.uap) != 0)
-                    Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
-            }
+        }
 
-            if (regCheck.isChecked) Api.ua_register(ua.uap)
+        return true
 
-            val i = Intent()
-            setResult(Activity.RESULT_OK, i)
-            finish()
-            return true
+    }
 
-        } else if (item.itemId == android.R.id.home) {
+    override fun onBackPressed() {
 
-            Log.d("Baresip", "Back array was pressed at Account")
-            val i = Intent()
-            setResult(Activity.RESULT_OK, i)
-            finish()
-            return true
+        BaresipService.activities.removeAt(0)
+        super.onBackPressed()
 
-        } else return super.onOptionsItemSelected(item)
     }
 
     fun onClick(v: View) {

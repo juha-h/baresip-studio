@@ -43,6 +43,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                             if (ua == null) {
                                 Log.w("Baresip", "onClickListener did not find AoR $aor")
                             } else {
+                                BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
                                 i.putExtra("peer", Contact.contacts()[pos].uri)
                                 (cxt as Activity).startActivity(i)

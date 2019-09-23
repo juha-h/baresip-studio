@@ -15,14 +15,17 @@ import java.io.File
 class ContactsActivity : AppCompatActivity() {
 
     internal lateinit var clAdapter: ContactListAdapter
+    internal lateinit var aor: String
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
-        val listView = findViewById(R.id.contacts) as ListView
+        aor = intent.getStringExtra("aor")!!
+        BaresipService.activities.add(0, "contacts,$aor")
 
-        val aor = intent.getStringExtra("aor")!!
+        val listView = findViewById(R.id.contacts) as ListView
         clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
         listView.adapter = clAdapter
         listView.isLongClickable = true
@@ -42,20 +45,28 @@ class ContactsActivity : AppCompatActivity() {
                 startActivityForResult(i, MainActivity.CONTACT_CODE)
             }
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
         if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         menuInflater.inflate(R.menu.contacts_menu, menu)
         return true
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
         when (item.itemId) {
+
             R.id.export_contacts -> {
                 if (saveContacts(dir, "contacts.bs"))
                     Utils.alertView(this, "",
@@ -64,6 +75,7 @@ class ContactsActivity : AppCompatActivity() {
                     Utils.alertView(this,getString(R.string.error),
                             getString(R.string.export_error))
             }
+
             R.id.import_contacts -> {
                 if (restoreContacts(dir, "contacts.bs")) {
                     Utils.alertView(this, "",
@@ -74,21 +86,27 @@ class ContactsActivity : AppCompatActivity() {
                     Utils.alertView(this,getString(R.string.error),
                             getString(R.string.import_error))
             }
+
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Contacts")
+                BaresipService.activities.removeAt(0)
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
                 finish()
             }
         }
+
         return true
+
     }
 
     override fun onBackPressed() {
-        Log.d("Baresip", "Back button was pressed at Contacts")
+
+        BaresipService.activities.removeAt(0)
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()
+        
     }
 
     companion object {

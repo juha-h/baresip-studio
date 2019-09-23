@@ -44,9 +44,12 @@ class ChatActivity : AppCompatActivity() {
             val i = Intent()
             setResult(Activity.RESULT_CANCELED, i)
             finish()
+            return
         } else {
             ua = userAgent
         }
+
+        BaresipService.activities.add(0, "chat,$aor,$peerUri,$focus")
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
@@ -59,6 +62,7 @@ class ChatActivity : AppCompatActivity() {
             else
                 chatPeer = chatPeer.substring(4)
         }
+
         setTitle(String.format(getString(R.string.chat_with), chatPeer))
 
         val headerView = findViewById(R.id.account) as TextView
@@ -161,16 +165,20 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         menuInflater.inflate(R.menu.call_icon, menu)
         return true
+
     }
 
     override fun onPause() {
+
         if (newMessage.text.toString() != "") {
             Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
         super.onPause()
+
     }
 
     /*override fun onStop() {
@@ -179,8 +187,9 @@ class ChatActivity : AppCompatActivity() {
     }*/
 
     override fun onResume() {
+
         super.onResume()
-        Log.d("Baresip", "Chat resumed")
+
         val chatText = BaresipService.chatTexts.get("$aor::$peerUri")
         if (chatText != null) {
             Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
@@ -192,15 +201,20 @@ class ChatActivity : AppCompatActivity() {
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
+
     }
 
     override fun onDestroy() {
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
         super.onDestroy()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when (item.itemId) {
+
             android.R.id.home -> {
                 var save = false
                 for (m in chatMessages) {
@@ -211,9 +225,11 @@ class ChatActivity : AppCompatActivity() {
                 }
                 if (save) Message.saveMessages(applicationContext.filesDir.absolutePath)
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
+                BaresipService.activities.removeAt(0)
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
             }
+
             R.id.callIcon -> {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -223,9 +239,19 @@ class ChatActivity : AppCompatActivity() {
                 intent.putExtra("peer", peerUri)
                 startActivity(intent)
             }
+
         }
+
         finish()
         return true
+
+    }
+
+    override fun onBackPressed() {
+
+        BaresipService.activities.removeAt(0)
+        super.onBackPressed()
+
     }
 
     private fun uaPeerMessages(aor: String, peerUri: String): ArrayList<Message> {
