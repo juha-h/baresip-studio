@@ -24,7 +24,9 @@
         where also issues can be reported.
         ]]>
     </string>
-    <string name="baresip_link" translatable="false"><a href="https://github.com/juha-h/baresip-studio">GitHub</a></string>
+    <string name="baresip_link" translatable="false">
+        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
+    </string>
 
     <!-- Account Activity -->
     <string name="account">Account</string>
@@ -186,17 +188,15 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
     <string name="_28000" translatable="false">28000</string>
-    <string name="opus_packet_loss">Opus Expected Packet Loss</string>
-    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage.
-        Valid values are 0-100. Factory default is 0, which disables Opus Forward Error
-        Correction (FEC).</string>
+    <string name="opus_packet_loss">Expected Opus packet-loss</string>
+    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage, from 0-100. By default 0, turning off Opus Forward Error Correction (FEC).</string>
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
-    <string name="default_call_volume_help">If set, default call audio volume at scale 1&#8211;10.</string>
+    <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="debug">Debug</string>
     <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
@@ -247,15 +247,15 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="send">Send</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-    <string name="dots" translatable="false">&#8230;</string>
+    <string name="dots" translatable="false">…</string>
 
     <!-- Main Activity -->
     <string name="about">About</string>
     <string name="restart">Restart</string>
     <string name="quit">Quit</string>
-    <string name="outgoing_call_to_dots">Outgoing call to &#8230;</string>
-    <string name="incoming_call_from_dots">Incoming call from &#8230;</string>
-    <string name="transferring_call_to_dots">Transferring call to &#8230;</string>
+    <string name="outgoing_call_to_dots">Outgoing call to …</string>
+    <string name="incoming_call_from_dots">Incoming call from …</string>
+    <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>

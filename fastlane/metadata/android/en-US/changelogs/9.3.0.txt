@@ -1,3 +1,2 @@
- - Added Answer Mode (Manual or Automatic) account configuration option.
- - Added Norwegian strings and changelogs from Weblate.
- 
+- Added Answer Mode (Manual or Automatic) account configuration option.
+- Added Norwegian Bokmål strings and changelogs from Weblate.

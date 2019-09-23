@@ -1,0 +1,5 @@
+- Tillagt støtte for Opus framtidsfeilkorrigering (FEC) via Opus
+  sin oppsettsvariabel for forventet pakketap.
+- Forsøksvis oppdatering av dynamisk DNS-info hvis registrering mislykkes
+  som følge av "ugyldig argument"-feil.
+- Bruk av oversettbar streng i alle oppsettsrelaterte varselsmeldinger.

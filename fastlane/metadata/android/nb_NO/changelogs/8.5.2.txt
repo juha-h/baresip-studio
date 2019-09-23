@@ -1,0 +1,1 @@
+- Fikset sjekking av DNS-tjeneroppsett.
