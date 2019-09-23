@@ -1,0 +1,1 @@
+- Resume baresip to paused activity instead of main activity.
