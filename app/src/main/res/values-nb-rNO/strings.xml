@@ -152,8 +152,6 @@
     <string name="debug">Feilretting</string>
     <string name="debug_help">Gjør feilrettings- og infonivå-loggmeldinger tilgjengelige i Logcat.</string>
     <string name="reset_config_help">Tilbakestiller oppsettet til fabrikkforvalgte verdier.</string>
-    <string name="read_cert_error">Klarte ikke å lese filen "cert.pem" fra Nedlastinger.</string>
-    <string name="read_ca_certs_error">Klarte ikke å lese filen \'ca_certs.crt\' from Download directory.</string>
     <string name="contact_already_exists">Kontakten \"%1$s\" finnes allerede.</string>
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
@@ -187,14 +185,12 @@
     <string name="tls_ca_file_help">Hvis valgt vil filen \"ca_certs.crt\" inneholdende TLS-sertifikatene tilhørende sertifikatsmyndighetene ha blitt lastet inn fra Nedlastinger.</string>
     <string name="read_cert_error">Klarte ikke å lese filen \"cert.pem\" fra Nedlastinger.</string>
     <string name="read_ca_certs_error">Klarte ikke å lese filen \"ca_certs.crt\" fra Nedlastinger.</string>
-    <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0-100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>
     <string name="invalid_listen_address">Ugyldig lyttadresse</string>
     <string name="invalid_dns_servers">Ugyldige DNS-tjenere</string>
     <string name="failed_to_set_dns_servers">Klarte ikke å sette DNS-tjenere</string>
     <string name="failed_to_load_aec_module">Klarte ikke å laste inn akustisk ekkokanselleringsmodul.</string>
     <string name="invalid_opus_bitrate">Ugyldig Opus-bitrate</string>
     <string name="invalid_opus_packet_loss">Ugyldig Opus-pakketapsprosent</string>
-    <string name="opus_packet_loss">Forventet Opus-pakketap</string>
     <string name="answer_mode">Svarsmodus</string>
     <string name="answer_mode_help">Angir hvordan innkommende anrop besvares.</string>
     <string name="manual">Manuell</string>
