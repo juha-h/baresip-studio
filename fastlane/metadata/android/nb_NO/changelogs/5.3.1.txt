@@ -1,2 +1,2 @@
 - Mindre strikt sjekking av brukerdel i kontoens SIP-URI.
-- Tillagt støtte for arm64-v8a-arkitektur.
+- Tillagt støtte for ARMv8-A-arkitektur.
