@@ -27,8 +27,6 @@ class AccountsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
 
-        filesPath = applicationContext.filesDir.absolutePath
-
         BaresipService.activities.add(0, "accounts")
 
         val listView = findViewById(R.id.accounts) as ListView
@@ -159,8 +157,6 @@ class AccountsActivity : AppCompatActivity() {
 
     companion object {
 
-        internal var filesPath = ""
-
         var accounts = ArrayList<AccountRow>()
 
         fun generateAccounts() {
@@ -173,8 +169,8 @@ class AccountsActivity : AppCompatActivity() {
         fun saveAccounts() {
             var accounts = ""
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
-            Utils.putFileContents(File(filesPath + "/accounts"), accounts)
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '${filesPath}/accounts'")
+            Utils.putFileContents(File(BaresipService.filesPath + "/accounts"), accounts)
+            // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun exportAccounts(path: File, password: String): Boolean {
@@ -190,7 +186,8 @@ class AccountsActivity : AppCompatActivity() {
             if (content == "Failed") return false
             val accounts = Utils.decrypt(content, password)
             if (accounts == "") return false
-            return Utils.putFileContents(File(filesPath + "/accounts"), accounts)
+            return Utils.putFileContents(File(BaresipService.filesPath + "/accounts"),
+                    accounts)
         }
 
     }
