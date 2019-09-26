@@ -1,0 +1,2 @@
+- Added support for G722 codec.
+- Fixed saving of accounts.
