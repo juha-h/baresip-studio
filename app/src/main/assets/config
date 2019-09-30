@@ -1,4 +1,4 @@
-auto_start no
+auto_start yes
 log_level 2
 poll_method epoll
 sip_trans_bsize 128
