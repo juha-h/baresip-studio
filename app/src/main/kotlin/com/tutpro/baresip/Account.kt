@@ -20,8 +20,10 @@ class Account(val accp: String) {
     var vmOld = 0
     var missedCalls = false
     var unreadMessages = false
+    var callHistory = true
 
     init {
+
         val stunHost = account_stun_host(accp)
         if (stunHost != "") {
             val stunPort = account_stun_port(accp)
@@ -30,6 +32,7 @@ class Account(val accp: String) {
             else
                 stunServer = "$stunHost:$stunPort"
         }
+
         var i = 0
         while (true) {
             val ob = account_outbound(accp, i)
@@ -40,6 +43,7 @@ class Account(val accp: String) {
                 break
             }
         }
+
         i = 0
         while (true) {
             val ac = account_audio_codec(accp, i)
@@ -50,8 +54,12 @@ class Account(val accp: String) {
                 break
             }
         }
-        answerMode = Utils.paramValue(account_extra(accp),"answer_mode")
+
+        val extra = account_extra(accp)
+        answerMode = Utils.paramValue(extra,"answer_mode")
         if (answerMode == "") answerMode = "manual"
+        callHistory = Utils.paramValue(extra,"call_history") == ""
+
     }
 
     fun print() : String {
@@ -99,7 +107,16 @@ class Account(val accp: String) {
             res = res + ";vm_uri=\"$vmUri\""
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
-        if (answerMode == "auto") res += ";extra=\"answer_mode=auto\""
+
+        var extra = ""
+        if (!callHistory) extra = "call_history=no"
+        if (answerMode == "auto") {
+            if (extra == "")
+                extra = "answer_mode=auto"
+            else
+                extra += ";answer_mode=auto"
+        }
+        res += ";extra=\"$extra\""
 
         return res
     }

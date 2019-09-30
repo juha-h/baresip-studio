@@ -30,12 +30,12 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
             }
         }
 
+        fun clear(aor: String) {
+            BaresipService.history = ArrayList(BaresipService.history.filter{it.aor != aor})
+        }
+
         fun aorHistorySize(aor: String): Int {
-            var size = 0;
-            for (h in BaresipService.history) {
-                if (h.aor == aor) size++
-            }
-            return size
+            return BaresipService.history.filter { it.aor == aor }.count()
         }
 
         fun aorLatestHistory(aor: String): CallHistory? {
@@ -74,6 +74,11 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
                 }
             }
 
+        }
+
+        fun print() {
+            for (h in BaresipService.history)
+                Log.d("Baresip", "[${h.aor}, ${h.peerURI}, ${h.direction}, ${h.connected}]")
         }
     }
 

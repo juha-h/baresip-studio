@@ -129,6 +129,9 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     </string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history?
     </string>
+    <string name="delete_history">Delete</string>
+    <string name="disable_history">Disable</string>
+    <string name="enable_history">Enable</string>
 
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>

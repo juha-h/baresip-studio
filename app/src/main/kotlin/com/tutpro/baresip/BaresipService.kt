@@ -201,8 +201,10 @@ class BaresipService: Service() {
                     val aor = call.ua.account.aor
                     Log.d(LOG_TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
-                    CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                    CallHistory.save(filesPath)
+                    if (call.ua.account.callHistory) {
+                        CallHistory.add(CallHistory(aor, peerUri, "in", false))
+                        CallHistory.save(filesPath)
+                    }
                 }
             }
 
@@ -409,9 +411,11 @@ class BaresipService: Service() {
                         if ((Call.calls().size > 0) || (tm.callState != TelephonyManager.CALL_STATE_IDLE)) {
                             Log.d(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
-                            CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                            CallHistory.save(filesPath)
-                            ua.account.missedCalls = true
+                            if (ua.account.callHistory) {
+                                CallHistory.add(CallHistory(aor, peerUri, "in", false))
+                                CallHistory.save(filesPath)
+                                ua.account.missedCalls = true
+                            }
                             if (!Utils.isVisible())
                                 return
                             newEvent = "call rejected"
@@ -486,9 +490,11 @@ class BaresipService: Service() {
                         Log.d(LOG_TAG, "AoR $aor call $callp established")
                         call.status = "connected"
                         call.onhold = false
-                        CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
-                        CallHistory.save(filesPath)
-                        call.hasHistory = true
+                        if (ua.account.callHistory) {
+                            CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
+                            CallHistory.save(filesPath)
+                            call.hasHistory = true
+                        }
                         if (call.dir == "in") {
                             stopRinging()
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -574,7 +580,7 @@ class BaresipService: Service() {
                         Log.d(LOG_TAG, "AoR $aor call $callp is closed")
                         if (call.status == "incoming") stopRinging()
                         calls.remove(call)
-                        if (!call.hasHistory) {
+                        if (ua.account.callHistory && !call.hasHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, false))
                             CallHistory.save(filesPath)
                             if (call.dir == "in") ua.account.missedCalls = true
