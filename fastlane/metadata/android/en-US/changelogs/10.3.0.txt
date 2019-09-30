@@ -1,0 +1,4 @@
+- Added Call History menu that allows deleting, disabling, and enabling
+  of account's call history.
+- Added Spanish language strings (credits to Javier Falbo).
+- Auto start of baresip is now default in new installations.
