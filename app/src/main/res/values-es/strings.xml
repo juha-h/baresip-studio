@@ -229,7 +229,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
         Verifique Aplicaciones → baresip → Permisos → Almacenamiento."</string>
     <string name="imported_contacts">Contactos importados de la carpeta de descargas.</string>
     <string name="import_error">Error al importar contactos desde la carpeta Descargar. Comprobar aplicaciones →
-        baresip → Permisos → Almacenamiento y ese archivo \ 'contactos.bs \' existe en la carpeta.</string>
+        baresip → Permisos → Almacenamiento y ese archivo \'contactos.bs\' existe en la carpeta.</string>
 
     <!-- Generic -->
     <string name="alert">Alerta</string>
