@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
@@ -18,6 +19,9 @@ import java.util.GregorianCalendar
 
 class CallsActivity : AppCompatActivity() {
 
+    internal lateinit var account: Account
+    internal lateinit var adapter: CallListAdapter
+
     internal var uaHistory = ArrayList<CallRow>()
     internal var aor = ""
 
@@ -29,6 +33,7 @@ class CallsActivity : AppCompatActivity() {
         aor = intent.getStringExtra("aor")!!
         BaresipService.activities.add(0, "calls,$aor")
         val ua = Account.findUa(aor)!!
+        account = ua.account
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
@@ -36,7 +41,7 @@ class CallsActivity : AppCompatActivity() {
 
         val listView = findViewById(R.id.calls) as ListView
         aorGenerateHistory(aor)
-        val adapter = CallListAdapter(this, uaHistory)
+        adapter = CallListAdapter(this, uaHistory)
         listView.adapter = adapter
         listView.isLongClickable = true
 
@@ -70,6 +75,7 @@ class CallsActivity : AppCompatActivity() {
                     .setPositiveButton(getString(R.string.send_message), dialogClickListener)
                     .show()
         }
+
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerURI
             val peerName = ContactsActivity.contactName(peerUri)
@@ -85,11 +91,6 @@ class CallsActivity : AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        if (uaHistory.size == 0) {
-                            val i = Intent()
-                            setResult(Activity.RESULT_CANCELED, i)
-                            finish()
-                        }
                         adapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -121,6 +122,7 @@ class CallsActivity : AppCompatActivity() {
         }
 
         ua.account.missedCalls = false
+        invalidateOptionsMenu()
     }
 
     override fun onPause() {
@@ -133,6 +135,19 @@ class CallsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.delete_history -> {
+                CallHistory.clear(aor)
+                CallHistory.save(applicationContext.filesDir.absolutePath)
+                aorGenerateHistory(aor)
+                adapter.notifyDataSetChanged()
+            }
+
+            R.id.history_on_off -> {
+                account.callHistory = !account.callHistory
+                invalidateOptionsMenu()
+                AccountsActivity.saveAccounts()
+            }
 
             android.R.id.home -> {
                 BaresipService.activities.removeAt(0)
@@ -151,6 +166,24 @@ class CallsActivity : AppCompatActivity() {
         super.onBackPressed()
 
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+
+        if (account.callHistory)
+            menu.findItem(R.id.history_on_off).setTitle(getString(R.string.disable_history))
+        else
+            menu.findItem(R.id.history_on_off).setTitle(getString(R.string.enable_history))
+        return super.onPrepareOptionsMenu(menu)
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        menuInflater.inflate(R.menu.calls_menu, menu)
+        return true
+
+    }
+
 
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()

@@ -144,6 +144,9 @@
         %2$s puheluhistoriasta?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta?</string>
+    <string name="delete_history">Tyhjennä</string>
+    <string name="disable_history">Poista käytöstä</string>
+    <string name="enable_history">Ota käyttöön</string>
     <!-- Chat Activity -->
     <string name="chat">Viestiketju</string>
     <string name="chat_with">Viestiketju %1$s</string>
