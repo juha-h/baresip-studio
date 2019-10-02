@@ -822,6 +822,7 @@ class MainActivity : AppCompatActivity() {
                     "message show", "message reply" -> {
                         val peer = params[1]
                         Log.d("Baresip", "Message for $aor from $peer")
+                        Log.d("Baresip", "Activity stack ${BaresipService.activities.toString()}")
                         if ((aorSpinner.selectedItemPosition == -1) ||
                                 (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
                             aorSpinner.setSelection(account_index)

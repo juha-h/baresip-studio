@@ -49,7 +49,8 @@ class ChatActivity : AppCompatActivity() {
             ua = userAgent
         }
 
-        BaresipService.activities.add(0, "chat,$aor,$peerUri,$focus")
+        if (!BaresipService.activities.first().startsWith("chat,$aor,$peerUri"))
+            BaresipService.activities.add(0, "chat,$aor,$peerUri,$focus")
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
