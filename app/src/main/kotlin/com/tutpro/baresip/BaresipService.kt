@@ -180,6 +180,14 @@ class BaresipService: Service() {
 
                 if (Config.variable("dyn_dns")[0] == "yes")
                     Config.remove("dns_server")
+
+                if (AccountsActivity.noAccounts()) {
+                    val newIntent = Intent(this, MainActivity::class.java)
+                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+                    newIntent.putExtra("action", "accounts")
+                    startActivity(newIntent)
+                }
             }
 
             "Call Show", "Call Answer" -> {
