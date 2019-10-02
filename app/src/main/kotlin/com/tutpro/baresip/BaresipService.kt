@@ -837,15 +837,11 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            if (rt.isPlaying) rt.stop()
-        } else {
-            if (rtTimer != null) {
-                rtTimer!!.cancel()
-                rtTimer = null
-                if (rt.isPlaying) rt.stop()
-            }
+        if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.P) && (rtTimer != null)) {
+            rtTimer!!.cancel()
+            rtTimer = null
         }
+        rt.stop()
         abandonAudioFocus()
     }
 
