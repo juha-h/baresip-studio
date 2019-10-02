@@ -265,12 +265,17 @@ class MainActivity : AppCompatActivity() {
                         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         callButton.visibility = View.INVISIBLE
+                        callButton.isEnabled = false
                         hangupButton.visibility = View.VISIBLE
+                        hangupButton.isEnabled = false
                         Handler().postDelayed({
+                            hangupButton.isEnabled = true
                             if (!call(ua, uri, "outgoing")) {
                                 am.mode = AudioManager.MODE_NORMAL
                                 callButton.visibility = View.VISIBLE
+                                callButton.isEnabled = true
                                 hangupButton.visibility = View.INVISIBLE
+                                hangupButton.isEnabled = false
                             }
                         }, 2500)
                     }
@@ -301,6 +306,7 @@ class MainActivity : AppCompatActivity() {
             val callp = Call.uaCalls(ua, "in")[0].callp
             Log.d("Baresip", "AoR $aor answering call $callp from ${callUri.text}")
             answerButton.isEnabled = false
+            rejectButton.isEnabled = false
             Api.ua_answer(ua.uap, callp)
         }
 
@@ -309,6 +315,7 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             val callp = Call.uaCalls(ua, "in")[0].callp
             Log.d("Baresip", "AoR $aor rejecting call $callp from ${callUri.text}")
+            answerButton.isEnabled = false
             rejectButton.isEnabled = false
             Api.ua_hangup(ua.uap, callp, 486, "Rejected")
         }
@@ -1089,6 +1096,7 @@ class MainActivity : AppCompatActivity() {
                     Contact.contacts().map{Contact -> Contact.name}))
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
+            callButton.isEnabled = true
             hangupButton.visibility = View.INVISIBLE
             answerButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
