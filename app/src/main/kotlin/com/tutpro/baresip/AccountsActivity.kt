@@ -190,6 +190,11 @@ class AccountsActivity : AppCompatActivity() {
                     accounts)
         }
 
+        fun noAccounts(): Boolean {
+            return Utils.getFileContents(File(BaresipService.filesPath + "/accounts"))
+                    .length == 0
+        }
+
     }
 
 }

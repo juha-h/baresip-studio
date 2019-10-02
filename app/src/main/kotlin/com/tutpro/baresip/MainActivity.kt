@@ -460,6 +460,9 @@ class MainActivity : AppCompatActivity() {
         val action = intent.getStringExtra("action")
         Log.d("Baresip", "Handling intent '$action'")
         when (action) {
+            "accounts" -> {
+                resumeAction = "accounts"
+            }
             "call" -> {
                 if (!Call.calls().isEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
@@ -526,6 +529,10 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Main resumed with action '$resumeAction'")
         visible = true
         when (resumeAction) {
+            "accounts" -> {
+                val i = Intent(this, AccountsActivity::class.java)
+                startActivityForResult(i, ACCOUNTS_CODE)
+            }
             "call show" ->
                 handleServiceEvent("call incoming",
                         arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
@@ -1180,7 +1187,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun restoreActivities() {
-        Log.d("Baresip", "Stack is ${BaresipService.activities.toString()}")
+        Log.d("Baresip", "Activity stack ${BaresipService.activities.toString()}")
         val activity = BaresipService.activities[0].split(",")
         BaresipService.activities.removeAt(0)
         when (activity[0]) {
