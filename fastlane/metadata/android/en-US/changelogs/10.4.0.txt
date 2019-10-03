@@ -1,0 +1,6 @@
+- Allow deletion of account's chat history via chats activity menu item.
+- Ask confirmation before deleting chat and call history.
+- Improved updating of main activity voicemail, chat, and call icons.
+- Go directly to Accounts activity when baresip is started without any accounts.
+- Swapped positions of call Accept and Reject buttons.
+- Do not allow terminating outgoing call before call attempt has started.
