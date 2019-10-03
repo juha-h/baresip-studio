@@ -132,6 +132,7 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="delete_history">Delete</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
+    <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'?</string>
 
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
@@ -152,6 +153,8 @@ Check Apps → baresip → Permissions → Storage and that file \'accounts.bs\'
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
+    <string name="delete_chats">Delete</string>
+    <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'?</string>
 
     <!-- Config Activity -->
     <string name="configuration">Configuration</string>

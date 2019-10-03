@@ -173,6 +173,7 @@ class BaresipService: Service() {
                 }
 
                 ContactsActivity.restoreContacts(applicationContext.filesDir, "contacts")
+                Message.restoreMessages()
 
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 isServiceRunning = true
@@ -261,8 +262,7 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.saveUaMessage(ua.account.aor,
-                            intent.getStringExtra("time").toLong(),
-                            applicationContext.filesDir.absolutePath)
+                            intent.getStringExtra("time").toLong())
                 nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
             }
 
@@ -273,8 +273,7 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.deleteUaMessage(ua.account.aor,
-                            intent.getStringExtra("time").toLong(),
-                            applicationContext.filesDir.absolutePath)
+                            intent.getStringExtra("time").toLong())
                 nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
             }
 
@@ -637,7 +636,7 @@ class BaresipService: Service() {
         Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
         Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true))
-        Message.saveMessages(filesPath)
+        Message.saveMessages()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
             val intent = Intent(this, BaresipService::class.java)

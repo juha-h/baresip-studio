@@ -31,8 +31,8 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 BaresipService.messages.removeAt(firstIndex)
         }
 
-        fun saveMessages(path: String) {
-            val file = File(path, "messages")
+        fun saveMessages() {
+            val file = File(BaresipService.filesPath, "messages")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
@@ -46,8 +46,8 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             }
         }
 
-        fun restoreMessages(path: String) {
-            val file = File(path, "messages")
+        fun restoreMessages() {
+            val file = File(BaresipService.filesPath, "messages")
             if (file.exists()) {
                 try {
                     val fis = FileInputStream(file)
@@ -61,7 +61,6 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 }
             }
         }
-
 
     }
 }

@@ -5,6 +5,7 @@ import android.content.*
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 
@@ -25,8 +26,6 @@ class ChatsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_chats)
-
-        filesPath = applicationContext.filesDir.absolutePath
 
         listView = findViewById(R.id.chats) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
@@ -73,7 +72,7 @@ class ChatsActivity: AppCompatActivity() {
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
                         BaresipService.messages = msgs
-                        Message.saveMessages(filesPath)
+                        Message.saveMessages()
                         uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -143,9 +142,35 @@ class ChatsActivity: AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        menuInflater.inflate(R.menu.chats_menu, menu)
+        return true
+
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.delete_chats -> {
+                val deleteDialog = AlertDialog.Builder(this@ChatsActivity)
+                deleteDialog.setMessage(String.format(getString(R.string.delete_chats_alert),
+                        aor.substringAfter(":")))
+                deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
+                    BaresipService.messages = ArrayList(BaresipService.messages.filter{it.aor != aor})
+                    Message.saveMessages()
+                    uaMessages = ArrayList()
+                    clAdapter = ChatListAdapter(this, uaMessages)
+                    listView.adapter = clAdapter
+                    Account.findUa(aor)!!.account.unreadMessages = false
+                    dialog.dismiss()
+                }
+                deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                deleteDialog.create().show()
+            }
 
             android.R.id.home -> {
                 BaresipService.activities.removeAt(0)
@@ -198,24 +223,22 @@ class ChatsActivity: AppCompatActivity() {
 
     companion object {
 
-        var filesPath = ""
-
-        fun saveUaMessage(aor: String, time: Long, path: String) {
+        fun saveUaMessage(aor: String, time: Long) {
             for (i in Message.messages().indices.reversed())
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages()[i].new = false
-                    Message.saveMessages(path)
+                    Message.saveMessages()
                     return
                 }
         }
 
-        fun deleteUaMessage(aor: String, time: Long, path: String) {
+        fun deleteUaMessage(aor: String, time: Long) {
             for (i in Message.messages().indices.reversed())
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages().removeAt(i)
-                    Message.saveMessages(path)
+                    Message.saveMessages()
                     return
                 }
         }

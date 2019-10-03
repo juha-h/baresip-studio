@@ -20,7 +20,7 @@ import java.util.GregorianCalendar
 class CallsActivity : AppCompatActivity() {
 
     internal lateinit var account: Account
-    internal lateinit var adapter: CallListAdapter
+    internal lateinit var clAdapter: CallListAdapter
 
     internal var uaHistory = ArrayList<CallRow>()
     internal var aor = ""
@@ -41,8 +41,8 @@ class CallsActivity : AppCompatActivity() {
 
         val listView = findViewById(R.id.calls) as ListView
         aorGenerateHistory(aor)
-        adapter = CallListAdapter(this, uaHistory)
-        listView.adapter = adapter
+        clAdapter = CallListAdapter(this, uaHistory)
+        listView.adapter = clAdapter
         listView.isLongClickable = true
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
@@ -91,7 +91,7 @@ class CallsActivity : AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        adapter.notifyDataSetChanged()
+                        clAdapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
@@ -137,10 +137,20 @@ class CallsActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.delete_history -> {
-                CallHistory.clear(aor)
-                CallHistory.save(applicationContext.filesDir.absolutePath)
-                aorGenerateHistory(aor)
-                adapter.notifyDataSetChanged()
+                val deleteDialog = AlertDialog.Builder(this@CallsActivity)
+                deleteDialog.setMessage(String.format(getString(R.string.delete_history_alert),
+                        aor.substringAfter(":")))
+                deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
+                    CallHistory.clear(aor)
+                    CallHistory.save(applicationContext.filesDir.absolutePath)
+                    aorGenerateHistory(aor)
+                    clAdapter.notifyDataSetChanged()
+                    dialog.dismiss()
+                }
+                deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                deleteDialog.create().show()
             }
 
             R.id.history_on_off -> {
