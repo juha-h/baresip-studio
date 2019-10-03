@@ -152,6 +152,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o
         agregar pares a los contactos?</string>
     <string name="short_chat_question">¿Quieres eliminar el chat con \'%1$s\'?</string>
+    <string name="delete_chats">Eliminar</string>
 
     <!-- Config Activity -->
     <string name="configuration">Configuración</string>

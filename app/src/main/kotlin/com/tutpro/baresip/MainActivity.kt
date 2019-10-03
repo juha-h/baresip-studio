@@ -147,15 +147,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Baresip", "Setting $aor current")
                 Api.uag_current_set(UserAgent.uas()[position].uap)
                 showCall(ua)
-                if (acc.vmUri != "") {
-                    if (acc.vmNew > 0)
-                        voicemailButton.setImageResource(R.drawable.voicemail_new)
-                    else
-                        voicemailButton.setImageResource(R.drawable.voicemail)
-                    voicemailButton.visibility = View.VISIBLE
-                } else {
-                    voicemailButton.visibility = View.INVISIBLE
-                }
                 updateIcons(acc)
             }
 
@@ -403,8 +394,6 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(i, CONTACTS_CODE)
         }
 
-        if (intentAction == null)
-            Message.restoreMessages(applicationContext.filesDir.absolutePath)
         messagesButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, ChatsActivity::class.java)
@@ -579,7 +568,6 @@ class MainActivity : AppCompatActivity() {
                             aorSpinner.setSelection(currentPosition)
                         }
                         showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
-                        updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                     }
                 }
             }
@@ -840,7 +828,7 @@ class MainActivity : AppCompatActivity() {
                         b.putString("peer", peer)
                         b.putBoolean("focus", ev[0] == "message reply")
                         i.putExtras(b)
-                        startActivity(i)
+                        startActivityForResult(i, CHAT_CODE)
                     }
                     "mwi notify" -> {
                         val lines = ev[1].split("\n")
@@ -949,16 +937,8 @@ class MainActivity : AppCompatActivity() {
                     if ((aorSpinner.selectedItemPosition == -1) ||
                             (aorSpinner.selectedItemPosition >= UserAgent.uas().size))
                             aorSpinner.setSelection(0)
-                    val acc = UserAgent.uas()[aorSpinner.selectedItemPosition].account
-                    if (acc.vmUri != "") {
-                        if (acc.vmNew > 0)
-                            voicemailButton.setImageResource(R.drawable.voicemail_new)
-                        else
-                            voicemailButton.setImageResource(R.drawable.voicemail)
-                        voicemailButton.visibility = View.VISIBLE
-                    } else {
-                        voicemailButton.visibility = View.INVISIBLE
-                    }
+                    else
+                        updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 } else {
                     aorSpinner.setSelection(-1)
                 }
@@ -967,16 +947,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             ACCOUNT_CODE -> {
-                val acc = UserAgent.uas()[aorSpinner.selectedItemPosition].account
-                if (acc.vmUri != "") {
-                    if (acc.vmNew > 0)
-                        voicemailButton.setImageResource(R.drawable.voicemail_new)
-                    else
-                        voicemailButton.setImageResource(R.drawable.voicemail)
-                    voicemailButton.visibility = View.VISIBLE
-                } else {
-                    voicemailButton.visibility = View.INVISIBLE
-                }
+                updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
             }
 
             CONTACTS_CODE -> {
@@ -1001,12 +972,15 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 if (resultCode == RESULT_CANCELED) {
-                    Log.d("Baresip", "History canceled")
                     if (CallHistory.aorHistorySize(acc.aor) == 0) {
                         holdButton.visibility = View.INVISIBLE
                     }
                 }
                 callsButton.setImageResource(R.drawable.calls)
+            }
+
+            CHATS_CODE, CHAT_CODE -> {
+                updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
             }
 
             ABOUT_CODE -> {
@@ -1029,8 +1003,7 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.no_microphone_permission), Toast.LENGTH_SHORT).show()
             return false
         }
-        if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
-            spinToAor(ua.account.aor)
+        if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]) spinToAor(ua.account.aor)
         val callp = Api.ua_connect(ua.uap, uri)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
@@ -1193,6 +1166,15 @@ class MainActivity : AppCompatActivity() {
             messagesButton.setImageResource(R.drawable.messages_unread)
         else
             messagesButton.setImageResource(R.drawable.messages)
+        if (acc.vmUri != "") {
+            if (acc.vmNew > 0)
+                voicemailButton.setImageResource(R.drawable.voicemail_new)
+            else
+                voicemailButton.setImageResource(R.drawable.voicemail)
+            voicemailButton.visibility = View.VISIBLE
+        } else {
+            voicemailButton.visibility = View.INVISIBLE
+        }
     }
 
     private fun restoreActivities() {

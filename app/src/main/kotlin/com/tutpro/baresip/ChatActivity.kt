@@ -97,7 +97,7 @@ class ChatActivity : AppCompatActivity() {
                         if (chatMessages.size == 0) {
                             listView.removeFooterView(footerView)
                         }
-                        Message.saveMessages(applicationContext.filesDir.absolutePath)
+                        Message.saveMessages()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
@@ -224,7 +224,7 @@ class ChatActivity : AppCompatActivity() {
                         save = true
                     }
                 }
-                if (save) Message.saveMessages(applicationContext.filesDir.absolutePath)
+                if (save) Message.saveMessages()
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 BaresipService.activities.removeAt(0)
                 val i = Intent()
@@ -251,7 +251,9 @@ class ChatActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         BaresipService.activities.removeAt(0)
-        super.onBackPressed()
+        val i = Intent()
+        setResult(Activity.RESULT_OK, i)
+        finish()
 
     }
 

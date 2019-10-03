@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/delete_chats"
+        android:title="@string/delete_chats" />
+
+</menu>
