@@ -158,7 +158,7 @@ class ChatsActivity: AppCompatActivity() {
                 deleteDialog.setMessage(String.format(getString(R.string.delete_chats_alert),
                         aor.substringAfter(":")))
                 deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                    BaresipService.messages = ArrayList(BaresipService.messages.filter{it.aor != aor})
+                    Message.clear(aor)
                     Message.saveMessages()
                     uaMessages.clear()
                     clAdapter.notifyDataSetChanged()

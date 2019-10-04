@@ -31,7 +31,8 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
         }
 
         fun clear(aor: String) {
-            BaresipService.history = ArrayList(BaresipService.history.filter{it.aor != aor})
+            val it = BaresipService.history.iterator()
+            while (it.hasNext()) if (it.next().aor == aor) it.remove()
         }
 
         fun aorHistorySize(aor: String): Int {

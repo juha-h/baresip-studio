@@ -31,6 +31,11 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 BaresipService.messages.removeAt(firstIndex)
         }
 
+        fun clear(aor: String) {
+            val it = BaresipService.messages.iterator()
+            while (it.hasNext()) if (it.next().aor == aor) it.remove()
+        }
+
         fun saveMessages() {
             val file = File(BaresipService.filesPath, "messages")
             try {
