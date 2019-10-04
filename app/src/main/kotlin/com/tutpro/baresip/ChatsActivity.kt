@@ -160,9 +160,8 @@ class ChatsActivity: AppCompatActivity() {
                 deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
                     BaresipService.messages = ArrayList(BaresipService.messages.filter{it.aor != aor})
                     Message.saveMessages()
-                    uaMessages = ArrayList()
-                    clAdapter = ChatListAdapter(this, uaMessages)
-                    listView.adapter = clAdapter
+                    uaMessages.clear()
+                    clAdapter.notifyDataSetChanged()
                     Account.findUa(aor)!!.account.unreadMessages = false
                     dialog.dismiss()
                 }
