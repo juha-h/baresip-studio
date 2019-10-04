@@ -77,7 +77,7 @@
 \n • SRTP significa que RTP / AVP se ofrece en llamadas salientes y que se utiliza RTP / SAVP o RTP / SAVPF
             si se ofrece en llamada entrante.
     </string>
-    <string name="answer_mode">Modo de respuesta</string>
+    <string name="answer_mode">Modo de Contestación</string>
     <string name="answer_mode_help">Selecciona cómo se contestan las llamadas entrantes.</string>
     <string name="manual">Manual</string>
     <string name="auto">Automático</string>
@@ -122,7 +122,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="call_history">Historial de llamadas</string>
     <string name="call">Llamada</string>
     <string name="calls_calls">llamadas</string>
-    <string name="calls_call">llamada</string>
+    <string name="calls_call">llamar</string>
     <string name="calls_call_message_question">¿Quieres llamar o enviar un mensaje a \'%1$s\'?</string>
     <string name="calls_add_delete_question">¿Quieres agregar \'%1$s\' a contactos o eliminar
         %2$s del historial de llamadas?
@@ -132,6 +132,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="delete_history">Eliminar</string>
     <string name="disable_history">Inhabilitar</string>
     <string name="enable_history">Habilitar</string>
+	<string name="delete_history_alert">¿Desea eliminar el historial de llamadas de la cuenta \'%1$s\'?</string>
 
     <!-- Chat Activity -->
     <string name="chat">Mensajes de chat</string>
@@ -153,6 +154,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
         agregar pares a los contactos?</string>
     <string name="short_chat_question">¿Quieres eliminar el chat con \'%1$s\'?</string>
     <string name="delete_chats">Eliminar</string>
+	<string name="delete_chats_alert">¿Quieres eliminar el historial de chat de la cuenta \'%1$s\'?</string>
 
     <!-- Config Activity -->
     <string name="configuration">Configuración</string>
@@ -261,7 +263,7 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="incoming_call_from_dots">Llamada entrante de …</string>
     <string name="transferring_call_to_dots">Transfiriendo llamada a …</string>
     <string name="invalid_sip_uri">URI de SIP no válido</string>
-    <string name="callee">Llamante</string>
+    <string name="callee">Destinatario</string>
     <string name="hangup">Colgar</string>
     <string name="hold">Esperar</string>
     <string name="dtmf">DTMF</string>
