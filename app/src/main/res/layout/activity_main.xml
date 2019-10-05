@@ -48,7 +48,8 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/callTitle" >
+                android:layout_below="@id/callTitle"
+                android:paddingBottom="10dp" >
 
                 <AutoCompleteTextView
                     android:id="@+id/callUri"
@@ -102,6 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uriRow"
+                android:padding="0dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="10dp"
                 android:background="@null"
@@ -156,9 +158,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uriRow"
+                android:padding="0dp"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/info"
-                android:padding="0dp"
                 android:layout_marginTop="6dp"
                 android:background="@null"
                 android:clickable="false"
