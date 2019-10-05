@@ -20,7 +20,7 @@ object Config {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
             write = true
         }
-        if (!config.contains(Regex("module_app[ ]+g726.so"))) {
+        if (!config.contains(Regex("module[ ]+g726.so"))) {
             config = config.replace(Regex("module[ ]+g7...?.so\n"), "")
             config = config.replace(Regex("module[ ]+ilbc.so\n"), "")
             config = "${config}module ilbc.so\n"
