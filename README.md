@@ -6,7 +6,7 @@ Motivated by need for a secure SIP user agent for Android that does not depend o
 
 After cloning the project, generate static libraries and include files to distribution directory using master branch of https://github.com/juha-h/libbaresip-android.
 
-Then in Android Studio 3.4.2:
+Then in Android Studio 3.5.1:
 
 - Open an existing Android Studio project
 
