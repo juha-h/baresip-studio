@@ -1,16 +1,17 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import java.io.File
+
 import java.net.InetAddress
+import java.nio.charset.StandardCharsets
 
 object Config {
 
-    private val path = BaresipService.filesPath + "/config"
-    private val file = File(path)
-    private var config = Utils.getFileContents(file)
+    private val configPath = BaresipService.filesPath + "/config"
+    private var config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
 
     fun initialize(dnsServers: List<InetAddress>) {
+        Log.d("Baresip", "Config is '$config'")
         var write = false
         if (!config.contains("zrtp_hash")) {
             config = "${config}zrtp_hash yes\n"
@@ -41,10 +42,10 @@ object Config {
         }
         if (!config.contains("opus_samplerate")) {
             config = "${config}opus_samplerate 16000\n"
-            val accountsFile = File(BaresipService.filesPath + "/config")
-            var accounts = Utils.getFileContents(accountsFile)
+            val accountsPath = BaresipService.filesPath + "/accounts"
+            var accounts = String(Utils.getFileContents(accountsPath)!!, StandardCharsets.ISO_8859_1)
             accounts = accounts.replace("opus/48000/1", "opus/16000/1")
-            Utils.putFileContents(accountsFile, accounts)
+            Utils.putFileContents(accountsPath, accounts.toByteArray())
             write = true
         }
         if (!config.contains("opus_stereo")) {
@@ -95,7 +96,7 @@ object Config {
         }
         if (write) {
             Log.e("Baresip", "Writing config '$config'")
-            Utils.putFileContents(file, config)
+            Utils.putFileContents(configPath, config.toByteArray())
         }
     }
 
@@ -115,7 +116,7 @@ object Config {
 
     fun remove(variable: String) {
         config = Utils.removeLinesStartingWithName(config, variable)
-        Utils.putFileContents(file, config)
+        Utils.putFileContents(configPath, config.toByteArray())
     }
 
     fun replace(variable: String, value: String) {
@@ -124,7 +125,7 @@ object Config {
     }
 
     fun reset(ctx: Context) {
-        Utils.copyAssetToFile(ctx, "config", path)
+        Utils.copyAssetToFile(ctx, "config", configPath)
     }
 
     fun save() {
@@ -133,7 +134,7 @@ object Config {
             if (line.length > 0)
                 result = result + line + '\n'
         config = result
-        Utils.putFileContents(file, config)
+        Utils.putFileContents(configPath, config.toByteArray())
         Log.d("Baresip", "New config '$result'")
         // Api.reload_config()
     }

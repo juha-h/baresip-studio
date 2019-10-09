@@ -404,8 +404,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (intentAction == null)
-            CallHistory.restore(applicationContext.filesDir.absolutePath)
         callsButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, CallsActivity::class.java)
@@ -891,22 +889,28 @@ class MainActivity : AppCompatActivity() {
                 }
                 baresipService.setAction("ToggleSpeaker")
                 startService(baresipService)
-                return true
             }
             R.id.config -> {
                 i = Intent(this, ConfigActivity::class.java)
                 startActivityForResult(i, CONFIG_CODE)
-                return true
             }
             R.id.accounts -> {
                 i = Intent(this, AccountsActivity::class.java)
                 startActivityForResult(i, ACCOUNTS_CODE)
-                return true
+            }
+            R.id.export_all -> {
+                if (Utils.requestPermission(this,
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    askPassword(getString(R.string.encrypt_password))
+            }
+            R.id.import_all -> {
+                if (Utils.requestPermission(this,
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                    askPassword(getString(R.string.decrypt_password))
             }
             R.id.about -> {
                 i = Intent(this, AboutActivity::class.java)
                 startActivityForResult(i, ABOUT_CODE)
-                return true
             }
             R.id.restart, R.id.quit -> {
                 if (stopState == "initial") {
@@ -921,10 +925,77 @@ class MainActivity : AppCompatActivity() {
                         System.exit(0)
                     }
                 }
-                return true
             }
-            else -> return super.onOptionsItemSelected(item)
         }
+        return true
+    }
+
+    private fun askPassword(title: String) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle(title)
+        val viewInflated = LayoutInflater.from(this)
+                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                        false)
+        val input = viewInflated.findViewById(R.id.password) as EditText
+        builder.setView(viewInflated)
+        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+            val password = input.text.toString()
+            if (password != "") {
+                if (title == getString(R.string.encrypt_password))
+                    exportAll(password)
+                else
+                    importAll(password)
+            }
+        }
+        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            dialog.cancel()
+        }
+        builder.show()
+    }
+
+    private fun exportAll(password: String) {
+        val files = arrayOf("accounts", "config", "contacts", "history", "messages", "uuid",
+                "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        val exportFilePath = BaresipService.downloadsPath + "/baresip.bs"
+        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
+        if (!Utils.zip(files, "baresip.zip")) {
+            Utils.alertView(this, getString(R.string.error), "Failed to write zip file 'baresip.zip")
+            return
+        }
+        val content = Utils.getFileContents(zipFilePath)
+        if (content == null) {
+            Utils.alertView(this, getString(R.string.error), "Failed to read zip file 'baresip.zip")
+            return
+        }
+        if (!Utils.encryptToFile(exportFilePath, content, password)) {
+            Utils.alertView(this, getString(R.string.error), getString(R.string.export_all_failed))
+            return
+        }
+        Utils.alertView(this, getString(R.string.info), getString(R.string.exported_all))
+        Utils.deleteFile(zipFilePath)
+    }
+
+    private fun importAll(password: String) {
+        val importFilePath = BaresipService.downloadsPath + "/baresip.bs"
+        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
+        val zipData = Utils.decryptFromFile(importFilePath, password)
+        if (zipData == null) {
+            Utils.alertView(this, getString(R.string.error), getString(R.string.import_all_failed))
+            return
+        }
+        if (!Utils.putFileContents(zipFilePath, zipData)) {
+            Utils.alertView(this, getString(R.string.error),
+                    "Failed to write file 'baresip.zip'")
+            return
+        }
+        if (!Utils.unZip(zipFilePath)) {
+            Utils.alertView(this, getString(R.string.error),
+                    "Failed to unzip file 'baresip.zip'")
+            return
+        }
+        Utils.alertView(this, getString(R.string.info), getString(R.string.imported_all))
+        Utils.deleteFile(zipFilePath)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

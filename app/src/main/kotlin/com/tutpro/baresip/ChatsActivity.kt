@@ -72,7 +72,7 @@ class ChatsActivity: AppCompatActivity() {
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
                         BaresipService.messages = msgs
-                        Message.saveMessages()
+                        Message.save()
                         uaMessages = uaMessages(aor)
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -159,7 +159,7 @@ class ChatsActivity: AppCompatActivity() {
                         aor.substringAfter(":")))
                 deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
                     Message.clear(aor)
-                    Message.saveMessages()
+                    Message.save()
                     uaMessages.clear()
                     clAdapter.notifyDataSetChanged()
                     Account.findUa(aor)!!.account.unreadMessages = false
@@ -227,7 +227,7 @@ class ChatsActivity: AppCompatActivity() {
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages()[i].new = false
-                    Message.saveMessages()
+                    Message.save()
                     return
                 }
         }
@@ -237,7 +237,7 @@ class ChatsActivity: AppCompatActivity() {
                 if ((Message.messages()[i].aor == aor) &&
                         (Message.messages()[i].timeStamp == time)) {
                     Message.messages().removeAt(i)
-                    Message.saveMessages()
+                    Message.save()
                     return
                 }
         }

@@ -45,9 +45,9 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
             return null
         }
 
-        fun save(path: String) {
-            Log.d("Baresip", "Saving history of size ${BaresipService.history.size}")
-            val file = File(path, "history")
+        fun save() {
+            Log.d("Baresip", "Saving call history of size ${BaresipService.history.size}")
+            val file = File(BaresipService.filesPath, "history")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
@@ -60,21 +60,19 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
             }
         }
 
-        fun restore(path: String) {
-            val file = File(path + "/history")
-            if (file.exists()) {
+        fun restore() {
+            val file = File(BaresipService.filesPath, "history")
+            if (file.exists())
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     BaresipService.history = ois.readObject() as ArrayList<CallHistory>
                     ois.close()
                     fis.close()
-                    Log.d("Baresip", "Restored history of size ${BaresipService.history.size}")
+                    Log.d("Baresip", "Restored call history of size ${BaresipService.history.size}")
                 } catch (e: Exception) {
                     Log.e("Baresip", "InputStream exception: - " + e.toString())
                 }
-            }
-
         }
 
         fun print() {

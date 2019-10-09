@@ -97,7 +97,7 @@ class ChatActivity : AppCompatActivity() {
                         if (chatMessages.size == 0) {
                             listView.removeFooterView(footerView)
                         }
-                        Message.saveMessages()
+                        Message.save()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
@@ -224,7 +224,7 @@ class ChatActivity : AppCompatActivity() {
                         save = true
                     }
                 }
-                if (save) Message.saveMessages()
+                if (save) Message.save()
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 BaresipService.activities.removeAt(0)
                 val i = Intent()

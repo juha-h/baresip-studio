@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 
-import java.io.File
+import java.nio.charset.StandardCharsets
 
 class RunOnStartup : BroadcastReceiver() {
 
@@ -13,8 +13,8 @@ class RunOnStartup : BroadcastReceiver() {
         Log.i("Baresip", "RunOnStartup received intent ${intent.action}")
         if ((intent.action == Intent.ACTION_BOOT_COMPLETED) or
                 (intent.action == "com.tutpro.baresip.Restart")) {
-            val configFile = File(context.filesDir.absolutePath + "/config")
-            val config = Utils.getFileContents(configFile)
+            val configPath = context.filesDir.absolutePath + "/config"
+            val config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
             val asCv = Utils.getNameValue(config,"auto_start")
             if ((asCv.size > 0) && (asCv[0] == "yes")) {
                 Log.d("Baresip", "Start baresip upon boot completed or restart")

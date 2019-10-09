@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.support.v4.content.LocalBroadcastManager
 import android.os.Build
+import android.os.Environment
 import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
 import android.support.v4.content.ContextCompat
 import android.provider.Settings
@@ -55,6 +56,7 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip")
 
         filesPath = filesDir.absolutePath
+        downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -146,7 +148,7 @@ class BaresipService: Service() {
                     try {
                         File(filesPath).mkdirs()
                     } catch (e: Error) {
-                        Log.e(LOG_TAG, "Failed to create directory: " + e.toString())
+                        Log.e(LOG_TAG, "Failed to create directory: $e")
                     }
                 }
                 for (a in assets) {
@@ -172,8 +174,9 @@ class BaresipService: Service() {
                     }
                 }
 
-                ContactsActivity.restoreContacts(applicationContext.filesDir, "contacts")
-                Message.restoreMessages()
+                Contact.restore()
+                CallHistory.restore()
+                Message.restore()
 
                 Thread(Runnable { baresipStart(filesPath) }).start()
                 isServiceRunning = true
@@ -212,7 +215,7 @@ class BaresipService: Service() {
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
                     if (call.ua.account.callHistory) {
                         CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                        CallHistory.save(filesPath)
+                        CallHistory.save()
                     }
                 }
             }
@@ -420,7 +423,7 @@ class BaresipService: Service() {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                                CallHistory.save(filesPath)
+                                CallHistory.save()
                                 ua.account.missedCalls = true
                             }
                             if (!Utils.isVisible())
@@ -499,7 +502,7 @@ class BaresipService: Service() {
                         call.onhold = false
                         if (ua.account.callHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
-                            CallHistory.save(filesPath)
+                            CallHistory.save()
                             call.hasHistory = true
                         }
                         if (call.dir == "in") {
@@ -589,7 +592,7 @@ class BaresipService: Service() {
                         calls.remove(call)
                         if (ua.account.callHistory && !call.hasHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, false))
-                            CallHistory.save(filesPath)
+                            CallHistory.save()
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
                         if (Call.calls().size == 0) {
@@ -636,7 +639,7 @@ class BaresipService: Service() {
         Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
         Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true))
-        Message.saveMessages()
+        Message.save()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
             val intent = Intent(this, BaresipService::class.java)
@@ -930,6 +933,7 @@ class BaresipService: Service() {
         var dynDns = false
 
         var filesPath = ""
+        var downloadsPath = ""
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
         var calls = ArrayList<Call>()

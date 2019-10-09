@@ -127,7 +127,7 @@ class CallsActivity : AppCompatActivity() {
 
     override fun onPause() {
 
-        CallHistory.save(applicationContext.filesDir.absolutePath)
+        CallHistory.save()
         super.onPause()
 
     }
@@ -142,7 +142,7 @@ class CallsActivity : AppCompatActivity() {
                         aor.substringAfter(":")))
                 deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
                     CallHistory.clear(aor)
-                    CallHistory.save(applicationContext.filesDir.absolutePath)
+                    CallHistory.save()
                     aorGenerateHistory(aor)
                     clAdapter.notifyDataSetChanged()
                     dialog.dismiss()

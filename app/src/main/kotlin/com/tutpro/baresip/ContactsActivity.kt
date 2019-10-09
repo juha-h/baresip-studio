@@ -3,14 +3,11 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
-import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.ListView
-
-import java.io.File
 
 class ContactsActivity : AppCompatActivity() {
 
@@ -63,12 +60,10 @@ class ContactsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
         when (item.itemId) {
 
             R.id.export_contacts -> {
-                if (saveContacts(dir, "contacts.bs"))
+                if (Contact.export())
                     Utils.alertView(this, "",
                             getString(R.string.exported_contacts))
                 else
@@ -77,11 +72,11 @@ class ContactsActivity : AppCompatActivity() {
             }
 
             R.id.import_contacts -> {
-                if (restoreContacts(dir, "contacts.bs")) {
+                if (Contact.import()) {
                     Utils.alertView(this, "",
                             getString(R.string.imported_contacts))
                     clAdapter.notifyDataSetChanged()
-                    saveContacts(applicationContext.filesDir, "contacts")
+                    Contact.save()
                 } else
                     Utils.alertView(this,getString(R.string.error),
                             getString(R.string.import_error))
@@ -110,33 +105,6 @@ class ContactsActivity : AppCompatActivity() {
     }
 
     companion object {
-
-        fun saveContacts(path: File, file: String): Boolean {
-            var contents = ""
-            for (c in Contact.contacts())
-                contents += "\"${c.name}\" <${c.uri}>\n"
-            return Utils.putFileContents(File(path, file), contents)
-        }
-
-        fun restoreContacts(path: File, file: String): Boolean {
-            val content = Utils.getFileContents(File(path, file))
-            if (content == "Failed") return false
-            Api.contacts_remove()
-            Contact.contacts().clear()
-            content.lines().forEach {
-                val parts = it.split("\"")
-                if (parts.size == 3) {
-                    val name = parts[1]
-                    var uri = parts[2].trim()
-                    if (uri.startsWith("<"))
-                        uri = uri.substringAfter("<").substringBefore(">")
-                    // Currently no need to make baresip aware of the contact
-                    // Api.contact_add("\"$name\" $uri")
-                    Contact.contacts().add(Contact(name, uri))
-                }
-            }
-            return true
-        }
 
         fun findContactURI(name: String): String {
             for (c in Contact.contacts())
