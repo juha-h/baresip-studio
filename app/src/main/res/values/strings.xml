@@ -97,17 +97,6 @@
     <string name="account_allocation_failure">"Failed to allocate new account.</string>
     <string name="encrypt_password">Encrypt Password</string>
     <string name="decrypt_password">Decrypt Password</string>
-    <string name="export_accounts">Export</string>
-    <string name="exported_accounts">Exported accounts to Download folder file \'accounts.bs\'.</string>
-    <string name="export_accounts_error">"Failed to export accounts to Download folder.
-    Check Apps → baresip → Permissions → Storage."
-    </string>
-    <string name="import_accounts">Import</string>
-    <string name="imported_accounts">Accounts imported.  You need to restart baresip.</string>
-    <string name="import_accounts_error">Failed to import accounts from Download folder file.
-        Check Apps → baresip → Permissions → Storage and that exported file \'accounts.bs\' exists in
-        the folder and, if so, you gave correct Decrypt Password."
-    </string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
 
     <!-- Baresip Service -->
@@ -210,6 +199,9 @@
         to factory default values.</string>
     <string name="read_cert_error">Failed to read file \'cert.pem\' from Download directory.</string>
     <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\' from Download directory.</string>
+    <string name="config_restart">You need to restart baresip in order to activate the new
+        configuration. Restart now?
+    </string>
 
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
@@ -227,12 +219,6 @@
     <string name="send_message">Send Message</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
     <string name="contacts_exceeded">Your maximum number of contacts %1%d has been exceeded.</string>
-    <string name="exported_contacts">Exported contacts to Download folder file \'contacts.bs\'.</string>
-    <string name="export_error">"Failed to export contacts to Download folder.
-        Check Apps → baresip → Permissions → Storage."</string>
-    <string name="imported_contacts">Contacs imported.</string>
-    <string name="import_error">Failed to import contacts from Download folder. Check Apps →
-        baresip → Permissions → Storage and that file \'contacts.bs\' exists in the folder.</string>
 
     <!-- Generic -->
     <string name="alert">Alert</string>
@@ -256,8 +242,8 @@
     <string name="dots" translatable="false">…</string>
 
     <!-- Main Activity -->
-    <string name="export_all">Export</string>
-    <string name="import_all">Import</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
     <string name="about">About</string>
     <string name="restart">Restart</string>
     <string name="quit">Quit</string>
@@ -296,19 +282,20 @@
     <string name="transfer_query">Do you accept to transfer call to \'%1$s\'?</string>
     <string name="call_failed">Call failed</string>
     <string name="call_closed">Call closed</string>
-    <string name="restart_needed">You need to restart baresip in order to activate the new config.</string>
     <string name="call_not_secure">This call is NOT secure!</string>
     <string name="peer_not_verified">This call is SECURE, but peer is NOT verified!</string>
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
         Do you want to unverify the peer?
     </string>
     <string name="unverify">Unverify</string>
-    <string name="exported_all">Exported all application data to Download folder file \'baresip.bs\'.</string>
-    <string name="export_all_failed">Failed to export application data to Download folder file
+    <string name="backed_up">Application data backed up to Download folder file \'baresip.bs\'.</string>
+    <string name="backup_failed">Failed to back up application data to Download folder file
         \'baresip.bs\'. Check Apps → baresip → Permissions → Storage</string>
-    <string name="imported_all">All application data imported. You need to restart baresip.</string>
-    <string name="import_all_failed">Failed to import application data from Download folder. Check Apps →
-        baresip → Permissions → Storage and that exported file \'baresip.bs\' exists in the folder
+    <string name="restored">Application data restored. baresip needs to be restarted.
+        Restart now?
+    </string>
+    <string name="restore_failed">Failed to restore application data from Download folder. Check Apps →
+        baresip → Permissions → Storage and that backup file \'baresip.bs\' exists in the folder
         and, if so, you gave correct Decrypt Password.
     </string>
 

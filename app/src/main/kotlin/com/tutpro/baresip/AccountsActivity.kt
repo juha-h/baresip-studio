@@ -4,12 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import android.app.AlertDialog
-import android.view.ViewGroup
-import android.view.LayoutInflater
 
 import java.util.ArrayList
 
@@ -69,34 +65,15 @@ class AccountsActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        menuInflater.inflate(R.menu.accounts_menu, menu)
-        return true
-
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-
-            R.id.export_accounts -> {
-                if (Utils.requestPermission(this,
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    askPassword(getString(R.string.encrypt_password))
-            }
-
-            R.id.import_accounts -> {
-                if (Utils.requestPermission(this,
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE))
-                    askPassword(getString(R.string.decrypt_password))
-            }
 
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Accounts")
                 BaresipService.activities.removeAt(0)
                 val i = Intent()
-                setResult(Activity.RESULT_OK, i)
+                setResult(RESULT_OK, i)
                 finish()
             }
 
@@ -116,42 +93,6 @@ class AccountsActivity : AppCompatActivity() {
 
     }
 
-    private fun askPassword(title: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(title)
-        val viewInflated = LayoutInflater.from(this)
-                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
-                        false)
-        val input = viewInflated.findViewById(R.id.password) as EditText
-        builder.setView(viewInflated)
-        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
-            dialog.dismiss()
-            val password = input.text.toString()
-            if (password != "") {
-                if (title == getString(R.string.encrypt_password)) {
-                    if (exportAccounts(password))
-                        Utils.alertView(this, getString(R.string.info),
-                                getString(R.string.exported_accounts))
-                    else
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.export_accounts_error))
-                } else {
-                    if (importAccounts(password))
-                        Utils.alertView(this, getString(R.string.info),
-                                getString(R.string.imported_accounts))
-                    else
-                        Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.import_accounts_error))
-                }
-            }
-        }
-        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            dialog.cancel()
-        }
-        builder.show()
-
-    }
-
     companion object {
 
         var accounts = ArrayList<AccountRow>()
@@ -168,20 +109,6 @@ class AccountsActivity : AppCompatActivity() {
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
             // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
-        }
-
-        fun exportAccounts(password: String): Boolean {
-            val content = Utils.getFileContents("${BaresipService.filesPath}/accounts")
-            if (content == null) return false
-            return Utils.encryptToFile("${BaresipService.downloadsPath}/accounts.bs",
-                    content, password)
-        }
-
-        fun importAccounts(password: String): Boolean {
-            val content = Utils.decryptFromFile("${BaresipService.downloadsPath}/accounts.bs",
-                    password)
-            if (content == null) return false
-            return Utils.putFileContents("${BaresipService.filesPath}/accounts", content)
         }
 
         fun noAccounts(): Boolean {

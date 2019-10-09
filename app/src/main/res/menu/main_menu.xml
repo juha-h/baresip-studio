@@ -6,11 +6,11 @@
   <item android:id="@+id/accounts"
       android:title="@string/accounts" />
 
-  <item android:id="@+id/export_all"
-      android:title="@string/export_all" />
+  <item android:id="@+id/backup"
+      android:title="@string/backup" />
 
-  <item android:id="@+id/import_all"
-      android:title="@string/import_all" />
+  <item android:id="@+id/restore"
+      android:title="@string/restore" />
 
   <item android:id="@+id/about"
         android:title="@string/about" />
