@@ -6,14 +6,11 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-
-import java.io.File
 
 class ConfigActivity : AppCompatActivity() {
 
@@ -44,8 +41,6 @@ class ConfigActivity : AppCompatActivity() {
     private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
-    private var downloadsDir  =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -226,14 +221,13 @@ class ConfigActivity : AppCompatActivity() {
                         if (!Utils.requestPermission(this,
                                         android.Manifest.permission.READ_EXTERNAL_STORAGE))
                             return false
-                        val content = Utils.getFileContents(File(downloadsDir, "cert.pem"))
-                        if (content == "Failed") {
+                        val content = Utils.getFileContents(BaresipService.downloadsPath + "/cert.pem")
+                        if (content == null) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.read_cert_error))
                             return false
                         }
-                        Utils.putFileContents(File(BaresipService.filesPath + "/cert.pem"),
-                                content)
+                        Utils.putFileContents(BaresipService.filesPath + "/cert.pem", content)
                         Config.remove("sip_certificate")
                         Config.add("sip_certificate", BaresipService.filesPath + "/cert.pem")
                     } else {
@@ -248,13 +242,13 @@ class ConfigActivity : AppCompatActivity() {
                         if (!Utils.requestPermission(this,
                                         android.Manifest.permission.READ_EXTERNAL_STORAGE))
                             return false
-                        val content = Utils.getFileContents(File(downloadsDir, "ca_certs.crt"))
-                        if (content == "Failed") {
+                        val content = Utils.getFileContents(BaresipService.downloadsPath + "/ca_certs.crt")
+                        if (content == null) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.read_ca_certs_error))
                             return false
                         }
-                        Utils.putFileContents(File(BaresipService.filesPath + "/ca_certs.crt"),
+                        Utils.putFileContents(BaresipService.filesPath + "/ca_certs.crt",
                                 content)
                         Config.remove("sip_cafile")
                         Config.add("sip_cafile", BaresipService.filesPath + "/ca_certs.crt")

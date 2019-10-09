@@ -4,8 +4,6 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.support.v7.app.AlertDialog
-import android.os.PowerManager
-import android.app.KeyguardManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -13,8 +11,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Base64
-import android.util.Base64.encodeToString
 
 import kotlin.collections.ArrayList
 import kotlin.Exception
@@ -22,56 +18,15 @@ import kotlin.Exception
 import java.io.*
 import java.security.SecureRandom
 import java.util.*
-import java.nio.ByteBuffer
+import java.util.zip.*
+
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 object Utils {
-
-    fun getFileContents(file: File): String {
-        if (!file.exists()) {
-            Log.e("Baresip", "Failed to find file: " + file.path)
-            return "Failed"
-        } else {
-            val length = file.length().toInt()
-            val bytes = ByteArray(length)
-            try {
-                val `in` = FileInputStream(file)
-                try {
-                    `in`.read(bytes)
-                } finally {
-                    `in`.close()
-                }
-                return String(bytes)
-            } catch (e: java.io.IOException) {
-                Log.e("Baresip", "Failed to read file: " + file.path + ": " +
-                        e.toString())
-                return "Failed"
-            }
-        }
-    }
-
-    fun putFileContents(file: File, contents: String): Boolean {
-        try {
-            val fOut = FileOutputStream(file.absoluteFile, false)
-            val fWriter = OutputStreamWriter(fOut)
-            try {
-                fWriter.write(contents)
-                fWriter.close()
-                fOut.close()
-            } catch (e: java.io.IOException) {
-                Log.e("Baresip", "Failed to put contents to file: " + e.toString())
-                return false
-            }
-
-        } catch (e: java.io.FileNotFoundException) {
-            Log.e("Baresip", "Failed to find contents file: " + e.toString())
-            return false
-        }
-        return true
-    }
 
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
@@ -88,24 +43,6 @@ object Utils {
         for (line in string.split("\n"))
             if (!line.startsWith(name) && (line.length > 0)) result += line + "\n"
         return result
-    }
-
-    fun copyAssetToFile(context: Context, asset: String, path: String) {
-        try {
-            val `is` = context.assets.open(asset)
-            val os = FileOutputStream(path)
-            val buffer = ByteArray(512)
-            var byteRead: Int = `is`.read(buffer)
-            while (byteRead  != -1) {
-                os.write(buffer, 0, byteRead)
-                byteRead = `is`.read(buffer)
-            }
-            os.close()
-            `is`.close()
-        } catch (e: IOException) {
-            Log.e("Baresip", "Failed to read asset " + asset + ": " +
-                    e.toString())
-        }
     }
 
     fun alertView(context: Context, title: String, message: String) {
@@ -142,7 +79,7 @@ object Utils {
         }
     }
 
-    fun aorUser(aor: String): String {
+    private fun aorUser(aor: String): String {
         val user = aor.substringBefore("@")
         return if (user == aor) "" else user
     }
@@ -164,20 +101,20 @@ object Utils {
         return Regex("^(([0-1]?[0-9]{1,2}\\.)|(2[0-4][0-9]\\.)|(25[0-5]\\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))$").matches(ip)
     }
 
-    fun checkIpV6(ip: String): Boolean {
+    private fun checkIpV6(ip: String): Boolean {
         return Regex("^(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4})$").matches(ip)
     }
 
-    fun checkIpv6InBrackets(bracketedIp: String): Boolean {
+    private fun checkIpv6InBrackets(bracketedIp: String): Boolean {
         return bracketedIp.startsWith("[") && bracketedIp.endsWith("]") &&
                 checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
     }
 
-    fun checkIp(ip: String): Boolean {
+    private fun checkIp(ip: String): Boolean {
         return checkIpV4(ip) || checkIpV6(ip)
     }
 
-    fun checkUriUser(user: String): Boolean {
+    private fun checkUriUser(user: String): Boolean {
         for (c in user)
             if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
         return user.length > 0
@@ -193,7 +130,7 @@ object Utils {
         return true
     }
 
-    fun checkPort(port: String): Boolean {
+    private fun checkPort(port: String): Boolean {
         val number = port.toIntOrNull()
         if (number == null) return false
         return (number > 0) && (number < 65536)
@@ -208,7 +145,7 @@ object Utils {
                     checkPort(ipPort.substringAfterLast(":"))
     }
 
-    fun checkDomainPort(domainPort: String): Boolean {
+    private fun checkDomainPort(domainPort: String): Boolean {
         return checkDomain(domainPort.substringBeforeLast(":")) &&
                 checkPort(domainPort.substringAfterLast(":"))
     }
@@ -218,13 +155,13 @@ object Utils {
                 checkIpPort(hostPort) || checkDomainPort(hostPort)
     }
 
-    fun checkParams(params: String): Boolean {
+    private fun checkParams(params: String): Boolean {
         for (param in params.split(";"))
             if (!checkParam(param)) return false
         return true
     }
 
-    fun checkParam(param: String): Boolean {
+    private fun checkParam(param: String): Boolean {
         val nameValue = param.split("=")
         if (nameValue.size == 1)
             /* Todo: do proper check */
@@ -295,23 +232,6 @@ object Utils {
         return appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
     }
 
-    fun isDeviceLocked(context: Context): Boolean {
-        val isLocked: Boolean
-
-        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val inKeyguardRestrictedInputMode = keyguardManager.inKeyguardRestrictedInputMode()
-
-        if (inKeyguardRestrictedInputMode) {
-            isLocked = true
-        } else {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            isLocked = !powerManager.isInteractive
-        }
-
-        Log.d("Baresip", "Now device is ${if (isLocked) "locked" else "unlocked"}")
-        return isLocked
-    }
-
     fun dtmfWatcher(callp: String): TextWatcher {
         return object : TextWatcher {
             override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
@@ -341,81 +261,183 @@ object Utils {
         return true
     }
 
-    fun encrypt(plainText: String, password: String): String {
-        val sr = SecureRandom.getInstance("SHA1PRNG")
-        val salt = ByteArray(16)
-        sr.nextBytes(salt)
-        val iterationCount = Random().nextInt(1024) + 512
-        val spec = PBEKeySpec(password.toCharArray(), salt, iterationCount, 256)
-        val secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec)
-        val iv = ByteArray(12)
-        SecureRandom().nextBytes(iv)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        val parameterSpec = GCMParameterSpec(128, iv)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec)
-        val cipherText = cipher.doFinal(plainText.toByteArray())
-        val byteBuffer = ByteBuffer.allocate(Int.SIZE_BYTES + salt.size + Int.SIZE_BYTES +
-                Int.SIZE_BYTES + iv.size + cipherText.size)
-        byteBuffer.putInt(salt.size)
-        byteBuffer.put(salt)
-        byteBuffer.putInt(iterationCount)
-        byteBuffer.putInt(iv.size)
-        byteBuffer.put(iv)
-        byteBuffer.put(cipherText)
-        return encodeToString(byteBuffer.array(), Base64.DEFAULT)
+    fun copyAssetToFile(context: Context, asset: String, path: String) {
+        try {
+            val `is` = context.assets.open(asset)
+            val os = FileOutputStream(path)
+            val buffer = ByteArray(512)
+            var byteRead: Int = `is`.read(buffer)
+            while (byteRead  != -1) {
+                os.write(buffer, 0, byteRead)
+                byteRead = `is`.read(buffer)
+            }
+            os.close()
+            `is`.close()
+        } catch (e: IOException) {
+            Log.e("Baresip", "Failed to copy asset '$asset' to file: $e")
+        }
     }
 
-    fun decrypt(cipherMessage: String, password: String): String {
-        val byteBuffer = ByteBuffer.wrap(Base64.decode(cipherMessage, Base64.DEFAULT))
-        val saltLength = byteBuffer.getInt()
-        if (saltLength != 16) {
-            Log.w("Baresip", "invalid salt length $saltLength")
-            return ""
-        }
-        val salt = ByteArray(saltLength)
-        byteBuffer.get(salt)
-        val iterationCount = byteBuffer.getInt()
-        if ((iterationCount < 512) || (iterationCount > 1023 + 512)) {
-            Log.w("Baresip", "invalid iteratorCount $iterationCount")
-            return ""
-        }
-        val spec = PBEKeySpec(password.toCharArray(), salt, iterationCount, 256)
-        val secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec)
-        val ivLength = byteBuffer.getInt()
-        if (ivLength != 12) {
-            Log.d("Baresip", "invalid iv length $ivLength")
-            return ""
-        }
-        val iv = ByteArray(ivLength)
-        byteBuffer.get(iv)
-        val cipherText = ByteArray(byteBuffer.remaining())
-        byteBuffer.get(cipherText)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+    fun deleteFile(filePath: String) {
+        val file = File(filePath)
+        if (file.exists()) file.delete()
+    }
+
+    fun getFileContents(filePath: String): ByteArray? {
         try {
-            return String(cipher.doFinal(cipherText))
+            return File(filePath).readBytes()
+        } catch(e: FileNotFoundException) {
+            Log.e("Baresip", "File '$filePath' not found: ${e.printStackTrace()}")
+            return null
         } catch (e: Exception) {
-            Log.w("Baresip", "Decryption failed ${e.printStackTrace()}")
-            return ""
+            Log.e("Baresip", "Failed to read file '$filePath': ${e.printStackTrace()}")
+            return null
         }
+    }
+
+    fun putFileContents(filePath: String, contents: ByteArray): Boolean {
+        try {
+            File(filePath).writeBytes(contents)
+        }
+        catch (e: IOException) {
+            Log.e("Baresip", "Failed to write file '$filePath': $e")
+            return false
+        }
+        return true
+    }
+
+    class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray):
+        Serializable {
+        val serialVersionUID = -29238082928391L
+    }
+
+    private fun encrypt(content: ByteArray, password: CharArray): Crypto? {
+        var obj: Crypto? = null
+        try {
+            val sr = SecureRandom()
+            val salt = ByteArray(128)
+            sr.nextBytes(salt)
+            val iterationCount = Random().nextInt(1024) + 512
+            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 128)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
+            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val ivRandom = SecureRandom()
+            val iv = ByteArray(16)
+            ivRandom.nextBytes(iv)
+            val ivSpec = IvParameterSpec(iv)
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
+            val cipherData = cipher.doFinal(content)
+            obj = Crypto(salt, iterationCount, iv, cipherData)
+        } catch (e: Exception) {
+            Log.e("Baresip", "Encrypt failed: ${e.printStackTrace()}")
+        }
+        return obj
+
+    }
+
+    private fun decrypt(obj: Crypto, password: CharArray): ByteArray? {
+        var plainData: ByteArray? = null
+        try {
+            val pbKeySpec = PBEKeySpec(password, obj.salt, obj.iter, 128)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
+            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            val ivSpec = IvParameterSpec(obj.iv)
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+            plainData = cipher.doFinal(obj.data)
+        } catch (e: Exception) {
+            Log.e("Baresip", "Decrypt failed: ${e.printStackTrace()}")
+        }
+        return plainData
+    }
+
+
+    fun encryptToFile(filePath: String, content: ByteArray, password: String): Boolean {
+        val obj = encrypt(content, password.toCharArray())
+        try {
+            ObjectOutputStream(FileOutputStream(File(filePath))).use {
+                it.writeObject(obj)
+            }
+        } catch (e: Exception) {
+            Log.e("Baresip", "Write failed: ${e.printStackTrace()}")
+            return false
+        }
+        return true
+    }
+
+    fun decryptFromFile(filePath: String, password: String): ByteArray? {
+        var plainData: ByteArray? = null
+        try {
+            ObjectInputStream(FileInputStream(File(filePath))).use { it ->
+                val obj = it.readObject() as Crypto
+                plainData = decrypt(obj, password.toCharArray())
+            }
+        } catch (e: Exception) {
+            Log.e("Baresip", "Decrypt failed from file '$filePath'")
+        }
+        return plainData
+    }
+
+    fun zip(fileNames: Array<String>, zipFileName: String): Boolean {
+        val zipFilePath = BaresipService.filesPath + "/" + zipFileName
+        try {
+            ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFilePath))).use { out ->
+                val data = ByteArray(1024)
+                for (file in fileNames) {
+                    val filePath = BaresipService.filesPath + "/" + file
+                    if (File(filePath).exists()) {
+                        FileInputStream(filePath).use { fi ->
+                            BufferedInputStream(fi).use { origin ->
+                                val entry = ZipEntry(filePath)
+                                out.putNextEntry(entry)
+                                while (true) {
+                                    val readBytes = origin.read(data)
+                                    if (readBytes == -1) break
+                                    out.write(data, 0, readBytes)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            Log.e("Baresip", "Failed to zip file '$zipFilePath': $e")
+            return false
+        }
+        return true
+    }
+
+    fun unZip(zipFilePath: String): Boolean {
+        try {
+            ZipFile(zipFilePath).use { zip ->
+                zip.entries().asSequence().forEach { entry ->
+                    zip.getInputStream(entry).use { input ->
+                        File(entry.name).outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            Log.e("Baresip", "Failed to unzip file '$zipFilePath': $e")
+            return false
+        }
+        return true
     }
 
     fun dumpIntent(intent: Intent) {
-
         val bundle: Bundle = intent.extras ?: return
-
         val keys = bundle.keySet()
         val it = keys.iterator()
-
         Log.d("Baresip", "Dumping intent start")
-
         while (it.hasNext()) {
             val key = it.next()
             Log.d("Baresip","[" + key + "=" + bundle.get(key)+"]");
         }
-
         Log.d("Baresip", "Dumping intent finish")
-
     }
 
 }

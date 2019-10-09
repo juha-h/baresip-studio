@@ -238,26 +238,20 @@
     <string name="contact_action_question">Haluatko soittaa tai lähettää
     viestin kontaktille \'%1$s\'?</string>
     <string name="send_message">Lähetä viesti</string>
-    <string name="contact_delete_question">Haluatko poistaa kontaktin
-    \'%1$s\'?
-    </string>
-    <string name="contacts_exceeded">Kontaktiesi enimmäismäärä %1$d on
-    ylittynyt.
-    </string>
+    <string name="contact_delete_question">Haluatko poistaa kontaktin \'%1$s\'?</string>
+    <string name="contacts_exceeded">Kontaktiesi enimmäismäärä %1$d on ylittynyt.</string>
     <string name="export_contacts">Tallenna</string>
-    <string name="exported_contacts">Kontaktit tallennettiin
-    Download-kansion tiedostoon \'contacts.bs\'.
+    <string name="exported_contacts">Kontaktit tallennettiin Download-kansion tiedostoon
+        \'contacts.bs\'.
     </string>
     <string name="export_error">"Kontaktien tallennus Download kansioon epäonnistui.
     Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.
     </string>
     <string name="import_contacts">Palauta</string>
-    <string name="imported_contacts">Kontaktit palautettiin Download-kansiosta.
-    </string>
-    <string name="import_error">Kontantien palauttaminen
-    Download-kansiosta epäonnistui.
+    <string name="imported_contacts">Kontaktit palautettiin.</string>
+    <string name="import_error">Kontantien palauttaminen Download-kansiosta epäonnistui.
     Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tiedosto \'contacts.bs\' on
-    kansiossa.
+    Download-kansiossa.
     </string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
@@ -311,14 +305,12 @@
     TLS sertifikaattitiedostosta. Niiden oletusarvot on palautettu. Käynnistä
     baresip uudelleen.
     </string>
-    <string name="registering_failed">Tilin \'%1$s\' rekisteröinti
-    epäonnistui.</string>
+    <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
     <string name="no_microphone_permission">Et ole sallinut mikrofonin
     käyttöä.
     </string>
     <string name="verify">Todenna</string>
-    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;
-    &lt;%2$s&gt;?
+    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt; &lt;%2$s&gt;?
     </string>
     <string name="transfer_query">Hyväksytkö puhelun siirron kohteeseen
     \'%1$s\'?
@@ -334,8 +326,23 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
-qqqq    <string name="tls_ca_file">TLS CA-tiedosto</string>
-    <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää todennusauktoriteettien TLS-sertifikaatit, on ladattu tai ladataan Download-kansiosta.</string>
+    <string name="tls_ca_file">TLS CA-tiedosto</string>
+    <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
+        todennusauktoriteettien TLS-sertifikaatit, on ladattu tai ladataan Download-kansiosta.
+    </string>
     <string name="tls_certificate_file">TLS sertifikaattitiedosto</string>
-    <string name="tls_certificate_file_help">"Jos merkitty, tiedosto \'cert.pem\', joka sisältää tämän baresip-sovelluksen TLS-sertifikaatin ja yksityisen avaimen, on ladattu tai ladataan Download-kansiosta."</string>
+    <string name="tls_certificate_file_help">"Jos merkitty, tiedosto \'cert.pem\', joka sisältää
+        tämän baresip-sovelluksen TLS-sertifikaatin ja yksityisen avaimen, on ladattu tai ladataan
+        Download-kansiosta."
+    </string>
+    <string name="exported_all">Sovelluksen kaikki data talletettiin Download-kansion tiedostoon
+        \'baresip.bs\'.
+    </string>
+    <string name="imported_all">Sovelluksen kaikki data palautettiin. Sinun pitää käynnistää
+        baresip uudelleen.
+    </string>
+    <string name="import_all_failed">Sovelluksen data palauttaminen Download-kansiosta epäonnistui.
+        Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu tiedosto
+        \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
+    </string>
 </resources>

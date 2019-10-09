@@ -3,7 +3,6 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -12,7 +11,6 @@ import android.app.AlertDialog
 import android.view.ViewGroup
 import android.view.LayoutInflater
 
-import java.io.File
 import java.util.ArrayList
 
 class AccountsActivity : AppCompatActivity() {
@@ -20,7 +18,6 @@ class AccountsActivity : AppCompatActivity() {
     internal lateinit var alAdapter: AccountListAdapter
 
     internal var aor = ""
-    internal var password = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -69,6 +66,7 @@ class AccountsActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -92,7 +90,6 @@ class AccountsActivity : AppCompatActivity() {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.READ_EXTERNAL_STORAGE))
                     askPassword(getString(R.string.decrypt_password))
-
             }
 
             android.R.id.home -> {
@@ -120,7 +117,6 @@ class AccountsActivity : AppCompatActivity() {
     }
 
     private fun askPassword(title: String) {
-        val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         val viewInflated = LayoutInflater.from(this)
@@ -130,17 +126,17 @@ class AccountsActivity : AppCompatActivity() {
         builder.setView(viewInflated)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
-            password = input.text.toString()
+            val password = input.text.toString()
             if (password != "") {
                 if (title == getString(R.string.encrypt_password)) {
-                    if (exportAccounts(dir, password))
+                    if (exportAccounts(password))
                         Utils.alertView(this, getString(R.string.info),
                                 getString(R.string.exported_accounts))
                     else
                         Utils.alertView(this, getString(R.string.error),
                                 getString(R.string.export_accounts_error))
                 } else {
-                    if (importAccounts(dir, password))
+                    if (importAccounts(password))
                         Utils.alertView(this, getString(R.string.info),
                                 getString(R.string.imported_accounts))
                     else
@@ -153,6 +149,7 @@ class AccountsActivity : AppCompatActivity() {
             dialog.cancel()
         }
         builder.show()
+
     }
 
     companion object {
@@ -169,30 +166,27 @@ class AccountsActivity : AppCompatActivity() {
         fun saveAccounts() {
             var accounts = ""
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
-            Utils.putFileContents(File(BaresipService.filesPath + "/accounts"), accounts)
+            Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
             // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
-        fun exportAccounts(path: File, password: String): Boolean {
-            var accounts = ""
-            for (a in Account.accounts())
-                accounts = accounts + a.print() + "\n"
-            return Utils.putFileContents(File(path, "accounts.bs"),
-                    Utils.encrypt(accounts, password))
+        fun exportAccounts(password: String): Boolean {
+            val content = Utils.getFileContents("${BaresipService.filesPath}/accounts")
+            if (content == null) return false
+            return Utils.encryptToFile("${BaresipService.downloadsPath}/accounts.bs",
+                    content, password)
         }
 
-        fun importAccounts(path: File, password: String): Boolean {
-            val content = Utils.getFileContents(File(path, "accounts.bs"))
-            if (content == "Failed") return false
-            val accounts = Utils.decrypt(content, password)
-            if (accounts == "") return false
-            return Utils.putFileContents(File(BaresipService.filesPath + "/accounts"),
-                    accounts)
+        fun importAccounts(password: String): Boolean {
+            val content = Utils.decryptFromFile("${BaresipService.downloadsPath}/accounts.bs",
+                    password)
+            if (content == null) return false
+            return Utils.putFileContents("${BaresipService.filesPath}/accounts", content)
         }
 
         fun noAccounts(): Boolean {
-            return Utils.getFileContents(File(BaresipService.filesPath + "/accounts"))
-                    .length == 0
+            val contents = Utils.getFileContents(BaresipService.filesPath + "/accounts")
+            return contents == null || contents.size == 0
         }
 
     }
