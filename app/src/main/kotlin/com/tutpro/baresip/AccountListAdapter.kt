@@ -42,6 +42,8 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                     ua.account.aor))
             deleteDialog.setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
                 Api.ua_destroy(ua.uap)
+                CallHistory.clear(ua.account.aor)
+                Message.clear(ua.account.aor)
                 UserAgent.remove(ua)
                 AccountsActivity.generateAccounts()
                 AccountsActivity.saveAccounts()
