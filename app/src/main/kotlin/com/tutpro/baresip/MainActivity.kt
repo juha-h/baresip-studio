@@ -898,12 +898,12 @@ class MainActivity : AppCompatActivity() {
                 i = Intent(this, AccountsActivity::class.java)
                 startActivityForResult(i, ACCOUNTS_CODE)
             }
-            R.id.export_all -> {
+            R.id.backup -> {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
                     askPassword(getString(R.string.encrypt_password))
             }
-            R.id.import_all -> {
+            R.id.restore -> {
                 if (Utils.requestPermission(this,
                                 android.Manifest.permission.READ_EXTERNAL_STORAGE))
                     askPassword(getString(R.string.decrypt_password))
@@ -913,25 +913,29 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(i, ABOUT_CODE)
             }
             R.id.restart, R.id.quit -> {
-                if (stopState == "initial") {
-                    Log.d("Baresip", "Quiting")
-                    if (BaresipService.isServiceRunning) {
-                        if (item.itemId == R.id.restart) restart = true
-                        baresipService.setAction("Stop");
-                        startService(baresipService)
-                        quitTimer.start()
-                    } else {
-                        finishAndRemoveTask()
-                        System.exit(0)
-                    }
-                }
+                quitRestart(item.itemId == R.id.restart)
             }
         }
         return true
     }
 
+    private fun quitRestart(reStart: Boolean) {
+        if (stopState == "initial") {
+            Log.d("Baresip", "quitRestart Restart = $restart")
+            if (BaresipService.isServiceRunning) {
+                restart = reStart
+                baresipService.setAction("Stop");
+                startService(baresipService)
+                quitTimer.start()
+            } else {
+                finishAndRemoveTask()
+                System.exit(0)
+            }
+        }
+    }
+
     private fun askPassword(title: String) {
-        val builder = android.app.AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         val viewInflated = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
@@ -943,9 +947,9 @@ class MainActivity : AppCompatActivity() {
             val password = input.text.toString()
             if (password != "") {
                 if (title == getString(R.string.encrypt_password))
-                    exportAll(password)
+                    backup(password)
                 else
-                    importAll(password)
+                    restore(password)
             }
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -954,10 +958,10 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun exportAll(password: String) {
+    private fun backup(password: String) {
         val files = arrayOf("accounts", "config", "contacts", "history", "messages", "uuid",
                 "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
-        val exportFilePath = BaresipService.downloadsPath + "/baresip.bs"
+        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"
         if (!Utils.zip(files, "baresip.zip")) {
             Utils.alertView(this, getString(R.string.error), "Failed to write zip file 'baresip.zip")
@@ -968,20 +972,20 @@ class MainActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.error), "Failed to read zip file 'baresip.zip")
             return
         }
-        if (!Utils.encryptToFile(exportFilePath, content, password)) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.export_all_failed))
+        if (!Utils.encryptToFile(backupFilePath, content, password)) {
+            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
             return
         }
-        Utils.alertView(this, getString(R.string.info), getString(R.string.exported_all))
+        Utils.alertView(this, getString(R.string.info), getString(R.string.backed_up))
         Utils.deleteFile(zipFilePath)
     }
 
-    private fun importAll(password: String) {
-        val importFilePath = BaresipService.downloadsPath + "/baresip.bs"
+    private fun restore(password: String) {
+        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"
-        val zipData = Utils.decryptFromFile(importFilePath, password)
+        val zipData = Utils.decryptFromFile(backupFilePath, password)
         if (zipData == null) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.import_all_failed))
+            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
@@ -994,8 +998,18 @@ class MainActivity : AppCompatActivity() {
                     "Failed to unzip file 'baresip.zip'")
             return
         }
-        Utils.alertView(this, getString(R.string.info), getString(R.string.imported_all))
         Utils.deleteFile(zipFilePath)
+        Log.d("Baresip", "Showing restart dialog")
+        val restartDialog = AlertDialog.Builder(this)
+        restartDialog.setMessage(getString(R.string.restored))
+        restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+            quitRestart(true)
+            dialog.dismiss()
+        }
+        restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        restartDialog.create().show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -1007,7 +1021,7 @@ class MainActivity : AppCompatActivity() {
                 if (UserAgent.uas().size > 0) {
                     if ((aorSpinner.selectedItemPosition == -1) ||
                             (aorSpinner.selectedItemPosition >= UserAgent.uas().size))
-                            aorSpinner.setSelection(0)
+                        aorSpinner.setSelection(0)
                     else
                         updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
                 } else {
@@ -1027,10 +1041,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             CONFIG_CODE -> {
-                if ((resultCode == RESULT_OK) &&
-                        (data!!.getBooleanExtra("restart", true)))
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.restart_needed))
+                if ((data != null) && data.hasExtra("restart"))
+                    quitRestart(true)
             }
 
             CALLS_CODE -> {

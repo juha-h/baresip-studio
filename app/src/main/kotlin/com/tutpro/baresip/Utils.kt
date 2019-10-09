@@ -280,7 +280,10 @@ object Utils {
 
     fun deleteFile(filePath: String) {
         val file = File(filePath)
-        if (file.exists()) file.delete()
+        if (file.exists()) {
+            Log.d("Baresip", "Deleting file '$filePath'")
+            file.delete()
+        }
     }
 
     fun getFileContents(filePath: String): ByteArray? {
@@ -411,9 +414,13 @@ object Utils {
     }
 
     fun unZip(zipFilePath: String): Boolean {
+        val allFiles = listOf("accounts", "config", "contacts", "history", "messages", "uuid",
+                "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        val zipFiles = mutableListOf<String>()
         try {
             ZipFile(zipFilePath).use { zip ->
                 zip.entries().asSequence().forEach { entry ->
+                    zipFiles.add(entry.name.substringAfterLast("/"))
                     zip.getInputStream(entry).use { input ->
                         File(entry.name).outputStream().use { output ->
                             input.copyTo(output)
@@ -424,6 +431,9 @@ object Utils {
         } catch (e: IOException) {
             Log.e("Baresip", "Failed to unzip file '$zipFilePath': $e")
             return false
+        }
+        (allFiles - zipFiles).iterator().forEach {
+            deleteFile(BaresipService.filesPath + "/$it")
         }
         return true
     }

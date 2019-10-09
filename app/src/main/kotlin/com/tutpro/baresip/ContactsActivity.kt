@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.ListView
@@ -51,36 +50,9 @@ class ContactsActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        menuInflater.inflate(R.menu.contacts_menu, menu)
-        return true
-
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-
-            R.id.export_contacts -> {
-                if (Contact.export())
-                    Utils.alertView(this, "",
-                            getString(R.string.exported_contacts))
-                else
-                    Utils.alertView(this,getString(R.string.error),
-                            getString(R.string.export_error))
-            }
-
-            R.id.import_contacts -> {
-                if (Contact.import()) {
-                    Utils.alertView(this, "",
-                            getString(R.string.imported_contacts))
-                    clAdapter.notifyDataSetChanged()
-                    Contact.save()
-                } else
-                    Utils.alertView(this,getString(R.string.error),
-                            getString(R.string.import_error))
-            }
 
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Contacts")

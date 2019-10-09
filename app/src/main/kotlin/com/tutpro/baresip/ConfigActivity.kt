@@ -335,7 +335,19 @@ class ConfigActivity : AppCompatActivity() {
 
                 if (save) Config.save()
 
-                intent.putExtra("restart", restart)
+                if (restart) {
+                    val restartDialog = android.support.v7.app.AlertDialog.Builder(this)
+                    restartDialog.setMessage(getString(R.string.config_restart))
+                    restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+                        dialog.dismiss()
+                        intent.putExtra("restart", true)
+                    }
+                    restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    restartDialog.create().show()
+                }
+
                 setResult(RESULT_OK, intent)
                 finish()
 

@@ -41,11 +41,6 @@ class Contact(var name: String, var uri: String) {
             return true
         }
 
-        fun export(): Boolean {
-            return Utils.putFileContents(BaresipService.downloadsPath + "/contacts.bs",
-                    Utils.getFileContents(BaresipService.filesPath + "/contacts")!!)
-        }
-
         fun import(): Boolean {
             val contacts = Utils.getFileContents(BaresipService.downloadsPath + "/contacts.bs")
             if (contacts != null) {

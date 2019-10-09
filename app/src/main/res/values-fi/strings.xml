@@ -107,22 +107,6 @@
     </string>
     <string name="encrypt_password">Salasana</string>
     <string name="decrypt_password">Salasana</string>
-    <string name="export_accounts">Tallenna</string>
-    <string name="exported_accounts">Tilit tallennettiin
-    Download-kansion tiedostoon \'accounts.bs\'.
-    </string>
-    <string name="export_accounts_error">"Tilien tallennus
-    Download-kansioon epäonnistui. Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.
-    </string>
-    <string name="import_accounts">Palauta</string>
-    <string name="imported_accounts">Tilit palautettiin
-    Download-kansiosta. Sinun pitää käynnistää baresip uudelleen.
-    </string>
-    <string name="import_accounts_error">Tilien palauttaminen
-    Download-kansiosta epäonnistui. Tarkista Sovellukset → baresip →
-    Käyttöluvat → Tallennustila ja että tiedosto \'accounts.bs\' on
-    kansiossa ja (jos on) että annoit oikean salasanan.
-    </string>
     <string name="delete_account">Haluatko poistaa tilin
     \'%1$s\'?
     </string>
@@ -226,6 +210,9 @@
     </string>
     <string name="read_cert_error">Tiedoston \'cert.pem\' luku Download-kansiosta epäonnistui.</string>
     <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' luku Download-kansiosta epäonnistui.</string>
+    <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uuden
+        konfiguraation käyttöön. Käynnistä nyt?
+    </string>
     <!-- Contact Activity -->
     <string name="contact">Kontakti</string>
     <string name="new_contact">Uusi kontakti</string>
@@ -240,19 +227,6 @@
     <string name="send_message">Lähetä viesti</string>
     <string name="contact_delete_question">Haluatko poistaa kontaktin \'%1$s\'?</string>
     <string name="contacts_exceeded">Kontaktiesi enimmäismäärä %1$d on ylittynyt.</string>
-    <string name="export_contacts">Tallenna</string>
-    <string name="exported_contacts">Kontaktit tallennettiin Download-kansion tiedostoon
-        \'contacts.bs\'.
-    </string>
-    <string name="export_error">"Kontaktien tallennus Download kansioon epäonnistui.
-    Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila.
-    </string>
-    <string name="import_contacts">Palauta</string>
-    <string name="imported_contacts">Kontaktit palautettiin.</string>
-    <string name="import_error">Kontantien palauttaminen Download-kansiosta epäonnistui.
-    Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tiedosto \'contacts.bs\' on
-    Download-kansiossa.
-    </string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
@@ -272,6 +246,8 @@
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <!-- Main Activity -->
+    <string name="backup">Tallenna</string>
+    <string name="restore">Palauta</string>
     <string name="about">Tietoja</string>
     <string name="restart">Käynnistä uudelleen</string>
     <string name="quit">Lopeta</string>
@@ -317,8 +293,6 @@
     </string>
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
-    <string name="restart_needed">Sinun pitää käynnistää baresip
-    uudelleen, jotta saat uuden konfiguraation käyttöön.</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
     <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta
     kohdetta ei ole todennettu!
@@ -335,13 +309,15 @@
         tämän baresip-sovelluksen TLS-sertifikaatin ja yksityisen avaimen, on ladattu tai ladataan
         Download-kansiosta."
     </string>
-    <string name="exported_all">Sovelluksen kaikki data talletettiin Download-kansion tiedostoon
+    <string name="backed_up">Sovelluksen tiedot talletettiin Download-kansion tiedostoon
         \'baresip.bs\'.
     </string>
-    <string name="imported_all">Sovelluksen kaikki data palautettiin. Sinun pitää käynnistää
-        baresip uudelleen.
+    <string name="backup_failed">Sovelluksen tietojen talletus Download-kansion tiedostoon
+        \'baresip.bs\' epäonnistui. Check Apps → baresip → Permissions → Storage</string>
+    <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
+        uudelleen. Käynnistä uudelleen nyt?
     </string>
-    <string name="import_all_failed">Sovelluksen data palauttaminen Download-kansiosta epäonnistui.
+    <string name="restore_failed">Sovelluksen data palauttaminen Download-kansiosta epäonnistui.
         Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu tiedosto
         \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
     </string>
