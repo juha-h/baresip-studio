@@ -1,0 +1,7 @@
+- Replaced exporting and importing of accounts and contacts with backup
+  and restore of all application data.
+- Improved security by disallowing Android based application backup and
+  installation of application to external storage.
+- When account is deleted, delete also account's call and chat history.
+- Fixed deleting of messages and chats.
+- Minor UI and string improvements.
