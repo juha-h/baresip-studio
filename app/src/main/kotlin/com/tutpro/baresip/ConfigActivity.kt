@@ -225,6 +225,7 @@ class ConfigActivity : AppCompatActivity() {
                         if (content == null) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.read_cert_error))
+                            certificateFile.isChecked = false
                             return false
                         }
                         Utils.putFileContents(BaresipService.filesPath + "/cert.pem", content)
@@ -246,6 +247,7 @@ class ConfigActivity : AppCompatActivity() {
                         if (content == null) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.read_ca_certs_error))
+                            caFile.isChecked = false
                             return false
                         }
                         Utils.putFileContents(BaresipService.filesPath + "/ca_certs.crt",
@@ -266,6 +268,7 @@ class ConfigActivity : AppCompatActivity() {
                         if (Api.module_load("webrtc_aec.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.failed_to_load_aec_module))
+                            aec.isChecked = false
                             return false
                         }
                     } else {
@@ -335,18 +338,7 @@ class ConfigActivity : AppCompatActivity() {
 
                 if (save) Config.save()
 
-                if (restart) {
-                    val restartDialog = android.support.v7.app.AlertDialog.Builder(this)
-                    restartDialog.setMessage(getString(R.string.config_restart))
-                    restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
-                        dialog.dismiss()
-                        intent.putExtra("restart", true)
-                    }
-                    restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    restartDialog.create().show()
-                }
+                if (restart) intent.putExtra("restart", true)
 
                 setResult(RESULT_OK, intent)
                 finish()
@@ -355,7 +347,6 @@ class ConfigActivity : AppCompatActivity() {
 
             android.R.id.home -> {
 
-                Log.d("Baresip", "Back array was pressed at Config")
                 setResult(Activity.RESULT_CANCELED, intent)
                 finish()
 
