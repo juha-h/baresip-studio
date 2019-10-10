@@ -12,12 +12,13 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>Check that configuration default values meet your needs (touch item titles for help).</li>
+            <li>Check that Configuration default values meet your needs (touch item titles for help).</li>
             <li>Then create one or more accounts (again touch item titles for help).</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
-            <li>If you cannot hear the other party of a call, try to increase Media volume.</li>
+            <li>If you cannot hear the other party during call, try to increase Media volume of
+            the device or set Default Call Volume in Configuration.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,

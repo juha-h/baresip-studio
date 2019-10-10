@@ -17,7 +17,8 @@
         viestejä ja kontakteja.</li>
         <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
         kun puhelun kohde on tyhjä.</li>
-        <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia.</li>
+        <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
+        tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
         missä voi myös raportoida virheistä.
