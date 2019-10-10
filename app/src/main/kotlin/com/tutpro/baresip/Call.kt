@@ -21,22 +21,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
             return BaresipService.calls
         }
 
-        fun calls(calls: ArrayList<Call>, dir: String): ArrayList<Call> {
-            val result = ArrayList<Call>()
-            for (i in calls.indices) {
-                if (calls[i].dir == dir) result.add(calls[i])
-            }
-            return result
-        }
-
-        fun calls(dir: String): ArrayList<Call> {
-            val result = ArrayList<Call>()
-            for (c in BaresipService.calls) {
-                if (c.dir == dir) result.add(c)
-            }
-            return result
-        }
-
         fun uaCalls(ua: UserAgent, dir: String): ArrayList<Call> {
             val result = ArrayList<Call>()
             for (c in BaresipService.calls)
