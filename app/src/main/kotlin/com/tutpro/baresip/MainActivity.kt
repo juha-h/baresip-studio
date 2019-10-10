@@ -959,7 +959,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun backup(password: String) {
-        val files = arrayOf("accounts", "config", "contacts", "history", "messages", "uuid",
+        val files = arrayOf("accounts", "calls", "config", "contacts", "messages", "uuid",
                 "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"

@@ -174,6 +174,9 @@ class BaresipService: Service() {
                     }
                 }
 
+                if (File(filesDir, "history").exists())
+                    File(filesDir, "history").renameTo(File(filesDir, "calls"))
+
                 Contact.restore()
                 CallHistory.restore()
                 Message.restore()
@@ -887,7 +890,7 @@ class BaresipService: Service() {
     private fun cleanService() {
         uas.clear()
         status.clear()
-        history.clear()
+        callHistory.clear()
         messages.clear()
         if (this::nm.isInitialized)
             nm.cancelAll()
@@ -937,7 +940,7 @@ class BaresipService: Service() {
         var uas = ArrayList<UserAgent>()
         var status = ArrayList<Int>()
         var calls = ArrayList<Call>()
-        var history = ArrayList<CallHistory>()
+        var callHistory = ArrayList<CallHistory>()
         var messages = ArrayList<Message>()
         var contacts = ArrayList<Contact>()
         var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()

@@ -197,8 +197,8 @@ class CallsActivity : AppCompatActivity() {
 
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
-        for (i in CallHistory.history().indices.reversed()) {
-            val h = CallHistory.history()[i]
+        for (i in BaresipService.callHistory.indices.reversed()) {
+            val h = BaresipService.callHistory[i]
             if (h.aor == aor) {
                 var direction: Int
                 if (h.direction == "in")
@@ -231,7 +231,7 @@ class CallsActivity : AppCompatActivity() {
 
     private fun removeUaHistoryAt(i: Int) {
         for (index in uaHistory[i].indexes)
-            CallHistory.history().removeAt(index)
+            BaresipService.callHistory.removeAt(index)
         uaHistory.removeAt(i)
     }
 

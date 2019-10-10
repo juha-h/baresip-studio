@@ -414,7 +414,7 @@ object Utils {
     }
 
     fun unZip(zipFilePath: String): Boolean {
-        val allFiles = listOf("accounts", "config", "contacts", "history", "messages", "uuid",
+        val allFiles = listOf("accounts", "calls", "config", "contacts", "messages", "uuid",
                 "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val zipFiles = mutableListOf<String>()
         try {
