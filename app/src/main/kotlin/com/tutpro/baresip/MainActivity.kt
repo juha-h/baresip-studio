@@ -247,9 +247,9 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     if (!Utils.checkSipUri(uri)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_sip_uri)} '$uri'")
+                        Utils.alertView(this, getString(R.string.notice), "${getString(R.string.invalid_sip_uri)} '$uri'")
                     } else {
+                        callUri.isFocusable = false
                         // Set audio mode to MODE_IN_COMMUNICATION and wait 2.5 sec before
                         // placing to call in order to avoid missing audio from callee due to
                         // a bug in many Android devices.
