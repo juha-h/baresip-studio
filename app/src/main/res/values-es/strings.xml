@@ -97,18 +97,6 @@
     <string name="account_allocation_failure">"Error al asignar nueva cuenta.</string>
     <string name="encrypt_password">Cifrar contraseña</string>
     <string name="decrypt_password">Descifrar contraseña</string>
-    <string name="export_accounts">Exportar</string>
-    <string name="exported_accounts">Cuentas exportadas para descargar el archivo de carpeta \'accounts.bs\'.</string>
-    <string name="export_accounts_error">"Error al exportar cuentas a la carpeta Descargar.
-    Verifique Aplicaciones → baresip → Permisos → Almacenamiento."
-    </string>
-    <string name="import_accounts">Importar</string>
-    <string name="imported_accounts">Cuentas importadas de la carpeta de descargas. Necesitas reiniciar
-        baresip.</string>
-    <string name="import_accounts_error">Error al importar cuentas desde Descargar archivo de carpeta.
-Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo \'accounts.bs\' existe en
-        la carpeta y, si es así, proporcionó la contraseña de descifrado correcta."
-    </string>
     <string name="delete_account">¿Quieres eliminar la cuenta? \'%1$s\'?</string>
 
     <!-- Baresip Service -->
@@ -227,12 +215,6 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="send_message">Enviar mensaje</string>
     <string name="contact_delete_question">¿Quieres eliminar el contacto? \'%1$s\'?</string>
     <string name="contacts_exceeded">Su número máximo de contactos %1%d se ha excedido.</string>
-    <string name="exported_contacts">Contactos exportados para descargar el archivo de carpeta \'contacts.bs\'.</string>
-    <string name="export_error">"Error al exportar contactos a la carpeta Descargar.
-        Verifique Aplicaciones → baresip → Permisos → Almacenamiento."</string>
-    <string name="imported_contacts">Contactos importados de la carpeta de descargas.</string>
-    <string name="import_error">Error al importar contactos desde la carpeta Descargar. Comprobar aplicaciones →
-        baresip → Permisos → Almacenamiento y ese archivo \'contactos.bs\' existe en la carpeta.</string>
 
     <!-- Generic -->
     <string name="alert">Alerta</string>
@@ -293,7 +275,6 @@ Verifique Aplicaciones → baresip → Permisos → Almacenamiento y ese archivo
     <string name="transfer_query">¿Aceptas transferir la llamada a \'%1$s\'?</string>
     <string name="call_failed">Llamada fallida</string>
     <string name="call_closed">Llamada cerrada</string>
-    <string name="restart_needed">Debe reiniciar baresip para activar la nueva configuración.</string>
     <string name="call_not_secure">¡Esta llamada NO es segura!</string>
     <string name="peer_not_verified">¡Esta llamada es SEGURA, pero el par NO está verificado!</string>
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
