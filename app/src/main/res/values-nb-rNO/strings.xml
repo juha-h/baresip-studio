@@ -25,10 +25,6 @@
     <string name="account_allocation_failure">Klarte ikke å tildele ny konto.</string>
     <string name="encrypt_password">Krypter passord</string>
     <string name="decrypt_password">Dekrypter passord</string>
-    <string name="export_accounts">Eksporter</string>
-    <string name="exported_accounts">Eksporterte kontoer til filen \"accounts.bs\" i nedlastingsmappen.</string>
-    <string name="import_accounts">Importer</string>
-    <string name="imported_accounts">Importerte kontorer fra nedlastingsmappen. Du må starte baresip på ny.</string>
     <string name="delete_account">Ønsker du å slette kontoen \"%1$s\"\?</string>
     <string name="answer">Svar</string>
     <string name="reject">Legg på</string>
@@ -130,9 +126,6 @@
     <string name="voicemail_uri">Telefonsvarer-URI</string>
     <string name="voicemain_uri_help">SIP-URI for sjekk av telefonsvarermeldinger. Hvis levnet tom, vil telefonsvarermeldinger (melding venter-anvisninger) ikke bli levert.</string>
     <string name="default_account_help">Velger denne kontoen når baresip startes.</string>
-    <string name="export_accounts_error">"Klarte ikke å eksportere kontoer til nedlastingsmappe.
-\n        Sjekk Programmer → baresip → Tilganger → Lagring."</string>
-    <string name="import_accounts_error">Klarte ikke å importere kontoer fra nedlastingsmappefil. Sjekk Programmer → baresip → Tilganger → Lagring, og at filen \"accounts.bs\" finnes i mappen, og at, i sådant fall, at du har angitt rett dekrypteringspassord.</string>
     <string name="transfer_request">Samtaleoverføringsforespørsel til</string>
     <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk\?</string>
     <string name="message_failed">Mislyktes</string>
@@ -156,10 +149,6 @@
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
     <string name="contacts_exceeded">Ditt har nådd ditt maksimale antall kontakter på %1$d.</string>
-    <string name="exported_contacts">Eksporterte kontakter til nedlastingsmappen i forma av filen \"contacts.bs\".</string>
-    <string name="export_error">Klarte ikke å eksportere kontakter til nedlastingsmappen. Sjekk Programmer → baresip → Tilganger → Lagring.</string>
-    <string name="imported_contacts">Importerte kontakter fra nedlastingsmappen.</string>
-    <string name="import_error">Klarte ikke å importere kontakter fra nedlastingsmappen. Sjekk Programmer → baresip → Tilganger → Lagring og at filen \"contacts.bs\" finnes i mappen.</string>
     <string name="invalid_sip_uri">Ugyldig SIP URI</string>
     <string name="callee">Ringer</string>
     <string name="hangup">Legg på</string>
@@ -178,7 +167,6 @@
     <string name="transfer_query">Godtar du å overføre samtalen til \"%1$s\"\?</string>
     <string name="call_failed">Anrop mislyktes</string>
     <string name="call_closed">Samtale lukket</string>
-    <string name="restart_needed">Du må starte baresip på ny for å aktivere det nye oppsettet.</string>
     <string name="tls_certificate_file">TLS-sertifikatsfil</string>
     <string name="tls_certificate_file_help">Hvis valgt vil eller har filen \"cert.pem\" som inneholder TLS-sertifikatet og den private nøkkelen tilhørende denne baresip-instansen blitt lastet inn fra Nedlastinger. Av sikkerhetshensyn må du slette filen etter innlasting.</string>
     <string name="tls_ca_file">TLS-CA-fil</string>
