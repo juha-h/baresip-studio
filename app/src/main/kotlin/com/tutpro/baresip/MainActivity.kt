@@ -1041,8 +1041,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             CONFIG_CODE -> {
-                if ((data != null) && data.hasExtra("restart"))
-                    quitRestart(true)
+                if ((data != null) && data.hasExtra("restart")) {
+                    val restartDialog = AlertDialog.Builder(this)
+                    restartDialog.setMessage(getString(R.string.config_restart))
+                    restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+                        dialog.dismiss()
+                        quitRestart(true)
+                    }
+                    restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    restartDialog.create().show()
+                }
             }
 
             CALLS_CODE -> {
