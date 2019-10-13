@@ -95,8 +95,8 @@
     <string name="invalid_aor">Usuario inválido@dominio \'%1$s\'</string>
     <string name="account_exists">La cuena \'%1$s\' ya existe.</string>
     <string name="account_allocation_failure">"Error al asignar nueva cuenta.</string>
-    <string name="encrypt_password">Cifrar contraseña</string>
-    <string name="decrypt_password">Descifrar contraseña</string>
+    <string name="encrypt_password">Contraseña de Cifrado</string>
+    <string name="decrypt_password">Descifrar con contraseña</string>
     <string name="delete_account">¿Quieres eliminar la cuenta? \'%1$s\'?</string>
 
     <!-- Baresip Service -->
@@ -238,6 +238,8 @@
     <string name="dots" translatable="false">…</string>
 
     <!-- Main Activity -->
+	<string name="backup">Copia de Seguridad</string>
+    <string name="restore">Restaurar</string>
     <string name="about">Acerca de</string>
     <string name="restart">Reiniciar</string>
     <string name="quit">Salir</string>
@@ -280,5 +282,14 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-
+    <string name="backed_up">Datos de la aplicación respaldados en carpeta Descargar \'baresip.bs\'.</string>
+    <string name="backup_failed">Error al hacer una copia de seguridad de los datos de la aplicación para el la carpeta Descargar
+        \'baresip.bs\'. Chequear Apps → baresip → Permisos → Almacenamiento</string>
+    <string name="restored">Datos de la aplicación restaurados. Baresip necesita ser reiniciado.
+        ¿Reiniciar ahora?
+    </string>
+    <string name="restore_failed">Error al restaurar los datos de la aplicación desde la carpeta de descargas. Cheque Apps →
+        baresip → Permisos → Almacenamiento y el archivo de la copia de seguridad \'baresip.bs\' existe en la carpeta
+        y, si es así, proporcionó la contraseña de descifrado correcta.
+    </string>
 </resources>
