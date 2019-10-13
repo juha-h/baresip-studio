@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Main created with action '$intentAction'")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+        if (Build.VERSION.SDK_INT >= 27) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
             kgm.requestDismissKeyguard(this, null)
@@ -182,14 +182,14 @@ class MainActivity : AppCompatActivity() {
         callUri.threshold = 2
         callUri.setOnFocusChangeListener { view, b ->
             if (b) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                if (Build.VERSION.SDK_INT >= 27) {
                     kgm.requestDismissKeyguard(this, null)
                 }
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
             }
         }
         callUri.setOnClickListener { view ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            if (Build.VERSION.SDK_INT >= 27) {
                 kgm.requestDismissKeyguard(this, null)
             }
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
