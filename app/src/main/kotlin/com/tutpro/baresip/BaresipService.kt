@@ -161,7 +161,7 @@ class BaresipService: Service() {
                     }
                     if (a == "config") {
                         var dnsServers = listOf<InetAddress>()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (Build.VERSION.SDK_INT >= 23) {
                             val activeNetwork = cm.activeNetwork
                             if (activeNetwork != null) {
                                 dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
@@ -382,7 +382,7 @@ class BaresipService: Service() {
                             newEvent = "registering failed,DNS lookup failed"
                             Api.net_dns_debug()
                             if (dynDns)
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (Build.VERSION.SDK_INT >= 23) {
                                     val activeNetwork = cm.activeNetwork
                                     if (activeNetwork != null) {
                                         val dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
@@ -437,7 +437,7 @@ class BaresipService: Service() {
                             calls.add(Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)))
                             if (ua.account.answerMode == "manual") {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (Build.VERSION.SDK_INT >= 23) {
                                     Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                     if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                         startRinging()
@@ -472,7 +472,7 @@ class BaresipService: Service() {
                                     .setOngoing(true)
                                     .setContentTitle(getString(R.string.incoming_call_from))
                                     .setContentText(caller)
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
@@ -558,7 +558,7 @@ class BaresipService: Service() {
                                     .setAutoCancel(true)
                                     .setContentTitle(getString(R.string.transfer_request))
                                     .setContentText(target)
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
@@ -661,7 +661,7 @@ class BaresipService: Service() {
                     .setAutoCancel(true)
                     .setContentTitle(getString(R.string.message_from) + " " + sender)
                     .setContentText(text)
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT < 26) {
                 nb.setVibrate(LongArray(0))
                         .setVisibility(VISIBILITY_PRIVATE)
                         .setPriority(Notification.PRIORITY_HIGH)
@@ -725,7 +725,7 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= 26) {
             val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
                     NotificationManager.IMPORTANCE_LOW)
             defaultChannel.lockscreenVisibility = VISIBILITY_PUBLIC
@@ -771,7 +771,7 @@ class BaresipService: Service() {
     }
 
     private fun requestAudioFocus(streamType: Int) {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) && (audioFocusRequest == null)) {
+        if ((Build.VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
             @TargetApi(26)
             audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
                 setAudioAttributes(AudioAttributes.Builder().run {
@@ -800,14 +800,14 @@ class BaresipService: Service() {
     }
 
     private fun isAudioFocused(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT >= 26)
             return audioFocusRequest != null
         else
             return audioFocused
     }
 
     private fun abandonAudioFocus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= 26) {
             if (audioFocusRequest != null) {
                 am.abandonAudioFocusRequest(audioFocusRequest!!)
                 audioFocusRequest = null
@@ -825,7 +825,7 @@ class BaresipService: Service() {
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
         requestAudioFocus(AudioManager.STREAM_RING)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= 28) {
             rt.isLooping = true
             rt.play()
         } else {
@@ -842,7 +842,7 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.P) && (rtTimer != null)) {
+        if ((Build.VERSION.SDK_INT < 28) && (rtTimer != null)) {
             rtTimer!!.cancel()
             rtTimer = null
         }

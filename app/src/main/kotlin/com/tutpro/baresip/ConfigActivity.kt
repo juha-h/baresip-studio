@@ -205,7 +205,7 @@ class ConfigActivity : AppCompatActivity() {
                         }
                     } else {
                         Config.add("dyn_dns", "yes")
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (Build.VERSION.SDK_INT >= 23) {
                             val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                             Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
                         } else {
