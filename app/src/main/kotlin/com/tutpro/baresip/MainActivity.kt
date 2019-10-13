@@ -568,6 +568,7 @@ class MainActivity : AppCompatActivity() {
                         showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                     }
                 }
+                uaAdapter.notifyDataSetChanged()
             }
         }
         resumeAction = ""
