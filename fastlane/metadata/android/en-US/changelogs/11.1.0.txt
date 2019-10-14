@@ -1,0 +1,6 @@
+- Added 'Bind Address' configuration variable that allows choosing which
+  network interface or IP address baresip is using.
+- Always update status icon of accounts when resuming to main activity.
+- Fixed crash when resuming to previously destroyed main activity.
+- Correctly show active incoming call when resuming to main activity.
+- Updated Spanish strings.
