@@ -549,26 +549,22 @@ class MainActivity : AppCompatActivity() {
             "message show", "message reply" ->
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
-                if (!BaresipService.activities.isEmpty()) {
-                    restoreActivities()
-                } else {
-                    if (UserAgent.uas().size > 0) {
-                        val currentPosition = aorSpinner.selectedItemPosition
-                        uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(),
-                                UserAgent.status())
-                        aorSpinner.adapter = uaAdapter
-                        if (currentPosition == -1) {
-                            if (Call.calls().size > 0)
-                                spinToAor(Call.calls()[0].ua.account.aor)
-                            else
-                                aorSpinner.setSelection(0)
-                        } else {
-                            aorSpinner.setSelection(currentPosition)
-                        }
-                        showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
+                if (!BaresipService.activities.isEmpty()) restoreActivities()
+                if (UserAgent.uas().size > 0) {
+                    val currentPosition = aorSpinner.selectedItemPosition
+                    uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(),
+                            UserAgent.status())
+                    aorSpinner.adapter = uaAdapter
+                    if (currentPosition == -1) {
+                        if (Call.calls().size > 0)
+                            spinToAor(Call.calls()[0].ua.account.aor)
+                        else
+                            aorSpinner.setSelection(0)
+                    } else {
+                        aorSpinner.setSelection(currentPosition)
                     }
+                    showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                 }
-                uaAdapter.notifyDataSetChanged()
             }
         }
         resumeAction = ""
