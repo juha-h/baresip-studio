@@ -169,6 +169,12 @@
     osoitteilla.
     </string>
     <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
+    <string name="bind_address">Verkko-osoite</string>
+    <string name="bind_address_help">Verkkoliitännän nimi tai IP-osoite,
+    jota baresip käyttää lähdeliitäntänä tai -osoitteena. Normaalisti
+    tätä ei tarvitse asettaa.
+    </string>
+    <string name="invalid_bind_address">Virheellinen verkko-osoite</string>
     <string name="prefer_ipv6">Suosi IPv6-protokollaa</string>
     <string name="prefer_ipv6_help">Jos merkitty, baresip suosii
     IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä.</string>

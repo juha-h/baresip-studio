@@ -110,7 +110,7 @@ object Utils {
                 checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
     }
 
-    private fun checkIp(ip: String): Boolean {
+    fun checkIp(ip: String): Boolean {
         return checkIpV4(ip) || checkIpV6(ip)
     }
 
@@ -212,6 +212,13 @@ object Utils {
         for (c in name) {
             if (!c.isLetterOrDigit() && !(c in "-.!%*_+`'~ ")) return false
         }
+        return true
+    }
+
+    fun checkIfName(name: String): Boolean {
+        if ((name.length < 2) || !name.first().isLetter()) return false
+        for (c in name)
+            if (!c.isLetterOrDigit()) return false
         return true
     }
 

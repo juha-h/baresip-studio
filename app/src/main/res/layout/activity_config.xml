@@ -64,6 +64,26 @@
             android:importantForAutofill="no" >
         </EditText>
 
+        <TextView
+            android:id="@+id/BindAddressTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:text="@string/bind_address"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/BindAddress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textSize="18sp"
+            android:inputType="textUri"
+            android:importantForAutofill="no" >
+        </EditText>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
