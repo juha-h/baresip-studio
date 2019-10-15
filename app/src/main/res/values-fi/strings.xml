@@ -9,8 +9,7 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-        <li>Tarkista, että konfiguraation oletusarvot vastaavat tarpeitasi.
-        Kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja,
@@ -155,7 +154,7 @@
     <string name="delete_chats">Tyhjennä</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian?</string>
     <!-- Config Activity -->
-    <string name="configuration">Konfiguraatio</string>
+    <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
     <string name="start_automatically_help">Jos merkitty, baresip
     käynnistyy automaattisesti, kun laite käynnistyy.</string>
@@ -211,14 +210,14 @@
     </string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
-    <string name="reset_config">Palauta oletuskonfiguraatio</string>
-    <string name="reset_config_help">Jos merkitty, oletuskonfiguraatio palautetaan, kun
+    <string name="reset_config">Palauta oletusasetukset</string>
+    <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
     <string name="read_cert_error">Tiedoston \'cert.pem\' luku Download-kansiosta epäonnistui.</string>
     <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' luku Download-kansiosta epäonnistui.</string>
-    <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uuden
-        konfiguraation käyttöön. Käynnistä nyt?
+    <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset
+        käyttöön. Käynnistä nyt?
     </string>
     <!-- Contact Activity -->
     <string name="contact">Kontakti</string>
