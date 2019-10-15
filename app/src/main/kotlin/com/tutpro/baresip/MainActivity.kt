@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_CODE)
         }
 
-        uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(), UserAgent.status())
+        uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas, BaresipService.status)
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -552,9 +552,6 @@ class MainActivity : AppCompatActivity() {
                 if (!BaresipService.activities.isEmpty()) restoreActivities()
                 if (UserAgent.uas().size > 0) {
                     val currentPosition = aorSpinner.selectedItemPosition
-                    uaAdapter = UaSpinnerAdapter(applicationContext, UserAgent.uas(),
-                            UserAgent.status())
-                    aorSpinner.adapter = uaAdapter
                     if (currentPosition == -1) {
                         if (Call.calls().size > 0)
                             spinToAor(Call.calls()[0].ua.account.aor)
