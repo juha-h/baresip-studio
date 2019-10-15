@@ -934,17 +934,17 @@ class BaresipService: Service() {
         var speakerPhone = false
         var callVolume = 0
         var dynDns = false
-
         var filesPath = ""
         var downloadsPath = ""
-        var uas = ArrayList<UserAgent>()
-        var status = ArrayList<Int>()
-        var calls = ArrayList<Call>()
+
+        val uas = ArrayList<UserAgent>()
+        val status = ArrayList<Int>()
+        val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistory>()
         var messages = ArrayList<Message>()
-        var contacts = ArrayList<Contact>()
-        var chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
-        var activities = mutableListOf<String>()
+        val contacts = ArrayList<Contact>()
+        val chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
+        val activities = mutableListOf<String>()
 
     }
 
