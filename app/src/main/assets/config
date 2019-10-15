@@ -21,6 +21,7 @@ rtp_stats no
 dyn_dns yes
 net_prefer_ipv6 no
 module opus.so
+module amr.so
 module ilbc.so
 module g7221.so
 module g722.so
