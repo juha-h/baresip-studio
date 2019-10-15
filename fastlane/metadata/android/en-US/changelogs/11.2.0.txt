@@ -1,0 +1,3 @@
+- Added support for AMR narrowband codec.
+- Added Bulgarian strings.
+- Renamed main menu Configuration item to Settings.
