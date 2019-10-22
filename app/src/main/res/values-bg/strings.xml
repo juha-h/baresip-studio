@@ -205,8 +205,6 @@
 	<string name="contact">контакт</string>
 	<string name="new_contact">Нов контакт</string>
 	<string name="contact_name">име</string>
-	<string name="export_contacts">изнеси</string>
-	<string name="import_contacts">внеси</string>
 	<string name="invalid_contact">Невалидно име за контакт \'%1$s\'</string>
 	<string name="contact_already_exists">Този контакт \'%1$s\' вече съществува.</string>
 	<string name="invalid_contact_uri">Невалиден SIP URI</string>

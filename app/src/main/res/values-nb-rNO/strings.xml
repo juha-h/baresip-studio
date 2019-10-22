@@ -60,8 +60,6 @@
     <string name="contact">Kontakt</string>
     <string name="new_contact">Ny kontakt</string>
     <string name="contact_name">Navn</string>
-    <string name="export_contacts">Eksporter</string>
-    <string name="import_contacts">Importer</string>
     <string name="invalid_contact">\"%1$s\" er et ugydlig kontaktnavn</string>
     <string name="contacts">Kontakter</string>
     <string name="send_message">Send melding</string>
