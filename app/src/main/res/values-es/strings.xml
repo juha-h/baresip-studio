@@ -203,8 +203,6 @@
     <string name="contact">Contacto</string>
     <string name="new_contact">Nuevo Contacto</string>
     <string name="contact_name">Nombre</string>
-    <string name="export_contacts">Exportar</string>
-    <string name="import_contacts">Importar</string>
     <string name="invalid_contact">Nombre de contacto inválido \'%1$s\'</string>
     <string name="contact_already_exists">El Contacto \'%1$s\' ya existe.</string>
     <string name="invalid_contact_uri">URI de SIP no válido</string>

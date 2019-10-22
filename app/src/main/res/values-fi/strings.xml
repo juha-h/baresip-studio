@@ -324,12 +324,13 @@
         \'baresip.bs\'.
     </string>
     <string name="backup_failed">Sovelluksen tietojen talletus Download-kansion tiedostoon
-        \'baresip.bs\' epäonnistui. Check Apps → baresip → Permissions → Storage</string>
+        \'baresip.bs\' epäonnistui. Tarkista Asetukset → Sovellukset → baresip →
+        Käyttöluvat → Tallennustila.</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt?
     </string>
     <string name="restore_failed">Sovelluksen data palauttaminen Download-kansiosta epäonnistui.
-        Tarkista Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu tiedosto
-        \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
+        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu
+        tiedosto \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
     </string>
 </resources>

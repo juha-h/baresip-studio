@@ -77,8 +77,6 @@
     <string name="contact">Contact</string>
     <string name="new_contact">Contact nou</string>
     <string name="contact_name">Nume</string>
-    <string name="export_contacts">Export</string>
-    <string name="import_contacts">Import</string>
     <string name="invalid_contact">Nume de contact invalid \'%1$s\'</string>
     <string name="contact_already_exists">Contactul \'%1$s\' deja există.</string>
     <string name="invalid_contact_uri">Adresă SIP invalidă</string>
