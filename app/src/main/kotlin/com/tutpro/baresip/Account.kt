@@ -1,6 +1,8 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Account(val accp: String) {
 
@@ -149,6 +151,27 @@ class Account(val accp: String) {
 
     fun host() : String {
         return aor.split("@")[1]
+    }
+
+    private fun removeAudioCodecsStartingWith(prefix: String) {
+        val newCodecs = ArrayList<String>()
+        for (acSpec in audioCodec)
+            if (!acSpec.toLowerCase(Locale.ROOT).startsWith(prefix)) newCodecs.add(acSpec)
+        audioCodec = newCodecs
+    }
+
+    fun removeAudioCodecs(codecModule: String) {
+        when (codecModule) {
+            "g711" -> {
+                removeAudioCodecsStartingWith("pcm")
+            }
+            "g722" -> {
+                removeAudioCodecsStartingWith("g722/")
+            }
+            else -> {
+                removeAudioCodecsStartingWith(codecModule)
+            }
+        }
     }
 
     companion object {

@@ -38,10 +38,10 @@ object Utils {
         return result
     }
 
-    fun removeLinesStartingWithName(string: String, name: String): String {
+    fun removeLinesStartingWithString(lines: String, string: String): String {
         var result = ""
-        for (line in string.split("\n"))
-            if (!line.startsWith(name) && (line.length > 0)) result += line + "\n"
+        for (line in lines.split("\n"))
+            if (!line.startsWith(string) && (line.length > 0)) result += line + "\n"
         return result
     }
 

@@ -3,14 +3,19 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import android.widget.RelativeLayout.LayoutParams
+import android.widget.AdapterView
 
 class ConfigActivity : AppCompatActivity() {
 
@@ -35,6 +40,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldCAFile = false
+    private var oldAudioModules = mutableMapOf<String, Boolean>()
     private var oldAec = false
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
@@ -43,6 +49,7 @@ class ConfigActivity : AppCompatActivity() {
     private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
+    private val audioModules = listOf("opus", "amr", "ilbc", "g722", "g7221", "g726", "g711")
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -90,6 +97,37 @@ class ConfigActivity : AppCompatActivity() {
         caFile = findViewById(R.id.CAFile) as CheckBox
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
         caFile.isChecked = oldCAFile
+
+        val audioModulesList = findViewById(R.id.AudioModulesList) as LinearLayout
+        var id = 1000
+        for (module in audioModules) {
+            val rl = RelativeLayout(this)
+            val rlParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            rlParams.marginStart = 16
+            rl.layoutParams = rlParams
+            val tv = TextView(this)
+            tv.id = id++
+            val tvParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            tvParams.addRule(RelativeLayout.ALIGN_PARENT_START)
+            tvParams.addRule(RelativeLayout.CENTER_VERTICAL)
+            tvParams.addRule(RelativeLayout.START_OF, id)
+            tv.layoutParams = tvParams
+            tv.text = module
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            tv.setTextColor(Color.BLACK)
+            rl.addView(tv)
+            val cb = CheckBox(this)
+            cb.id = id++
+            val cbParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            cbParams.addRule(RelativeLayout.ALIGN_PARENT_END)
+            cbParams.addRule(RelativeLayout.CENTER_VERTICAL)
+            cb.layoutParams = cbParams
+            cb.gravity = Gravity.END
+            cb.isChecked = Config.variable("module $module.so").size > 0
+            oldAudioModules.put(module, cb.isChecked)
+            rl.addView(cb)
+            audioModulesList.addView(rl)
+        }
 
         aec = findViewById(R.id.Aec) as CheckBox
         val aecCv = Config.variable("module")
@@ -166,7 +204,7 @@ class ConfigActivity : AppCompatActivity() {
                 var autoStartString = "no"
                 if (autoStart.isChecked) autoStartString = "yes"
                 if (oldAutoStart != autoStartString) {
-                    Config.replace("auto_start", autoStartString)
+                    Config.replaceVariable("auto_start", autoStartString)
                     save = true
                     restart = false
                 }
@@ -178,8 +216,8 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_listen_address)}: $listenAddr")
                         return false
                     }
-                    Config.remove("sip_listen")
-                    if (listenAddr != "") Config.add("sip_listen", listenAddr)
+                    Config.removeVariable("sip_listen")
+                    if (listenAddr != "") Config.addLine("sip_listen $listenAddr")
                     save = true
                     restart = true
                 }
@@ -191,8 +229,8 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_bind_address)}: $bindAddr")
                         return false
                     }
-                    Config.remove("net_interface")
-                    if (bindAddr != "") Config.add("net_interface", bindAddr)
+                    Config.removeVariable("net_interface")
+                    if (bindAddr != "") Config.addLine("net_interface $bindAddr")
                     save = true
                     restart = true
                 }
@@ -200,7 +238,7 @@ class ConfigActivity : AppCompatActivity() {
                 var preferIPv6String = "no"
                 if (preferIPv6.isChecked) preferIPv6String = "yes"
                 if (oldPreferIPv6 != preferIPv6String) {
-                    Config.replace("net_prefer_ipv6", preferIPv6String)
+                    Config.replaceVariable("net_prefer_ipv6", preferIPv6String)
                     save = true
                     restart = true
                 }
@@ -212,19 +250,19 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_dns_servers)}: $dnsServers")
                         return false
                     }
-                    Config.remove("dyn_dns")
-                    Config.remove("dns_server")
+                    Config.removeVariable("dyn_dns")
+                    Config.removeVariable("dns_server")
                     if (dnsServers.isNotEmpty()) {
                         for (server in dnsServers.split(","))
-                            Config.add("dns_server", server)
-                        Config.add("dyn_dns", "no")
+                            Config.addLine("dns_server $server")
+                        Config.addLine("dyn_dns no")
                         if (Api.net_use_nameserver(dnsServers) != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
                             return false
                         }
                     } else {
-                        Config.add("dyn_dns", "yes")
+                        Config.addLine("dyn_dns yes")
                         if (Build.VERSION.SDK_INT >= 23) {
                             val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                             Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
@@ -249,10 +287,10 @@ class ConfigActivity : AppCompatActivity() {
                             return false
                         }
                         Utils.putFileContents(BaresipService.filesPath + "/cert.pem", content)
-                        Config.remove("sip_certificate")
-                        Config.add("sip_certificate", BaresipService.filesPath + "/cert.pem")
+                        Config.removeVariable("sip_certificate")
+                        Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
                     } else {
-                        Config.remove("sip_certificate")
+                        Config.removeVariable("sip_certificate")
                     }
                     save = true
                     restart = true
@@ -272,22 +310,44 @@ class ConfigActivity : AppCompatActivity() {
                         }
                         Utils.putFileContents(BaresipService.filesPath + "/ca_certs.crt",
                                 content)
-                        Config.remove("sip_cafile")
-                        Config.add("sip_cafile", BaresipService.filesPath + "/ca_certs.crt")
+                        Config.removeVariable("sip_cafile")
+                        Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
                     } else {
-                        Config.remove("sip_cafile")
+                        Config.removeVariable("sip_cafile")
                     }
                     save = true
                     restart = true
                 }
 
+                var id = 1001
+                for (module in audioModules) {
+                    val box = findViewById<CheckBox>(id++)
+                    if (box.isChecked && !oldAudioModules[module]!!) {
+                        if (Api.module_load("$module.so") != 0) {
+                            Utils.alertView(this, getString(R.string.error),
+                                    "${getString(R.string.failed_to_load_module)}: $module.so")
+                            return false
+                        }
+                        Config.addLine("module $module.so")
+                        save = true
+                    }
+                    if (!box.isChecked && oldAudioModules[module]!!) {
+                        Api.module_unload("$module.so")
+                        Config.removeLine("module $module.so")
+                        for (ua in UserAgent.uas()) ua.account.removeAudioCodecs(module)
+                        AccountsActivity.saveAccounts()
+                        save = true
+                    }
+                    id++
+                }
+
                 if (aec.isChecked != oldAec) {
-                    Config.remove("module webrtc_aec.so")
+                    Config.removeLine("module webrtc_aec.so")
                     if (aec.isChecked) {
-                        Config.add("module", "webrtc_aec.so")
+                        Config.addLine("module webrtc_aec.so")
                         if (Api.module_load("webrtc_aec.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.failed_to_load_aec_module))
+                                    getString(R.string.failed_to_load_module))
                             aec.isChecked = false
                             return false
                         }
@@ -304,8 +364,8 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
                         return false
                     }
-                    Config.remove("opus_bitrate")
-                    Config.add("opus_bitrate", opusBitRate)
+                    Config.removeVariable("opus_bitrate")
+                    Config.addLine("opus_bitrate $opusBitRate")
                     save = true
                     restart = true
                 }
@@ -317,11 +377,11 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
                         return false
                     }
-                    Config.remove("opus_inbandfec")
-                    Config.remove("opus_packet_loss")
+                    Config.removeVariable("opus_inbandfec")
+                    Config.removeVariable("opus_packet_loss")
                     if (opusPacketLoss != "0") {
-                        Config.add("opus_inbandfec", "yes")
-                        Config.add("opus_packet_loss", opusPacketLoss)
+                        Config.addLine("opus_inbandfec yes")
+                        Config.addLine("opus_packet_loss $opusPacketLoss")
                     }
                     save = true
                     restart = true
@@ -330,21 +390,21 @@ class ConfigActivity : AppCompatActivity() {
                 var iceModeString = "full"
                 if (iceLite.isChecked) iceModeString = "lite"
                 if (oldIceMode != iceModeString) {
-                    Config.replace("ice_mode", iceModeString)
+                    Config.replaceVariable("ice_mode", iceModeString)
                     save = true
                     restart = true
                 }
 
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
-                    Config.replace("call_volume", callVolume.toString())
+                    Config.replaceVariable("call_volume", callVolume.toString())
                     save = true
                 }
 
                 var logLevelString = "2"
                 if (debug.isChecked) logLevelString = "0"
                 if (oldLogLevel != logLevelString) {
-                    Config.replace("log_level", logLevelString)
+                    Config.replaceVariable("log_level", logLevelString)
                     Api.log_level_set(logLevelString.toInt())
                     Log.logLevelSet(logLevelString.toInt())
                     save = true
@@ -414,6 +474,10 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.CAFileTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.tls_ca_file),
                         getString(R.string.tls_ca_file_help))
+            }
+            findViewById(R.id.AudioModulesTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.audio_modules_title),
+                        getString(R.string.audio_modules_help))
             }
             findViewById(R.id.AecTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.aec),

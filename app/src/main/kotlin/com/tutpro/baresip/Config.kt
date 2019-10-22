@@ -21,17 +21,6 @@ object Config {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
             write = true
         }
-        if (!config.contains(Regex("module[ ]+amr.so"))) {
-            config = config.replace(Regex("module[ ]+g7...?.so\n"), "")
-            config = config.replace(Regex("module[ ]+ilbc.so\n"), "")
-            config = "${config}module amr.so\n"
-            config = "${config}module ilbc.so\n"
-            config = "${config}module g7221.so\n"
-            config = "${config}module g722.so\n"
-            config = "${config}module g726.so\n"
-            config = "${config}module g711.so\n"
-            write = true
-        }
         if (config.contains(Regex("#module_app[ ]+mwi.so"))) {
             config = config.replace(Regex("#module_app[ ]+mwi.so"),
                     "module_app mwi.so")
@@ -69,7 +58,7 @@ object Config {
         }
         val preferIpv6 = variable("prefer_ipv6")
         if (preferIpv6.size > 0) {
-            remove("prefer_ipv6")
+            removeVariable("prefer_ipv6")
             config = "net_prefer_ipv6 ${preferIpv6[0]}\n${config}"
             write = true
         } else {
@@ -112,18 +101,21 @@ object Config {
         return result
     }
 
-    fun add(variable: String, value: String) {
-        config += "$variable $value\n"
+    fun addLine(line: String) {
+        config += "$line\n"
     }
 
-    fun remove(variable: String) {
-        config = Utils.removeLinesStartingWithName(config, variable)
-        Utils.putFileContents(configPath, config.toByteArray())
+    fun removeLine(line: String) {
+        config = Utils.removeLinesStartingWithString(config, line)
     }
 
-    fun replace(variable: String, value: String) {
-        remove(variable)
-        add(variable, value)
+    fun removeVariable(variable: String) {
+        config = Utils.removeLinesStartingWithString(config, "$variable ")
+    }
+
+    fun replaceVariable(variable: String, value: String) {
+        removeVariable(variable)
+        addLine("$variable $value")
     }
 
     fun reset(ctx: Context) {
