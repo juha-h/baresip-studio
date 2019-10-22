@@ -186,9 +186,23 @@
         DNS-palvelijoihin.</string>
     <string name="invalid_dns_servers">Virheelliset DNS-palvelimet</string>
     <string name="failed_to_set_dns_servers">DNS-palvelinten asetus epäonnistui</string>
+    <string name="tls_certificate_file">TLS-varmennintiedosto</string>
+    <string name="tls_certificate_file_help">Jos merkitty, tiedosto \'cert.pem\', joka sisältää
+        tämän baresip-sovelluksen julkisen ja yksityisen TLS-varmentimen, on joko jo ladattu tai tullaan
+        lataamaan Download-hakemistosta.  Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
+    </string>
+    <string name="tls_ca_file">TLS CA-tiedosto</string>
+    <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
+        TLS-varmenninauktoriteettien julkiset varmentimen, on joko jo ladattu tai tullaan lataamaan
+        Download-hakemistosta.
+    </string>
+    <string name="audio_modules_title">Audio-modulit</string>
+    <string name="audio_modules_help">Merkittyjen modulien tarjoamat audio-koodekit ovat tilien
+        käytettävissä.
+    </string>
+    <string name="failed_to_load_module">Modulin lataaminen epäonnistui</string>
     <string name="aec">Akustinen kaiun poisto</string>
     <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana.</string>
-    <string name="failed_to_load_aec_module">Kaiunpoistomodulin lataaminen epäonnistui.</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
@@ -306,15 +320,6 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
-    <string name="tls_ca_file">TLS CA-tiedosto</string>
-    <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
-        todennusauktoriteettien TLS-sertifikaatit, on ladattu tai ladataan Download-kansiosta.
-    </string>
-    <string name="tls_certificate_file">TLS sertifikaattitiedosto</string>
-    <string name="tls_certificate_file_help">"Jos merkitty, tiedosto \'cert.pem\', joka sisältää
-        tämän baresip-sovelluksen TLS-sertifikaatin ja yksityisen avaimen, on ladattu tai ladataan
-        Download-kansiosta."
-    </string>
     <string name="backed_up">Sovelluksen tiedot talletettiin Download-kansion tiedostoon
         \'baresip.bs\'.
     </string>

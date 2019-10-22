@@ -186,7 +186,7 @@ class BaresipService: Service() {
                 showStatusNotification()
 
                 if (Config.variable("dyn_dns")[0] == "yes")
-                    Config.remove("dns_server")
+                    Config.removeVariable("dns_server")
 
                 if (AccountsActivity.noAccounts()) {
                     val newIntent = Intent(this, MainActivity::class.java)
@@ -712,9 +712,9 @@ class BaresipService: Service() {
         Log.d(LOG_TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false
         if (error == "ua_init") {
-            Config.remove("sip_listen")
-            Config.remove("sip_certificate")
-            Config.remove("sip_cafile")
+            Config.removeVariable("sip_listen")
+            Config.removeVariable("sip_certificate")
+            Config.removeVariable("sip_cafile")
         }
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")

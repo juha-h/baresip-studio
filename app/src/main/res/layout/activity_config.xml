@@ -192,7 +192,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal" >
+            android:orientation="vertical" >
+            <TextView
+                android:id="@+id/AudioModulesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:onClick="onClick"
+                android:text="@string/audio_modules_title" >
+            </TextView>
+            <LinearLayout
+                android:id="@+id/AudioModulesList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" >
             <TextView
                 android:id="@+id/AecTitle"
                 android:layout_width="wrap_content"
