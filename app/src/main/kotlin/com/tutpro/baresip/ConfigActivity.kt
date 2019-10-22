@@ -112,7 +112,7 @@ class ConfigActivity : AppCompatActivity() {
             tvParams.addRule(RelativeLayout.CENTER_VERTICAL)
             tvParams.addRule(RelativeLayout.START_OF, id)
             tv.layoutParams = tvParams
-            tv.text = module
+            tv.text = "\u2022 $module"
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
             tv.setTextColor(Color.BLACK)
             rl.addView(tv)
