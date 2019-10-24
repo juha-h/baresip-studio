@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
                 Log.d("Baresip", "Seconds remaining: ${millisUntilFinished / 1000}")
             }
+
             override fun onFinish() {
                 when (stopState) {
                     "initial" -> {
@@ -440,7 +441,8 @@ class MainActivity : AppCompatActivity() {
         if (intent.hasExtra("action"))
             // MainActivity was not visible when call, message, or transfer request came in
             handleIntent(intent)
-    }
+
+    } // OnCreate
 
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
