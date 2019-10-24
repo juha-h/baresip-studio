@@ -1,0 +1,1 @@
+- Initial implementation of audio through Bluetooth headset.
