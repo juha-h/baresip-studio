@@ -174,7 +174,6 @@
 	</string>
 	<string name="aec">Акустично отменяне на ехото</string>
 	<string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
-	<string name="failed_to_load_aec_module">Неуспешно зареждане на модул за анулиране на звуковото ехо.</string>
 	<string name="opus_bit_rate">Opus Bit Rate</string>
 	<string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.

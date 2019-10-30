@@ -153,7 +153,6 @@
     <string name="invalid_listen_address">Adresă de ascultare invalidă</string>
     <string name="invalid_dns_servers">Servere DNS invalide</string>
     <string name="failed_to_set_dns_servers">Nu s-au putut seta serverele DNS</string>
-    <string name="failed_to_load_aec_module">Nu s-a putut încărca modulul de anulare acustică a ecoului (AEC).</string>
     <string name="invalid_opus_bitrate">Rată de biți Opus invalidă</string>
     <string name="invalid_opus_packet_loss">Procentaj de pachete pierdute Opus invalid</string>
     <string name="answer_mode">Mod de răspuns</string>

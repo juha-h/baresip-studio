@@ -174,7 +174,6 @@
     <string name="invalid_listen_address">Ugyldig lyttadresse</string>
     <string name="invalid_dns_servers">Ugyldige DNS-tjenere</string>
     <string name="failed_to_set_dns_servers">Klarte ikke å sette DNS-tjenere</string>
-    <string name="failed_to_load_aec_module">Klarte ikke å laste inn akustisk ekkokanselleringsmodul.</string>
     <string name="invalid_opus_bitrate">Ugyldig Opus-bitrate</string>
     <string name="invalid_opus_packet_loss">Ugyldig Opus-pakketapsprosent</string>
     <string name="answer_mode">Svarsmodus</string>

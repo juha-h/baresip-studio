@@ -177,7 +177,6 @@
         de autoridades de certificación se ha cargado o se cargará desde el directorio de descargas.</string>
     <string name="aec">Cancelación de eco acústico</string>
     <string name="aec_help">Si está marcada, se intenta la cancelación del eco en el audio de la llamada.</string>
-    <string name="failed_to_load_aec_module">Error al cargar el módulo de cancelación de eco acústico.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
