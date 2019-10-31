@@ -200,7 +200,7 @@ class Account(val accp: String) {
 
         fun exists(aor: String): Boolean {
             for (ua in UserAgent.uas()) {
-                if (ua.account.aor == aor) return true
+                if (ua.account.aor == "sip:$aor") return true
             }
             return false
         }
