@@ -90,7 +90,12 @@ object Utils {
     }
 
     fun checkAor(aor: String): Boolean {
-        return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+        val parts = aor.split(":")
+        if (parts.size == 1)
+            return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+        else
+            return checkUriUser(aorUser(parts[0])) && checkDomain(aorDomain(parts[0])) &&
+                    checkPort(parts[1])
     }
 
     fun checkTelNo(no: String): Boolean {
