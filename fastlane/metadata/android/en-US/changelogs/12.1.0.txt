@@ -1,0 +1,3 @@
+- Allow port number in account's Address of Record (AoR).
+- Fixed checking if account already exists.
+- Updated NO and BG strings.
