@@ -38,7 +38,7 @@ class AccountsActivity : AppCompatActivity() {
             } else if (Account.exists(aor)) {
                 Log.d("Baresip", "Account $aor already exists")
                 Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.account_exists), aor))
+                        String.format(getString(R.string.account_exists), aor.split(":")[0]))
             } else {
                 val ua = UserAgent.uaAlloc("<sip:$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {
