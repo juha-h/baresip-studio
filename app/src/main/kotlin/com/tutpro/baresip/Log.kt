@@ -10,11 +10,11 @@ object Log {
 
     fun logLevelSet(value: Int) {
         when (value) {
-            0 -> logLevel = Log.LogLevel.DEBUG
-            1 -> logLevel = Log.LogLevel.INFO
-            2 -> logLevel = Log.LogLevel.WARN
-            3 -> logLevel = Log.LogLevel.ERROR
-            4 -> logLevel = Log.LogLevel.OFF
+            0 -> logLevel = LogLevel.DEBUG
+            1 -> logLevel = LogLevel.INFO
+            2 -> logLevel = LogLevel.WARN
+            3 -> logLevel = LogLevel.ERROR
+            4 -> logLevel = LogLevel.OFF
         }
     }
 
