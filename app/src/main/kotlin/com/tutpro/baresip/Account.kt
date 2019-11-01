@@ -198,9 +198,11 @@ class Account(val accp: String) {
             return null
         }
 
+
         fun exists(aor: String): Boolean {
             for (ua in UserAgent.uas()) {
-                if (ua.account.aor == "sip:$aor") return true
+                if (ua.account.aor.split(":")[1] == aor.split(":")[0])
+                    return true
             }
             return false
         }
