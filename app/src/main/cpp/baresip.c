@@ -374,10 +374,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring javaPath) {
+Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance,
+        jstring javaPath, jstring javaIpV6Addr, jboolean javaPreferIpV6) {
 
     LOGD("starting baresip\n");
 
+    struct sa temp_sa;
+    const char *ipv6_addr = (*env)->GetStringUTFChars(env, javaIpV6Addr, 0);
     char start_error[64] = "";
 
     JavaVM *javaVM = g_ctx.javaVM;
@@ -417,6 +420,12 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         LOGW("baresip_init() failed (%d)\n", err);
         strcpy(start_error, "baresip_init");
         goto out;
+    }
+
+    if (strlen(ipv6_addr) > 0) {
+        LOGW("setting ipv6 net address (%s)\n", ipv6_addr);
+        sa_set_str(&temp_sa, ipv6_addr, 0);
+        net_set_address(baresip_network(), &temp_sa, (bool)(javaPreferIpV6 == JNI_TRUE));
     }
 
     play_set_path(baresip_player(), path);
@@ -482,6 +491,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     err = re_main(signal_handler);
 
     out:
+
+    (*env)->ReleaseStringUTFChars(env, javaIpV6Addr, ipv6_addr);
 
     if (err) {
         LOGE("stopping UAs due to error: (%d)\n", err);
@@ -1366,7 +1377,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
     str_ncpy(servers, native_servers, 256);
     (*env)->ReleaseStringUTFChars(env, javaServers, native_servers);
     server = &(servers[0]);
-    while((count < NET_MAX_NS) && ((comma = strchr(server, ',')) != NULL)) {
+    while ((count < NET_MAX_NS) && ((comma = strchr(server, ',')) != NULL)) {
         *comma = '\0';
         err = sa_decode(&(nsv[count]), server, str_len(server));
         if (err) {
@@ -1385,6 +1396,23 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
         count++;
     }
     return net_use_nameserver(baresip_network(), nsv, count);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz,
+        jstring javaIp, jboolean javaPrefer) {
+    const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
+    int res = 0;
+    struct sa temp_sa;
+    LOGD("using address '%s'\n", native_ip);
+    if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
+        net_set_address(baresip_network(), &temp_sa, (bool)(javaPrefer == JNI_TRUE));
+    } else {
+        LOGE("invalid ip address %s\n", native_ip);
+        res = EAFNOSUPPORT;
+    }
+    (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+    return res;
 }
 
 JNIEXPORT void JNICALL

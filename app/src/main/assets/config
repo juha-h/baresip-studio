@@ -19,7 +19,7 @@ rtcp_mux no
 jitter_buffer_delay 5-10
 rtp_stats no
 dyn_dns yes
-net_prefer_ipv6 no
+prefer_ipv6 no
 module opus.so
 module amr.so
 module ilbc.so
