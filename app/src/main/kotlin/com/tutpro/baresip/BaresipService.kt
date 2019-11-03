@@ -50,6 +50,8 @@ class BaresipService: Service() {
     internal var audioFocused = false
     internal var origCallVolume = -1
     internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    internal var dnsServers = listOf<InetAddress>()
+    internal var linkAddresses = listOf<LinkAddress>()
 
     override fun onCreate() {
 
@@ -76,18 +78,12 @@ class BaresipService: Service() {
         cm.registerNetworkCallback(
                 builder.build(),
                 object : ConnectivityManager.NetworkCallback() {
+
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        Log.d(LOG_TAG, "Network '$network' is available")
-                        if (dynDns) {
-                            val linkProperties = cm.getLinkProperties(network)
-                            val dnsServers = linkProperties.dnsServers
-                            if (Config.updateDnsServers(dnsServers) == 0)
-                                Api.net_dns_debug()
-                            else
-                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                        }
-                        UserAgent.register()
+                        Log.i(LOG_TAG, "Network '${cm.getLinkProperties(network)}' is available")
+                        dnsServers = cm.getLinkProperties(network).dnsServers
+                        linkAddresses = cm.getLinkProperties(network).linkAddresses
                     }
 
                     override fun onLost(network: Network) {
@@ -97,14 +93,26 @@ class BaresipService: Service() {
 
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
-                        Log.d(LOG_TAG, "Network $network link properties changed")
+                        Log.d(LOG_TAG, "Network link properties changed: $linkProperties")
                         if (dynDns) {
                             val dnsServers = linkProperties.dnsServers
-                            if (Config.updateDnsServers(dnsServers) == 0)
-                                Api.net_dns_debug()
-                            else
+                            if (Config.updateDnsServers(dnsServers) != 0)
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
+                        if (preferIpV6) {
+                            val ipV6Addr = Utils.findIpV6Address(linkProperties.linkAddresses)
+                            if (ipV6Addr != "") {
+                                if (Config.updateNetAddress(ipV6Addr, preferIpV6) != 0)
+                                    Log.w(LOG_TAG, "Failed to update net address '$ipV6Addr'")
+
+                            } else {
+                                val ipV4Addr = Utils.findIpV4Address(linkProperties.linkAddresses)
+                                if (ipV4Addr != "")
+                                    if (Config.updateNetAddress(ipV4Addr, !preferIpV6) != 0)
+                                        Log.w(LOG_TAG, "Failed to update net address '$ipV4Addr'")
+                            }
+                        }
+                        Api.net_debug()
                         UserAgent.register()
                     }
                 }
@@ -239,19 +247,8 @@ class BaresipService: Service() {
                     } else {
                         Log.d(LOG_TAG, "Asset '$a' already copied")
                     }
-                    if (a == "config") {
-                        var dnsServers = listOf<InetAddress>()
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            val activeNetwork = cm.activeNetwork
-                            if (activeNetwork != null) {
-                                dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
-                                Log.d(LOG_TAG, "DNS Servers = $dnsServers")
-                            } else {
-                                Log.d(LOG_TAG, "No active network!")
-                            }
-                        }
+                    if (a == "config")
                         Config.initialize(dnsServers)
-                    }
                 }
 
                 if (File(filesDir, "history").exists())
@@ -261,12 +258,18 @@ class BaresipService: Service() {
                 CallHistory.restore()
                 Message.restore()
 
-                Thread(Runnable { baresipStart(filesPath) }).start()
+                Thread(Runnable { baresipStart(filesPath,
+                        Utils.findIpV6Address(linkAddresses),
+                        preferIpV6) }).start()
+
                 isServiceRunning = true
+
                 showStatusNotification()
 
-                if (Config.variable("dyn_dns")[0] == "yes")
-                    Config.removeVariable("dns_server")
+                if (bindAddress != "") {
+                    Config.removeVariable("net_interface")
+                    Config.save()
+                }
 
                 if (AccountsActivity.noAccounts()) {
                     val newIntent = Intent(this, MainActivity::class.java)
@@ -1010,7 +1013,7 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    external fun baresipStart(path: String)
+    external fun baresipStart(path: String, ipV6Addr: String, preferIpV6: Boolean)
     external fun baresipStop(force: Boolean)
 
     companion object {
@@ -1041,6 +1044,8 @@ class BaresipService: Service() {
         var speakerPhone = false
         var callVolume = 0
         var dynDns = false
+        var preferIpV6 = false
+        var bindAddress = ""
         var filesPath = ""
         var downloadsPath = ""
 

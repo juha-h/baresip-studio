@@ -6,6 +6,7 @@ import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.LinkAddress
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -225,6 +226,22 @@ object Utils {
         for (c in name)
             if (!c.isLetterOrDigit()) return false
         return true
+    }
+
+    fun findIpV6Address(list: List<LinkAddress>): String {
+        for (la in list)
+            if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE)
+                if (checkIpV6(la.address.hostAddress))
+                    return la.address.hostAddress
+        return ""
+    }
+
+    fun findIpV4Address(list: List<LinkAddress>): String {
+        for (la in list)
+            if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE)
+                if (checkIpV4(la.address.hostAddress))
+                    return la.address.hostAddress
+        return ""
     }
 
     fun implode(list: List<String>, sep: String): String {
