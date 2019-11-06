@@ -99,8 +99,8 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
-    <string name="user_domain">käyttäjä@domain</string>
-    <string name="invalid_aor">Virheellinen käyttäjä@domain \'%1$s\'</string>
+    <string name="user_domain">käyttäjä@domain[:portti]</string>
+    <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti] \'%1$s\'</string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
     <string name="account_allocation_failure">"Uuden tilin luonti
     epäonnistui.
