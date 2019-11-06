@@ -323,7 +323,7 @@
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt?
     </string>
-    <string name="restore_failed">Sovelluksen data palauttaminen Download-kansiosta epäonnistui.
+    <string name="restore_failed">Sovelluksen tietojen palauttaminen Download-kansiosta epäonnistui.
         Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu
         tiedosto \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
     </string>
