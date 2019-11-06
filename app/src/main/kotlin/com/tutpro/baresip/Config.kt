@@ -57,6 +57,8 @@ object Config {
             Log.logLevelSet(ll)
         }
 
+        removeVariable("net_interface")
+        
         removeVariable("net_prefer_ipv6")
         val preferIpV6 = variable("prefer_ipv6")
         if (preferIpV6.size == 0) {
