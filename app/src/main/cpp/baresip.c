@@ -423,9 +423,10 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     if (strlen(ipv6_addr) > 0) {
-        LOGW("setting ipv6 net address (%s)\n", ipv6_addr);
         sa_set_str(&temp_sa, ipv6_addr, 0);
-        net_set_address(baresip_network(), &temp_sa, (bool)(javaPreferIpV6 == JNI_TRUE));
+        net_set_address(baresip_network(), &temp_sa);
+        if ((bool)(javaPreferIpV6 == JNI_TRUE))
+            net_set_af(baresip_network(), AF_INET6);
     }
 
     play_set_path(baresip_player(), path);
@@ -1399,20 +1400,39 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz,
-        jstring javaIp, jboolean javaPrefer) {
+Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz, jstring javaIp) {
     const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
     int res = 0;
     struct sa temp_sa;
-    LOGD("using address '%s'\n", native_ip);
+    char buf[256];
+    LOGD("setting address '%s'\n", native_ip);
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
-        net_set_address(baresip_network(), &temp_sa, (bool)(javaPrefer == JNI_TRUE));
+        sa_ntop(&temp_sa, buf, 256);
+        net_set_address(baresip_network(), &temp_sa);
     } else {
         LOGE("invalid ip address %s\n", native_ip);
         res = EAFNOSUPPORT;
     }
     (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
     return res;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_Api_net_1set_1af(JNIEnv *env, jobject thiz, jboolean javaIpV6) {
+    int af = javaIpV6 == JNI_TRUE ? AF_INET6 : AF_INET;
+    int res = 0;
+    LOGD("setting af '%d'\n", af);
+    if (net_af(baresip_network()) != af) {
+        net_set_af(baresip_network(), af);
+        return true;
+    }
+    return false;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_net_1force_1change(JNIEnv *env, jobject thiz) {
+    LOGD("forcing net change\n");
+    net_force_change(baresip_network());
 }
 
 JNIEXPORT void JNICALL
