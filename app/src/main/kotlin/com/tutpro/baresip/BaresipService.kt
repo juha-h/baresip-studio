@@ -274,14 +274,6 @@ class BaresipService: Service() {
 
                 showStatusNotification()
 
-                if (Config.variable("dyn_dns")[0] == "yes")
-                    Config.removeVariable("dns_server")
-
-                if (bindAddress != "") {
-                    Config.removeVariable("net_interface")
-                    Config.save()
-                }
-
                 if (AccountsActivity.noAccounts()) {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
@@ -1056,7 +1048,6 @@ class BaresipService: Service() {
         var callVolume = 0
         var dynDns = false
         var preferIpV6 = false
-        var bindAddress = ""
         var filesPath = ""
         var downloadsPath = ""
 
