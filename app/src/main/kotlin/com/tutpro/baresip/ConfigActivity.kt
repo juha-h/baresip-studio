@@ -74,7 +74,7 @@ class ConfigActivity : AppCompatActivity() {
         bindAddr.setText(oldBindAddr)
 
         preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
-        val piCv = Config.variable("net_prefer_ipv6")
+        val piCv = Config.variable("prefer_ipv6")
         oldPreferIPv6 = if (piCv.size == 0) "no" else piCv[0]
         preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
@@ -238,9 +238,31 @@ class ConfigActivity : AppCompatActivity() {
                 var preferIPv6String = "no"
                 if (preferIPv6.isChecked) preferIPv6String = "yes"
                 if (oldPreferIPv6 != preferIPv6String) {
-                    Config.replaceVariable("net_prefer_ipv6", preferIPv6String)
+                    Config.replaceVariable("prefer_ipv6", preferIPv6String)
+                    BaresipService.preferIpV6 = preferIPv6String == "yes"
+                    if (preferIPv6String == "yes") {
+                        val ipV6Addr = Utils.findIpV6Address(BaresipService.linkAddresses)
+                        if (ipV6Addr != "") {
+                            if (Api.net_set_address(ipV6Addr) != 0) {
+                                Log.w("Baresip", "Failed to update net address '$ipV6Addr'")
+                            } else {
+                                Api.net_set_af(true)
+                                Api.net_force_change()
+                            }
+                        }
+                    } else {
+                        val ipV4Addr = Utils.findIpV4Address(BaresipService.linkAddresses)
+                        if (ipV4Addr != "") {
+                            if (Api.net_set_address(ipV4Addr) != 0) {
+                                Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
+                            } else {
+                                Api.net_set_af(false)
+                                Api.net_force_change()
+                            }
+                        }
+                    }
+                    Api.net_debug()
                     save = true
-                    restart = true
                 }
 
                 val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
@@ -263,12 +285,7 @@ class ConfigActivity : AppCompatActivity() {
                         }
                     } else {
                         Config.addLine("dyn_dns yes")
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                            Config.updateDnsServers(cm.getLinkProperties(cm.activeNetwork).getDnsServers())
-                        } else {
-                            restart = true
-                        }
+                        Config.updateDnsServers(BaresipService.dnsServers)
                     }
                     Api.net_debug()
                     save = true

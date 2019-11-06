@@ -50,8 +50,6 @@ class BaresipService: Service() {
     internal var audioFocused = false
     internal var origCallVolume = -1
     internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
-    internal var dnsServers = listOf<InetAddress>()
-    internal var linkAddresses = listOf<LinkAddress>()
 
     override fun onCreate() {
 
@@ -93,27 +91,37 @@ class BaresipService: Service() {
 
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
-                        Log.d(LOG_TAG, "Network link properties changed: $linkProperties")
+                        Log.e(LOG_TAG, "Network link properties changed: $linkProperties")
+                        if (!isServiceRunning)
+                            return
                         if (dynDns) {
-                            val dnsServers = linkProperties.dnsServers
+                            dnsServers = linkProperties.dnsServers
                             if (Config.updateDnsServers(dnsServers) != 0)
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
-                        if (preferIpV6) {
-                            val ipV6Addr = Utils.findIpV6Address(linkProperties.linkAddresses)
-                            if (ipV6Addr != "") {
-                                if (Config.updateNetAddress(ipV6Addr, preferIpV6) != 0)
-                                    Log.w(LOG_TAG, "Failed to update net address '$ipV6Addr'")
-
+                        val ipV6Addr = Utils.findIpV6Address(linkProperties.linkAddresses)
+                        if (ipV6Addr != "") {
+                            Log.w(LOG_TAG, "Found IPv6 address '$ipV6Addr'")
+                            if (Api.net_set_address(ipV6Addr) != 0) {
+                                Log.w(LOG_TAG, "Failed to update net address '$ipV6Addr'")
                             } else {
-                                val ipV4Addr = Utils.findIpV4Address(linkProperties.linkAddresses)
-                                if (ipV4Addr != "")
-                                    if (Config.updateNetAddress(ipV4Addr, !preferIpV6) != 0)
-                                        Log.w(LOG_TAG, "Failed to update net address '$ipV4Addr'")
+                                if (preferIpV6)
+                                    Api.net_set_af(true)
                             }
                         }
+                        val ipV4Addr = Utils.findIpV4Address(linkProperties.linkAddresses)
+                        if (ipV4Addr != "") {
+                            Log.w(LOG_TAG, "Found IPv4 address '$ipV4Addr'")
+                            if (Api.net_set_address(ipV4Addr) != 0) {
+                                Log.w(LOG_TAG, "Failed to update net address '$ipV4Addr'")
+                            } else {
+                                if (!preferIpV6 || (ipV6Addr == ""))
+                                    Api.net_set_af(false)
+                            }
+                        }
+                        Api.net_force_change()
                         Api.net_debug()
-                        UserAgent.register()
+                        // UserAgent.register()
                     }
                 }
         )
@@ -248,7 +256,7 @@ class BaresipService: Service() {
                         Log.d(LOG_TAG, "Asset '$a' already copied")
                     }
                     if (a == "config")
-                        Config.initialize(dnsServers)
+                        Config.initialize()
                 }
 
                 if (File(filesDir, "history").exists())
@@ -265,6 +273,9 @@ class BaresipService: Service() {
                 isServiceRunning = true
 
                 showStatusNotification()
+
+                if (Config.variable("dyn_dns")[0] == "yes")
+                    Config.removeVariable("dns_server")
 
                 if (bindAddress != "") {
                     Config.removeVariable("net_interface")
@@ -1057,6 +1068,8 @@ class BaresipService: Service() {
         val contacts = ArrayList<Contact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
         val activities = mutableListOf<String>()
+        var dnsServers = listOf<InetAddress>()
+        var linkAddresses = listOf<LinkAddress>()
 
     }
 

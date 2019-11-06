@@ -32,7 +32,9 @@ object Api {
     external fun contacts_remove()
     external fun log_level_set(level: Int)
     external fun net_use_nameserver(servers: String): Int
-    external fun net_set_address(ip_addr: String, preferIpV6: Boolean): Int
+    external fun net_set_address(ip_addr: String): Int
+    external fun net_set_af(ipv6: Boolean): Boolean
+    external fun net_force_change()
     external fun net_debug()
     external fun net_dns_debug()
     external fun module_load(module: String): Int

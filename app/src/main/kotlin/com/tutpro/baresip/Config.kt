@@ -10,7 +10,7 @@ object Config {
     private val configPath = BaresipService.filesPath + "/config"
     private var config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
 
-    fun initialize(dnsServers: List<InetAddress>) {
+    fun initialize() {
 
         Log.d("Baresip", "Config is '$config'")
 
@@ -57,6 +57,7 @@ object Config {
             Log.logLevelSet(ll)
         }
 
+        removeVariable("net_prefer_ipv6")
         val preferIpV6 = variable("prefer_ipv6")
         if (preferIpV6.size == 0) {
             BaresipService.preferIpV6 = false
@@ -74,8 +75,13 @@ object Config {
             config = "${config}dyn_dns no\n"
         } else {
             if (config.contains(Regex("dyn_dns[ ]+yes"))) {
-                for (dnsServer in dnsServers)
-                    config = "${config}dns_server ${dnsServer.hostAddress}:53\n"
+                removeVariable("dns_server")
+                Log.d("Baresip", "DNS servers ${BaresipService.dnsServers}")
+                for (dnsServer in BaresipService.dnsServers)
+                    if (Utils.checkIpV4(dnsServer.hostAddress))
+                        config = "${config}dns_server ${dnsServer.hostAddress}:53\n"
+                    else
+                        config = "${config}dns_server [${dnsServer.hostAddress}]:53\n"
                 BaresipService.dynDns = true
             }
         }
@@ -141,11 +147,6 @@ object Config {
                 servers = "${servers},${address}"
         }
         return Api.net_use_nameserver(servers)
-    }
-
-
-    fun updateNetAddress(ipAddress: String, prefer: Boolean): Int {
-        return Api.net_set_address(ipAddress, prefer)
     }
 
 }
