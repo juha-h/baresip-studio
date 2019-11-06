@@ -158,11 +158,6 @@
     </string>
     <string name="invalid_listen_address">Invalid Listen Address</string>
     <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
-    <string name="bind_address">Bind Address</string>
-    <string name="bind_address_help">IP address or name of interface that baresip uses as source
-        IP address.  Usually there is no need to set this.
-    </string>
-    <string name="invalid_bind_address">Invalid Bind Address</string>
     <string name="prefer_ipv6">Prefer IPv6</string>
     <string name="prefer_ipv6_help">Prefer IPv6 if both IPv4 and IPv6 are available.</string>
     <string name="dns_servers">DNS Servers</string>

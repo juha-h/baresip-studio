@@ -76,7 +76,6 @@ object Config {
         } else {
             if (config.contains(Regex("dyn_dns[ ]+yes"))) {
                 removeVariable("dns_server")
-                Log.d("Baresip", "DNS servers ${BaresipService.dnsServers}")
                 for (dnsServer in BaresipService.dnsServers)
                     if (Utils.checkIpV4(dnsServer.hostAddress))
                         config = "${config}dns_server ${dnsServer.hostAddress}:53\n"

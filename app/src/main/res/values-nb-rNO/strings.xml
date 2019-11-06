@@ -175,8 +175,6 @@
     <string name="read_cert_error">Klarte ikke å lese filen \"cert.pem\" fra Nedlastinger.</string>
     <string name="read_ca_certs_error">Klarte ikke å lese filen \"ca_certs.crt\" fra Nedlastinger.</string>
     <string name="invalid_listen_address">Ugyldig lyttadresse</string>
-    <string name="bind_address">Bindingsadresse</string>
-    <string name="bind_address_help">IP-adresse eller navnet på grensesnittet baresip bruker som kilde-IP-adresse. Vanligvis trengs ikke dette.</string>
     <string name="invalid_dns_servers">Ugyldige DNS-tjenere</string>
     <string name="failed_to_set_dns_servers">Klarte ikke å sette DNS-tjenere</string>
     <string name="invalid_opus_bitrate">Ugyldig Opus-bitrate</string>

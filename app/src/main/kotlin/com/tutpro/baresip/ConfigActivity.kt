@@ -21,7 +21,6 @@ class ConfigActivity : AppCompatActivity() {
 
     internal lateinit var autoStart: CheckBox
     internal lateinit var listenAddr: EditText
-    internal lateinit var bindAddr: EditText
     internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
     internal lateinit var certificateFile: CheckBox
@@ -35,7 +34,6 @@ class ConfigActivity : AppCompatActivity() {
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
-    private var oldBindAddr = ""
     private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
     private var oldCertificateFile = false
@@ -67,11 +65,6 @@ class ConfigActivity : AppCompatActivity() {
         val laCv = Config.variable("sip_listen")
         oldListenAddr = if (laCv.size == 0) "" else laCv[0]
         listenAddr.setText(oldListenAddr)
-
-        bindAddr = findViewById(R.id.BindAddress) as EditText
-        val baCv = Config.variable("net_interface")
-        oldBindAddr = if (baCv.size == 0) "" else baCv[0]
-        bindAddr.setText(oldBindAddr)
 
         preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
         val piCv = Config.variable("prefer_ipv6")
@@ -218,19 +211,6 @@ class ConfigActivity : AppCompatActivity() {
                     }
                     Config.removeVariable("sip_listen")
                     if (listenAddr != "") Config.addLine("sip_listen $listenAddr")
-                    save = true
-                    restart = true
-                }
-
-                val bindAddr = bindAddr.text.toString().trim()
-                if (bindAddr != oldBindAddr) {
-                    if ((bindAddr != "") && !Utils.checkIp(bindAddr) && !Utils.checkIfName(bindAddr)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_bind_address)}: $bindAddr")
-                        return false
-                    }
-                    Config.removeVariable("net_interface")
-                    if (bindAddr != "") Config.addLine("net_interface $bindAddr")
                     save = true
                     restart = true
                 }
@@ -471,10 +451,6 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.ListenAddressTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.listen_address),
                         getString(R.string.listen_address_help))
-            }
-            findViewById(R.id.BindAddressTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.bind_address),
-                        getString(R.string.bind_address_help))
             }
             findViewById(R.id.PreferIPv6Title) as TextView-> {
                 Utils.alertView(this, getString(R.string.prefer_ipv6),
