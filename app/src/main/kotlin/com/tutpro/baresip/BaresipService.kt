@@ -50,6 +50,7 @@ class BaresipService: Service() {
     internal var audioFocused = false
     internal var origCallVolume = -1
     internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    internal var activeNetwork: Network? = null
 
     override fun onCreate() {
 
@@ -81,17 +82,48 @@ class BaresipService: Service() {
                         super.onAvailable(network)
                         val linkProperties = cm.getLinkProperties(network)
                         Log.i(LOG_TAG, "Network $network is available: '$linkProperties'")
-                        dnsServers = linkProperties.dnsServers
-                        linkAddresses = linkProperties.linkAddresses
+                        if (activeNetwork == null) {
+                            Log.i(LOG_TAG, "Updating dnsServers and linkAddresses")
+                            activeNetwork = network
+                            dnsServers = linkProperties.dnsServers
+                            linkAddresses = linkProperties.linkAddresses
+                        }
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        Log.d(LOG_TAG, "Network '$network' is lost")
-                        val allNetworks = cm.allNetworks
-                        if (allNetworks.size > 0) {
-                            Log.d(LOG_TAG, "Network ${allNetworks[0]} is available")
-                            val linkProperties = cm.getLinkProperties(allNetworks[0])
+                        if (activeNetwork == network) {
+                            Log.d(LOG_TAG, "Active network '$network' is lost")
+                            activeNetwork = null
+                            for (net in cm.allNetworks)
+                                if (net != network) {
+                                    Log.d(LOG_TAG, "New network $net is available")
+                                    activeNetwork = net
+                                    break
+                                }
+                            if (activeNetwork != null) {
+                                val linkProperties = cm.getLinkProperties(activeNetwork)
+                                if (dynDns) {
+                                    dnsServers = linkProperties.dnsServers
+                                    if (Config.updateDnsServers(dnsServers) != 0)
+                                        Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                }
+                                linkAddresses = linkProperties.linkAddresses
+                                Utils.updateLinkAddresses()
+                                UserAgent.register()
+                            }
+                        } else {
+                            Log.d(LOG_TAG, "Network '$network' is lost")
+                        }
+                    }
+
+                    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                        super.onLinkPropertiesChanged(network, linkProperties)
+                        if (!isServiceRunning)
+                            return
+                        if (network == activeNetwork) {
+                            Log.e(LOG_TAG, "Active network $network link properties changed: " +
+                                    "$linkProperties")
                             if (dynDns) {
                                 dnsServers = linkProperties.dnsServers
                                 if (Config.updateDnsServers(dnsServers) != 0)
@@ -99,23 +131,11 @@ class BaresipService: Service() {
                             }
                             linkAddresses = linkProperties.linkAddresses
                             Utils.updateLinkAddresses()
-                            UserAgent.register()
+                            // UserAgent.register()
+                        } else {
+                            Log.e(LOG_TAG, "Network $network link properties changed: " +
+                                    "$linkProperties")
                         }
-                    }
-
-                    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                        super.onLinkPropertiesChanged(network, linkProperties)
-                        Log.e(LOG_TAG, "Network $network link properties changed: $linkProperties")
-                        if (!isServiceRunning)
-                            return
-                        if (dynDns) {
-                            dnsServers = linkProperties.dnsServers
-                            if (Config.updateDnsServers(dnsServers) != 0)
-                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                        }
-                        linkAddresses = linkProperties.linkAddresses
-                        Utils.updateLinkAddresses()
-                        // UserAgent.register()
                     }
                 }
         )
