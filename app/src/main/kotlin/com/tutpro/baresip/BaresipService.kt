@@ -79,19 +79,33 @@ class BaresipService: Service() {
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        Log.i(LOG_TAG, "Network '${cm.getLinkProperties(network)}' is available")
-                        dnsServers = cm.getLinkProperties(network).dnsServers
-                        linkAddresses = cm.getLinkProperties(network).linkAddresses
+                        val linkProperties = cm.getLinkProperties(network)
+                        Log.i(LOG_TAG, "Network $network is available: '$linkProperties'")
+                        dnsServers = linkProperties.dnsServers
+                        linkAddresses = linkProperties.linkAddresses
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(LOG_TAG, "Network '$network' is lost")
+                        val allNetworks = cm.allNetworks
+                        if (allNetworks.size > 0) {
+                            Log.d(LOG_TAG, "Network ${allNetworks[0]} is available")
+                            val linkProperties = cm.getLinkProperties(allNetworks[0])
+                            if (dynDns) {
+                                dnsServers = linkProperties.dnsServers
+                                if (Config.updateDnsServers(dnsServers) != 0)
+                                    Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                            }
+                            linkAddresses = linkProperties.linkAddresses
+                            Utils.updateLinkAddresses()
+                            UserAgent.register()
+                        }
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
-                        Log.e(LOG_TAG, "Network link properties changed: $linkProperties")
+                        Log.e(LOG_TAG, "Network $network link properties changed: $linkProperties")
                         if (!isServiceRunning)
                             return
                         if (dynDns) {
@@ -99,28 +113,8 @@ class BaresipService: Service() {
                             if (Config.updateDnsServers(dnsServers) != 0)
                                 Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
                         }
-                        val ipV6Addr = Utils.findIpV6Address(linkProperties.linkAddresses)
-                        if (ipV6Addr != "") {
-                            Log.w(LOG_TAG, "Found IPv6 address '$ipV6Addr'")
-                            if (Api.net_set_address(ipV6Addr) != 0) {
-                                Log.w(LOG_TAG, "Failed to update net address '$ipV6Addr'")
-                            } else {
-                                if (preferIpV6)
-                                    Api.net_set_af(true)
-                            }
-                        }
-                        val ipV4Addr = Utils.findIpV4Address(linkProperties.linkAddresses)
-                        if (ipV4Addr != "") {
-                            Log.w(LOG_TAG, "Found IPv4 address '$ipV4Addr'")
-                            if (Api.net_set_address(ipV4Addr) != 0) {
-                                Log.w(LOG_TAG, "Failed to update net address '$ipV4Addr'")
-                            } else {
-                                if (!preferIpV6 || (ipV6Addr == ""))
-                                    Api.net_set_af(false)
-                            }
-                        }
-                        Api.net_force_change()
-                        Api.net_debug()
+                        linkAddresses = linkProperties.linkAddresses
+                        Utils.updateLinkAddresses()
                         // UserAgent.register()
                     }
                 }
@@ -267,6 +261,7 @@ class BaresipService: Service() {
                 Message.restore()
 
                 Thread(Runnable { baresipStart(filesPath,
+                        Utils.findIpV4Address(linkAddresses),
                         Utils.findIpV6Address(linkAddresses),
                         preferIpV6) }).start()
 
@@ -1016,7 +1011,7 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    external fun baresipStart(path: String, ipV6Addr: String, preferIpV6: Boolean)
+    external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, preferIpV6: Boolean)
     external fun baresipStop(force: Boolean)
 
     companion object {

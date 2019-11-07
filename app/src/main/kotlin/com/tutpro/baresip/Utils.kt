@@ -244,6 +244,36 @@ object Utils {
         return ""
     }
 
+    fun updateLinkAddresses() {
+        val ipV6Addr = findIpV6Address(BaresipService.linkAddresses)
+        if (ipV6Addr != "") {
+            Log.d("Baresip", "Found IPv6 address '$ipV6Addr'")
+            if (Api.net_set_address(ipV6Addr) != 0) {
+                Log.w("Baresip", "Failed to update net address '$ipV6Addr'")
+            } else {
+                Api.net_set_af(BaresipService.preferIpV6)
+            }
+        } else {
+            Api.net_unset_address(true)
+            Api.net_set_af(false)
+        }
+        val ipV4Addr = findIpV4Address(BaresipService.linkAddresses)
+        if (ipV4Addr != "") {
+            Log.w("Baresip", "Found IPv4 address '$ipV4Addr'")
+            if (Api.net_set_address(ipV4Addr) != 0) {
+                Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
+            } else {
+                if (!BaresipService.preferIpV6 || (ipV6Addr == ""))
+                    Api.net_set_af(false)
+            }
+        } else {
+            Api.net_unset_address(false)
+            Api.net_set_af(false)
+        }
+        Api.net_force_change()
+        Api.net_debug()
+    }
+
     fun implode(list: List<String>, sep: String): String {
         var res = ""
         for (s in list) {
