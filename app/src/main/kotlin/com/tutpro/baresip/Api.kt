@@ -33,6 +33,7 @@ object Api {
     external fun log_level_set(level: Int)
     external fun net_use_nameserver(servers: String): Int
     external fun net_set_address(ip_addr: String): Int
+    external fun net_unset_address(ipv6: Boolean)
     external fun net_set_af(ipv6: Boolean): Boolean
     external fun net_force_change()
     external fun net_debug()

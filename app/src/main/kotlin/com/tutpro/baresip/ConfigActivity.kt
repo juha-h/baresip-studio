@@ -220,28 +220,7 @@ class ConfigActivity : AppCompatActivity() {
                 if (oldPreferIPv6 != preferIPv6String) {
                     Config.replaceVariable("prefer_ipv6", preferIPv6String)
                     BaresipService.preferIpV6 = preferIPv6String == "yes"
-                    if (preferIPv6String == "yes") {
-                        val ipV6Addr = Utils.findIpV6Address(BaresipService.linkAddresses)
-                        if (ipV6Addr != "") {
-                            if (Api.net_set_address(ipV6Addr) != 0) {
-                                Log.w("Baresip", "Failed to update net address '$ipV6Addr'")
-                            } else {
-                                Api.net_set_af(true)
-                                Api.net_force_change()
-                            }
-                        }
-                    } else {
-                        val ipV4Addr = Utils.findIpV4Address(BaresipService.linkAddresses)
-                        if (ipV4Addr != "") {
-                            if (Api.net_set_address(ipV4Addr) != 0) {
-                                Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
-                            } else {
-                                Api.net_set_af(false)
-                                Api.net_force_change()
-                            }
-                        }
-                    }
-                    Api.net_debug()
+                    Utils.updateLinkAddresses()
                     save = true
                 }
 
