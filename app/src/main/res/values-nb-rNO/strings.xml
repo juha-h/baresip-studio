@@ -185,4 +185,17 @@
     <string name="manual">Manuell</string>
     <string name="auto">Automatisk</string>
     <string name="restart">Programomstart</string>
+    <string name="delete_history">Slett</string>
+    <string name="delete_history_alert">Ønsker du virkelig å slette samtalehistorikken for kontoen «%1$s»\?</string>
+    <string name="delete_chats">Slett</string>
+    <string name="delete_chats_alert">Ønsker du å slette sludrehistorikken for kontoen «%1$s»\?</string>
+    <string name="config_restart">Ønsker du å starte baresip på ny for å aktivere de nye innstillingene nå\?</string>
+    <string name="backup">Sikkerhetskopier</string>
+    <string name="restore">Gjenopprett</string>
+    <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \"baresip.bs\".</string>
+    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \"baresip.bs\". Sjekk \"Programmer → baresip → Tilganger → Lagring</string>
+    <string name="restored">Programdata gjenopprettet. Start baresip på ny nå\?</string>
+    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \"baresip.bs\" finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
+    <string name="audio_modules_title">Lydmoduler</string>
+    <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
 </resources>
