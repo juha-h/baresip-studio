@@ -186,7 +186,7 @@
     <string name="auto">Automatisk</string>
     <string name="restart">Programomstart</string>
     <string name="delete_history">Slett</string>
-    <string name="delete_history_alert">Ønsker du virkelig å slette samtalehistorikken for kontoen «%1$s»\?</string>
+    <string name="delete_history_alert">Ønsker du virkelig å slette samtalehistorikk for kontoen «%1$s»\?</string>
     <string name="delete_chats">Slett</string>
     <string name="delete_chats_alert">Ønsker du å slette sludrehistorikken for kontoen «%1$s»\?</string>
     <string name="config_restart">Ønsker du å starte baresip på ny for å aktivere de nye innstillingene nå\?</string>
