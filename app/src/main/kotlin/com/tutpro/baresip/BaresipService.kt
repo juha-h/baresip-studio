@@ -35,6 +35,7 @@ class BaresipService: Service() {
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
     internal lateinit var rt: Ringtone
+    internal lateinit var nt: Ringtone
     internal lateinit var nm: NotificationManager
     internal lateinit var snb: NotificationCompat.Builder
     internal lateinit var cm: ConnectivityManager
@@ -67,6 +68,10 @@ class BaresipService: Service() {
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_RINGTONE)
         rt = RingtoneManager.getRingtone(applicationContext, rtUri)
+
+        val ntUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
+                RingtoneManager.TYPE_NOTIFICATION)
+        nt = RingtoneManager.getRingtone(applicationContext, ntUri)
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
@@ -795,6 +800,8 @@ class BaresipService: Service() {
             nb.addAction(R.drawable.ic_stat, "Delete", deletePendingIntent)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
+        } else {
+            nt.play()
         }
         val intent = Intent("service event")
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
