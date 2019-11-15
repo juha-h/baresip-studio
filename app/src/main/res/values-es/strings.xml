@@ -268,7 +268,6 @@
     <string name="start_failed">Baresip no pudo iniciar. Esto puede deberse a una dirección de escucha no válida
         o archivo TLS. Han sido reiniciados. Reiniciar baresip.</string>
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
-    <string name="no_microphone_permission">No ha otorgado permiso de micrófono.</string>
     <string name="verify">Verificar</string>
     <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
     <string name="transfer_query">¿Aceptas transferir la llamada a \'%1$s\'?</string>

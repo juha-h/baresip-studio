@@ -271,7 +271,6 @@
 		Те са нулирани. Рестартирайте baresip. 
 	</string>
 	<string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
-	<string name="no_microphone_permission">Не сте дали разрешение за микрофон.</string>
 	<string name="verify">Потвърди</string>
 	<string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
 	<string name="transfer_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
