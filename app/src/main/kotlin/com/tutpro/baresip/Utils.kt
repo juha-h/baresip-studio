@@ -214,11 +214,8 @@ object Utils {
     }
 
     fun checkName(name: String): Boolean {
-        if (name.length < 2) return false
-        for (c in name) {
-            if (!c.isLetterOrDigit() && !(c in "-.!%*_+`'~ ")) return false
-        }
-        return true
+        return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
+                name.lines().size == 1
     }
 
     fun checkIfName(name: String): Boolean {
