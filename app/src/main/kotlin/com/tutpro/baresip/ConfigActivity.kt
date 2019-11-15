@@ -1,11 +1,9 @@
 package com.tutpro.baresip
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.TypedValue
@@ -48,6 +46,10 @@ class ConfigActivity : AppCompatActivity() {
     private var save = false
     private var restart = false
     private val audioModules = listOf("opus", "amr", "ilbc", "g722", "g7221", "g726", "g711")
+    private var menu: Menu? = null
+
+    private val READ_CERT_PERMISSION_CODE = 1
+    private val READ_CA_PERMISSION_CODE = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -182,6 +184,9 @@ class ConfigActivity : AppCompatActivity() {
 
         val inflater = menuInflater
         inflater.inflate(R.menu.check_icon, menu)
+
+        this.menu = menu
+
         return true
 
     }
@@ -253,7 +258,8 @@ class ConfigActivity : AppCompatActivity() {
                 if (certificateFile.isChecked != oldCertificateFile) {
                     if (certificateFile.isChecked) {
                         if (!Utils.requestPermission(this,
-                                        android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        READ_CERT_PERMISSION_CODE))
                             return false
                         val content = Utils.getFileContents(BaresipService.downloadsPath + "/cert.pem")
                         if (content == null) {
@@ -275,9 +281,11 @@ class ConfigActivity : AppCompatActivity() {
                 if (caFile.isChecked != oldCAFile) {
                     if (caFile.isChecked) {
                         if (!Utils.requestPermission(this,
-                                        android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        READ_CA_PERMISSION_CODE))
                             return false
-                        val content = Utils.getFileContents(BaresipService.downloadsPath + "/ca_certs.crt")
+                        val content = Utils.getFileContents(BaresipService.downloadsPath +
+                                "/ca_certs.crt")
                         if (content == null) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.read_ca_certs_error))
@@ -411,6 +419,28 @@ class ConfigActivity : AppCompatActivity() {
 
         BaresipService.activities.removeAt(0)
         return true
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            READ_CERT_PERMISSION_CODE ->
+                if (grantResults.isNotEmpty() && (grantResults[0] ==
+                                PackageManager.PERMISSION_GRANTED))
+                    menu!!.performIdentifierAction(R.id.checkIcon, 0)
+                else
+                    certificateFile.isChecked = false
+            READ_CA_PERMISSION_CODE ->
+                if ((grantResults.size > 0) && (grantResults[0] ==
+                                PackageManager.PERMISSION_GRANTED))
+                    menu!!.performIdentifierAction(R.id.checkIcon, 0)
+                else
+                    caFile.isChecked = false
+        }
 
     }
 

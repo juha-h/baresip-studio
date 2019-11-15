@@ -277,7 +277,6 @@
         or TLS file. They have been reset. Restart baresip.
     </string>
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
-    <string name="no_microphone_permission">You have not granted microphone permission.</string>
     <string name="verify">Verify</string>
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
     <string name="transfer_query">Do you accept to transfer call to \'%1$s\'?</string>
@@ -298,6 +297,12 @@
     <string name="restore_failed">Failed to restore application data from Download folder. Check Apps →
         baresip → Permissions → Storage and that backup file \'baresip.bs\' exists in the folder
         and, if so, you gave correct Decrypt Password.
+    </string>
+    <string name="no_calls">You are not able to place or answer calls without Record Audio
+        permission.
+    </string>
+    <string name="no_call_awareness">Without Phone permission, baresip cannot be aware if another
+        phone call has already been established.
     </string>
 
 </resources>

@@ -163,7 +163,6 @@
     <string name="call_already_active">Du har allerede et aktivt anrop.</string>
     <string name="start_failed">Baresip kunne ikke starte. Lytteadressen ble tilbakestilt. Start programmet på ny.</string>
     <string name="registering_failed">Registrering av %1$s mislyktes.</string>
-    <string name="no_microphone_permission">Du har ikke innvilget mikrofontilgang.</string>
     <string name="verify_sas">Ønsker du å bekrefte SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="transfer_query">Godtar du å overføre samtalen til \"%1$s\"\?</string>
     <string name="call_failed">Anrop mislyktes</string>

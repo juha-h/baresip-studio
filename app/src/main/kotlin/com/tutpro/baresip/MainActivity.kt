@@ -6,8 +6,6 @@ import android.app.NotificationManager
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.*
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.content.pm.PackageManager
@@ -110,7 +108,6 @@ class MainActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
                 Log.d("Baresip", "Seconds remaining: ${millisUntilFinished / 1000}")
             }
-
             override fun onFinish() {
                 when (stopState) {
                     "initial" -> {
@@ -129,13 +126,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.w("Baresip", "Baresip does not have RECORD_AUDIO permission")
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_CODE)
-        }
-
         uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas, BaresipService.status)
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
@@ -150,7 +140,6 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
                 updateIcons(acc)
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {
                 Log.d("Baresip", "Nothing selected")
             }
@@ -433,6 +422,8 @@ class MainActivity : AppCompatActivity() {
         if (!BaresipService.isServiceRunning) {
             baresipService.setAction("Start")
             startService(baresipService)
+            Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
+                            RECORD_PERMISSION_REQUEST_CODE)
         }
 
         if (intent.hasExtra("onStartup"))
@@ -649,12 +640,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val callp = params[1]
-                        if (ContextCompat.checkSelfPermission(applicationContext,
-                                        Manifest.permission.RECORD_AUDIO) ==
-                                PackageManager.PERMISSION_DENIED) {
-                            Toast.makeText(applicationContext,
-                                    getString(R.string.no_microphone_permission),
-                                    Toast.LENGTH_SHORT).show()
+                        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
@@ -895,13 +881,13 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(i, ACCOUNTS_CODE)
             }
             R.id.backup -> {
-                if (Utils.requestPermission(this,
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    askPassword(getString(R.string.encrypt_password))
+                if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                BACKUP_PERMISSION_REQUEST_CODE))
+                        askPassword(getString(R.string.encrypt_password))
             }
             R.id.restore -> {
-                if (Utils.requestPermission(this,
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                if (Utils.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE,
+                                RESTORE_PERMISSION_REQUEST_CODE))
                     askPassword(getString(R.string.decrypt_password))
             }
             R.id.about -> {
@@ -913,6 +899,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+
+            RECORD_PERMISSION_REQUEST_CODE ->
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                    Toast.makeText(applicationContext, getString(R.string.no_calls),
+                            Toast.LENGTH_LONG).show()
+                else
+                    Utils.requestPermission(this, Manifest.permission.READ_PHONE_STATE,
+                            PHONE_PERMISSION_REQUEST_CODE)
+
+            PHONE_PERMISSION_REQUEST_CODE ->
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                    Toast.makeText(applicationContext, getString(R.string.no_call_awareness),
+                            Toast.LENGTH_LONG).show()
+
+            BACKUP_PERMISSION_REQUEST_CODE ->
+                if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    askPassword(getString(R.string.encrypt_password))
+
+            RESTORE_PERMISSION_REQUEST_CODE ->
+                if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    askPassword(getString(R.string.decrypt_password))
+
+        }
     }
 
     private fun quitRestart(reStart: Boolean) {
@@ -1086,10 +1102,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String, status: String): Boolean {
-        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(applicationContext,
-                    getString(R.string.no_microphone_permission), Toast.LENGTH_SHORT).show()
+        if (Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
+            Toast.makeText(applicationContext, getString(R.string.no_calls),
+                    Toast.LENGTH_LONG).show()
             return false
         }
         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]) spinToAor(ua.account.aor)
@@ -1361,8 +1376,11 @@ class MainActivity : AppCompatActivity() {
         const val CHATS_CODE = 8
         const val CHAT_CODE = 9
 
-        const val PERMISSION_REQUEST_CODE = 1
-        const val RESTART_REQUEST_CODE = 2
+        const val BACKUP_PERMISSION_REQUEST_CODE = 1
+        const val RESTORE_PERMISSION_REQUEST_CODE = 2
+        const val RECORD_PERMISSION_REQUEST_CODE = 3
+        const val PHONE_PERMISSION_REQUEST_CODE = 4
+        const val RESTART_REQUEST_CODE = 5
 
     }
 

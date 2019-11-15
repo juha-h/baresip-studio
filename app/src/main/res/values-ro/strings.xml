@@ -130,7 +130,6 @@
     <string name="dialpad">Tastatura virtuală</string>
     <string name="call_already_active">Aveți deja un apel activ.</string>
     <string name="registering_failed">Înregistrarea %1$s a eșuat.</string>
-    <string name="no_microphone_permission">Nu ați acordat permisiunea de acces la microfon.</string>
     <string name="verify">Verificare</string>
     <string name="verify_sas">Doriți să verificați SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="transfer_query">Acceptați să transferați apelul către \'%1$s\'\?</string>

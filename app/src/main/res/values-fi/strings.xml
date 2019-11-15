@@ -105,11 +105,9 @@
     <string name="account_allocation_failure">"Uuden tilin luonti
     epäonnistui.
     </string>
-    <string name="encrypt_password">Salasana</string>
-    <string name="decrypt_password">Salasana</string>
-    <string name="delete_account">Haluatko poistaa tilin
-    \'%1$s\'?
-    </string>
+    <string name="encrypt_password">Tallenna salasanalla</string>
+    <string name="decrypt_password">Palauta salasanalla</string>
+    <string name="delete_account">Haluatko poistaa tilin \'%1$s\'?</string>
     <!-- Baresip Service -->
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
@@ -296,9 +294,6 @@
     baresip uudelleen.
     </string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
-    <string name="no_microphone_permission">Et ole sallinut mikrofonin
-    käyttöä.
-    </string>
     <string name="verify">Todenna</string>
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt; &lt;%2$s&gt;?
     </string>
@@ -326,5 +321,11 @@
     <string name="restore_failed">Sovelluksen tietojen palauttaminen Download-kansiosta epäonnistui.
         Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu
         tiedosto \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
+    </string>
+    <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
+        ilman Mikrofoni-käyttöoikeutta.
+    </string>
+    <string name="no_call_awareness">Ilman Puhelin-käyttöoikeutta baresip ei voi tietää, onko
+        toinen puhelu parhaillaan jo käynnissä.
     </string>
 </resources>
