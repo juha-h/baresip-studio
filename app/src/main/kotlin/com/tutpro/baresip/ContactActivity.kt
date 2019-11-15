@@ -71,7 +71,11 @@ class ContactActivity : AppCompatActivity() {
 
             R.id.checkIcon -> {
 
-                val newName = nameView.text.toString().trim()
+                var newName = nameView.text.toString().trim()
+                var newUri = uriView.text.toString().trim()
+
+                if (newName == "") newName = newUri
+
                 if (!Utils.checkName(newName)) {
                     Utils.alertView(this, getString(R.string.error),
                             String.format(getString(R.string.invalid_contact), newName))
@@ -89,7 +93,6 @@ class ContactActivity : AppCompatActivity() {
                     return false
                 }
 
-                var newUri = uriView.text.toString().trim()
                 if (!newUri.startsWith("sip:")) {
                     if (newUri.contains("@") || (BaresipService.uas.size != 1)) {
                         newUri = "sip:$newUri"
