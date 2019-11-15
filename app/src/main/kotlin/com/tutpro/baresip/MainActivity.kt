@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 Log.d("Baresip", "aorSpinner selecting $position")
                 val acc = UserAgent.uas()[position].account
                 val aor = acc.aor
