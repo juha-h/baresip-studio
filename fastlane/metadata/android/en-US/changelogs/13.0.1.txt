@@ -1,0 +1,2 @@
+- Always notify user agent spinner about possible data set change when
+  resuming main activity without intent.
