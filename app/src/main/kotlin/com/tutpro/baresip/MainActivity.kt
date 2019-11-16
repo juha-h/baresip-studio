@@ -555,6 +555,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         aorSpinner.setSelection(currentPosition)
                     }
+                    uaAdapter.notifyDataSetChanged()
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
                 }
             }
