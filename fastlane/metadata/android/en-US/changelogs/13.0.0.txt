@@ -1,0 +1,9 @@
+- Play notification sound also when message arrives and baresip is visible.
+- If contact's name is empty, use contact's SIP URI AoR as contact's name.
+- Relaxed checking of contact's name.
+- Avoid occasional crash when selecting an account in the spinner.
+- Ask Record Audio (Microphone) permission when baresip starts (if not
+  already granted or permanently denied).
+- Improved handling of Write/Read External Storage (Storage Space)
+  permission upon Backup/Restore.
+- Read Phone State (Phone) permission is not needed.
