@@ -325,7 +325,4 @@
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
     </string>
-    <string name="no_call_awareness">Ilman Puhelin-käyttöoikeutta baresip ei voi tietää, onko
-        toinen puhelu parhaillaan jo käynnissä.
-    </string>
 </resources>

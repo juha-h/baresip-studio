@@ -130,6 +130,8 @@ class MainActivity : AppCompatActivity() {
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            // Have to allow NULL view, since sometimes when onItemSelected is called, view is NULL.
+            // Haven't found any explanation why this can happen.
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 Log.d("Baresip", "aorSpinner selecting $position")
                 val acc = UserAgent.uas()[position].account
@@ -423,7 +425,7 @@ class MainActivity : AppCompatActivity() {
             baresipService.setAction("Start")
             startService(baresipService)
             Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                            RECORD_PERMISSION_REQUEST_CODE)
+                    RECORD_PERMISSION_REQUEST_CODE)
         }
 
         if (intent.hasExtra("onStartup"))
@@ -911,14 +913,6 @@ class MainActivity : AppCompatActivity() {
                 if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Toast.makeText(applicationContext, getString(R.string.no_calls),
                             Toast.LENGTH_LONG).show()
-                else
-                    Utils.requestPermission(this, Manifest.permission.READ_PHONE_STATE,
-                            PHONE_PERMISSION_REQUEST_CODE)
-
-            PHONE_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
-                    Toast.makeText(applicationContext, getString(R.string.no_call_awareness),
-                            Toast.LENGTH_LONG).show()
 
             BACKUP_PERMISSION_REQUEST_CODE ->
                 if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
@@ -1102,7 +1096,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String, status: String): Boolean {
-        if (Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
+        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
             Toast.makeText(applicationContext, getString(R.string.no_calls),
                     Toast.LENGTH_LONG).show()
             return false
@@ -1379,8 +1373,7 @@ class MainActivity : AppCompatActivity() {
         const val BACKUP_PERMISSION_REQUEST_CODE = 1
         const val RESTORE_PERMISSION_REQUEST_CODE = 2
         const val RECORD_PERMISSION_REQUEST_CODE = 3
-        const val PHONE_PERMISSION_REQUEST_CODE = 4
-        const val RESTART_REQUEST_CODE = 5
+        const val RESTART_REQUEST_CODE = 4
 
     }
 
