@@ -27,11 +27,11 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         val peer: String
         if (up) {
             lp.setMargins(75, 10, 0, 10)
-            layout.setBackgroundResource(R.drawable.you_bg)
+            layout.setBackgroundResource(R.drawable.message_out_bg)
             peer = cxt.getString(R.string.you)
         } else {
             lp.setMargins(0, 10, 75, 10)
-            layout.setBackgroundResource(R.drawable.peer_bg)
+            layout.setBackgroundResource(R.drawable.message_in_bg)
             val contactName = ContactsActivity.contactName(message.peerUri)
             if (contactName.startsWith("sip:") &&
                     (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))

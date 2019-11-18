@@ -6,6 +6,7 @@ import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.LinkAddress
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
@@ -64,6 +65,10 @@ object Utils {
 
     fun uriUserPart(uri: String): String {
         return uri.substringAfter(":").substringBefore("@")
+    }
+
+    fun uriAor(uri: String): String {
+        return uriUserPart(uri) + "@" + uriHostPart(uri)
     }
 
     fun friendlyUri(uri: String, domain: String): String {
@@ -510,4 +515,8 @@ object Utils {
         Log.d("Baresip", "Dumping intent finish")
     }
 
+    fun randomColor(): Int {
+        val rnd = Random()
+        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+    }
 }

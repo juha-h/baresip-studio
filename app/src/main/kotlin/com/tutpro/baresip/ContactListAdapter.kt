@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
@@ -23,6 +24,11 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
         val row = rows[pos]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.contact_row, parent, false)
+        val avatarView = rowView.findViewById(R.id.avatar) as TextView
+        val background = avatarView.background as GradientDrawable
+        background.setColor(row.color)
+        if (row.name.length > 0)
+            avatarView.text = "${row.name[0]}"
         val nameView = rowView.findViewById(R.id.contactName) as TextView
         nameView.text = row.name
         nameView.textSize = 20f

@@ -8,7 +8,20 @@
     android:paddingRight="16dp"
     android:paddingTop="16dp"
     android:paddingBottom="24dp"
-    android:orientation="vertical">
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/Avatar"
+        android:scaleType="centerInside"
+        android:background="@drawable/circle"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:gravity="center" >
+    </TextView>
 
     <TextView
         android:id="@+id/NameTitle"
@@ -16,6 +29,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@android:color/black"
+        android:paddingTop="10dp"
         android:text="@string/contact_name" >
     </TextView>
 

@@ -87,6 +87,14 @@ class ContactsActivity : AppCompatActivity() {
             return name
         }
 
+        fun findContact(uri: String): Contact? {
+            for (c in Contact.contacts())
+                if ((Utils.uriUserPart(c.uri) == Utils.uriUserPart(uri)) &&
+                        (Utils.uriHostPart(c.uri) == Utils.uriHostPart(uri)))
+                    return c
+            return null
+        }
+
         fun nameExists(name: String, ignoreCase: Boolean): Boolean {
             for (c in Contact.contacts())
                 if (c.name.equals(name, ignoreCase = ignoreCase)) return true

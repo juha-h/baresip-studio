@@ -13,7 +13,9 @@
         android:id="@+id/contacts"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/plusButton" >
+        android:layout_above="@id/plusButton"
+        android:divider="#00000000"
+        android:dividerHeight="10dp" >
     </ListView>
 
     <ImageButton
