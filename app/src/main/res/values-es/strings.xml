@@ -268,4 +268,5 @@
     <string name="audio_modules_title">Módulos de audio</string>
     <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>
     <string name="failed_to_load_module">Falló la carga del módulo.</string>
+    <string name="no_calls">No es posible hacer o responder llamadas sin el permiso Micrófono.</string>
 </resources>
