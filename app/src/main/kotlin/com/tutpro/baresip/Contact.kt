@@ -3,7 +3,7 @@ package com.tutpro.baresip
 import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 
-class Contact(var name: String, var uri: String) {
+class Contact(var name: String, var uri: String, var color: Int) {
 
     companion object {
 
@@ -35,7 +35,7 @@ class Contact(var name: String, var uri: String) {
                         uri = uri.substringAfter("<").substringBefore(">")
                     // Currently no need to make baresip aware of the contact
                     // Api.contact_add("\"$name\" $uri")
-                    BaresipService.contacts.add(Contact(name, uri))
+                    BaresipService.contacts.add(Contact(name, uri, Utils.randomColor()))
                 }
             }
             return true

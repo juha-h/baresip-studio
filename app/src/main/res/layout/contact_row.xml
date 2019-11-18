@@ -6,10 +6,26 @@
     android:orientation="horizontal" >
 
     <TextView
+        android:id="@+id/avatar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_centerVertical="true"
+        android:scaleType="centerInside"
+        android:background="@drawable/circle"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:gravity="center" >
+    </TextView>
+
+    <TextView
         android:id="@+id/contactName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/avatar"
+        android:layout_marginStart="10dp"
         android:textSize="20sp"
         android:layout_marginBottom="6dp">
     </TextView>

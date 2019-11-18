@@ -2,6 +2,9 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -10,17 +13,21 @@ import android.widget.*
 
 class ContactActivity : AppCompatActivity() {
 
+    lateinit var avatarView: TextView
     lateinit var nameView: EditText
     lateinit var uriView: EditText
 
-    internal var index = 0
     internal var new = false
+
+    private var index = 0
+    private var color = Utils.randomColor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact)
 
+        avatarView = findViewById(R.id.Avatar) as TextView
         nameView = findViewById(R.id.Name) as EditText
         uriView = findViewById(R.id.Uri) as EditText
 
@@ -28,7 +35,9 @@ class ContactActivity : AppCompatActivity() {
         val uOrI: String
 
         if (new) {
-            setTitle(getString(R.string.new_contact))
+            title = getString(R.string.new_contact)
+            val background = avatarView.background as GradientDrawable
+            background.setColor(color)
             nameView.setText("")
             nameView.hint = getString(R.string.contact_name)
             nameView.setSelection(nameView.text.length)
@@ -43,6 +52,10 @@ class ContactActivity : AppCompatActivity() {
         } else {
             index = intent.getIntExtra("index", 0)
             val name = Contact.contacts()[index].name
+            val background = avatarView.background as GradientDrawable
+            background.setColor(Contact.contacts()[index].color)
+            if (name.length > 0)
+                avatarView.text = "${name[0]}"
             setTitle(name)
             nameView.setText(name)
             uriView.setText(Contact.contacts()[index].uri)
@@ -114,7 +127,7 @@ class ContactActivity : AppCompatActivity() {
                         BaresipService.activities.removeAt(0)
                         return true
                     } else {
-                        Contact.contacts().add(Contact(newName, newUri))
+                        Contact.contacts().add(Contact(newName, newUri, color))
                     }
                 } else {
                     Contact.contacts()[index].uri = newUri
