@@ -1,0 +1,4 @@
+- Added to Settings possibility to choose which audio modules are
+  loaded. Audio codecs provided by the loaded modules are available for
+  accounts to use.
+- Minor code improvements.
