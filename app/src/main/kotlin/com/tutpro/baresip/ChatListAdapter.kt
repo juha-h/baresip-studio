@@ -35,11 +35,8 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
             peer = contact.name
             avatarBackground.setColor(contact.color)
         } else {
-            if (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor))
-                peer = Utils.uriUserPart(message.peerUri)
-            else
-                peer = Utils.uriAor(message.peerUri)
-            avatarBackground.setColor(Color.RED)
+            peer = Utils.friendlyUri(message.peerUri, message.aor)
+            avatarBackground.setColor(Utils.randomColor())
         }
         avatarView.text = "${peer[0]}"
         if (message.direction == R.drawable.arrow_down_green) {
