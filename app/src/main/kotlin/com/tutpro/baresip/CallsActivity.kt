@@ -6,16 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.format.DateUtils.isToday
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
 
-import java.text.SimpleDateFormat
 import java.util.ArrayList
-import java.util.Calendar
-import java.util.GregorianCalendar
+import java.text.DateFormat
 
 class CallsActivity : AppCompatActivity() {
 
@@ -46,7 +45,7 @@ class CallsActivity : AppCompatActivity() {
         listView.isLongClickable = true
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
-            val peerUri = uaHistory[pos].peerURI
+            val peerUri = uaHistory[pos].peerUri
             var peerName = ContactsActivity.contactName(peerUri)
             if (peerName.startsWith("sip:"))
                 peerName = Utils.friendlyUri(peerName, Utils.aorDomain(aor))
@@ -77,7 +76,7 @@ class CallsActivity : AppCompatActivity() {
         }
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
-            val peerUri = uaHistory[pos].peerURI
+            val peerUri = uaHistory[pos].peerUri
             val peerName = ContactsActivity.contactName(peerUri)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
@@ -194,7 +193,6 @@ class CallsActivity : AppCompatActivity() {
 
     }
 
-
     private fun aorGenerateHistory(aor: String) {
         uaHistory.clear()
         for (i in BaresipService.callHistory.indices.reversed()) {
@@ -211,18 +209,16 @@ class CallsActivity : AppCompatActivity() {
                         direction = R.drawable.arrow_up_green
                     else
                         direction = R.drawable.arrow_up_red
-                if (uaHistory.isNotEmpty() && (uaHistory.last().peerURI == h.peerURI)) {
+                if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerURI)) {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
-                    val time: String
-                    if (isToday(h.time)) {
-                        val fmt = SimpleDateFormat("HH:mm")
-                        time = fmt.format(h.time.time)
-                    } else {
-                        val fmt = SimpleDateFormat("dd.MM")
-                        time = fmt.format(h.time.time)
-                    }
+                    val fmt: DateFormat
+                    if (isToday(h.time.timeInMillis))
+                        fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+                    else
+                        fmt = DateFormat.getDateInstance(DateFormat.SHORT)
+                    val time = fmt.format(h.time.time)
                     uaHistory.add(CallRow(h.aor, h.peerURI, direction, time, i))
                 }
             }
@@ -233,13 +229,6 @@ class CallsActivity : AppCompatActivity() {
         for (index in uaHistory[i].indexes)
             BaresipService.callHistory.removeAt(index)
         uaHistory.removeAt(i)
-    }
-
-    private fun isToday(time: GregorianCalendar): Boolean {
-        val now = GregorianCalendar()
-        return now.get(Calendar.YEAR) == time.get(Calendar.YEAR) &&
-                now.get(Calendar.MONTH) == time.get(Calendar.MONTH) &&
-                now.get(Calendar.DAY_OF_MONTH) == time.get(Calendar.DAY_OF_MONTH)
     }
 
 }

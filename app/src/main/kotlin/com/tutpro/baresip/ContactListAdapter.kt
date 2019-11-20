@@ -20,8 +20,8 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                          private val aor: String) :
         ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
 
-    override fun getView(pos: Int, convertView: View?, parent: ViewGroup): View {
-        val row = rows[pos]
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val row = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.contact_row, parent, false)
         val avatarView = rowView.findViewById(R.id.avatar) as TextView
@@ -51,7 +51,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                             } else {
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
-                                i.putExtra("peer", Contact.contacts()[pos].uri)
+                                i.putExtra("peer", Contact.contacts()[position].uri)
                                 (cxt as Activity).startActivity(i)
                             }
                         }
@@ -61,7 +61,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
                 val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
                 builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
-                        Contact.contacts()[pos].name))
+                        Contact.contacts()[position].name))
                         .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
                         .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
                         .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
@@ -72,7 +72,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        Contact.contacts().removeAt(pos)
+                        Contact.contacts().removeAt(position)
                         Contact.save()
                         this.notifyDataSetChanged()
                     }
@@ -82,7 +82,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             }
             val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
             builder.setMessage(String.format(cxt.getString(R.string.contact_delete_question),
-                    Contact.contacts()[pos].name))
+                    Contact.contacts()[position].name))
                     .setNegativeButton(cxt.getText(R.string.cancel), dialogClickListener)
                     .setPositiveButton(cxt.getText(R.string.delete), dialogClickListener)
                     .show()
@@ -93,7 +93,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val i = Intent(cxt, ContactActivity::class.java)
             val b = Bundle()
             b.putBoolean("new", false)
-            b.putInt("index", pos)
+            b.putInt("index", position)
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
         }

@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 
 class Contact(var name: String, var uri: String, var color: Int) {
@@ -23,7 +22,7 @@ class Contact(var name: String, var uri: String, var color: Int) {
         fun restore(): Boolean {
             val content = Utils.getFileContents(BaresipService.filesPath + "/contacts")
             if (content == null) return false
-            val contacts = String(content, StandardCharsets.ISO_8859_1)
+            val contacts = String(content)
             Api.contacts_remove()
             BaresipService.contacts.clear()
             contacts.lines().forEach {

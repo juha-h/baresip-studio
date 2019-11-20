@@ -8,29 +8,47 @@
     android:layout_marginTop="0dp"
     android:descendantFocusability="blocksDescendants" >
 
+    <TextView
+        android:id="@+id/avatar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_centerVertical="true"
+        android:scaleType="centerInside"
+        android:background="@drawable/circle"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:gravity="center" >
+    </TextView>
+
     <LinearLayout
         android:id="@+id/directions"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true" />
+        android:layout_toEndOf="@id/avatar"
+        android:layout_marginStart="5dp"
+        android:layout_centerVertical="true" >
+    </LinearLayout>
 
     <TextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:focusable="false"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:focusable="false"
         android:gravity="end"
         android:textAlignment="gravity"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingStart="0dp"
         android:paddingEnd="5dp"
-        android:textSize="18sp"
+        android:textSize="12sp"
         android:maxLines="1"
-        android:text="" />
+        android:text="" >
+    </TextView>
 
     <TextView
         android:id="@+id/etc"
@@ -38,7 +56,8 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/directions"
         android:paddingTop="10dp"
-        android:text="" />
+        android:text="" >
+    </TextView>
 
     <TextView
         android:id="@+id/peer_uri"
@@ -55,6 +74,7 @@
         android:textSize="18sp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:text="" />
+        android:text="" >
+    </TextView>
 
 </RelativeLayout>
