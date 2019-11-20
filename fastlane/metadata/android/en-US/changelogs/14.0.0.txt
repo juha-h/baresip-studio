@@ -1,0 +1,4 @@
+- Added character based avatars to contacts, chats, and call history.
+- Fixed saving/restoring of contacts with non-ASCII contact names.
+- Improved formatting of dates and times.
+- Added About limitation note about multiple network interfaces.
