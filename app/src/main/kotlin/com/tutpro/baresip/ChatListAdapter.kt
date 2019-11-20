@@ -14,8 +14,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 
-import java.text.SimpleDateFormat
 import java.util.*
+import java.text.DateFormat
 
 class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Message>) :
         ArrayAdapter<Message>(cxt, R.layout.message, rows) {
@@ -50,22 +50,22 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
         val peerView = rowView.findViewById(R.id.peer) as TextView
         peerView.setText(peer)
         val infoView = rowView.findViewById(R.id.info) as TextView
-        var info: String
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
-        val fmt: SimpleDateFormat
-        if (isToday(message.timeStamp)) {
-            fmt = SimpleDateFormat("HH:mm")
-        } else {
-            fmt = SimpleDateFormat("dd/MM, HH:mm")
-        }
+        val fmt: DateFormat
+        if (isToday(message.timeStamp))
+            fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+        else
+            fmt = DateFormat.getDateInstance(DateFormat.SHORT)
         infoView.text = fmt.format(cal.time)
         if (message.direction == R.drawable.arrow_up_red) {
+            val info: String
             if (message.responseCode != 0)
-                infoView.text = "${infoView.text} - ${cxt.getString(R.string.message_failed)}: " +
-                        "${message.responseCode} ${message.responseReason}"
+                info = "${infoView.text} - ${cxt.getString(R.string.message_failed)}: " +
+                    "${message.responseCode} ${message.responseReason}"
             else
-                infoView.text = "${infoView.text} - ${cxt.getString(R.string.sending_failed)}"
+                info = "${infoView.text} - ${cxt.getString(R.string.sending_failed)}"
+            infoView.text = info
             infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
         }
         val textView = rowView.findViewById(R.id.text) as TextView

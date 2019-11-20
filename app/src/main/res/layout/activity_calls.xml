@@ -20,7 +20,9 @@
         android:id="@+id/calls"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/account" >
+        android:layout_below="@id/account"
+        android:divider="#00000000"
+        android:dividerHeight="10dp" >
     </ListView>
 
 </RelativeLayout>

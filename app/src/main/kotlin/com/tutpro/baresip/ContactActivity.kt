@@ -5,10 +5,12 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.ShapeDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 
 class ContactActivity : AppCompatActivity() {
@@ -20,7 +22,7 @@ class ContactActivity : AppCompatActivity() {
     internal var new = false
 
     private var index = 0
-    private var color = Utils.randomColor()
+    private var color = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -36,6 +38,7 @@ class ContactActivity : AppCompatActivity() {
 
         if (new) {
             title = getString(R.string.new_contact)
+            color = Utils.randomColor()
             val background = avatarView.background as GradientDrawable
             background.setColor(color)
             nameView.setText("")
@@ -52,14 +55,19 @@ class ContactActivity : AppCompatActivity() {
         } else {
             index = intent.getIntExtra("index", 0)
             val name = Contact.contacts()[index].name
-            val background = avatarView.background as GradientDrawable
-            background.setColor(Contact.contacts()[index].color)
+            color = Contact.contacts()[index].color
+            (avatarView.background as GradientDrawable).setColor(color)
             if (name.length > 0)
                 avatarView.text = "${name[0]}"
             setTitle(name)
             nameView.setText(name)
             uriView.setText(Contact.contacts()[index].uri)
             uOrI = index.toString()
+        }
+
+        avatarView.setOnClickListener { view ->
+            color = Utils.randomColor()
+            (avatarView.background as GradientDrawable).setColor(color)
         }
 
         BaresipService.activities.add(0, "contact,$new,$uOrI")
@@ -132,6 +140,7 @@ class ContactActivity : AppCompatActivity() {
                 } else {
                     Contact.contacts()[index].uri = newUri
                     Contact.contacts()[index].name = newName
+                    Contact.contacts()[index].color = color
                 }
 
                 Contact.contacts().sortBy { Contact -> Contact.name }
