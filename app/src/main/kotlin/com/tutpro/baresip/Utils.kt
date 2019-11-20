@@ -67,11 +67,8 @@ object Utils {
         return uri.substringAfter(":").substringBefore("@")
     }
 
-    fun uriAor(uri: String): String {
-        return uriUserPart(uri) + "@" + uriHostPart(uri)
-    }
-
     fun friendlyUri(uri: String, domain: String): String {
+        Log.d("Baresip", "Checking uri $uri and domain $domain")
         var u = uri
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
@@ -79,7 +76,10 @@ object Utils {
                 !u.contains(";")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (host == domain) return user else return "$user@$host"
+            if (checkE164Number(user) || (host == domain))
+                return user
+            else
+                return "$user@$host"
         } else {
             return uri
         }
@@ -104,8 +104,8 @@ object Utils {
                     checkPort(parts[1])
     }
 
-    fun checkTelNo(no: String): Boolean {
-        return Regex("^[+]?[0-9]{1,16}\$").matches(no)
+    fun checkE164Number(no: String): Boolean {
+        return Regex("^[+][1-9][0-9]{0,14}\$").matches(no)
     }
 
     fun checkIpV4(ip: String): Boolean {

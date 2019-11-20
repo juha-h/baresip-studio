@@ -56,15 +56,10 @@ class ChatActivity : AppCompatActivity() {
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         var chatPeer = ContactsActivity.contactName(peerUri)
-        if (chatPeer.startsWith("sip:")) {
-            if (Utils.checkTelNo(Utils.uriUserPart(peerUri)) ||
-                    (Utils.uriHostPart(peerUri) == Utils.aorDomain(aor)))
-                chatPeer = Utils.uriUserPart(peerUri)
-            else
-                chatPeer = chatPeer.substring(4)
-        }
+        if (chatPeer.startsWith("sip:"))
+            chatPeer = Utils.friendlyUri(chatPeer, Utils.aorDomain(aor))
 
-        setTitle(String.format(getString(R.string.chat_with), chatPeer))
+        title = String.format(getString(R.string.chat_with), chatPeer)
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"

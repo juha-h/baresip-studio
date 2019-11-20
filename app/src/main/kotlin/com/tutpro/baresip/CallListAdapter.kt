@@ -27,10 +27,7 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
             peer = contact.name
             avatarBackground.setColor(contact.color)
         } else {
-            if (Utils.uriHostPart(callRow.peerUri) == Utils.uriHostPart(callRow.aor))
-                peer = Utils.uriUserPart(callRow.peerUri)
-            else
-                peer = Utils.uriAor(callRow.peerUri)
+            peer = Utils.friendlyUri(callRow.peerUri, callRow.aor)
             avatarBackground.setColor(Utils.randomColor())
         }
         avatarView.text = "${peer[0]}"
