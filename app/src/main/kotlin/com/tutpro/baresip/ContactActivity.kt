@@ -2,15 +2,11 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 
 class ContactActivity : AppCompatActivity() {
