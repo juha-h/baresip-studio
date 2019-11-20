@@ -18,6 +18,11 @@
         kun puhelun kohde on tyhjä.</li>
         <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
         tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
+        <h2>Rajoitukset</h2>
+        <ul>
+            <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
+            samanaikaisesti aktiivisia verkkoliittymiä.</li>
+        </ul>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
         missä voi myös raportoida virheistä.

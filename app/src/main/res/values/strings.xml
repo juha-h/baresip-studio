@@ -20,6 +20,11 @@
             <li>If you cannot hear the other party during call, try to increase Media volume of
             the device or set Default Call Volume in Settings.</li>
         </ul>
+        <h2>Limitations</h2>
+        <ul>
+            <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
+            concurrently active network interfaces.</li>
+        </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         where also issues can be reported.
