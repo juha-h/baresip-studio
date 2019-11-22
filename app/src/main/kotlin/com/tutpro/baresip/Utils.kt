@@ -6,6 +6,8 @@ import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
 import android.net.LinkAddress
 import android.os.Bundle
@@ -104,7 +106,7 @@ object Utils {
                     checkPort(parts[1])
     }
 
-    fun checkE164Number(no: String): Boolean {
+    private fun checkE164Number(no: String): Boolean {
         return Regex("^[+][1-9][0-9]{0,14}\$").matches(no)
     }
 
@@ -121,7 +123,7 @@ object Utils {
                 checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
     }
 
-    fun checkIp(ip: String): Boolean {
+    private fun checkIp(ip: String): Boolean {
         return checkIpV4(ip) || checkIpV6(ip)
     }
 
@@ -220,7 +222,7 @@ object Utils {
 
     fun checkName(name: String): Boolean {
         return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
-                name.lines().size == 1
+                name.lines().size == 1 && !name.contains('"')
     }
 
     fun checkIfName(name: String): Boolean {
@@ -312,7 +314,6 @@ object Utils {
         }
     }
 
-
     fun checkPermission(ctx: Context, permission: String) : Boolean {
         return ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
     }
@@ -343,11 +344,13 @@ object Utils {
         }
     }
 
-    fun deleteFile(filePath: String) {
-        val file = File(filePath)
+    fun deleteFile(file: File) {
         if (file.exists()) {
-            Log.d("Baresip", "Deleting file '$filePath'")
-            file.delete()
+            try {
+                file.delete()
+            } catch (e: IOException) {
+                Log.e("Baresip", "Could not delete file ${file.absolutePath}")
+            }
         }
     }
 
@@ -369,6 +372,22 @@ object Utils {
         }
         catch (e: IOException) {
             Log.e("Baresip", "Failed to write file '$filePath': $e")
+            return false
+        }
+        return true
+    }
+
+    fun saveBitmap(bitmap: Bitmap, file: File): Boolean {
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            val scaledBitmap = createScaledBitmap (bitmap, 96, 96, true)
+            scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+            Log.e("Baresip", "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
+        } catch (e: Exception) {
+            Log.e("Baresip", "Failed to save bitmap to ${file.absolutePath}")
             return false
         }
         return true
@@ -449,7 +468,7 @@ object Utils {
         return plainData
     }
 
-    fun zip(fileNames: Array<String>, zipFileName: String): Boolean {
+    fun zip(fileNames: ArrayList<String>, zipFileName: String): Boolean {
         val zipFilePath = BaresipService.filesPath + "/" + zipFileName
         try {
             ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFilePath))).use { out ->
@@ -498,7 +517,7 @@ object Utils {
             return false
         }
         (allFiles - zipFiles).iterator().forEach {
-            deleteFile(BaresipService.filesPath + "/$it")
+            deleteFile(File(BaresipService.filesPath, "$it"))
         }
         return true
     }

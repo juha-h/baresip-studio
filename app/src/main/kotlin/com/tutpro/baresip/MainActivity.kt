@@ -18,6 +18,7 @@ import android.text.TextWatcher
 import android.widget.*
 import android.view.*
 
+import java.io.File
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -966,8 +967,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun backup(password: String) {
-        val files = arrayOf("accounts", "calls", "config", "contacts", "messages", "uuid",
+        val files = arrayListOf("accounts", "calls", "config", "contacts", "messages", "uuid",
                 "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        File(BaresipService.filesPath).walk().forEach {
+            if (it.name.endsWith(".png")) files.add(it.name)
+        }
+        Log.d("Baresip", "Backing up files $files")
         val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"
         if (!Utils.zip(files, "baresip.zip")) {
@@ -984,7 +989,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.alertView(this, getString(R.string.info), getString(R.string.backed_up))
-        Utils.deleteFile(zipFilePath)
+        Utils.deleteFile(File(zipFilePath))
     }
 
     private fun restore(password: String) {
@@ -1005,7 +1010,7 @@ class MainActivity : AppCompatActivity() {
                     "Failed to unzip file 'baresip.zip'")
             return
         }
-        Utils.deleteFile(zipFilePath)
+        Utils.deleteFile(File(zipFilePath))
         Log.d("Baresip", "Showing restart dialog")
         val restartDialog = AlertDialog.Builder(this)
         restartDialog.setMessage(getString(R.string.restored))
