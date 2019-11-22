@@ -2,41 +2,56 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.support.v7.widget.CardView
+import android.view.View
+
+import java.io.File
+
+private const val READ_REQUEST_CODE = 42
 
 class ContactActivity : AppCompatActivity() {
 
-    lateinit var avatarView: TextView
+    lateinit var textAvatarView: TextView
+    lateinit var cardAvatarView: CardView
+    lateinit var imageAvatarView: ImageView
     lateinit var nameView: EditText
     lateinit var uriView: EditText
 
-    internal var new = false
+    internal var newContact = false
+    internal var newAvatar = ""
 
     private var index = 0
     private var color = 0
+    private var id: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact)
 
-        avatarView = findViewById(R.id.Avatar) as TextView
+        textAvatarView = findViewById(R.id.Avatar) as TextView
+        cardAvatarView = findViewById(R.id.CardAvatar) as CardView
+        imageAvatarView = findViewById(R.id.ImageAvatar) as ImageView
         nameView = findViewById(R.id.Name) as EditText
         uriView = findViewById(R.id.Uri) as EditText
 
-        new = intent.getBooleanExtra("new", false)
+        newContact = intent.getBooleanExtra("new", false)
         val uOrI: String
 
-        if (new) {
+        if (newContact) {
             title = getString(R.string.new_contact)
             color = Utils.randomColor()
-            val background = avatarView.background as GradientDrawable
-            background.setColor(color)
+            id = System.currentTimeMillis()
+            showTextAvatar("?", color)
             nameView.setText("")
             nameView.hint = getString(R.string.contact_name)
             nameView.setSelection(nameView.text.length)
@@ -50,23 +65,83 @@ class ContactActivity : AppCompatActivity() {
             uOrI = uri
         } else {
             index = intent.getIntExtra("index", 0)
-            val name = Contact.contacts()[index].name
-            color = Contact.contacts()[index].color
-            (avatarView.background as GradientDrawable).setColor(color)
-            if (name.length > 0)
-                avatarView.text = "${name[0]}"
-            setTitle(name)
+            val contact = Contact.contacts()[index]
+            val name = contact.name
+            color = contact.color
+            id = contact.id
+            val avatarImage = contact.avatarImage
+            if (avatarImage != null)
+                showImageAvatar(avatarImage)
+            else
+                showTextAvatar(name, color)
+            title = name
             nameView.setText(name)
-            uriView.setText(Contact.contacts()[index].uri)
+            uriView.setText(contact.uri)
             uOrI = index.toString()
         }
 
-        avatarView.setOnClickListener { view ->
+        textAvatarView.setOnClickListener { _ ->
+
             color = Utils.randomColor()
-            (avatarView.background as GradientDrawable).setColor(color)
+            showTextAvatar(textAvatarView.text.toString(), color)
+            newAvatar = "text"
+
         }
 
-        BaresipService.activities.add(0, "contact,$new,$uOrI")
+        textAvatarView.setOnLongClickListener { _ ->
+
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+
+            startActivityForResult(intent, READ_REQUEST_CODE)
+
+            true
+
+        }
+
+        cardAvatarView.setOnClickListener { _ ->
+
+            color = Utils.randomColor()
+            showTextAvatar(nameView.text.toString(), color)
+            newAvatar = "text"
+
+        }
+
+        cardAvatarView.setOnLongClickListener { _ ->
+
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+
+            startActivityForResult(intent, READ_REQUEST_CODE)
+
+            true
+
+        }
+
+        BaresipService.activities.add(0, "contact,$newContact,$uOrI")
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            resultData?.data?.also { uri ->
+                Log.d("Baresip", "Uri: $uri")
+                try {
+                    val inputStream = baseContext.contentResolver.openInputStream(uri)
+                    val avatarImage = BitmapFactory.decodeStream(inputStream)
+                    showImageAvatar(avatarImage)
+                    if (Utils.saveBitmap(avatarImage, File(BaresipService.filesPath, "tmp.png")))
+                            newAvatar = "image"
+                } catch (e: Exception) {
+                    Log.e("Baresip", "Could not read avatar image")
+                }
+            }
+        }
 
     }
 
@@ -99,7 +174,7 @@ class ContactActivity : AppCompatActivity() {
                     return false
                 }
                 val alert: Boolean
-                if (new)
+                if (newContact)
                     alert = ContactsActivity.nameExists(newName, true)
                 else
                     alert = (Contact.contacts()[index].name != newName) &&
@@ -123,7 +198,8 @@ class ContactActivity : AppCompatActivity() {
                     return false
                 }
 
-                if (new) {
+                val contact: Contact
+                if (newContact) {
                     if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.contacts_exceeded),
@@ -131,15 +207,33 @@ class ContactActivity : AppCompatActivity() {
                         BaresipService.activities.removeAt(0)
                         return true
                     } else {
-                        Contact.contacts().add(Contact(newName, newUri, color))
+                        contact = Contact(newName, newUri, color, id)
+                        Contact.contacts().add(contact)
                     }
                 } else {
-                    Contact.contacts()[index].uri = newUri
-                    Contact.contacts()[index].name = newName
-                    Contact.contacts()[index].color = color
+                    contact = Contact.contacts()[index]
+                    contact.uri = newUri
+                    contact.name = newName
+                    contact.color = color
+                }
+
+                when (newAvatar) {
+                    "text" -> {
+                        if (contact.avatarImage != null) {
+                            contact.avatarImage = null
+                            Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
+                        }
+                    }
+                    "image" ->  {
+                        contact.avatarImage = (imageAvatarView.drawable as BitmapDrawable).bitmap
+                        Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
+                        File(BaresipService.filesPath, "tmp.png")
+                                .renameTo(File(BaresipService.filesPath, "${contact.id}.png"))
+                    }
                 }
 
                 Contact.contacts().sortBy { Contact -> Contact.name }
+
                 Contact.save()
 
                 i.putExtra("name", newName)
@@ -167,4 +261,21 @@ class ContactActivity : AppCompatActivity() {
 
     }
 
+    private fun showTextAvatar(name: String, color: Int) {
+        textAvatarView.visibility = View.VISIBLE
+        cardAvatarView.visibility = View.GONE
+        imageAvatarView.visibility = View.GONE
+        (textAvatarView.background as GradientDrawable).setColor(color)
+        if (name.isNotEmpty())
+            textAvatarView.text = "${name[0]}"
+        else
+            textAvatarView.text = ""
+    }
+
+    private fun showImageAvatar(image: Bitmap) {
+        textAvatarView.visibility = View.GONE
+        cardAvatarView.visibility = View.VISIBLE
+        imageAvatarView.visibility = View.VISIBLE
+        imageAvatarView.setImageBitmap(image)
+    }
 }

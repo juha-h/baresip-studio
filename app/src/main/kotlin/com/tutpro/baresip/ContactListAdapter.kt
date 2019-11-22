@@ -14,6 +14,9 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.TextView
 
+import java.io.File
+import java.io.IOException
+
 import java.util.*
 
 class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>,
@@ -72,6 +75,16 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
+                        val contact = Contact.contacts()[position]
+                        val id = contact.id
+                        val avatarFile = File(BaresipService.filesPath, "$id.img")
+                        if (avatarFile.exists()) {
+                            try {
+                                avatarFile.delete()
+                            } catch (e: IOException) {
+                                Log.e("Baresip", "Could not delete file '$id.img")
+                            }
+                        }
                         Contact.contacts().removeAt(position)
                         Contact.save()
                         this.notifyDataSetChanged()
