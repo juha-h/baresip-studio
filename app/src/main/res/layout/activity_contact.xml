@@ -11,14 +11,13 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/Avatar"
+        android:id="@+id/TextAvatar"
         android:layout_width="96dp"
         android:layout_height="96dp"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerInside"
         android:background="@drawable/circle"
         android:textSize="72sp"
-        android:textStyle="bold"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
         android:gravity="center" >
@@ -34,7 +33,7 @@
 
         <ImageView
             android:id="@+id/ImageAvatar"
-            android:layout_height="90dp"
+            android:layout_height="96dp"
             android:layout_width="96dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" >

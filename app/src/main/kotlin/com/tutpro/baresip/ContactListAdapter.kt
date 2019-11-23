@@ -7,16 +7,17 @@ import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 
 import java.io.File
 import java.io.IOException
-
 import java.util.*
 
 class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>,
@@ -24,16 +25,30 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
         ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val row = rows[position]
+        val contact = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.contact_row, parent, false)
-        val avatarView = rowView.findViewById(R.id.avatar) as TextView
-        val background = avatarView.background as GradientDrawable
-        background.setColor(row.color)
-        if (row.name.length > 0)
-            avatarView.text = "${row.name[0]}"
+        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
+        val imageAvatarView = rowView.findViewById(R.id.ImageAvatar) as ImageView
+        val avatarImage = contact.avatarImage
+        if (avatarImage != null) {
+            textAvatarView.visibility = View.GONE
+            cardAvatarView.visibility = View.VISIBLE
+            imageAvatarView.visibility = View.VISIBLE
+            imageAvatarView.setImageBitmap(avatarImage)
+        } else {
+            textAvatarView.visibility = View.VISIBLE
+            cardAvatarView.visibility = View.GONE
+            imageAvatarView.visibility = View.GONE
+            (textAvatarView.background as GradientDrawable).setColor(contact.color)
+            if (contact.name.isNotEmpty())
+                textAvatarView.text = "${contact.name[0]}"
+            else
+                textAvatarView.text = ""
+        }
         val nameView = rowView.findViewById(R.id.contactName) as TextView
-        nameView.text = row.name
+        nameView.text = contact.name
         nameView.textSize = 20f
         nameView.setPadding(6, 6, 0, 6)
         if (aor != "") {
@@ -75,7 +90,6 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        val contact = Contact.contacts()[position]
                         val id = contact.id
                         val avatarFile = File(BaresipService.filesPath, "$id.img")
                         if (avatarFile.exists()) {
