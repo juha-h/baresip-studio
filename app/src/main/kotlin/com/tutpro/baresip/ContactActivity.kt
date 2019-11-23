@@ -22,7 +22,7 @@ class ContactActivity : AppCompatActivity() {
 
     lateinit var textAvatarView: TextView
     lateinit var cardAvatarView: CardView
-    lateinit var imageAvatarView: ImageView
+    lateinit var cardImageAvatarView: ImageView
     lateinit var nameView: EditText
     lateinit var uriView: EditText
 
@@ -38,9 +38,9 @@ class ContactActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact)
 
-        textAvatarView = findViewById(R.id.Avatar) as TextView
+        textAvatarView = findViewById(R.id.TextAvatar) as TextView
         cardAvatarView = findViewById(R.id.CardAvatar) as CardView
-        imageAvatarView = findViewById(R.id.ImageAvatar) as ImageView
+        cardImageAvatarView = findViewById(R.id.ImageAvatar) as ImageView
         nameView = findViewById(R.id.Name) as EditText
         uriView = findViewById(R.id.Uri) as EditText
 
@@ -82,42 +82,38 @@ class ContactActivity : AppCompatActivity() {
 
         textAvatarView.setOnClickListener { _ ->
 
-            color = Utils.randomColor()
-            showTextAvatar(textAvatarView.text.toString(), color)
-            newAvatar = "text"
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+            startActivityForResult(intent, READ_REQUEST_CODE)
 
         }
 
         textAvatarView.setOnLongClickListener { _ ->
 
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "image/*"
-            }
-
-            startActivityForResult(intent, READ_REQUEST_CODE)
-
+            color = Utils.randomColor()
+            showTextAvatar(textAvatarView.text.toString(), color)
+            newAvatar = "text"
             true
 
         }
 
         cardAvatarView.setOnClickListener { _ ->
 
-            color = Utils.randomColor()
-            showTextAvatar(nameView.text.toString(), color)
-            newAvatar = "text"
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+            startActivityForResult(intent, READ_REQUEST_CODE)
 
         }
 
         cardAvatarView.setOnLongClickListener { _ ->
 
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "image/*"
-            }
-
-            startActivityForResult(intent, READ_REQUEST_CODE)
-
+            color = Utils.randomColor()
+            showTextAvatar(nameView.text.toString(), color)
+            newAvatar = "text"
             true
 
         }
@@ -225,7 +221,7 @@ class ContactActivity : AppCompatActivity() {
                         }
                     }
                     "image" ->  {
-                        contact.avatarImage = (imageAvatarView.drawable as BitmapDrawable).bitmap
+                        contact.avatarImage = (cardImageAvatarView.drawable as BitmapDrawable).bitmap
                         Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
                         File(BaresipService.filesPath, "tmp.png")
                                 .renameTo(File(BaresipService.filesPath, "${contact.id}.png"))
@@ -264,18 +260,13 @@ class ContactActivity : AppCompatActivity() {
     private fun showTextAvatar(name: String, color: Int) {
         textAvatarView.visibility = View.VISIBLE
         cardAvatarView.visibility = View.GONE
-        imageAvatarView.visibility = View.GONE
         (textAvatarView.background as GradientDrawable).setColor(color)
-        if (name.isNotEmpty())
-            textAvatarView.text = "${name[0]}"
-        else
-            textAvatarView.text = ""
+        textAvatarView.text = "${name[0]}"
     }
 
     private fun showImageAvatar(image: Bitmap) {
         textAvatarView.visibility = View.GONE
         cardAvatarView.visibility = View.VISIBLE
-        imageAvatarView.visibility = View.VISIBLE
-        imageAvatarView.setImageBitmap(image)
+        cardImageAvatarView.setImageBitmap(image)
     }
 }

@@ -2,6 +2,8 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,18 +21,27 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
         val callRow = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.call_row, parent, false)
-        val avatarView = rowView.findViewById(R.id.avatar) as TextView
-        val avatarBackground = avatarView.background as GradientDrawable
+        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
+        val cardImageAvatarView = rowView.findViewById(R.id.CardImageAvatar) as ImageView
         val contact = ContactsActivity.findContact(callRow.peerUri)
-        val peer: String
         if (contact != null) {
-            peer = contact.name
-            avatarBackground.setColor(contact.color)
+            val avatarImage = contact.avatarImage
+            if (avatarImage != null) {
+                textAvatarView.visibility = View.GONE
+                cardAvatarView.visibility = View.VISIBLE
+                cardImageAvatarView.setImageBitmap(avatarImage)
+            } else {
+                textAvatarView.visibility = View.VISIBLE
+                cardAvatarView.visibility = View.GONE
+                (textAvatarView.background as GradientDrawable).setColor(contact.color)
+                textAvatarView.text = "${contact.name[0]}"
+            }
         } else {
-            peer = Utils.friendlyUri(callRow.peerUri, callRow.aor)
-            avatarBackground.setColor(Utils.randomColor())
+            textAvatarView.visibility = View.VISIBLE
+            cardAvatarView.visibility = View.GONE
+            textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
-        avatarView.text = "${peer[0]}"
         val directions = rowView.findViewById(R.id.directions) as LinearLayout
         var count = 1
         for (d in callRow.directions) {

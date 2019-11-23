@@ -1,18 +1,15 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 
 import java.util.*
 import java.text.DateFormat
@@ -24,21 +21,31 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
         val message = rows[position]
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.chat_row, parent, false)
-        val avatarView = rowView.findViewById(R.id.avatar) as TextView
-        val avatarBackground = avatarView.background as GradientDrawable
+        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
+        val cardImageAvatarView = rowView.findViewById(R.id.ImageAvatar) as ImageView
         val layout = rowView.findViewById(R.id.chat) as LinearLayout
-        val lp = layout.layoutParams as RelativeLayout.LayoutParams
-        lp.setMargins(10, 10, 10, 10)
-        val peer: String
         val contact = ContactsActivity.findContact(message.peerUri)
+        val peer: String
         if (contact != null) {
             peer = contact.name
-            avatarBackground.setColor(contact.color)
+            val avatarImage = contact.avatarImage
+            if (avatarImage != null) {
+                textAvatarView.visibility = View.GONE
+                cardAvatarView.visibility = View.VISIBLE
+                cardImageAvatarView.setImageBitmap(avatarImage)
+            } else {
+                textAvatarView.visibility = View.VISIBLE
+                cardAvatarView.visibility = View.GONE
+                (textAvatarView.background as GradientDrawable).setColor(contact.color)
+                textAvatarView.text = "${peer[0]}"
+            }
         } else {
             peer = Utils.friendlyUri(message.peerUri, message.aor)
-            avatarBackground.setColor(Utils.randomColor())
+            textAvatarView.visibility = View.VISIBLE
+            cardAvatarView.visibility = View.GONE
+            textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
-        avatarView.text = "${peer[0]}"
         if (message.direction == R.drawable.arrow_down_green) {
             layout.setBackgroundResource(R.drawable.message_in_bg)
         } else {
