@@ -1,0 +1,2 @@
+- Added image based contact avatars as alternative to character ones.
+- Small user interface improvements and fixes.
