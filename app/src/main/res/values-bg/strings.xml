@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">Относно baresip</string>
     <string name="about_text">
@@ -27,18 +25,17 @@
     <string name="baresip_link" translatable="false">
         <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
     </string>
-
     <!-- Account Activity -->
-	<string name="account">Акаунт</string>
-	<string name="display_name">Показване на име</string>
-	<string name="your_name">Твоето име</string>
-	<string name="display_name_help">Публично име (ако има такова), използвано в URI на изходящи заявки.</string>
-	<string name="authentication_username">Потребителско име за удостоверяване</string>
-	<string name="authentication_username_help">Потребителско име за удостоверяване, ако се изисква от изходящ прокси.</string>
-	<string name="authentication_password">Парола за удостоверяване</string>
-	<string name="authentication_password_help">Парола за удостоверяване, ако се изисква от изходящ прокси.</string>
-	<string name="outbound_proxies">Изходящи прокси</string>
-	<string name="outbound_proxies_help">SIP URI на един или два прокси сървъра, които трябва да се използват при изпращане на заявки. 
+    <string name="account">Акаунт</string>
+    <string name="display_name">Показване на име</string>
+    <string name="your_name">Твоето име</string>
+    <string name="display_name_help">Публично име (ако има такова), използвано в URI на изходящи заявки.</string>
+    <string name="authentication_username">Потребителско име за удостоверяване</string>
+    <string name="authentication_username_help">Потребителско име за удостоверяване, ако се изисква от изходящ прокси.</string>
+    <string name="authentication_password">Парола за удостоверяване</string>
+    <string name="authentication_password_help">Парола за удостоверяване, ако се изисква от изходящ прокси.</string>
+    <string name="outbound_proxies">Изходящи прокси</string>
+    <string name="outbound_proxies_help">SIP URI на един или два прокси сървъра, които трябва да се използват при изпращане на заявки. 
 		Ако са дадени две, заявките за РЕГИСТРИРАНЕ се изпращат и до двете, и до други заявки 
 		тази, която отговаря. Ако не е даден изходящ прокси, заявките се изпращат въз основа на 
 		DNS NAPTR / SRV / Търсене на запис на хоризонталната част на URI на повикващия. Ако хостпарт на SIP URI е IPv6 
@@ -47,25 +44,25 @@
 \n • sip:foo.com:5060;transport=tls 
 \n • sip:[2001:67c:223:777::10]:5060;transport=tcp 
 	</string>
-	<string name="sip_uri_of_proxy_server">SIP URI на прокси сървър</string>
-	<string name="sip_uri_of_another_proxy_server">SIP URI на друг прокси сървър</string>
-	<string name="register">Регистрирай</string>
-	<string name="register_help">Ако е отметнато, регистрацията е активирана и заявките за РЕГИСТРИРАНЕ се изпращат на 
+    <string name="sip_uri_of_proxy_server">SIP URI на прокси сървър</string>
+    <string name="sip_uri_of_another_proxy_server">SIP URI на друг прокси сървър</string>
+    <string name="register">Регистрирай</string>
+    <string name="register_help">Ако е отметнато, регистрацията е активирана и заявките за РЕГИСТРИРАНЕ се изпращат на 
 		12 минути интервали. </string>
-	<string name="audio_codecs">Аудио кодеци</string>
-	<string name="audio_codecs_help">Списък на поддържаните аудио кодеци в приоритетен ред.</string>
-	<string name="media_nat">NAT Traversal Average</string>
-	<string name="media_nat_help">Избира протокол за преминаване на носител NAT (ако има такъв). Възможният избор е STUN 
+    <string name="audio_codecs">Аудио кодеци</string>
+    <string name="audio_codecs_help">Списък на поддържаните аудио кодеци в приоритетен ред.</string>
+    <string name="media_nat">NAT Traversal Average</string>
+    <string name="media_nat_help">Избира протокол за преминаване на носител NAT (ако има такъв). Възможният избор е STUN 
 		(Помощни програми за сесионно преминаване за NAT, RFC 5389) и ICE (Интерактивна свързаност 
 		Учредяване, RFC 5245). 
 	</string>
-	<string name="stun_server">СТУН Сървър</string>
-	<string name="stun_server_help">STUN сървър на хост на формуляра [: port]. 
+    <string name="stun_server">СТУН Сървър</string>
+    <string name="stun_server_help">STUN сървър на хост на формуляра [: port]. 
 		Фабричната стойност по подразбиране е \'stun.l.google.com:19302\', сочещи към обществен сървър на Google STUN. 
 		В момента потребителското име и паролата не се поддържат. </string>
-	<string translatable="false" name="stun_server_default">stun.l.google.com:19302</string>
-	<string name="media_encryption">Шифроване на медиите</string>
-	<string name="media_encryption_help">Избира протокол за криптиране на медийния транспорт (ако има такъв). 
+    <string translatable="false" name="stun_server_default">stun.l.google.com:19302</string>
+    <string name="media_encryption">Шифроване на медиите</string>
+    <string name="media_encryption_help">Избира протокол за криптиране на медийния транспорт (ако има такъв). 
 \n • ZRTP (препоръчително) означава, че след изпробване на преговорите за криптиране на медиите от край до край ZRTP 
 			разговорът е установен. 
 \n • DTLS-SRTPF означава, че UDP / TLS / RTP / SAVPF се предлага при изходящо повикване и RTP / SAVP, 
@@ -75,214 +72,207 @@
 \n • SRTP означава, че RTP / AVP се предлага при изходящо повикване и че RTP / SAVP или RTP / SAVPF се използва 
 			ако се предлага при входящо повикване. 
 	</string>
-	<string name="answer_mode">Режим на отговори</string>
-	<string name="answer_mode_help">Избира как се отговаря на входящите повиквания.</string>
-	<string name="manual">Ръчно</string>
-	<string name="auto">Автоматично</string>
-	<string name="voicemail_uri">URI на гласова поща</string>
-	<string name="voicemain_uri_help">SIP URI за проверка на гласови съобщения. Ако се остави празно, съобщенията на гласовата поща 
+    <string name="answer_mode">Режим на отговори</string>
+    <string name="answer_mode_help">Избира как се отговаря на входящите повиквания.</string>
+    <string name="manual">Ръчно</string>
+    <string name="auto">Автоматично</string>
+    <string name="voicemail_uri">URI на гласова поща</string>
+    <string name="voicemain_uri_help">SIP URI за проверка на гласови съобщения. Ако се остави празно, съобщенията на гласовата поща 
 		(Индикации за чакане на съобщение) не са активирани. 
 	</string>
-	<string name="default_account">Профил по подразбиране</string>
-	<string name="default_account_help">Ако е отметнато, този акаунт се избира при стартиране на baresip. </string>
-
-<!-- Accounts Activity -->
-	<string name="accounts">Профили</string>
-	<string name="user_domain">потребител@домейн</string>
-	<string name="invalid_aor">Невалиден потребител@домейн \'%1$s\'</string>
-	<string name="account_exists">Профила \'%1$s\' вече съществува.</string>
-	<string name="account_allocation_failure">"Неуспешно разпределяне на нов акаунт.</string>
-	<string name="encrypt_password">Шифроване на парола</string>
-	<string name="decrypt_password">Дешифриране на парола</string>
-	<string name="delete_account">Искате ли да изтриете акаунта \'%1$s\'?</string>
-
-<!-- Baresip Service -->
-	<string name="answer">Отговор</string>
-	<string name="reject">Отхвърляне</string>
-	<string name="incoming_call_from">Обадете се от</string>
-	<string name="transfer_request">Заявка за прехвърляне на обаждане до</string>
-	<string name="message_from">Съобщение от</string>
-
-<!-- Calls Activity -->
-	<string name="call_history">История на обажданията</string>
-	<string name="call">Обади се</string>
-	<string name="calls_calls">повиквания</string>
-	<string name="calls_call">обади се</string>
-	<string name="calls_call_message_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
-	<string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване 
+    <string name="default_account">Профил по подразбиране</string>
+    <string name="default_account_help">Ако е отметнато, този акаунт се избира при стартиране на baresip. </string>
+    <!-- Accounts Activity -->
+    <string name="accounts">Профили</string>
+    <string name="user_domain">потребител@домейн</string>
+    <string name="invalid_aor">Невалиден потребител@домейн \'%1$s\'</string>
+    <string name="account_exists">Профила \'%1$s\' вече съществува.</string>
+    <string name="account_allocation_failure">"Неуспешно разпределяне на нов акаунт.</string>
+    <string name="encrypt_password">Шифроване на парола</string>
+    <string name="decrypt_password">Дешифриране на парола</string>
+    <string name="delete_account">Искате ли да изтриете акаунта \'%1$s\'?</string>
+    <!-- Baresip Service -->
+    <string name="answer">Отговор</string>
+    <string name="reject">Отхвърляне</string>
+    <string name="incoming_call_from">Обадете се от</string>
+    <string name="transfer_request">Заявка за прехвърляне на обаждане до</string>
+    <string name="message_from">Съобщение от</string>
+    <!-- Calls Activity -->
+    <string name="call_history">История на обажданията</string>
+    <string name="call">Обади се</string>
+    <string name="calls_calls">повиквания</string>
+    <string name="calls_call">обади се</string>
+    <string name="calls_call_message_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
+    <string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване 
 		%2$s от историята на обажданията? 
 	</string>
-	<string name="calls_delete_question">Искате ли да изтриете \'%1$s\' %2$s от историята на обажданията? </string>
-	<string name="delete_history">Изтрий</string>
-	<string name="disable_history">Забрани история на обаждания</string>
-	<string name="enable_history">Разреши история на обаждания</string>
-	<string name="delete_history_alert">Искате ли да изтриете историята на обажданията на акаунта \'%1$s\'?</string>
-
-<!-- Chat Activity -->
-	<string name="chat">Съобщения в чата</string>
-	<string name="chat_with">Чатя с %1$s</string>
-	<string name="new_message">Ново съобщение</string>
-	<string name="long_message_question">Искате ли да изтриете съобщението или да добавите потребителя \'%1$s\' в контакти?</string>
-	<string name="short_message_question">Искате ли да изтриете съобщението?</string>
-	<string name="add_contact">Добави контакт</string>
-	<string name="sending_failed">Изпращането на съобщението не бе успешно</string>
-	<string name="message_failed">Неуспешно</string>
-
-<!-- Chats Activity -->
-	<string name="chats">История на чата</string>
-	<string name="today">днес</string>
-	<string name="you">Вие</string>
-	<string name="new_chat_peer">Нов потребител за чат</string>
-	<string name="invalid_chat_peer_uri">Невалиден SIP URI</string>
-	<string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или 
+    <string name="calls_delete_question">Искате ли да изтриете \'%1$s\' %2$s от историята на обажданията? </string>
+    <string name="delete_history">Изтрий</string>
+    <string name="disable_history">Забрани история на обаждания</string>
+    <string name="enable_history">Разреши история на обаждания</string>
+    <string name="delete_history_alert">Искате ли да изтриете историята на обажданията на акаунта \'%1$s\'?</string>
+    <!-- Chat Activity -->
+    <string name="chat">Съобщения в чата</string>
+    <string name="chat_with">Чатя с %1$s</string>
+    <string name="new_message">Ново съобщение</string>
+    <string name="long_message_question">Искате ли да изтриете съобщението или да добавите потребителя \'%1$s\' в контакти?</string>
+    <string name="short_message_question">Искате ли да изтриете съобщението?</string>
+    <string name="add_contact">Добави контакт</string>
+    <string name="sending_failed">Изпращането на съобщението не бе успешно</string>
+    <string name="message_failed">Неуспешно</string>
+    <!-- Chats Activity -->
+    <string name="chats">История на чата</string>
+    <string name="today">днес</string>
+    <string name="you">Вие</string>
+    <string name="new_chat_peer">Нов потребител за чат</string>
+    <string name="invalid_chat_peer_uri">Невалиден SIP URI</string>
+    <string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или 
 		да го добавяне в контактите?</string>
-	<string name="short_chat_question">Искате ли да изтриете чата с \'%1$s\'?</string>
-	<string name="delete_chats">Изтрий</string>
-	<string name="delete_chats_alert">Искате ли да изтриете историята на чата на акаунта \'%1$s\'?</string>
-
-<!-- Config Activity -->
-	<string name="configuration">Конфигуриране</string>
-	<string name="start_automatically">Стартирайте автоматично</string>
-	<string name="start_automatically_help">Ако е отметнато, baresip се стартира автоматично след включване на устройството.</string>
-	<string name="listen_address">Слушане на адрес</string>
-	<string name="listen_address_help">IP адрес и порт на формата \'адрес: порт\', на който baresip слуша 
+    <string name="short_chat_question">Искате ли да изтриете чата с \'%1$s\'?</string>
+    <string name="delete_chats">Изтрий</string>
+    <string name="delete_chats_alert">Искате ли да изтриете историята на чата на акаунта \'%1$s\'?</string>
+    <!-- Config Activity -->
+    <string name="configuration">Конфигуриране</string>
+    <string name="start_automatically">Стартирайте автоматично</string>
+    <string name="start_automatically_help">Ако е отметнато, baresip се стартира автоматично след включване на устройството.</string>
+    <string name="listen_address">Слушане на адрес</string>
+    <string name="listen_address_help">IP адрес и порт на формата \'адрес: порт\', на който baresip слуша 
 		за входящи SIP заявки. Ако IP адресът е IPv6 адрес, той трябва да бъде написан вътре в скоби []. 
 		IPv4 адрес 0.0.0.0 или IPv6 адрес [::] позволява на baresip да слуша всички налични адреси. 
 		Ако се остави празно (фабрично по подразбиране), baresip ще слуша на порт 5060 от всички налични адреси. 
 	</string>
-	<string name="invalid_listen_address">Невалиден адрес за слушане</string>
-	<string translatable="false" name="_0_0_0_0_5060">0.0.0.0:5060</string>
-	<string name="prefer_ipv6">Предпочитан IPv6</string>
-	<string name="prefer_ipv6_help">Предпочетете IPv6, ако са налични и IPv4, и IPv6.</string>
-	<string name="dns_servers">DNS сървъри</string>
-	<string name="dns_servers_help">Списък разделен със запетая на адреси на DNS сървъри. Ако не е зададено, 
+    <string name="invalid_listen_address">Невалиден адрес за слушане</string>
+    <string translatable="false" name="_0_0_0_0_5060">0.0.0.0:5060</string>
+    <string name="prefer_ipv6">Предпочитан IPv6</string>
+    <string name="prefer_ipv6_help">Предпочетете IPv6, ако са налични и IPv4, и IPv6.</string>
+    <string name="dns_servers">DNS сървъри</string>
+    <string name="dns_servers_help">Списък разделен със запетая на адреси на DNS сървъри. Ако не е зададено, 
 		адресите на DNS сървъра се получават динамично от системата. Всеки DNS адрес е във форма \'ip:port\' 
 		или \'ip\'. Ако портът е пропуснат, той по подразбиране е 53. Ако ip е IPv6 адрес и също е зададен порт, 
 		ip трябва да бъде написани вътре в скоби []. Като пример, посочете \`8.8.8.8:53,[2001:4860:4860::8888]:53 \'
 		сочи към IPv4 и IPv6 адреси на обществени DNS сървъри на Google.
 	</string>
-	<string name="invalid_dns_servers">Невалидни DNS сървъри</string>
-	<string name="failed_to_set_dns_servers">Неуспешно задаване на DNS сървъри</string>
-	<string name="tls_certificate_file">Файл за сертификати TLS</string>
-	<string name="tls_certificate_file_help">Ако е поставена отметка, файл \'cert.pem\' съдържащ TLS сертификатът и 
+    <string name="invalid_dns_servers">Невалидни DNS сървъри</string>
+    <string name="failed_to_set_dns_servers">Неуспешно задаване на DNS сървъри</string>
+    <string name="tls_certificate_file">Файл за сертификати TLS</string>
+    <string name="tls_certificate_file_help">Ако е поставена отметка, файл \'cert.pem\' съдържащ TLS сертификатът и 
 		личният ключ на този екземпляр baresip е бил или ще бъде зареден от директорията за Изтегляне. От 
 		съображения за сигурност изтрийте файла след зареждането му.
 	</string>
-	<string name="tls_ca_file">TLS CA File</string>
-	<string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на 
+    <string name="tls_ca_file">TLS CA File</string>
+    <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на 
 		Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.
 	</string>
-	<string name="aec">Акустично отменяне на ехото</string>
-	<string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
-	<string name="opus_bit_rate">Opus Bit Rate</string>
-	<string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
+    <string name="aec">Акустично отменяне на ехото</string>
+    <string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
+    <string name="opus_bit_rate">Opus Bit Rate</string>
+    <string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.
 	</string>
-	<string translatable="false" name="_28000">28000</string>
-	<string name="opus_packet_loss">Очаквана загуба на пакети Opus</string>
-	<string name="opus_packet_loss_help">Очакван процент загуба на пакет от аудио поток на Opus, от 0–100. 
+    <string translatable="false" name="_28000">28000</string>
+    <string name="opus_packet_loss">Очаквана загуба на пакети Opus</string>
+    <string name="opus_packet_loss_help">Очакван процент загуба на пакет от аудио поток на Opus, от 0–100. 
 		По подразбиране 0 изключване на Opus Forward Error Correction (FEC).
 	</string>
-	<string translatable="false" name="_0">0</string>
-	<string name="invalid_opus_bitrate">Невалиден битрейт на Opus</string>
-	<string name="invalid_opus_packet_loss">Невалиден процент загуба на пакет Opus</string>
-	<string name="ice_lite_mode">ICE Lite режим</string>
-	<string name="ice_lite_mode_help">Ако е отметнато, се използва режим ICE Lite.</string>
-	<string name="default_call_volume">Усилване на повикването по подразбиране</string>
-	<string name="default_call_volume_help">Ако се задава, трябва да се избира сила на звука при 
+    <string translatable="false" name="_0">0</string>
+    <string name="invalid_opus_bitrate">Невалиден битрейт на Opus</string>
+    <string name="invalid_opus_packet_loss">Невалиден процент загуба на пакет Opus</string>
+    <string name="ice_lite_mode">ICE Lite режим</string>
+    <string name="ice_lite_mode_help">Ако е отметнато, се използва режим ICE Lite.</string>
+    <string name="default_call_volume">Усилване на повикването по подразбиране</string>
+    <string name="default_call_volume_help">Ако се задава, трябва да се избира сила на звука при 
 		повикване по подразбиране в мащаб 1–10.
 	</string>
-	<string name="debug">Debug</string>
-	<string name="debug_help">Осигурява наличие на съобщения за грешки и информация на ниво информация в Logcat.</string>
-	<string name="reset_config">Възстановяване на фабричните настройки</string>
-	<string name="reset_config_help">Ако е отметнато, конфигурацията се нулира до фабрични стойности по подразбиране</string>
-	<string name="read_cert_error">Неуспешно четене на файл \'cert.pem\' от директорията за изтегляне.</string>
-	<string name="read_ca_certs_error">Файлът не беше прочетен \'ca_certs.crt\' от директорията за изтегляне.</string>
-	<string name="config_restart">Трябва да рестартирате baresip, за да активирате новата конфигурация. Рестартирай сега?</string>
-
-<!-- Contact Activity -->
-	<string name="contact">контакт</string>
-	<string name="new_contact">Нов контакт</string>
-	<string name="contact_name">име</string>
-	<string name="invalid_contact">Невалидно име за контакт \'%1$s\'</string>
-	<string name="contact_already_exists">Този контакт \'%1$s\' вече съществува.</string>
-	<string name="invalid_contact_uri">Невалиден SIP URI</string>
-
-<!-- Contacts Activity -->
-	<string name="contacts">Контакти</string>
-	<string name="contact_action_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
-	<string name="send_message">Изпрати съобщение</string>
-	<string name="contact_delete_question">Искате ли да изтриете този контакт \'%1$s\'?</string>
-	<string name="contacts_exceeded">Вашият максимален брой контакти %1%d е надвишен.</string>
-
-<!-- Generic -->
-	<string name="alert">Внимание</string>
-	<string name="info">Информация</string>
-	<string name="notice">известие</string>
-	<string name="cancel">Отказ</string>
-	<string name="ok">Добре</string>
-	<string name="yes">да</string>
-	<string name="no">не</string>
-	<string name="accept">приемам</string>
-	<string name="deny">отказвам</string>
-	<string name="user_id">Потребителско Име</string>
-	<string name="password">Парола</string>
-	<string translatable="false" name="sip_uri">SIP URI</string>
-	<string name="add">Добави</string>
-	<string name="delete">Изтрий</string>
-	<string name="edit">Редактиране</string>
-	<string name="send">Изпращам</string>
-	<string name="status">Статус</string>
-	<string name="error">Грешка</string>
-	<string translatable="false" name="dots">…</string>
-
-<!-- Main Activity -->
-	<string name="backup">Създай Резервно копие</string>
-	<string name="restore">Възстанови от Резервно копие</string>
-	<string name="about">Относно</string>
-	<string name="restart">Рестартирай</string>
-	<string name="quit">Отписване</string>
-	<string name="outgoing_call_to_dots">Изходящо повикване до…</string>
-	<string name="incoming_call_from_dots">Входящо обаждане от…</string>
-	<string name="transferring_call_to_dots">Прехвърляне на обаждане до…</string>
-	<string name="invalid_sip_uri">Невалиден SIP URI</string>
-	<string name="callee">Набиране</string>
-	<string name="hangup">Затвори</string>
-	<string name="hold">Задържане</string>
-	<string name="dtmf">DTMF</string>
-	<string name="call_info">Информация за обаждане</string>
-	<string name="duration">Продължителност</string>
-	<string name="codecs">Кодеци</string>
-	<string name="rate">Скорост</string>
-	<string name="voicemail">Гласова поща</string>
-	<string name="voicemail_messages">Съобщения за гласова поща</string>
-	<string name="you_have">Ти имаш</string>
-	<string name="one_new_message">едно ново съобщение</string>
-	<string name="new_messages">Нови съобщения</string>
-	<string name="one_old_message">Едно старо съобщение</string>
-	<string name="old_messages">Стари съобщения</string>
-	<string name="and">и</string>
-	<string name="no_messages">Нямате съобщения</string>
-	<string name="listen">Слушам</string>
-	<string name="messages">Съобщения</string>
-	<string name="dialpad">Бутони за набиране</string>
-	<string name="call_already_active">Вече имате активно обаждане.</string>
-	<string name="start_failed">Baresip не успя да стартира. Това може да се дължи на невалиден адрес за слушане или TLS файл. 
+    <string name="debug">Debug</string>
+    <string name="debug_help">Осигурява наличие на съобщения за грешки и информация на ниво информация в Logcat.</string>
+    <string name="reset_config">Възстановяване на фабричните настройки</string>
+    <string name="reset_config_help">Ако е отметнато, конфигурацията се нулира до фабрични стойности по подразбиране</string>
+    <string name="read_cert_error">Неуспешно четене на файл \'cert.pem\' от директорията за изтегляне.</string>
+    <string name="read_ca_certs_error">Файлът не беше прочетен \'ca_certs.crt\' от директорията за изтегляне.</string>
+    <string name="config_restart">Трябва да рестартирате baresip, за да активирате новата конфигурация. Рестартирай сега?</string>
+    <!-- Contact Activity -->
+    <string name="contact">контакт</string>
+    <string name="new_contact">Нов контакт</string>
+    <string name="contact_name">име</string>
+    <string name="invalid_contact">Невалидно име за контакт \'%1$s\'</string>
+    <string name="contact_already_exists">Този контакт \'%1$s\' вече съществува.</string>
+    <string name="invalid_contact_uri">Невалиден SIP URI</string>
+    <!-- Contacts Activity -->
+    <string name="contacts">Контакти</string>
+    <string name="contact_action_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
+    <string name="send_message">Изпрати съобщение</string>
+    <string name="contact_delete_question">Искате ли да изтриете този контакт \'%1$s\'?</string>
+    <string name="contacts_exceeded">Вашият максимален брой контакти %1%d е надвишен.</string>
+    <!-- Generic -->
+    <string name="alert">Внимание</string>
+    <string name="info">Информация</string>
+    <string name="notice">известие</string>
+    <string name="cancel">Отказ</string>
+    <string name="ok">Добре</string>
+    <string name="yes">да</string>
+    <string name="no">не</string>
+    <string name="accept">приемам</string>
+    <string name="deny">отказвам</string>
+    <string name="user_id">Потребителско Име</string>
+    <string name="password">Парола</string>
+    <string translatable="false" name="sip_uri">SIP URI</string>
+    <string name="add">Добави</string>
+    <string name="delete">Изтрий</string>
+    <string name="edit">Редактиране</string>
+    <string name="send">Изпращам</string>
+    <string name="status">Статус</string>
+    <string name="error">Грешка</string>
+    <string translatable="false" name="dots">…</string>
+    <!-- Main Activity -->
+    <string name="backup">Създай Резервно копие</string>
+    <string name="restore">Възстанови от Резервно копие</string>
+    <string name="about">Относно</string>
+    <string name="restart">Рестартирай</string>
+    <string name="quit">Отписване</string>
+    <string name="outgoing_call_to_dots">Изходящо повикване до…</string>
+    <string name="incoming_call_from_dots">Входящо обаждане от…</string>
+    <string name="transferring_call_to_dots">Прехвърляне на обаждане до…</string>
+    <string name="invalid_sip_uri">Невалиден SIP URI</string>
+    <string name="callee">Набиране</string>
+    <string name="hangup">Затвори</string>
+    <string name="hold">Задържане</string>
+    <string name="dtmf">DTMF</string>
+    <string name="call_info">Информация за обаждане</string>
+    <string name="duration">Продължителност</string>
+    <string name="codecs">Кодеци</string>
+    <string name="rate">Скорост</string>
+    <string name="voicemail">Гласова поща</string>
+    <string name="voicemail_messages">Съобщения за гласова поща</string>
+    <string name="you_have">Ти имаш</string>
+    <string name="one_new_message">едно ново съобщение</string>
+    <string name="new_messages">Нови съобщения</string>
+    <string name="one_old_message">Едно старо съобщение</string>
+    <string name="old_messages">Стари съобщения</string>
+    <string name="and">и</string>
+    <string name="no_messages">Нямате съобщения</string>
+    <string name="listen">Слушам</string>
+    <string name="messages">Съобщения</string>
+    <string name="dialpad">Бутони за набиране</string>
+    <string name="call_already_active">Вече имате активно обаждане.</string>
+    <string name="start_failed">Baresip не успя да стартира. Това може да се дължи на невалиден адрес за слушане или TLS файл. 
 		Те са нулирани. Рестартирайте baresip. 
 	</string>
-	<string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
-	<string name="verify">Потвърди</string>
-	<string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-	<string name="transfer_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
-	<string name="call_failed">Обаждането не бе успешно</string>
-	<string name="call_closed">Обаждането е затворено</string>
-	<string name="call_not_secure">Това обаждане НЕ е сигурно!</string>
-	<string name="peer_not_verified">Това обаждане е СИГУРНО, но другият абонат НЕ е потвърдил!</string>
-	<string name="call_is_secure">Този разговор е СИГУРЕН и другият абонат е ПРОВЕРЕН! Искате ли да го потвърдите? </string>
-	<string name="unverify">Отмяна на потвърждението</string>
-	<string name="backed_up">Данните от приложението са архивирани във файла за изтегляне на папки \'baresip.bs\'.</string>
-	<string name="backup_failed">Неуспешно архивиране на данни от приложението за изтегляне на файла с папки \'baresip.bs\'. Проверете Приложения → baresip → Разрешения → Съхранение</string>
-	<string name="restored">Данните за приложението са възстановени. baresip трябва да се рестартира. Рестартирай сега?</string>
-	<string name="restore_failed">Възстановяването на данните на приложението от папката за изтегляне не бе успешно. Проверете Приложения → baresip → Разрешения → Съхранение и този архивен файл \'baresip.bs\' съществува в папката и ако е така, вие сте дали правилна парола за дешифриране.</string>
-	
+    <string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
+    <string name="verify">Потвърди</string>
+    <string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
+    <string name="transfer_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
+    <string name="call_failed">Обаждането не бе успешно</string>
+    <string name="call_closed">Обаждането е затворено</string>
+    <string name="call_not_secure">Това обаждане НЕ е сигурно!</string>
+    <string name="peer_not_verified">Това обаждане е СИГУРНО, но другият абонат НЕ е потвърдил!</string>
+    <string name="call_is_secure">Този разговор е СИГУРЕН и другият абонат е ПРОВЕРЕН! Искате ли да го потвърдите? </string>
+    <string name="unverify">Отмяна на потвърждението</string>
+    <string name="backed_up">Данните от приложението са архивирани във файла за изтегляне на папки \'baresip.bs\'.</string>
+    <string name="backup_failed">Неуспешно архивиране на данни от приложението за изтегляне на файла с папки \'baresip.bs\'. Проверете Приложения → baresip → Разрешения → Съхранение</string>
+    <string name="restored">Данните за приложението са възстановени. baresip трябва да се рестартира. Рестартирай сега?</string>
+    <string name="restore_failed">Възстановяването на данните на приложението от папката за изтегляне не бе успешно. Проверете Приложения → baresip → Разрешения → Съхранение и този архивен файл \'baresip.bs\' съществува в папката и ако е така, вие сте дали правилна парола за дешифриране.</string>
+    <string name="audio_modules_title">Аудио модули</string>
+    <string name="audio_modules_help">Аудио кодеци предоставени от проверените модули могат да бъдат използвани от акаунтите.</string>
+    <string name="failed_to_load_module">Не могат да бъдат заредени модулите.</string>
+    <string name="no_calls">Разговори не могат да бъдат осъществени без разрешен достъп до микрофона.</string>
 </resources>
