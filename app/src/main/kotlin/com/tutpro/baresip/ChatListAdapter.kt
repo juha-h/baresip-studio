@@ -46,7 +46,8 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
             cardAvatarView.visibility = View.GONE
             textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
-        if (message.direction == R.drawable.arrow_down_green) {
+        if ((message.direction == R.drawable.arrow_down_green) ||
+                (message.direction == R.drawable.arrow_down_red)) {
             layout.setBackgroundResource(R.drawable.message_in_bg)
         } else {
             layout.setBackgroundResource(R.drawable.message_out_bg)

@@ -972,7 +972,6 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        Log.d("Baresip", "Backing up files $files")
         val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"
         if (!Utils.zip(files, "baresip.zip")) {
@@ -1011,7 +1010,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.deleteFile(File(zipFilePath))
-        Log.d("Baresip", "Showing restart dialog")
         val restartDialog = AlertDialog.Builder(this)
         restartDialog.setMessage(getString(R.string.restored))
         restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->

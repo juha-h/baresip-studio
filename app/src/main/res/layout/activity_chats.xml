@@ -27,7 +27,7 @@
         android:transcriptMode="alwaysScroll"
         android:stackFromBottom="true"
         android:divider="#00000000"
-        android:dividerHeight="10dp" >
+        android:dividerHeight="16dp" >
     </ListView>
 
     <AutoCompleteTextView

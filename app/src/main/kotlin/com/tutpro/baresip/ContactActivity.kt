@@ -126,7 +126,6 @@ class ContactActivity : AppCompatActivity() {
 
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             resultData?.data?.also { uri ->
-                Log.d("Baresip", "Uri: $uri")
                 try {
                     val inputStream = baseContext.contentResolver.openInputStream(uri)
                     val avatarImage = BitmapFactory.decodeStream(inputStream)

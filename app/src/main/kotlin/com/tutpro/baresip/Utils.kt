@@ -70,7 +70,6 @@ object Utils {
     }
 
     fun friendlyUri(uri: String, domain: String): String {
-        Log.d("Baresip", "Checking uri $uri and domain $domain")
         var u = uri
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
