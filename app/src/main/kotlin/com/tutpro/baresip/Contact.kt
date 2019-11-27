@@ -66,8 +66,6 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                         } catch (e: Exception) {
                             Log.e("Baresip", "Could not read avatar image from '$id.img")
                         }
-                    } else {
-                        Log.d("Baresip", "Contact $id does not have avatarImage")
                     }
                     BaresipService.contacts.add(contact)
                 }
