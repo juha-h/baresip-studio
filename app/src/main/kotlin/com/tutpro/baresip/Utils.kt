@@ -97,12 +97,23 @@ object Utils {
     }
 
     fun checkAor(aor: String): Boolean {
-        val parts = aor.split(":")
-        if (parts.size == 1)
-            return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+        val p = aor.split(":")
+        if (p.size == 2)
+            return checkUriUser(aorUser(p[0])) && checkDomain(aorDomain(p[0])) &&
+                checkPortTransport(p[1])
+        val t = aor.split(";transport=")
+        if (t.size == 2)
+            return checkUriUser(aorUser(t[0])) && checkDomain(aorDomain(t[0])) &&
+                    t[1] in arrayOf("udp", "tcp", "tls")
+        return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+    }
+
+    private fun checkPortTransport(portTransport: String): Boolean {
+        val pt = portTransport.split(";transport=")
+        if (pt.count() == 1)
+            return checkPort(pt[0])
         else
-            return checkUriUser(aorUser(parts[0])) && checkDomain(aorDomain(parts[0])) &&
-                    checkPort(parts[1])
+            return checkPort(pt[0]) && pt[1] in arrayOf("udp", "tcp", "tls")
     }
 
     private fun checkE164Number(no: String): Boolean {

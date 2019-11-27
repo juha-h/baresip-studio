@@ -22,7 +22,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val rowView = inflater.inflate(R.layout.account_row, parent, false)
         val aorView = rowView.findViewById(R.id.aor) as TextView
-        aorView.text = row.aor
+        aorView.text = row.aor.split(":")[0]
         aorView.textSize = 20f
         aorView.setPadding(6, 6, 0, 6)
         aorView.setOnClickListener { _ ->

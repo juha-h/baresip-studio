@@ -587,6 +587,22 @@ Java_com_tutpro_baresip_AccountKt_account_1aor(JNIEnv *env, jobject thiz, jstrin
 }
 
 JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1uri(JNIEnv *env, jobject thiz, jstring javaAcc) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    const struct sip_addr *addr = account_laddr(acc);
+    char uri_buf[512];
+    int l;
+    l = re_snprintf(&(uri_buf[0]), 511, "%H", uri_encode, addr->uri);
+    if (l != -1)
+        uri_buf[l] = '\0';
+    else
+        uri_buf[0] = '\0';
+    return (*env)->NewStringUTF(env, uri_buf);
+}
+
+JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1auth_1user(JNIEnv *env, jobject thiz, jstring javaAcc) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);

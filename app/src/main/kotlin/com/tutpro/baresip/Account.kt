@@ -8,6 +8,7 @@ class Account(val accp: String) {
 
     var displayName = account_display_name(accp)
     val aor = account_aor(accp)
+    val uri = account_uri(accp)
     var authUser = account_auth_user(accp)
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
@@ -207,12 +208,21 @@ class Account(val accp: String) {
             return false
         }
 
+        fun aor(accp: String): String {
+            return account_aor(accp)
+        }
+
+        fun uri(accp: String): String {
+            return account_uri(accp)
+        }
+
     }
 }
 
 external fun account_set_display_name(acc: String, dn: String): Int
 external fun account_display_name(acc: String): String
 external fun account_aor(acc: String): String
+external fun account_uri(acc: String): String
 external fun account_auth_user(acc: String): String
 external fun account_set_auth_user(acc: String, user: String): Int
 external fun account_auth_pass(acc: String): String

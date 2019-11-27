@@ -35,7 +35,7 @@ class CallsActivity : AppCompatActivity() {
         account = ua.account
 
         val headerView = findViewById(R.id.account) as TextView
-        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
+        val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
         headerView.text = headerText
 
         val listView = findViewById(R.id.calls) as ListView

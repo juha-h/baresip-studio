@@ -34,7 +34,7 @@ class ChatsActivity: AppCompatActivity() {
         BaresipService.activities.add(0, "chats,$aor")
 
         val headerView = findViewById(R.id.account) as TextView
-        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
+        val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
         headerView.text = headerText
 
         uaMessages = uaMessages(aor)

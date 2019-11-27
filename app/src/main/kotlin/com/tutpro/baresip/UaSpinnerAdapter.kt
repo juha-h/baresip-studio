@@ -26,7 +26,7 @@ class UaSpinnerAdapter(private val cxt: Context, private val uas: ArrayList<User
         val inflater = cxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val row = inflater.inflate(R.layout.account_spinner, parent, false)
         val textView = row.findViewById(R.id.spinnerText) as TextView
-        textView.text = uas[position].account.aor.replace("sip:", "")
+        textView.text = uas[position].account.aor.split(":")[1]
         textView.textSize = 17f
         val imageView = row.findViewById(R.id.spinnerImage) as ImageView
         imageView.setImageResource(images[position])
