@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 
@@ -65,9 +66,15 @@ class AccountsActivity : AppCompatActivity() {
 
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.help -> {
+                Utils.alertView(this@AccountsActivity, "New Account",
+                        getString(R.string.accounts_help))
+            }
 
             android.R.id.home -> {
                 Log.d("Baresip", "Back array was pressed at Accounts")
@@ -76,9 +83,14 @@ class AccountsActivity : AppCompatActivity() {
                 setResult(RESULT_OK, i)
                 finish()
             }
-
         }
 
+        return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        menuInflater.inflate(R.menu.accounts_menu, menu)
         return true
 
     }

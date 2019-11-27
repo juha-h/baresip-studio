@@ -16,6 +16,7 @@ class AccountActivity : AppCompatActivity() {
 
     internal lateinit var acc: Account
     internal lateinit var ua: UserAgent
+    internal lateinit var uri: TextView
     internal lateinit var displayName: EditText
     internal lateinit var aor: String
     internal lateinit var authUser: EditText
@@ -47,7 +48,10 @@ class AccountActivity : AppCompatActivity() {
         uaIndex = UserAgent.findAorIndex(aor)!!
         ua = UserAgent.uas()[uaIndex]
 
-        setTitle(aor.replace("sip:", ""))
+        setTitle(aor.split(":")[1])
+
+        uri = findViewById(R.id.Uri) as TextView
+        uri.setText(acc.uri)
 
         displayName = findViewById(R.id.DisplayName) as EditText
         displayName.setText(acc.displayName)

@@ -17,6 +17,17 @@
         android:focusableInTouchMode="true" >
 
         <TextView
+            android:id="@+id/Uri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:paddingBottom="10dp"
+            android:text="" >
+        </TextView>
+
+        <TextView
             android:id="@+id/DisplayNameTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
