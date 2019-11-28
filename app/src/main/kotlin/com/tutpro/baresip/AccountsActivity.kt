@@ -72,7 +72,7 @@ class AccountsActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.help -> {
-                Utils.alertView(this@AccountsActivity, "New Account",
+                Utils.alertView(this@AccountsActivity, getString(R.string.new_account),
                         getString(R.string.accounts_help))
             }
 

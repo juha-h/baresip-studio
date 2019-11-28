@@ -21,7 +21,7 @@
             <li>If you cannot hear the other party during call, try to increase Media volume of
             the device or set Default Call Volume in Settings.</li>
         </ul>
-        <h2>Limitations</h2>
+        <h2>Known Issues</h2>
         <ul>
             <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
             concurrently active network interfaces.</li>
@@ -98,6 +98,7 @@
 
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
+    <string name="new_account">New Account</string>
     <string name="accounts_help">Account\'s port number and transport protocol may be optionally
         given when a new account is created: username@domain[:port][;transport=udp|tcp|tls].  If port
         is given and transport protocol is not given, transport protocol defaults to udp.  If port is

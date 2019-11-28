@@ -18,7 +18,7 @@
         kun puhelun kohde on tyhjä.</li>
         <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
         tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
-        <h2>Rajoitukset</h2>
+        <h2>Tunnetut ongelmat</h2>
         <ul>
             <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
             samanaikaisesti aktiivisia verkkoliittymiä.</li>
@@ -104,6 +104,7 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
+    <string name="new_account">Uusi tili</string>
     <string name="accounts_help">Valinnaisesti voidaan uutta tiliä luotaessa antaa myös porttinumero
         ja tiedonsiirtoprokolla: käyttäjä@domain[:portti][;transport=udp|tcp|tls]. Jos portti on
         annettu, mutta protolollaa ei ole annettu, protokolla on udp. Jos porttia ei ole annettu,
