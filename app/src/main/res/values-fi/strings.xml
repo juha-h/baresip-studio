@@ -105,9 +105,10 @@
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
     <string name="new_account">Uusi tili</string>
-    <string name="accounts_help">Valinnaisesti voidaan uutta tiliä luotaessa antaa myös porttinumero
-        ja tiedonsiirtoprokolla: käyttäjä@domain[:portti][;transport=udp|tcp|tls]. Jos portti on
-        annettu, mutta protolollaa ei ole annettu, protokolla on udp. Jos porttia ei ole annettu,
+    <string name="accounts_help">Uutta tiliä luotaessa voidaan käyttäjän ja domainin lisäksi
+        tarvittaessa antaa myös porttinumero ja tiedonsiirtoprotokolla:
+        käyttäjä@domain[:portti][;transport=udp|tcp|tls]. Jos portti on
+        annettu, mutta protokollaa ei ole annettu, protokolla on udp. Jos porttia ei ole annettu,
         mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).  Jos kumpaakaan ei ole
         annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen rekisteröintipalvelin
         päätellään pelkästään domainin DNS-informaation perusteella.
