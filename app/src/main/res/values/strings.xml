@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
@@ -34,7 +32,6 @@
     <string name="baresip_link" translatable="false">
         <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
     </string>
-
     <!-- Account Activity -->
     <string name="account">Account</string>
     <string name="display_name">Display Name</string>
@@ -99,7 +96,6 @@
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
-
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">New Account</string>
@@ -117,14 +113,12 @@
     <string name="encrypt_password">Encrypt Password</string>
     <string name="decrypt_password">Decrypt Password</string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
-
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
     <string name="incoming_call_from">Call from</string>
     <string name="transfer_request">Call transfer request to</string>
     <string name="message_from">Message from</string>
-
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call">Call</string>
@@ -140,7 +134,6 @@
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
     <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'?</string>
-
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
     <string name="chat_with">Chat with %1$s</string>
@@ -150,7 +143,6 @@
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>
     <string name="message_failed">Failed</string>
-
     <!-- Chats Activity -->
     <string name="chats">Chat History</string>
     <string name="today">Today</string>
@@ -162,7 +154,6 @@
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
     <string name="delete_chats">Delete</string>
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'?</string>
-
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
@@ -221,7 +212,6 @@
     <string name="config_restart">You need to restart baresip in order to activate the new
         settings. Restart now?
     </string>
-
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>
@@ -229,14 +219,12 @@
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
     <string name="send_message">Send Message</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
     <string name="contacts_exceeded">Your maximum number of contacts %1%d has been exceeded.</string>
-
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -258,7 +246,6 @@
     <string name="error">Error</string>
     <string name="help">Help</string>
     <string name="dots" translatable="false">…</string>
-
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -315,8 +302,5 @@
         baresip → Permissions → Storage and that backup file \'baresip.bs\' exists in the folder
         and, if so, you gave correct Decrypt Password.
     </string>
-    <string name="no_calls">You are not able to place or answer calls without Microphone
-        permission.
-    </string>
-
+    <string name="no_calls">You are not able to place or answer calls without microphone permission.</string>
 </resources>
