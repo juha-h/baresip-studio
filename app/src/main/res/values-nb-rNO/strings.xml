@@ -200,4 +200,5 @@
     <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
     <string name="help">Hjelp</string>
     <string name="new_account">Ny konto</string>
+    <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
 </resources>
