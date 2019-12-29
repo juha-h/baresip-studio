@@ -43,7 +43,7 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                     val uri = uriParams.substringAfter("<").substringBefore(">")
                     val params = uriParams.substringAfter(">;")
                     val colorValue = Utils.paramValue(params, "color" )
-                    var color = 0
+                    val color: Int
                     if (colorValue != "")
                         color = colorValue.toInt()
                     else
