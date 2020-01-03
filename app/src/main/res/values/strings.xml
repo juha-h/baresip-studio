@@ -99,7 +99,7 @@
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">New Account</string>
-    <string name="accounts_help">"It is possibly to set account port number and transport protocol as username@domain[:port][;transport=udp|tcp|tls] when creating a new account. UDP is used if only specifying the port. Port 5060 or 5061 (TLS) is used  if only transport protocol is specified. The account\'s registrar (if any) is determined solely based on info from domain DNS if neither port, transport protocol, nor outbound proxy is specified."</string>
+    <string name="accounts_help">It is possible to set account port number and transport protocol as username@domain[:port][;transport=udp|tcp|tls] when creating a new account. UDP is used if only specifying the port. Port 5060 or 5061 (TLS) is used if only transport protocol is specified. The account\'s registrar (if any) is determined solely based on info from domain DNS if neither port, transport protocol, nor outbound proxy is specified.</string>
     <string name="user_domain">user@domain</string>
     <string name="invalid_aor">Invalid user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="account_exists">Account \'%1$s\' already exists.</string>
