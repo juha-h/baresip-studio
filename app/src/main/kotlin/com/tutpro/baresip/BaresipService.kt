@@ -1026,6 +1026,7 @@ class BaresipService: Service() {
     }
 
     private fun cleanService() {
+        abandonAudioFocus()
         uas.clear()
         status.clear()
         callHistory.clear()
