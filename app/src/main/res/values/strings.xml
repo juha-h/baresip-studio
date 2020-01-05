@@ -296,5 +296,5 @@
         baresip → Permissions → Storage and that backup file \'baresip.bs\' exists in the folder
         and, if so, you gave correct Decrypt Password.
     </string>
-    <string name="no_calls">You are not able to place or answer calls without microphone permission.</string>
+    <string name="no_calls">You are not able to place or answer calls without Microphone permission.</string>
 </resources>
