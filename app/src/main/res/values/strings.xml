@@ -173,7 +173,10 @@
     <string name="invalid_listen_address">Invalid Listen Address</string>
     <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
     <string name="prefer_ipv6">Prefer IPv6</string>
-    <string name="prefer_ipv6_help">If checked, baresip uses IPv6 protocol if both IPv4 and IPv6 are available.</string>
+    <string name="prefer_ipv6_help">If checked, baresip uses IPv6
+    protocol if both IPv4 and IPv6 are available. If not checked and
+    both are available, baresip uses IPv4.
+    </string>
     <string name="dns_servers">DNS Servers</string>
     <string name="dns_servers_help">Comma separated list of addresses of DNS servers.  If not given,
         DNS server addresses are obtained dynamically from the system. Each DNS address is of form

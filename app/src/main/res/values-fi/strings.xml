@@ -182,7 +182,11 @@
     </string>
     <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
     <string name="prefer_ipv6">Suosi IPv6-protokollaa</string>
-    <string name="prefer_ipv6_help">Jos merkitty, baresip käyttää IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä.</string>
+    <string name="prefer_ipv6_help">Jos merkitty, baresip käyttää
+    IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä. Jos
+    ei merkitty ja molemmat ovat käytettävissä, baresip käyttää
+    IPv4-protokollaa.
+    </string>
     <string name="dns_servers">DNS-palvelimet</string>
     <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
         osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.
