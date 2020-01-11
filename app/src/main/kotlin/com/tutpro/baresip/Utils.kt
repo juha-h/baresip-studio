@@ -133,10 +133,6 @@ object Utils {
                 checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
     }
 
-    private fun checkIp(ip: String): Boolean {
-        return checkIpV4(ip) || checkIpV6(ip)
-    }
-
     private fun checkUriUser(user: String): Boolean {
         for (c in user)
             if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
@@ -174,7 +170,7 @@ object Utils {
     }
 
     fun checkHostPort(hostPort: String): Boolean {
-        return checkIp(hostPort) || checkDomain(hostPort) ||
+        return checkIpV4(hostPort) || checkIpv6InBrackets(hostPort) || checkDomain(hostPort) ||
                 checkIpPort(hostPort) || checkDomainPort(hostPort)
     }
 
