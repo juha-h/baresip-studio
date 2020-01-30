@@ -20,7 +20,7 @@
     <string name="default_account">Forvalgt konto</string>
     <string name="accounts">Kontoer</string>
     <string name="user_domain">bruker@domene</string>
-    <string name="invalid_aor">Ugyldig bruker@domene \"%1$s\"</string>
+    <string name="invalid_aor">Ugyldig bruker@domene[:port][;transport=udp|tcp|tls] \"%1$s\"</string>
     <string name="account_exists">Kontoen \"%1$s\" finnes allerede.</string>
     <string name="account_allocation_failure">Klarte ikke å tildele ny konto.</string>
     <string name="encrypt_password">Krypter passord</string>
@@ -201,4 +201,5 @@
     <string name="help">Hjelp</string>
     <string name="new_account">Ny konto</string>
     <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
+    <string name="accounts_help">"Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en  ny konto. UDP brukes hvis kun port angis. Port  5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis."</string>
 </resources>
