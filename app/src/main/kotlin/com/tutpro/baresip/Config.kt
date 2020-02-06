@@ -57,14 +57,8 @@ object Config {
             Log.logLevelSet(ll)
         }
 
-        removeVariable("net_interface")
-        
-        removeVariable("net_prefer_ipv6")
-        val preferIpV6 = variable("prefer_ipv6")
-        if (preferIpV6.size == 0) {
-            BaresipService.preferIpV6 = false
-        } else {
-            BaresipService.preferIpV6 = preferIpV6[0] == "yes"
+        if (config.contains("net_interface")) {
+           BaresipService.netInterface = variable("net_interface")[0]
         }
 
         if (!config.contains("call_volume")) {

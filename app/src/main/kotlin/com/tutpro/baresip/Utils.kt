@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
 import android.net.LinkAddress
+import android.net.LinkProperties
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -254,34 +255,46 @@ object Utils {
         return ""
     }
 
-    fun updateLinkAddresses() {
-        val ipV6Addr = findIpV6Address(BaresipService.linkAddresses)
-        if (ipV6Addr != "") {
-            Log.d("Baresip", "Found IPv6 address '$ipV6Addr'")
-            if (Api.net_set_address(ipV6Addr) != 0) {
-                Log.w("Baresip", "Failed to update net address '$ipV6Addr'")
+    private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
+        var updated = false
+        val ipV6Addr = findIpV6Address(linkAddresses)
+        if (ipV6Addr != findIpV6Address(BaresipService.linkAddresses)) {
+            Log.d("Baresip", "Updating IPv6 address to '$ipV6Addr'")
+            if (ipV6Addr != "") {
+                if (Api.net_set_address(ipV6Addr) != 0)
+                    Log.w("Baresip", "Failed to update net address '$ipV6Addr")
             } else {
-                Api.net_set_af(BaresipService.preferIpV6)
+                Api.net_unset_address(Api.AF_INET6)
             }
-        } else {
-            Api.net_unset_address(true)
-            Api.net_set_af(false)
+            updated = true
         }
-        val ipV4Addr = findIpV4Address(BaresipService.linkAddresses)
-        if (ipV4Addr != "") {
-            Log.w("Baresip", "Found IPv4 address '$ipV4Addr'")
-            if (Api.net_set_address(ipV4Addr) != 0) {
-                Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
+        val ipV4Addr = findIpV4Address(linkAddresses)
+        if (ipV4Addr != findIpV4Address(BaresipService.linkAddresses)) {
+            Log.d("Baresip", "Updating IPv4 address to '$ipV4Addr'")
+            if (ipV4Addr != "") {
+                if (Api.net_set_address(ipV4Addr) != 0)
+                    Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
             } else {
-                if (!BaresipService.preferIpV6 || (ipV6Addr == ""))
-                    Api.net_set_af(false)
+                Api.net_unset_address(Api.AF_INET)
             }
-        } else {
-            Api.net_unset_address(false)
-            Api.net_set_af(false)
+            updated = true
         }
-        Api.net_force_change()
-        Api.net_debug()
+        if (updated) {
+            BaresipService.linkAddresses = linkAddresses
+            Api.uag_reset_transp(true,true)
+            Api.net_debug()
+
+        }
+    }
+
+    fun updateLinkProperties(linkProperties: LinkProperties) {
+        if (BaresipService.dynDns && (BaresipService.dnsServers != linkProperties.dnsServers)) {
+            if (Config.updateDnsServers(linkProperties.dnsServers) != 0)
+                Log.w("Baresip", "Failed to update DNS servers '${BaresipService.dnsServers}'")
+            else
+                BaresipService.dnsServers = linkProperties.dnsServers
+        }
+        updateLinkAddresses(linkProperties.linkAddresses)
     }
 
     fun implode(list: List<String>, sep: String): String {

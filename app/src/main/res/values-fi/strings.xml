@@ -89,6 +89,11 @@
         lähteviin puheluihin ja että RTP/SAVP- tai RTP/SAVPF-protokollaa
         käytetään, jos sellaista tarjotaan tulevissa puheluissa.
     </string>
+    <string name="prefer_ipv6_media">Suosi IPv6-mediaprotokollaa</string>
+    <string name="prefer_ipv6_media_help">Jos merkitty, tarjoa IPv6-mediaprotokollaa (mikäli
+        se on käytettävissä), jos puhelun molempien osapuolten tukemaa mediaprotokollaa
+        ei saada automaattisesti selvitettyä.
+    </string>
     <string name="answer_mode">Vastaustapa</string>
     <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan.</string>
     <string name="manual">Manuaalinen</string>
@@ -181,12 +186,6 @@
     osoitteilla.
     </string>
     <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
-    <string name="prefer_ipv6">Suosi IPv6-protokollaa</string>
-    <string name="prefer_ipv6_help">Jos merkitty, baresip käyttää
-    IPv6-protokollaa, mikäli sekä IPv4 että IPv6 ovat käytettävissä. Jos
-    ei merkitty ja molemmat ovat käytettävissä, baresip käyttää
-    IPv4-protokollaa.
-    </string>
     <string name="dns_servers">DNS-palvelimet</string>
     <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
         osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.

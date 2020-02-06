@@ -2,8 +2,13 @@ package com.tutpro.baresip
 
 object Api {
 
+    val AF_UNSPEC = 0
+    val AF_INET = 2
+    val AF_INET6 = 10
+
     external fun audio_codecs(): String
     external fun uag_current_set(uap: String)
+    external fun uag_reset_transp(reg: Boolean, reinvite: Boolean)
     external fun ua_account(ua: String): String
     external fun ua_alloc(uri: String): String
     external fun ua_update_account(ua: String): Int
@@ -15,6 +20,8 @@ object Api {
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
     external fun ua_call_alloc(uap: String, xcallp: String): String
     external fun ua_answer(uap: String, callp: String)
+    external fun ua_set_media_af(uap: String, af: Int)
+    external fun ua_debug(uap: String)
     external fun call_hold(callp: String): Int
     external fun call_unhold(callp: String): Int
     external fun call_connect(callp: String, peer_uri: String): Int
@@ -33,9 +40,7 @@ object Api {
     external fun log_level_set(level: Int)
     external fun net_use_nameserver(servers: String): Int
     external fun net_set_address(ip_addr: String): Int
-    external fun net_unset_address(ipv6: Boolean)
-    external fun net_set_af(ipv6: Boolean): Boolean
-    external fun net_force_change()
+    external fun net_unset_address(af: Int)
     external fun net_debug()
     external fun net_dns_debug()
     external fun module_load(module: String): Int
