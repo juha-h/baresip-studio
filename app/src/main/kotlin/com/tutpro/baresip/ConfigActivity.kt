@@ -19,7 +19,6 @@ class ConfigActivity : AppCompatActivity() {
 
     internal lateinit var autoStart: CheckBox
     internal lateinit var listenAddr: EditText
-    internal lateinit var preferIPv6: CheckBox
     internal lateinit var dnsServers: EditText
     internal lateinit var certificateFile: CheckBox
     internal lateinit var caFile: CheckBox
@@ -32,7 +31,6 @@ class ConfigActivity : AppCompatActivity() {
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
-    private var oldPreferIPv6 = ""
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldCAFile = false
@@ -67,11 +65,6 @@ class ConfigActivity : AppCompatActivity() {
         val laCv = Config.variable("sip_listen")
         oldListenAddr = if (laCv.size == 0) "" else laCv[0]
         listenAddr.setText(oldListenAddr)
-
-        preferIPv6 = findViewById(R.id.PreferIPv6) as CheckBox
-        val piCv = Config.variable("prefer_ipv6")
-        oldPreferIPv6 = if (piCv.size == 0) "no" else piCv[0]
-        preferIPv6.isChecked = oldPreferIPv6 == "yes"
 
         dnsServers = findViewById(R.id.DnsServers) as EditText
         val ddCv = Config.variable("dyn_dns")
@@ -218,15 +211,6 @@ class ConfigActivity : AppCompatActivity() {
                     if (listenAddr != "") Config.addLine("sip_listen $listenAddr")
                     save = true
                     restart = true
-                }
-
-                var preferIPv6String = "no"
-                if (preferIPv6.isChecked) preferIPv6String = "yes"
-                if (oldPreferIPv6 != preferIPv6String) {
-                    Config.replaceVariable("prefer_ipv6", preferIPv6String)
-                    BaresipService.preferIpV6 = preferIPv6String == "yes"
-                    Utils.updateLinkAddresses()
-                    save = true
                 }
 
                 val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
@@ -460,10 +444,6 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.ListenAddressTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.listen_address),
                         getString(R.string.listen_address_help))
-            }
-            findViewById(R.id.PreferIPv6Title) as TextView-> {
-                Utils.alertView(this, getString(R.string.prefer_ipv6),
-                        getString(R.string.prefer_ipv6_help))
             }
             findViewById(R.id.DnsServersTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.dns_servers),

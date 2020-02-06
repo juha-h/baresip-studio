@@ -17,6 +17,7 @@ class Account(val accp: String) {
     var audioCodec = ArrayList<String>()
     var regint = account_regint(accp)
     var mediaEnc = account_mediaenc(accp)
+    var preferIPv6Media = false
     var answerMode = ""
     var vmUri = account_vm_uri(accp)
     var vmNew = 0
@@ -59,6 +60,7 @@ class Account(val accp: String) {
         }
 
         val extra = account_extra(accp)
+        preferIPv6Media = Utils.paramValue(extra,"prefer_ipv6_media") == "yes"
         answerMode = Utils.paramValue(extra,"answer_mode")
         if (answerMode == "") answerMode = "manual"
         callHistory = Utils.paramValue(extra,"call_history") == ""
@@ -112,14 +114,18 @@ class Account(val accp: String) {
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
         var extra = ""
-        if (!callHistory) extra = "call_history=no"
-        if (answerMode == "auto") {
-            if (extra == "")
-                extra = "answer_mode=auto"
-            else
+
+        if (!callHistory)
+            extra += ";call_history=no"
+
+        if (answerMode == "auto")
                 extra += ";answer_mode=auto"
-        }
-        res += ";extra=\"$extra\""
+
+        if (preferIPv6Media)
+                extra += ";prefer_ipv6_media=yes"
+
+        if (extra != "")
+            res += ";extra=\"" + extra.substringAfter(";") + "\""
 
         return res
     }

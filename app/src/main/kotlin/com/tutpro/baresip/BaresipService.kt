@@ -87,9 +87,10 @@ class BaresipService: Service() {
                         super.onAvailable(network)
                         val linkProperties = cm.getLinkProperties(network)
                         Log.i(LOG_TAG, "Network $network is available: '$linkProperties'")
-                        if (activeNetwork == null) {
-                            Log.i(LOG_TAG, "Updating dnsServers and linkAddresses")
-                            activeNetwork = network
+                        activeNetwork = network
+                        if (isServiceRunning) {
+                            Utils.updateLinkProperties(linkProperties)
+                        } else {
                             dnsServers = linkProperties.dnsServers
                             linkAddresses = linkProperties.linkAddresses
                         }
@@ -107,15 +108,7 @@ class BaresipService: Service() {
                                     break
                                 }
                             if (activeNetwork != null) {
-                                val linkProperties = cm.getLinkProperties(activeNetwork)
-                                if (dynDns) {
-                                    dnsServers = linkProperties.dnsServers
-                                    if (Config.updateDnsServers(dnsServers) != 0)
-                                        Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                                }
-                                linkAddresses = linkProperties.linkAddresses
-                                Utils.updateLinkAddresses()
-                                UserAgent.register()
+                                Utils.updateLinkProperties(cm.getLinkProperties(activeNetwork))
                             }
                         } else {
                             Log.d(LOG_TAG, "Network '$network' is lost")
@@ -127,16 +120,14 @@ class BaresipService: Service() {
                         if (!isServiceRunning)
                             return
                         if (network == activeNetwork) {
-                            Log.e(LOG_TAG, "Active network $network link properties changed: " +
+                            Log.d(LOG_TAG, "Active network $network link properties changed: " +
                                     "$linkProperties")
-                            if (dynDns) {
+                            if (isServiceRunning) {
+                                Utils.updateLinkProperties(linkProperties)
+                            } else {
                                 dnsServers = linkProperties.dnsServers
-                                if (Config.updateDnsServers(dnsServers) != 0)
-                                    Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                linkAddresses = linkProperties.linkAddresses
                             }
-                            linkAddresses = linkProperties.linkAddresses
-                            Utils.updateLinkAddresses()
-                            // UserAgent.register()
                         } else {
                             Log.e(LOG_TAG, "Network $network link properties changed: " +
                                     "$linkProperties")
@@ -288,7 +279,8 @@ class BaresipService: Service() {
                 Thread(Runnable { baresipStart(filesPath,
                         Utils.findIpV4Address(linkAddresses),
                         Utils.findIpV6Address(linkAddresses),
-                        preferIpV6) }).start()
+                        "", Api.AF_UNSPEC)
+                        }).start()
 
                 isServiceRunning = true
 
@@ -437,9 +429,11 @@ class BaresipService: Service() {
 
     @Keep
     fun uaAdd(uap: String) {
-        Log.d(LOG_TAG, "uaAdd at BaresipService")
         val ua = UserAgent(uap)
+        Log.d(LOG_TAG, "uaAdd ${ua.account.aor} at BaresipService")
         uas.add(ua)
+        if (ua.account.preferIPv6Media)
+            Api.ua_set_media_af(ua.uap, Api.AF_INET6)
         if (Api.ua_isregistered(uap)) {
             Log.d(LOG_TAG, "Ua ${ua.account.aor} is registered")
             status.add(R.drawable.dot_green)
@@ -456,13 +450,14 @@ class BaresipService: Service() {
 
     @Keep
     fun uaEvent(event: String, uap: String, callp: String) {
-        Log.d(LOG_TAG, "uaEvent got event $event/$uap/$callp")
         if (!isServiceRunning) return
         val ua = UserAgent.find(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "uaEvent did not find ua $uap")
             return
         }
+        Log.d(LOG_TAG, "got uaEvent $event/${ua.account.aor}/$callp")
+
         val aor = ua.account.aor
         var newEvent: String? = null
         val ev = event.split(",")
@@ -829,6 +824,7 @@ class BaresipService: Service() {
         isServiceRunning = false
         if (error == "ua_init") {
             Config.removeVariable("sip_listen")
+            Config.removeVariable("net_interface")
             Config.removeVariable("sip_certificate")
             Config.removeVariable("sip_cafile")
         }
@@ -1042,7 +1038,8 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, preferIpV6: Boolean)
+    external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, netInterface: String,
+                              netAf: Int)
     external fun baresipStop(force: Boolean)
 
     companion object {
@@ -1073,7 +1070,7 @@ class BaresipService: Service() {
         var speakerPhone = false
         var callVolume = 0
         var dynDns = false
-        var preferIpV6 = false
+        var netInterface = ""
         var filesPath = ""
         var downloadsPath = ""
 
@@ -1085,8 +1082,8 @@ class BaresipService: Service() {
         val contacts = ArrayList<Contact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
         val activities = mutableListOf<String>()
-        var dnsServers = listOf<InetAddress>()
         var linkAddresses = listOf<LinkAddress>()
+        var dnsServers = listOf<InetAddress>()
 
     }
 

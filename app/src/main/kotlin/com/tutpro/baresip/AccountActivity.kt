@@ -27,6 +27,7 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var stunServer: EditText
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
+    internal lateinit var ipV6MediaCheck: CheckBox
     internal lateinit var answerMode: String
     internal lateinit var vmUri: EditText
     internal lateinit var defaultCheck: CheckBox
@@ -155,6 +156,9 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        ipV6MediaCheck = findViewById(R.id.PreferIPv6Media) as CheckBox
+        ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
         answerMode = acc.answerMode
         val answerModeSpinner = findViewById(R.id.answerModeSpinner) as Spinner
@@ -377,6 +381,16 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
+                if (ipV6MediaCheck.isChecked != acc.preferIPv6Media) {
+                    acc.preferIPv6Media = ipV6MediaCheck.isChecked
+                    Log.d("Baresip", "New preferIPv6Media is ${acc.preferIPv6Media}")
+                    if (acc.preferIPv6Media)
+                        Api.ua_set_media_af(ua.uap, Api.AF_INET6)
+                    else
+                        Api.ua_set_media_af(ua.uap, Api.AF_UNSPEC)
+                    save = true
+                }
+
                 if (answerMode != acc.answerMode) {
                     acc.answerMode = answerMode
                     Log.d("Baresip", "New answermode is ${acc.answerMode}")
@@ -415,6 +429,8 @@ class AccountActivity : AppCompatActivity() {
                     AccountsActivity.saveAccounts()
                     if (Api.ua_update_account(ua.uap) != 0)
                         Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
+                    //else
+                        //Api.ua_debug(ua.uap)
                 }
 
                 if (regCheck.isChecked) Api.ua_register(ua.uap)
@@ -484,6 +500,10 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.MediaEncTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.media_encryption),
                         getString(R.string.media_encryption_help))
+            }
+            findViewById(R.id.PreferIPv6MediaTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.prefer_ipv6_media),
+                        getString(R.string.prefer_ipv6_media_help))
             }
             findViewById(R.id.AnswerModeTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.answer_mode),
