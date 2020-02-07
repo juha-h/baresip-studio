@@ -82,9 +82,7 @@
             if offered in incoming call.
     </string>
     <string name="prefer_ipv6_media">Prefer IPv6 Media</string>
-    <string name="prefer_ipv6_media_help">If checked, offer to use IPv6 media protocol (if available)
-        when media protocol of peer cannot be automatically determined.
-    </string>
+    <string name="prefer_ipv6_media_help">Offer using IPv6 media protocol (if available) when peer media protocol cannot be automatically determined.</string>
     <string name="answer_mode">Answer Mode</string>
     <string name="answer_mode_help">Selects how incoming calls are answered.</string>
     <string name="manual">Manual</string>
