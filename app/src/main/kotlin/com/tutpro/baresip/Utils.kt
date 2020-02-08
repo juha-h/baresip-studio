@@ -281,9 +281,8 @@ object Utils {
         }
         if (updated) {
             BaresipService.linkAddresses = linkAddresses
-            Api.uag_reset_transp(true,true)
+            Api.uag_reset_transp(true, true)
             Api.net_debug()
-
         }
     }
 
