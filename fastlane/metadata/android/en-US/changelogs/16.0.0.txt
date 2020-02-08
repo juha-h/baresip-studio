@@ -1,0 +1,6 @@
+- Replaced global setting "Prefer IPv6" with account specific "Prefer IPv6 Media" setting.
+- Improved handling of changes in network connectivity.
+- Do not require port in IPv6 outbound URI.
+- Abandoned audio focus also at quit if not already done earlier.
+- Added initial Russian language support.
+- Updated some Norwegian strings.
