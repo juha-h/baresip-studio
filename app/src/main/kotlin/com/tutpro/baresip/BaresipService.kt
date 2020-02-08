@@ -51,7 +51,7 @@ class BaresipService: Service() {
     internal var audioFocused = false
     internal var origCallVolume = -1
     internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
-    internal var activeNetwork: Network? = null
+    internal var activeNetwork = ""
 
     override fun onCreate() {
 
@@ -86,29 +86,49 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         val linkProperties = cm.getLinkProperties(network)
-                        Log.i(LOG_TAG, "Network $network is available: '$linkProperties'")
-                        activeNetwork = network
-                        if (isServiceRunning) {
-                            Utils.updateLinkProperties(linkProperties)
+                        val interfaceName = linkProperties.interfaceName!!
+                        if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
+                                ((Build.VERSION.SDK_INT < 23) &&
+                                        (cm.activeNetworkInfo.toString() ==
+                                        cm.getNetworkInfo(network).toString()))) {
+                            Log.d(LOG_TAG, "Active network $network@$interfaceName " +
+                                    " is available: $linkProperties")
+                            activeNetwork = "$network"
+                            if (isServiceRunning) {
+                                Utils.updateLinkProperties(linkProperties)
+                            } else {
+                                dnsServers = linkProperties.dnsServers
+                                linkAddresses = linkProperties.linkAddresses
+                            }
                         } else {
-                            dnsServers = linkProperties.dnsServers
-                            linkAddresses = linkProperties.linkAddresses
+                            Log.d(LOG_TAG, "Non-active network $network@$interfaceName " +
+                                        " is available: $linkProperties")
                         }
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        if (activeNetwork == network) {
-                            Log.d(LOG_TAG, "Active network '$network' is lost")
-                            activeNetwork = null
+                        if (activeNetwork == "$network") {
+                            Log.d(LOG_TAG, "Currently active network $network is lost")
+                            var newNetwork: Network? = null
                             for (net in cm.allNetworks)
                                 if (net != network) {
-                                    Log.d(LOG_TAG, "New network $net is available")
-                                    activeNetwork = net
-                                    break
+                                    if (((Build.VERSION.SDK_INT >= 23) && (net == cm.activeNetwork)) ||
+                                            ((Build.VERSION.SDK_INT < 23) &&
+                                                    cm.activeNetworkInfo.toString() ==
+                                                    cm.getNetworkInfo(net).toString()))  {
+                                        Log.d(LOG_TAG, "New active network $net is available")
+                                        newNetwork = net
+                                        break
+                                    }
                                 }
-                            if (activeNetwork != null) {
-                                Utils.updateLinkProperties(cm.getLinkProperties(activeNetwork))
+                            if (newNetwork != null) {
+                                val interfaceName = cm.getLinkProperties(newNetwork).interfaceName!!
+                                val linkProperties = cm.getLinkProperties(newNetwork)
+                                Log.d(LOG_TAG, "Updating new active network " +
+                                        "$newNetwork@$interfaceName link properties: $linkProperties")
+                                activeNetwork = "$newNetwork"
+                                Utils.updateLinkProperties(cm.getLinkProperties(newNetwork))
                             }
                         } else {
                             Log.d(LOG_TAG, "Network '$network' is lost")
@@ -117,11 +137,14 @@ class BaresipService: Service() {
 
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
-                        if (!isServiceRunning)
-                            return
-                        if (network == activeNetwork) {
-                            Log.d(LOG_TAG, "Active network $network link properties changed: " +
-                                    "$linkProperties")
+                        val interfaceName = cm.getLinkProperties(network).interfaceName!!
+                        if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
+                                ((Build.VERSION.SDK_INT < 23) &&
+                                        (cm.activeNetworkInfo.toString() ==
+                                        cm.getNetworkInfo(network).toString()))) {
+                            Log.d(LOG_TAG, "Active network $network@$interfaceName " +
+                                    " link properties changed: $linkProperties")
+                            activeNetwork = "$network"
                             if (isServiceRunning) {
                                 Utils.updateLinkProperties(linkProperties)
                             } else {
@@ -129,8 +152,8 @@ class BaresipService: Service() {
                                 linkAddresses = linkProperties.linkAddresses
                             }
                         } else {
-                            Log.e(LOG_TAG, "Network $network link properties changed: " +
-                                    "$linkProperties")
+                            Log.e(LOG_TAG, "Network $network@$interfaceName " +
+                                    " link properties changed: $linkProperties")
                         }
                     }
                 }
