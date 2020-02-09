@@ -85,8 +85,8 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Cuentas</string>
-    <string name="user_domain">usuario@dominio[:puerto]</string>
-    <string name="invalid_aor">usuario@dominio[:puerto] «%1$s» no válido</string>
+    <string name="user_domain">usuario@dominio</string>
+    <string name="invalid_aor">"usuario@dominio[:puerto][;transport=udp|tcp|tls]  «%1$s» no válido"</string>
     <string name="account_exists">Ya existe la cuenta «%1$s».</string>
     <string name="account_allocation_failure">Error al asignar la cuenta nueva.</string>
     <string name="encrypt_password">Contraseña de cifrado</string>
