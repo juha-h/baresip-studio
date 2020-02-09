@@ -115,7 +115,6 @@
     <string name="one_new_message">одно новое сообщение</string>
     <string name="one_old_message">одно старое сообщение</string>
     <string name="password">Пароль</string>
-    <string name="prefer_ipv6">Предпочитать IPv6</string>
     <string name="quit">Выход</string>
     <string name="rate">Скорость</string>
     <string name="register">Регистрация</string>
@@ -142,7 +141,6 @@
     <string name="listen_address">Прослушивать адрес</string>
     <string name="outbound_proxies">Исходящие прокси</string>
     <string name="outgoing_call_to_dots">Исходящий вызов на ...</string>
-    <string name="prefer_ipv6_help">Предпочитать IPv6 если доступен IPv4.</string>
     <string name="registering_failed">Регистрация `%1$s` не удалась.</string>
     <string name="restored">Данные приложения восстановлены нужна перезагрузка. Перегрузить?</string>
     <string name="today">Сегодня</string>

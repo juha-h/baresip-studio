@@ -157,8 +157,6 @@
     </string>
     <string name="invalid_listen_address">Dirección de escucha no válida</string>
     <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
-    <string name="prefer_ipv6">Prefiero IPv6</string>
-    <string name="prefer_ipv6_help">Prefiere IPv6 si tanto IPv4 como IPv6 están disponibles.</string>
     <string name="dns_servers">Servidores DNS</string>
     <string name="dns_servers_help">Lista separada por comas de direcciones de servidores DNS. Si no se da,
         Las direcciones del servidor DNS se obtienen dinámicamente del sistema. Cada dirección DNS es de forma

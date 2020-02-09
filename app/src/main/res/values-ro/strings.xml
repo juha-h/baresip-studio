@@ -60,8 +60,6 @@
     <string name="start_automatically">Pornește automat</string>
     <string name="start_automatically_help">Dacă este bifată, baresip pornește automat după (re)pornirea dispozitivului.</string>
     <string name="listen_address">Adresă de conectare</string>
-    <string name="prefer_ipv6">Preferă IPv6</string>
-    <string name="prefer_ipv6_help">Preferă IPv6 atunci când IPv4 și IPv6 sunt disponibile.</string>
     <string name="dns_servers">Servere DNS</string>
     <string name="aec">Anularea acustică a ecoului</string>
     <string name="aec_help">Dacă este bifat, se încearcă eliminarea ecoului în timpul apelurilor.</string>
