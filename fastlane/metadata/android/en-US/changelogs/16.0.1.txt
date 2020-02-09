@@ -1,0 +1,2 @@
+- Re-register UAs when a new active network becomes available or
+  when link properties change even if IP addresses remain the same.
