@@ -297,8 +297,8 @@
     <string name="verify">Verify</string>
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
     <string name="transfer_query">Do you accept to transfer call to \'%1$s\'?</string>
-    <string name="call_failed">Call failed</string>
-    <string name="call_closed">Call closed</string>
+    <string name="call_failed">Call failed.</string>
+    <string name="call_closed">Call is closed.</string>
     <string name="call_not_secure">This call is NOT secure!</string>
     <string name="peer_not_verified">This call is SECURE, but peer is NOT verified!</string>
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
