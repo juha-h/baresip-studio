@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">About baresip</string>
     <string name="about_text">
@@ -23,9 +21,6 @@
         El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         donde también se pueden informar problemas.
         ]]>
-    </string>
-    <string name="baresip_link" translatable="false">
-        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
     </string>
 
     <!-- Account Activity -->
@@ -65,7 +60,6 @@
         El valor predeterminado de fábrica es \'stun.l.google.com:19302\', que apunta al servidor público de Google STUN.
         Nombre de usuario y contraseña actualmente no son compatibles.
     </string>
-    <string name="stun_server_default" translatable="false">stun.l.google.com:19302</string>
     <string name="media_encryption">Encriptación de Media</string>
     <string name="media_encryption_help">Selecciona el protocolo de cifrado de transporte de medios (si lo hay).
 \n • ZRTP (recomendado) significa que la negociación de cifrado de medios de extremo a extremo de ZRTP se intenta después que
@@ -156,7 +150,6 @@
         todas las direcciones disponibles.
     </string>
     <string name="invalid_listen_address">Dirección de escucha no válida</string>
-    <string name="_0_0_0_0_5060" translatable="false">0.0.0.0:5060</string>
     <string name="dns_servers">Servidores DNS</string>
     <string name="dns_servers_help">Lista separada por comas de direcciones de servidores DNS. Si no se da,
         Las direcciones del servidor DNS se obtienen dinámicamente del sistema. Cada dirección DNS es de forma
@@ -178,10 +171,8 @@
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
-    <string name="_28000" translatable="false">28000</string>
     <string name="opus_packet_loss">Opus-pérdida de paquetes esperada</string>
     <string name="opus_packet_loss_help">Porcentaje esperado de pérdida de paquetes de transmisión de audio Opus, de 0 a 100. Por defecto 0, desactiva Opus Forward Error Correction (FEC).</string>
-    <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Opus bitrate inválido</string>
     <string name="invalid_opus_packet_loss">Porcentaje de pérdida de paquetes opus no válido</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
@@ -223,14 +214,12 @@
     <string name="deny">Denegar</string>
     <string name="user_id">ID Usuario</string>
     <string name="password">Clave</string>
-    <string name="sip_uri" translatable="false">SIP URI</string>
     <string name="add">Agregar</string>
     <string name="delete">Borrar</string>
     <string name="edit">Editar</string>
     <string name="send">Enviar</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-    <string name="dots" translatable="false">…</string>
 
     <!-- Main Activity -->
 	<string name="backup">Copia de Seguridad</string>
