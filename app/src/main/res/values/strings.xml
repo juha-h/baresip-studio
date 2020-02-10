@@ -307,7 +307,7 @@
     <string name="unverify">Unverify</string>
     <string name="backed_up">Application data backed up to Download folder file \'baresip.bs\'.</string>
     <string name="backup_failed">Failed to back up application data to Download folder file
-        \'baresip.bs\'. Check Apps → baresip → Permissions → Storage</string>
+        \'baresip.bs\'. Check Apps → baresip → Permissions → Storage.</string>
     <string name="restored">Application data restored. baresip needs to be restarted.
         Restart now?
     </string>
