@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">baresip</string>
     <string name="about">О программе</string>
     <string name="add">Добавить</string>
     <string name="add_contact">Добавить контакт</string>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">baresip</string>
-
     <!-- About Activity -->
     <string name="about_title">Относно baresip</string>
     <string name="about_text">
@@ -23,9 +21,6 @@
         Изходният код е достъпен на адрес <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         където също могат да се докладват проблеми.
         ]]>
-    </string>
-    <string name="baresip_link" translatable="false">
-        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
     </string>
 
     <!-- Account Activity -->
@@ -63,7 +58,6 @@
 	<string name="stun_server_help">STUN сървър на хост на формуляра [: port]. 
 		Фабричната стойност по подразбиране е \'stun.l.google.com:19302\', сочещи към обществен сървър на Google STUN. 
 		В момента потребителското име и паролата не се поддържат. </string>
-	<string translatable="false" name="stun_server_default">stun.l.google.com:19302</string>
 	<string name="media_encryption">Шифроване на медиите</string>
 	<string name="media_encryption_help">Избира протокол за криптиране на медийния транспорт (ако има такъв). 
 \n • ZRTP (препоръчително) означава, че след изпробване на преговорите за криптиране на медиите от край до край ZRTP 
@@ -151,7 +145,6 @@
 		Ако се остави празно (фабрично по подразбиране), baresip ще слуша на порт 5060 от всички налични адреси. 
 	</string>
 	<string name="invalid_listen_address">Невалиден адрес за слушане</string>
-	<string translatable="false" name="_0_0_0_0_5060">0.0.0.0:5060</string>
 	<string name="dns_servers">DNS сървъри</string>
 	<string name="dns_servers_help">Списък разделен със запетая на адреси на DNS сървъри. Ако не е зададено, 
 		адресите на DNS сървъра се получават динамично от системата. Всеки DNS адрес е във форма \'ip:port\' 
@@ -176,12 +169,10 @@
 	<string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.
 	</string>
-	<string translatable="false" name="_28000">28000</string>
 	<string name="opus_packet_loss">Очаквана загуба на пакети Opus</string>
 	<string name="opus_packet_loss_help">Очакван процент загуба на пакет от аудио поток на Opus, от 0–100. 
 		По подразбиране 0 изключване на Opus Forward Error Correction (FEC).
 	</string>
-	<string translatable="false" name="_0">0</string>
 	<string name="invalid_opus_bitrate">Невалиден битрейт на Opus</string>
 	<string name="invalid_opus_packet_loss">Невалиден процент загуба на пакет Opus</string>
 	<string name="ice_lite_mode">ICE Lite режим</string>
@@ -225,14 +216,12 @@
 	<string name="deny">отказвам</string>
 	<string name="user_id">Потребителско Име</string>
 	<string name="password">Парола</string>
-	<string translatable="false" name="sip_uri">SIP URI</string>
 	<string name="add">Добави</string>
 	<string name="delete">Изтрий</string>
 	<string name="edit">Редактиране</string>
 	<string name="send">Изпращам</string>
 	<string name="status">Статус</string>
 	<string name="error">Грешка</string>
-	<string translatable="false" name="dots">…</string>
 
 <!-- Main Activity -->
 	<string name="backup">Създай Резервно копие</string>
