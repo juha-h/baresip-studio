@@ -299,11 +299,13 @@ class BaresipService: Service() {
                 CallHistory.restore()
                 Message.restore()
 
-                Thread(Runnable { baresipStart(filesPath,
-                        Utils.findIpV4Address(linkAddresses),
-                        Utils.findIpV6Address(linkAddresses),
-                        "", Api.AF_UNSPEC)
-                        }).start()
+                val ipV4Addr = Utils.findIpV4Address(linkAddresses)
+                val ipV6Addr = Utils.findIpV6Address(linkAddresses)
+                if ((ipV4Addr == "") && (ipV6Addr == ""))
+                    Log.w(LOG_TAG, "Starting baresip without IP addresses")
+                Thread(Runnable { baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
+                        Api.AF_UNSPEC)
+                }).start()
 
                 isServiceRunning = true
 
