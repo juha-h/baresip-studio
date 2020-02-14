@@ -91,7 +91,7 @@ class BaresipService: Service() {
                                 ((Build.VERSION.SDK_INT < 23) &&
                                         (cm.activeNetworkInfo.toString() ==
                                         cm.getNetworkInfo(network).toString()))) {
-                            Log.d(LOG_TAG, "Active network $network@$interfaceName " +
+                            Log.i(LOG_TAG, "Active network $network@$interfaceName " +
                                     " is available: $linkProperties")
                             activeNetwork = "$network"
                             if (isServiceRunning) {
@@ -101,7 +101,7 @@ class BaresipService: Service() {
                                 linkAddresses = linkProperties.linkAddresses
                             }
                         } else {
-                            Log.d(LOG_TAG, "Non-active network $network@$interfaceName " +
+                            Log.i(LOG_TAG, "Non-active network $network@$interfaceName " +
                                         " is available: $linkProperties")
                         }
                     }
@@ -152,7 +152,7 @@ class BaresipService: Service() {
                                 linkAddresses = linkProperties.linkAddresses
                             }
                         } else {
-                            Log.e(LOG_TAG, "Network $network@$interfaceName " +
+                            Log.d(LOG_TAG, "Network $network@$interfaceName " +
                                     " link properties changed: $linkProperties")
                         }
                     }
