@@ -1420,7 +1420,7 @@ Java_com_tutpro_baresip_Api_contacts_1remove(JNIEnv *env, jobject thiz) {
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint level) {
     const enum log_level native_level = (enum log_level)level;
-    LOGD("seting log level '%u'\n", native_level);
+    LOGD("setting log level to '%u'\n", native_level);
     log_level_set(native_level);
 }
 
