@@ -1,0 +1,2 @@
+- Tillagt støtte for G.726-kodek.
+- Forbedret prioritetsrang for forvalgt kodek.

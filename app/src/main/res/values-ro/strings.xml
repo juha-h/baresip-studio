@@ -23,7 +23,7 @@
     <string name="default_account_help">Dacă este bifată, acest cont este selectat atunci când baresip este pornit.</string>
     <string name="accounts">Conturi</string>
     <string name="user_domain">utilizator@domeniu</string>
-    <string name="invalid_aor">utilizator@domeniu \'%1$s\' este invalid</string>
+    <string name="invalid_aor">utilizator@domeniu[:port][;transport=udp|tcp|tls] \'%1$s\' este invalid</string>
     <string name="account_exists">Contul \'%1$s\' exista deja.</string>
     <string name="account_allocation_failure">Nu s-a putut aloca un cont nou.</string>
     <string name="encrypt_password">Parolă criptare</string>
@@ -157,4 +157,12 @@
     <string name="manual">Manual</string>
     <string name="auto">Automat</string>
     <string name="restart">Repornire</string>
+    <string name="opus_bit_rate_help">Rata medie maximă de biți utilizată de fluxul audio Opus. Valorile valide sunt 6000-510000. Valoarea implicită din fabrică este 28000.</string>
+    <string name="delete_history">Șterge</string>
+    <string name="disable_history">Dezactivează</string>
+    <string name="enable_history">Activează</string>
+    <string name="delete_chats">Şterge</string>
+    <string name="backup">Copie de rezervă</string>
+    <string name="restore">Restaurare</string>
+    <string name="audio_modules_help">Codecurile audio furnizate de modulele bifate sunt disponibile pentru utilizare de către conturi.</string>
 </resources>

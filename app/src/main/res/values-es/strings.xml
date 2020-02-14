@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- About Activity -->
-    <string name="about_title">About baresip</string>
+    <string name="about_title">Acerca de Baresip</string>
     <string name="about_text">
         <![CDATA[
         <h1>Agente de usuario SIP basado en la biblioteca Baresip</h1>
@@ -22,11 +21,10 @@
         donde también se pueden informar problemas.
         ]]>
     </string>
-
     <!-- Account Activity -->
     <string name="account">Cuenta</string>
-    <string name="display_name">Nombre para Mostrar</string>
-    <string name="your_name">Su Nombre</string>
+    <string name="display_name">Nombre para mostrar</string>
+    <string name="your_name">Su nombre</string>
     <string name="display_name_help">Nombre (si lo hay) utilizado en el URI de origen de las solicitudes salientes.</string>
     <string name="authentication_username">Nombre de usuario de autenticación</string>
     <string name="authentication_username_help">Nombre de usuario de autenticación si lo requiere el proxy saliente.</string>
@@ -48,7 +46,7 @@
     <string name="register_help">Si está marcado, el registro está habilitado y las solicitudes de REGISTRO se envían a
         Intervalos de 12 minutos.
     </string>
-    <string name="audio_codecs">Codecs de Audio</string>
+    <string name="audio_codecs">Códecs de audio</string>
     <string name="audio_codecs_help">Lista de códecs de audio compatibles en orden de prioridad.</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selecciona el protocolo transversal de NAT media (si lo hay). Las posibles opciones son STUN
@@ -60,7 +58,7 @@
         El valor predeterminado de fábrica es \'stun.l.google.com:19302\', que apunta al servidor público de Google STUN.
         Nombre de usuario y contraseña actualmente no son compatibles.
     </string>
-    <string name="media_encryption">Encriptación de Media</string>
+    <string name="media_encryption">Cifrado de medios</string>
     <string name="media_encryption_help">Selecciona el protocolo de cifrado de transporte de medios (si lo hay).
 \n • ZRTP (recomendado) significa que la negociación de cifrado de medios de extremo a extremo de ZRTP se intenta después que
             la llamada ha sido establecida.
@@ -71,61 +69,51 @@
 \n • SRTP significa que RTP / AVP se ofrece en llamadas salientes y que se utiliza RTP / SAVP o RTP / SAVPF
             si se ofrece en llamada entrante.
     </string>
-    <string name="answer_mode">Modo de Contestación</string>
+    <string name="answer_mode">Modo de contestación</string>
     <string name="answer_mode_help">Selecciona cómo se contestan las llamadas entrantes.</string>
     <string name="manual">Manual</string>
     <string name="auto">Automático</string>
     <string name="voicemail_uri">URI de correo de voz</string>
-    <string name="voicemain_uri_help">SIP URI para verificar los mensajes de correo de voz. Si se deja vacío, correo de voz
-        los mensajes (Indicaciones de mensaje en espera) no están suscritos.
-    </string>
+    <string name="voicemain_uri_help">URI de SIP para comprobar los mensajes de correo de voz. Si se deja vacío, no se suscribirá a los mensajes de correo de voz (indicaciones de mensaje en espera).</string>
     <string name="default_account">Cuenta predeterminada</string>
     <string name="default_account_help">Si está marcada, esta cuenta se selecciona cuando se inicia baresip.
     </string>
-
     <!-- Accounts Activity -->
     <string name="accounts">Cuentas</string>
     <string name="user_domain">usuario@dominio</string>
-    <string name="invalid_aor">Usuario inválido@dominio \'%1$s\'</string>
-    <string name="account_exists">La cuena \'%1$s\' ya existe.</string>
-    <string name="account_allocation_failure">"Error al asignar nueva cuenta.</string>
-    <string name="encrypt_password">Contraseña de Cifrado</string>
-    <string name="decrypt_password">Descifrar con contraseña</string>
-    <string name="delete_account">¿Quieres eliminar la cuenta? \'%1$s\'?</string>
-
+    <string name="invalid_aor">"usuario@dominio[:puerto][;transport=udp|tcp|tls]  «%1$s» no válido"</string>
+    <string name="account_exists">Ya existe la cuenta «%1$s».</string>
+    <string name="account_allocation_failure">Error al asignar la cuenta nueva.</string>
+    <string name="encrypt_password">Contraseña de cifrado</string>
+    <string name="decrypt_password">Contraseña para descifrar</string>
+    <string name="delete_account">¿Quiere eliminar la cuenta «%1$s»\?</string>
     <!-- Baresip Service -->
     <string name="answer">Contestar</string>
     <string name="reject">Rechazar</string>
     <string name="incoming_call_from">Llamada de</string>
     <string name="transfer_request">Solicitud de transferencia de llamada a</string>
     <string name="message_from">Mensaje de</string>
-
     <!-- Calls Activity -->
     <string name="call_history">Historial de llamadas</string>
     <string name="call">Llamada</string>
     <string name="calls_calls">llamadas</string>
     <string name="calls_call">llamar</string>
-    <string name="calls_call_message_question">¿Quieres llamar o enviar un mensaje a \'%1$s\'?</string>
-    <string name="calls_add_delete_question">¿Quieres agregar \'%1$s\' a contactos o eliminar
-        %2$s del historial de llamadas?
-    </string>
-    <string name="calls_delete_question">Quieres borrar \'%1$s\' %2$s del historial de llamadas?
-    </string>
+    <string name="calls_call_message_question">¿Quiere llamar o enviar un mensaje a «%1$s»\?</string>
+    <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos o eliminar %2$s del historial de llamadas\?</string>
+    <string name="calls_delete_question">¿Quiere eliminar «%1$s» %2$s del historial de llamadas\?</string>
     <string name="delete_history">Eliminar</string>
-    <string name="disable_history">Inhabilitar</string>
-    <string name="enable_history">Habilitar</string>
-	<string name="delete_history_alert">¿Desea eliminar el historial de llamadas de la cuenta \'%1$s\'?</string>
-
+    <string name="disable_history">Desactivar</string>
+    <string name="enable_history">Activar</string>
+    <string name="delete_history_alert">¿Quiere eliminar el historial de llamadas de la cuenta «%1$s»\?</string>
     <!-- Chat Activity -->
     <string name="chat">Mensajes de chat</string>
     <string name="chat_with">Chatear con %1$s</string>
-    <string name="new_message">Nuevo mensaje</string>
-    <string name="long_message_question">¿Desea eliminar el mensaje o agregar un par \'%1$s\' a los contactos?</string>
-    <string name="short_message_question">¿Quieres borrar el mensaje?</string>
-    <string name="add_contact">Agregar contacto</string>
+    <string name="new_message">Mensaje nuevo</string>
+    <string name="long_message_question">¿Quiere eliminar el mensaje o añadir el par «%1$s» a los contactos\?</string>
+    <string name="short_message_question">¿Quiere eliminar el mensaje\?</string>
+    <string name="add_contact">Añadir contacto</string>
     <string name="sending_failed">Envío de mensaje fallido</string>
     <string name="message_failed">Ha fallado</string>
-
     <!-- Chats Activity -->
     <string name="chats">Historial de chat</string>
     <string name="today">Hoy</string>
@@ -134,15 +122,14 @@
     <string name="invalid_chat_peer_uri">URI de SIP no válido</string>
     <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o
         agregar pares a los contactos?</string>
-    <string name="short_chat_question">¿Quieres eliminar el chat con \'%1$s\'?</string>
+    <string name="short_chat_question">¿Quiere eliminar el chat con «%1$s»\?</string>
     <string name="delete_chats">Eliminar</string>
-	<string name="delete_chats_alert">¿Quieres eliminar el historial de chat de la cuenta \'%1$s\'?</string>
-
+    <string name="delete_chats_alert">¿Quiere eliminar el historial de chat de la cuenta «%1$s»\?</string>
     <!-- Config Activity -->
     <string name="configuration">Configuración</string>
     <string name="start_automatically">Comenzar automáticamente</string>
     <string name="start_automatically_help">Si está marcado, baresip se inicia automáticamente después de que el dispositivo se (re)inicia.</string>
-    <string name="listen_address">Escuchar dirección</string>
+    <string name="listen_address">Dirección de escucha</string>
     <string name="listen_address_help">Dirección IP y puerto de formulario \'address:port\' en el que escucha baresip
         para solicitudes SIP entrantes. Si la dirección IP es una dirección IPv6, debe escribirse dentro
         soportes []. La dirección IPv4 0.0.0.0 o la dirección IPv6 [::] hace que la escucha de baresip sea
@@ -157,23 +144,23 @@
         también se da puerto, IP debe
         estar escrito entre corchetes []. Como ejemplo, lista \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
         apunta a direcciones IPv4 e IPv6 de servidores DNS públicos de Google.</string>
-    <string name="invalid_dns_servers">Servidores DNS inválidos</string>
+    <string name="invalid_dns_servers">Servidores DNS no válidos</string>
     <string name="failed_to_set_dns_servers">Error al establecer servidores DNS</string>
-    <string name="tls_certificate_file">Archivo de CERTIFICADO TLS</string>
+    <string name="tls_certificate_file">Archivo de certificado TLS</string>
     <string name="tls_certificate_file_help">Si está marcado, presente \'cert.pem\' conteniendo
         el certificado TLS y la clave privada de esta instancia de baresip se han cargado o se cargarán desde
         Descargar directorio Por razones de seguridad, elimine el archivo después de cargarlo.</string>
-    <string name="tls_ca_file">Archivo TLS CA</string>
+    <string name="tls_ca_file">Archivo de CA de TLS</string>
     <string name="tls_ca_file_help">Si está marcado, presente \'ca_certs.crt\' que contiene certificados TLS
         de autoridades de certificación se ha cargado o se cargará desde el directorio de descargas.</string>
     <string name="aec">Cancelación de eco acústico</string>
     <string name="aec_help">Si está marcada, se intenta la cancelación del eco en el audio de la llamada.</string>
-    <string name="opus_bit_rate">Opus Bit Rate</string>
+    <string name="opus_bit_rate">Tasa de bits de Opus</string>
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
-    <string name="opus_packet_loss">Opus-pérdida de paquetes esperada</string>
+    <string name="opus_packet_loss">Pérdida de paquetes de Opus esperada</string>
     <string name="opus_packet_loss_help">Porcentaje esperado de pérdida de paquetes de transmisión de audio Opus, de 0 a 100. Por defecto 0, desactiva Opus Forward Error Correction (FEC).</string>
-    <string name="invalid_opus_bitrate">Opus bitrate inválido</string>
+    <string name="invalid_opus_bitrate">Tasa de bits de Opus no válida</string>
     <string name="invalid_opus_packet_loss">Porcentaje de pérdida de paquetes opus no válido</string>
     <string name="ice_lite_mode">ICE Lite Mode</string>
     <string name="ice_lite_mode_help">Si está marcado, se utiliza el modo ICE Lite.</string>
@@ -181,53 +168,49 @@
     <string name="default_call_volume_help">Si está configurado, el volumen de audio predeterminado de la llamada en escala 1–10.</string>
     <string name="debug">Depurar</string>
     <string name="debug_help">Proporciona depuración y disponibilidad de mensajes de registro a nivel de información en Logcat.</string>
-    <string name="reset_config">Restablecer los valores predeterminados de fábrica</string>
+    <string name="reset_config">Restablecer los valores de fábrica</string>
     <string name="reset_config_help">Si está marcado, la configuración se restablece
         a los valores predeterminados de fábrica.</string>
-    <string name="read_cert_error">Error al leer el archivo \'cert.pem\' desde el directorio de descargas.</string>
+    <string name="read_cert_error">Falló la lectura del archivo «cert.pem» desde el directorio Descargas.</string>
     <string name="read_ca_certs_error">Error al leer el archivo \'ca_certs.crt\' desde el directorio de descargas.</string>
-
     <!-- Contact Activity -->
     <string name="contact">Contacto</string>
-    <string name="new_contact">Nuevo Contacto</string>
+    <string name="new_contact">Contacto nuevo</string>
     <string name="contact_name">Nombre</string>
-    <string name="invalid_contact">Nombre de contacto inválido \'%1$s\'</string>
-    <string name="contact_already_exists">El Contacto \'%1$s\' ya existe.</string>
+    <string name="invalid_contact">El nombre de contacto «%1$s» no es válido</string>
+    <string name="contact_already_exists">Ya existe el contacto «%1$s».</string>
     <string name="invalid_contact_uri">URI de SIP no válido</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Contactos</string>
     <string name="contact_action_question">¿Quieres llamar o enviar un mensaje a \'%1$s\'?</string>
     <string name="send_message">Enviar mensaje</string>
-    <string name="contact_delete_question">¿Quieres eliminar el contacto? \'%1$s\'?</string>
+    <string name="contact_delete_question">¿Quiere eliminar el contacto «%1$s»\?</string>
     <string name="contacts_exceeded">Su número máximo de contactos %1%d se ha excedido.</string>
-
     <!-- Generic -->
     <string name="alert">Alerta</string>
-    <string name="info">Info</string>
+    <string name="info">Información</string>
     <string name="notice">Aviso</string>
     <string name="cancel">Cancelar</string>
-    <string name="ok">OK</string>
-    <string name="yes">Si</string>
+    <string name="ok">Aceptar</string>
+    <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="accept">Aceptar</string>
     <string name="deny">Denegar</string>
-    <string name="user_id">ID Usuario</string>
-    <string name="password">Clave</string>
-    <string name="add">Agregar</string>
-    <string name="delete">Borrar</string>
+    <string name="user_id">Id. de usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="add">Añadir</string>
+    <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
     <string name="send">Enviar</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-
     <!-- Main Activity -->
-	<string name="backup">Copia de Seguridad</string>
+    <string name="backup">Copia de respaldo</string>
     <string name="restore">Restaurar</string>
     <string name="about">Acerca de</string>
     <string name="restart">Reiniciar</string>
     <string name="quit">Salir</string>
-    <string name="outgoing_call_to_dots">Llamada saliente a …</string>
+    <string name="outgoing_call_to_dots">Llamada saliente a…</string>
     <string name="incoming_call_from_dots">Llamada entrante de …</string>
     <string name="transferring_call_to_dots">Transfiriendo llamada a …</string>
     <string name="invalid_sip_uri">URI de SIP no válido</string>
@@ -237,27 +220,27 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Información de llamada</string>
     <string name="duration">Duración</string>
-    <string name="codecs">Codecs</string>
-    <string name="rate">Rate</string>
+    <string name="codecs">Códecs</string>
+    <string name="rate">Tasa</string>
     <string name="voicemail">Mensaje de voz</string>
     <string name="voicemail_messages">Mensajes de correo de voz</string>
-    <string name="you_have">Tienes</string>
-    <string name="one_new_message">un nuevo mensaje</string>
-    <string name="new_messages">nuevos mensajes</string>
-    <string name="one_old_message">un viejo mensaje</string>
+    <string name="you_have">Tiene</string>
+    <string name="one_new_message">un mensaje nuevo</string>
+    <string name="new_messages">mensajes nuevos</string>
+    <string name="one_old_message">un mensaje antiguo</string>
     <string name="old_messages">mensajes antiguos</string>
     <string name="and">y</string>
-    <string name="no_messages">No tienes mensajes</string>
+    <string name="no_messages">No tiene mensajes</string>
     <string name="listen">Escuchar</string>
     <string name="messages">Mensajes</string>
     <string name="dialpad">Teclado</string>
-    <string name="call_already_active">Ya tienes una llamada activa.</string>
+    <string name="call_already_active">Ya tiene una llamada activa.</string>
     <string name="start_failed">Baresip no pudo iniciar. Esto puede deberse a una dirección de escucha no válida
         o archivo TLS. Han sido reiniciados. Reiniciar baresip.</string>
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
     <string name="verify">Verificar</string>
     <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">¿Aceptas transferir la llamada a \'%1$s\'?</string>
+    <string name="transfer_query">¿Acepta transferir la llamada a «%1$s»\?</string>
     <string name="call_failed">Llamada fallida</string>
     <string name="call_closed">Llamada cerrada</string>
     <string name="call_not_secure">¡Esta llamada NO es segura!</string>
@@ -265,14 +248,13 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-    <string name="backed_up">Datos de la aplicación respaldados en carpeta Descargar \'baresip.bs\'.</string>
-    <string name="backup_failed">Error al hacer una copia de seguridad de los datos de la aplicación para el la carpeta Descargar
-        \'baresip.bs\'. Chequear Apps → baresip → Permisos → Almacenamiento</string>
-    <string name="restored">Datos de la aplicación restaurados. Baresip necesita ser reiniciado.
-        ¿Reiniciar ahora?
-    </string>
-    <string name="restore_failed">Error al restaurar los datos de la aplicación desde la carpeta de descargas. Cheque Apps →
-        baresip → Permisos → Almacenamiento y el archivo de la copia de seguridad \'baresip.bs\' existe en la carpeta
-        y, si es así, proporcionó la contraseña de descifrado correcta.
-    </string>
+    <string name="backed_up">Se respaldaron los datos de la aplicación en el archivo de la carpeta Descargas «baresip.bs».</string>
+    <string name="backup_failed">Falló la creación de la copia de respaldo de los datos de la aplicación en el archivo «baresip.bs» en la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento</string>
+    <string name="restored">Se restauraron los datos de la aplicación. Baresip necesita reiniciarse. ¿Quiere reiniciar ahora\?</string>
+    <string name="restore_failed">Falló la restauración de los datos de la aplicación desde la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento y si existe el archivo de la copia de respaldo «baresip.bs» en la carpeta; si es así, proporcione la contraseña de descifrado correcta.</string>
+    <string name="config_restart">Es necesario reiniciar Baresip para que surta efecto la configuración nueva. ¿Quiere reiniciar ahora\?</string>
+    <string name="audio_modules_title">Módulos de audio</string>
+    <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>
+    <string name="failed_to_load_module">Falló la carga del módulo.</string>
+    <string name="no_calls">No es posible hacer o responder llamadas sin el permiso Micrófono.</string>
 </resources>
