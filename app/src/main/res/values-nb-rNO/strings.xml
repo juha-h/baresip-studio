@@ -20,7 +20,7 @@
     <string name="default_account">Forvalgt konto</string>
     <string name="accounts">Kontoer</string>
     <string name="user_domain">bruker@domene</string>
-    <string name="invalid_aor">Ugyldig bruker@domene \"%1$s\"</string>
+    <string name="invalid_aor">Ugyldig bruker@domene[:port][;transport=udp|tcp|tls] \"%1$s\"</string>
     <string name="account_exists">Kontoen \"%1$s\" finnes allerede.</string>
     <string name="account_allocation_failure">Klarte ikke å tildele ny konto.</string>
     <string name="encrypt_password">Krypter passord</string>
@@ -183,4 +183,23 @@
     <string name="manual">Manuell</string>
     <string name="auto">Automatisk</string>
     <string name="restart">Programomstart</string>
+    <string name="delete_history">Slett</string>
+    <string name="delete_history_alert">Ønsker du virkelig å slette samtalehistorikk for kontoen «%1$s»\?</string>
+    <string name="delete_chats">Slett</string>
+    <string name="delete_chats_alert">Ønsker du å slette sludrehistorikken for kontoen «%1$s»\?</string>
+    <string name="config_restart">Ønsker du å starte baresip på ny for å aktivere de nye innstillingene nå\?</string>
+    <string name="backup">Sikkerhetskopier</string>
+    <string name="restore">Gjenopprett</string>
+    <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \"baresip.bs\".</string>
+    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'baresip.bs\'. Sjekk \"Programmer → baresip → Tilganger → Lagring</string>
+    <string name="restored">Programdata gjenopprettet. Start baresip på ny nå\?</string>
+    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \"baresip.bs\" finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
+    <string name="audio_modules_title">Lydmoduler</string>
+    <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
+    <string name="help">Hjelp</string>
+    <string name="new_account">Ny konto</string>
+    <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
+    <string name="accounts_help">"Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en  ny konto. UDP brukes hvis kun port angis. Port  5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis."</string>
+    <string name="prefer_ipv6_media">Foretrekk IPv6-media</string>
+    <string name="prefer_ipv6_media_help">Tilby bruk av IPv6-mediaprotokoll (hvis tilgjengelig) når likemanns mediaprotokoll ikke kan bestemmes.</string>
 </resources>
