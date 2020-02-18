@@ -587,22 +587,16 @@ class MainActivity : AppCompatActivity() {
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok)
                 ) { dialog, _ ->
                     dialog.dismiss()
-                    quitTimer.cancel()
-                    finishAndRemoveTask()
-                    System.exit(0)
+                    //quitTimer.cancel()
+                    //finishAndRemoveTask()
+                    //System.exit(0)
                 }
                 alertDialog.show()
+                return
             } else {
                 quitTimer.cancel()
                 finishAndRemoveTask()
-                if (restart) {
-                    Log.d("Baresip", "Trigger restart")
-                    val restartActivity = Intent(applicationContext, MainActivity::class.java)
-                    val restartIntent = PendingIntent.getActivity(applicationContext,
-                            RESTART_REQUEST_CODE, restartActivity, PendingIntent.FLAG_CANCEL_CURRENT)
-                    val am = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    am.set(AlarmManager.RTC,System.currentTimeMillis() + 1000, restartIntent)
-                }
+                if (restart) reStart()
                 System.exit(0)
                 return
             }
@@ -839,10 +833,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*override fun onStop() {
-        super.onStop()
-        Log.d("Baresip", "Main stopped")
-    }*/
+    private fun reStart() {
+        Log.d("Baresip", "Trigger restart")
+        val restartActivity = Intent(applicationContext, MainActivity::class.java)
+        val restartIntent = PendingIntent.getActivity(applicationContext,
+                RESTART_REQUEST_CODE, restartActivity, PendingIntent.FLAG_CANCEL_CURRENT)
+        val am = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.set(AlarmManager.RTC,System.currentTimeMillis() + 1000, restartIntent)
+    }
 
     override fun onBackPressed() {
         moveTaskToBack(true)
@@ -937,6 +935,7 @@ class MainActivity : AppCompatActivity() {
                 quitTimer.start()
             } else {
                 finishAndRemoveTask()
+                if (reStart) reStart()
                 System.exit(0)
             }
         }
