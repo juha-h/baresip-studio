@@ -1,0 +1,5 @@
+- Do not re-register accounts when link properties change, but IP addresses
+  remain the same.
+- If baresip doeds not start, let the user change the Settings that might
+  have caused the problem.
+- String updates and fixes.
