@@ -55,11 +55,14 @@ class UserAgent (val uap: String) {
             return null
         }
 
-        fun register() {
+        fun register(reRegister: Boolean) {
             for (ua in BaresipService.uas) {
-                if (ua.account.regint > 0)
+                if (ua.account.regint > 0) {
+                    if ((reRegister == false) && Api.ua_isregistered(ua.uap))
+                        continue
                     if (Api.ua_register(ua.uap) != 0)
                         Log.d("Baresip", "Failed to register ${ua.account.aor}")
+                }
             }
         }
     }
