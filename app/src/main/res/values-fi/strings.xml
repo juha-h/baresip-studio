@@ -307,10 +307,9 @@
     <string name="messages">Viestit</string>
     <string name="dialpad">Numeronäppäimistö</string>
     <string name="call_already_active">Sinulla on jo puhelu käynnissä.</string>
-    <string name="start_failed">Sovelluksen käynnistäminen
-    epäonnistui. Tämä voi johtua virheellisestä kuunteluosoitteesta tai
-    TLS sertifikaattitiedostosta. Niiden oletusarvot on palautettu. Käynnistä
-    baresip uudelleen.
+    <string name="start_failed">Sovelluksen käynnistäminen epäonnistui. Tämä voi johtua virheellisestä
+        Asetukset arvosta.  Tarkista Kuunteluosoite, TLS-varmennintiedosto ja TLS CA-tiedosto.
+        Sen jälkeen käynnistä baresip uudelleen.
     </string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
     <string name="verify">Todenna</string>
