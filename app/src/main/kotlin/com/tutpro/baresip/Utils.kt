@@ -284,7 +284,7 @@ object Utils {
             Api.uag_reset_transp(true, true)
             Api.net_debug()
         } else {
-            UserAgent.register()
+            UserAgent.register(false)
         }
     }
 
