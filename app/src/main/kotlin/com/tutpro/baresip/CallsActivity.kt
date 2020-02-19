@@ -25,12 +25,13 @@ class CallsActivity : AppCompatActivity() {
     internal var aor = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calls)
 
         aor = intent.getStringExtra("aor")!!
-        BaresipService.activities.add(0, "calls,$aor")
+        Utils.addActivity("calls,$aor")
+
         val ua = Account.findUa(aor)!!
         account = ua.account
 

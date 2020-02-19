@@ -19,7 +19,7 @@ class ContactsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_contacts)
 
         aor = intent.getStringExtra("aor")!!
-        BaresipService.activities.add(0, "contacts,$aor")
+        Utils.addActivity("contacts,$aor")
 
         val listView = findViewById(R.id.contacts) as ListView
         clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
