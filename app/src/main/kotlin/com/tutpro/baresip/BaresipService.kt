@@ -464,7 +464,10 @@ class BaresipService: Service() {
             status.add(R.drawable.dot_green)
         } else {
             Log.d(LOG_TAG, "Ua ${ua.account.aor} is NOT registered")
-            status.add(R.drawable.dot_yellow)
+            if (ua.account.regint == 0)
+                status.add(R.drawable.dot_white)
+            else
+                status.add(R.drawable.dot_yellow)
         }
         val intent = Intent("service event")
         intent.putExtra("event", "ua added")
@@ -494,7 +497,7 @@ class BaresipService: Service() {
                     }
                     "registered" -> {
                         if (ua.account.regint == 0)
-                            status[account_index] = R.drawable.dot_yellow
+                            status[account_index] = R.drawable.dot_white
                         else
                             status[account_index] = R.drawable.dot_green
                         ua.registrationFailed = false
