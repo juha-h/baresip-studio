@@ -54,7 +54,7 @@ class ConfigActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config)
 
-        BaresipService.activities.add(0, "config")
+        Utils.addActivity("config")
 
         autoStart = findViewById(R.id.AutoStart) as CheckBox
         val asCv = Config.variable("auto_start")

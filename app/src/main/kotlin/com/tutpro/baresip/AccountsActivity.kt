@@ -21,7 +21,7 @@ class AccountsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
 
-        BaresipService.activities.add(0, "accounts")
+        Utils.addActivity("accounts")
 
         val listView = findViewById(R.id.accounts) as ListView
         generateAccounts()

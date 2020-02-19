@@ -42,7 +42,7 @@ class AccountActivity : AppCompatActivity() {
         setContentView(R.layout.activity_account)
 
         val accp = intent.getStringExtra("accp")
-        BaresipService.activities.add(0, "account,$accp")
+        Utils.addActivity("account,$accp")
 
         acc = Account.find(accp)!!
         aor = acc.aor

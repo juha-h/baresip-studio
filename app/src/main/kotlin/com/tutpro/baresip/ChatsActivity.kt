@@ -24,14 +24,13 @@ class ChatsActivity: AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_chats)
 
         listView = findViewById(R.id.chats) as ListView
         plusButton = findViewById(R.id.plusButton) as ImageButton
 
         aor = intent.extras!!.getString("aor")!!
-        BaresipService.activities.add(0, "chats,$aor")
+        Utils.addActivity("chats,$aor")
 
         val headerView = findViewById(R.id.account) as TextView
         val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"

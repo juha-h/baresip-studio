@@ -16,7 +16,7 @@ class AboutActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
-        BaresipService.activities.add(0, "about")
+        Utils.addActivity("about")
 
         val aboutText = findViewById<TextView>(R.id.aboutText)
         val text = String.format(getString(R.string.about_text), BuildConfig.VERSION_NAME)

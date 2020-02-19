@@ -567,8 +567,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         Log.d("Baresip", "Main paused")
-        if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != "main"))
-            BaresipService.activities.add(0, "main")
+        Utils.addActivity("main")
         visible = false
         super.onPause()
     }

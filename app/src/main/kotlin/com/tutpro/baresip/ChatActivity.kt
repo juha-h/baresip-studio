@@ -30,8 +30,6 @@ class ChatActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        Log.d("Baresip", "Chat created")
-
         setContentView(R.layout.activity_chat)
 
         aor = intent.getStringExtra("aor")!!
@@ -50,7 +48,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         if (!BaresipService.activities.first().startsWith("chat,$aor,$peerUri"))
-            BaresipService.activities.add(0, "chat,$aor,$peerUri,$focus")
+            Utils.addActivity("chat,$aor,$peerUri,$focus")
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
