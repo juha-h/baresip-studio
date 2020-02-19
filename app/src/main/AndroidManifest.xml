@@ -46,6 +46,7 @@
         </activity>
         <activity
             android:name=".AccountsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts"
             android:parentActivityName=".MainActivity">
         </activity>
@@ -57,6 +58,7 @@
         </activity>
         <activity
             android:name=".ContactsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contacts"
             android:windowSoftInputMode="adjustPan"
             android:parentActivityName=".MainActivity" >
@@ -69,26 +71,31 @@
         </activity>
         <activity
             android:name=".ConfigActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/configuration"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".CallsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_history"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".ChatsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chats"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".ChatActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chat"
             android:parentActivityName=".ChatsActivity" >
         </activity>
         <activity
             android:name=".AboutActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about"
             android:parentActivityName=".MainActivity">
         </activity>
