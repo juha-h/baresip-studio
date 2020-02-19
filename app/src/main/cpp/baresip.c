@@ -386,7 +386,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance,
         jstring javaPath, jstring javaIpV4Addr, jstring javaIpV6Addr,
-        jstring javaNetInterface, jint javaNetAf) {
+        jstring javaNetInterface, jint javaNetAf, jint javaLogLevel) {
 
     LOGD("starting baresip\n");
 
@@ -421,7 +421,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     conf_path_set(path);
 
-    log_enable_debug(true);
+    log_level_set((enum log_level)javaLogLevel);
 
     err = conf_configure();
     if (err) {

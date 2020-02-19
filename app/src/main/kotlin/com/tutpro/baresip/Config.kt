@@ -49,12 +49,13 @@ object Config {
 
         if (!config.contains("log_level")) {
             config = "${config}log_level 2\n"
-            Api.log_level_set(2)
             Log.logLevel = Log.LogLevel.WARN
+            BaresipService.logLevel = 2
         } else {
             val ll = variable("log_level")[0].toInt()
-            Api.log_level_set(ll)
+            replaceVariable("log_level", "$ll")
             Log.logLevelSet(ll)
+            BaresipService.logLevel = ll
         }
 
         if (config.contains("net_interface")) {
