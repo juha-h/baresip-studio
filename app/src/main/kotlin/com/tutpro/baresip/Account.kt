@@ -76,7 +76,7 @@ class Account(val accp: String) {
         else
             res = ""
 
-        res = res + "<${aor}>"
+        res = res + "<$uri>"
 
         if (authUser != "") res = res + ";auth_user=\"${authUser}\""
 
