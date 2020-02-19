@@ -561,7 +561,7 @@ object Utils {
     }
 
     fun addActivity(activity: String) {
-        if (BaresipService.activities.first() != activity)
+        if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
     }
 }
