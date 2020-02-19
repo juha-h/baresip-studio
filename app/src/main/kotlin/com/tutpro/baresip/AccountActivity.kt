@@ -298,7 +298,7 @@ class AccountActivity : AppCompatActivity() {
                 } else {
                     if (acc.regint != 0) {
                         Api.ua_unregister(ua.uap)
-                        UserAgent.updateStatus(ua, R.drawable.dot_yellow)
+                        UserAgent.updateStatus(ua, R.drawable.dot_white)
                         newRegint = 0
                     }
                 }

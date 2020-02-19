@@ -11,6 +11,9 @@
         <ul>
         <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+            keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
+            (rekisteröintiä ei ole aktivoitu).</li>
         <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
         <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
