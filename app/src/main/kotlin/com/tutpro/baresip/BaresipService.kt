@@ -304,7 +304,7 @@ class BaresipService: Service() {
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(LOG_TAG, "Starting baresip without IP addresses")
                 Thread(Runnable { baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
-                        Api.AF_UNSPEC)
+                        Api.AF_UNSPEC, logLevel)
                 }).start()
 
                 isServiceRunning = true
@@ -1058,7 +1058,7 @@ class BaresipService: Service() {
     }
 
     external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, netInterface: String,
-                              netAf: Int)
+                              netAf: Int, logLevel: Int)
     external fun baresipStop(force: Boolean)
 
     companion object {
@@ -1092,6 +1092,7 @@ class BaresipService: Service() {
         var netInterface = ""
         var filesPath = ""
         var downloadsPath = ""
+        var logLevel = 2
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()
