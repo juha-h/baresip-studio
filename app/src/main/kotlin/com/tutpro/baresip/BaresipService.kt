@@ -1020,9 +1020,9 @@ class BaresipService: Service() {
     private fun resetCallVolume() {
         if (origCallVolume != -1) {
             am.setStreamVolume(am.mode, origCallVolume, 0)
+            Log.d(LOG_TAG, "Reset call volume of stream ${am.mode} to ${am.getStreamVolume(am.mode)}")
             origCallVolume = -1
         }
-        Log.d(LOG_TAG, "Call volume of stream ${am.mode} is ${am.getStreamVolume(am.mode)}")
     }
 
     private fun proximitySensing(enable: Boolean) {
