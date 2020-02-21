@@ -1,0 +1,8 @@
+- Fixed saving of an account that has ;transport parameter in its AoR.
+- Fixed enabling of notifications when call is closed.
+- Use white status icon when account's registration has not been enabled.
+- Default call volume now effects both voice call and music streams.
+- Improved Accounts activity layout and implementation.
+- Do not show baresip lib debug messages if Debug has not been enabled.
+- Do not re-create activities when screen orientation changes.
+- Properly show chat information that does not fit one line
