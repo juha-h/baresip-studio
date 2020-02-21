@@ -247,7 +247,8 @@ class MainActivity : AppCompatActivity() {
                         // placing to call in order to avoid missing audio from callee due to
                         // a bug in many Android devices.
                         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         callButton.visibility = View.INVISIBLE
                         callButton.isEnabled = false
                         hangupButton.visibility = View.VISIBLE
