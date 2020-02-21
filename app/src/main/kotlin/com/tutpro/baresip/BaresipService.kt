@@ -49,7 +49,7 @@ class BaresipService: Service() {
     internal var rtTimer: Timer? = null
     internal var audioFocusRequest: AudioFocusRequest? = null
     internal var audioFocused = false
-    internal var origCallVolume = -1
+    internal var origVolumes = arrayOf(-1, -1, -1, -1)
     internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
     internal var activeNetwork = ""
 
@@ -643,7 +643,8 @@ class BaresipService: Service() {
                             call.hasHistory = true
                         }
                         stopRinging()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         if (!isAudioFocused()) {
                             requestAudioFocus(AudioManager.STREAM_VOICE_CALL)
                             setCallVolume()
@@ -727,7 +728,9 @@ class BaresipService: Service() {
                         calls.remove(call)
                         if (Call.calls().size == 0) {
                             resetCallVolume()
-                            am.mode = AudioManager.MODE_NORMAL
+                            Log.d(LOG_TAG, "Audio mode is ${am.mode}")
+                            if (am.mode != AudioManager.MODE_NORMAL)
+                                am.mode = AudioManager.MODE_NORMAL
                             if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
                             if (am.isBluetoothScoOn) {
                                 Log.d(LOG_TAG, "Stopping Bluetooth SCO")
@@ -777,6 +780,7 @@ class BaresipService: Service() {
         }
         val timeStamp = System.currentTimeMillis().toString()
         Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
+        Log.d(LOG_TAG, "Audio mode is ${am.mode}")
         Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true))
         Message.save()
@@ -909,11 +913,12 @@ class BaresipService: Service() {
     private fun requestAudioFocus(streamType: Int) {
         if ((Build.VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
             @TargetApi(26)
-            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE).run {
-                setAudioAttributes(AudioAttributes.Builder().run {
-                    setLegacyStreamType(streamType)
-                    build()
-                })
+            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                    .run {
+                        setAudioAttributes(AudioAttributes.Builder().run {
+                            setLegacyStreamType(streamType)
+                            build()
+                        })
                 build()
             }
             @TargetApi(26)
@@ -1008,20 +1013,25 @@ class BaresipService: Service() {
 
     private fun setCallVolume() {
         if (callVolume != 0) {
-            origCallVolume = am.getStreamVolume(am.mode)
-            am.setStreamVolume(am.mode,
-                    (callVolume * 0.1 * am.getStreamMaxVolume(am.mode)).roundToInt(),
-                    0)
-            Log.d(LOG_TAG, "Original/new call volume of stream ${am.mode} is " +
-                    "$origCallVolume/${am.getStreamVolume(am.mode)}")
+            for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_MUSIC)) {
+                origVolumes[streamType] = am.getStreamVolume(streamType)
+                am.setStreamVolume(streamType,
+                        (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
+                        0)
+                Log.d(LOG_TAG, "New call volume of stream type $streamType is " +
+                        "${am.getStreamVolume(streamType)}")
+            }
         }
     }
 
     private fun resetCallVolume() {
-        if (origCallVolume != -1) {
-            am.setStreamVolume(am.mode, origCallVolume, 0)
-            Log.d(LOG_TAG, "Reset call volume of stream ${am.mode} to ${am.getStreamVolume(am.mode)}")
-            origCallVolume = -1
+        for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_MUSIC)) {
+            if (origVolumes[streamType] != -1) {
+                am.setStreamVolume(streamType, origVolumes[streamType], 0)
+                Log.d(LOG_TAG, "Reset volume of stream type $streamType to " +
+                        "${am.getStreamVolume(streamType)}")
+                origVolumes[streamType] = -1
+            }
         }
     }
 
