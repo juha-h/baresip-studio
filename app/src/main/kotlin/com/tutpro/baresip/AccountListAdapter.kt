@@ -39,7 +39,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
             Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
             deleteDialog.setMessage(String.format(cxt.getString(R.string.delete_account),
-                    ua.account.aor))
+                    aorView.text))
             deleteDialog.setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
                 Api.ua_destroy(ua.uap)
                 CallHistory.clear(ua.account.aor)
