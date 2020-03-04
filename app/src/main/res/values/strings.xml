@@ -40,10 +40,20 @@
     <string name="display_name">Display Name</string>
     <string name="your_name">Your Name</string>
     <string name="display_name_help">Name (if any) used in From URI of outbound requests.</string>
+    <string name="invalid_display_name">Invalid Display Name \'%1$s\'</string>
+    <string name="authentication_username_password_mismatch">Autentication Username and Authentication
+        Password must both be given or both must be empty.
+    </string>
     <string name="authentication_username">Authentication Username</string>
-    <string name="authentication_username_help">Authentication username if required by outbound proxy.</string>
+    <string name="authentication_username_help">Authentication username if authentication of SIP
+        requests is required.
+    </string>
+    <string name="invalid_authentication_username">Invalid Authentication Username \'%1$s\'</string>
     <string name="authentication_password">Authentication Password</string>
-    <string name="authentication_password_help">Authentication password if required by outbound proxy.</string>
+    <string name="authentication_password_help">Authentication password if authentication of SIP
+        requests is required.
+    </string>
+    <string name="invalid_authentication_password">Invalid Authentication Password \'%1$s\'</string>
     <string name="outbound_proxies">Outbound Proxies</string>
     <string name="outbound_proxies_help">SIP URI of one or two proxies that must be used when sending requests.
         If two is given, REGISTER requests are sent to both and other requests are sent to
@@ -56,6 +66,7 @@
     </string>
     <string name="sip_uri_of_proxy_server">SIP URI of Proxy Server</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
+    <string name="invalid_proxy_server_uri">Invalid Proxy Server URI \'%1$s\'</string>
     <string name="register">Register</string>
     <string name="register_help">If checked, registration is enabled and REGISTER requests are sent at
         12 minute intervals.
@@ -72,6 +83,7 @@
         Factory default value is \'stun.l.google.com:19302\', pointing to public Google STUN server.
         Username and password are currently not supported.
     </string>
+    <string name="invalid_stun_server">Invalid STUN Server \'%1$s\'</string>
     <string name="stun_server_default" translatable="false">stun.l.google.com:19302</string>
     <string name="media_encryption">Media Encryption</string>
     <string name="media_encryption_help">Selects media transport encryption protocol (if any).
@@ -94,6 +106,7 @@
     <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
     </string>
+    <string name="invalid_voicemail_uri">Invalid Voicemail URI \'%1$s\'</string>
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>

@@ -37,12 +37,18 @@
     <string name="your_name">Tilin käyttäjän nimi</string>
     <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
         SIP-sanomien From URI:ssa (vapaaehtoinen).</string>
+    <string name="invalid_display_name">Virheellinen tilin käyttäjän nimi \'%1$s\'</string>
+    <string name="authentication_username_password_mismatch">Käyttäjätunnus ja salasana ovat molemmat
+        annettava ellei kumpikin ole tyhjä.
+    </string>
     <string name="authentication_username">Käyttäjätunnus</string>
     <string name="authentication_username_help">Todentamiseen käytettävä
         käyttäjätunnus, jos välityspalvelin vaatii sellaisen.</string>
+    <string name="invalid_authentication_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
     <string name="authentication_password">Salasana</string>
     <string name="authentication_password_help">Todentamiseen käytettävä
         salasana, jos välityspalvelin vaatii sellaisen.</string>
+    <string name="invalid_authentication_password">Virheellinen salasana \'%1$s\'</string>
     <string name="outbound_proxies">Välityspalvelimet</string>
     <string name="outbound_proxies_help">Yhden tai kahden
         välityspalvelimen SIP URI, joille SIP-sanomat lähetetään. Jos
@@ -60,6 +66,7 @@
     <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">Toisen
         välityspalvelimen SIP URI</string>
+    <string name="invalid_proxy_server_uri">Virheellinen välityspalvelimen URI \'%1$s\'</string>
     <string name="register">Rekisteröi</string>
     <string name="register_help">Jos merkitty, rekisteröinti on
         aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
@@ -78,6 +85,7 @@
         osoittaa Google:n julkiseen STUN-palvelimeen.  Käyttäjätunnusta ja
         salasanaa ei voi tällä hetkellä antaa.
     </string>
+    <string name="invalid_stun_server">Virheellinen STUN-palvelin \'%1$s\'</string>
     <string name="media_encryption">Median salaus</string>
     <string name="media_encryption_help">Valitsee median salausprotokollan (vapaaehtoinen).
 \n • ZRTP (suositeltu) tarkoittaa, että ZRTP-salausta yritetään neuvotella sen jälkeen, kun puhelu on alkanut.
@@ -106,6 +114,7 @@
         puhepostiviestien kuunteluun.  Jos URI:a ei ole annettu, tietoa
         mahdollista puhepostiviesteistä (Message Waiting Indications) ei tilata.
     </string>
+    <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
     <string name="default_account">Oletustili</string>
     <string name="default_account_help">Jos merkitty, niin tämä tili on
         valittuna, kun baresip käynnistetään.

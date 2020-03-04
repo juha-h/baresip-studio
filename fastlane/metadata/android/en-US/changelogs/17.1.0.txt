@@ -1,0 +1,4 @@
+- Use usage type instead of stream type when requesting audio focus.
+- Fixed formatting of Account English Help text.
+- Don't show possible port of an AoR when asked about deleting the AoR.
+- Filled the non-register status icon with white color.

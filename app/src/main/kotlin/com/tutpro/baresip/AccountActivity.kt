@@ -215,12 +215,20 @@ class AccountActivity : AppCompatActivity() {
                             Log.e("Baresip", "Setting of display name failed")
                         }
                     } else {
-                        Utils.alertView(this, "Notice", "Invalid Display Name: $dn")
+                        Utils.alertView(this, "Notice",
+                                String.format(getString(R.string.invalid_display_name), dn))
                         return false
                     }
                 }
 
                 val au = authUser.text.toString().trim()
+                val ap = authPass.text.toString().trim()
+                if (((au != "") && (ap == "")) || ((au == "") && (ap != ""))) {
+                    Utils.alertView(this, "Notice",
+                            getString(R.string.authentication_username_password_mismatch))
+                    return false
+                }
+
                 if (au != acc.authUser) {
                     if (checkAuthUser(au)) {
                         if (account_set_auth_user(acc.accp, au) == 0) {
@@ -232,12 +240,11 @@ class AccountActivity : AppCompatActivity() {
                         }
                     } else {
                         Utils.alertView(this, "Notice",
-                                "Invalid Authentication UserName: $au")
+                                String.format(getString(R.string.invalid_authentication_username), au))
                         return false
                     }
                 }
 
-                val ap = authPass.text.toString().trim()
                 if (ap != acc.authPass) {
                     if (Utils.checkPrintAscii(ap)) {
                         if (account_set_auth_pass(acc.accp, ap) == 0) {
@@ -249,7 +256,7 @@ class AccountActivity : AppCompatActivity() {
                         }
                     } else {
                         Utils.alertView(this, "Notice",
-                                "Invalid Authentication Password: $ap")
+                                String.format(getString(R.string.invalid_authentication_password), ap))
                         return false
                     }
                 }
@@ -279,7 +286,7 @@ class AccountActivity : AppCompatActivity() {
                             }
                         } else {
                             Utils.alertView(this, "Notice",
-                                    "Invalid Proxy Server URI: ${ob[i]}")
+                                    String.format(getString(R.string.invalid_proxy_server_uri), ob[i]))
                             return false
                         }
                     }
@@ -326,7 +333,7 @@ class AccountActivity : AppCompatActivity() {
                     if (acc.stunServer != newStunServer) {
                         if (!Utils.checkHostPort(newStunServer)) {
                             Utils.alertView(this, "Notice",
-                                    "Invalid STUN Server '$newStunServer'")
+                                    String.format(getString(R.string.invalid_stun_server), newStunServer))
                             return false
                         }
                         var host = ""
@@ -404,7 +411,7 @@ class AccountActivity : AppCompatActivity() {
                         if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
                         if (!Utils.checkSipUri(vmUri)) {
                             Utils.alertView(this, "Notice",
-                                    "Invalid Voicemail URI: $vmUri")
+                                    String.format(getString(R.string.invalid_voicemail_uri), vmUri))
                             return false
                         }
                         account_set_mwi(acc.accp, "yes")
