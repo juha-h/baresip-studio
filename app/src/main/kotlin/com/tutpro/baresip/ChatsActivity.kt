@@ -113,7 +113,7 @@ class ChatsActivity: AppCompatActivity() {
                     }
                 }
                 if (!Utils.checkSipUri(uri)) {
-                    Utils.alertView(this, getString(R.string.error),
+                    Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.invalid_chat_peer_uri))
                 } else {
                     peerUri.text.clear()

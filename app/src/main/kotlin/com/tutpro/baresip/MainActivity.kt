@@ -240,7 +240,8 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     if (!Utils.checkSipUri(uri)) {
-                        Utils.alertView(this, getString(R.string.notice), "${getString(R.string.invalid_sip_uri)} '$uri'")
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_sip_uri), uri))
                     } else {
                         callUri.isFocusable = false
                         // Set audio mode to MODE_IN_COMMUNICATION and wait 2.5 sec before
@@ -323,7 +324,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         infoButton.setOnClickListener {
-            Log.d("Baresip", "Info Button was clicked")
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val calls = Call.uaCalls(ua, "")
             if (calls.size > 0) {
@@ -341,7 +341,8 @@ class MainActivity : AppCompatActivity() {
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
                                     "${getString(R.string.rate)}: $rate")
                 } else {
-                    Utils.alertView(this, "Call Info", "No info available.")
+                    Utils.alertView(this, getString(R.string.call_info),
+                            getString(R.string.call_info_not_available))
                 }
             }
         }
@@ -974,12 +975,14 @@ class MainActivity : AppCompatActivity() {
         val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
         val zipFilePath = BaresipService.filesPath + "/baresip.zip"
         if (!Utils.zip(files, "baresip.zip")) {
-            Utils.alertView(this, getString(R.string.error), "Failed to write zip file 'baresip.zip")
+            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
+            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
         if (content == null) {
-            Utils.alertView(this, getString(R.string.error), "Failed to read zip file 'baresip.zip")
+            Log.w("Baresip", "Failed to read zip file 'baresip.zip")
+            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
             return
         }
         if (!Utils.encryptToFile(backupFilePath, content, password)) {
@@ -999,13 +1002,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
-            Utils.alertView(this, getString(R.string.error),
-                    "Failed to write file 'baresip.zip'")
+            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
+            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
-            Utils.alertView(this, getString(R.string.error),
-                    "Failed to unzip file 'baresip.zip'")
+            Log.w("Baresip", "Failed to unzip file 'baresip.zip")
+            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
             return
         }
         Utils.deleteFile(File(zipFilePath))

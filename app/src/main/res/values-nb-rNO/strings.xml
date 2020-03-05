@@ -148,7 +148,7 @@
     <string name="invalid_contact_uri">Ugyldig SIP URI</string>
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
     <string name="contacts_exceeded">Ditt har nådd ditt maksimale antall kontakter på %1$d.</string>
-    <string name="invalid_sip_uri">Ugyldig SIP URI</string>
+    <string name="invalid_sip_uri">Ugyldig SIP URI \'%1$s\'</string>
     <string name="callee">Ringer</string>
     <string name="hangup">Legg på</string>
     <string name="hold">Sett på vent</string>

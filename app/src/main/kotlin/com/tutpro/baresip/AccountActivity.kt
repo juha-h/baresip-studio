@@ -490,7 +490,8 @@ class AccountActivity : AppCompatActivity() {
                         getString(R.string.outbound_proxies_help))
             }
             findViewById(R.id.RegTitle) as TextView -> {
-                Utils.alertView(this, "Register", getString(R.string.register_help))
+                Utils.alertView(this, getString(R.string.register),
+                        getString(R.string.register_help))
             }
             findViewById(R.id.AudioCodecsTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.audio_codecs),

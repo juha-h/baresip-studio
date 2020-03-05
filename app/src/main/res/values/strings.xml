@@ -269,12 +269,13 @@
     <string name="outgoing_call_to_dots">Outgoing call to …</string>
     <string name="incoming_call_from_dots">Incoming call from …</string>
     <string name="transferring_call_to_dots">Transferring call to …</string>
-    <string name="invalid_sip_uri">Invalid SIP URI</string>
+    <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
     <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
+    <string name="call_info_not_available">No info available</string>
     <string name="duration">Duration</string>
     <string name="codecs">Codecs</string>
     <string name="rate">Rate</string>

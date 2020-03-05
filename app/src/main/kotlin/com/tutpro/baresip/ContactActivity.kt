@@ -164,7 +164,7 @@ class ContactActivity : AppCompatActivity() {
                 if (newName == "") newName = newUri
 
                 if (!Utils.checkName(newName)) {
-                    Utils.alertView(this, getString(R.string.error),
+                    Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_contact), newName))
                     return false
                 }
@@ -175,7 +175,7 @@ class ContactActivity : AppCompatActivity() {
                     alert = (Contact.contacts()[index].name != newName) &&
                             ContactsActivity.nameExists(newName, false)
                 if (alert) {
-                    Utils.alertView(this, getString(R.string.error),
+                    Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.contact_already_exists), newName))
                     return false
                 }
@@ -188,7 +188,7 @@ class ContactActivity : AppCompatActivity() {
                     }
                 }
                 if (!Utils.checkSipUri(newUri)) {
-                    Utils.alertView(this, getString(R.string.error),
+                    Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_contact_uri), newUri))
                     return false
                 }

@@ -297,12 +297,13 @@
     <string name="outgoing_call_to_dots">Lähtevä puhelu …</string>
     <string name="incoming_call_from_dots">Tuleva puhelu …</string>
     <string name="transferring_call_to_dots">Siirtopuhelu …</string>
-    <string name="invalid_sip_uri">Virheellinen SIP URI</string>
+    <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
     <string name="hold">Aseta puhelu pitoon</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
+    <string name="call_info_not_available">Ei saatavilla</string>
     <string name="duration">Kesto</string>
     <string name="codecs">Koodekit</string>
     <string name="rate">Nopeus</string>

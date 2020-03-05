@@ -220,7 +220,7 @@
     <string name="outgoing_call_to_dots">Изходящо повикване до…</string>
     <string name="incoming_call_from_dots">Входящо обаждане от…</string>
     <string name="transferring_call_to_dots">Прехвърляне на обаждане до…</string>
-    <string name="invalid_sip_uri">Невалиден SIP URI</string>
+    <string name="invalid_sip_uri">Невалиден SIP URI \'%1$s\'</string>
     <string name="callee">Набиране</string>
     <string name="hangup">Затвори</string>
     <string name="hold">Задържане</string>

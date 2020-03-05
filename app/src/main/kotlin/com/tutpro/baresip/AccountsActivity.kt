@@ -34,7 +34,7 @@ class AccountsActivity : AppCompatActivity() {
             val aor = newAorView.text.toString().trim()
             if (!Utils.checkAor(aor)) {
                 Log.d("Baresip", "Invalid Address of Record $aor")
-                Utils.alertView(this, getString(R.string.error),
+                Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
             } else if (Account.exists(aor)) {
                 Log.d("Baresip", "Account $aor already exists")

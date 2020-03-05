@@ -105,7 +105,7 @@
     <string name="outgoing_call_to_dots">Apel efectuat către …</string>
     <string name="incoming_call_from_dots">Apel primit de la …</string>
     <string name="transferring_call_to_dots">Transfer apel către …</string>
-    <string name="invalid_sip_uri">Adresă SIP invalidă</string>
+    <string name="invalid_sip_uri">Adresă SIP invalidă \'%1$s\'</string>
     <string name="callee">Apelat</string>
     <string name="hangup">Închide</string>
     <string name="hold">Pune în așteptare</string>

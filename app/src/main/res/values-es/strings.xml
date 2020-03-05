@@ -213,7 +213,7 @@
     <string name="outgoing_call_to_dots">Llamada saliente a…</string>
     <string name="incoming_call_from_dots">Llamada entrante de …</string>
     <string name="transferring_call_to_dots">Transfiriendo llamada a …</string>
-    <string name="invalid_sip_uri">URI de SIP no válido</string>
+    <string name="invalid_sip_uri">URI de SIP no válido \'%1$s\'</string>
     <string name="callee">Destinatario</string>
     <string name="hangup">Colgar</string>
     <string name="hold">Esperar</string>
