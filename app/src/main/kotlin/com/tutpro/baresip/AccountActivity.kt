@@ -215,7 +215,7 @@ class AccountActivity : AppCompatActivity() {
                             Log.e("Baresip", "Setting of display name failed")
                         }
                     } else {
-                        Utils.alertView(this, "Notice",
+                        Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_display_name), dn))
                         return false
                     }
@@ -224,7 +224,7 @@ class AccountActivity : AppCompatActivity() {
                 val au = authUser.text.toString().trim()
                 val ap = authPass.text.toString().trim()
                 if (((au != "") && (ap == "")) || ((au == "") && (ap != ""))) {
-                    Utils.alertView(this, "Notice",
+                    Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.authentication_username_password_mismatch))
                     return false
                 }
@@ -239,7 +239,7 @@ class AccountActivity : AppCompatActivity() {
                             Log.e("Baresip", "Setting of auth user failed")
                         }
                     } else {
-                        Utils.alertView(this, "Notice",
+                        Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_username), au))
                         return false
                     }
@@ -255,7 +255,7 @@ class AccountActivity : AppCompatActivity() {
                             Log.e("Baresip", "Setting of auth pass failed")
                         }
                     } else {
-                        Utils.alertView(this, "Notice",
+                        Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_password), ap))
                         return false
                     }
@@ -285,7 +285,7 @@ class AccountActivity : AppCompatActivity() {
                                 break
                             }
                         } else {
-                            Utils.alertView(this, "Notice",
+                            Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_proxy_server_uri), ob[i]))
                             return false
                         }
@@ -332,7 +332,7 @@ class AccountActivity : AppCompatActivity() {
                     val newStunServer = stunServer.text.toString().trim()
                     if (acc.stunServer != newStunServer) {
                         if (!Utils.checkHostPort(newStunServer)) {
-                            Utils.alertView(this, "Notice",
+                            Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_stun_server), newStunServer))
                             return false
                         }
@@ -410,7 +410,7 @@ class AccountActivity : AppCompatActivity() {
                         if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
                         if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
                         if (!Utils.checkSipUri(vmUri)) {
-                            Utils.alertView(this, "Notice",
+                            Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_voicemail_uri), vmUri))
                             return false
                         }
