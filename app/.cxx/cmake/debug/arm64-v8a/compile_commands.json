@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/usr/src/baresip-studio/app/.cxx/cmake/debug/arm64-v8a",
-  "command": "/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/clang --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Dbaresip_EXPORTS -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/openssl/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/re/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/rem/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/baresip/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DHAVE_INTTYPES_H -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/baresip.dir/baresip.c.o   -c /usr/src/baresip-studio/app/src/main/cpp/baresip.c",
-  "file": "/usr/src/baresip-studio/app/src/main/cpp/baresip.c"
-}
-]

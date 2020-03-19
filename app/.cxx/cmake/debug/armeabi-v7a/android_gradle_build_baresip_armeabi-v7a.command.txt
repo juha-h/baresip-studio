@@ -1,7 +1,0 @@
-Executable : /opt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
-arguments : 
--C
-/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a
-baresip
-jvmArgs : 
-

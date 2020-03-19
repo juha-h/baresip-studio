@@ -1,3 +1,0 @@
-/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
-/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/baresip.dir
