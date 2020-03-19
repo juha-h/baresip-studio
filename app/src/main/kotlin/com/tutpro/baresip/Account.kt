@@ -80,7 +80,8 @@ class Account(val accp: String) {
 
         if (authUser != "") res = res + ";auth_user=\"${authUser}\""
 
-        if (authPass != "") res = res + ";auth_pass=\"${authPass}\""
+        if ((authPass != "") && !MainActivity.aorPasswords.containsKey(aor))
+            res = res + ";auth_pass=\"${authPass}\""
 
         if (outbound.size > 0) {
             res = res + ";outbound=\"${outbound[0]}\""

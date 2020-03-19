@@ -122,9 +122,34 @@ static const char *translate_errorcode(uint16_t scode)
 	}
 }
 
+static void get_password(char *aor, char *password)
+{
+    LOGD("getting password of AoR %s\n", aor);
+
+    JavaVM *javaVM = g_ctx.javaVM;
+    JNIEnv *env;
+    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
+    if (res != JNI_OK) {
+        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+        if (JNI_OK != res) {
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
+            return;
+        }
+    }
+
+    jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
+                                                 "(Ljava/lang/String;)Ljava/lang/String;");
+    jstring javaAoR = (*env)->NewStringUTF(env, aor);
+    jstring javaPassword = (*env)->CallObjectMethod(env, g_ctx.mainActivityObj, methodId, javaAoR);
+    const char *pwd = (*env)->GetStringUTFChars(env, javaPassword, 0);
+    strcpy(password, pwd);
+    (*env)->ReleaseStringUTFChars(env, javaPassword, pwd);
+}
+
 static void ua_event_handler(struct ua *ua, enum ua_event ev,
 			     struct call *call, const char *prm, void *arg)
 {
+    (void)arg;
     const char *event;
     char event_buf[256];
     char ua_buf[32];
@@ -196,6 +221,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_AUDIO_ERROR:
             mem_deref(call);
             return;
+        case UA_EVENT_GET_PASSWORD:
+            get_password((char *)ua, (char *)call);
+            return;
         default:
             return;
     }
@@ -216,6 +244,18 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
             return;
         }
+    }
+
+    if (ev == UA_EVENT_GET_PASSWORD) {
+        jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
+                                                 "(Ljava/lang/String;)Ljava/lang/String;");
+        sprintf(ua_buf, "%lu", (unsigned long)ua);
+        jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
+        jstring javaPassword = (*env)->CallObjectMethod(env, g_ctx.mainActivityObj, methodId, javaUA);
+        const char *password = (*env)->GetStringUTFChars(env, javaPassword, 0);
+        strcpy((char *)call, password);
+        (*env)->ReleaseStringUTFChars(env, javaPassword, password);
+        return;
     }
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz,

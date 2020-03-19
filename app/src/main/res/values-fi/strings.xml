@@ -38,16 +38,19 @@
     <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
         SIP-sanomien From URI:ssa (vapaaehtoinen).</string>
     <string name="invalid_display_name">Virheellinen tilin käyttäjän nimi \'%1$s\'</string>
-    <string name="authentication_username_password_mismatch">Käyttäjätunnus ja salasana ovat molemmat
-        annettava ellei kumpikin ole tyhjä.
+    <string name="authentication_username_password_mismatch">Salasanaa ei
+    voi antaa ilman käyttäjätunnusta.
     </string>
     <string name="authentication_username">Käyttäjätunnus</string>
     <string name="authentication_username_help">Todentamiseen käytettävä
-        käyttäjätunnus, jos välityspalvelin vaatii sellaisen.</string>
+    käyttäjätunnus, jos välityspalvelin vaatii sellaisen.</string>
     <string name="invalid_authentication_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
     <string name="authentication_password">Salasana</string>
     <string name="authentication_password_help">Todentamiseen käytettävä
-        salasana, jos välityspalvelin vaatii sellaisen.</string>
+    salasana, jonka pituus on enintään 64 ASCII merkkiä. Jos
+    käyttäjätunnus on annettu, mutta salasanaa ei ole annettu, se
+    kysytään, kun baresip käynnistetään.
+    </string>
     <string name="invalid_authentication_password">Virheellinen salasana \'%1$s\'</string>
     <string name="outbound_proxies">Välityspalvelimet</string>
     <string name="outbound_proxies_help">Yhden tai kahden
@@ -356,4 +359,5 @@
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
     </string>
+    <string name="account_password">Tilin %1$s salasana</string>
 </resources>
