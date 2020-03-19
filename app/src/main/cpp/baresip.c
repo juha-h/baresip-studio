@@ -147,13 +147,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CALL_INCOMING:
             if (list_count(ua_calls(ua)) > 1) {
                 play = mem_deref(play);
-                (void)play_file(&play, player, "callwaiting.wav", 3);
+                (void)play_file(&play, player, "callwaiting.wav", 3, NULL, NULL);
             }
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
-            (void)play_file(&play, player, "ringback.wav", -1);
+            (void)play_file(&play, player, "ringback.wav", -1, NULL, NULL);
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
@@ -185,7 +185,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 			    const char *tone;
 			    tone = translate_errorcode(call_scode(call));
 			    if (tone) {
-				    (void)play_file(&play, player, tone, 1);
+				    (void)play_file(&play, player, tone, 1, NULL, NULL);
 			    }
 		    }
             len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s", prm);
