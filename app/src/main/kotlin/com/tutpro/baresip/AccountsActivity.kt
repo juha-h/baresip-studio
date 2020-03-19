@@ -120,6 +120,7 @@ class AccountsActivity : AppCompatActivity() {
             var accounts = ""
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
+            Log.d("Baresip", "Saved accounts to '${BaresipService.filesPath}/accounts'")
             // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
