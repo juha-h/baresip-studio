@@ -1,0 +1,5 @@
+- Ask authentication password at baresip start if authentication
+  username is given in account configuration, but password is not.
+- Initialize account's status dot to yellow, when Register is checked at
+  Account activity.
+- Minor string improvements.
