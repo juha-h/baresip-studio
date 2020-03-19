@@ -61,7 +61,10 @@ class AccountActivity : AppCompatActivity() {
         authUser.setText(acc.authUser)
 
         authPass = findViewById(R.id.AuthPass) as EditText
-        authPass.setText(acc.authPass)
+        if (MainActivity.aorPasswords.containsKey(aor))
+            authPass.setText("")
+        else
+            authPass.setText(acc.authPass)
 
         outbound1 = findViewById(R.id.Outbound1) as EditText
         outbound2 = findViewById(R.id.Outbound2) as EditText
@@ -223,7 +226,8 @@ class AccountActivity : AppCompatActivity() {
 
                 val au = authUser.text.toString().trim()
                 val ap = authPass.text.toString().trim()
-                if (((au != "") && (ap == "")) || ((au == "") && (ap != ""))) {
+
+                if ((au == "") && (ap != "")) {
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.authentication_username_password_mismatch))
                     return false
@@ -245,10 +249,11 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                if (ap != acc.authPass) {
-                    if (Utils.checkPrintAscii(ap)) {
+                if ((ap != acc.authPass) && (ap != "")) {
+                    if (Utils.checkPrintAscii(ap) && (ap.length <= 64)) {
                         if (account_set_auth_pass(acc.accp, ap) == 0) {
                             acc.authPass = account_auth_pass(acc.accp)
+                            MainActivity.aorPasswords.remove(aor)
                             // Log.d("Baresip", "New auth password is ${acc.authPass}")
                             save = true
                         } else {
@@ -258,6 +263,11 @@ class AccountActivity : AppCompatActivity() {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_password), ap))
                         return false
+                    }
+                } else {
+                    if ((ap == "") && !MainActivity.aorPasswords.containsKey(aor)) {
+                        MainActivity.aorPasswords.put(aor, acc.authPass)
+                        save = true
                     }
                 }
 

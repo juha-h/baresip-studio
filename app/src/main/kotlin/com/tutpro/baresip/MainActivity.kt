@@ -424,11 +424,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
+
         if (!BaresipService.isServiceRunning) {
-            baresipService.setAction("Start")
-            startService(baresipService)
-            Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                    RECORD_PERMISSION_REQUEST_CODE)
+            if (File(filesDir.absolutePath + "/accounts").exists()) {
+                var accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                        Charsets.UTF_8).lines().toMutableList()
+                askAorPasswords(accounts)
+            }
         }
 
         if (intent.hasExtra("onStartup"))
@@ -966,6 +968,53 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
+    private fun askAorPasswords(accounts: MutableList<String>) {
+        if (accounts.isNotEmpty()) {
+            val account = accounts.removeAt(0)
+            val params = account.substringAfter(">")
+            if ((Utils.paramValue(params, "auth_user") != "") &&
+                    (Utils.paramValue(params, "auth_pass") == "")) {
+                val aor = account.substringAfter("<").substringBefore(">")
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle(String.format(getString(R.string.account_password), Utils.plainAor(aor)))
+                val viewInflated = LayoutInflater.from(this)
+                        .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                                false)
+                val input = viewInflated.findViewById(R.id.password) as EditText
+                builder.setView(viewInflated)
+                builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    dialog.dismiss()
+                    val password = input.text.toString()
+                    if ((password.length < 1) || (password.length > 64) || !Utils.checkPrintAscii(password)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_authentication_password),  password))
+                        accounts.add(0, account)
+                    } else {
+                        aorPasswords.put(aor, password)
+                    }
+                    askAorPasswords(accounts)
+                }
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.cancel()
+                    aorPasswords.put(aor, "")
+                    askAorPasswords(accounts)
+                }
+                builder.show()
+            } else {
+                askAorPasswords(accounts)
+            }
+        } else {
+            startBaresip()
+        }
+    }
+
+    private fun startBaresip() {
+        baresipService.setAction("Start")
+        startService(baresipService)
+        Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
+                RECORD_PERMISSION_REQUEST_CODE)
+    }
+
     private fun backup(password: String) {
         val files = arrayListOf("accounts", "calls", "config", "contacts", "messages", "uuid",
                 "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
@@ -1365,6 +1414,7 @@ class MainActivity : AppCompatActivity() {
         var resumeUap = ""
         var resumeCall: Call? = null
         var resumeUri = ""
+        val aorPasswords = mutableMapOf<String, String>()
 
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2

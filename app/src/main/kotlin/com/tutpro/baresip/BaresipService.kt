@@ -844,6 +844,16 @@ class BaresipService: Service() {
     }
 
     @Keep
+    fun getPassword(aor: String): String {
+        if (!isServiceRunning) return ""
+        Log.d(LOG_TAG, "getPassword of $aor")
+        if (MainActivity.aorPasswords[aor] != null)
+            return MainActivity.aorPasswords[aor]!!
+        else
+            return ""
+    }
+
+    @Keep
     fun stopped(error: String) {
         Log.d(LOG_TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false

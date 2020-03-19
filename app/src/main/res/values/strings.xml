@@ -41,8 +41,7 @@
     <string name="your_name">Your Name</string>
     <string name="display_name_help">Name (if any) used in From URI of outbound requests.</string>
     <string name="invalid_display_name">Invalid Display Name \'%1$s\'</string>
-    <string name="authentication_username_password_mismatch">Autentication Username and Authentication
-        Password must both be given or both must be empty.
+    <string name="authentication_username_password_mismatch">Authentication Password cannot be given without Authentication Username.
     </string>
     <string name="authentication_username">Authentication Username</string>
     <string name="authentication_username_help">Authentication username if authentication of SIP
@@ -50,8 +49,9 @@
     </string>
     <string name="invalid_authentication_username">Invalid Authentication Username \'%1$s\'</string>
     <string name="authentication_password">Authentication Password</string>
-    <string name="authentication_password_help">Authentication password if authentication of SIP
-        requests is required.
+    <string name="authentication_password_help">Authentication
+    Password up to 64 characters. If Authentication Username is given, but Password is not
+    given, it will be asked when baresip is started.
     </string>
     <string name="invalid_authentication_password">Invalid Authentication Password \'%1$s\'</string>
     <string name="outbound_proxies">Outbound Proxies</string>
@@ -318,4 +318,5 @@
         and, if so, you gave correct Decrypt Password.
     </string>
     <string name="no_calls">You are not able to place or answer calls without Microphone permission.</string>
+    <string name="account_password">Account %1$s Authentication Password</string>
 </resources>

@@ -97,6 +97,12 @@ object Utils {
         return if (domain == aor) "" else domain
     }
 
+    fun plainAor(aor: String): String {
+        return aor.substringAfter(":").substringBefore("@")  + "@" +
+                aor.substringAfter("@").substringBefore(";")
+                        .substringBefore(":")
+    }
+
     fun checkAor(aor: String): Boolean {
         val p = aor.split(":")
         if (p.size == 2)
