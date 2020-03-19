@@ -1,0 +1,42 @@
+{
+  "stringTable": {
+    "0": "/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a",
+    "1": "--target=armv7-none-linux-androideabi21 --gcc-toolchain=/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Dbaresip_EXPORTS -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/openssl/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/re/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/rem/include -I/usr/src/baresip-studio/app/src/main/cpp/../../../../distribution/baresip/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security -DHAVE_INTTYPES_H -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "/opt/Android/Sdk/ndk-bundle/build/cmake/android.toolchain.cmake",
+    "/usr/src/baresip-studio/app/src/main/cpp/CMakeLists.txt",
+    "/opt/Android/Sdk/ndk-bundle/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/opt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "/opt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "baresip-Debug-armeabi-v7a": {
+      "buildCommand": "/opt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/usr/src/baresip-studio/app/.cxx/cmake/debug/armeabi-v7a\" baresip",
+      "buildType": "debug",
+      "toolchain": "3432185094",
+      "abi": "armeabi-v7a",
+      "artifactName": "baresip",
+      "files": [
+        {
+          "src": "/usr/src/baresip-studio/app/src/main/cpp/baresip.c",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "/usr/src/baresip-studio/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libbaresip.so"
+    }
+  },
+  "toolchains": {
+    "3432185094": {
+      "cCompilerExecutable": "/opt/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/clang"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": []
+}

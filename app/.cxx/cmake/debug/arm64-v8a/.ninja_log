@@ -1,0 +1,3 @@
+# ninja log v5
+4	772	1584609252	CMakeFiles/baresip.dir/baresip.c.o	c5fe66d6729f70bf
+772	2357	1584609253	/usr/src/baresip-studio/app/build/intermediates/cmake/debug/obj/arm64-v8a/libbaresip.so	c243240861469425

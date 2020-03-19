@@ -1,0 +1,21 @@
+Executable : /opt/Android/Sdk/cmake/3.10.2.4988404/bin/cmake
+arguments : 
+-H/usr/src/baresip-studio/app/src/main/cpp
+-DCMAKE_C_FLAGS=-DHAVE_INTTYPES_H
+-DCMAKE_BUILD_TYPE=Release
+-DCMAKE_TOOLCHAIN_FILE=/opt/Android/Sdk/ndk-bundle/build/cmake/android.toolchain.cmake
+-DANDROID_ABI=armeabi-v7a
+-DANDROID_NDK=/opt/Android/Sdk/ndk-bundle
+-DANDROID_PLATFORM=android-21
+-DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a
+-DCMAKE_ANDROID_NDK=/opt/Android/Sdk/ndk-bundle
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/usr/src/baresip-studio/app/build/intermediates/cmake/release/obj/armeabi-v7a
+-DCMAKE_MAKE_PROGRAM=/opt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_SYSTEM_VERSION=21
+-B/usr/src/baresip-studio/app/.cxx/cmake/release/armeabi-v7a
+-GNinja
+jvmArgs : 
+
+Build command args:

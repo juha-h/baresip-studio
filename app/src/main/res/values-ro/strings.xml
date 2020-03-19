@@ -131,8 +131,8 @@
     <string name="verify">Verificare</string>
     <string name="verify_sas">Doriți să verificați SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="transfer_query">Acceptați să transferați apelul către \'%1$s\'\?</string>
-    <string name="call_failed">Apelul a eșuat</string>
-    <string name="call_closed">Apel închis</string>
+    <string name="call_failed">Apelul a eșuat.</string>
+    <string name="call_closed">Apel închis.</string>
     <string name="call_not_secure">Acest apel NU este securizat!</string>
     <string name="peer_not_verified">Acest apel este SECURIZAT, dar contactul NU este verificat!</string>
     <string name="call_is_secure">Acest apel este SECURIZAT și contactul este VERIFICAT! Doriți să anulați verificarea\?</string>
@@ -141,7 +141,7 @@
     <string name="media_nat_help">Selectare protocol traversare NAT (dacă există). Posibile opțiuni: STUN (Session Traversal Utilities for NAT, RFC 5389) și ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server_help">Un server STUN este de forma gazdă[:port]. Setarea implicită este \'stun.l.google.com:19302\', ce folosește un server public STUN găzduit de Google. Momentan nu se poate seta un nume de utilizator și parolă.</string>
     <string name="voicemain_uri_help">Adresă SIP pentru verificarea mesajelor din căsuța vocală. Dacă nu este completată, nu se va face abonarea (Message Waiting Indications) la căsuța vocală.</string>
-    <string name="start_failed">Baresip nu a putut porni! Aceasta se poate datora unei adrese de ascultare invalidă sau a unui fișier TLS invalid. Aceste setări au fost resetate. Reporniți baresip.</string>
+    <string name="start_failed">Baresip nu a putut porni! Aceasta se poate datora unei setări invalide. Verificați adresa de ascultare, fișierul certificat TLS și fișierul TLS al CA. Apoi reporniți baresip.</string>
     <string name="tls_certificate_file">Fișier certificat TLS</string>
     <string name="tls_ca_file">Fișier CA TLS</string>
     <string name="read_cert_error">Nu s-a putut citi fișierul \'cert.pem\' din dosarul Download.</string>

@@ -290,7 +290,6 @@
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <string name="help">Apua</string>
-
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>
@@ -334,7 +333,7 @@
     <string name="transfer_query">Hyväksytkö puhelun siirron kohteeseen
     \'%1$s\'?
     </string>
-    <string name="call_failed">Puhelu epäonnistui</string>
+    <string name="call_failed">Puhelu epäonnistui.</string>
     <string name="call_closed">Puhelu on päättynyt.</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
     <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta
