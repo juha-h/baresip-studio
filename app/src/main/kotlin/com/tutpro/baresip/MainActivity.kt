@@ -427,9 +427,11 @@ class MainActivity : AppCompatActivity() {
 
         if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
-                var accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                val accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
                         Charsets.UTF_8).lines().toMutableList()
                 askAorPasswords(accounts)
+            } else {
+                startBaresip()
             }
         }
 
