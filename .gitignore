@@ -11,6 +11,7 @@ local.properties
 build
 /captures
 .externalNativeBuild
-app/release
+/app/release
+/app/.cxx
 gradle/wrapper/gradle-wrapper.jar
-
+/distribution/*
