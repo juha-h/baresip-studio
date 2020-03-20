@@ -1013,8 +1013,6 @@ class MainActivity : AppCompatActivity() {
     private fun startBaresip() {
         baresipService.setAction("Start")
         startService(baresipService)
-        Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                RECORD_PERMISSION_REQUEST_CODE)
     }
 
     private fun backup(password: String) {
@@ -1092,6 +1090,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
+                Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
+                        RECORD_PERMISSION_REQUEST_CODE)
             }
 
             ACCOUNT_CODE -> {
