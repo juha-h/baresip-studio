@@ -227,12 +227,6 @@ class AccountActivity : AppCompatActivity() {
                 val au = authUser.text.toString().trim()
                 val ap = authPass.text.toString().trim()
 
-                if ((au == "") && (ap != "")) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.authentication_username_password_mismatch))
-                    return false
-                }
-
                 if (au != acc.authUser) {
                     if (checkAuthUser(au)) {
                         if (account_set_auth_user(acc.accp, au) == 0) {
@@ -249,24 +243,31 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                if ((ap != acc.authPass) && (ap != "")) {
-                    if (Utils.checkPrintAscii(ap) && (ap.length <= 64)) {
-                        if (account_set_auth_pass(acc.accp, ap) == 0) {
-                            acc.authPass = account_auth_pass(acc.accp)
-                            MainActivity.aorPasswords.remove(aor)
-                            // Log.d("Baresip", "New auth password is ${acc.authPass}")
-                            save = true
+                if (ap != acc.authPass) {
+                    if (ap != "") {
+                        if (Utils.checkPrintAscii(ap) && (ap.length <= 64)) {
+                            if (account_set_auth_pass(acc.accp, ap) == 0) {
+                                acc.authPass = account_auth_pass(acc.accp)
+                                MainActivity.aorPasswords.remove(aor)
+                                // Log.d("Baresip", "New auth password is ${acc.authPass}")
+                                save = true
+                            } else {
+                                Log.e("Baresip", "Setting of auth pass failed")
+                            }
                         } else {
-                            Log.e("Baresip", "Setting of auth pass failed")
+                            Utils.alertView(this, getString(R.string.notice),
+                                    String.format(getString(R.string.invalid_authentication_password), ap))
+                            return false
                         }
                     } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_authentication_password), ap))
-                        return false
+                        if ((au != "") && !MainActivity.aorPasswords.containsKey(aor)) {
+                            MainActivity.aorPasswords.put(aor, acc.authPass)
+                            save = true
+                        }
                     }
                 } else {
-                    if ((ap == "") && !MainActivity.aorPasswords.containsKey(aor)) {
-                        MainActivity.aorPasswords.put(aor, acc.authPass)
+                    if (MainActivity.aorPasswords.containsKey(aor)) {
+                        MainActivity.aorPasswords.remove(aor)
                         save = true
                     }
                 }

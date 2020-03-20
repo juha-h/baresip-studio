@@ -38,12 +38,11 @@
     <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
         SIP-sanomien From URI:ssa (vapaaehtoinen).</string>
     <string name="invalid_display_name">Virheellinen tilin käyttäjän nimi \'%1$s\'</string>
-    <string name="authentication_username_password_mismatch">Salasanaa ei
-    voi antaa ilman käyttäjätunnusta.
-    </string>
     <string name="authentication_username">Käyttäjätunnus</string>
     <string name="authentication_username_help">Todentamiseen käytettävä
-    käyttäjätunnus, jos välityspalvelin vaatii sellaisen.</string>
+    käyttäjätunnus, jos välityspalvelin vaatii sellaisen. Oletusarvo on
+    tilin käyttäjätunnus.
+    </string>
     <string name="invalid_authentication_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
     <string name="authentication_password">Salasana</string>
     <string name="authentication_password_help">Todentamiseen käytettävä
