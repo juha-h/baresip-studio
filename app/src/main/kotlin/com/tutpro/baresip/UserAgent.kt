@@ -1,6 +1,6 @@
 package com.tutpro.baresip
 
-class UserAgent (val uap: String) {
+class UserAgent(val uap: String) {
 
     val account = Account(Api.ua_account(uap))
     var registrationFailed = false

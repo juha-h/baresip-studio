@@ -14,8 +14,6 @@ class AccountsActivity : AppCompatActivity() {
 
     internal lateinit var alAdapter: AccountListAdapter
 
-    internal var aor = ""
-
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -47,7 +45,8 @@ class AccountsActivity : AppCompatActivity() {
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.account_allocation_failure))
                 } else {
-                    Log.d("Baresip", "Allocated UA ${ua.uap} for ${ua.account.uri}")
+                    Log.d("Baresip", "Allocated UA ${ua.uap} for $aor")
+                    ua.account.uri = "sip:$aor"
                     newAorView.setText("")
                     newAorView.hint = getString(R.string.user_domain)
                     newAorView.clearFocus()
@@ -118,9 +117,13 @@ class AccountsActivity : AppCompatActivity() {
 
         fun saveAccounts() {
             var accounts = ""
-            for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
+            var count = 0
+            for (a in Account.accounts()) {
+                accounts = accounts + a.print() + "\n"
+                count++
+            }
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
-            Log.d("Baresip", "Saved accounts to '${BaresipService.filesPath}/accounts'")
+            Log.d("Baresip", "Saved $count account(s) to '${BaresipService.filesPath}/accounts'")
             // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 

@@ -8,7 +8,7 @@ class Account(val accp: String) {
 
     var displayName = account_display_name(accp)
     val aor = account_aor(accp)
-    val uri = account_uri(accp)
+    var uri = account_uri(accp)
     var authUser = account_auth_user(accp)
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
