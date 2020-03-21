@@ -651,7 +651,7 @@ Java_com_tutpro_baresip_AccountKt_account_1aor(JNIEnv *env, jobject thiz, jstrin
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1uri(JNIEnv *env, jobject thiz, jstring javaAcc) {
+Java_com_tutpro_baresip_AccountKt_account_1laddr(JNIEnv *env, jobject thiz, jstring javaAcc) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);

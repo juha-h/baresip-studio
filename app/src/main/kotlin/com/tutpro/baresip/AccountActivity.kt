@@ -52,7 +52,7 @@ class AccountActivity : AppCompatActivity() {
         setTitle(aor.split(":")[1])
 
         uri = findViewById(R.id.Uri) as TextView
-        uri.setText(acc.uri)
+        uri.setText(acc.laddr)
 
         displayName = findViewById(R.id.DisplayName) as EditText
         displayName.setText(acc.displayName)
