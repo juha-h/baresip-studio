@@ -200,12 +200,8 @@ object Utils {
 
     fun paramValue(params: String, name: String): String {
         if (params == "") return ""
-        for (param in params.split(";")) {
-            val nameValue = param.split("=")
-            if (nameValue.size == 2) {
-                if (nameValue[0] == name) return nameValue[1]
-            }
-        }
+        for (param in params.split(";"))
+            if (param.substringBefore("=") == name) return param.substringAfter("=")
         return ""
     }
 
