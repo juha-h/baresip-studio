@@ -8,7 +8,7 @@ class Account(val accp: String) {
 
     var displayName = account_display_name(accp)
     val aor = account_aor(accp)
-    var laddr = account_laddr(accp)
+    var laddr = ""
     var authUser = account_auth_user(accp)
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
@@ -60,6 +60,8 @@ class Account(val accp: String) {
         }
 
         val extra = account_extra(accp)
+        laddr = Utils.paramValue(extra,"laddr").replace("#", ";")
+        if (laddr == "") laddr = aor
         preferIPv6Media = Utils.paramValue(extra,"prefer_ipv6_media") == "yes"
         answerMode = Utils.paramValue(extra,"answer_mode")
         if (answerMode == "") answerMode = "manual"
@@ -114,7 +116,7 @@ class Account(val accp: String) {
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
-        var extra = ""
+        var extra = "laddr=" + laddr.replace(";", "#")
 
         if (!callHistory)
             extra += ";call_history=no"
@@ -126,7 +128,7 @@ class Account(val accp: String) {
                 extra += ";prefer_ipv6_media=yes"
 
         if (extra != "")
-            res += ";extra=\"" + extra.substringAfter(";") + "\""
+            res += ";extra=\"" + extra + "\""
 
         return res
     }

@@ -39,14 +39,16 @@ class AccountsActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
             } else {
-                val ua = UserAgent.uaAlloc("<sip:$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
+                val laddr = "sip:$aor"
+                val eladdr = laddr.replace(";", "#")
+                val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;extra=\"laddr=$eladdr\"")
                 if (ua == null) {
                     Log.e("Baresip", "Failed to allocate UA for $aor")
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.account_allocation_failure))
                 } else {
-                    Log.d("Baresip", "Allocated UA ${ua.uap} for $aor")
-                    ua.account.laddr = "sip:$aor"
+                    ua.account.laddr = laddr
+                    Log.d("Baresip", "Allocated UA ${ua.uap} for $laddr")
                     newAorView.setText("")
                     newAorView.hint = getString(R.string.user_domain)
                     newAorView.clearFocus()
@@ -124,7 +126,7 @@ class AccountsActivity : AppCompatActivity() {
             }
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
             Log.d("Baresip", "Saved $count account(s) to '${BaresipService.filesPath}/accounts'")
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun noAccounts(): Boolean {
