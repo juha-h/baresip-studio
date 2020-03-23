@@ -40,8 +40,7 @@ class AccountsActivity : AppCompatActivity() {
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
             } else {
                 val laddr = "sip:$aor"
-                val eladdr = laddr.replace(";", "#")
-                val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;extra=\"laddr=$eladdr\"")
+                val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0")
                 if (ua == null) {
                     Log.e("Baresip", "Failed to allocate UA for $aor")
                     Utils.alertView(this, getString(R.string.notice),
@@ -66,7 +65,6 @@ class AccountsActivity : AppCompatActivity() {
         }
 
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 

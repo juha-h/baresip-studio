@@ -68,6 +68,16 @@ static void ua_debug_log(struct ua *ua) {
     }
 }
 
+static void account_debug_log(struct account *acc) {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", account_debug, acc);
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
 static void ua_print_status_log(struct ua *ua) {
     char debug_buf[2048];
     int l;
@@ -533,7 +543,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    LOGD("adding %u accounts", list_count(uag_list()));
     char ua_buf[32];
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
