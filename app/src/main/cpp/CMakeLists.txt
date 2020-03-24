@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.4.1)
 
 set(distribution_DIR ${CMAKE_SOURCE_DIR}/../../../../distribution)
@@ -22,6 +21,22 @@ set_target_properties(lib_rem PROPERTIES IMPORTED_LOCATION
 add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
+
+add_library(lib_avcodec STATIC IMPORTED)
+set_target_properties(lib_avcodec PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavcodec.a)
+
+add_library(lib_avutil STATIC IMPORTED)
+set_target_properties(lib_avutil PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavutil.a)
+
+add_library(lib_swresample STATIC IMPORTED)
+set_target_properties(lib_swresample PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswresample.a)
+
+add_library(lib_avformat STATIC IMPORTED)
+set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.a)
 
 add_library(lib_spandsp STATIC IMPORTED)
 set_target_properties(lib_spandsp PROPERTIES IMPORTED_LOCATION
@@ -65,6 +80,9 @@ target_include_directories(baresip PRIVATE
 
 target_link_libraries(baresip
         android
+        GLESv3
+        GLESv2
+        GLESv1_CM
         OpenSLES
         lib_baresip
         lib_rem
@@ -72,6 +90,10 @@ target_link_libraries(baresip
         lib_ssl
         lib_crypto
         lib_opus
+        lib_avcodec
+        lib_avutil
+        lib_swresample
+        lib_avformat
         lib_spandsp
         lib_g722_1
         lib_ilbc
