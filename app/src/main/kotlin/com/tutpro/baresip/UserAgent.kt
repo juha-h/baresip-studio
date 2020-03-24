@@ -38,6 +38,7 @@ class UserAgent(val uap: String) {
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)
+            Log.e("Baresip", "Failed to allocate UserAgent for $uri")
             return null
         }
 

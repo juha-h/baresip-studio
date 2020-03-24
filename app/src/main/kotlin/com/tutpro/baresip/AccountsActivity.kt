@@ -46,8 +46,8 @@ class AccountsActivity : AppCompatActivity() {
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.account_allocation_failure))
                 } else {
-                    ua.account.laddr = laddr
-                    Log.d("Baresip", "Allocated UA ${ua.uap} for $laddr")
+                    // Api.account_debug(ua.account.accp)
+                    Log.d("Baresip", "Allocated UA ${ua.uap} for ${account_luri(ua.account.accp)}")
                     newAorView.setText("")
                     newAorView.hint = getString(R.string.user_domain)
                     newAorView.clearFocus()

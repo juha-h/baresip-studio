@@ -36,7 +36,6 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         val actionView = rowView.findViewById(R.id.action) as ImageButton
         actionView.setImageResource(row.action)
         actionView.setOnClickListener { _ ->
-            Log.d("Baresip", "Delete button clicked")
             val deleteDialog = AlertDialog.Builder(cxt)
             deleteDialog.setMessage(String.format(cxt.getString(R.string.delete_account),
                     aorView.text))

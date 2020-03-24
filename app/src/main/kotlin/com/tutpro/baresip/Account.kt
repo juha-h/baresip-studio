@@ -8,7 +8,7 @@ class Account(val accp: String) {
 
     var displayName = account_display_name(accp)
     val aor = account_aor(accp)
-    var laddr = account_laddr(accp)
+    var luri = account_luri(accp)
     var authUser = account_auth_user(accp)
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
@@ -76,7 +76,7 @@ class Account(val accp: String) {
         else
             res = ""
 
-        res = res + "<$laddr>"
+        res = res + "<$luri>"
 
         if (authUser != "") res = res + ";auth_user=\"${authUser}\""
 
@@ -220,7 +220,7 @@ class Account(val accp: String) {
 external fun account_set_display_name(acc: String, dn: String): Int
 external fun account_display_name(acc: String): String
 external fun account_aor(acc: String): String
-external fun account_laddr(acc: String): String
+external fun account_luri(acc: String): String
 external fun account_auth_user(acc: String): String
 external fun account_set_auth_user(acc: String, user: String): Int
 external fun account_auth_pass(acc: String): String

@@ -21,6 +21,7 @@ object Api {
     external fun ua_call_alloc(uap: String, xcallp: String): String
     external fun ua_answer(uap: String, callp: String)
     external fun ua_set_media_af(uap: String, af: Int)
+    external fun account_debug(accp: String)
     external fun ua_debug(uap: String)
     external fun call_hold(callp: String): Int
     external fun call_unhold(callp: String): Int
