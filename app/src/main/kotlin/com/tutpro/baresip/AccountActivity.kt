@@ -418,21 +418,21 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var vmUri = voicemailUri.text.toString().trim()
-                if (vmUri != acc.vmUri) {
-                    if (vmUri != "") {
-                        if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
-                        if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
-                        if (!Utils.checkSipUri(vmUri)) {
+                var tVmUri = voicemailUri.text.toString().trim()
+                if (tVmUri != acc.vmUri) {
+                    if (tVmUri != "") {
+                        if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
+                        if (!tVmUri.contains("@")) tVmUri = "$tVmUri@${acc.host()}"
+                        if (!Utils.checkSipUri(tVmUri)) {
                             Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_voicemail_uri), vmUri))
+                                    String.format(getString(R.string.invalid_voicemail_uri), tVmUri))
                             return false
                         }
                         account_set_mwi(acc.accp, "yes")
                     } else {
                         account_set_mwi(acc.accp, "no")
                     }
-                    acc.vmUri = vmUri
+                    acc.vmUri = tVmUri
                     save = true
                 }
 

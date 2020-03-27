@@ -110,7 +110,7 @@ class Account(val accp: String) {
         if (vmUri == "")
             res = res + ";mwi=no"
         else
-            res = res + ";vm_uri=\"$vmUri\""
+            res = res + ";mwi=yes;vm_uri=\"$vmUri\""
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
