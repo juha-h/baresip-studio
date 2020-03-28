@@ -90,10 +90,10 @@ target_link_libraries(baresip
         lib_ssl
         lib_crypto
         lib_opus
+        lib_avformat
         lib_avcodec
         lib_avutil
         lib_swresample
-        lib_avformat
         lib_spandsp
         lib_g722_1
         lib_ilbc
