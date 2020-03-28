@@ -1159,7 +1159,7 @@ class MainActivity : AppCompatActivity() {
             return false
         }
         if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]) spinToAor(ua.account.aor)
-        val callp = Api.ua_connect(ua.uap, uri)
+        val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_ON)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
             Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
@@ -1173,7 +1173,7 @@ class MainActivity : AppCompatActivity() {
 
     // Currently transfer is implemented by first closing existing call and the making the new one
     private fun transfer(ua: UserAgent, call: Call, uri: String) {
-        val newCallp = Api.ua_call_alloc(ua.uap, call.callp)
+        val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_ON)
         if (newCallp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
