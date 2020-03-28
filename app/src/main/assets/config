@@ -1,5 +1,5 @@
 auto_start yes
-log_level 2
+log_level 0
 poll_method epoll
 sip_trans_bsize 128
 call_local_timeout 120
@@ -14,6 +14,8 @@ ausrc_format s16
 auenc_format s16
 auplay_format s16
 audec_format s16
+video_source avformat,android_camera
+videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
 jitter_buffer_delay 5-10
@@ -26,6 +28,8 @@ module g722.so
 module g7221.so
 module g726.so
 module g711.so
+module avcodec.so
+module avformat.so
 module webrtc_aec.so
 module opensles.so
 module stun.so
