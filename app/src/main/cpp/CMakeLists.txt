@@ -22,6 +22,10 @@ add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
 
+add_library(lib_x264 STATIC IMPORTED)
+set_target_properties(lib_x264 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/x264/lib/${ANDROID_ABI}/libx264.a)
+
 add_library(lib_avcodec STATIC IMPORTED)
 set_target_properties(lib_avcodec PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavcodec.a)
@@ -33,6 +37,10 @@ set_target_properties(lib_avutil PROPERTIES IMPORTED_LOCATION
 add_library(lib_swresample STATIC IMPORTED)
 set_target_properties(lib_swresample PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswresample.a)
+
+add_library(lib_avdevice STATIC IMPORTED)
+set_target_properties(lib_avdevice PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavdevice.a)
 
 add_library(lib_avformat STATIC IMPORTED)
 set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
@@ -90,8 +98,10 @@ target_link_libraries(baresip
         lib_ssl
         lib_crypto
         lib_opus
+        lib_avdevice
         lib_avformat
         lib_avcodec
+        lib_x264
         lib_avutil
         lib_swresample
         lib_spandsp

@@ -124,7 +124,7 @@ class AccountsActivity : AppCompatActivity() {
             }
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
             Log.d("Baresip", "Saved $count account(s) to '${BaresipService.filesPath}/accounts'")
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun noAccounts(): Boolean {
