@@ -28,6 +28,7 @@ class ContactActivity : AppCompatActivity() {
 
     internal var newContact = false
     internal var newAvatar = ""
+    internal var uOrI = ""
 
     private var index = 0
     private var color = 0
@@ -45,7 +46,6 @@ class ContactActivity : AppCompatActivity() {
         uriView = findViewById(R.id.Uri) as EditText
 
         newContact = intent.getBooleanExtra("new", false)
-        val uOrI: String
 
         if (newContact) {
             title = getString(R.string.new_contact)
@@ -118,7 +118,7 @@ class ContactActivity : AppCompatActivity() {
 
         }
 
-        BaresipService.activities.add(0, "contact,$newContact,$uOrI")
+        Utils.addActivity("contact,$newContact,$uOrI")
 
     }
 
@@ -152,7 +152,7 @@ class ContactActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val i = Intent(this, MainActivity::class.java)
+        if (BaresipService.activities.indexOf("contact,$newContact,$uOrI") == -1) return true
 
         when (item.itemId) {
 
@@ -231,6 +231,8 @@ class ContactActivity : AppCompatActivity() {
 
                 Contact.save()
 
+                BaresipService.activities.remove("contact,$newContact,$uOrI")
+                val i = Intent(this, MainActivity::class.java)
                 i.putExtra("name", newName)
                 setResult(Activity.RESULT_OK, i)
                 finish()
@@ -238,20 +240,24 @@ class ContactActivity : AppCompatActivity() {
 
             android.R.id.home -> {
 
+                BaresipService.activities.remove("contact,$newContact,$uOrI")
+                val i = Intent(this, MainActivity::class.java)
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
             }
 
         }
 
-        BaresipService.activities.removeAt(0)
         return true
 
     }
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("contact,$newContact,$uOrI")
+        val i = Intent(this, MainActivity::class.java)
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
         super.onBackPressed()
 
     }

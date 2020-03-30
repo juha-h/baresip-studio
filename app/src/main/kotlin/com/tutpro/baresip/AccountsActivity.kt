@@ -68,6 +68,8 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
+        if (BaresipService.activities.indexOf("accounts") == -1) return true
+
         when (item.itemId) {
 
             R.id.help -> {
@@ -76,8 +78,7 @@ class AccountsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at Accounts")
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("accounts")
                 val i = Intent()
                 setResult(RESULT_OK, i)
                 finish()
@@ -96,7 +97,7 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("accounts")
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()

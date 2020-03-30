@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -26,6 +27,9 @@ class ChatActivity : AppCompatActivity() {
     internal lateinit var ua: UserAgent
     internal lateinit var messageResponseReceiver: BroadcastReceiver
 
+    private var focus = false
+    private var lastCall: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -34,7 +38,15 @@ class ChatActivity : AppCompatActivity() {
 
         aor = intent.getStringExtra("aor")!!
         peerUri = intent.getStringExtra("peer")!!
-        val focus = intent.getBooleanExtra("focus", false)
+        focus = intent.getBooleanExtra("focus", false)
+
+        if (BaresipService.activities.first().startsWith("chat,$aor,$peerUri")) {
+            val i = Intent()
+            setResult(Activity.RESULT_CANCELED, i)
+            finish()
+        } else {
+            Utils.addActivity("chat,$aor,$peerUri,$focus")
+        }
 
         val userAgent = Account.findUa(aor)
         if (userAgent == null) {
@@ -46,9 +58,6 @@ class ChatActivity : AppCompatActivity() {
         } else {
             ua = userAgent
         }
-
-        if (!BaresipService.activities.first().startsWith("chat,$aor,$peerUri"))
-            Utils.addActivity("chat,$aor,$peerUri,$focus")
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
@@ -175,11 +184,6 @@ class ChatActivity : AppCompatActivity() {
 
     }
 
-    /*override fun onStop() {
-        super.onStop()
-        Log.d("Baresip", "Chat Stopped")
-    }*/
-
     override fun onResume() {
 
         super.onResume()
@@ -207,6 +211,10 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
+        if ((BaresipService.activities.indexOf("chat,$aor,$peerUri,false") == -1) &&
+                (BaresipService.activities.indexOf("chat,$aor,$peerUri,true") == -1))
+                return true
+
         when (item.itemId) {
 
             android.R.id.home -> {
@@ -219,31 +227,37 @@ class ChatActivity : AppCompatActivity() {
                 }
                 if (save) Message.save()
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("chat,$aor,$peerUri,false")
+                BaresipService.activities.remove("chat,$aor,$peerUri,true")
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
+                finish()
             }
 
             R.id.callIcon -> {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                intent.putExtra("action", "call")
-                intent.putExtra("uap", ua.uap)
-                intent.putExtra("peer", peerUri)
-                startActivity(intent)
+                if (SystemClock.elapsedRealtime() - lastCall > 1000) {
+                    lastCall = SystemClock.elapsedRealtime()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.putExtra("action", "call")
+                    intent.putExtra("uap", ua.uap)
+                    intent.putExtra("peer", peerUri)
+                    startActivity(intent)
+                    finish()
+                }
             }
 
         }
 
-        finish()
         return true
 
     }
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("chat,$aor,$peerUri,false")
+        BaresipService.activities.remove("chat,$aor,$peerUri,true")
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()

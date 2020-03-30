@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.format.DateUtils.isToday
@@ -23,6 +24,7 @@ class CallsActivity : AppCompatActivity() {
 
     internal var uaHistory = ArrayList<CallRow>()
     internal var aor = ""
+    private var lastClick: Long = 0
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -67,13 +69,16 @@ class CallsActivity : AppCompatActivity() {
                     }
                 }
             }
-            val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
-            builder.setMessage(String.format(getString(R.string.calls_call_message_question),
-                    peerName))
-                    .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    .setNegativeButton(getString(R.string.call), dialogClickListener)
-                    .setPositiveButton(getString(R.string.send_message), dialogClickListener)
-                    .show()
+            if (SystemClock.elapsedRealtime() - lastClick > 1000) {
+                lastClick = SystemClock.elapsedRealtime()
+                val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
+                builder.setMessage(String.format(getString(R.string.calls_call_message_question),
+                        peerName))
+                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                        .setNegativeButton(getString(R.string.call), dialogClickListener)
+                        .setPositiveButton(getString(R.string.send_message), dialogClickListener)
+                        .show()
+            }
         }
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
@@ -134,6 +139,8 @@ class CallsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
+        if (BaresipService.activities.indexOf("calls,$aor") == -1) return true
+
         when (item.itemId) {
 
             R.id.delete_history -> {
@@ -160,7 +167,7 @@ class CallsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("calls,$aor")
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
@@ -172,7 +179,10 @@ class CallsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("calls,$aor")
+        val i = Intent()
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
         super.onBackPressed()
 
     }

@@ -19,7 +19,7 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
 
-    internal var aor = ""
+    private var aor = ""
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -171,7 +171,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("chats,$aor")
                 val i = Intent()
                 setResult(Activity.RESULT_CANCELED, i)
                 finish()
@@ -197,10 +197,11 @@ class ChatsActivity: AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("chats,$aor")
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()
+        super.onBackPressed()
 
     }
 
