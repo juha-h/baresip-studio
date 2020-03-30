@@ -1,0 +1,4 @@
+- Prevent crashes resulting from double clicking of various icons and
+  list items.
+- Change color of account's notification icon to white when account is
+  unregistered.
