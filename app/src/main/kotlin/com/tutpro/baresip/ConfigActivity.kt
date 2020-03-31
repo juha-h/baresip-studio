@@ -186,7 +186,7 @@ class ConfigActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val intent = Intent(this, MainActivity::class.java)
+        if (BaresipService.activities.indexOf("config") == -1) return true
 
         when (item.itemId) {
 
@@ -386,8 +386,9 @@ class ConfigActivity : AppCompatActivity() {
 
                 if (save) Config.save()
 
+                BaresipService.activities.remove("config")
+                val intent = Intent(this, MainActivity::class.java)
                 if (restart) intent.putExtra("restart", true)
-
                 setResult(RESULT_OK, intent)
                 finish()
 
@@ -395,13 +396,14 @@ class ConfigActivity : AppCompatActivity() {
 
             android.R.id.home -> {
 
+                BaresipService.activities.remove("config")
+                val intent = Intent(this, MainActivity::class.java)
                 setResult(Activity.RESULT_CANCELED, intent)
                 finish()
 
             }
         }
 
-        BaresipService.activities.removeAt(0)
         return true
 
     }
@@ -430,7 +432,10 @@ class ConfigActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("config")
+        val intent = Intent(this, MainActivity::class.java)
+        setResult(Activity.RESULT_CANCELED, intent)
+        finish()
         super.onBackPressed()
 
     }

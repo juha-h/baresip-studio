@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.ImageButton
@@ -12,6 +13,7 @@ class ContactsActivity : AppCompatActivity() {
 
     internal lateinit var clAdapter: ContactListAdapter
     internal lateinit var aor: String
+    private var lastClick: Long = 0
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -33,12 +35,15 @@ class ContactsActivity : AppCompatActivity() {
                         String.format(getString(R.string.contacts_exceeded),
                                 Contact.CONTACTS_SIZE))
             } else {
-                val i = Intent(this, ContactActivity::class.java)
-                val b = Bundle()
-                b.putBoolean("new", true)
-                b.putString("uri", "")
-                i.putExtras(b)
-                startActivityForResult(i, MainActivity.CONTACT_CODE)
+                if (SystemClock.elapsedRealtime() - lastClick > 1000) {
+                    lastClick = SystemClock.elapsedRealtime()
+                    val i = Intent(this, ContactActivity::class.java)
+                    val b = Bundle()
+                    b.putBoolean("new", true)
+                    b.putString("uri", "")
+                    i.putExtras(b)
+                    startActivityForResult(i, MainActivity.CONTACT_CODE)
+                }
             }
         }
 
@@ -55,8 +60,7 @@ class ContactsActivity : AppCompatActivity() {
         when (item.itemId) {
 
             android.R.id.home -> {
-                Log.d("Baresip", "Back array was pressed at Contacts")
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("contacts,$aor")
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
                 finish()
@@ -69,7 +73,7 @@ class ContactsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("contacts,$aor")
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()

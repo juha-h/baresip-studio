@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.CardView
 import android.view.LayoutInflater
@@ -23,6 +24,8 @@ import java.util.*
 class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>,
                          private val aor: String) :
         ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
+
+    private var lastClick: Long = 0
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val contact = rows[position]
@@ -77,13 +80,16 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                         }
                     }
                 }
-                val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
-                        Contact.contacts()[position].name))
-                        .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
-                        .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
-                        .show()
+                if (SystemClock.elapsedRealtime() - lastClick > 1000) {
+                    lastClick = SystemClock.elapsedRealtime()
+                    val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
+                    builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
+                            Contact.contacts()[position].name))
+                            .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
+                            .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
+                            .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
+                            .show()
+                }
             }
         }
         nameView.setOnLongClickListener { _ ->
@@ -117,12 +123,15 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
         }
         val actionView = rowView.findViewById(R.id.edit) as ImageButton
         actionView.setOnClickListener { _ ->
-            val i = Intent(cxt, ContactActivity::class.java)
-            val b = Bundle()
-            b.putBoolean("new", false)
-            b.putInt("index", position)
-            i.putExtras(b)
-            (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
+            if (SystemClock.elapsedRealtime() - lastClick > 1000) {
+                lastClick = SystemClock.elapsedRealtime()
+                val i = Intent(cxt, ContactActivity::class.java)
+                val b = Bundle()
+                b.putBoolean("new", false)
+                b.putInt("index", position)
+                i.putExtras(b)
+                (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
+            }
         }
         return rowView
     }

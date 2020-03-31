@@ -35,13 +35,14 @@ class AccountActivity : AppCompatActivity() {
     private var newCodecs = ArrayList<String>()
     private var save = false
     private var uaIndex= -1
+    private var accp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        val accp = intent.getStringExtra("accp")
+        accp = intent.getStringExtra("accp")
         Utils.addActivity("account,$accp")
 
         acc = Account.find(accp)!!
@@ -203,6 +204,8 @@ class AccountActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if (BaresipService.activities.indexOf("account,$accp") == -1) return true
 
         when (item.itemId) {
 
@@ -418,21 +421,21 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var vmUri = voicemailUri.text.toString().trim()
-                if (vmUri != acc.vmUri) {
-                    if (vmUri != "") {
-                        if (!vmUri.startsWith("sip:")) vmUri = "sip:$vmUri"
-                        if (!vmUri.contains("@")) vmUri = "$vmUri@${acc.host()}"
-                        if (!Utils.checkSipUri(vmUri)) {
+                var tVmUri = voicemailUri.text.toString().trim()
+                if (tVmUri != acc.vmUri) {
+                    if (tVmUri != "") {
+                        if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
+                        if (!tVmUri.contains("@")) tVmUri = "$tVmUri@${acc.host()}"
+                        if (!Utils.checkSipUri(tVmUri)) {
                             Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_voicemail_uri), vmUri))
+                                    String.format(getString(R.string.invalid_voicemail_uri), tVmUri))
                             return false
                         }
                         account_set_mwi(acc.accp, "yes")
                     } else {
                         account_set_mwi(acc.accp, "no")
                     }
-                    acc.vmUri = vmUri
+                    acc.vmUri = tVmUri
                     save = true
                 }
 
@@ -456,7 +459,7 @@ class AccountActivity : AppCompatActivity() {
 
                 if (regCheck.isChecked) Api.ua_register(ua.uap)
 
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("account,$accp")
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
                 finish()
@@ -465,7 +468,7 @@ class AccountActivity : AppCompatActivity() {
 
             android.R.id.home -> {
 
-                BaresipService.activities.removeAt(0)
+                BaresipService.activities.remove("account,$accp")
                 val i = Intent()
                 setResult(Activity.RESULT_OK, i)
                 finish()
@@ -480,7 +483,10 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        BaresipService.activities.removeAt(0)
+        BaresipService.activities.remove("account,$accp")
+        val i = Intent()
+        setResult(Activity.RESULT_OK, i)
+        finish()
         super.onBackPressed()
 
     }

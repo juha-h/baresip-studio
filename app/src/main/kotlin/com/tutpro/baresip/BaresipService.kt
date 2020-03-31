@@ -537,7 +537,7 @@ class BaresipService: Service() {
                             return
                     }
                     "unregistering" -> {
-                        status[account_index] = R.drawable.dot_yellow
+                        status[account_index] = R.drawable.dot_white
                         updateStatusNotification()
                         if (!Utils.isVisible())
                             return

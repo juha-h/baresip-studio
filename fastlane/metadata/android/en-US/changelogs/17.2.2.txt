@@ -1,0 +1,2 @@
+- Do not subscribe to message waiting indication when account is created
+  and voicemail URI is not set.
