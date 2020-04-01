@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var speakerIcon: MenuItem
 
     internal var restart = false
+    internal var atStartup = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -425,22 +426,22 @@ class MainActivity : AppCompatActivity() {
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
 
-        if (!BaresipService.isServiceRunning) {
-            if (File(filesDir.absolutePath + "/accounts").exists()) {
-                val accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
-                        Charsets.UTF_8).lines().toMutableList()
-                askAorPasswords(accounts)
-            } else {
-                startBaresip()
-            }
-        }
-
-        if (intent.hasExtra("onStartup"))
-            moveTaskToBack(true)
+        atStartup = intent.hasExtra("onStartup")
 
         if (intent.hasExtra("action"))
             // MainActivity was not visible when call, message, or transfer request came in
             handleIntent(intent)
+        else
+            if (!BaresipService.isServiceRunning)
+                if (File(filesDir.absolutePath + "/accounts").exists()) {
+                    val accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                            Charsets.UTF_8).lines().toMutableList()
+                    askAorPasswords(accounts)
+                } else {
+                    // Baresip is started for the first time
+                    Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
+                            RECORD_PERMISSION_REQUEST_CODE)
+                }
 
     } // OnCreate
 
@@ -914,10 +915,12 @@ class MainActivity : AppCompatActivity() {
 
         when (requestCode) {
 
-            RECORD_PERMISSION_REQUEST_CODE ->
+            RECORD_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Toast.makeText(applicationContext, getString(R.string.no_calls),
                             Toast.LENGTH_LONG).show()
+                startBaresip()
+            }
 
             BACKUP_PERMISSION_REQUEST_CODE ->
                 if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
@@ -1013,6 +1016,8 @@ class MainActivity : AppCompatActivity() {
     private fun startBaresip() {
         baresipService.setAction("Start")
         startService(baresipService)
+        if (atStartup)
+            moveTaskToBack(true)
     }
 
     private fun backup(password: String) {
@@ -1090,8 +1095,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
-                Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                        RECORD_PERMISSION_REQUEST_CODE)
             }
 
             ACCOUNT_CODE -> {
