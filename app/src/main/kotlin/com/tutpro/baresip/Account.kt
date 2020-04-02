@@ -120,10 +120,10 @@ class Account(val accp: String) {
             extra += ";call_history=no"
 
         if (answerMode == "auto")
-                extra += ";answer_mode=auto"
+            extra += ";answer_mode=auto"
 
         if (preferIPv6Media)
-                extra += ";prefer_ipv6_media=yes"
+            extra += ";prefer_ipv6_media=yes"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
