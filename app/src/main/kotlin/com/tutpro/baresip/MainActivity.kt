@@ -15,6 +15,8 @@ import android.support.v4.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
 import android.text.TextWatcher
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.widget.*
 import android.view.*
 
@@ -956,6 +958,13 @@ class MainActivity : AppCompatActivity() {
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
         val input = viewInflated.findViewById(R.id.password) as EditText
+        val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                input.transformationMethod = HideReturnsTransformationMethod()
+            else
+                input.transformationMethod = PasswordTransformationMethod()
+        }
         builder.setView(viewInflated)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
@@ -986,6 +995,13 @@ class MainActivity : AppCompatActivity() {
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                                 false)
                 val input = viewInflated.findViewById(R.id.password) as EditText
+                val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+                checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (isChecked)
+                        input.transformationMethod = HideReturnsTransformationMethod()
+                    else
+                        input.transformationMethod = PasswordTransformationMethod()
+                }
                 builder.setView(viewInflated)
                 builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
