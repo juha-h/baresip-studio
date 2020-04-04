@@ -224,11 +224,6 @@ object Utils {
             return false
     }
 
-    fun checkPrintAscii(s: String): Boolean {
-        if (s == "") return true
-        return Regex("^[ -~]*\$").matches(s)
-    }
-
     fun checkName(name: String): Boolean {
         return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
                 name.lines().size == 1 && !name.contains('"')
@@ -566,4 +561,5 @@ object Utils {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
     }
+
 }

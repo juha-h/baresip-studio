@@ -3,10 +3,18 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.widget.*
+import com.tutpro.baresip.Account.Companion.checkAuthPass
+import com.tutpro.baresip.MainActivity.Companion.ACCOUNT_CODE
+import com.tutpro.baresip.MainActivity.Companion.aorPasswords
 
 import java.util.ArrayList
 
@@ -59,11 +67,58 @@ class AccountsActivity : AppCompatActivity() {
                     val b = Bundle()
                     b.putString("accp", ua.account.accp)
                     i.putExtras(b)
-                    startActivity(i)
+                    startActivityForResult(i, ACCOUNT_CODE)
                 }
             }
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            ACCOUNT_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val aor = Account.find(data!!.getStringExtra("accp"))!!.aor
+                    val ua = UserAgent.uas()[UserAgent.findAorIndex(aor)!!]
+                    if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
+                        askPassword(String.format(getString(R.string.account_password), aor), ua)
+                }
+            }
+        }
+    }
+
+    private fun askPassword(title: String, ua: UserAgent) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(title)
+        val viewInflated = LayoutInflater.from(this)
+                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                        false)
+        val input = viewInflated.findViewById(R.id.password) as EditText
+        val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                input.transformationMethod = HideReturnsTransformationMethod()
+            else
+                input.transformationMethod = PasswordTransformationMethod()
+        }
+        builder.setView(viewInflated)
+        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+            var password = input.text.toString().trim()
+            if (!checkAuthPass(password)) {
+                Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_authentication_password), password))
+                password = ""
+            }
+            aorPasswords[ua.account.aor] = password
+            account_set_auth_pass(ua.account.accp, password)
+            if (password != "")
+                if (ua.account.regint > 0) Api.ua_register(ua.uap)
+        }
+        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            dialog.cancel()
+        }
+        builder.show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

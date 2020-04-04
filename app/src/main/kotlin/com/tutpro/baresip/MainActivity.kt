@@ -19,6 +19,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.widget.*
 import android.view.*
+import com.tutpro.baresip.Account.Companion.checkAuthPass
 
 import java.io.File
 import kotlin.collections.ArrayList
@@ -951,7 +952,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun askPassword(title: String) {
+    private fun askPassword(title: String, ua: UserAgent? = null) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         val viewInflated = LayoutInflater.from(this)
@@ -968,12 +969,23 @@ class MainActivity : AppCompatActivity() {
         builder.setView(viewInflated)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
-            val password = input.text.toString()
-            if (password != "") {
-                if (title == getString(R.string.encrypt_password))
-                    backup(password)
-                else
-                    restore(password)
+            var password = input.text.toString().trim()
+            if (!checkAuthPass(password)) {
+                Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_authentication_password), password))
+                password = ""
+            }
+            when (title) {
+                getString(R.string.encrypt_password) ->
+                    if (password != "") backup(password)
+                getString(R.string.decrypt_password) ->
+                    if (password != "") restore(password)
+                else -> {
+                    aorPasswords[ua!!.account.aor] = password
+                    account_set_auth_pass(ua.account.accp, password)
+                    if (password != "")
+                        if (ua.account.regint > 0) Api.ua_register(ua.uap)
+                }
             }
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -1005,11 +1017,10 @@ class MainActivity : AppCompatActivity() {
                 builder.setView(viewInflated)
                 builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
-                    val password = input.text.toString()
-                    if ((password.length < 1) || (password.length > 64) || !Utils.checkPrintAscii(password)) {
+                    val password = input.text.toString().trim()
+                    if (!checkAuthPass(password)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_password),  password))
-                        accounts.add(0, account)
                     } else {
                         aorPasswords.put(aor, password)
                     }
@@ -1111,10 +1122,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 baresipService.setAction("UpdateNotification")
                 startService(baresipService)
+                for (ua in UserAgent.uas()) updateIcons(ua.account)
             }
 
             ACCOUNT_CODE -> {
-                updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
+                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                val account = ua.account
+                updateIcons(account)
+                if (aorPasswords.containsKey(account.aor) && aorPasswords[account.aor] == "")
+                    askPassword(String.format(getString(R.string.account_password),
+                            Utils.plainAor(account.aor)), ua)
             }
 
             CONTACTS_CODE -> {
@@ -1435,6 +1452,8 @@ class MainActivity : AppCompatActivity() {
         var resumeUap = ""
         var resumeCall: Call? = null
         var resumeUri = ""
+
+        // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 
         const val ACCOUNTS_CODE = 1
