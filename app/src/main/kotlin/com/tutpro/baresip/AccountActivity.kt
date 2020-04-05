@@ -9,12 +9,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout.LayoutParams
 import android.widget.*
+
+import kotlinx.android.synthetic.main.activity_account.*
+
 import com.tutpro.baresip.Account.Companion.checkAuthPass
 import com.tutpro.baresip.Account.Companion.checkAuthUser
 import com.tutpro.baresip.Account.Companion.checkDisplayName
 import com.tutpro.baresip.MainActivity.Companion.aorPasswords
-
-import kotlinx.android.synthetic.main.activity_account.*
 
 class AccountActivity : AppCompatActivity() {
 

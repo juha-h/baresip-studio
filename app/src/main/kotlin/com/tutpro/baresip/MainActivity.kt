@@ -1,10 +1,7 @@
 package com.tutpro.baresip
 
 import android.Manifest
-import android.app.KeyguardManager
-import android.app.NotificationManager
-import android.app.AlarmManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.*
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -19,10 +16,11 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.widget.*
 import android.view.*
-import com.tutpro.baresip.Account.Companion.checkAuthPass
 
 import java.io.File
 import kotlin.collections.ArrayList
+
+import com.tutpro.baresip.Account.Companion.checkAuthPass
 
 class MainActivity : AppCompatActivity() {
 
@@ -65,15 +63,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Main created with action '$intentAction'")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        if (Build.VERSION.SDK_INT >= 27) {
-            setShowWhenLocked(true)
-            setTurnScreenOn(true)
-            kgm.requestDismissKeyguard(this, null)
-        } else {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
-        }
+        dismissKeyguard()
+
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(R.layout.activity_main)
@@ -439,7 +430,7 @@ class MainActivity : AppCompatActivity() {
                 if (File(filesDir.absolutePath + "/accounts").exists()) {
                     val accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
                             Charsets.UTF_8).lines().toMutableList()
-                    askAorPasswords(accounts)
+                    askPasswords(accounts)
                 } else {
                     // Baresip is started for the first time
                     Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
@@ -980,12 +971,8 @@ class MainActivity : AppCompatActivity() {
                     if (password != "") backup(password)
                 getString(R.string.decrypt_password) ->
                     if (password != "") restore(password)
-                else -> {
-                    aorPasswords[ua!!.account.aor] = password
-                    account_set_auth_pass(ua.account.accp, password)
-                    if (password != "")
-                        if (ua.account.regint > 0) Api.ua_register(ua.uap)
-                }
+                else ->
+                    AccountsActivity.setAuthPass(ua!!, password)
             }
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -994,7 +981,7 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun askAorPasswords(accounts: MutableList<String>) {
+    private fun askPasswords(accounts: MutableList<String>) {
         if (accounts.isNotEmpty()) {
             val account = accounts.removeAt(0)
             val params = account.substringAfter(">")
@@ -1024,16 +1011,16 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         aorPasswords.put(aor, password)
                     }
-                    askAorPasswords(accounts)
+                    askPasswords(accounts)
                 }
                 builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
                     dialog.cancel()
                     aorPasswords.put(aor, "")
-                    askAorPasswords(accounts)
+                    askPasswords(accounts)
                 }
                 builder.show()
             } else {
-                askAorPasswords(accounts)
+                askPasswords(accounts)
             }
         } else {
             startBaresip()
@@ -1120,18 +1107,20 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     aorSpinner.setSelection(-1)
                 }
-                baresipService.setAction("UpdateNotification")
-                startService(baresipService)
-                for (ua in UserAgent.uas()) updateIcons(ua.account)
+                if (BaresipService.isServiceRunning) {
+                    baresipService.setAction("UpdateNotification")
+                    startService(baresipService)
+                }
             }
 
             ACCOUNT_CODE -> {
                 val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
                 val account = ua.account
                 updateIcons(account)
-                if (aorPasswords.containsKey(account.aor) && aorPasswords[account.aor] == "")
-                    askPassword(String.format(getString(R.string.account_password),
-                            Utils.plainAor(account.aor)), ua)
+                if (resultCode == Activity.RESULT_OK)
+                    if (aorPasswords.containsKey(account.aor) && aorPasswords[account.aor] == "")
+                        askPassword(String.format(getString(R.string.account_password),
+                                Utils.plainAor(account.aor)), ua)
             }
 
             CONTACTS_CODE -> {
@@ -1442,6 +1431,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return
+    }
+
+    @Suppress("DEPRECATION")
+    private fun dismissKeyguard() {
+        if (Build.VERSION.SDK_INT >= 27) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            kgm.requestDismissKeyguard(this, null)
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+        }
     }
 
     companion object {

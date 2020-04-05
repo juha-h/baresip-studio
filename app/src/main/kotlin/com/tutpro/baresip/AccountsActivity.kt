@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.*
+
 import com.tutpro.baresip.Account.Companion.checkAuthPass
 import com.tutpro.baresip.MainActivity.Companion.ACCOUNT_CODE
 import com.tutpro.baresip.MainActivity.Companion.aorPasswords
@@ -81,7 +82,8 @@ class AccountsActivity : AppCompatActivity() {
                     val aor = Account.find(data!!.getStringExtra("accp"))!!.aor
                     val ua = UserAgent.uas()[UserAgent.findAorIndex(aor)!!]
                     if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
-                        askPassword(String.format(getString(R.string.account_password), aor), ua)
+                        askPassword(String.format(getString(R.string.account_password),
+                                Utils.plainAor(aor)), ua)
                 }
             }
         }
@@ -110,10 +112,7 @@ class AccountsActivity : AppCompatActivity() {
                         String.format(getString(R.string.invalid_authentication_password), password))
                 password = ""
             }
-            aorPasswords[ua.account.aor] = password
-            account_set_auth_pass(ua.account.accp, password)
-            if (password != "")
-                if (ua.account.regint > 0) Api.ua_register(ua.uap)
+            setAuthPass(ua, password)
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
             dialog.cancel()
@@ -123,15 +122,14 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("accounts") == -1) return true
+        if (BaresipService.activities.indexOf("accounts") == -1)
+            return true
 
         when (item.itemId) {
-
             R.id.help -> {
                 Utils.alertView(this@AccountsActivity, getString(R.string.new_account),
                         getString(R.string.accounts_help))
             }
-
             android.R.id.home -> {
                 BaresipService.activities.remove("accounts")
                 val i = Intent()
@@ -139,25 +137,21 @@ class AccountsActivity : AppCompatActivity() {
                 finish()
             }
         }
-
         return true
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.accounts_menu, menu)
         return true
-
     }
 
     override fun onBackPressed() {
-
         BaresipService.activities.remove("accounts")
         val i = Intent()
         setResult(Activity.RESULT_OK, i)
         finish()
         super.onBackPressed()
-
     }
 
     companion object {
@@ -188,6 +182,17 @@ class AccountsActivity : AppCompatActivity() {
             return contents == null || contents.size == 0
         }
 
+        fun setAuthPass(ua: UserAgent, ap: String) {
+            val acc = ua.account
+            if (account_set_auth_pass(acc.accp, ap) == 0) {
+                acc.authPass = account_auth_pass(acc.accp)
+                aorPasswords[acc.aor] = ap
+                if ((ap != "") && (acc.regint > 0))
+                    Api.ua_register(ua.uap)
+            } else {
+                Log.e("Baresip", "Setting of auth pass failed")
+            }
+        }
     }
 
 }
