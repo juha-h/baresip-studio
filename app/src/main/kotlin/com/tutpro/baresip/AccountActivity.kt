@@ -212,6 +212,9 @@ class AccountActivity : AppCompatActivity() {
 
         if (BaresipService.activities.indexOf("account,$accp") == -1) return true
 
+        val intent = Intent()
+        intent.putExtra("aor", aor)
+
         when (item.itemId) {
 
             R.id.checkIcon -> {
@@ -466,24 +469,16 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
                     Api.ua_register(ua.uap)
 
-                BaresipService.activities.remove("account,$accp")
-                val i = Intent()
-                i.putExtra("accp", accp)
-                setResult(Activity.RESULT_OK, i)
-                finish()
-
+                setResult(Activity.RESULT_OK, intent)
             }
 
-            android.R.id.home -> {
-
-                BaresipService.activities.remove("account,$accp")
-                val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
-                finish()
-
-            }
+            android.R.id.home ->
+                setResult(Activity.RESULT_CANCELED, intent)
 
         }
+
+        BaresipService.activities.remove("account,$accp")
+        finish()
 
         return true
 
@@ -492,8 +487,9 @@ class AccountActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         BaresipService.activities.remove("account,$accp")
-        val i = Intent()
-        setResult(Activity.RESULT_CANCELED, i)
+        val intent = Intent()
+        intent.putExtra("aor", aor)
+        setResult(Activity.RESULT_CANCELED, intent)
         finish()
         super.onBackPressed()
 

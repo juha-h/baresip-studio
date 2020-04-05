@@ -79,7 +79,7 @@ class AccountsActivity : AppCompatActivity() {
         when (requestCode) {
             ACCOUNT_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val aor = Account.find(data!!.getStringExtra("accp"))!!.aor
+                    val aor = data!!.getStringExtra("aor")
                     val ua = UserAgent.uas()[UserAgent.findAorIndex(aor)!!]
                     if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
                         askPassword(String.format(getString(R.string.account_password),

@@ -1114,13 +1114,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             ACCOUNT_CODE -> {
-                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-                val account = ua.account
-                updateIcons(account)
+                val aor = data!!.getStringExtra("aor")
+                spinToAor(aor)
+                val ua = Account.findUa(aor)!!
+                updateIcons(ua.account)
                 if (resultCode == Activity.RESULT_OK)
-                    if (aorPasswords.containsKey(account.aor) && aorPasswords[account.aor] == "")
+                    if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
                         askPassword(String.format(getString(R.string.account_password),
-                                Utils.plainAor(account.aor)), ua)
+                                Utils.plainAor(aor)), ua)
             }
 
             CONTACTS_CODE -> {
