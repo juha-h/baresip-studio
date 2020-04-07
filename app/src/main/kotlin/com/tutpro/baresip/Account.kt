@@ -122,10 +122,10 @@ class Account(val accp: String) {
             extra += ";call_history=no"
 
         if (answerMode == "auto")
-                extra += ";answer_mode=auto"
+            extra += ";answer_mode=auto"
 
         if (preferIPv6Media)
-                extra += ";prefer_ipv6_media=yes"
+            extra += ";prefer_ipv6_media=yes"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
@@ -216,6 +216,29 @@ class Account(val accp: String) {
             return false
         }
 
+        fun checkDisplayName(dn: String): Boolean {
+            if (dn == "") return true
+            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
+            return dnRegex.matches(dn)
+        }
+
+        fun checkAuthUser(au: String): Boolean {
+            if (au == "") return true
+            val ud = au.split("@")
+            val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
+            val telnoRegex = Regex("^[+]?[0-9]{1,16}\$")
+            if (ud.size == 1) {
+                return userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])
+            } else {
+                return (userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])) &&
+                        Utils.checkDomain(ud[1])
+            }
+        }
+
+        fun checkAuthPass(ap: String): Boolean {
+            return (ap.length > 0) && (ap.length <= 64) &&
+                    Regex("^[ -~]*\$").matches(ap) && !ap.contains('"')
+        }
     }
 }
 

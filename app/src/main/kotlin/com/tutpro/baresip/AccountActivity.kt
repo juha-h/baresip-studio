@@ -12,6 +12,11 @@ import android.widget.*
 
 import kotlinx.android.synthetic.main.activity_account.*
 
+import com.tutpro.baresip.Account.Companion.checkAuthPass
+import com.tutpro.baresip.Account.Companion.checkAuthUser
+import com.tutpro.baresip.Account.Companion.checkDisplayName
+import com.tutpro.baresip.MainActivity.Companion.aorPasswords
+
 class AccountActivity : AppCompatActivity() {
 
     internal lateinit var acc: Account
@@ -62,7 +67,7 @@ class AccountActivity : AppCompatActivity() {
         authUser.setText(acc.authUser)
 
         authPass = findViewById(R.id.AuthPass) as EditText
-        if (MainActivity.aorPasswords.containsKey(aor))
+        if (aorPasswords.containsKey(aor))
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
@@ -207,6 +212,9 @@ class AccountActivity : AppCompatActivity() {
 
         if (BaresipService.activities.indexOf("account,$accp") == -1) return true
 
+        val intent = Intent()
+        intent.putExtra("aor", aor)
+
         when (item.itemId) {
 
             R.id.checkIcon -> {
@@ -246,32 +254,33 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                if (ap != acc.authPass) {
-                    if (ap != "") {
-                        if (Utils.checkPrintAscii(ap) && (ap.length <= 64)) {
-                            if (account_set_auth_pass(acc.accp, ap) == 0) {
-                                acc.authPass = account_auth_pass(acc.accp)
-                                MainActivity.aorPasswords.remove(aor)
-                                // Log.d("Baresip", "New auth password is ${acc.authPass}")
-                                save = true
-                            } else {
-                                Log.e("Baresip", "Setting of auth pass failed")
-                            }
+                if (ap != "") {
+                    if (ap != acc.authPass) {
+                        if (checkAuthPass(ap)) {
+                            setAuthPass(acc, ap)
+                            aorPasswords.remove(aor)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_authentication_password), ap))
                             return false
                         }
                     } else {
-                        if ((au != "") && !MainActivity.aorPasswords.containsKey(aor)) {
-                            MainActivity.aorPasswords.put(aor, acc.authPass)
+                        if (aorPasswords.containsKey(aor)) {
+                            aorPasswords.remove(aor)
                             save = true
                         }
                     }
-                } else {
-                    if (MainActivity.aorPasswords.containsKey(aor)) {
-                        MainActivity.aorPasswords.remove(aor)
-                        save = true
+                } else { // ap == ""
+                    if (acc.authUser != "") {
+                        if (!aorPasswords.containsKey(aor)) {
+                            setAuthPass(acc, "")
+                            aorPasswords.put(aor, "")
+                        }
+                    } else {
+                        if (acc.authPass != "") {
+                            setAuthPass(acc, "")
+                            aorPasswords.remove(aor)
+                        }
                     }
                 }
 
@@ -457,25 +466,19 @@ class AccountActivity : AppCompatActivity() {
                         //Api.ua_debug(ua.uap)
                 }
 
-                if (regCheck.isChecked) Api.ua_register(ua.uap)
+                if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
+                    Api.ua_register(ua.uap)
 
-                BaresipService.activities.remove("account,$accp")
-                val i = Intent()
-                setResult(Activity.RESULT_OK, i)
-                finish()
-
+                setResult(Activity.RESULT_OK, intent)
             }
 
-            android.R.id.home -> {
-
-                BaresipService.activities.remove("account,$accp")
-                val i = Intent()
-                setResult(Activity.RESULT_OK, i)
-                finish()
-
-            }
+            android.R.id.home ->
+                setResult(Activity.RESULT_CANCELED, intent)
 
         }
+
+        BaresipService.activities.remove("account,$accp")
+        finish()
 
         return true
 
@@ -484,8 +487,9 @@ class AccountActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         BaresipService.activities.remove("account,$accp")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
+        val intent = Intent()
+        intent.putExtra("aor", aor)
+        setResult(Activity.RESULT_CANCELED, intent)
         finish()
         super.onBackPressed()
 
@@ -548,28 +552,19 @@ class AccountActivity : AppCompatActivity() {
         }
     }
 
+    private fun setAuthPass(acc: Account, ap: String) {
+        if (account_set_auth_pass(acc.accp, ap) == 0) {
+            acc.authPass = account_auth_pass(acc.accp)
+            aorPasswords.remove(acc.aor)
+            save = true
+        } else {
+            Log.e("Baresip", "Setting of auth pass failed")
+        }
+    }
+
     private fun checkOutboundUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
         return Utils.checkHostPortParams(uri.substring(4))
-    }
-
-    private fun checkDisplayName(dn: String): Boolean {
-        if (dn == "") return true
-        val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
-        return dnRegex.matches(dn)
-    }
-
-    private fun checkAuthUser(au: String): Boolean {
-        if (au == "") return true
-        val ud = au.split("@")
-        val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
-        val telnoRegex = Regex("^[+]?[0-9]{1,16}\$")
-        if (ud.size == 1) {
-            return userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])
-        } else {
-            return (userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])) &&
-                    Utils.checkDomain(ud[1])
-        }
     }
 
 }

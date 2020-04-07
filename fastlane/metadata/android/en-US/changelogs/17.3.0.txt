@@ -1,0 +1,3 @@
+- Added "Show Password" checkbox to authentication password prompt.
+- Ask microphone permission as the first thing when baresip starts.
+- Do not allow " character in account's authentication password.
