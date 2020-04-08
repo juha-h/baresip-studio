@@ -5,6 +5,8 @@ object Api {
     val AF_UNSPEC = 0
     val AF_INET = 2
     val AF_INET6 = 10
+    val VIDMODE_OFF = 0
+    val VIDMODE_ON = 1
 
     external fun audio_codecs(): String
     external fun uag_current_set(uap: String)
@@ -16,9 +18,9 @@ object Api {
     external fun ua_register(ua: String): Int
     external fun ua_isregistered(ua: String): Boolean
     external fun ua_unregister(ua: String)
-    external fun ua_connect(uap: String, peer_uri: String): String
+    external fun ua_connect(uap: String, peer_uri: String, video: Int): String
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
-    external fun ua_call_alloc(uap: String, xcallp: String): String
+    external fun ua_call_alloc(uap: String, xcallp: String, video: Int): String
     external fun ua_answer(uap: String, callp: String)
     external fun ua_set_media_af(uap: String, af: Int)
     external fun account_debug(accp: String)

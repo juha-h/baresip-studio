@@ -1165,18 +1165,18 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaUA,
-                                        jstring javaURI) {
+Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaURI, jint javaVidMode) {
     struct call *call;
     struct ua *ua;
     int err;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_uri = (*env)->GetStringUTFChars(env, javaURI, 0);
     char call_buf[32];
-    LOGD("connecting ua %s to %s\n", native_ua, native_uri);
+    LOGD("connecting ua %s to %s %s video\n", native_ua, native_uri,
+            javaVidMode == 0 ? "without" : "with");
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     re_thread_enter();
-    err = ua_connect(ua, &call, NULL, native_uri, VIDMODE_OFF);
+    err = ua_connect(ua, &call, NULL, native_uri, (enum vidmode)javaVidMode);
     re_thread_leave();
     if (err) {
         LOGW("connecting to %s failed with error %d\n", native_uri, err);
@@ -1190,8 +1190,7 @@ Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaU
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
-                                            jstring javaXCall) {
+Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaXCall, jint javaVidMode) {
     struct call *xcall, *call = NULL;
     struct ua *ua;
     int err;
@@ -1202,7 +1201,7 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     xcall = (struct call *)strtoul(native_xcall, NULL, 10);
     re_thread_enter();
-    err = ua_call_alloc(&call, ua, VIDMODE_OFF, NULL, xcall, call_localuri(xcall), true);
+    err = ua_call_alloc(&call, ua, (enum vidmode)javaVidMode, NULL, xcall, call_localuri(xcall), true);
     if (err) {
         LOGW("call allocation for ua %s failed with error %d\n", native_ua, err);
         call_buf[0] = '\0';
