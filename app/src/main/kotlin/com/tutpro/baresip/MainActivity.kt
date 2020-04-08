@@ -20,7 +20,6 @@ import android.view.*
 import java.io.File
 import kotlin.collections.ArrayList
 
-import com.arthenica.mobileffmpeg.Config
 import com.tutpro.baresip.Account.Companion.checkAuthPass
 
 class MainActivity : AppCompatActivity() {
@@ -519,7 +518,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.d("Baresip", "Main resumed with action '$resumeAction'")
-        Log.d("Baresip", "Cameras ${Utils.supportedCameras(applicationContext)}")
         visible = true
         when (resumeAction) {
             "accounts" -> {

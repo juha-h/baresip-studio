@@ -18,6 +18,10 @@
         android:required="false" />
 
     <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+
+    <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
 

@@ -42,6 +42,18 @@ add_library(lib_avdevice STATIC IMPORTED)
 set_target_properties(lib_avdevice PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavdevice.a)
 
+add_library(lib_avfilter STATIC IMPORTED)
+set_target_properties(lib_avfilter PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavfilter.a)
+
+add_library(lib_postproc STATIC IMPORTED)
+set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.a)
+
+add_library(lib_swscale STATIC IMPORTED)
+set_target_properties(lib_swscale PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswscale.a)
+
 add_library(lib_avformat STATIC IMPORTED)
 set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.a)
@@ -80,6 +92,9 @@ set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
 
 add_library(baresip SHARED baresip.c)
 
+set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -u AImageReader_new")
+
 target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include
         ${distribution_DIR}/re/include
@@ -99,11 +114,14 @@ target_link_libraries(baresip
         lib_crypto
         lib_opus
         lib_avdevice
+        lib_avfilter
+        lib_swscale
         lib_avformat
         lib_avcodec
         lib_x264
         lib_avutil
         lib_swresample
+        lib_postproc
         lib_spandsp
         lib_g722_1
         lib_ilbc
@@ -112,4 +130,6 @@ target_link_libraries(baresip
         lib_zrtp
         lib_bn
         z
-        log)
+        log
+        camera2ndk
+        mediandk)

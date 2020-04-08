@@ -9,10 +9,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
-import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraManager
-import android.hardware.camera2.CameraMetadata
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.os.Bundle
@@ -564,26 +560,6 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
-    }
-
-    fun supportedCameras(ctx: Context): List<String> {
-        val detectedCameraIdList = ArrayList<String>()
-        try {
-            val manager = ctx.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-            val cameraIdList = manager.getCameraIdList()
-            for (cameraId in cameraIdList) {
-                val chars = manager.getCameraCharacteristics(cameraId)
-                val cameraSupport = chars.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
-                if (cameraSupport != null && cameraSupport == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                    Log.d("Baresip", "Detected camera with id " + cameraId + " has LEGACY hardware level which is not supported by Android Camera2 NDK API.");
-                } else if (cameraSupport != null) {
-                    detectedCameraIdList.add(cameraId)
-                }
-            }
-        } catch (e: CameraAccessException) {
-            Log.w("Baresip", "Detecting camera ids failed: $e")
-        }
-        return detectedCameraIdList
     }
 
 }
