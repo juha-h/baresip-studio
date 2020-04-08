@@ -19,7 +19,7 @@ videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
 jitter_buffer_delay 5-10
-rtp_stats no
+rtp_stats yes
 dyn_dns yes
 module opus.so
 module amr.so
@@ -56,3 +56,4 @@ ice_debug no
 ice_nomination regular
 ice_mode full
 zrtp_hash yes
+

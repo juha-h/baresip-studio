@@ -88,6 +88,16 @@ static void ua_print_status_log(struct ua *ua) {
     }
 }
 
+static void call_video_debug_log() {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", video_debug, call_video(ua_call(uag_current())));
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
 static struct re_printf pf_null = {vprintf_null, 0};
 
 static void signal_handler(int sig)
@@ -1376,6 +1386,11 @@ Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring java
     }
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, status_buf);
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_call_1video_1debug(JNIEnv *env, jobject thiz) {
+    call_video_debug_log();
 }
 
 JNIEXPORT jint JNICALL
