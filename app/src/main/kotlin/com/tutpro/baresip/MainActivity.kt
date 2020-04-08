@@ -220,6 +220,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         callButton.setOnClickListener {
+            if (aorSpinner.selectedItemPosition == -1)
+                return@setOnClickListener
             callUri.setAdapter(null)
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
