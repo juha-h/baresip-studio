@@ -18,7 +18,7 @@
         android:gravity="center" >
     </TextView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/CardAvatar"
         android:layout_width="36dp"
         android:layout_height="36dp"
@@ -35,7 +35,7 @@
             android:scaleType="centerCrop" >
         </ImageView>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/chat"

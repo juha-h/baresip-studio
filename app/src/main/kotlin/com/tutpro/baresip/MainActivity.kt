@@ -3,12 +3,12 @@ package com.tutpro.baresip
 import android.Manifest
 import android.app.*
 import android.content.*
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.*
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.inputmethod.InputMethodManager
 import android.text.InputType
 import android.text.TextWatcher
