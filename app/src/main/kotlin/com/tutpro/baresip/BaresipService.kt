@@ -11,13 +11,13 @@ import android.media.*
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.*
-import android.support.annotation.Keep
-import android.support.v4.app.NotificationCompat
+import androidx.annotation.Keep
+import androidx.core.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.app.NotificationCompat.VISIBILITY_PRIVATE
-import android.support.v4.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE
+import androidx.core.content.ContextCompat
 import android.provider.Settings
 import android.telephony.TelephonyManager
 

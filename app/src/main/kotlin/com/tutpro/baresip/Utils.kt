@@ -3,7 +3,7 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,8 +12,8 @@ import android.graphics.Color
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
 

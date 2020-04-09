@@ -2,7 +2,7 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.graphics.Typeface
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
