@@ -911,8 +911,19 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
 
             RECORD_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED)) {
                     Toast.makeText(applicationContext, getString(R.string.no_calls),
+                            Toast.LENGTH_LONG).show()
+                    startBaresip()
+                } else {
+                    Utils.requestPermission(this, Manifest.permission.CAMERA,
+                            CAMERA_PERMISSION_REQUEST_CODE)
+                }
+            }
+
+            CAMERA_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                    Toast.makeText(applicationContext, getString(R.string.no_video_calls),
                             Toast.LENGTH_LONG).show()
                 startBaresip()
             }
@@ -1473,7 +1484,8 @@ class MainActivity : AppCompatActivity() {
         const val BACKUP_PERMISSION_REQUEST_CODE = 1
         const val RESTORE_PERMISSION_REQUEST_CODE = 2
         const val RECORD_PERMISSION_REQUEST_CODE = 3
-        const val RESTART_REQUEST_CODE = 4
+        const val CAMERA_PERMISSION_REQUEST_CODE = 4
+        const val RESTART_REQUEST_CODE = 5
 
     }
 
