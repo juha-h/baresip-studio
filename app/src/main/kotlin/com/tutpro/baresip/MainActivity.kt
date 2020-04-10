@@ -913,9 +913,10 @@ class MainActivity : AppCompatActivity() {
 
             RECORD_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
-                    Toast.makeText(applicationContext, getString(R.string.no_calls),
-                            Toast.LENGTH_LONG).show()
-                startBaresip()
+                    Utils.alertView(this, getString(R.string.notice),
+                            getString(R.string.no_calls), ::startBaresip)
+                else
+                    startBaresip()
             }
 
             BACKUP_PERMISSION_REQUEST_CODE ->

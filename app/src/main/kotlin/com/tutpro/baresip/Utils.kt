@@ -50,12 +50,15 @@ object Utils {
         return result
     }
 
-    fun alertView(context: Context, title: String, message: String) {
+    fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(R.string.ok)
-                { dialog, _ -> dialog.dismiss() }
+                { dialog, _ ->
+                    dialog.dismiss()
+                    action()
+                }
                 .show()
     }
 
