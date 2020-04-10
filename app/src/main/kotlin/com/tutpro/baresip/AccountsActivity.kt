@@ -76,10 +76,13 @@ class AccountsActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
         when (requestCode) {
             ACCOUNT_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val aor = data!!.getStringExtra("aor")
+                    val aor = data!!.getStringExtra("aor")!!
                     val ua = UserAgent.uas()[UserAgent.findAorIndex(aor)!!]
                     if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
                         askPassword(String.format(getString(R.string.account_password),
@@ -87,6 +90,7 @@ class AccountsActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
 
     private fun askPassword(title: String, ua: UserAgent) {
@@ -97,7 +101,7 @@ class AccountsActivity : AppCompatActivity() {
                         false)
         val input = viewInflated.findViewById(R.id.password) as EditText
         val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
-        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+        checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
                 input.transformationMethod = HideReturnsTransformationMethod()
             else

@@ -92,8 +92,8 @@ class MainActivity : AppCompatActivity() {
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                handleServiceEvent(intent.getStringExtra("event"),
-                        intent.getStringArrayListExtra("params"))
+                handleServiceEvent(intent.getStringExtra("event")!!,
+                        intent.getStringArrayListExtra("params")!!)
             }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
@@ -462,7 +462,7 @@ class MainActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT).show()
                     return
                 }
-                val uap = intent.getStringExtra("uap")
+                val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
                     Log.w("Baresip", "handleIntent 'call' did not find ua $uap")
@@ -472,10 +472,10 @@ class MainActivity : AppCompatActivity() {
                         (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
                     spinToAor(ua.account.aor)
                 resumeAction = action
-                resumeUri = intent.getStringExtra("peer")
+                resumeUri = intent.getStringExtra("peer")!!
             }
             "call show", "call answer" -> {
-                val callp = intent.getStringExtra("callp")
+                val callp = intent.getStringExtra("callp")!!
                 val call = Call.find(callp)
                 if (call == null) {
                     Log.w("Baresip", "handleIntent '$action' did not find call $callp")
@@ -489,7 +489,7 @@ class MainActivity : AppCompatActivity() {
                 resumeCall = call
             }
             "transfer show", "transfer accept" -> {
-                val callp = intent.getStringExtra("callp")
+                val callp = intent.getStringExtra("callp")!!
                 val call = Call.find(callp)
                 if (call == null) {
                     Log.w("Baresip", "handleIntent '$action' did not find call $callp")
@@ -498,10 +498,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 resumeAction = action
                 resumeCall = call
-                resumeUri = intent.getStringExtra("uri")
+                resumeUri = intent.getStringExtra("uri")!!
             }
             "message", "message show", "message reply" -> {
-                val uap = intent.getStringExtra("uap")
+                val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
                     Log.w("Baresip", "onNewIntent did not find ua $uap")
@@ -512,7 +512,7 @@ class MainActivity : AppCompatActivity() {
                     spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeUap = uap
-                resumeUri = intent.getStringExtra("peer")
+                resumeUri = intent.getStringExtra("peer")!!
             }
         }
     }
@@ -953,7 +953,7 @@ class MainActivity : AppCompatActivity() {
                         false)
         val input = viewInflated.findViewById(R.id.password) as EditText
         val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
-        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+        checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
                 input.transformationMethod = HideReturnsTransformationMethod()
             else
@@ -997,7 +997,7 @@ class MainActivity : AppCompatActivity() {
                                 false)
                 val input = viewInflated.findViewById(R.id.password) as EditText
                 val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
-                checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked)
                         input.transformationMethod = HideReturnsTransformationMethod()
                     else
@@ -1096,6 +1096,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
+        super.onActivityResult(requestCode, resultCode, data)
+
         when (requestCode) {
 
             ACCOUNTS_CODE -> {
@@ -1116,7 +1118,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             ACCOUNT_CODE -> {
-                val aor = data!!.getStringExtra("aor")
+                val aor = data!!.getStringExtra("aor")!!
                 spinToAor(aor)
                 val ua = Account.findUa(aor)!!
                 updateIcons(ua.account)
@@ -1150,7 +1152,7 @@ class MainActivity : AppCompatActivity() {
                 val acc = UserAgent.uas()[aorSpinner.selectedItemPosition].account
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
-                        val peerUri = data.getStringExtra("peer_uri")
+                        val peerUri = data.getStringExtra("peer_uri")!!
                         callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(peerUri),
                                 Utils.aorDomain(Utils.aorDomain(acc.aor))))
                     }
