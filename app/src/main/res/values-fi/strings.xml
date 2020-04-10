@@ -360,6 +360,7 @@
     <string name="no_video_calls">Et voi soittaa video-puheluita tai vastata niihin
         ilman Kamera-käyttöoikeutta.
     </string>
+    <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="account_password">Tilin %1$s salasana</string>
     <string name="show_password">Näytä salasana</string>
 </resources>

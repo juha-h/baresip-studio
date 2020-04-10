@@ -317,6 +317,7 @@
     </string>
     <string name="no_calls">You are not able to place or answer calls without Microphone permission.</string>
     <string name="no_video_calls">You are not able to place or answer video calls without Camera permission.</string>
+    <string name="no_cameras">You don\'t have any supported video cameras.</string>
     <string name="account_password">Account %1$s Authentication Password</string>
     <string name="show_password">Show Password</string>
 </resources>

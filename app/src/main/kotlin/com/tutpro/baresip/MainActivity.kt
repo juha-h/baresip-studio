@@ -6,6 +6,7 @@ import android.content.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var kgm: KeyguardManager
+    internal lateinit var cm: CameraManager
     internal lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
@@ -89,6 +91,8 @@ class MainActivity : AppCompatActivity() {
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        cm = getSystemService(CAMERA_SERVICE) as CameraManager
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -922,11 +926,16 @@ class MainActivity : AppCompatActivity() {
             }
 
             CAMERA_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED)) {
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.no_video_calls), ::startBaresip)
-                else
-                    startBaresip()
+                } else {
+                    if (Utils.supportedCameraIds(cm).isEmpty())
+                        Utils.alertView(this, getString(R.string.notice),
+                                getString(R.string.no_cameras), ::startBaresip)
+                    else
+                        startBaresip()
+                }
             }
 
             BACKUP_PERMISSION_REQUEST_CODE ->

@@ -9,6 +9,9 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.os.Bundle
@@ -563,6 +566,22 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
+    }
+
+    fun supportedCameraIds(cm: CameraManager): List<String> {
+        val ids = ArrayList<String>()
+        try {
+            for (id in cm.cameraIdList) {
+                val chars = cm.getCameraCharacteristics(id)
+                val level = chars.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
+                if ((level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL) ||
+                        (level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3))
+                    ids.add(id)
+            }
+        } catch (e: CameraAccessException) {
+            Log.e("Baresip", "Could not get supportedCameraIds: ${e.printStackTrace()}")
+        }
+        return ids
     }
 
 }
