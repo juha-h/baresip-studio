@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.app.*
 import android.app.Notification.VISIBILITY_PUBLIC
@@ -359,7 +360,7 @@ class BaresipService: Service() {
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
                     startActivity(newIntent)
-                    nm.cancel(BaresipService.TRANSFER_NOTIFICATION_ID)
+                    nm.cancel(TRANSFER_NOTIFICATION_ID)
                 }
             }
 
@@ -370,7 +371,7 @@ class BaresipService: Service() {
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
                 else
                     Api.call_notify_sipfrag(callp, 603, "Decline")
-                nm.cancel(BaresipService.TRANSFER_NOTIFICATION_ID)
+                nm.cancel(TRANSFER_NOTIFICATION_ID)
             }
 
             "Message Show", "Message Reply" -> {
@@ -381,7 +382,7 @@ class BaresipService: Service() {
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 newIntent.putExtra("peer", intent.getStringExtra("peer"))
                 startActivity(newIntent)
-                nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
+                nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
             "Message Save" -> {
@@ -392,7 +393,7 @@ class BaresipService: Service() {
                 else
                     ChatsActivity.saveUaMessage(ua.account.aor,
                             intent.getStringExtra("time").toLong())
-                nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
+                nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
             "Message Delete" -> {
@@ -403,7 +404,7 @@ class BaresipService: Service() {
                 else
                     ChatsActivity.deleteUaMessage(ua.account.aor,
                             intent.getStringExtra("time").toLong())
-                nm.cancel(BaresipService.MESSAGE_NOTIFICATION_ID)
+                nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
             "UpdateNotification" -> {
@@ -552,7 +553,7 @@ class BaresipService: Service() {
                         if ((Call.calls().size > 0) ||
                                 (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
                                 !Utils.checkPermission(applicationContext,
-                                        android.Manifest.permission.RECORD_AUDIO)) {
+                                        Manifest.permission.RECORD_AUDIO)) {
                             Log.d(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             if (ua.account.callHistory) {

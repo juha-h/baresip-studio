@@ -55,7 +55,7 @@ class ContactActivity : AppCompatActivity() {
             nameView.setText("")
             nameView.hint = getString(R.string.contact_name)
             nameView.setSelection(nameView.text.length)
-            val uri = intent.getStringExtra("uri")
+            val uri = intent.getStringExtra("uri")!!
             if (uri == "") {
                 uriView.setText("")
                 uriView.hint = getString(R.string.sip_uri)
@@ -123,6 +123,8 @@ class ContactActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, resultData)
 
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             resultData?.data?.also { uri ->

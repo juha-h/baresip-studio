@@ -47,7 +47,7 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        accp = intent.getStringExtra("accp")
+        accp = intent.getStringExtra("accp")!!
         Utils.addActivity("account,$accp")
 
         acc = Account.find(accp)!!

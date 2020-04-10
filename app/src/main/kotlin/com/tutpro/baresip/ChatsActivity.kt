@@ -184,6 +184,8 @@ class ChatsActivity: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
+        super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == MainActivity.CHAT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 clAdapter.clear()
