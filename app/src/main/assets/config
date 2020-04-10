@@ -15,6 +15,7 @@ auenc_format s16
 auplay_format s16
 audec_format s16
 video_source avformat,android_camera
+video_fps 15
 videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
