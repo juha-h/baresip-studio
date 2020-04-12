@@ -332,7 +332,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase())
+                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                 newIntent.putExtra("callp", intent!!.getStringExtra("callp"))
                 startActivity(newIntent)
             }
@@ -363,7 +363,7 @@ class BaresipService: Service() {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", action.toLowerCase())
+                    newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
                     startActivity(newIntent)
@@ -385,7 +385,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase())
+                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 newIntent.putExtra("peer", intent.getStringExtra("peer"))
                 startActivity(newIntent)
