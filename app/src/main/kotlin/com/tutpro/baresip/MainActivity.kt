@@ -435,8 +435,12 @@ class MainActivity : AppCompatActivity() {
                     askPasswords(accounts)
                 } else {
                     // Baresip is started for the first time
-                    Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                            RECORD_PERMISSION_REQUEST_CODE)
+                    if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
+                        Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
+                                RECORD_PERMISSION_REQUEST_CODE)
+                    else
+                        // Some old devices have granted Mic permission without a need to ask
+                        startBaresip()
                 }
 
     } // OnCreate
