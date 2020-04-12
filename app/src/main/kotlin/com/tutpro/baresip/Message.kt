@@ -57,6 +57,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
+                    @Suppress("UNCHECKED_CAST")
                     BaresipService.messages = ois.readObject() as ArrayList<Message>
                     ois.close()
                     fis.close()

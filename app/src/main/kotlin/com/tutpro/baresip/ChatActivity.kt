@@ -156,8 +156,8 @@ class ChatActivity : AppCompatActivity() {
         messageResponseReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 handleMessageResponse(intent.getIntExtra("response code", 0),
-                        intent.getStringExtra("response reason"),
-                        intent.getStringExtra("time"))
+                        intent.getStringExtra("response reason")!!,
+                        intent.getStringExtra("time")!!)
             }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,

@@ -86,24 +86,26 @@ class BaresipService: Service() {
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        val linkProperties = cm.getLinkProperties(network)
-                        val interfaceName = linkProperties.interfaceName!!
-                        if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
-                                ((Build.VERSION.SDK_INT < 23) &&
-                                        (cm.activeNetworkInfo.toString() ==
-                                        cm.getNetworkInfo(network).toString()))) {
-                            Log.i(LOG_TAG, "Active network $network@$interfaceName " +
-                                    " is available: $linkProperties")
-                            activeNetwork = "$network"
-                            if (isServiceRunning) {
-                                Utils.updateLinkProperties(linkProperties)
+                        val linkProps = cm.getLinkProperties(network)
+                        if (linkProps != null) {
+                            val interfaceName = linkProps.interfaceName!!
+                            if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
+                                    ((Build.VERSION.SDK_INT < 23) &&
+                                            (cm.activeNetworkInfo.toString() ==
+                                                    cm.getNetworkInfo(network).toString()))) {
+                                Log.i(LOG_TAG, "Active network $network@$interfaceName " +
+                                        " is available: $linkProps")
+                                activeNetwork = "$network"
+                                if (isServiceRunning) {
+                                    Utils.updateLinkProperties(linkProps)
+                                } else {
+                                    dnsServers = linkProps.dnsServers
+                                    linkAddresses = linkProps.linkAddresses
+                                }
                             } else {
-                                dnsServers = linkProperties.dnsServers
-                                linkAddresses = linkProperties.linkAddresses
+                                Log.i(LOG_TAG, "Non-active network $network@$interfaceName " +
+                                        " is available: $linkProps")
                             }
-                        } else {
-                            Log.i(LOG_TAG, "Non-active network $network@$interfaceName " +
-                                        " is available: $linkProperties")
                         }
                     }
 
@@ -124,12 +126,14 @@ class BaresipService: Service() {
                                     }
                                 }
                             if (newNetwork != null) {
-                                val interfaceName = cm.getLinkProperties(newNetwork).interfaceName!!
-                                val linkProperties = cm.getLinkProperties(newNetwork)
-                                Log.d(LOG_TAG, "Updating new active network " +
-                                        "$newNetwork@$interfaceName link properties: $linkProperties")
-                                activeNetwork = "$newNetwork"
-                                Utils.updateLinkProperties(cm.getLinkProperties(newNetwork))
+                                val linkProps = cm.getLinkProperties(newNetwork)
+                                if (linkProps != null) {
+                                    val interfaceName = linkProps.interfaceName
+                                    Log.d(LOG_TAG, "Updating new active network " +
+                                            "$newNetwork@$interfaceName link properties: $linkProps")
+                                    activeNetwork = "$newNetwork"
+                                    Utils.updateLinkProperties(linkProps)
+                                }
                             }
                         } else {
                             Log.d(LOG_TAG, "Network '$network' is lost")
@@ -138,23 +142,26 @@ class BaresipService: Service() {
 
                     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                         super.onLinkPropertiesChanged(network, linkProperties)
-                        val interfaceName = cm.getLinkProperties(network).interfaceName!!
-                        if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
-                                ((Build.VERSION.SDK_INT < 23) &&
-                                        (cm.activeNetworkInfo.toString() ==
-                                        cm.getNetworkInfo(network).toString()))) {
-                            Log.d(LOG_TAG, "Active network $network@$interfaceName " +
-                                    " link properties changed: $linkProperties")
-                            activeNetwork = "$network"
-                            if (isServiceRunning) {
-                                Utils.updateLinkProperties(linkProperties)
+                        val linkProps = cm.getLinkProperties(network)
+                        if (linkProps != null) {
+                            val interfaceName = linkProps.interfaceName
+                            if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
+                                    ((Build.VERSION.SDK_INT < 23) &&
+                                            (cm.activeNetworkInfo.toString() ==
+                                                    cm.getNetworkInfo(network).toString()))) {
+                                Log.d(LOG_TAG, "Active network $network@$interfaceName " +
+                                        " link properties changed: $linkProperties")
+                                activeNetwork = "$network"
+                                if (isServiceRunning) {
+                                    Utils.updateLinkProperties(linkProperties)
+                                } else {
+                                    dnsServers = linkProperties.dnsServers
+                                    linkAddresses = linkProperties.linkAddresses
+                                }
                             } else {
-                                dnsServers = linkProperties.dnsServers
-                                linkAddresses = linkProperties.linkAddresses
+                                Log.d(LOG_TAG, "Network $network@$interfaceName " +
+                                        " link properties changed: $linkProperties")
                             }
-                        } else {
-                            Log.d(LOG_TAG, "Network $network@$interfaceName " +
-                                    " link properties changed: $linkProperties")
                         }
                     }
                 }
@@ -331,7 +338,7 @@ class BaresipService: Service() {
             }
 
             "Call Reject" -> {
-                val callp = intent!!.getStringExtra("callp")
+                val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.find(callp)
                 if (call == null) {
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
@@ -348,7 +355,7 @@ class BaresipService: Service() {
             }
 
             "Transfer Show", "Transfer Accept" -> {
-                val uap = intent!!.getStringExtra("uap")
+                val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.find(uap)
                 if (ua == null) {
                     Log.w(LOG_TAG, "onStartCommand did not find ua $uap")
@@ -365,7 +372,7 @@ class BaresipService: Service() {
             }
 
             "Transfer Deny" -> {
-                val callp = intent!!.getStringExtra("callp")
+                val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.find(callp)
                 if (call == null)
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
@@ -386,24 +393,24 @@ class BaresipService: Service() {
             }
 
             "Message Save" -> {
-                val uap = intent!!.getStringExtra("uap")
+                val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.find(uap)
                 if (ua == null)
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.saveUaMessage(ua.account.aor,
-                            intent.getStringExtra("time").toLong())
+                            intent.getStringExtra("time")!!.toLong())
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
             "Message Delete" -> {
-                val uap = intent!!.getStringExtra("uap")
+                val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.find(uap)
                 if (ua == null)
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.deleteUaMessage(ua.account.aor,
-                            intent.getStringExtra("time").toLong())
+                            intent.getStringExtra("time")!!.toLong())
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -517,18 +524,20 @@ class BaresipService: Service() {
                                 if (Build.VERSION.SDK_INT >= 23) {
                                     val activeNetwork = cm.activeNetwork
                                     if (activeNetwork != null) {
-                                        val dnsServers = cm.getLinkProperties(activeNetwork).dnsServers
-                                        Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
-                                        if (Config.updateDnsServers(dnsServers) != 0) {
-                                            Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                                        } else {
-                                            Api.net_dns_debug()
-                                            if (!ua.registrationFailed) {
-                                                ua.registrationFailed = true
-                                                Api.ua_register(uap)
+                                        val linkProps = cm.getLinkProperties(activeNetwork)
+                                        if (linkProps != null) {
+                                            val dnsServers = linkProps.dnsServers
+                                            Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
+                                            if (Config.updateDnsServers(dnsServers) != 0) {
+                                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                            } else {
+                                                Api.net_dns_debug()
+                                                if (!ua.registrationFailed) {
+                                                    ua.registrationFailed = true
+                                                    Api.ua_register(uap)
+                                                }
                                             }
                                         }
-
                                     } else {
                                         Log.d(LOG_TAG, "No active network!")
                                     }
