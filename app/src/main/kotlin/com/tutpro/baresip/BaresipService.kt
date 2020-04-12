@@ -89,10 +89,7 @@ class BaresipService: Service() {
                         val linkProps = cm.getLinkProperties(network)
                         if (linkProps != null) {
                             val interfaceName = linkProps.interfaceName!!
-                            if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
-                                    ((Build.VERSION.SDK_INT < 23) &&
-                                            (cm.activeNetworkInfo.toString() ==
-                                                    cm.getNetworkInfo(network).toString()))) {
+                            if (network == cm.activeNetwork) {
                                 Log.i(LOG_TAG, "Active network $network@$interfaceName " +
                                         " is available: $linkProps")
                                 activeNetwork = "$network"
@@ -116,10 +113,7 @@ class BaresipService: Service() {
                             var newNetwork: Network? = null
                             for (net in cm.allNetworks)
                                 if (net != network) {
-                                    if (((Build.VERSION.SDK_INT >= 23) && (net == cm.activeNetwork)) ||
-                                            ((Build.VERSION.SDK_INT < 23) &&
-                                                    cm.activeNetworkInfo.toString() ==
-                                                    cm.getNetworkInfo(net).toString()))  {
+                                    if (net == cm.activeNetwork)  {
                                         Log.d(LOG_TAG, "New active network $net is available")
                                         newNetwork = net
                                         break
@@ -145,10 +139,7 @@ class BaresipService: Service() {
                         val linkProps = cm.getLinkProperties(network)
                         if (linkProps != null) {
                             val interfaceName = linkProps.interfaceName
-                            if (((Build.VERSION.SDK_INT >= 23) && (network == cm.activeNetwork)) ||
-                                    ((Build.VERSION.SDK_INT < 23) &&
-                                            (cm.activeNetworkInfo.toString() ==
-                                                    cm.getNetworkInfo(network).toString()))) {
+                            if (network == cm.activeNetwork) {
                                 Log.d(LOG_TAG, "Active network $network@$interfaceName " +
                                         " link properties changed: $linkProperties")
                                 activeNetwork = "$network"
@@ -332,7 +323,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase())
+                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                 newIntent.putExtra("callp", intent!!.getStringExtra("callp"))
                 startActivity(newIntent)
             }
@@ -363,7 +354,7 @@ class BaresipService: Service() {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", action.toLowerCase())
+                    newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
                     startActivity(newIntent)
@@ -385,7 +376,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase())
+                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 newIntent.putExtra("peer", intent.getStringExtra("peer"))
                 startActivity(newIntent)
@@ -520,28 +511,27 @@ class BaresipService: Service() {
                             // Most likely this error is due to DNS lookup failure
                             newEvent = "registering failed,DNS lookup failed"
                             Api.net_dns_debug()
-                            if (dynDns)
-                                if (Build.VERSION.SDK_INT >= 23) {
-                                    val activeNetwork = cm.activeNetwork
-                                    if (activeNetwork != null) {
-                                        val linkProps = cm.getLinkProperties(activeNetwork)
-                                        if (linkProps != null) {
-                                            val dnsServers = linkProps.dnsServers
-                                            Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
-                                            if (Config.updateDnsServers(dnsServers) != 0) {
-                                                Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
-                                            } else {
-                                                Api.net_dns_debug()
-                                                if (!ua.registrationFailed) {
-                                                    ua.registrationFailed = true
-                                                    Api.ua_register(uap)
-                                                }
+                            if (dynDns) {
+                                val activeNetwork = cm.activeNetwork
+                                if (activeNetwork != null) {
+                                    val linkProps = cm.getLinkProperties(activeNetwork)
+                                    if (linkProps != null) {
+                                        val dnsServers = linkProps.dnsServers
+                                        Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
+                                        if (Config.updateDnsServers(dnsServers) != 0) {
+                                            Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                        } else {
+                                            Api.net_dns_debug()
+                                            if (!ua.registrationFailed) {
+                                                ua.registrationFailed = true
+                                                Api.ua_register(uap)
                                             }
                                         }
-                                    } else {
-                                        Log.d(LOG_TAG, "No active network!")
                                     }
+                                } else {
+                                    Log.d(LOG_TAG, "No active network!")
                                 }
+                            }
                         }
                         if (!Utils.isVisible())
                             return
@@ -578,13 +568,9 @@ class BaresipService: Service() {
                             calls.add(Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)))
                             if (ua.account.answerMode == "manual") {
-                                if (Build.VERSION.SDK_INT >= 23) {
-                                    Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                                    if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                                        startRinging()
-                                } else {
+                                Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                                if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                     startRinging()
-                                }
                             } else {
                                 val newIntent = Intent(this, MainActivity::class.java)
                                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
@@ -613,11 +599,10 @@ class BaresipService: Service() {
                                     .setOngoing(true)
                                     .setContentTitle(getString(R.string.incoming_call_from))
                                     .setContentText(caller)
-                            if (Build.VERSION.SDK_INT < 26) {
+                            if (Build.VERSION.SDK_INT < 26)
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
-                            }
                             val answerIntent = Intent(this, BaresipService::class.java)
                             answerIntent.action = "Call Answer"
                             answerIntent.putExtra("callp", callp)
@@ -696,11 +681,10 @@ class BaresipService: Service() {
                                     .setAutoCancel(true)
                                     .setContentTitle(getString(R.string.transfer_request))
                                     .setContentText(target)
-                            if (Build.VERSION.SDK_INT < 26) {
+                            if (Build.VERSION.SDK_INT < 26)
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
-                            }
                             val acceptIntent = Intent(this, BaresipService::class.java)
                             acceptIntent.action = "Transfer Accept"
                             acceptIntent.putExtra("uap", uap)
@@ -805,11 +789,10 @@ class BaresipService: Service() {
                     .setAutoCancel(true)
                     .setContentTitle(getString(R.string.message_from) + " " + sender)
                     .setContentText(text)
-            if (Build.VERSION.SDK_INT < 26) {
+            if (Build.VERSION.SDK_INT < 26)
                 nb.setVibrate(LongArray(0))
                         .setVisibility(VISIBILITY_PRIVATE)
                         .setPriority(Notification.PRIORITY_HIGH)
-            }
             val replyIntent = Intent(this, BaresipService::class.java)
             replyIntent.action = "Message Reply"
             replyIntent.putExtra("uap", uap)

@@ -174,16 +174,14 @@ class MainActivity : AppCompatActivity() {
         callUri.threshold = 2
         callUri.setOnFocusChangeListener { view, b ->
             if (b) {
-                if (Build.VERSION.SDK_INT >= 27) {
+                if (Build.VERSION.SDK_INT >= 27)
                     kgm.requestDismissKeyguard(this, null)
-                }
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
             }
         }
         callUri.setOnClickListener { view ->
-            if (Build.VERSION.SDK_INT >= 27) {
+            if (Build.VERSION.SDK_INT >= 27)
                 kgm.requestDismissKeyguard(this, null)
-            }
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
 
