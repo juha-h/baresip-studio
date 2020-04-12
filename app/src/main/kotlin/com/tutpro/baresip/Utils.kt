@@ -568,20 +568,22 @@ object Utils {
             BaresipService.activities.add(0, activity)
     }
 
-    fun supportedCameraIds(cm: CameraManager): List<String> {
-        val ids = ArrayList<String>()
+    fun supportedCameras(cm: CameraManager): Map<String, Int> {
+        val cameras = mutableMapOf<String, Int>()
         try {
             for (id in cm.cameraIdList) {
                 val chars = cm.getCameraCharacteristics(id)
                 val level = chars.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
                 if ((level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL) ||
-                        (level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3))
-                    ids.add(id)
+                        (level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3)) {
+                    val dir = chars.get(CameraCharacteristics.LENS_FACING)
+                    if (dir != null) cameras.put(id, dir)
+                }
             }
         } catch (e: CameraAccessException) {
-            Log.e("Baresip", "Could not get supportedCameraIds: ${e.printStackTrace()}")
+            Log.e("Baresip", "Could not get supportedCameras: ${e.printStackTrace()}")
         }
-        return ids
+        return cameras
     }
 
 }

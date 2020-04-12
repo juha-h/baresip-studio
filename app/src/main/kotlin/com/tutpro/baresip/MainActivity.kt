@@ -930,7 +930,7 @@ class MainActivity : AppCompatActivity() {
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.no_video_calls), ::startBaresip)
                 } else {
-                    if (Utils.supportedCameraIds(cm).isEmpty())
+                    if (Utils.supportedCameras(cm).isEmpty())
                         Utils.alertView(this, getString(R.string.notice),
                                 getString(R.string.no_cameras), ::startBaresip)
                     else
