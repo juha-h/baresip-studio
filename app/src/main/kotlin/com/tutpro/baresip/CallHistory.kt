@@ -62,6 +62,7 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
+                    @Suppress("UNCHECKED_CAST")
                     BaresipService.callHistory = ois.readObject() as ArrayList<CallHistory>
                     ois.close()
                     fis.close()
