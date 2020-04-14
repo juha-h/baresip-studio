@@ -110,7 +110,7 @@
         </service>
 
         <receiver
-            android:name=".RunOnStartup"
+            android:name=".BootCompletedReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
