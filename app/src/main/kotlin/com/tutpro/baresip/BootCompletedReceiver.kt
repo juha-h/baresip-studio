@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 class BootCompletedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.i("Baresip", "RunOnStartup received intent ${intent.action}")
+        Log.i("Baresip", "BootCompletedReceiver received intent ${intent.action}")
         if ((intent.action == Intent.ACTION_BOOT_COMPLETED) or
                 (intent.action == "com.tutpro.baresip.Restart")) {
             val configPath = context.filesDir.absolutePath + "/config"
