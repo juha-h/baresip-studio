@@ -15,6 +15,8 @@ auenc_format s16
 auplay_format s16
 audec_format s16
 video_source avformat,android_camera,1
+video_display opengles,nil
+video_size 640x480
 video_fps 15
 videoenc_format yuv420p
 rtp_tos 184
@@ -33,6 +35,7 @@ module avcodec.so
 module avformat.so
 module webrtc_aec.so
 module opensles.so
+module opengles.so
 module stun.so
 module turn.so
 module ice.so
