@@ -197,7 +197,7 @@
     <string name="help">Hjelp</string>
     <string name="new_account">Ny konto</string>
     <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
-    <string name="accounts_help">"Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en  ny konto. UDP brukes hvis kun port angis. Port  5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis."</string>
+    <string name="accounts_help">Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en ny konto. UDP brukes hvis kun port angis. Port 5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis.</string>
     <string name="prefer_ipv6_media">Foretrekk IPv6-media</string>
     <string name="prefer_ipv6_media_help">Tilby bruk av IPv6-mediaprotokoll (hvis tilgjengelig) når likemanns mediaprotokoll ikke kan bestemmes.</string>
 </resources>
