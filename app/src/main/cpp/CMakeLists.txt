@@ -22,6 +22,10 @@ add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
 
+add_library(lib_vpx STATIC IMPORTED)
+set_target_properties(lib_vpx PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/vpx/lib/${ANDROID_ABI}/libvpx.a)
+
 add_library(lib_x264 STATIC IMPORTED)
 set_target_properties(lib_x264 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/x264/lib/${ANDROID_ABI}/libx264.a)
@@ -119,6 +123,7 @@ target_link_libraries(baresip
         lib_avformat
         lib_avcodec
         lib_x264
+        lib_vpx
         lib_avutil
         lib_swresample
         lib_postproc

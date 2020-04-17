@@ -105,7 +105,7 @@ class Account(val accp: String) {
                 }
         }
 
-        res = res + ";video_codecs=H264"
+        res = res + ";video_codecs=VP9,VP8,H264"
 
         if (mediaEnc != "") res = res + ";mediaenc=${mediaEnc}"
 
