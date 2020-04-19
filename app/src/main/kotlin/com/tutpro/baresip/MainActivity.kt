@@ -22,6 +22,7 @@ import java.io.File
 import kotlin.collections.ArrayList
 
 import com.tutpro.baresip.Account.Companion.checkAuthPass
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
+    internal lateinit var videoIcon: MenuItem
+    internal var videoView: VideoView? = null
 
     internal var restart = false
     internal var atStartup = false
@@ -253,6 +256,7 @@ class MainActivity : AppCompatActivity() {
                         callButton.isEnabled = false
                         hangupButton.visibility = View.VISIBLE
                         hangupButton.isEnabled = false
+                        videoLayout.addView(videoView!!.surfaceView)
                         Handler().postDelayed({
                             hangupButton.isEnabled = true
                             if (!call(ua, uri, "outgoing")) {
@@ -422,6 +426,8 @@ class MainActivity : AppCompatActivity() {
                 dialpadButton.tag = "off"
             }
         }
+
+        if (videoView == null) videoView = VideoView(applicationContext)
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
 
@@ -787,6 +793,8 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
+                        videoIcon.setIcon(R.drawable.video_off)
+                        videoLayout.removeView(videoView!!.surfaceView)
                         volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -862,8 +870,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        menuInflater.inflate(R.menu.video_icon, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
+        videoIcon = menu.findItem(R.id.videoIcon)
         speakerIcon = menu.findItem(R.id.speakerIcon)
+        videoIcon.setVisible(false)
         return true
     }
 
@@ -882,6 +893,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 baresipService.setAction("ToggleSpeaker")
                 startService(baresipService)
+            }
+            R.id.speakerIcon -> {
             }
             R.id.config -> {
                 i = Intent(this, ConfigActivity::class.java)
@@ -1266,6 +1279,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
+            if (videoLayout.visibility == View.VISIBLE) videoLayout.visibility = View.INVISIBLE
+            defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
             callUri.text.clear()
             callUri.hint = getString(R.string.callee)
@@ -1283,6 +1298,7 @@ class MainActivity : AppCompatActivity() {
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
+            videoIcon.setVisible(false)
             baresipService.putExtra("enable", false)
             baresipService.setAction("ProximitySensing")
             startService(baresipService)
@@ -1359,6 +1375,9 @@ class MainActivity : AppCompatActivity() {
                     dtmf.addTextChangedListener(dtmfWatcher)
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
+                    defaultLayout.visibility = View.INVISIBLE
+                    videoLayout.visibility = View.VISIBLE
+                    videoIcon.setVisible(true)
                 }
             }
         }
