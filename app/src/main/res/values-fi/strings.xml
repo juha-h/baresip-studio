@@ -237,10 +237,6 @@
         ei ole käytössä.</string>
     <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
     <string name="invalid_opus_packet_loss">Virheellinen Opus-koodekin odotettu pakettihäviö</string>
-    <string name="ice_lite_mode">ICE Lite-moodi</string>
-    <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
-    käytössä.
-    </string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
     asteikolla 1–10.

@@ -48,7 +48,5 @@ opus_application voip
 opus_stereo no
 opus_sprop_stereo no
 ice_turn no
-ice_debug no
 ice_nomination regular
-ice_mode full
 zrtp_hash yes

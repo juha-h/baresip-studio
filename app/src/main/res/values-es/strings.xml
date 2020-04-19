@@ -162,8 +162,6 @@
     <string name="opus_packet_loss_help">Porcentaje esperado de pérdida de paquetes de transmisión de audio Opus, de 0 a 100. Por defecto 0, desactiva Opus Forward Error Correction (FEC).</string>
     <string name="invalid_opus_bitrate">Tasa de bits de Opus no válida</string>
     <string name="invalid_opus_packet_loss">Porcentaje de pérdida de paquetes opus no válido</string>
-    <string name="ice_lite_mode">ICE Lite Mode</string>
-    <string name="ice_lite_mode_help">Si está marcado, se utiliza el modo ICE Lite.</string>
     <string name="default_call_volume">Volumen de llamada predeterminado</string>
     <string name="default_call_volume_help">Si está configurado, el volumen de audio predeterminado de la llamada en escala 1–10.</string>
     <string name="debug">Depurar</string>

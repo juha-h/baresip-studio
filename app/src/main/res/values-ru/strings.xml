@@ -94,8 +94,6 @@
     <string name="audio_modules_title">Аудио модули</string>
     <string name="authentication_password_help">Пароль авторизации исходящего прокси.</string>
     <string name="backup">Резервное копирование</string>
-    <string name="ice_lite_mode_help">Если отмечено используется ICE Lite режим.</string>
-    <string name="manual">Руководство</string>
     <string name="media_encryption">Шифрование медиа</string>
     <string name="media_encryption_help">Выберите протокол шифрования медиа</string>
     <string name="message_failed">Неудачно</string>

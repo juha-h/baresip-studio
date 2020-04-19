@@ -167,8 +167,6 @@
 	</string>
     <string name="invalid_opus_bitrate">Невалиден битрейт на Opus</string>
     <string name="invalid_opus_packet_loss">Невалиден процент загуба на пакет Opus</string>
-    <string name="ice_lite_mode">ICE Lite режим</string>
-    <string name="ice_lite_mode_help">Ако е отметнато, се използва режим ICE Lite.</string>
     <string name="default_call_volume">Усилване на повикването по подразбиране</string>
     <string name="default_call_volume_help">Ако се задава, трябва да се избира сила на звука при 
 		повикване по подразбиране в мащаб 1–10.

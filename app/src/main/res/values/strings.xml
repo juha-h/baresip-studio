@@ -205,8 +205,6 @@
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
-    <string name="ice_lite_mode">ICE Lite Mode</string>
-    <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="debug">Debug</string>

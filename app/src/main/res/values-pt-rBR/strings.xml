@@ -87,8 +87,6 @@
     <string name="debug_help">Fornece disponibilidade de mensagens de log no nível de depuração e informações no Logcat.</string>
     <string name="default_call_volume_help">Se ajustado, volume de áudio da chamada padrão na escala de 1 a 10.</string>
     <string name="default_call_volume">Volume de Chamadas Padrão</string>
-    <string name="ice_lite_mode_help">Se selecionado, ICE Lite Mode é usado.</string>
-    <string name="ice_lite_mode">Modo ICE Lite</string>
     <string name="invalid_opus_packet_loss">Porcentagem de Perda de Pacotes do Opus inválida</string>
     <string name="invalid_opus_bitrate">Taxa de bits Opus inválida</string>
     <string name="opus_packet_loss_help">Porcentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por padrão 0, desativando a Opus Forward Error Correction (FEC).</string>
