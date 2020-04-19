@@ -1,10 +1,13 @@
 #include <string.h>
 #include <pthread.h>
 #include <jni.h>
-#include <android/log.h>
 #include <stdlib.h>
 #include <re.h>
 #include <baresip.h>
+
+#include <android/log.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 #define LOGD(...) \
     if (log_level_get() < LEVEL_INFO) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
@@ -29,6 +32,8 @@ typedef struct baresip_context {
 BaresipContext g_ctx;
 
 struct play *play = NULL;
+
+static ANativeWindow *window = 0;
 
 static int vprintf_null(const char *p, size_t size, void *arg) {
     (void)p;
@@ -175,6 +180,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     char ua_buf[32];
     char call_buf[32];
     int len;
+    ANativeWindow **win;
 
     struct player *player = baresip_player();
 
@@ -244,6 +250,10 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_GET_PASSWORD:
             get_password((char *)ua, (char *)call);
             return;
+        case UA_EVENT_GET_WINDOW:
+            win = (ANativeWindow **)call;
+            *win = window;
+            return;
         default:
             return;
     }
@@ -264,18 +274,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
             return;
         }
-    }
-
-    if (ev == UA_EVENT_GET_PASSWORD) {
-        jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
-                                                 "(Ljava/lang/String;)Ljava/lang/String;");
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
-        jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        jstring javaPassword = (*env)->CallObjectMethod(env, g_ctx.mainActivityObj, methodId, javaUA);
-        const char *password = (*env)->GetStringUTFChars(env, javaPassword, 0);
-        strcpy((char *)call, password);
-        (*env)->ReleaseStringUTFChars(env, javaPassword, password);
-        return;
     }
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz,
@@ -1590,4 +1588,16 @@ Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring ja
     module_unload(native_module);
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_VideoView_set_1surface(JNIEnv *env, jobject thiz,
+        jobject surface) {
+    if (surface != 0) {
+        window = ANativeWindow_fromSurface(env, surface);
+        LOGD("got window %p", window);
+    } else {
+        LOGD("releasing window");
+        ANativeWindow_release(window);
+    }
 }
