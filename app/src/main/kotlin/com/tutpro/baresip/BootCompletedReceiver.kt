@@ -17,7 +17,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
             val config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
             val asCv = Utils.getNameValue(config,"auto_start")
             if ((asCv.size > 0) && (asCv[0] == "yes")) {
-                Log.d("Baresip", "Start baresip upon boot completed or restart")
+                Log.i("Baresip", "Start baresip upon boot completed or restart")
                 val i = Intent(context, MainActivity::class.java)
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 val b = Bundle()

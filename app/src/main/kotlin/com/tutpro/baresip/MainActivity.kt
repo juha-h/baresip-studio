@@ -598,14 +598,15 @@ class MainActivity : AppCompatActivity() {
                     //System.exit(0)
                 }
                 alertDialog.show()
-                return
             } else {
                 quitTimer.cancel()
                 finishAndRemoveTask()
-                if (restart) reStart()
-                System.exit(0)
-                return
+                if (restart)
+                    reStart()
+                else
+                    System.exit(0)
             }
+            return
         }
         val uap = params[0]
         val ua = UserAgent.find(uap)
@@ -841,11 +842,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun reStart() {
         Log.d("Baresip", "Trigger restart")
-        val restartActivity = Intent(applicationContext, MainActivity::class.java)
-        val restartIntent = PendingIntent.getActivity(applicationContext,
-                RESTART_REQUEST_CODE, restartActivity, PendingIntent.FLAG_CANCEL_CURRENT)
-        val am = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.set(AlarmManager.RTC,System.currentTimeMillis() + 1000, restartIntent)
+        val pm = applicationContext.packageManager
+        val intent = pm.getLaunchIntentForPackage(this.getPackageName())
+        this.finishAffinity()
+        this.startActivity(intent)
+        System.exit(0)
     }
 
     override fun onBackPressed() {
@@ -944,8 +945,10 @@ class MainActivity : AppCompatActivity() {
                 quitTimer.start()
             } else {
                 finishAndRemoveTask()
-                if (reStart) reStart()
-                System.exit(0)
+                if (reStart)
+                    reStart()
+                else
+                    System.exit(0)
             }
         }
     }
