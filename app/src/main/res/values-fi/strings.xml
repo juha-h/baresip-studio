@@ -148,6 +148,8 @@
     <string name="incoming_call_from">Puhelu soittajalta</string>
     <string name="transfer_request">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
+    <!-- Boot Completed Receiver -->
+    <string name="tap_to_start">Kosketa käynnistääksesi sovelluksen</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
