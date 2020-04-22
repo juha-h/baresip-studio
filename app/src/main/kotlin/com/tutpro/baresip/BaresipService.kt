@@ -3,7 +3,6 @@ package com.tutpro.baresip
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.*
-import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.PendingIntent.getActivity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
@@ -17,7 +16,6 @@ import androidx.core.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE
 import androidx.core.content.ContextCompat
 import android.provider.Settings
 import android.telephony.TelephonyManager
@@ -615,7 +613,7 @@ class BaresipService: Service() {
                                     .setContentText(caller)
                             if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(VISIBILITY_PRIVATE)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
                             val answerIntent = Intent(this, BaresipService::class.java)
@@ -698,7 +696,7 @@ class BaresipService: Service() {
                                     .setContentText(target)
                             if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(VISIBILITY_PRIVATE)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .setPriority(Notification.PRIORITY_HIGH)
                             }
                             val acceptIntent = Intent(this, BaresipService::class.java)
@@ -807,7 +805,7 @@ class BaresipService: Service() {
                     .setContentText(text)
             if (Build.VERSION.SDK_INT < 26) {
                 nb.setVibrate(LongArray(0))
-                        .setVisibility(VISIBILITY_PRIVATE)
+                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .setPriority(Notification.PRIORITY_HIGH)
             }
             val replyIntent = Intent(this, BaresipService::class.java)
@@ -879,11 +877,11 @@ class BaresipService: Service() {
         if (Build.VERSION.SDK_INT >= 26) {
             val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
                     NotificationManager.IMPORTANCE_LOW)
-            defaultChannel.lockscreenVisibility = VISIBILITY_PUBLIC
+            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             nm.createNotificationChannel(defaultChannel)
             val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
                     NotificationManager.IMPORTANCE_HIGH)
-            highChannel.lockscreenVisibility = VISIBILITY_PUBLIC
+            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             highChannel.enableVibration(true)
             nm.createNotificationChannel(highChannel)
         }
@@ -894,7 +892,7 @@ class BaresipService: Service() {
                 .setAction(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
         val pi = getActivity(this, STATUS_REQ_CODE, intent, 0)
-        snb.setVisibility(VISIBILITY_PUBLIC)
+        snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(pi)
                 .setOngoing(true)
