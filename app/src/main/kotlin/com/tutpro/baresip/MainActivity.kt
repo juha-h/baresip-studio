@@ -60,7 +60,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val intentAction = intent.getStringExtra("action")
-        Log.d("Baresip", "Main created with action '$intentAction'")
+
+        Log.d("Baresip", "At MainActivity onCreate with action '$intentAction'")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         dismissKeyguard()
@@ -937,7 +938,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun quitRestart(reStart: Boolean) {
         if (stopState == "initial") {
-            Log.d("Baresip", "quitRestart Restart = $restart")
+            Log.d("Baresip", "quitRestart Restart = $reStart")
             if (BaresipService.isServiceRunning) {
                 restart = reStart
                 baresipService.setAction("Stop");
