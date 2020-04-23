@@ -775,8 +775,8 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1outbound(JNIEnv *env, jobject th
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thiz, jstring javaAcc,
-                                                    jint ix) {
+Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thiz,
+        jstring javaAcc, jint ix) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
@@ -784,13 +784,13 @@ Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thi
     char codec_buf[32];
     int len;
     struct le *le;
+    codec_buf[0] = '\0';
     if (acc) {
         codecl = account_aucodecl(acc);
         if (!list_isempty(codecl)) {
             int i = -1;
             for (le = list_head(codecl); le != NULL; le = le->next) {
                 i++;
-                if (i > ix) break;
                 if (i == ix) {
                     const struct aucodec *ac = le->data;
                     len = re_snprintf(codec_buf, sizeof codec_buf, "%s/%u/%u", ac->name, ac->srate, ac->ch);
@@ -801,12 +801,9 @@ Java_com_tutpro_baresip_AccountKt_account_1audio_1codec(JNIEnv *env, jobject thi
                     break;
                 }
             }
-            if (i == ix) {
-                return (*env)->NewStringUTF(env, codec_buf);
-            }
         }
     }
-    return (*env)->NewStringUTF(env, "");
+    return (*env)->NewStringUTF(env, codec_buf);
 }
 
 JNIEXPORT jint JNICALL
@@ -816,7 +813,6 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1audio_1codecs(JNIEnv *env, jobje
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     const char *codecs = (*env)->GetStringUTFChars(env, javaCodecs, 0);
-    LOGD("setting audio codecs '%s'\n", codecs);
     int res = account_set_audio_codecs(acc, codecs);
     (*env)->ReleaseStringUTFChars(env, javaCodecs, codecs);
     return res;
