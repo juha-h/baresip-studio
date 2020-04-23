@@ -1,0 +1,1 @@
+- Upstream increase of maximum number of account's audio codecs from 8 to 16.
