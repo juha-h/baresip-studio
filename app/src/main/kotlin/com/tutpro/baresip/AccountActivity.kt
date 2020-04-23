@@ -84,9 +84,8 @@ class AccountActivity : AppCompatActivity() {
         regCheck.isChecked = acc.regint > 0
 
         val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-        newCodecs.addAll(audioCodecs)
-        while (newCodecs.size < audioCodecs.size) newCodecs.add("")
-
+        newCodecs.addAll(acc.audioCodec)
+        while (newCodecs.size < audioCodecs.size) newCodecs.add("-")
         val layout = findViewById(R.id.CodecSpinners) as LinearLayout
         val spinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
         for (i in audioCodecs.indices) {
@@ -97,8 +96,8 @@ class AccountActivity : AppCompatActivity() {
             if (acc.audioCodec.size > i) {
                 val codec = acc.audioCodec[i]
                 spinnerList[i].add(codec)
-                for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
                 spinnerList[i].add("-")
+                for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
             } else {
                 spinnerList[i].addAll(audioCodecs)
                 spinnerList[i].add(0, "-")
