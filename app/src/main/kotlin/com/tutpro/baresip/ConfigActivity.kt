@@ -25,7 +25,6 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var aec: CheckBox
     internal lateinit var opusBitRate: EditText
     internal lateinit var opusPacketLoss: EditText
-    internal lateinit var iceLite: CheckBox
     internal lateinit var debug: CheckBox
     internal lateinit var reset: CheckBox
 
@@ -131,11 +130,6 @@ class ConfigActivity : AppCompatActivity() {
         val oplCv = Config.variable("opus_packet_loss")
         oldOpusPacketLoss = if (oplCv.size == 0) "0" else oplCv[0]
         opusPacketLoss.setText(oldOpusPacketLoss)
-
-        iceLite = findViewById(R.id.IceLite) as CheckBox
-        val imCv = Config.variable("ice_mode")
-        oldIceMode = if (imCv.size == 0) "full" else imCv[0]
-        iceLite.isChecked = oldIceMode == "lite"
 
         val callVolSpinner = findViewById(R.id.VolumeSpinner) as Spinner
         val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -355,14 +349,6 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                var iceModeString = "full"
-                if (iceLite.isChecked) iceModeString = "lite"
-                if (oldIceMode != iceModeString) {
-                    Config.replaceVariable("ice_mode", iceModeString)
-                    save = true
-                    restart = true
-                }
-
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
                     Config.replaceVariable("call_volume", callVolume.toString())
@@ -477,10 +463,6 @@ class ConfigActivity : AppCompatActivity() {
             findViewById(R.id.OpusPacketLossTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.opus_packet_loss),
                         getString(R.string.opus_packet_loss_help))
-            }
-            findViewById(R.id.IceLiteTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.ice_lite_mode),
-                        getString(R.string.ice_lite_mode_help))
             }
             findViewById(R.id.VolumeTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.default_call_volume),

@@ -148,6 +148,8 @@
     <string name="incoming_call_from">Puhelu soittajalta</string>
     <string name="transfer_request">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
+    <!-- Boot Completed Receiver -->
+    <string name="tap_to_start">Kosketa käynnistääksesi sovelluksen</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
@@ -237,10 +239,6 @@
         ei ole käytössä.</string>
     <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
     <string name="invalid_opus_packet_loss">Virheellinen Opus-koodekin odotettu pakettihäviö</string>
-    <string name="ice_lite_mode">ICE Lite-moodi</string>
-    <string name="ice_lite_mode_help">Jos merkitty, ICE Lite-moodi on
-    käytössä.
-    </string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
     asteikolla 1–10.

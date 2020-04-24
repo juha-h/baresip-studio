@@ -1,0 +1,6 @@
+- Due to Android 10 restrictions, baresip cannot anymore be automatically
+  started after boot without a notification.
+- Fixed restart of baresip on Android 10.
+- Removed setting of ICE Lite Mode due to upstream removal.
+- Added Brazilian Portuguese strings from Weblate.
+- Small fixes in Spanish and Norwegian strings.

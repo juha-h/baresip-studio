@@ -125,6 +125,8 @@
     <string name="incoming_call_from">Call from</string>
     <string name="transfer_request">Call transfer request to</string>
     <string name="message_from">Message from</string>
+    <!-- Boot Completed Receiver -->
+    <string name="tap_to_start">Tap to start application</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call">Call</string>
@@ -205,8 +207,6 @@
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
-    <string name="ice_lite_mode">ICE Lite Mode</string>
-    <string name="ice_lite_mode_help">If checked, ICE Lite Mode is used.</string>
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="debug">Debug</string>
