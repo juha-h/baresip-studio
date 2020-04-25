@@ -896,7 +896,7 @@ class MainActivity : AppCompatActivity() {
                 baresipService.setAction("ToggleSpeaker")
                 startService(baresipService)
             }
-            R.id.speakerIcon -> {
+            R.id.videoIcon -> {
             }
             R.id.config -> {
                 i = Intent(this, ConfigActivity::class.java)
