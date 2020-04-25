@@ -1194,7 +1194,8 @@ Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaU
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaXCall, jint javaVidMode) {
+Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
+        jstring javaXCall, jint javaVidMode) {
     struct call *xcall, *call = NULL;
     struct ua *ua;
     int err;
@@ -1220,7 +1221,7 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA,
-                                       jstring javaCall) {
+                                       jstring javaCall, jint javaVidMode) {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     LOGD("answering call %s/%s\n", native_ua, native_call);
@@ -1228,7 +1229,7 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     play = mem_deref(play);
     re_thread_enter();
-    ua_answer(ua, call);
+    ua_answer(ua, call, (enum vidmode)javaVidMode);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);

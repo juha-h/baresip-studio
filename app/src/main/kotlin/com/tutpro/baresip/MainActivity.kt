@@ -297,7 +297,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "AoR $aor answering call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
-            Api.ua_answer(ua.uap, callp)
+            Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
         }
 
         rejectButton.setOnClickListener {
