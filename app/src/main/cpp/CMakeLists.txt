@@ -108,7 +108,8 @@ target_include_directories(baresip PRIVATE
 target_link_libraries(baresip
         android
         EGL
-        GLESv3
+        GLESv2
+        GLESv1_CM
         OpenSLES
         lib_baresip
         lib_rem
