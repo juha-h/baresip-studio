@@ -38,6 +38,7 @@ module avformat.so
 module webrtc_aec.so
 module opensles.so
 module opengles.so
+module selfview.so
 module stun.so
 module turn.so
 module ice.so
@@ -57,6 +58,7 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
+video_selfview pip
 ice_turn no
 ice_nomination regular
 zrtp_hash yes
