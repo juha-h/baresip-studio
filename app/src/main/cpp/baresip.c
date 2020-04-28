@@ -1260,7 +1260,7 @@ Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA)
 
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
+Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
                                           jstring javaPeer) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
@@ -1278,7 +1278,7 @@ Java_com_tutpro_baresip_Api_call_1connect(JNIEnv *env, jobject thiz, jstring jav
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jstring javaCall,
+Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jstring javaCall,
                                                   jint code, jstring reason) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
@@ -1293,7 +1293,7 @@ Java_com_tutpro_baresip_Api_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jst
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_call_1start_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("starting audio of call %s\n", native_call);
@@ -1305,7 +1305,7 @@ Java_com_tutpro_baresip_Api_call_1start_1audio(JNIEnv *env, jobject thiz, jstrin
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     LOGD("stopping audio of call %s\n", native_call);
@@ -1317,7 +1317,7 @@ Java_com_tutpro_baresip_Api_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_call_1hold(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     int ret;
@@ -1333,7 +1333,7 @@ Java_com_tutpro_baresip_Api_call_1hold(JNIEnv *env, jobject thiz, jstring javaCa
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_call_1unhold(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     int ret;
@@ -1349,7 +1349,7 @@ Java_com_tutpro_baresip_Api_call_1unhold(JNIEnv *env, jobject thiz, jstring java
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     const struct aucodec *tx = audio_codec(call_audio(call), true);
@@ -1370,7 +1370,7 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
+Java_com_tutpro_baresip_Call_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     char status_buf[256];
@@ -1384,7 +1384,7 @@ Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring java
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Api_call_1has_1video(JNIEnv *env, jobject thiz, jstring javaCall)
+Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring javaCall)
 {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);

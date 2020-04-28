@@ -325,9 +325,14 @@ object Utils {
                 val text = sequence.subSequence(start, start + count).toString()
                 if (text.length > 0) {
                     val digit = text[0]
-                    Log.d("Baresip", "Got DTMF digit '$digit'")
-                    if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
-                        Api.call_send_digit(callp, digit)
+                    val call = Call.find(callp)
+                    if (call == null) {
+                        Log.w("Baresip", "dtmfWatcher did not find call $callp")
+                    } else {
+                        Log.d("Baresip", "Got DTMF digit '$digit'")
+                        if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
+                            call.sendDigit(digit)
+                    }
                 }
             }
             override fun afterTextChanged(sequence: Editable) {

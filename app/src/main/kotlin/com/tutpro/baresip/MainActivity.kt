@@ -316,12 +316,12 @@ class MainActivity : AppCompatActivity() {
             val call = Call.uaCalls(ua, "")[0]
             if (call.onhold) {
                 Log.d("Baresip", "AoR $aor resuming call ${call.callp} with ${callUri.text}")
-                Api.call_unhold(call.callp)
+                call.unhold()
                 call.onhold = false
                 holdButton.setImageResource(R.drawable.pause)
             } else {
                 Log.d("Baresip", "AoR $aor holding call ${call.callp} with ${callUri.text}")
-                Api.call_hold(call.callp)
+                call.hold()
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
             }
@@ -331,8 +331,8 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val calls = Call.uaCalls(ua, "")
             if (calls.size > 0) {
-                val status = Api.call_status(calls[0].callp)
-                val codecs = Api.call_audio_codecs(calls[0].callp)
+                val status = calls[0].status()
+                val codecs = calls[0].audioCodecs()
                 if (status.contains('[') && status.contains(']') &&
                         status.contains('=') && codecs.contains(',')) {
                     val duration = status.split("[")[1].split("]")[0]
@@ -771,7 +771,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         transferDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             if (call in Call.calls())
-                                Api.call_notify_sipfrag(callp, 603, "Decline")
+                                call.notifySipfrag(603, "Decline")
                             dialog.dismiss()
                         }
                         transferDialog.create().show()
@@ -1250,20 +1250,20 @@ class MainActivity : AppCompatActivity() {
             Call.calls().add(newCall)
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
-            val err = Api.call_connect(newCallp, uri)
+            val err = newCall.connect(uri)
             if (err == 0) {
-                Api.call_start_audio(newCallp)
+                newCall.startAudio()
                 if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
                     spinToAor(ua.account.aor)
                 showCall(ua)
             } else {
-                Api.call_start_audio(call.callp)
+                call.startAudio()
                 Log.e("Baresip", "call_connect $newCallp failed with error $err")
-                Api.call_notify_sipfrag(call.callp, 500, "Call Error")
+                call.notifySipfrag(500, "Call Error")
             }
         } else {
             Log.e("Baresip", "ua_call_alloc ${ua.uap}/${call.callp} failed")
-            Api.call_notify_sipfrag(call.callp, 500, "Call Error")
+            call.notifySipfrag(500, "Call Error")
         }
     }
 
