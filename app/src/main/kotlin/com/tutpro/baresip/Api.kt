@@ -25,16 +25,6 @@ object Api {
     external fun ua_set_media_af(uap: String, af: Int)
     external fun account_debug(accp: String)
     external fun ua_debug(uap: String)
-    external fun call_hold(callp: String): Int
-    external fun call_unhold(callp: String): Int
-    external fun call_connect(callp: String, peer_uri: String): Int
-    external fun call_peeruri(callp: String): String
-    external fun call_send_digit(callp: String, digit: Char): Int
-    external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
-    external fun call_start_audio(callp: String)
-    external fun call_stop_audio(callp: String)
-    external fun call_audio_codecs(callp: String): String
-    external fun call_status(callp: String): String
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
     external fun reload_config(): Int
     external fun cmd_exec(cmd: String): Int

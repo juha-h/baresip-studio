@@ -375,7 +375,7 @@ class BaresipService: Service() {
                 if (call == null)
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
                 else
-                    Api.call_notify_sipfrag(callp, 603, "Decline")
+                    call.notifySipfrag(603, "Decline")
                 nm.cancel(TRANSFER_NOTIFICATION_ID)
             }
 
@@ -556,7 +556,12 @@ class BaresipService: Service() {
                         return
                     }
                     "call incoming" -> {
-                        val peerUri = Api.call_peeruri(callp)
+                        val call = Call.find(callp)
+                        if (call == null) {
+                            Log.w(LOG_TAG, "Incoming call $callp is not found")
+                            return
+                        }
+                        val peerUri = call.peerUri()
                         if ((Call.calls().size > 0) ||
                                 (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
                                 !Utils.checkPermission(applicationContext,
