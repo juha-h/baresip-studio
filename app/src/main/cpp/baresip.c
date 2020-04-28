@@ -1383,6 +1383,15 @@ Java_com_tutpro_baresip_Api_call_1status(JNIEnv *env, jobject thiz, jstring java
     return (*env)->NewStringUTF(env, status_buf);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_Api_call_1has_1video(JNIEnv *env, jobject thiz, jstring javaCall)
+{
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return call_has_video(call) ? true : false;
+}
+
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();
