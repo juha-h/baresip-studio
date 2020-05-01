@@ -8,14 +8,14 @@ import android.view.SurfaceView
 
 class VideoView(val context: Context) {
 
-    /* external fun nativeOnStart()
-    external fun nativeOnResume()
-    external fun nativeOnPause()
-    external fun nativeOnStop() */
     external fun set_surface(surface: Surface?)
+    external fun on_start()
+    external fun on_resume()
+    external fun on_pause()
+    external fun on_stop()
 
     val surfaceHolderCallback: SurfaceHolderCallback?
-    val surfaceView: View?
+    val surfaceView: View
 
     init {
         surfaceHolderCallback = SurfaceHolderCallback()
@@ -45,13 +45,18 @@ class VideoView(val context: Context) {
 
     inner class SurfaceHolderCallback: SurfaceHolder.Callback {
 
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, w: Int, h: Int) {
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            Log.d("Baresip", "Surface created")
             set_surface(holder.surface)
         }
 
-        override fun surfaceCreated(holder: SurfaceHolder) {}
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, w: Int, h: Int) {
+            Log.d("Baresip", "Surface changed")
+            set_surface(holder.surface)
+        }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
+            Log.d("Baresip", "Surface destroyed")
             set_surface(null)
         }
 

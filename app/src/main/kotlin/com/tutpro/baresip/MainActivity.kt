@@ -17,6 +17,8 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.widget.*
 import android.view.*
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 
 import java.io.File
 import kotlin.collections.ArrayList
@@ -27,6 +29,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     internal lateinit var layout: RelativeLayout
+    internal lateinit var videoView: VideoView
     internal lateinit var baresipService: Intent
     internal lateinit var callTitle: TextView
     internal lateinit var callUri: AutoCompleteTextView
@@ -55,7 +58,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
     internal lateinit var videoIcon: MenuItem
-    internal var videoView: VideoView? = null
 
     internal var restart = false
     internal var atStartup = false
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
+        videoView = VideoView(applicationContext)
         aorSpinner = findViewById(R.id.AoRList)
         callTitle = findViewById(R.id.callTitle) as TextView
         callUri = findViewById(R.id.callUri) as AutoCompleteTextView
@@ -257,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                         callButton.isEnabled = false
                         hangupButton.visibility = View.VISIBLE
                         hangupButton.isEnabled = false
-                        videoLayout.addView(videoView!!.surfaceView)
+                        videoLayout.addView(videoView.surfaceView)
                         Handler().postDelayed({
                             hangupButton.isEnabled = true
                             if (!call(ua, uri, "outgoing")) {
@@ -293,11 +296,11 @@ class MainActivity : AppCompatActivity() {
         answerButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = Call.uaCalls(ua, "in")[0].callp
-            Log.d("Baresip", "AoR $aor answering call $callp from ${callUri.text}")
+            val call = Call.uaCalls(ua, "in")[0]
+            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
-            Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+            Api.ua_answer(ua.uap, call.callp, Api.VIDMODE_OFF)
         }
 
         rejectButton.setOnClickListener {
@@ -419,7 +422,6 @@ class MainActivity : AppCompatActivity() {
                 callUri.inputType = InputType.TYPE_CLASS_PHONE
                 dialpadButton.setImageResource(R.drawable.dialpad_on)
                 dialpadButton.tag = "on"
-                Api.call_video_debug()
             } else {
                 callUri.inputType = InputType.TYPE_CLASS_TEXT +
                         InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -427,8 +429,6 @@ class MainActivity : AppCompatActivity() {
                 dialpadButton.tag = "off"
             }
         }
-
-        if (videoView == null) videoView = VideoView(applicationContext)
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
 
@@ -796,7 +796,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
                         videoIcon.setIcon(R.drawable.video_off)
-                        videoLayout.removeView(videoView!!.surfaceView)
+                        videoLayout.removeView(videoView.surfaceView)
                         volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -874,8 +874,8 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.video_icon, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
-        videoIcon = menu.findItem(R.id.videoIcon)
         speakerIcon = menu.findItem(R.id.speakerIcon)
+        videoIcon = menu.findItem(R.id.videoIcon)
         videoIcon.setVisible(false)
         return true
     }
@@ -897,6 +897,19 @@ class MainActivity : AppCompatActivity() {
                 startService(baresipService)
             }
             R.id.videoIcon -> {
+                for (call in Call.calls())
+                    if (call.status == "connected")
+                            if (call.video) {
+                                if (call.setVideo(false) == 0)
+                                    item.setIcon(R.drawable.video_off)
+                                else
+                                    Log.e("Baresip", "Failed to set call video")
+                            } else {
+                                if (call.setVideo(true) == 0)
+                                    item.setIcon(R.drawable.video_on)
+                                else
+                                    Log.e("Baresip", "Failed to set call video")
+                            }
             }
             R.id.config -> {
                 i = Intent(this, ConfigActivity::class.java)
@@ -1231,7 +1244,8 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_ON)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
+            Call.calls().add(Call(callp, ua, uri, "out", status, true,
+                    Utils.dtmfWatcher(callp)))
             showCall(ua)
             return true
         } else {
@@ -1246,7 +1260,7 @@ class MainActivity : AppCompatActivity() {
         if (newCallp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
-                    Utils.dtmfWatcher(newCallp))
+                    true, Utils.dtmfWatcher(newCallp))
             Call.calls().add(newCall)
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
@@ -1353,6 +1367,19 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
+                    videoIcon.isVisible = true
+                    if (call.hasVideo()) {
+                        defaultLayout.visibility = View.INVISIBLE
+                        videoLayout.visibility = View.VISIBLE
+                        videoView.surfaceView.visibility = View.VISIBLE
+                        videoIcon.setIcon(R.drawable.video_on)
+                        videoIcon.isVisible = true
+                    } else {
+                        defaultLayout.visibility = View.VISIBLE
+                        videoLayout.visibility = View.INVISIBLE
+                        videoIcon.setIcon(R.drawable.video_off)
+                        videoIcon.isVisible = false
+                    }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
@@ -1379,9 +1406,6 @@ class MainActivity : AppCompatActivity() {
                     dtmf.addTextChangedListener(dtmfWatcher)
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
-                    defaultLayout.visibility = View.INVISIBLE
-                    videoLayout.visibility = View.VISIBLE
-                    videoIcon.setVisible(true)
                 }
             }
         }
