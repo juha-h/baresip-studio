@@ -4,23 +4,12 @@
 #include <stdlib.h>
 #include <re.h>
 #include <baresip.h>
-
-#include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include "logger.h"
+#include "vidisp.h"
 
-#define LOGD(...) \
-    if (log_level_get() < LEVEL_INFO) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGI(...) \
-    if (log_level_get() < LEVEL_WARN) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGW(...) \
-    if (log_level_get() < LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGE(...) \
-    if (log_level_get() <= LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
+#define LOG_TAG "Baresip Lib"
 
 typedef struct baresip_context {
     JavaVM  *javaVM;
@@ -32,8 +21,6 @@ typedef struct baresip_context {
 BaresipContext g_ctx;
 
 struct play *play = NULL;
-
-static ANativeWindow *window = 0;
 
 static int vprintf_null(const char *p, size_t size, void *arg) {
     (void)p;
@@ -249,10 +236,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             return;
         case UA_EVENT_GET_PASSWORD:
             get_password((char *)ua, (char *)call);
-            return;
-        case UA_EVENT_GET_WINDOW:
-            win = (ANativeWindow **)call;
-            *win = window;
             return;
         default:
             return;
@@ -551,6 +534,13 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
+    err = vidisp_register(&vid, baresip_vidispl(), "opengles", opengles_alloc, NULL,
+            opengles_display, NULL);
+    if (err) {
+        LOGW("vidisp_register failed (%d)\n", err);
+        goto out;
+    }
+
     char ua_buf[32];
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
@@ -579,8 +569,9 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     err = re_main(signal_handler);
 
     out:
-        (*env)->ReleaseStringUTFChars(env, javaIpV4Addr, ipv4_addr);
-        (*env)->ReleaseStringUTFChars(env, javaIpV6Addr, ipv6_addr);
+
+    (*env)->ReleaseStringUTFChars(env, javaIpV4Addr, ipv4_addr);
+    (*env)->ReleaseStringUTFChars(env, javaIpV6Addr, ipv6_addr);
 
     if (err) {
         LOGE("stopping UAs due to error: (%d)\n", err);
@@ -602,6 +593,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGD("unloading modules ...");
     mod_close();
+
+    vid = mem_deref(vid);
 
     libre_close();
 
@@ -1123,31 +1116,6 @@ Java_com_tutpro_baresip_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring
     uag_current_set(ua);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
-{
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call;
-    call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return (*env)->NewStringUTF(env, call_peeruri(call));
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
-                                              jchar digit) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    const uint16_t native_digit = digit;
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
-    re_thread_enter();
-    int res = call_send_digit(call, (char)native_digit);
-    if (!res) res = call_send_digit(call, KEYCODE_REL);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return res;
-}
-
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
                                                 jstring javaUA, jstring javaCall, jint code,
@@ -1348,6 +1316,31 @@ Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring jav
     return ret;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
+                                              jchar digit) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    const uint16_t native_digit = digit;
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
+    re_thread_enter();
+    int res = call_send_digit(call, (char)native_digit);
+    if (!res) res = call_send_digit(call, KEYCODE_REL);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_Call_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
+{
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call;
+    call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return (*env)->NewStringUTF(env, call_peeruri(call));
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
@@ -1392,8 +1385,20 @@ Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring
     return call_has_video(call) ? true : false;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring javaCall,
+        jboolean enabled)
+{
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    LOGD("sdp_media_set_disabled (%d)", enabled);
+    sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), !enabled);
+    return call_modify(call);
+}
+
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_call_1video_1debug(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_Call_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();
 }
 
@@ -1564,8 +1569,7 @@ Java_com_tutpro_baresip_Api_net_1unset_1address(JNIEnv *env, jobject thiz, jint 
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg,
-        jboolean reinvite) {
+Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg, jboolean reinvite) {
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
     (void)uag_reset_transp(reg, reinvite);
 }
@@ -1596,14 +1600,3 @@ Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring ja
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_set_1surface(JNIEnv *env, jobject thiz,
-        jobject surface) {
-    if (surface != 0) {
-        window = ANativeWindow_fromSurface(env, surface);
-        LOGD("got window %p", window);
-    } else {
-        LOGD("releasing window");
-        ANativeWindow_release(window);
-    }
-}
