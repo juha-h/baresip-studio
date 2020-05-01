@@ -15,7 +15,6 @@ auenc_format s16
 auplay_format s16
 audec_format s16
 video_source avformat,android_camera,1
-video_display opengles,nil
 video_size 640x480
 video_fps 15
 videoenc_format yuv420p
@@ -37,7 +36,6 @@ module vp9.so
 module avformat.so
 module webrtc_aec.so
 module opensles.so
-module opengles.so
 module selfview.so
 module stun.so
 module turn.so
