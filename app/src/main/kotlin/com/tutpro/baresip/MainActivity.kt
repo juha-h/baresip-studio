@@ -555,14 +555,19 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 if (!BaresipService.activities.isEmpty()) restoreActivities()
                 if (UserAgent.uas().size > 0) {
-                    val currentPosition = aorSpinner.selectedItemPosition
-                    if (currentPosition == -1) {
-                        if (Call.calls().size > 0)
-                            spinToAor(Call.calls()[0].ua.account.aor)
-                        else
-                            aorSpinner.setSelection(0)
+                    val incomingCall = Call.incomingCall()
+                    if (incomingCall != null) {
+                        spinToAor(incomingCall.ua.account.aor)
                     } else {
-                        aorSpinner.setSelection(currentPosition)
+                        val currentPosition = aorSpinner.selectedItemPosition
+                        if (currentPosition == -1) {
+                            if (Call.calls().size > 0)
+                                spinToAor(Call.calls()[0].ua.account.aor)
+                            else
+                                aorSpinner.setSelection(0)
+                        } else {
+                            aorSpinner.setSelection(currentPosition)
+                        }
                     }
                     uaAdapter.notifyDataSetChanged()
                     showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
