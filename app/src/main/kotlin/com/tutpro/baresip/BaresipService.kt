@@ -556,12 +556,7 @@ class BaresipService: Service() {
                         return
                     }
                     "call incoming" -> {
-                        val call = Call.find(callp)
-                        if (call == null) {
-                            Log.w(LOG_TAG, "Incoming call $callp is not found")
-                            return
-                        }
-                        val peerUri = call.peerUri()
+                        val peerUri = Api.call_peeruri(callp)
                         if ((Call.calls().size > 0) ||
                                 (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
                                 !Utils.checkPermission(applicationContext,

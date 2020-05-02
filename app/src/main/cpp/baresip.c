@@ -1115,31 +1115,6 @@ Java_com_tutpro_baresip_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring
     uag_current_set(ua);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
-{
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call;
-    call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return (*env)->NewStringUTF(env, call_peeruri(call));
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
-                                              jchar digit) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    const uint16_t native_digit = digit;
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
-    re_thread_enter();
-    int res = call_send_digit(call, (char)native_digit);
-    if (!res) res = call_send_digit(call, KEYCODE_REL);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return res;
-}
-
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
                                                 jstring javaUA, jstring javaCall, jint code,
@@ -1338,6 +1313,31 @@ Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring jav
     ret = call_hold(call, false);
     re_thread_leave();
     return ret;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
+{
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    struct call *call;
+    call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return (*env)->NewStringUTF(env, call_peeruri(call));
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
+                                              jchar digit) {
+    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+    const uint16_t native_digit = digit;
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
+    re_thread_enter();
+    int res = call_send_digit(call, (char)native_digit);
+    if (!res) res = call_send_digit(call, KEYCODE_REL);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    return res;
 }
 
 JNIEXPORT jstring JNICALL
