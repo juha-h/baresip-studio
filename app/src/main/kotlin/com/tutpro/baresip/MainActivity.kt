@@ -1125,6 +1125,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
 
             ACCOUNTS_CODE -> {
+                uaAdapter.notifyDataSetChanged()
                 val aor = data!!.getStringExtra("aor")!!
                 spinToAor(aor)
                 if (aorSpinner.selectedItemPosition != -1)
