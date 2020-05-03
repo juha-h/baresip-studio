@@ -47,6 +47,8 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         accp = intent.getStringExtra("accp")!!
         Utils.addActivity("account,$accp")
 
@@ -195,8 +197,6 @@ class AccountActivity : AppCompatActivity() {
 
         defaultCheck = findViewById(R.id.Default) as CheckBox
         defaultCheck.isChecked = uaIndex == 0
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     }
 

@@ -1119,9 +1119,6 @@ class MainActivity : AppCompatActivity() {
 
         super.onActivityResult(requestCode, resultCode, data)
 
-        Log.d("Baresip", "onActivity result $requestCode $resultCode")
-        if (data != null) Log.d("Baresip", "aor = ${data.getStringExtra("aor")}")
-
         when (requestCode) {
 
             ACCOUNTS_CODE -> {
@@ -1173,11 +1170,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             CHATS_CODE, CHAT_CODE -> {
+                spinToAor(data!!.getStringExtra("aor")!!)
                 updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
             }
 
             ABOUT_CODE -> {
             }
+
         }
     }
 
