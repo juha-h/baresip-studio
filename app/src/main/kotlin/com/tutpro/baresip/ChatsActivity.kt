@@ -18,8 +18,7 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
-
-    private var aor = ""
+    internal lateinit var aor: String
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -131,21 +130,16 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onResume() {
-
         super.onResume()
-
         clAdapter.clear()
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
         listView.adapter = clAdapter
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.chats_menu, menu)
         return true
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -168,24 +162,22 @@ class ChatsActivity: AppCompatActivity() {
                     dialog.dismiss()
                 }
                 deleteDialog.create().show()
+                return true
             }
 
             android.R.id.home -> {
                 BaresipService.activities.remove("chats,$aor")
-                val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
-                finish()
+                returnResult()
+                return true
             }
 
         }
 
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == MainActivity.CHAT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 clAdapter.clear()
@@ -194,17 +186,25 @@ class ChatsActivity: AppCompatActivity() {
                 listView.adapter = clAdapter
             }
         }
-
     }
 
     override fun onBackPressed() {
-
         BaresipService.activities.remove("chats,$aor")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
-        finish()
+        returnResult()
         super.onBackPressed()
+    }
 
+    override fun onPause() {
+        /* Without this, data is null at MainActivity onActivityResult */
+        returnResult()
+        super.onPause()
+    }
+
+    private fun returnResult() {
+        val i = Intent()
+        i.putExtra("aor", aor)
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
     }
 
     private fun uaMessages(aor: String) : ArrayList<Message> {

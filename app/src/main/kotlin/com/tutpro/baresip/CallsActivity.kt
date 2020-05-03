@@ -130,16 +130,10 @@ class CallsActivity : AppCompatActivity() {
         invalidateOptionsMenu()
     }
 
-    override fun onPause() {
-
-        CallHistory.save()
-        super.onPause()
-
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("calls,$aor") == -1) return true
+        if (BaresipService.activities.indexOf("calls,$aor") == -1)
+            return true
 
         when (item.itemId) {
 
@@ -158,33 +152,42 @@ class CallsActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
                 deleteDialog.create().show()
+                return true
             }
 
             R.id.history_on_off -> {
                 account.callHistory = !account.callHistory
                 invalidateOptionsMenu()
                 AccountsActivity.saveAccounts()
+                return true
             }
 
             android.R.id.home -> {
-                BaresipService.activities.remove("calls,$aor")
-                val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
-                finish()
+                onBackPressed()
+                return true
             }
         }
 
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {
-
         BaresipService.activities.remove("calls,$aor")
+        returnResult()
+        super.onBackPressed()
+    }
+
+    override fun onPause() {
+        CallHistory.save()
+        returnResult()
+        super.onPause()
+    }
+
+    private fun returnResult() {
         val i = Intent()
+        i.putExtra("aor", aor)
         setResult(Activity.RESULT_CANCELED, i)
         finish()
-        super.onBackPressed()
-
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {

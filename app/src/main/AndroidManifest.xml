@@ -56,13 +56,12 @@
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/account"
-            android:parentActivityName=".AccountsActivity">
+            android:label="@string/account" >
         </activity>
         <activity
             android:name=".ContactsActivity"
@@ -98,8 +97,7 @@
         <activity
             android:name=".ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/chat"
-            android:parentActivityName=".ChatsActivity" >
+            android:label="@string/chat" >
         </activity>
         <activity
             android:name=".AboutActivity"

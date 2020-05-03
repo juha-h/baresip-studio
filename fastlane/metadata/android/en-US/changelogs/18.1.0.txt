@@ -1,0 +1,3 @@
+- Improved configuration of account's audio codecs.
+- Always show incoming call (if any) when baresip is resumed.
+- Improved and fixed resuming to non-main activities.

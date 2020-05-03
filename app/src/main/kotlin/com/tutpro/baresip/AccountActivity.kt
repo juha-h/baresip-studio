@@ -47,6 +47,8 @@ class AccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         accp = intent.getStringExtra("accp")!!
         Utils.addActivity("account,$accp")
 
@@ -209,10 +211,8 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("account,$accp") == -1) return true
-
-        val intent = Intent()
-        intent.putExtra("aor", aor)
+        if (BaresipService.activities.indexOf("account,$accp") == -1)
+            return true
 
         when (item.itemId) {
 
@@ -458,30 +458,32 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
                     Api.ua_register(ua.uap)
 
-                setResult(Activity.RESULT_OK, intent)
+                BaresipService.activities.remove("account,$accp")
+                returnResult(Activity.RESULT_OK)
+                return true
             }
 
-            android.R.id.home ->
-                setResult(Activity.RESULT_CANCELED, intent)
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
 
         }
 
-        BaresipService.activities.remove("account,$accp")
-        finish()
-
-        return true
+        return super.onOptionsItemSelected(item)
 
     }
 
     override fun onBackPressed() {
-
         BaresipService.activities.remove("account,$accp")
-        val intent = Intent()
-        intent.putExtra("aor", aor)
-        setResult(Activity.RESULT_CANCELED, intent)
-        finish()
+        returnResult(Activity.RESULT_CANCELED)
         super.onBackPressed()
+    }
 
+    override fun onPause() {
+        /* Without this, data is null at MainActivity onActivityResult */
+        returnResult(Activity.RESULT_CANCELED)
+        super.onPause()
     }
 
     fun onClick(v: View) {
@@ -539,6 +541,13 @@ class AccountActivity : AppCompatActivity() {
                         getString(R.string.default_account_help))
             }
         }
+    }
+
+    private fun returnResult(code: Int) {
+        val i = Intent()
+        i.putExtra("aor", aor)
+        setResult(code, i)
+        finish()
     }
 
     private fun setAuthPass(acc: Account, ap: String) {

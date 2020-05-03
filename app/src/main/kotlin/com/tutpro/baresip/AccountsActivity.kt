@@ -22,13 +22,15 @@ import java.util.ArrayList
 class AccountsActivity : AppCompatActivity() {
 
     internal lateinit var alAdapter: AccountListAdapter
+    internal lateinit var aor: String
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
 
-        Utils.addActivity("accounts")
+        aor = intent.getStringExtra("aor")!!
+        Utils.addActivity("accounts,$aor")
 
         val listView = findViewById(R.id.accounts) as ListView
         generateAccounts()
@@ -126,22 +128,24 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("accounts") == -1)
+        if (BaresipService.activities.indexOf("accounts,$aor") == -1)
             return true
 
         when (item.itemId) {
+
             R.id.help -> {
                 Utils.alertView(this@AccountsActivity, getString(R.string.new_account),
                         getString(R.string.accounts_help))
+                return true
             }
+
             android.R.id.home -> {
-                BaresipService.activities.remove("accounts")
-                val i = Intent()
-                setResult(RESULT_OK, i)
-                finish()
+                onBackPressed()
+                return true
             }
         }
-        return true
+
+        return super.onOptionsItemSelected(item)
 
     }
 
@@ -151,11 +155,22 @@ class AccountsActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        BaresipService.activities.remove("accounts")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
-        finish()
+        BaresipService.activities.remove("accounts,$aor")
+        returnResult()
         super.onBackPressed()
+    }
+
+    override fun onPause() {
+        /* Without this, data is null at MainActivity onActivityResult */
+        returnResult()
+        super.onPause()
+    }
+
+    private fun returnResult() {
+        val i = Intent()
+        i.putExtra("aor", aor)
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
     }
 
     companion object {
