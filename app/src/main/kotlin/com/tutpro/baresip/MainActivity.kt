@@ -395,6 +395,7 @@ class MainActivity : AppCompatActivity() {
                 val i = Intent(this@MainActivity, ChatsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
+                b.putString("peer", resumeUri)
                 i.putExtras(b)
                 startActivityForResult(i, CHATS_CODE)
             }
@@ -546,10 +547,7 @@ class MainActivity : AppCompatActivity() {
             "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                         arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "message" -> {
-                messagesButton.performClick()
-            }
-            "message show", "message reply" ->
+            "message", "message show", "message reply" ->
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
                 val incomingCall = Call.incomingCall()
@@ -806,7 +804,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         restoreActivities()
                     }
-                    "message show", "message reply" -> {
+                    "message", "message show", "message reply" -> {
                         val peer = params[1]
                         Log.d("Baresip", "Message for $aor from $peer")
                         Log.d("Baresip", "Activity stack ${BaresipService.activities.toString()}")
