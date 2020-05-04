@@ -55,6 +55,8 @@ class CallsActivity : AppCompatActivity() {
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
+                        BaresipService.activities.remove("calls,$aor")
+                        returnResult()
                         val i = Intent(this@CallsActivity, MainActivity::class.java)
                         i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         if (which == DialogInterface.BUTTON_NEGATIVE)
