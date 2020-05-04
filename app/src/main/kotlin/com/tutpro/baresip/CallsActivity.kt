@@ -56,6 +56,7 @@ class CallsActivity : AppCompatActivity() {
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
                         BaresipService.activities.remove("calls,$aor")
+                        MainActivity.activityAor = aor
                         returnResult()
                         val i = Intent(this@CallsActivity, MainActivity::class.java)
                         i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -98,6 +99,7 @@ class CallsActivity : AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
+                        CallHistory.save()
                         clAdapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -180,14 +182,12 @@ class CallsActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        CallHistory.save()
-        returnResult()
+        MainActivity.activityAor = aor
         super.onPause()
     }
 
     private fun returnResult() {
         val i = Intent()
-        i.putExtra("aor", aor)
         setResult(Activity.RESULT_CANCELED, i)
         finish()
     }

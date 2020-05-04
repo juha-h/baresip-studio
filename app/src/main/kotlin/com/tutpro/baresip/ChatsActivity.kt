@@ -166,8 +166,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                BaresipService.activities.remove("chats,$aor")
-                returnResult()
+                onBackPressed()
                 return true
             }
 
@@ -195,14 +194,12 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onPause() {
-        /* Without this, data is null at MainActivity onActivityResult */
-        returnResult()
+        MainActivity.activityAor = aor
         super.onPause()
     }
 
     private fun returnResult() {
         val i = Intent()
-        i.putExtra("aor", aor)
         setResult(Activity.RESULT_CANCELED, i)
         finish()
     }

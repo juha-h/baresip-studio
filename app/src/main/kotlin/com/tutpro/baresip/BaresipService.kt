@@ -416,14 +416,11 @@ class BaresipService: Service() {
                 updateStatusNotification()
             }
 
-            "ToggleSpeaker" -> {
-                Log.d(LOG_TAG, "Toggling speakerphone from $speakerPhone")
-                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
-                speakerPhone = am.isSpeakerphoneOn
-            }
-
-            "ProximitySensing" -> {
-                proximitySensing(intent!!.getBooleanExtra("enable", false))
+            "SetSpeaker" -> {
+                Log.d(LOG_TAG, "Set speakerphone $speakerPhone")
+                am.isSpeakerphoneOn = speakerPhone
+                if (Call.call("established") != null)
+                    proximitySensing(!speakerPhone)
             }
 
             "Stop", "Stop Force" -> {
@@ -652,6 +649,7 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
+                        proximitySensing(!speakerPhone)
                         if (!Utils.isVisible())
                             return
                     }
@@ -741,6 +739,7 @@ class BaresipService: Service() {
                                 abandonAudioFocus()
                             }
                             speakerPhone = false
+                            am.isSpeakerphoneOn = false
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
@@ -748,8 +747,7 @@ class BaresipService: Service() {
                             CallHistory.save()
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
-                        if (!Utils.isVisible())
-                            return
+                        if (!Utils.isVisible()) return
                     }
                     "transfer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")

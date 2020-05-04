@@ -126,15 +126,16 @@ class MainActivity : AppCompatActivity() {
         uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas, BaresipService.status)
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
+        aorSpinner.tag = ""
         aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             // Have to allow NULL view, since sometimes when onItemSelected is called, view is NULL.
             // Haven't found any explanation why this can happen.
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 Log.d("Baresip", "aorSpinner selecting $position")
                 val acc = UserAgent.uas()[position].account
-                val aor = acc.aor
+                aorSpinner.tag = acc.aor
                 val ua = UserAgent.uas()[position]
-                Log.d("Baresip", "Setting $aor current")
+                Log.d("Baresip", "Setting ${aorSpinner.tag} current")
                 Api.uag_current_set(UserAgent.uas()[position].uap)
                 showCall(ua)
                 updateIcons(acc)
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                     if ((event.x - view.left) < 100) {
                         val i = Intent(this@MainActivity, AccountActivity::class.java)
                         val b = Bundle()
-                        b.putString("accp", UserAgent.uas()[aorSpinner.selectedItemPosition].account.accp)
+                        b.putString("aor", aorSpinner.tag.toString())
                         i.putExtras(b)
                         startActivityForResult(i, ACCOUNT_CODE)
                         true
@@ -202,8 +203,7 @@ class MainActivity : AppCompatActivity() {
                     unverifyDialog.setTitle(getString(R.string.info))
                     unverifyDialog.setMessage(getString(R.string.call_is_secure))
                     unverifyDialog.setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
-                        val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition],
-                                "")
+                        val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
                         if (calls.size > 0) {
                             if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
                                 Log.e("Baresip",
@@ -383,7 +383,7 @@ class MainActivity : AppCompatActivity() {
             val i = Intent(this@MainActivity, ContactsActivity::class.java)
             val b = Bundle()
             if (aorSpinner.selectedItemPosition >= 0)
-                b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
+                b.putString("aor", aorSpinner.tag.toString())
             else
                 b.putString("aor", "")
             i.putExtras(b)
@@ -394,7 +394,7 @@ class MainActivity : AppCompatActivity() {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, ChatsActivity::class.java)
                 val b = Bundle()
-                b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
+                b.putString("aor", aorSpinner.tag.toString())
                 b.putString("peer", resumeUri)
                 i.putExtras(b)
                 startActivityForResult(i, CHATS_CODE)
@@ -405,7 +405,7 @@ class MainActivity : AppCompatActivity() {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val i = Intent(this@MainActivity, CallsActivity::class.java)
                 val b = Bundle()
-                b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
+                b.putString("aor", aorSpinner.tag.toString())
                 i.putExtras(b)
                 startActivityForResult(i, CALLS_CODE)
             }
@@ -477,8 +477,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w("Baresip", "handleIntent 'call' did not find ua $uap")
                     return
                 }
-                if ((aorSpinner.selectedItemPosition == -1) ||
-                        (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeUri = intent.getStringExtra("peer")!!
@@ -491,8 +490,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val ua = call.ua
-                if ((aorSpinner.selectedItemPosition == -1) ||
-                        (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeCall = call
@@ -516,8 +514,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w("Baresip", "onNewIntent did not find ua $uap")
                     return
                 }
-                if ((aorSpinner.selectedItemPosition == -1) ||
-                        (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
+                if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeUap = uap
@@ -528,7 +525,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("Baresip", "Main resumed with action '$resumeAction'")
+        Log.d("Baresip", "Main onResume with action '$resumeAction'")
         visible = true
         when (resumeAction) {
             "call show" ->
@@ -550,20 +547,19 @@ class MainActivity : AppCompatActivity() {
             "message", "message show", "message reply" ->
                 handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
             else -> {
-                val incomingCall = Call.incomingCall()
+                val incomingCall = Call.call("incoming")
                 if (incomingCall != null) {
                     spinToAor(incomingCall.ua.account.aor)
                 } else {
                     restoreActivities()
                     if (UserAgent.uas().size > 0) {
-                        val currentPosition = aorSpinner.selectedItemPosition
-                        if (currentPosition == -1) {
+                        if (aorSpinner.selectedItemPosition == -1) {
                             if (Call.calls().size > 0)
                                 spinToAor(Call.calls()[0].ua.account.aor)
-                            else
+                            else {
                                 aorSpinner.setSelection(0)
-                        } else {
-                            aorSpinner.setSelection(currentPosition)
+                                aorSpinner.tag = UserAgent.uas()[0].account.aor
+                            }
                         }
                     }
                 }
@@ -577,7 +573,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        Log.d("Baresip", "Main paused")
+        Log.d("Baresip", "Main onPause")
         Utils.addActivity("main")
         visible = false
         super.onPause()
@@ -627,7 +623,10 @@ class MainActivity : AppCompatActivity() {
                 when (ev[0]) {
                     "ua added" -> {
                         uaAdapter.notifyDataSetChanged()
-                        if (aorSpinner.selectedItemPosition == -1) aorSpinner.setSelection(0)
+                        if (aorSpinner.selectedItemPosition == -1) {
+                            aorSpinner.setSelection(0)
+                            aorSpinner.tag = UserAgent.uas()[0].account.aor
+                        }
                     }
                     "registered", "unregistering" -> {
                         uaAdapter.notifyDataSetChanged()
@@ -643,7 +642,7 @@ class MainActivity : AppCompatActivity() {
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                     }
                     "call rejected" -> {
-                        if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                        if (ua.account.aor == aorSpinner.tag) {
                             callsButton.setImageResource(R.drawable.calls_missed)
                         }
                     }
@@ -660,9 +659,8 @@ class MainActivity : AppCompatActivity() {
                         }
                         volumeControlStream = AudioManager.STREAM_RING
                         if (visible) {
-                            if ((aorSpinner.selectedItemPosition == -1) ||
-                                    (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
-                                aorSpinner.setSelection(account_index)
+                            if (ua.account.aor != aorSpinner.tag)
+                                spinToAor(ua.account.aor)
                             showCall(ua)
                         } else {
                             Log.d("Baresip", "Reordering to front")
@@ -682,7 +680,7 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
-                        if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                        if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
                             showCall(ua)
@@ -709,7 +707,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             call.security = security
                             call.zid = ev[3]
-                            if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                            if (ua.account.aor == aorSpinner.tag) {
                                 securityButton.setImageResource(security)
                                 setSecurityButtonTag(securityButton, security)
                                 securityButton.visibility = View.VISIBLE
@@ -719,7 +717,7 @@ class MainActivity : AppCompatActivity() {
                         verifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             call.security = R.drawable.box_yellow
                             call.zid = ev[3]
-                            if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                            if (ua.account.aor == aorSpinner.tag) {
                                 securityButton.setImageResource(R.drawable.box_yellow)
                                 securityButton.tag = "yellow"
                                 securityButton.visibility = View.VISIBLE
@@ -740,7 +738,7 @@ class MainActivity : AppCompatActivity() {
                             tag = "yellow"
                         else
                             tag = "green"
-                        if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                        if (ua.account.aor == aorSpinner.tag) {
                             securityButton.setImageResource(call.security)
                             securityButton.tag = tag
                         }
@@ -784,7 +782,7 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call closed" -> {
-                        if (ua == UserAgent.uas()[aorSpinner.selectedItemPosition]) {
+                        if (ua.account.aor == aorSpinner.tag) {
                             showCall(ua)
                             if (ua.account.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
@@ -808,9 +806,6 @@ class MainActivity : AppCompatActivity() {
                         val peer = params[1]
                         Log.d("Baresip", "Message for $aor from $peer")
                         Log.d("Baresip", "Activity stack ${BaresipService.activities.toString()}")
-                        if ((aorSpinner.selectedItemPosition == -1) ||
-                                (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]))
-                            aorSpinner.setSelection(account_index)
                         val i = Intent(applicationContext, ChatActivity::class.java)
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         val b = Bundle()
@@ -830,8 +825,7 @@ class MainActivity : AppCompatActivity() {
                                 break
                             }
                         }
-                        if ((aorSpinner.selectedItemPosition >= 0) &&
-                                (ua == UserAgent.uas()[aorSpinner.selectedItemPosition])) {
+                        if (ua.account.aor == aorSpinner.tag) {
                             if (acc.vmNew > 0)
                                 voicemailButton.setImageResource(R.drawable.voicemail_new)
                             else
@@ -881,12 +875,8 @@ class MainActivity : AppCompatActivity() {
                     item.setIcon(R.drawable.speaker_off)
                 else
                     item.setIcon(R.drawable.speaker_on)
-                if (Call.calls().size > 0) {
-                    baresipService.putExtra("enable", BaresipService.speakerPhone)
-                    baresipService.setAction("ProximitySensing")
-                    startService(baresipService)
-                }
-                baresipService.setAction("ToggleSpeaker")
+                BaresipService.speakerPhone = !BaresipService.speakerPhone
+                baresipService.setAction("SetSpeaker")
                 startService(baresipService)
             }
 
@@ -898,10 +888,7 @@ class MainActivity : AppCompatActivity() {
             R.id.accounts -> {
                 i = Intent(this, AccountsActivity::class.java)
                 val b = Bundle()
-                if (aorSpinner.selectedItemPosition != -1)
-                    b.putString("aor", UserAgent.uas()[aorSpinner.selectedItemPosition].account.aor)
-                else
-                    b.putString("aor", "")
+                b.putString("aor", aorSpinner.tag.toString())
                 i.putExtras(b)
                 startActivityForResult(i, ACCOUNTS_CODE)
             }
@@ -933,16 +920,15 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        Log.d("Baresip", "onActivity result $requestCode $resultCode $data")
+        Log.d("Baresip", "onActivity result $requestCode $resultCode")
 
         when (requestCode) {
 
             ACCOUNTS_CODE -> {
                 uaAdapter.notifyDataSetChanged()
-                val aor = data!!.getStringExtra("aor")!!
-                spinToAor(aor)
-                if (aorSpinner.selectedItemPosition != -1)
-                    updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
+                spinToAor(activityAor)
+                if (aorSpinner.tag != "")
+                    updateIcons(Account.findUa(aorSpinner.tag.toString())!!.account)
                 if (BaresipService.isServiceRunning) {
                     baresipService.setAction("UpdateNotification")
                     startService(baresipService)
@@ -950,14 +936,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             ACCOUNT_CODE -> {
-                val aor = data!!.getStringExtra("aor")!!
-                spinToAor(aor)
-                val ua = Account.findUa(aor)!!
+                spinToAor(activityAor)
+                val ua = Account.findUa(activityAor)!!
                 updateIcons(ua.account)
                 if (resultCode == Activity.RESULT_OK)
-                    if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
+                    if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
                         askPassword(String.format(getString(R.string.account_password),
-                                Utils.plainAor(aor)), ua)
+                                Utils.plainAor(activityAor)), ua)
             }
 
             CONTACTS_CODE -> {
@@ -981,13 +966,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             CALLS_CODE -> {
-                spinToAor(data!!.getStringExtra("aor")!!)
+                spinToAor(activityAor)
                 callsButton.setImageResource(R.drawable.calls)
             }
 
             CHATS_CODE, CHAT_CODE -> {
-                spinToAor(data!!.getStringExtra("aor")!!)
-                updateIcons(UserAgent.uas()[aorSpinner.selectedItemPosition].account)
+                spinToAor(activityAor)
+                updateIcons(Account.findUa(activityAor)!!.account)
             }
 
             ABOUT_CODE -> { }
@@ -1191,12 +1176,16 @@ class MainActivity : AppCompatActivity() {
         for (account_index in UserAgent.uas().indices)
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 aorSpinner.setSelection(account_index)
+                aorSpinner.tag = aor
                 return
             }
-        if (UserAgent.uas().isNotEmpty())
+        if (UserAgent.uas().isNotEmpty()) {
             aorSpinner.setSelection(0)
-        else
+            aorSpinner.tag = UserAgent.uas()[0].account.aor
+        } else {
             aorSpinner.setSelection(-1)
+            aorSpinner.tag = ""
+        }
     }
 
     private fun call(ua: UserAgent, uri: String, status: String): Boolean {
@@ -1205,7 +1194,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG).show()
             return false
         }
-        if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition]) spinToAor(ua.account.aor)
+        if (ua.account.aor != aorSpinner.tag)
+            spinToAor(ua.account.aor)
         val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
@@ -1231,7 +1221,7 @@ class MainActivity : AppCompatActivity() {
             val err = newCall.connect(uri)
             if (err == 0) {
                 newCall.startAudio()
-                if (ua != UserAgent.uas()[aorSpinner.selectedItemPosition])
+                if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 showCall(ua)
             } else {
@@ -1278,9 +1268,6 @@ class MainActivity : AppCompatActivity() {
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
-            baresipService.putExtra("enable", false)
-            baresipService.setAction("ProximitySensing")
-            startService(baresipService)
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1300,9 +1287,6 @@ class MainActivity : AppCompatActivity() {
                     Utils.aorDomain(ua.account.aor)))
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
-            baresipService.putExtra("enable", !BaresipService.speakerPhone)
-            baresipService.setAction("ProximitySensing")
-            startService(baresipService)
             when (call.status) {
                 "outgoing", "transferring" -> {
                     securityButton.visibility = View.INVISIBLE
@@ -1403,7 +1387,7 @@ class MainActivity : AppCompatActivity() {
             "account" -> {
                 val i = Intent(this, AccountActivity::class.java)
                 val b = Bundle()
-                b.putString("accp", activity[1])
+                b.putString("aor", activity[1])
                 i.putExtras(b)
                 startActivityForResult(i, ACCOUNT_CODE)
             }
@@ -1480,6 +1464,7 @@ class MainActivity : AppCompatActivity() {
         var resumeUap = ""
         var resumeCall: Call? = null
         var resumeUri = ""
+        var activityAor = ""
 
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()

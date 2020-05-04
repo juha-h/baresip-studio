@@ -85,9 +85,9 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
             return null
         }
 
-        fun incomingCall(): Call? {
+        fun call(status: String): Call? {
             for (c in BaresipService.calls)
-                if (c.status == "incoming") return c
+                if (c.status == status) return c
             return null
         }
 
