@@ -45,7 +45,7 @@ class AccountsActivity : AppCompatActivity() {
                 Log.d("Baresip", "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
-            } else if (Account.exists(aor)) {
+            } else if (Account.ofAor(aor) != null) {
                 Log.d("Baresip", "Account $aor already exists")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
@@ -85,7 +85,7 @@ class AccountsActivity : AppCompatActivity() {
             ACCOUNT_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val aor = data!!.getStringExtra("aor")!!
-                    val ua = Account.findUa(aor)!!
+                    val ua = UserAgent.ofAor(aor)!!
                     if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
                         askPassword(String.format(getString(R.string.account_password),
                                 Utils.plainAor(aor)), ua)

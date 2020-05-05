@@ -79,7 +79,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
             return result
         }
 
-        fun find(callp: String): Call? {
+        fun ofCallp(callp: String): Call? {
             for (c in BaresipService.calls)
                 if (c.callp == callp) return c
             return null

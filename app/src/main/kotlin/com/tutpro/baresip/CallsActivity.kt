@@ -34,7 +34,7 @@ class CallsActivity : AppCompatActivity() {
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("calls,$aor")
 
-        val ua = Account.findUa(aor)!!
+        val ua = UserAgent.ofAor(aor)!!
         account = ua.account
 
         val headerView = findViewById(R.id.account) as TextView

@@ -49,7 +49,7 @@ class AccountActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         aor = intent.getStringExtra("aor")!!
-        ua = Account.findUa(aor)!!
+        ua = UserAgent.ofAor(aor)!!
         acc = ua.account
         uaIndex = UserAgent.findAorIndex(aor)!!
 

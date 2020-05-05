@@ -322,7 +322,7 @@ object Utils {
                 val text = sequence.subSequence(start, start + count).toString()
                 if (text.length > 0) {
                     val digit = text[0]
-                    val call = Call.find(callp)
+                    val call = Call.ofCallp(callp)
                     if (call == null) {
                         Log.w("Baresip", "dtmfWatcher did not find call $callp")
                     } else {

@@ -155,7 +155,7 @@ class ChatsActivity: AppCompatActivity() {
                     Message.save()
                     uaMessages.clear()
                     clAdapter.notifyDataSetChanged()
-                    Account.findUa(aor)!!.account.unreadMessages = false
+                    UserAgent.ofAor(aor)!!.account.unreadMessages = false
                     dialog.dismiss()
                 }
                 deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->

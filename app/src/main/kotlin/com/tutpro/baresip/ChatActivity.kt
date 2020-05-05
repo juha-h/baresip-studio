@@ -48,7 +48,7 @@ class ChatActivity : AppCompatActivity() {
             Utils.addActivity("chat,$aor,$peerUri,$focus")
         }
 
-        val userAgent = Account.findUa(aor)
+        val userAgent = UserAgent.ofAor(aor)
         if (userAgent == null) {
             Log.w("Baresip", "MessageActivity did not find ua of $aor")
             MainActivity.activityAor = aor

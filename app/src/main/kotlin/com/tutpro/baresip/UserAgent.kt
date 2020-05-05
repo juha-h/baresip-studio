@@ -35,17 +35,22 @@ class UserAgent(val uap: String) {
             }
         }
 
+        fun ofAor(aor: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (ua.account.aor == aor) return ua
+            return null
+        }
+
+        fun ofUap(uap: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (ua.uap == uap) return ua
+            return null
+        }
+
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)
             Log.e("Baresip", "Failed to allocate UserAgent for $uri")
-            return null
-        }
-
-        fun find(uap: String): UserAgent? {
-            for (ua in BaresipService.uas) {
-                if (ua.uap == uap) return ua
-            }
             return null
         }
 

@@ -472,7 +472,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val uap = intent.getStringExtra("uap")!!
-                val ua = UserAgent.find(uap)
+                val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w("Baresip", "handleIntent 'call' did not find ua $uap")
                     return
@@ -484,7 +484,7 @@ class MainActivity : AppCompatActivity() {
             }
             "call show", "call answer" -> {
                 val callp = intent.getStringExtra("callp")!!
-                val call = Call.find(callp)
+                val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w("Baresip", "handleIntent '$action' did not find call $callp")
                     return
@@ -497,7 +497,7 @@ class MainActivity : AppCompatActivity() {
             }
             "transfer show", "transfer accept" -> {
                 val callp = intent.getStringExtra("callp")!!
-                val call = Call.find(callp)
+                val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w("Baresip", "handleIntent '$action' did not find call $callp")
                     moveTaskToBack(true)
@@ -509,7 +509,7 @@ class MainActivity : AppCompatActivity() {
             }
             "message", "message show", "message reply" -> {
                 val uap = intent.getStringExtra("uap")!!
-                val ua = UserAgent.find(uap)
+                val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w("Baresip", "onNewIntent did not find ua $uap")
                     return
@@ -609,7 +609,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val uap = params[0]
-        val ua = UserAgent.find(uap)
+        val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w("Baresip", "handleServiceEvent '$event' did not find ua $uap")
             return
@@ -652,7 +652,7 @@ class MainActivity : AppCompatActivity() {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Incoming call $callp not found")
                             return
@@ -674,7 +674,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call established" -> {
                         val callp = params[1]
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Established call $callp not found")
                             return
@@ -688,7 +688,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call verify" -> {
                         val callp = params[1]
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Call $callp to be verified is not found")
                             return
@@ -728,7 +728,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call verified", "call secure" -> {
                         val callp = params[1]
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Call $callp that is verified is not found")
                             return
@@ -745,7 +745,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call transfer", "transfer show" -> {
                         val callp = params[1]
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
@@ -771,7 +771,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "transfer accept" -> {
                         val callp = params[1]
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
@@ -928,7 +928,7 @@ class MainActivity : AppCompatActivity() {
                 uaAdapter.notifyDataSetChanged()
                 spinToAor(activityAor)
                 if (aorSpinner.tag != "")
-                    updateIcons(Account.findUa(aorSpinner.tag.toString())!!.account)
+                    updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
                 if (BaresipService.isServiceRunning) {
                     baresipService.setAction("UpdateNotification")
                     startService(baresipService)
@@ -937,7 +937,7 @@ class MainActivity : AppCompatActivity() {
 
             ACCOUNT_CODE -> {
                 spinToAor(activityAor)
-                val ua = Account.findUa(activityAor)!!
+                val ua = UserAgent.ofAor(activityAor)!!
                 updateIcons(ua.account)
                 if (resultCode == Activity.RESULT_OK)
                     if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
@@ -972,7 +972,7 @@ class MainActivity : AppCompatActivity() {
 
             CHATS_CODE, CHAT_CODE -> {
                 spinToAor(activityAor)
-                updateIcons(Account.findUa(activityAor)!!.account)
+                updateIcons(Account.ofAor(activityAor)!!)
             }
 
             ABOUT_CODE -> { }
