@@ -419,8 +419,6 @@ class BaresipService: Service() {
             "SetSpeaker" -> {
                 Log.d(LOG_TAG, "Set speakerphone $speakerPhone")
                 am.isSpeakerphoneOn = speakerPhone
-                if (Call.call("established") != null)
-                    proximitySensing(!speakerPhone)
             }
 
             "Stop", "Stop Force" -> {
@@ -547,6 +545,10 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
+                    "call offered" -> {
+                        proximitySensing(true)
+                        return
+                    }
                     "call progress", "call ringing" -> {
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
@@ -629,6 +631,10 @@ class BaresipService: Service() {
                             return
                         }
                     }
+                    "call answered" -> {
+                        proximitySensing(true)
+                        return
+                    }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.find(callp)
@@ -649,7 +655,6 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
-                        proximitySensing(!speakerPhone)
                         if (!Utils.isVisible())
                             return
                     }
