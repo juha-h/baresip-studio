@@ -1,0 +1,1 @@
+- Simplified control of proximity sensing.
