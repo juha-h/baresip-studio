@@ -30,7 +30,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         aorView.setOnClickListener { _ ->
             val i = Intent(cxt, AccountActivity::class.java)
             val b = Bundle()
-            b.putString("accp", UserAgent.uas()[position].account.accp)
+            b.putString("aor", UserAgent.uas()[position].account.aor)
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, ACCOUNT_CODE)
         }

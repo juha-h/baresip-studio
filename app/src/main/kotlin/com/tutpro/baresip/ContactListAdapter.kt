@@ -66,7 +66,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 i.putExtra("action", "call")
                             else
                                 i.putExtra("action", "message")
-                            val ua = Account.findUa(aor)
+                            val ua = UserAgent.ofAor(aor)
                             if (ua == null) {
                                 Log.w("Baresip", "onClickListener did not find AoR $aor")
                             } else {

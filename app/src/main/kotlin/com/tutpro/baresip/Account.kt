@@ -194,26 +194,10 @@ class Account(val accp: String) {
             return res
         }
 
-        fun find(accp: String): Account? {
-            for (ua in UserAgent.uas()) {
-                if (ua.account.accp == accp) return ua.account
-            }
+        fun ofAor(aor: String): Account? {
+            for (ua in UserAgent.uas())
+                if (ua.account.aor == aor) return ua.account
             return null
-        }
-
-        fun findUa(aor: String): UserAgent? {
-            for (ua in UserAgent.uas()) {
-                if (ua.account.aor == aor) return ua
-            }
-            return null
-        }
-
-        fun exists(aor: String): Boolean {
-            for (ua in UserAgent.uas()) {
-                if (ua.account.aor.split(":")[1] == aor.split(":")[0])
-                    return true
-            }
-            return false
         }
 
         fun checkDisplayName(dn: String): Boolean {

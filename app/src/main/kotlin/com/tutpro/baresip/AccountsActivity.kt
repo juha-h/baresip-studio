@@ -45,7 +45,7 @@ class AccountsActivity : AppCompatActivity() {
                 Log.d("Baresip", "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
-            } else if (Account.exists(aor)) {
+            } else if (Account.ofAor(aor) != null) {
                 Log.d("Baresip", "Account $aor already exists")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
@@ -68,7 +68,7 @@ class AccountsActivity : AppCompatActivity() {
                     saveAccounts()
                     val i = Intent(this, AccountActivity::class.java)
                     val b = Bundle()
-                    b.putString("accp", ua.account.accp)
+                    b.putString("aor", ua.account.aor)
                     i.putExtras(b)
                     startActivityForResult(i, ACCOUNT_CODE)
                 }
@@ -85,7 +85,7 @@ class AccountsActivity : AppCompatActivity() {
             ACCOUNT_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val aor = data!!.getStringExtra("aor")!!
-                    val ua = UserAgent.uas()[UserAgent.findAorIndex(aor)!!]
+                    val ua = UserAgent.ofAor(aor)!!
                     if (aorPasswords.containsKey(aor) && aorPasswords[aor] == "")
                         askPassword(String.format(getString(R.string.account_password),
                                 Utils.plainAor(aor)), ua)
@@ -156,21 +156,15 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         BaresipService.activities.remove("accounts,$aor")
-        returnResult()
+        val i = Intent()
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
         super.onBackPressed()
     }
 
     override fun onPause() {
-        /* Without this, data is null at MainActivity onActivityResult */
-        returnResult()
+        MainActivity.activityAor = aor
         super.onPause()
-    }
-
-    private fun returnResult() {
-        val i = Intent()
-        i.putExtra("aor", aor)
-        setResult(Activity.RESULT_CANCELED, i)
-        finish()
     }
 
     companion object {

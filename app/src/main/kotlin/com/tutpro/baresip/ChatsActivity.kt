@@ -155,7 +155,7 @@ class ChatsActivity: AppCompatActivity() {
                     Message.save()
                     uaMessages.clear()
                     clAdapter.notifyDataSetChanged()
-                    Account.findUa(aor)!!.account.unreadMessages = false
+                    UserAgent.ofAor(aor)!!.account.unreadMessages = false
                     dialog.dismiss()
                 }
                 deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
@@ -166,8 +166,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                BaresipService.activities.remove("chats,$aor")
-                returnResult()
+                onBackPressed()
                 return true
             }
 
@@ -195,14 +194,12 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onPause() {
-        /* Without this, data is null at MainActivity onActivityResult */
-        returnResult()
+        MainActivity.activityAor = aor
         super.onPause()
     }
 
     private fun returnResult() {
         val i = Intent()
-        i.putExtra("aor", aor)
         setResult(Activity.RESULT_CANCELED, i)
         finish()
     }

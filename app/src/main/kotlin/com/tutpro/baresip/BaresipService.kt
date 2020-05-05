@@ -328,7 +328,7 @@ class BaresipService: Service() {
 
             "Call Reject" -> {
                 val callp = intent!!.getStringExtra("callp")!!
-                val call = Call.find(callp)
+                val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
                 } else {
@@ -345,7 +345,7 @@ class BaresipService: Service() {
 
             "Transfer Show", "Transfer Accept" -> {
                 val uap = intent!!.getStringExtra("uap")!!
-                val ua = UserAgent.find(uap)
+                val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w(LOG_TAG, "onStartCommand did not find ua $uap")
                 } else {
@@ -362,7 +362,7 @@ class BaresipService: Service() {
 
             "Transfer Deny" -> {
                 val callp = intent!!.getStringExtra("callp")!!
-                val call = Call.find(callp)
+                val call = Call.ofCallp(callp)
                 if (call == null)
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
                 else
@@ -383,7 +383,7 @@ class BaresipService: Service() {
 
             "Message Save" -> {
                 val uap = intent!!.getStringExtra("uap")!!
-                val ua = UserAgent.find(uap)
+                val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
@@ -394,7 +394,7 @@ class BaresipService: Service() {
 
             "Message Delete" -> {
                 val uap = intent!!.getStringExtra("uap")!!
-                val ua = UserAgent.find(uap)
+                val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
                 else
@@ -407,14 +407,9 @@ class BaresipService: Service() {
                 updateStatusNotification()
             }
 
-            "ToggleSpeaker" -> {
-                Log.d(LOG_TAG, "Toggling speakerphone from $speakerPhone")
-                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
-                speakerPhone = am.isSpeakerphoneOn
-            }
-
-            "ProximitySensing" -> {
-                proximitySensing(intent!!.getBooleanExtra("enable", false))
+            "SetSpeaker" -> {
+                Log.d(LOG_TAG, "Set speakerphone $speakerPhone")
+                am.isSpeakerphoneOn = speakerPhone
             }
 
             "Stop", "Stop Force" -> {
@@ -476,7 +471,7 @@ class BaresipService: Service() {
     @Keep
     fun uaEvent(event: String, uap: String, callp: String) {
         if (!isServiceRunning) return
-        val ua = UserAgent.find(uap)
+        val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "uaEvent did not find ua $uap")
             return
@@ -539,6 +534,10 @@ class BaresipService: Service() {
                         updateStatusNotification()
                         if (!Utils.isVisible())
                             return
+                    }
+                    "call offered" -> {
+                        proximitySensing(true)
+                        return
                     }
                     "call progress", "call ringing" -> {
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
@@ -617,9 +616,13 @@ class BaresipService: Service() {
                             return
                         }
                     }
+                    "call answered" -> {
+                        proximitySensing(true)
+                        return
+                    }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w(LOG_TAG, "Call $callp that is established is not found")
                             return
@@ -641,7 +644,7 @@ class BaresipService: Service() {
                             return
                     }
                     "call verified", "call secure" -> {
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Call $callp that is verified is not found")
                             return
@@ -656,7 +659,7 @@ class BaresipService: Service() {
                             return
                     }
                     "call transfer" -> {
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w(LOG_TAG, "Call $callp to be transferred is not found")
                             return
@@ -705,7 +708,7 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        val call = Call.find(callp)
+                        val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.d(LOG_TAG, "AoR $aor call $callp that is closed is not found")
                             return
@@ -725,6 +728,7 @@ class BaresipService: Service() {
                                 abandonAudioFocus()
                             }
                             speakerPhone = false
+                            am.isSpeakerphoneOn = false
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
@@ -732,8 +736,7 @@ class BaresipService: Service() {
                             CallHistory.save()
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
-                        if (!Utils.isVisible())
-                            return
+                        if (!Utils.isVisible()) return
                     }
                     "transfer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
@@ -759,7 +762,7 @@ class BaresipService: Service() {
         } catch (e: Exception) {
             Log.w(LOG_TAG, "UTF-8 decode failed")
         }
-        val ua = UserAgent.find(uap)
+        val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "messageEvent did not find ua $uap")
             return

@@ -40,7 +40,6 @@ class AccountActivity : AppCompatActivity() {
     private var newCodecs = ArrayList<String>()
     private var save = false
     private var uaIndex= -1
-    private var accp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -49,13 +48,12 @@ class AccountActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        accp = intent.getStringExtra("accp")!!
-        Utils.addActivity("account,$accp")
-
-        acc = Account.find(accp)!!
-        aor = acc.aor
+        aor = intent.getStringExtra("aor")!!
+        ua = UserAgent.ofAor(aor)!!
+        acc = ua.account
         uaIndex = UserAgent.findAorIndex(aor)!!
-        ua = UserAgent.uas()[uaIndex]
+
+        Utils.addActivity("account,$aor")
 
         setTitle(aor.split(":")[1])
 
@@ -211,7 +209,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("account,$accp") == -1)
+        if (BaresipService.activities.indexOf("account,$aor") == -1)
             return true
 
         when (item.itemId) {
@@ -458,7 +456,7 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
                     Api.ua_register(ua.uap)
 
-                BaresipService.activities.remove("account,$accp")
+                BaresipService.activities.remove("account,$aor")
                 returnResult(Activity.RESULT_OK)
                 return true
             }
@@ -475,14 +473,13 @@ class AccountActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        BaresipService.activities.remove("account,$accp")
+        BaresipService.activities.remove("account,$aor")
         returnResult(Activity.RESULT_CANCELED)
         super.onBackPressed()
     }
 
     override fun onPause() {
-        /* Without this, data is null at MainActivity onActivityResult */
-        returnResult(Activity.RESULT_CANCELED)
+        MainActivity.activityAor = aor
         super.onPause()
     }
 
@@ -545,7 +542,8 @@ class AccountActivity : AppCompatActivity() {
 
     private fun returnResult(code: Int) {
         val i = Intent()
-        i.putExtra("aor", aor)
+        if (code == Activity.RESULT_OK)
+            i.putExtra("aor", aor)
         setResult(code, i)
         finish()
     }

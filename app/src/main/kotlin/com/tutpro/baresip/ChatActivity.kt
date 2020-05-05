@@ -48,9 +48,10 @@ class ChatActivity : AppCompatActivity() {
             Utils.addActivity("chat,$aor,$peerUri,$focus")
         }
 
-        val userAgent = Account.findUa(aor)
+        val userAgent = UserAgent.ofAor(aor)
         if (userAgent == null) {
             Log.w("Baresip", "MessageActivity did not find ua of $aor")
+            MainActivity.activityAor = aor
             returnResult(Activity.RESULT_CANCELED)
             return
         } else {
@@ -175,7 +176,7 @@ class ChatActivity : AppCompatActivity() {
             Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
-        returnResult(Activity.RESULT_CANCELED)
+        MainActivity.activityAor = aor
         super.onPause()
     }
 
@@ -255,7 +256,6 @@ class ChatActivity : AppCompatActivity() {
 
     private fun returnResult(code: Int) {
         val i = Intent()
-        i.putExtra("aor", aor)
         setResult(code, i)
         finish()
     }
