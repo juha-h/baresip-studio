@@ -1323,8 +1323,7 @@ Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring jav
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
-        jchar digit) {
+Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall, jchar digit) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     const uint16_t native_digit = digit;
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
@@ -1391,15 +1390,23 @@ Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring javaCall,
-        jboolean enabled)
-{
+Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring javaCall, jboolean enable) {
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    LOGD("sdp_media_set_disabled (%d)", enabled);
-    if (!enabled) video_stop(call_video(call));
-    sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), !enabled);
+    struct video *v = call_video(call);
+    struct media_ctx **ctx = NULL;
+    int err;
+    if (!enable)
+        video_stop(v);
+    else {
+        err = video_start_source(v, ctx);
+        if (err) {
+            LOGE("video_start_source failed with error %d\n", err);
+            return err;
+        }
+    }
+    sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), !enable);
     return call_modify(call);
 }
 
