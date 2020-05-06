@@ -1241,15 +1241,18 @@ class MainActivity : AppCompatActivity() {
         }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)
+        val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call.calls().add(Call(callp, ua, uri, "out", status, true,
-                    Utils.dtmfWatcher(callp)))
+            val call = Call(callp, ua, uri, "out", "out", false,
+                    Utils.dtmfWatcher(callp))
+            call.add()
+            call.disableVideoStream()
+            call.connect(uri)
             showCall(ua)
             return true
         } else {
-            Log.e("Baresip", "ua_connect ${ua.uap}/$uri failed")
+            Log.e("Baresip", "ua_call_alloc ${ua.uap}/$uri failed")
             return false
         }
     }

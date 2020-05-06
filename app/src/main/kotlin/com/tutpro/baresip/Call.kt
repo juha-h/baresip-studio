@@ -15,6 +15,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }
 
+    fun add() {
+        BaresipService.calls.add(this)
+    }
+
     fun connect(uri: String): Int {
         return call_connect(callp, uri)
     }
@@ -53,6 +57,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return result
     }
 
+    fun disableVideoStream() {
+        call_disable_video_stream(callp)
+    }
+
     fun status(): String {
         return call_status(callp)
     }
@@ -72,6 +80,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean
     private external fun call_set_video(callp: String, enabled: Boolean): Int
+    private external fun call_disable_video_stream(callp: String)
 
     external fun call_video_debug()
 
