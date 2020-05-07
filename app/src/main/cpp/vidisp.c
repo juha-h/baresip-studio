@@ -4,10 +4,31 @@
 #include <android/native_window_jni.h>
 #include <re.h>
 #include <rem.h>
+#include <pthread.h>
 #include "logger.h"
 #include "vidisp.h"
 
 #define LOG_TAG "Baresip vidisp"
+
+const char *egl_error(EGLint const err) {
+    switch (err) {
+        case EGL_FALSE:
+            return "EGL_FALSE";
+        case EGL_TRUE:
+            return "EGL_TRUE";
+        case EGL_BAD_DISPLAY:
+            return "EGL_BAD_DISPLAY";
+        case EGL_NOT_INITIALIZED:
+            return "EGL_NOT_INITIALIZED";
+        case EGL_BAD_SURFACE:
+            return "EGL_BAD_SURFACE";
+        case EGL_CONTEXT_LOST:
+            return "EGL_CONTEXT_LOST";
+        default:
+            break;
+    }
+    return "UNKNOWN_ERROR";
+}
 
 static ANativeWindow *window = NULL;
 
@@ -15,7 +36,7 @@ struct vidisp *vid;
 
 static void renderer_destroy(struct vidisp_st *st) {
 
-    LOGI("Destroying renderer context");
+    LOGD("Destroying renderer context");
 
     eglMakeCurrent(st->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglDestroyContext(st->display, st->context);
@@ -37,7 +58,7 @@ static void destructor(void *arg)
     mem_deref(st->vf);
 }
 
-static int renderer_initialize(struct vidisp_st *st)
+static int context_initialize(struct vidisp_st *st)
 {
     const EGLint attribs[] = {
             EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
@@ -49,13 +70,10 @@ static int renderer_initialize(struct vidisp_st *st)
 
     EGLDisplay display;
     EGLConfig config;
-    EGLConfig *configs;
     EGLint numConfigs;
     EGLint format;
     EGLSurface surface;
     EGLContext context;
-
-    LOGI("Initializing context\n");
 
     if ((display = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY) {
         LOGW("eglGetDisplay() returned error %d\n", eglGetError());
@@ -87,8 +105,8 @@ static int renderer_initialize(struct vidisp_st *st)
     }
 
     EGLint value;
-    eglQuerySurface(display, surface, EGL_RENDER_BUFFER, &value);
-    LOGI("surface render buffer is %d\n", value);
+    if (eglQuerySurface(display, surface, EGL_RENDER_BUFFER, &value) == EGL_FALSE)
+        LOGE("EGL_RENDER_BUFFER query on surface returned error %d\n", eglGetError());
 
     if (!(context = eglCreateContext(display, config, EGL_NO_CONTEXT, NULL))) {
         LOGW("eglCreateContext() returned error %d\n", eglGetError());
@@ -102,8 +120,8 @@ static int renderer_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
-    eglQueryContext(display, context, EGL_RENDER_BUFFER, &value);
-    LOGI("context render buffer is %d\n", value);
+    if (eglQueryContext(display, context, EGL_RENDER_BUFFER, &value) == EGL_FALSE)
+        LOGE("EGL_RENDER_BUFFER query on context returned error %d\n", eglGetError());
 
     if (!eglQuerySurface(display, surface, EGL_WIDTH, &st->width) ||
         !eglQuerySurface(display, surface, EGL_HEIGHT, &st->height)) {
@@ -121,7 +139,7 @@ static int renderer_initialize(struct vidisp_st *st)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    LOGI("Context initialized\n");
+    LOGD("Rendered context created");
 
     return 0;
 }
@@ -137,7 +155,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     (void)resizeh;
     (void)arg;
 
-    LOGI("At opengles_alloc()\n");
+    // LOGD("At opengles_alloc() with thread id %li\n", (long)pthread_self());
 
     st = mem_zalloc(sizeof(*st), destructor);
     if (!st)
@@ -148,10 +166,10 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 
     if (st->window == NULL) {
         LOGW("Window is NULL\n");
-        return EINVAL;
+        err = EINVAL;
     }
 
-    err = renderer_initialize(st);
+    // err = context_initialize(st);
 
     if (err)
         mem_deref(st);
@@ -165,8 +183,9 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 static int texture_init(struct vidisp_st *st)
 {
     glGenTextures(1, &st->texture_id);
-    if (!st->texture_id)
-        return ENOMEM;
+    if (st->texture_id == 0) {
+        LOGW("glGenTextures generated texture_id 0 and error %d\n", glGetError());
+    }
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
     glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
@@ -263,7 +282,7 @@ static void setup_layout(struct vidisp_st *st, const struct vidsz *screensz, str
     ortho->h = h - ortho->y;
 }
 
-void opengles_render(struct vidisp_st *st)
+static int opengles_render(struct vidisp_st *st)
 {
     if (!st->texture_id) {
 
@@ -272,21 +291,23 @@ void opengles_render(struct vidisp_st *st)
         int err = 0;
 
         err = texture_init(st);
-        if (err)
-            return;
+        if (err) {
+            LOGW("opengles_render: failed to initialize texture\n");
+            return err;
+        }
 
         bufsz.w = st->width;
         bufsz.h = st->height;
 
-        LOGI("********* frame width/height = %d/%d\n", st->vf->size.w, st->vf->size.h);
+        // LOGD("video frame width/height = %d/%d\n", st->vf->size.w, st->vf->size.h);
 
         setup_layout(st, &bufsz, &ortho, &vp);
 
         GLint params[2];
         glGetIntegerv(GL_MAX_VIEWPORT_DIMS, params);
-        LOGI("***** viewport max w/h = %d/%d\n", params[0], params[1]);
+        // LOGD("glViewport max w/h = %d/%d\n", params[0], params[1]);
 
-        LOGI("******* glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
+        // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
         glViewport(vp.x, vp.y, vp.w, vp.h);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -295,8 +316,7 @@ void opengles_render(struct vidisp_st *st)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        LOGI("******* ortho x/w/y/h = %d/%d/%d/%d\n",
-             ortho.x, ortho.w, ortho.y, ortho.h);
+        // LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
         glOrthof(ortho.x, ortho.w, ortho.y, ortho.h, 0.0f, 1.0f);
         //		float ar = (float)st->_width / (float)st->_height;
 
@@ -305,6 +325,7 @@ void opengles_render(struct vidisp_st *st)
         glDisable(GL_DEPTH_TEST);
         glDisableClientState(GL_COLOR_ARRAY);
 
+        return 0;
     }
 
     texture_render(st);
@@ -317,6 +338,8 @@ void opengles_render(struct vidisp_st *st)
     glEnable(GL_DEPTH_TEST);
 
     glFlush();
+
+    return 0;
 }
 
 int opengles_display(struct vidisp_st *st, const char *title, const struct vidframe *frame,
@@ -326,25 +349,38 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
     (void)timestamp;
     int err;
 
+    // LOGD("At opengles_display() with thread id %li\n", (long)pthread_self());
+
+    if (!st->context) {
+        err = context_initialize(st);
+        if (err) {
+            LOGW("Renderer context init failed with error %d\n", err);
+            return err;
+        }
+    }
+
     if (!st->vf) {
         if (frame->size.w & 3) {
-            LOGW("opengles: width must be multiple of 4\n");
+            LOGW("opengles_display: width must be multiple of 4\n");
             return EINVAL;
         }
 
         err = vidframe_alloc(&st->vf, VID_FMT_RGB565, &frame->size);
-        if (err)
+        if (err) {
+            LOGW("opengles_display: vidframe_alloc failed\n");
             return err;
+        }
     }
 
     vidconv(st->vf, frame, NULL);
 
     opengles_render(st);
 
-    if (!eglSwapBuffers(st->display, st->surface))
-        LOGW("eglSwapBuffers() returned error %d\n", eglGetError());
+    err = eglSwapBuffers(st->display, st->surface);
+    if (!err)
+        LOGW("eglSwapBuffers() returned error %s\n", egl_error(eglGetError()));
 
-    return 0;
+    return err;
 }
 
 JNIEXPORT void JNICALL

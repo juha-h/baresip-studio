@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
     internal lateinit var videoIcon: MenuItem
+    internal lateinit var hangupIcon: MenuItem
 
     internal var restart = false
     internal var atStartup = false
@@ -797,6 +798,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
                         videoIcon.isVisible = false
+                        hangupIcon.isVisible = false
                         volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -868,11 +870,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        menuInflater.inflate(R.menu.hangup_icon, menu)
         menuInflater.inflate(R.menu.video_icon, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
         videoIcon = menu.findItem(R.id.videoIcon)
         videoIcon.setVisible(false)
+        hangupIcon = menu.findItem(R.id.hangupIcon)
+        hangupIcon.setVisible(false)
         return true
     }
 
@@ -909,6 +914,10 @@ class MainActivity : AppCompatActivity() {
                         showCall(call.ua)
                         break
                     }
+            }
+
+            R.id.hangupIcon -> {
+                hangupButton.performClick()
             }
 
             R.id.config -> {
@@ -1244,7 +1253,7 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", "out", false,
+            val call = Call(callp, ua, uri, "out", status, true,
                     Utils.dtmfWatcher(callp))
             call.add()
             call.disableVideoStream()
@@ -1320,6 +1329,7 @@ class MainActivity : AppCompatActivity() {
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
             videoIcon.isVisible = false
+            hangupIcon.isVisible = false
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1342,6 +1352,7 @@ class MainActivity : AppCompatActivity() {
             when (call.status) {
                 "outgoing", "transferring" -> {
                     videoIcon.isVisible = false
+                    hangupIcon.isVisible = false
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
@@ -1354,6 +1365,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "incoming" -> {
                     videoIcon.isVisible = false
+                    hangupIcon.isVisible = false
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.INVISIBLE
@@ -1371,10 +1383,12 @@ class MainActivity : AppCompatActivity() {
                         videoLayout.visibility = View.VISIBLE
                         videoView.surfaceView.visibility = View.VISIBLE
                         videoIcon.setIcon(R.drawable.video_on)
+                        hangupIcon.isVisible = true
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
                         videoIcon.setIcon(R.drawable.video_off)
+                        hangupIcon.isVisible = false
                     }
                     videoIcon.isVisible = true
                     if (ua.account.mediaEnc == "") {

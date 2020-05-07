@@ -31,6 +31,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         call_stop_audio(callp)
     }
 
+    fun startVideo(): Int {
+        return call_start_video(callp)
+    }
+
     fun hold(): Int {
         return call_hold(callp)
     }
@@ -59,6 +63,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     fun disableVideoStream() {
         call_disable_video_stream(callp)
+        video = false
     }
 
     fun status(): String {
@@ -76,6 +81,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
     private external fun call_start_audio(callp: String)
     private external fun call_stop_audio(callp: String)
+    private external fun call_start_video(callp: String): Int
     private external fun call_audio_codecs(callp: String): String
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean

@@ -47,7 +47,6 @@ class VideoView(val context: Context) {
 
         override fun surfaceCreated(holder: SurfaceHolder) {
             Log.d("Baresip", "Surface created")
-            set_surface(holder.surface)
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, w: Int, h: Int) {
