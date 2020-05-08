@@ -323,12 +323,12 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked) {
                     if (acc.regint != 3600) {
                         newRegint = 3600
-                        UserAgent.updateStatus(ua, R.drawable.dot_yellow)
+                        ua.updateStatus(R.drawable.dot_yellow)
                     }
                 } else {
                     if (acc.regint != 0) {
                         Api.ua_unregister(ua.uap)
-                        UserAgent.updateStatus(ua, R.drawable.dot_white)
+                        ua.updateStatus(R.drawable.dot_white)
                         newRegint = 0
                     }
                 }

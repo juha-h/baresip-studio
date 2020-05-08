@@ -562,8 +562,8 @@ class BaresipService: Service() {
                             newEvent = "call rejected"
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
-                            calls.add(Call(callp, ua, peerUri, "in", "incoming", false,
-                                    Utils.dtmfWatcher(callp)))
+                            Call(callp, ua, peerUri, "in", "incoming", false,
+                                    Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == "manual") {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
@@ -715,7 +715,7 @@ class BaresipService: Service() {
                         }
                         Log.d(LOG_TAG, "AoR $aor call $callp is closed")
                         stopRinging()
-                        calls.remove(call)
+                        call.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             if (am.mode != AudioManager.MODE_NORMAL)

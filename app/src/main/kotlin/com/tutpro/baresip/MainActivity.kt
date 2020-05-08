@@ -1273,7 +1273,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     true, Utils.dtmfWatcher(newCallp))
-            Call.calls().add(newCall)
+            newCall.add()
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
             val err = newCall.connect(uri)

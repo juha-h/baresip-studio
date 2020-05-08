@@ -11,12 +11,12 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var zid = ""
     var hasHistory = false
 
-    init {
-        if (ua.account.mediaEnc != "") security = R.drawable.box_red
-    }
-
     fun add() {
         BaresipService.calls.add(this)
+    }
+
+    fun remove() {
+        BaresipService.calls.remove(this)
     }
 
     fun connect(uri: String): Int {
@@ -72,6 +72,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     fun audioCodecs(): String {
         return call_audio_codecs(callp)
+    }
+
+    init {
+        if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }
 
     private external fun call_connect(callp: String, peer_uri: String): Int

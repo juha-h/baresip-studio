@@ -45,7 +45,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                 Api.ua_destroy(ua.uap)
                 CallHistory.clear(ua.account.aor)
                 Message.clear(ua.account.aor)
-                UserAgent.remove(ua)
+                ua.remove()
                 AccountsActivity.generateAccounts()
                 AccountsActivity.saveAccounts()
                 this.notifyDataSetChanged()
