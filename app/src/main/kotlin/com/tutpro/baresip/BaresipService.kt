@@ -572,8 +572,8 @@ class BaresipService: Service() {
                             newEvent = "call rejected"
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
-                            calls.add(Call(callp, ua, peerUri, "in", "incoming",
-                                    Utils.dtmfWatcher(callp)))
+                            Call(callp, ua, peerUri, "in", "incoming",
+                                    Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == "manual") {
                                 if (Build.VERSION.SDK_INT >= 23) {
                                     Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
