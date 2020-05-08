@@ -15,6 +15,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         BaresipService.calls.add(this)
     }
 
+    fun remove() {
+        BaresipService.calls.remove(this)
+    }
+
     fun connect(uri: String): Int {
         return call_connect(callp, uri)
     }

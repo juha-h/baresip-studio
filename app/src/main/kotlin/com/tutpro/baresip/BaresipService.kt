@@ -731,7 +731,7 @@ class BaresipService: Service() {
                         }
                         Log.d(LOG_TAG, "AoR $aor call $callp is closed")
                         stopRinging()
-                        calls.remove(call)
+                        call.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             if (am.mode != AudioManager.MODE_NORMAL)
