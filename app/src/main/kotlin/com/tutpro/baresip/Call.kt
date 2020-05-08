@@ -11,6 +11,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var zid = ""
     var hasHistory = false
 
+    fun add() {
+        BaresipService.calls.add(this)
+    }
+
     fun connect(uri: String): Int {
         return call_connect(callp, uri)
     }

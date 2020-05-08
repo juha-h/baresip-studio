@@ -1199,7 +1199,7 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call.calls().add(Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)))
+            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
             showCall(ua)
             return true
         } else {
@@ -1215,7 +1215,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))
-            Call.calls().add(newCall)
+            newCall.add()
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
             val err = newCall.connect(uri)
