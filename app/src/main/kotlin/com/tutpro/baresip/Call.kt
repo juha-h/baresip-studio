@@ -35,6 +35,14 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_start_video(callp)
     }
 
+    fun startVideoDisplay(): Int {
+        return call_start_video_display(callp)
+    }
+
+    fun stopVideoDisplay() {
+        call_stop_video_display(callp)
+    }
+
     fun hold(): Int {
         return call_hold(callp)
     }
@@ -86,6 +94,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_start_audio(callp: String)
     private external fun call_stop_audio(callp: String)
     private external fun call_start_video(callp: String): Int
+    private external fun call_start_video_display(callp: String): Int
+    private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean

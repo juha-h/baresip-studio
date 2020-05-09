@@ -155,7 +155,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     (void)resizeh;
     (void)arg;
 
-    // LOGD("At opengles_alloc() with thread id %li\n", (long)pthread_self());
+    LOGD("At opengles_alloc() with thread id %li\n", (long)pthread_self());
 
     st = mem_zalloc(sizeof(*st), destructor);
     if (!st)
@@ -169,6 +169,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
         err = EINVAL;
     }
 
+    // context should be initialized here and not in opengles_display
     // err = context_initialize(st);
 
     if (err)
@@ -351,6 +352,7 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
 
     // LOGD("At opengles_display() with thread id %li\n", (long)pthread_self());
 
+    /* This is hack to make sure that context is initialised on the same thread */
     if (!st->context) {
         err = context_initialize(st);
         if (err) {

@@ -1407,6 +1407,7 @@ Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring
     int err;
     if (!enable) {
         video_stop(v);
+        video_stop_display(v);
     } else {
         err = video_start_source(v, ctx);
         if (err) {
@@ -1449,6 +1450,28 @@ Java_com_tutpro_baresip_Call_call_1start_1video(JNIEnv *env, jobject thiz, jstri
     err = call_modify(call);
     re_thread_leave();
     return err;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1start_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    re_thread_enter();
+    int err = video_start_display(call_video(call), NULL);
+    re_thread_leave();
+    return err;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Call_call_1stop_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    re_thread_enter();
+    video_stop_display(call_video(call));
+    re_thread_leave();
+    return;
 }
 
 JNIEXPORT void JNICALL
