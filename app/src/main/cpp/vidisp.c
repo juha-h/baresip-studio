@@ -32,6 +32,14 @@ const char *egl_error(EGLint const err) {
 
 static ANativeWindow *window = NULL;
 
+/* Size of window (rendering buffer) */
+static int window_width = 0, window_height = 0;
+
+/* Size of video frames */
+static int frame_width, frame_height;
+
+static bool resize = false;
+
 struct vidisp *vid;
 
 static void renderer_destroy(struct vidisp_st *st) {
@@ -104,10 +112,6 @@ static int context_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
-    EGLint value;
-    if (eglQuerySurface(display, surface, EGL_RENDER_BUFFER, &value) == EGL_FALSE)
-        LOGE("EGL_RENDER_BUFFER query on surface returned error %d\n", eglGetError());
-
     if (!(context = eglCreateContext(display, config, EGL_NO_CONTEXT, NULL))) {
         LOGW("eglCreateContext() returned error %d\n", eglGetError());
         renderer_destroy(st);
@@ -120,15 +124,14 @@ static int context_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
-    if (eglQueryContext(display, context, EGL_RENDER_BUFFER, &value) == EGL_FALSE)
-        LOGE("EGL_RENDER_BUFFER query on context returned error %d\n", eglGetError());
-
     if (!eglQuerySurface(display, surface, EGL_WIDTH, &st->width) ||
         !eglQuerySurface(display, surface, EGL_HEIGHT, &st->height)) {
         LOGW("eglQuerySurface() returned error %d\n", eglGetError());
         renderer_destroy(st);
         return eglGetError();
     }
+
+    LOGD("Render buffer w/h = %d/%d", st->width, st->height);
 
     st->display = display;
     st->surface = surface;
@@ -139,7 +142,7 @@ static int context_initialize(struct vidisp_st *st)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    LOGD("Rendered context created");
+    LOGD("Rendered context initialized");
 
     return 0;
 }
@@ -155,7 +158,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     (void)resizeh;
     (void)arg;
 
-    LOGD("At opengles_alloc() with thread id %li\n", (long)pthread_self());
+    LOGD("At opengles_alloc() on thread %li\n", (long)pthread_self());
 
     st = mem_zalloc(sizeof(*st), destructor);
     if (!st)
@@ -234,53 +237,76 @@ static void texture_render(struct vidisp_st *st)
     glDisable(GL_TEXTURE_2D);
 }
 
-static void setup_layout(struct vidisp_st *st, const struct vidsz *screensz, struct vidrect *ortho,
-        struct vidrect *vp)
+static void setup_vertices(struct vidisp_st *st)
 {
-    int x, y, w, h, i = 0;
-
-    w = st->vf->size.w;
-    h = st->vf->size.h;
+    int i = 0;
 
     st->vertices[i++] = 0;
     st->vertices[i++] = 0;
     st->vertices[i++] = 0;
-    st->vertices[i++] = w;
+    st->vertices[i++] = frame_width;
     st->vertices[i++] = 0;
     st->vertices[i++] = 0;
     st->vertices[i++] = 0;
-    st->vertices[i++] = h;
+    st->vertices[i++] = frame_height;
     st->vertices[i++] = 0;
-    st->vertices[i++] = w;
-    st->vertices[i++] = h;
+    st->vertices[i++] = frame_width;
+    st->vertices[i++] = frame_height;
     st->vertices[i++] = 0;
+}
 
-    x = (screensz->w - w) / 2;
-    y = (screensz->h - h) / 2;
+static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
+{
+    int x, y;
+
+    x = (window_width - frame_width) / 2;
+    y = (window_height - frame_height) / 2;
 
     if (x < 0) {
-        vp->x    = 0;
+        vp->x = 0;
         ortho->x = -x;
     }
     else {
-        vp->x    = x;
+        vp->x = x;
         ortho->x = 0;
     }
 
     if (y < 0) {
-        vp->y    = 0;
+        vp->y = 0;
         ortho->y = -y;
     }
     else {
-        vp->y    = y;
+        vp->y = y;
         ortho->y = 0;
     }
 
-    vp->w = screensz->w - 2 * vp->x;
-    vp->h = screensz->h - 2 * vp->y;
+    vp->w = window_width - 2 * vp->x;
+    vp->h = window_height - 2 * vp->y;
 
-    ortho->w = w - ortho->x;
-    ortho->h = h - ortho->y;
+    ortho->w = frame_width - ortho->x;
+    ortho->h = frame_height - ortho->y;
+}
+
+static void window_resize()
+{
+    struct vidrect ortho, vp;
+
+    setup_layout(&ortho, &vp);
+
+    // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
+    glViewport(vp.x, vp.y, vp.w, vp.h);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glViewport(vp.x, vp.y, vp.w, vp.h);
+
+    // LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
+    glOrthof(ortho.x, ortho.w, ortho.y, ortho.h, 0.0f, 1.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    resize = false;
 }
 
 static int opengles_render(struct vidisp_st *st)
@@ -288,7 +314,6 @@ static int opengles_render(struct vidisp_st *st)
     if (!st->texture_id) {
 
         struct vidrect ortho, vp;
-        struct vidsz bufsz;
         int err = 0;
 
         err = texture_init(st);
@@ -297,18 +322,16 @@ static int opengles_render(struct vidisp_st *st)
             return err;
         }
 
-        bufsz.w = st->width;
-        bufsz.h = st->height;
+        LOGD("video frame width/height = %d/%d\n", st->vf->size.w, st->vf->size.h);
 
-        // LOGD("video frame width/height = %d/%d\n", st->vf->size.w, st->vf->size.h);
+        frame_width = st->vf->size.w;
+        frame_height = st->vf->size.h;
 
-        setup_layout(st, &bufsz, &ortho, &vp);
+        setup_vertices(st);
 
-        GLint params[2];
-        glGetIntegerv(GL_MAX_VIEWPORT_DIMS, params);
-        // LOGD("glViewport max w/h = %d/%d\n", params[0], params[1]);
+        setup_layout(&ortho, &vp);
 
-        // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
+        LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
         glViewport(vp.x, vp.y, vp.w, vp.h);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -317,17 +340,18 @@ static int opengles_render(struct vidisp_st *st)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        // LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
+        LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
         glOrthof(ortho.x, ortho.w, ortho.y, ortho.h, 0.0f, 1.0f);
-        //		float ar = (float)st->_width / (float)st->_height;
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
         glDisable(GL_DEPTH_TEST);
         glDisableClientState(GL_COLOR_ARRAY);
 
-        return 0;
-    }
+    } else
+
+        if (resize) window_resize();
 
     texture_render(st);
 
@@ -350,7 +374,7 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
     (void)timestamp;
     int err;
 
-    // LOGD("At opengles_display() with thread id %li\n", (long)pthread_self());
+    // LOGD("At opengles_display() on thread %li\n", (long)pthread_self());
 
     /* This is hack to make sure that context is initialised on the same thread */
     if (!st->context) {
@@ -363,7 +387,7 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
 
     if (!st->vf) {
         if (frame->size.w & 3) {
-            LOGW("opengles_display: width must be multiple of 4\n");
+            LOGW("opengles_display: frame width must be multiple of 4\n");
             return EINVAL;
         }
 
@@ -407,10 +431,21 @@ Java_com_tutpro_baresip_VideoView_on_1stop(JNIEnv *env, jclass thiz) {
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_VideoView_set_1surface(JNIEnv *env, jclass thiz, jobject surface) {
-    LOGI("VideoView set_surface");
+
+    int w, h;
+
+    LOGD("At set_surface() on thread %li\n", (long)pthread_self());
+
     if (surface != 0) {
         window = ANativeWindow_fromSurface(env, surface);
-        LOGI("Got window %p", window);
+        w = ANativeWindow_getWidth(window);
+        h = ANativeWindow_getHeight(window);
+        if ((w != window_width) || (h != window_height)) {
+            LOGI("Got new window %p with w/h = %d/%d", window, w, h);
+            window_width = w;
+            window_height = h;
+            resize = true;
+        }
     } else {
         LOGI("Releasing window");
         ANativeWindow_release(window);

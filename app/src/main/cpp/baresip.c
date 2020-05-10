@@ -1178,13 +1178,11 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
     const char *native_xcall = (*env)->GetStringUTFChars(env, javaXCall, 0);
     char call_buf[32];
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    re_thread_enter();
     if (strcmp(native_xcall, "") != 0) {
         xcall = (struct call *) strtoul(native_xcall, NULL, 10);
         luri = (char *)call_localuri(xcall);
     }
-    re_thread_enter();
-    LOGD("allocating new call for ua %s xcall %s on thread %li\n", native_ua, native_xcall,
-            (long)pthread_self());
     err = ua_call_alloc(&call, ua, (enum vidmode)javaVidMode, NULL, xcall, luri, true);
     if (err) {
         LOGW("call allocation for ua %s failed with error %d\n", native_ua, err);
@@ -1244,10 +1242,9 @@ Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jstring ja
     const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    re_thread_enter();
-    LOGD("connecting call %s to %s on thread %li\n", native_call, native_peer, (long)pthread_self());
     struct pl pl;
     pl_set_str(&pl, native_peer);
+    re_thread_enter();
     int err = call_connect(call, &pl);
     re_thread_leave();
     if (err) LOGW("call_connect error: %d\n", err);
@@ -1439,11 +1436,13 @@ Java_com_tutpro_baresip_Call_call_1start_1video(JNIEnv *env, jobject thiz, jstri
     int err = video_start_source(v, ctx);
     if (err) {
         LOGE("video_start_source failed with error %d\n", err);
+        re_thread_leave();
         return err;
     }
     err = video_start_display(v, NULL);
     if (err) {
         LOGE("video_start_display failed with error %d\n", err);
+        re_thread_leave();
         return err;
     }
     sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), false);
@@ -1475,11 +1474,10 @@ Java_com_tutpro_baresip_Call_call_1stop_1video_1display(JNIEnv *env, jobject thi
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1disable_1video_1stream(JNIEnv *env, jobject thiz,
-        jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+Java_com_tutpro_baresip_Call_call_1disable_1video_1stream(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     re_thread_enter();
     sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), true);
     re_thread_leave();
@@ -1503,9 +1501,8 @@ Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring jav
     re_thread_enter();
     int err = message_send(ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
     re_thread_leave();
-    if (err) {
+    if (err)
         LOGW("message_send failed with error %d\n", err);
-    }
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaPeer, native_peer);
     (*env)->ReleaseStringUTFChars(env, javaMsg, native_msg);
