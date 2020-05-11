@@ -331,7 +331,7 @@ static int opengles_render(struct vidisp_st *st)
 
         setup_layout(&ortho, &vp);
 
-        LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
+       // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
         glViewport(vp.x, vp.y, vp.w, vp.h);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -340,7 +340,7 @@ static int opengles_render(struct vidisp_st *st)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
+        // LOGD("glOrthof x/w/y/h = %d/%d/%d/%d\n", ortho.x, ortho.w, ortho.y, ortho.h);
         glOrthof(ortho.x, ortho.w, ortho.y, ortho.h, 0.0f, 1.0f);
 
         glMatrixMode(GL_MODELVIEW);
