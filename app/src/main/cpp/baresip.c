@@ -1576,7 +1576,7 @@ Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz) {
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule) {
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
-    int result = module_load(native_module);
+    int result = module_load(".", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
     return result;
 }
