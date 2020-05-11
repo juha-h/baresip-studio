@@ -299,6 +299,7 @@
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
+    <string name="video_call">Videopuhelu</string>
     <string name="hold">Aseta puhelu pitoon</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>

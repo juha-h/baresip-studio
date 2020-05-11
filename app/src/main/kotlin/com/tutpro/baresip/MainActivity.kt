@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
-    internal lateinit var videoIcon: MenuItem
-    internal lateinit var hangupIcon: MenuItem
+    internal lateinit var videoIcon: ImageButton
+    internal lateinit var hangupIcon: ImageButton
 
     internal var restart = false
     internal var atStartup = false
@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        getSupportActionBar()!!.setDisplayShowTitleEnabled(false);
 
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         videoView = VideoView(applicationContext)
@@ -94,6 +96,8 @@ class MainActivity : AppCompatActivity() {
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
+        videoIcon = findViewById(R.id.videoIcon) as ImageButton
+        hangupIcon = findViewById(R.id.hangupIcon) as ImageButton
 
         videoLayout.addView(videoView.surfaceView)
 
@@ -426,13 +430,35 @@ class MainActivity : AppCompatActivity() {
                 callUri.inputType = InputType.TYPE_CLASS_PHONE
                 dialpadButton.setImageResource(R.drawable.dialpad_on)
                 dialpadButton.tag = "on"
-                Utils.ffmpeg_execute("-h")
+                // Utils.ffmpeg_execute("-h")
             } else {
                 callUri.inputType = InputType.TYPE_CLASS_TEXT +
                         InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
                 dialpadButton.setImageResource(R.drawable.dialpad_off)
                 dialpadButton.tag = "off"
             }
+        }
+
+        videoIcon.setOnClickListener {
+            for (call in Call.calls())
+                if (call.status == "connected") {
+                    if (call.videoEnabled) {
+                        if (call.setVideo(false) == 0)
+                            call.videoEnabled = false
+                        else
+                            Log.e("Baresip", "Failed to set call video off")
+                    } else {
+                        if (call.setVideo(true) == 0)
+                            call.videoEnabled = true
+                        else
+                            Log.e("Baresip", "Failed to set call video on")
+                    }
+                    showCall(call.ua)
+                }
+        }
+
+        hangupIcon.setOnClickListener {
+            hangupButton.performClick()
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -877,14 +903,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-        menuInflater.inflate(R.menu.hangup_icon, menu)
-        menuInflater.inflate(R.menu.video_icon, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
-        videoIcon = menu.findItem(R.id.videoIcon)
-        videoIcon.isVisible = false
-        hangupIcon = menu.findItem(R.id.hangupIcon)
-        hangupIcon.isVisible = false
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -902,29 +922,6 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.speakerPhone = !BaresipService.speakerPhone
                 baresipService.setAction("SetSpeaker")
                 startService(baresipService)
-            }
-
-            R.id.videoIcon -> {
-                for (call in Call.calls())
-                    if (call.status == "connected") {
-                        if (call.videoEnabled) {
-                            if (call.setVideo(false) == 0)
-                                call.videoEnabled = false
-                            else
-                                Log.e("Baresip", "Failed to set call video off")
-                        } else {
-                            if (call.setVideo(true) == 0)
-                                call.videoEnabled = true
-                            else
-                                Log.e("Baresip", "Failed to set call video on")
-                        }
-                        showCall(call.ua)
-                        break
-                    }
-            }
-
-            R.id.hangupIcon -> {
-                hangupButton.performClick()
             }
 
             R.id.config -> {
@@ -1334,8 +1331,8 @@ class MainActivity : AppCompatActivity() {
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
-            // videoIcon.isVisible = false
-            // hangupIcon.isVisible = false
+            videoIcon.visibility = View.INVISIBLE
+            hangupIcon.visibility = View.INVISIBLE
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1357,8 +1354,8 @@ class MainActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
                 "outgoing", "transferring" -> {
-                    videoIcon.isVisible = false
-                    hangupIcon.isVisible = false
+                    videoIcon.visibility = View.INVISIBLE
+                    hangupIcon.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
@@ -1370,8 +1367,8 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "incoming" -> {
-                    videoIcon.isVisible = false
-                    hangupIcon.isVisible = false
+                    videoIcon.visibility = View.INVISIBLE
+                    hangupIcon.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.INVISIBLE
@@ -1389,21 +1386,21 @@ class MainActivity : AppCompatActivity() {
                             defaultLayout.visibility = View.INVISIBLE
                             videoLayout.visibility = View.VISIBLE
                             videoView.surfaceView.visibility = View.VISIBLE
-                            videoIcon.setIcon(R.drawable.video_on)
-                            videoIcon.isVisible = true
-                            hangupIcon.isVisible = true
+                            videoIcon.setImageResource(R.drawable.video_on)
+                            videoIcon.visibility = View.VISIBLE
+                            hangupIcon.visibility = View.VISIBLE
                         } else {
                             defaultLayout.visibility = View.VISIBLE
                             videoLayout.visibility = View.INVISIBLE
-                            videoIcon.setIcon(R.drawable.video_off)
-                            videoIcon.isVisible = true
-                            hangupIcon.isVisible = false
+                            videoIcon.setImageResource(R.drawable.video_off)
+                            videoIcon.visibility = View.VISIBLE
+                            hangupIcon.visibility = View.INVISIBLE
                         }
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
-                        videoIcon.isVisible = false
-                        hangupIcon.isVisible = false
+                        videoIcon.visibility = View.INVISIBLE
+                        hangupIcon.visibility = View.INVISIBLE
                     }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE

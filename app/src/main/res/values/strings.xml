@@ -264,6 +264,7 @@
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
+    <string name="video_call">Video call</string>
     <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
