@@ -4,12 +4,18 @@ import android.text.TextWatcher
 import java.util.ArrayList
 
 class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: String,
-           var status: String, var video: Boolean, val dtmfWatcher: TextWatcher?) {
+           var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
     var security = 0
     var zid = ""
     var hasHistory = false
+    var videoAvailable = false
+    var videoEnabled = false
+
+    init {
+        if (ua.account.mediaEnc != "") security = R.drawable.box_red
+    }
 
     fun add() {
         BaresipService.calls.add(this)
@@ -64,14 +70,15 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     }
 
     fun setVideo(enabled: Boolean): Int {
-        val result = call_set_video(callp, enabled)
-        if (result == 0) video = enabled
-        return result
+        val res = call_set_video(callp, enabled)
+        if (res != 0)
+            videoEnabled = enabled
+        return res
     }
 
     fun disableVideoStream() {
         call_disable_video_stream(callp)
-        video = false
+        videoEnabled = false
     }
 
     fun status(): String {
@@ -80,10 +87,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     fun audioCodecs(): String {
         return call_audio_codecs(callp)
-    }
-
-    init {
-        if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }
 
     private external fun call_connect(callp: String, peer_uri: String): Int

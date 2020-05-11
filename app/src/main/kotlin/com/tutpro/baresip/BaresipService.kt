@@ -562,7 +562,7 @@ class BaresipService: Service() {
                             newEvent = "call rejected"
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
-                            Call(callp, ua, peerUri, "in", "incoming", false,
+                            Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == "manual") {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
@@ -627,9 +627,9 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Call $callp that is established is not found")
                             return
                         }
-                        Log.d(LOG_TAG, "AoR $aor call $callp established")
                         call.status = "connected"
                         call.onhold = false
+                        Log.d(LOG_TAG, "AoR $aor call $callp established")
                         if (ua.account.callHistory) {
                             CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
                             CallHistory.save()

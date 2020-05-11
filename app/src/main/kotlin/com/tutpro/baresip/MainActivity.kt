@@ -426,6 +426,7 @@ class MainActivity : AppCompatActivity() {
                 callUri.inputType = InputType.TYPE_CLASS_PHONE
                 dialpadButton.setImageResource(R.drawable.dialpad_on)
                 dialpadButton.tag = "on"
+                Utils.ffmpeg_execute("-h")
             } else {
                 callUri.inputType = InputType.TYPE_CLASS_TEXT +
                         InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -566,6 +567,7 @@ class MainActivity : AppCompatActivity() {
                             if (Call.calls().size > 0)
                                 spinToAor(Call.calls()[0].ua.account.aor)
                             else {
+                                Log.w("Baresip", "Setting selection to 0")
                                 aorSpinner.setSelection(0)
                                 aorSpinner.tag = UserAgent.uas()[0].account.aor
                             }
@@ -688,6 +690,12 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
+                        if (call.hasVideo()) {
+                            Log.d("Baresip", "Call has video")
+                            call.setVideo(false)
+                            call.videoAvailable = true
+                            call.videoEnabled = false
+                        }
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
@@ -797,8 +805,6 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
-                        videoIcon.isVisible = false
-                        hangupIcon.isVisible = false
                         volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -865,6 +871,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         Log.d("Baresip", "Main onDestroy")
+        BaresipService.activities.clear()
         super.onDestroy()
     }
 
@@ -875,10 +882,10 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
         videoIcon = menu.findItem(R.id.videoIcon)
-        videoIcon.setVisible(false)
+        videoIcon.isVisible = false
         hangupIcon = menu.findItem(R.id.hangupIcon)
-        hangupIcon.setVisible(false)
-        return true
+        hangupIcon.isVisible = false
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -900,14 +907,14 @@ class MainActivity : AppCompatActivity() {
             R.id.videoIcon -> {
                 for (call in Call.calls())
                     if (call.status == "connected") {
-                        if (call.video) {
+                        if (call.videoEnabled) {
                             if (call.setVideo(false) == 0)
-                                call.video = false
+                                call.videoEnabled = false
                             else
                                 Log.e("Baresip", "Failed to set call video off")
                         } else {
                             if (call.setVideo(true) == 0)
-                                call.video = true
+                                call.videoEnabled = true
                             else
                                 Log.e("Baresip", "Failed to set call video on")
                         }
@@ -1253,10 +1260,9 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", status, true,
-                    Utils.dtmfWatcher(callp))
+            val call = Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp))
             call.add()
-            call.disableVideoStream()
+            // call.disableVideoStream()
             call.connect(uri)
             showCall(ua)
             return true
@@ -1272,7 +1278,7 @@ class MainActivity : AppCompatActivity() {
         if (newCallp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
-                    true, Utils.dtmfWatcher(newCallp))
+                    Utils.dtmfWatcher(newCallp))
             newCall.add()
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
@@ -1328,8 +1334,8 @@ class MainActivity : AppCompatActivity() {
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             infoButton.visibility = View.INVISIBLE
-            videoIcon.isVisible = false
-            hangupIcon.isVisible = false
+            // videoIcon.isVisible = false
+            // hangupIcon.isVisible = false
         } else {
             val callsOut = Call.uaCalls(ua, "out")
             val callsIn = Call.uaCalls(ua, "in")
@@ -1378,19 +1384,27 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
-                    if (call.video) {
-                        defaultLayout.visibility = View.INVISIBLE
-                        videoLayout.visibility = View.VISIBLE
-                        videoView.surfaceView.visibility = View.VISIBLE
-                        videoIcon.setIcon(R.drawable.video_on)
-                        hangupIcon.isVisible = true
+                    if (call.videoAvailable) {
+                        if (call.videoEnabled) {
+                            defaultLayout.visibility = View.INVISIBLE
+                            videoLayout.visibility = View.VISIBLE
+                            videoView.surfaceView.visibility = View.VISIBLE
+                            videoIcon.setIcon(R.drawable.video_on)
+                            videoIcon.isVisible = true
+                            hangupIcon.isVisible = true
+                        } else {
+                            defaultLayout.visibility = View.VISIBLE
+                            videoLayout.visibility = View.INVISIBLE
+                            videoIcon.setIcon(R.drawable.video_off)
+                            videoIcon.isVisible = true
+                            hangupIcon.isVisible = false
+                        }
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
-                        videoIcon.setIcon(R.drawable.video_off)
+                        videoIcon.isVisible = false
                         hangupIcon.isVisible = false
                     }
-                    videoIcon.isVisible = true
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
