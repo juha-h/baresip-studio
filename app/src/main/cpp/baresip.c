@@ -1392,13 +1392,10 @@ Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring javaCall,
-        jboolean enable) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring jCall, jboolean enable) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    re_thread_enter();
-    LOGD("setting video on thread %li\n", (long)pthread_self());
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     struct video *v = call_video(call);
     struct media_ctx **ctx = NULL;
     int err;
@@ -1421,7 +1418,6 @@ Java_com_tutpro_baresip_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring
     }
     sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), !enable);
     err = call_modify(call);
-    re_thread_leave();
     return err;
 }
 
