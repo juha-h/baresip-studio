@@ -37,7 +37,8 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var vmUri: EditText
     internal lateinit var defaultCheck: CheckBox
 
-    private var newCodecs = ArrayList<String>()
+    private var newAudioCodecs = ArrayList<String>()
+    private var newVideoCodecs = ArrayList<String>()
     private var save = false
     private var uaIndex= -1
 
@@ -84,32 +85,65 @@ class AccountActivity : AppCompatActivity() {
         regCheck.isChecked = acc.regint > 0
 
         val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-        newCodecs.addAll(acc.audioCodec)
-        while (newCodecs.size < audioCodecs.size) newCodecs.add("-")
-        val layout = findViewById(R.id.CodecSpinners) as LinearLayout
-        val spinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
+        newAudioCodecs.addAll(acc.audioCodec)
+        while (newAudioCodecs.size < audioCodecs.size) newAudioCodecs.add("-")
+        val acLayout = findViewById(R.id.AudioCodecSpinners) as LinearLayout
+        val acSpinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
         for (i in audioCodecs.indices) {
             val spinner = Spinner(applicationContext)
             spinner.id = i + 100
             spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            layout.addView(spinner)
+            acLayout.addView(spinner)
             if (acc.audioCodec.size > i) {
                 val codec = acc.audioCodec[i]
-                spinnerList[i].add(codec)
-                spinnerList[i].add("-")
-                for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
+                acSpinnerList[i].add(codec)
+                acSpinnerList[i].add("-")
+                for (c in audioCodecs) if (c != codec) acSpinnerList[i].add(c)
             } else {
-                spinnerList[i].addAll(audioCodecs)
-                spinnerList[i].add(0, "-")
+                acSpinnerList[i].addAll(audioCodecs)
+                acSpinnerList[i].add(0, "-")
             }
             val codecSpinner = findViewById(spinner.id) as Spinner
             val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                spinnerList[i])
+                acSpinnerList[i])
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             codecSpinner.adapter = adapter
             codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newCodecs.set(parent.id - 100, parent.selectedItem.toString())
+                    newAudioCodecs.set(parent.id - 100, parent.selectedItem.toString())
+                }
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                }
+            }
+        }
+
+        val videoCodecs = ArrayList(Api.video_codecs().split(","))
+        newVideoCodecs.addAll(acc.videoCodec)
+        while (newVideoCodecs.size < videoCodecs.size) newVideoCodecs.add("-")
+        val vcLayout = findViewById(R.id.VideoCodecSpinners) as LinearLayout
+        val vcSpinnerList = Array(videoCodecs.size, {_ -> ArrayList<String>()})
+        for (i in videoCodecs.indices) {
+            val spinner = Spinner(applicationContext)
+            spinner.id = i + 200
+            spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            vcLayout.addView(spinner)
+            if (acc.videoCodec.size > i) {
+                val codec = acc.videoCodec[i]
+                vcSpinnerList[i].add(codec)
+                vcSpinnerList[i].add("-")
+                for (c in videoCodecs) if (c != codec) vcSpinnerList[i].add(c)
+            } else {
+                vcSpinnerList[i].addAll(videoCodecs)
+                vcSpinnerList[i].add(0, "-")
+            }
+            val codecSpinner = findViewById(spinner.id) as Spinner
+            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+                    vcSpinnerList[i])
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            codecSpinner.adapter = adapter
+            codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                    newVideoCodecs.set(parent.id - 200, parent.selectedItem.toString())
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {
                 }
@@ -379,7 +413,8 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
+                val ac = ArrayList(LinkedHashSet<String>
+                (newAudioCodecs.filter { it != "-" } as ArrayList<String>))
                 if (ac != acc.audioCodec) {
                     val acList = Utils.implode(ac, ",")
                     if (account_set_audio_codecs(acc.accp, acList) == 0) {
@@ -388,6 +423,19 @@ class AccountActivity : AppCompatActivity() {
                         save = true
                     } else {
                         Log.e("Baresip", "Setting of audio codecs '$acList' failed")
+                    }
+                }
+
+                val vc = ArrayList(LinkedHashSet<String>
+                (newVideoCodecs.filter { it != "-" } as ArrayList<String>))
+                if (vc != acc.videoCodec) {
+                    val vcList = Utils.implode(vc, ",")
+                    if (account_set_video_codecs(acc.accp, vcList) == 0) {
+                        Log.d("Baresip", "New video codecs '$vcList'")
+                        acc.videoCodec = vc
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of video codecs '$vcList' failed")
                     }
                 }
 
@@ -508,6 +556,10 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.AudioCodecsTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.audio_codecs),
                         getString(R.string.audio_codecs_help))
+            }
+            findViewById(R.id.VideoCodecsTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.video_codecs),
+                        getString(R.string.video_codecs_help))
             }
             findViewById(R.id.MediaNatTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.media_nat),

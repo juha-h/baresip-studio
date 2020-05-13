@@ -9,6 +9,7 @@ object Api {
     val VIDMODE_ON = 1
 
     external fun audio_codecs(): String
+    external fun video_codecs(): String
     external fun uag_current_set(uap: String)
     external fun uag_reset_transp(reg: Boolean, reinvite: Boolean)
     external fun ua_account(ua: String): String

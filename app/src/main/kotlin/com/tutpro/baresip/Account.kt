@@ -15,6 +15,7 @@ class Account(val accp: String) {
     var mediaNat = account_medianat(accp)
     var stunServer = ""
     var audioCodec = ArrayList<String>()
+    var videoCodec = ArrayList<String>()
     var regint = account_regint(accp)
     var mediaEnc = account_mediaenc(accp)
     var preferIPv6Media = false
@@ -53,6 +54,17 @@ class Account(val accp: String) {
             val ac = account_audio_codec(accp, i)
             if (ac != "") {
                 audioCodec.add(ac)
+                i++
+            } else {
+                break
+            }
+        }
+
+        i = 0
+        while (true) {
+            val ac = account_video_codec(accp, i)
+            if (ac != "") {
+                videoCodec.add(ac)
                 i++
             } else {
                 break
@@ -105,7 +117,17 @@ class Account(val accp: String) {
                 }
         }
 
-        res = res + ";video_codecs=VP9,VP8,H264"
+        if (videoCodec.size > 0) {
+            var first = true
+            res = res + ";video_codecs="
+            for (c in videoCodec)
+                if (first) {
+                    res = res + c
+                    first = false
+                } else {
+                    res = res + ",$c"
+                }
+        }
 
         if (mediaEnc != "") res = res + ";mediaenc=${mediaEnc}"
 
@@ -238,6 +260,7 @@ external fun account_outbound(acc: String, ix: Int): String
 external fun account_set_outbound(acc: String, ob: String, ix: Int): Int
 external fun account_set_sipnat(acc: String, sipnat: String): Int
 external fun account_audio_codec(acc: String, ix: Int): String
+external fun account_video_codec(acc: String, ix: Int): String
 external fun account_regint(acc: String): Int
 external fun account_set_regint(acc: String, regint: Int): Int
 external fun account_stun_host(acc: String): String
@@ -249,6 +272,7 @@ external fun account_set_mediaenc(acc: String, mediaenc: String): Int
 external fun account_medianat(acc: String): String
 external fun account_set_medianat(acc: String, medianat: String): Int
 external fun account_set_audio_codecs(acc: String, codecs: String): Int
+external fun account_set_video_codecs(acc: String, codecs: String): Int
 external fun account_set_mwi(acc: String, value: String): Int
 external fun account_vm_uri(acc: String): String
 external fun account_extra(acc: String): String
