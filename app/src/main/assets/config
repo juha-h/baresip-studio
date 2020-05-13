@@ -30,9 +30,9 @@ module g722.so
 module g7221.so
 module g726.so
 module g711.so
-module avcodec.so
-module vp8.so
 module vp9.so
+module vp8.so
+module avcodec.so
 module avformat.so
 module webrtc_aec.so
 module opensles.so
