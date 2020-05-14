@@ -10,7 +10,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var security = 0
     var zid = ""
     var hasHistory = false
-    var videoAvailable = false
     var videoEnabled = false
 
     init {
