@@ -3,78 +3,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:textColor="@color/colorWhite"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <TextView
-                android:id="@+id/toolbarTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerInParent="true"
-                android:text="@string/app_name"
-                android:textColor="@android:color/white"
-                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
-
-            <ImageButton
-                android:id="@+id/videoIcon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:layout_marginEnd="14dp"
-                app:showAsAction="always"
-                android:background="@null"
-                android:visibility="invisible"
-                android:src="@drawable/video_off"
-                android:contentDescription="@string/video_call" >
-            </ImageButton>
-
-            <ImageButton
-                android:id="@+id/hangupIcon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_toStartOf="@id/videoIcon"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:layout_marginEnd="74dp"
-                app:showAsAction="always"
-                android:background="@null"
-                android:visibility="invisible"
-                android:src="@drawable/hangup_icon"
-                android:contentDescription="@string/hangup" >
-            </ImageButton>
-
-        </RelativeLayout>
-
-    </androidx.appcompat.widget.Toolbar>
 
     <RelativeLayout
         android:id="@+id/defaultLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_below="@id/toolbar" >
+        android:layout_marginBottom="10dp" >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorWhite"
+            android:textColorSecondary="@color/colorWhite"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:text="@string/app_name"
+                    android:textColor="@android:color/white"
+                    style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true" >
+            android:fillViewport="true"
+            android:layout_below="@id/toolbar">
 
             <RelativeLayout
                 android:id="@+id/mainActivityLayout"
@@ -237,6 +205,19 @@
         </ScrollView>
 
         <ImageButton
+            android:id="@+id/videoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:background="@null"
+            android:src="@drawable/video_call"
+            android:visibility="invisible"
+            android:contentDescription="@string/video_call" >
+        </ImageButton>
+
+        <ImageButton
             android:id="@+id/voicemailButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -306,6 +287,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="0dp"
+        android:visibility="invisible"
         android:layout_below="@id/toolbar" >
     </RelativeLayout>
 
