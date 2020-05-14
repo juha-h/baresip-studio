@@ -535,7 +535,7 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
-                    "call offered" -> {
+                    "local_call offered" -> {
                         proximitySensing(true)
                         return
                     }
@@ -616,9 +616,12 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "call answered" -> {
+                    "local call answered" -> {
                         proximitySensing(true)
                         return
+                    }
+                    "remote call offered", "remote call answered" -> {
+                        newEvent = "call updated"
                     }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
