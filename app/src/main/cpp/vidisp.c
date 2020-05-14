@@ -142,6 +142,8 @@ static int context_initialize(struct vidisp_st *st)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    resize = false;
+
     LOGD("Rendered context initialized");
 
     return 0;
@@ -290,6 +292,8 @@ static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
 static void window_resize()
 {
     struct vidrect ortho, vp;
+
+    LOGD("resizing window\n");
 
     setup_layout(&ortho, &vp);
 
