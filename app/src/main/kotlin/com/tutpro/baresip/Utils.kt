@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
@@ -19,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Surface
+import android.view.WindowManager
 
 import kotlin.collections.ArrayList
 import kotlin.Exception
@@ -589,6 +592,29 @@ object Utils {
             Log.e("Baresip", "Could not get supportedCameras: ${e.printStackTrace()}")
         }
         return cameras
+    }
+
+    fun getScreenOrientation(context: Context): String {
+        val screenOrientation = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        when (screenOrientation) {
+            Surface.ROTATION_0 -> return "SCREEN_ORIENTATION_PORTRAIT"
+            Surface.ROTATION_90 -> return "SCREEN_ORIENTATION_LANDSCAPE"
+            Surface.ROTATION_180 -> return "SCREEN_ORIENTATION_REVERSE_PORTRAIT"
+            else -> return "SCREEN_ORIENTATION_REVERSE_LANDSCAPE"
+        }
+    }
+
+    fun ffmpegExecute(command: String) {
+        com.arthenica.mobileffmpeg.Config.setLogLevel(com.arthenica.mobileffmpeg.Level.AV_LOG_INFO);
+        val rc = com.arthenica.mobileffmpeg.FFmpeg.execute(command)
+        val res = com.arthenica.mobileffmpeg.Config.getLastCommandOutput()
+        if (rc == com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS) {
+            Log.i("Baresip", "Command $command execution completed successfully: $res.")
+        } else if (rc == com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL) {
+            Log.i("Baresip", "Command execution cancelled by user.")
+        } else {
+            Log.i("Baresip", "Command execution failed with rc=$rc: $res.")
+        }
     }
 
 }
