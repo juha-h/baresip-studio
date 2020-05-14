@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
