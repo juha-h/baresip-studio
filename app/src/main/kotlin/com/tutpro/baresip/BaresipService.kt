@@ -1106,6 +1106,7 @@ class BaresipService: Service() {
         var libraryLoaded = false
         var isServiceClean = false
         var speakerPhone = false
+        var cameraFront = true
         var callVolume = 0
         var dynDns = false
         var netInterface = ""

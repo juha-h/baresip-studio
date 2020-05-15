@@ -48,6 +48,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         call_stop_video_display(callp)
     }
 
+    fun setVideoSource(front: Boolean): Int {
+        return call_set_video_source(callp, front)
+    }
+
     fun hold(): Int {
         return call_hold(callp)
     }
@@ -102,6 +106,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean
     private external fun call_set_video(callp: String, enabled: Boolean): Int
+    private external fun call_set_video_source(callp: String, front: Boolean): Int
     private external fun call_disable_video_stream(callp: String)
 
     external fun call_video_debug()

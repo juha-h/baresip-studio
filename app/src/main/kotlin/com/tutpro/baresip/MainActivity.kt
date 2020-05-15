@@ -98,24 +98,7 @@ class MainActivity : AppCompatActivity() {
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
 
-        videoLayout.addView(videoView.surfaceView)
-        val vb = ImageButton(this)
-        vb.setImageResource(R.drawable.video_on)
-        vb.setBackgroundResource(0)
-        val prm : RelativeLayout.LayoutParams =
-                RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        prm.marginStart = 10
-        prm.bottomMargin = 10
-        vb.layoutParams = prm
-        videoLayout.addView(vb)
-        vb.setOnClickListener {
-            val call = Call.call("connected")
-            if (call != null)
-                call.setVideo(false)
-        }
+        addVideoLayoutViews()
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -499,6 +482,77 @@ class MainActivity : AppCompatActivity() {
                 }
 
     } // OnCreate
+
+    private fun addVideoLayoutViews() {
+
+        videoLayout.addView(videoView.surfaceView)
+
+        // Video Button
+        val vb = ImageButton(this)
+        vb.setImageResource(R.drawable.video_off)
+        vb.setBackgroundResource(0)
+        var prm: RelativeLayout.LayoutParams =
+                RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        prm.marginStart = 15
+        prm.bottomMargin = 15
+        vb.layoutParams = prm
+        vb.setOnClickListener {
+            Call.call("connected")?.setVideo(false)
+        }
+        videoLayout.addView(vb)
+
+        // Camera Button
+        val cb = ImageButton(this)
+        cb.setImageResource(R.drawable.camera_front)
+        cb.setBackgroundResource(0)
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        prm.marginStart = 15
+        prm.bottomMargin = 15
+        cb.layoutParams = prm
+        cb.setOnClickListener {
+            val call = Call.call("connected")
+            if (call != null) {
+                if (call.setVideoSource(!BaresipService.cameraFront) != 0)
+                    Log.w("Baresip", "Failed to set video source")
+                else
+                    BaresipService.cameraFront = !BaresipService.cameraFront
+                if (BaresipService.cameraFront)
+                    cb.setImageResource(R.drawable.camera_front)
+                else
+                    cb.setImageResource(R.drawable.camera_rear)
+            }
+        }
+        videoLayout.addView(cb)
+
+        // Speaker Button
+        val sb = ImageButton(this)
+        sb.setImageResource(R.drawable.speaker_off_button)
+        sb.setBackgroundResource(0)
+        prm  = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        prm.marginEnd = 15
+        prm.topMargin = 15
+        sb.layoutParams = prm
+        sb.setOnClickListener {
+            if (BaresipService.speakerPhone)
+                sb.setImageResource(R.drawable.speaker_off_button)
+            else
+                sb.setImageResource(R.drawable.speaker_on_button)
+            BaresipService.speakerPhone = !BaresipService.speakerPhone
+            baresipService.setAction("SetSpeaker")
+            startService(baresipService)
+        }
+        videoLayout.addView(sb)
+
+    }
 
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task

@@ -1528,6 +1528,19 @@ Java_com_tutpro_baresip_Call_call_1disable_1video_1stream(JNIEnv *env, jobject t
     re_thread_leave();
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1set_1video_1source(JNIEnv *env, jobject thiz, jstring jCall,
+        jboolean front) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    char *dev = front ? "android_camera,1" : "android_camera,0";
+    re_thread_enter();
+    int err = video_set_source(call_video(call), "avformat", dev);
+    re_thread_leave();
+    return err;
+}
+
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Call_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();

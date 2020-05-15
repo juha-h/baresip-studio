@@ -212,7 +212,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:background="@null"
-            android:src="@drawable/video_off"
+            android:src="@drawable/video_on"
             android:visibility="invisible"
             android:contentDescription="@string/video_call" >
         </ImageButton>
