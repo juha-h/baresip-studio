@@ -72,6 +72,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_has_video(callp)
     }
 
+    fun hasVideoStream(): Boolean {
+        return call_has_video_stream(callp)
+    }
+
     fun setVideo(enabled: Boolean): Int {
         val res = call_set_video(callp, enabled)
         if (res == 0)
@@ -79,8 +83,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return res
     }
 
-    fun disableVideoStream() {
-        call_disable_video_stream(callp)
+    fun disableVideoStream(disable: Boolean) {
+        call_disable_video_stream(callp, disable)
         videoEnabled = false
     }
 
@@ -105,9 +109,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_audio_codecs(callp: String): String
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean
+    private external fun call_has_video_stream(callp: String): Boolean
     private external fun call_set_video(callp: String, enabled: Boolean): Int
     private external fun call_set_video_source(callp: String, front: Boolean): Int
-    private external fun call_disable_video_stream(callp: String)
+    private external fun call_disable_video_stream(callp: String, disable: Boolean)
 
     external fun call_video_debug()
 

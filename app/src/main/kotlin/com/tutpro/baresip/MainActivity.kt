@@ -441,11 +441,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         videoButton.setOnClickListener {
-            val call = Call.call("connected")
-            if (call != null) {
-                call.setVideo(true)
-                showCall(call.ua)
-            }
+            Call.call("connected")?.setVideo(true)
+            // videoLayout is made visible at "call updated" event
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -491,6 +488,7 @@ class MainActivity : AppCompatActivity() {
         vb.layoutParams = prm
         vb.setOnClickListener {
             Call.call("connected")?.setVideo(false)
+            // videoLayout is made invisible at "call updated" event
         }
         videoLayout.addView(vb)
 
@@ -774,10 +772,8 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        if (call.hasVideo()) {
+                        if (call.hasVideoStream())
                             call.setVideo(false)
-                            call.videoEnabled = false
-                        }
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
@@ -792,13 +788,18 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
+                        if (call.status != "connected")
+                            return
                         if (call.hasVideo()) {
-                            videoLayout.visibility = View.VISIBLE
                             defaultLayout.visibility = View.INVISIBLE
+                            videoLayout.visibility = View.VISIBLE
+                            videoView.surfaceView.visibility = View.VISIBLE
                         } else {
                             videoLayout.visibility = View.INVISIBLE
+                            videoView.surfaceView.visibility = View.INVISIBLE
                             defaultLayout.visibility = View.VISIBLE
                         }
+                        showCall(ua)
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -1330,7 +1331,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp))
             call.add()
-            call.disableVideoStream()
+            // At this point call has video, but we don't want to offer video stream to callee
+            call.disableVideoStream(true)
             call.connect(uri)
             showCall(ua)
             return true
@@ -1452,9 +1454,11 @@ class MainActivity : AppCompatActivity() {
                     if (call.videoEnabled) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
+                        videoView.surfaceView.visibility = View.VISIBLE
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
+                        videoView.surfaceView.visibility = View.INVISIBLE
                         videoButton.visibility = View.VISIBLE
                     }
                     if (ua.account.mediaEnc == "") {
