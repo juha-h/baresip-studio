@@ -74,7 +74,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     fun setVideo(enabled: Boolean): Int {
         val res = call_set_video(callp, enabled)
-        if (res != 0)
+        if (res == 0)
             videoEnabled = enabled
         return res
     }

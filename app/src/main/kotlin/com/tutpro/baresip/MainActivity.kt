@@ -429,9 +429,9 @@ class MainActivity : AppCompatActivity() {
                 callUri.inputType = InputType.TYPE_CLASS_PHONE
                 dialpadButton.setImageResource(R.drawable.dialpad_on)
                 dialpadButton.tag = "on"
-                Log.d("Baresip", "Screen ${Utils.getScreenOrientation(applicationContext)}")
-                val path = BaresipService.downloadsPath + "/video.mp4"
-                Utils.ffmpegExecute("-video_size hd720 -f android_camera -camera_index 1 -i anything -r 10 -t 5 -y $path")
+                //Log.d("Baresip", "Screen ${Utils.getScreenOrientation(applicationContext)}")
+                //val path = BaresipService.downloadsPath + "/video.mp4"
+                //Utils.ffmpegExecute("-video_size hd720 -f android_camera -camera_index 1 -i anything -r 10 -t 5 -y $path")
             } else {
                 callUri.inputType = InputType.TYPE_CLASS_TEXT +
                         InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -441,21 +441,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         videoButton.setOnClickListener {
-            for (call in Call.calls())
-                if (call.status == "connected") {
-                    if (call.videoEnabled) {
-                        if (call.setVideo(false) == 0)
-                            call.videoEnabled = false
-                        else
-                            Log.e("Baresip", "Failed to set call video off")
-                    } else {
-                        if (call.setVideo(true) == 0)
-                            call.videoEnabled = true
-                        else
-                            Log.e("Baresip", "Failed to set call video on")
-                    }
-                    showCall(call.ua)
-                }
+            val call = Call.call("connected")
+            if (call != null) {
+                call.setVideo(true)
+                showCall(call.ua)
+            }
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -1462,7 +1452,6 @@ class MainActivity : AppCompatActivity() {
                     if (call.videoEnabled) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
-                        videoView.surfaceView.visibility = View.VISIBLE
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
