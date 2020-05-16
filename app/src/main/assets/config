@@ -49,6 +49,8 @@ module_app contact.so
 module_app debug_cmd.so
 module_app mwi.so
 evdev_device /dev/input/event0
+avcodec_h265enc null
+avcodec_h265dec null
 opus_bitrate 28000
 opus_samplerate 16000
 opus_cbr no
