@@ -117,7 +117,7 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        val videoCodecs = ArrayList(Api.video_codecs().split(","))
+        val videoCodecs = ArrayList(Api.video_codecs().split(",")).distinct()
         newVideoCodecs.addAll(acc.videoCodec)
         while (newVideoCodecs.size < videoCodecs.size) newVideoCodecs.add("-")
         val vcLayout = findViewById(R.id.VideoCodecSpinners) as LinearLayout
