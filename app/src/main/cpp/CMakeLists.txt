@@ -101,6 +101,7 @@ add_library(baresip SHARED baresip.c vidisp.c)
 
 target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include
+        ${distribution_DIR}/ffmpeg/include
         ${distribution_DIR}/re/include
         ${distribution_DIR}/rem/include
         ${distribution_DIR}/baresip/include)

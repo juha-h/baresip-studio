@@ -6,6 +6,7 @@
 #include <baresip.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <libavcodec/jni.h>
 #include "logger.h"
 #include "vidisp.h"
 
@@ -424,7 +425,7 @@ static int runLoggingThread() {
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
-    LOGD("at JNI_OnLoad\n");
+    LOGW("JNI_OnLoad on thread %li\n", (long)pthread_self());
 
     memset(&g_ctx, 0, sizeof(g_ctx));
 
@@ -432,6 +433,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     g_ctx.env = NULL;
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
+
+    if (av_jni_set_java_vm(g_ctx.javaVM, NULL) != 0)
+        LOGW("av_jni_set_java_vm failed!");
 
     return JNI_VERSION_1_6;
 }
@@ -1779,4 +1783,3 @@ Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring ja
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
-
