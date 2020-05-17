@@ -15,8 +15,8 @@ auenc_format s16
 auplay_format s16
 audec_format s16
 video_source avformat,android_camera,1
-video_size 640x480
-video_fps 15
+video_size 640x360
+video_fps 30
 videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
