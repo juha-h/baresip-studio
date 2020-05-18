@@ -535,10 +535,6 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
-                    "local_call offered" -> {
-                        proximitySensing(true)
-                        return
-                    }
                     "call progress", "call ringing" -> {
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
@@ -616,12 +612,16 @@ class BaresipService: Service() {
                             return
                         }
                     }
+                    "local call offered" -> {
+                        proximitySensing(true)
+                        return
+                    }
                     "local call answered" -> {
                         proximitySensing(true)
                         return
                     }
                     "remote call offered", "remote call answered" -> {
-                        newEvent = "call updated"
+                        newEvent = "call update"
                     }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)

@@ -306,7 +306,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
-            Api.ua_answer(ua.uap, call.callp, Api.VIDMODE_ON)
+            // call.disableVideoStream(true)
+            Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
 
         rejectButton.setOnClickListener {
@@ -441,8 +442,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         videoButton.setOnClickListener {
+            videoButton.isClickable = false
             Call.call("connected")?.setVideo(true)
-            // videoLayout is made visible at "call updated" event
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -487,8 +488,12 @@ class MainActivity : AppCompatActivity() {
         prm.bottomMargin = 15
         vb.layoutParams = prm
         vb.setOnClickListener {
-            Call.call("connected")?.setVideo(false)
-            // videoLayout is made invisible at "call updated" event
+            // Call.call("connected")?.setVideo(false)
+            val call = Call.call("connected")
+            if (call != null) {
+                call.disableVideoStream(true)
+                call.modify()
+            }
         }
         videoLayout.addView(vb)
 
@@ -772,8 +777,10 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        if (call.hasVideoStream())
-                            call.setVideo(false)
+                        // call.stopVideoSource()
+                        // Enable video stream to that video can be added during the call
+                        // call.disableVideoStream(false)
+                        call.videoEnabled = call.hasVideoStream()
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
@@ -781,7 +788,7 @@ class MainActivity : AppCompatActivity() {
                             showCall(ua)
                         }
                     }
-                    "call updated" -> {
+                    "call update" -> {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
@@ -790,15 +797,11 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (call.status != "connected")
                             return
-                        if (call.hasVideo()) {
-                            defaultLayout.visibility = View.INVISIBLE
-                            videoLayout.visibility = View.VISIBLE
-                            videoView.surfaceView.visibility = View.VISIBLE
-                        } else {
-                            videoLayout.visibility = View.INVISIBLE
-                            videoView.surfaceView.visibility = View.INVISIBLE
-                            defaultLayout.visibility = View.VISIBLE
-                        }
+                        call.videoEnabled = call.hasVideoStream()
+                        if (!call.hasVideoStream())
+                            call.stopVideoDisplay()
+                        if (call.hasVideo())
+                            call.disableVideoStream(false)
                         showCall(ua)
                     }
                     "call verify" -> {
@@ -1454,12 +1457,13 @@ class MainActivity : AppCompatActivity() {
                     if (call.videoEnabled) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
-                        videoView.surfaceView.visibility = View.VISIBLE
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
-                        videoView.surfaceView.visibility = View.INVISIBLE
-                        videoButton.visibility = View.VISIBLE
+                        if (call.hasVideo()) {
+                            videoButton.visibility = View.VISIBLE
+                            videoButton.isClickable = true
+                        }
                     }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
