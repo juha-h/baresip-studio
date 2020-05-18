@@ -306,7 +306,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
-            // call.disableVideoStream(true)
+            call.disableVideoStream(true)
             Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
 
@@ -777,10 +777,9 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        // call.stopVideoSource()
-                        // Enable video stream to that video can be added during the call
-                        // call.disableVideoStream(false)
-                        call.videoEnabled = call.hasVideoStream()
+                        call.stopVideoSource()
+                        // Enable video stream so that video can be added during the call
+                        call.disableVideoStream(false)
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
