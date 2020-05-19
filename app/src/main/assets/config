@@ -1,5 +1,5 @@
 auto_start yes
-log_level 0
+log_level 2
 poll_method epoll
 sip_trans_bsize 128
 call_local_timeout 120
@@ -21,7 +21,7 @@ videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
 jitter_buffer_delay 5-10
-rtp_stats yes
+rtp_stats no
 dyn_dns yes
 module opus.so
 module amr.so
