@@ -503,10 +503,10 @@ class MainActivity : AppCompatActivity() {
         cb.setBackgroundResource(0)
         prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         prm.marginStart = 15
-        prm.bottomMargin = 15
+        prm.topMargin = 15
         cb.layoutParams = prm
         cb.setOnClickListener {
             val call = Call.call("connected")
@@ -544,6 +544,22 @@ class MainActivity : AppCompatActivity() {
             startService(baresipService)
         }
         videoLayout.addView(sb)
+
+        // Hangup Button
+        val hb = ImageButton(this)
+        hb.setImageResource(R.drawable.hangup)
+        hb.setBackgroundResource(0)
+        prm  = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        prm.marginEnd = 15
+        prm.bottomMargin = 15
+        hb.layoutParams = prm
+        hb.setOnClickListener {
+            hangupButton.performClick()
+        }
+        videoLayout.addView(hb)
 
     }
 
