@@ -37,11 +37,13 @@ class ConfigActivity : AppCompatActivity() {
     private var oldAec = false
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
-    private var oldIceMode = ""
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
+    private var videoSize = ""
+    private var oldVideoSize = Config.variable("video_size")[0]
     private var save = false
     private var restart = false
+    private var reload = false
     private val audioModules = listOf("opus", "amr", "ilbc", "g722", "g7221", "g726", "g711")
     private var menu: Menu? = null
 
@@ -149,6 +151,25 @@ class ConfigActivity : AppCompatActivity() {
                 callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+
+        Log.d("Baresip", "Old video_size $oldVideoSize")
+        val videoSizeSpinner = findViewById(R.id.VideoSizeSpinner) as Spinner
+        val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720")
+        sizes.removeIf{it == oldVideoSize}
+        sizes.add(0, oldVideoSize)
+        Log.d("Baresip", "sizes = $sizes")
+        val videoSizeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
+                sizes)
+        videoSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        videoSizeSpinner.adapter = videoSizeAdapter
+        videoSizeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                videoSize = parent.selectedItem.toString()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                videoSize = oldVideoSize
             }
         }
 
@@ -355,6 +376,12 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
+                if (oldVideoSize != videoSize) {
+                    Config.replaceVariable("video_size", videoSize)
+                    save = true
+                    reload = true
+                }
+
                 var logLevelString = "2"
                 if (debug.isChecked) logLevelString = "0"
                 if (oldLogLevel != logLevelString) {
@@ -374,7 +401,12 @@ class ConfigActivity : AppCompatActivity() {
 
                 BaresipService.activities.remove("config")
                 val intent = Intent(this, MainActivity::class.java)
-                if (restart) intent.putExtra("restart", true)
+                if (restart)
+                    intent.putExtra("restart", true)
+                else
+                    if (reload)
+                        if (Api.reload_config() != 0)
+                            Log.e("Baresip", "Reload of config failed")
                 setResult(RESULT_OK, intent)
                 finish()
 

@@ -68,6 +68,9 @@ object Config {
             BaresipService.callVolume = variable("call_volume")[0].toInt()
         }
 
+        if (!config.contains("video_size"))
+            config = "${config}video_size 640x360\n"
+
         if (!config.contains("dyn_dns")) {
             config = "${config}dyn_dns no\n"
         } else {
