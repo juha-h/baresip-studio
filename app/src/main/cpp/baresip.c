@@ -879,6 +879,18 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1video_1codecs(JNIEnv *env, jobje
 }
 
 JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1set_1video_1codecs(JNIEnv *env, jobject thiz,
+                                                              jstring jAcc, jstring jCodecs) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
+    int res = account_set_video_codecs(acc, codecs);
+    (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
+    return res;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_AccountKt_account_1regint(JNIEnv *env, jobject thiz, jstring javaAcc) {
     const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);

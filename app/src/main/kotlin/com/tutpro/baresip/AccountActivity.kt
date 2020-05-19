@@ -37,8 +37,6 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var vmUri: EditText
     internal lateinit var defaultCheck: CheckBox
 
-    private var newAudioCodecs = ArrayList<String>()
-    private var newVideoCodecs = ArrayList<String>()
     private var save = false
     private var uaIndex= -1
 
@@ -83,39 +81,6 @@ class AccountActivity : AppCompatActivity() {
 
         regCheck = findViewById(R.id.Register) as CheckBox
         regCheck.isChecked = acc.regint > 0
-
-        val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-        newAudioCodecs.addAll(acc.audioCodec)
-        while (newAudioCodecs.size < audioCodecs.size) newAudioCodecs.add("-")
-        val acLayout = findViewById(R.id.AudioCodecSpinners) as LinearLayout
-        val acSpinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
-        for (i in audioCodecs.indices) {
-            val spinner = Spinner(applicationContext)
-            spinner.id = i + 100
-            spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            acLayout.addView(spinner)
-            if (acc.audioCodec.size > i) {
-                val codec = acc.audioCodec[i]
-                acSpinnerList[i].add(codec)
-                acSpinnerList[i].add("-")
-                for (c in audioCodecs) if (c != codec) acSpinnerList[i].add(c)
-            } else {
-                acSpinnerList[i].addAll(audioCodecs)
-                acSpinnerList[i].add(0, "-")
-            }
-            val codecSpinner = findViewById(spinner.id) as Spinner
-            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                acSpinnerList[i])
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            codecSpinner.adapter = adapter
-            codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newAudioCodecs.set(parent.id - 100, parent.selectedItem.toString())
-                }
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                }
-            }
-        }
 
         val videoCodecs = ArrayList(Api.video_codecs().split(",")).distinct()
         newVideoCodecs.addAll(acc.videoCodec)
@@ -413,19 +378,6 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                val ac = ArrayList(LinkedHashSet<String>
-                (newAudioCodecs.filter { it != "-" } as ArrayList<String>))
-                if (ac != acc.audioCodec) {
-                    val acList = Utils.implode(ac, ",")
-                    if (account_set_audio_codecs(acc.accp, acList) == 0) {
-                        Log.d("Baresip", "New audio codecs '$acList'")
-                        acc.audioCodec = ac
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of audio codecs '$acList' failed")
-                    }
-                }
-
                 val vc = ArrayList(LinkedHashSet<String>
                 (newVideoCodecs.filter { it != "-" } as ArrayList<String>))
                 if (vc != acc.videoCodec) {
@@ -554,8 +506,12 @@ class AccountActivity : AppCompatActivity() {
                         getString(R.string.register_help))
             }
             findViewById(R.id.AudioCodecsTitle) as TextView -> {
-                Utils.alertView(this, getString(R.string.audio_codecs),
-                        getString(R.string.audio_codecs_help))
+                val i = Intent(this, CodecsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", aor)
+                b.putString("media", "audio")
+                i.putExtras(b)
+                startActivity(i)
             }
             findViewById(R.id.VideoCodecsTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.video_codecs),

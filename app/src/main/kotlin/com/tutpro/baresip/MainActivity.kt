@@ -1543,6 +1543,14 @@ class MainActivity : AppCompatActivity() {
                 i.putExtras(b)
                 startActivityForResult(i, ACCOUNT_CODE)
             }
+            "codecs" -> {
+                val i = Intent(this, CodecsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                b.putString("media", activity[2])
+                i.putExtras(b)
+                startActivity(i)
+            }
             "about" -> {
                 val i = Intent(this, AboutActivity::class.java)
                 startActivityForResult(i, ABOUT_CODE)
@@ -1635,7 +1643,6 @@ class MainActivity : AppCompatActivity() {
         const val RESTORE_PERMISSION_REQUEST_CODE = 2
         const val RECORD_PERMISSION_REQUEST_CODE = 3
         const val CAMERA_PERMISSION_REQUEST_CODE = 4
-        const val RESTART_REQUEST_CODE = 5
 
     }
 
