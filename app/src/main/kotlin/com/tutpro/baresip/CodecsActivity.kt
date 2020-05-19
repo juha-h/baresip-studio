@@ -35,18 +35,21 @@ class CodecsActivity : AppCompatActivity() {
         acc = ua.account
 
         val codecs: ArrayList<String>
+        val accCodecs: ArrayList<String>
 
         val title = findViewById(R.id.CodecsTitle) as TextView
 
         if (media == "audio") {
             title.text = getString(R.string.audio_codecs)
             codecs = ArrayList(Api.audio_codecs().split(","))
-            newCodecs.addAll(acc.audioCodec)
+            accCodecs = acc.audioCodec
         } else {
             title.text = getString(R.string.video_codecs)
-            codecs = ArrayList(Api.video_codecs().split(","))
-            newCodecs.addAll(acc.videoCodec)
+            codecs = ArrayList(Api.video_codecs().split(",").distinct())
+            accCodecs = acc.videoCodec
         }
+
+        newCodecs.addAll(accCodecs)
 
         while (newCodecs.size < codecs.size) newCodecs.add("-")
 
@@ -59,8 +62,8 @@ class CodecsActivity : AppCompatActivity() {
                     LayoutParams.WRAP_CONTENT)
             spinner.layoutParams.height = 75
             layout.addView(spinner)
-            if (acc.audioCodec.size > i) {
-                val codec = acc.audioCodec[i]
+            if (accCodecs.size > i) {
+                val codec = accCodecs[i]
                 spinnerList[i].add(codec)
                 spinnerList[i].add("-")
                 for (c in codecs) if (c != codec) spinnerList[i].add(c)
@@ -121,7 +124,7 @@ class CodecsActivity : AppCompatActivity() {
                     if (mc != acc.videoCodec) {
                         if (account_set_video_codecs(acc.accp, mcList) == 0) {
                             Log.d("Baresip", "New video codecs '$mcList'")
-                            acc.audioCodec = mc
+                            acc.videoCodec = mc
                             save = true
                         } else {
                             Log.e("Baresip", "Setting of video codecs '$mcList' failed")

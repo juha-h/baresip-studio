@@ -82,39 +82,6 @@ class AccountActivity : AppCompatActivity() {
         regCheck = findViewById(R.id.Register) as CheckBox
         regCheck.isChecked = acc.regint > 0
 
-        val videoCodecs = ArrayList(Api.video_codecs().split(",")).distinct()
-        newVideoCodecs.addAll(acc.videoCodec)
-        while (newVideoCodecs.size < videoCodecs.size) newVideoCodecs.add("-")
-        val vcLayout = findViewById(R.id.VideoCodecSpinners) as LinearLayout
-        val vcSpinnerList = Array(videoCodecs.size, {_ -> ArrayList<String>()})
-        for (i in videoCodecs.indices) {
-            val spinner = Spinner(applicationContext)
-            spinner.id = i + 200
-            spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            vcLayout.addView(spinner)
-            if (acc.videoCodec.size > i) {
-                val codec = acc.videoCodec[i]
-                vcSpinnerList[i].add(codec)
-                vcSpinnerList[i].add("-")
-                for (c in videoCodecs) if (c != codec) vcSpinnerList[i].add(c)
-            } else {
-                vcSpinnerList[i].addAll(videoCodecs)
-                vcSpinnerList[i].add(0, "-")
-            }
-            val codecSpinner = findViewById(spinner.id) as Spinner
-            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                    vcSpinnerList[i])
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            codecSpinner.adapter = adapter
-            codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newVideoCodecs.set(parent.id - 200, parent.selectedItem.toString())
-                }
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                }
-            }
-        }
-
         mediaNat = acc.mediaNat
         val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
         val mediaNatKeys = arrayListOf("stun", "ice", "")
@@ -378,19 +345,6 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                val vc = ArrayList(LinkedHashSet<String>
-                (newVideoCodecs.filter { it != "-" } as ArrayList<String>))
-                if (vc != acc.videoCodec) {
-                    val vcList = Utils.implode(vc, ",")
-                    if (account_set_video_codecs(acc.accp, vcList) == 0) {
-                        Log.d("Baresip", "New video codecs '$vcList'")
-                        acc.videoCodec = vc
-                        save = true
-                    } else {
-                        Log.e("Baresip", "Setting of video codecs '$vcList' failed")
-                    }
-                }
-
                 if (mediaEnc != acc.mediaEnc) {
                     if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
                         acc.mediaEnc = account_mediaenc(acc.accp)
@@ -510,6 +464,14 @@ class AccountActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", aor)
                 b.putString("media", "audio")
+                i.putExtras(b)
+                startActivity(i)
+            }
+            findViewById(R.id.VideoCodecsTitle) as TextView -> {
+                val i = Intent(this, CodecsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", aor)
+                b.putString("media", "video")
                 i.putExtras(b)
                 startActivity(i)
             }
