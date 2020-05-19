@@ -15,6 +15,7 @@ class Account(val accp: String) {
     var mediaNat = account_medianat(accp)
     var stunServer = ""
     var audioCodec = ArrayList<String>()
+    var videoCodec = ArrayList<String>()
     var regint = account_regint(accp)
     var mediaEnc = account_mediaenc(accp)
     var preferIPv6Media = false
@@ -247,6 +248,7 @@ external fun account_set_mediaenc(acc: String, mediaenc: String): Int
 external fun account_medianat(acc: String): String
 external fun account_set_medianat(acc: String, medianat: String): Int
 external fun account_set_audio_codecs(acc: String, codecs: String): Int
+external fun account_set_video_codecs(acc: String, codecs: String): Int
 external fun account_set_mwi(acc: String, value: String): Int
 external fun account_vm_uri(acc: String): String
 external fun account_extra(acc: String): String

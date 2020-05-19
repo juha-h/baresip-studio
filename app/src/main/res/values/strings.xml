@@ -71,6 +71,8 @@
     </string>
     <string name="audio_codecs">Audio Codecs</string>
     <string name="audio_codecs_help">List of supported audio codecs in priority order.</string>
+    <string name="video_codecs">Video Codecs</string>
+    <string name="video_codecs_help">List of supported video codecs in priority order.</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity

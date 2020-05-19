@@ -146,25 +146,19 @@
             android:id="@+id/AudioCodecsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/audio_codecs" >
         </TextView>
 
-        <LinearLayout
-            android:id="@+id/CodecSpinners"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:orientation="vertical" >
-        </LinearLayout>
-
         <TextView
             android:id="@+id/MediaNatTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="16dp"
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"

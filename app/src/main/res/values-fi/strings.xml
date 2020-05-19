@@ -75,7 +75,10 @@
     </string>
     <string name="audio_codecs">Äänen koodausmenetelmät</string>
     <string name="audio_codecs_help">Luettelo käytössä olevista äänen
-        koodausmenetelmistä prioriteettijärjestyksessä.</string>
+        koodausmenetelmistä prioriteettijärjestyksessä</string>
+    <string name="video_codecs">Videon koodausmenetelmät</string>
+    <string name="video_codecs_help">Luettelo käytössä olevista videon
+        koodausmenetelmistä prioriteettijärjestyksessä</string>
     <string name="media_nat">Media NAT hallinta</string>
     <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
