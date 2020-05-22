@@ -1,12 +1,12 @@
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <jni.h>
 #include <stdlib.h>
 #include <re.h>
 #include <baresip.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
-#include <libavcodec/jni.h>
 #include "logger.h"
 #include "vidisp.h"
 
@@ -386,8 +386,6 @@ static void mqueue_handler(int id, void *data, void *arg)
     }
 }
 
-#include <unistd.h>
-
 static int pfd[2];
 static pthread_t loggingThread;
 
@@ -433,9 +431,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     g_ctx.env = NULL;
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
-
-    if (av_jni_set_java_vm(g_ctx.javaVM, NULL) != 0)
-        LOGW("av_jni_set_java_vm failed!");
 
     return JNI_VERSION_1_6;
 }
