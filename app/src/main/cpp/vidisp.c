@@ -414,27 +414,27 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_on_1start(JNIEnv *env, jclass thiz) {
+Java_com_tutpro_baresip_plus_VideoView_on_1start(JNIEnv *env, jclass thiz) {
     LOGI("VideoView on_start");
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_on_1resume(JNIEnv *env, jclass thiz) {
+Java_com_tutpro_baresip_plus_VideoView_on_1resume(JNIEnv *env, jclass thiz) {
     LOGI("VideoView on_resume");
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_on_1pause(JNIEnv *env, jclass thiz) {
+Java_com_tutpro_baresip_plus_VideoView_on_1pause(JNIEnv *env, jclass thiz) {
     LOGI("VideoView on_pause");
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_on_1stop(JNIEnv *env, jclass thiz) {
+Java_com_tutpro_baresip_plus_VideoView_on_1stop(JNIEnv *env, jclass thiz) {
     LOGI("VideoView on_stop");
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_VideoView_set_1surface(JNIEnv *env, jclass thiz, jobject surface) {
+Java_com_tutpro_baresip_plus_VideoView_set_1surface(JNIEnv *env, jclass thiz, jobject surface) {
 
     int w, h;
 
