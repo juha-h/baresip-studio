@@ -20,8 +20,6 @@ import android.view.*
 import java.io.File
 import kotlin.collections.ArrayList
 
-import com.tutpro.baresip.Account.Companion.checkAuthPass
-
 class MainActivity : AppCompatActivity() {
 
     internal lateinit var layout: RelativeLayout
@@ -1041,7 +1039,7 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
             var password = input.text.toString().trim()
-            if (!checkAuthPass(password)) {
+            if (!Account.checkAuthPass(password)) {
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_authentication_password), password))
                 password = ""
@@ -1085,7 +1083,7 @@ class MainActivity : AppCompatActivity() {
                 builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     val password = input.text.toString().trim()
-                    if (!checkAuthPass(password)) {
+                    if (!Account.checkAuthPass(password)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_password),  password))
                     } else {

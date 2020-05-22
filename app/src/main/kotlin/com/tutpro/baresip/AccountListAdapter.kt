@@ -12,8 +12,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.TextView
 
-import com.tutpro.baresip.MainActivity.Companion.ACCOUNT_CODE
-
 import java.util.*
 
 class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<AccountRow>) :
@@ -32,7 +30,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
             val b = Bundle()
             b.putString("aor", UserAgent.uas()[position].account.aor)
             i.putExtras(b)
-            (cxt as Activity).startActivityForResult(i, ACCOUNT_CODE)
+            (cxt as Activity).startActivityForResult(i, MainActivity.ACCOUNT_CODE)
         }
         val ua = UserAgent.uas()[position]
         val actionView = rowView.findViewById(R.id.action) as ImageButton
