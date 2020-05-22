@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">baresip</string>
+    <string name="app_name" translatable="false">baresip+</string>
     <!-- About Activity -->
-    <string name="about_title">About baresip</string>
+    <string name="about_title">About @string/app_name</string>
     <string name="about_text">
         <![CDATA[
-        <h1>Baresip library based SIP User Agent</h1>
+        <h1>Baresip library based SIP User Agent with video calls</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
@@ -24,8 +24,13 @@
         </ul>
         <h2>Known Issues</h2>
         <ul>
-            <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
+            <li>Due to limitations in underlying libraries,
+            @string/app_name does not currently support multiple,
             concurrently active network interfaces.</li>
+            <li>In video calls, the device needs to be held in landscape
+            mode rotated 90 degrees left from portrait orientation.</li>
+            <li>Other party of the call can currently add video stream
+            to the call without confirmation from the user.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
