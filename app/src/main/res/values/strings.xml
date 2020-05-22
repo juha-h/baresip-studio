@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name" translatable="false">baresip+</string>
     <!-- About Activity -->
-    <string name="about_title">About @string/app_name</string>
+    <string name="about_title">About baresip+</string>
     <string name="about_text">
         <![CDATA[
         <h1>Baresip library based SIP User Agent with video calls</h1>

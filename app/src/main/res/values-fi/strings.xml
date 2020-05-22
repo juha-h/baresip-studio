@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- About Activity -->
-    <string name="about_title">@string/app_name sovelluksesta</string>
+    <string name="about_title">baresip+ sovelluksesta</string>
     <string name="about_text">
         <![CDATA[
         <h1>Baresip-kirjastoon perustuva, videopuhelut mahdollistava
@@ -28,8 +28,8 @@
             samanaikaisesti aktiivisia verkkoliittymiä.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
-            <li>Toinen osapuoli voi tällä hetkellä lisätä
-            pheluun videomedian ilman käyttäjän suostumusta.</li>
+            <li>Puhelun toinen osapuoli voi tällä hetkellä lisätä
+            puheluun videomedian ilman käyttäjän suostumusta.</li>
         </ul>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
