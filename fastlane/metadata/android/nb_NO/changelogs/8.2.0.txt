@@ -1,3 +1,0 @@
-- Forbedret innhold og utseende for "Om"-siden.
-- Alltid vis aktivt anrop (hvis noe), når programmet startes på ny.
-- Endret plassering for varselsdialog for OK-knapp.

@@ -1,2 +1,0 @@
-- Tillagt avlusingsoppsettsvalg for å skru adb-logcat-avlusing av og på.
-- Tillagt mulighet for å eksportere og importere kontoer til/fra fil i nedlastingsmappe.

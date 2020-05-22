@@ -1,2 +1,0 @@
-- Added Internet Low Bitrate Codec (iLBC).
-- Improved account's codec selection.

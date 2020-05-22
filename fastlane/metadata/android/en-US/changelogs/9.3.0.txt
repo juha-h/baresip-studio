@@ -1,2 +1,0 @@
-- Added Answer Mode (Manual or Automatic) account configuration option.
-- Added Norwegian Bokmål strings and changelogs from Weblate.

@@ -1,3 +1,0 @@
-- Fixed critical bug in checking of record audio permission that
-prevented new baresip installation from starting.
-- Small improvements.

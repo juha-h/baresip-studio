@@ -1,5 +1,0 @@
-- Don't set audio to communication mode when call is established,
-because on some devices it adds 3-4 sec delay to playing of audio.
-- Made Acoustic Echo Cancellation configurable.
-- Enable call info button when it becomes visible.
-- Use default device theme when displaying spinners.

@@ -1,1 +1,0 @@
-- Omkrans kontakt-URI-er i < og > når kontakter lagres til fil.

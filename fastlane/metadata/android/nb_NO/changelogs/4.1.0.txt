@@ -1,3 +1,0 @@
-- All urelatert data fra brukergrensesnitt beholdes nå i baresip-tjeneste,
-noe som tillater riktig gjenoppretting i fall Android dreper andre baresp-aktiviteter.
-- Mange andre forbedringer og feilrettinger.

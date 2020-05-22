@@ -1,7 +1,0 @@
-- Authentication username now defaults to account's username.
-- Ask authentication password at baresip start if authentication
-  username is given, but password is not.
-- Initialize account's status dot to yellow, when Register is checked
-  in account activity.
-- Fixed bug related to creation of first account on older Android versions.
-- Minor string improvements.

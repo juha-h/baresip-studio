@@ -1,1 +1,0 @@
-- Tillagt støtte for SIP-registeringstjenester som ikke håndterer gjenbruk av engangsord rett.

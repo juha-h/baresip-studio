@@ -1,3 +1,0 @@
-- Fixed crash when returning to the previous activity after received
-  call or message.
-- Better handling of proximity sensor and speaker phone.

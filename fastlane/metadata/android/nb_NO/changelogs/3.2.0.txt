@@ -1,2 +1,0 @@
-- Tillagt nummerskiveknapp for valg mellom telefonnummer og tekst for skjermtastatur.
-- Fikset autofullføring av ringer basert på kontakter.

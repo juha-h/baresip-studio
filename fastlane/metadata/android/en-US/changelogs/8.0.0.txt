@@ -1,3 +1,0 @@
-- Added support for G.722.1 audio codec.
-- Added support for WebRTC based audio echo cancellation (excludes Opus codec).
-- Minor call notification changes.

@@ -1,2 +1,0 @@
-- Forbedring av ekko-kansellering oppstrøms.
-- Nye oversettelser: el, nb_NO, ro.

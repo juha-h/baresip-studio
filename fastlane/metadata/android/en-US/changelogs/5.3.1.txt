@@ -1,2 +1,0 @@
-- Relaxed checking of userpart in account's SIP URI.
-- Added support for ARMv8-A architecture.

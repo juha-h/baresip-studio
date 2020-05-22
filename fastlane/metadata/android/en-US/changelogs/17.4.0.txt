@@ -1,3 +1,0 @@
-- Added support for Android 10 (API level 29).
-- Improved asking of microphone permission when baresip is started the first time.
-- Avoid crash if call button is touched without accounts.

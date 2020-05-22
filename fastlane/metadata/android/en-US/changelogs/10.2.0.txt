@@ -1,2 +1,0 @@
-- Added support for G.726 codec.
-- Improved default codec priority order.

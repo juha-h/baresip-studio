@@ -1,3 +1,0 @@
-- Resume baresip app to the activity that was stopped.
-- Add example contact when baresip is started the first time.
-- Fixed showing of new message in the chats and messages list.

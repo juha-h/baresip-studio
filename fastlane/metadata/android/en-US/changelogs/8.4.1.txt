@@ -1,2 +1,0 @@
-- Upstream acoustic echo cancellation improvement.
-- New translations: el, nb_NO, ro.

@@ -1,2 +1,0 @@
-- Get DNS servers dynamically also when baresip is started the very first time.
-- Avoid possible crash when getting account's audio codecs.

@@ -1,2 +1,0 @@
-- Allow changing of contact name also when only case of letters differ.
-- When restoring contacts, do not require that URIs are surrounded by angle brackets.

@@ -1,1 +1,0 @@
-- Første implementasjon av lyd gjennom Blåtannshodesett.

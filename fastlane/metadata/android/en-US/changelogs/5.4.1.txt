@@ -1,3 +1,0 @@
-- Removed unused baresip modules from config and libraries.
-- The baresip service now lets baresip activity die on its own after
-receiving kill intent from it.

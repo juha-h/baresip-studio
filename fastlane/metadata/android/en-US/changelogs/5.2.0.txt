@@ -1,4 +1,0 @@
-- Notify user about registration failure.
-- Added call info button for an active call.
-- Do not require "sip:" scheme in Outbound Proxy URI.
-- Allow domain label to start with a digit.

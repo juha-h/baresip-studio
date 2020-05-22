@@ -1,2 +1,0 @@
-- Added possibility to give transport protocol for account's AoR.
-- Do not show account's port or transport protocol except in Account Activity.

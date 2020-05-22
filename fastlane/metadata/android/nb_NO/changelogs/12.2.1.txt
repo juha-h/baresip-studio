@@ -1,1 +1,0 @@
-- Forbedret og fikset håndtering av dynamiske nettverksendringer.

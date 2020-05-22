@@ -1,2 +1,0 @@
-- Go to chat window when message notification is clicked.
-- Fixed bug in call transfer.

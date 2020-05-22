@@ -1,2 +1,0 @@
-- Tillagt støtte for merknadsoppsprett som forteller hvorfor en samtale ble lukket.
-- Fikset visning av ringer-URI hvis det inneholder portnummer eller parameter.

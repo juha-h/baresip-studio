@@ -1,5 +1,12 @@
 This is a bare-bones <a href="https://github.com/alfredh/baresip">baresip</a> based SIP User Agent application for Android.
 
-Currently the application supports voice calling and messaging, UDP, TCP, and TLS signaling transports, voicemail Message Waiting Indication, incoming call transfers (REFER), PCMU/PCMA, iLBC, G.726, G.722, G.722.1, AMR, and Opus voice codecs, as well as ZRTP and (DTLS) SRTP media encapsulation.
+Currently the application supports voice/video calling and messaging, UDP, TCP, and TLS signaling transports, voicemail Message Waiting Indication, incoming call transfers (REFER), PCMU/PCMA, iLBC, G.726, G.722, G.722.1, AMR, and Opus voice codecs, VP9, VP8, and H264 video codecs as well as ZRTP and (DTLS) SRTP media encapsulation.
 
 Motivated by need for a secure SIP user agent for Android that does not depend on third party push notification services.
+
+The application can be installed on Android devices running Android version 7.0 or later.  Video calling requires that Android device supports Camera 2 API at hardware Support Level 3 or FULL.
+
+
+
+
+

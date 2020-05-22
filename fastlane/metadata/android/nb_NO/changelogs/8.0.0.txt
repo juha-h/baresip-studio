@@ -1,3 +1,0 @@
-- Støtte for G.722.1-lydkodek lagt til.
-- Støtte for WebRTC-basert lydekkokansellering (ikke for Opus-kodek).
-- Mindre samtalemerknadsinnstillinger.

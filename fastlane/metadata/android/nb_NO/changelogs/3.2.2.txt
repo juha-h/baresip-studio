@@ -1,5 +1,0 @@
-- Håntering av anropsvideresending som mislykkes lagt til.
-- Unngått kræsj ved (om)start av enhet.
-- Unngått kræsj ved første gangs navigasjon fra kontoer til hovedaktivitet.
-- Brukt "textEmailAddress"-inndatatype for konto-URI-er.
-- Endret vektlegging av forvalgt merknadskanal til "lav".

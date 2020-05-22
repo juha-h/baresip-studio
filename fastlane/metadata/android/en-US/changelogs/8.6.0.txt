@@ -1,1 +1,0 @@
-- Added support for SIP registrars that do not correctly handle nonce reuse.

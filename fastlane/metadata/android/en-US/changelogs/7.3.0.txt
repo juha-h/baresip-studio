@@ -1,2 +1,0 @@
-- Account media NAT protocol can now be chosen between STUN, ICE, or none.
-- Set account status to yellow immediately when account's registration is off.

@@ -1,4 +1,0 @@
-- Tillagt mulighet for eksport/import av kontakter til/fra "Nedlastinger"-mappe.
-Hvis du ønsker å bruke denne funksjonen, innvilg baresip lagringstilgang
-i Innstillinger → Apper → baresip → Tilganger.
-- Fikset treg avslutning av baresip når nettverkstilkobling mangler.

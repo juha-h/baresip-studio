@@ -1,2 +1,0 @@
-- Improved implementation of contacts, messages, and call history.
-- Avoided crash when messages arrive before accounts have been added.

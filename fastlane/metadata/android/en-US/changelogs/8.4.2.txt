@@ -1,2 +1,0 @@
-- Update DNS servers and register UAs always when network becomes available.
-- Fixed and updated some texts.

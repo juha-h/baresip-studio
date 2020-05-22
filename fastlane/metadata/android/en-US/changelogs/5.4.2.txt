@@ -1,2 +1,0 @@
-- Fixed rare crash that can happen when first account is created and
-message or call comes in before user has returned to main activity.

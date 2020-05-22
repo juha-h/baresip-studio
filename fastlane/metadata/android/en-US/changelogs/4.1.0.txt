@@ -1,3 +1,0 @@
-- All user interface unrelated data is now kept in baresip service.
-allowing proper recovery in case Android kills other baresip activities.
-- Many other improvements and bugfixes.

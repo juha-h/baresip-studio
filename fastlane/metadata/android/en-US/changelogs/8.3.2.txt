@@ -1,5 +1,0 @@
-- If account is accessed from AoR spinner, return directly to Main
-Activity.
-- Use HtmlCompat to convert About HTML to text (should work on all
-Android API levels).
-- Use Ringtone looping capability on Android P+.

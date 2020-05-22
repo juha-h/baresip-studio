@@ -1,4 +1,0 @@
-- Added possibility to export/import contacts to/from the "Download" folder.
-If you want to use this feature, grant baresip storage permission
-in Settings → Apps → baresip → Permissions.
-- Fixed slow quitting of baresip when there is no network connectivity.

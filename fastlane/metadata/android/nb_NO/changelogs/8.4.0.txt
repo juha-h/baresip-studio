@@ -1,1 +1,0 @@
-- Ekkokansellering virker nå for samtaler som bruker Opus-kodeket.

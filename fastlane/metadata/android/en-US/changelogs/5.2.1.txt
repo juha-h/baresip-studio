@@ -1,2 +1,0 @@
-- Relaxed checking of Display Name and Authentication Username
-- Added version name to About page
