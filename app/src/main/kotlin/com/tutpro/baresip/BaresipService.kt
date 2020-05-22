@@ -1,4 +1,4 @@
-package com.tutpro.baresip
+package com.tutpro.baresip.plus
 
 import android.Manifest
 import android.annotation.TargetApi
@@ -56,8 +56,8 @@ class BaresipService: Service() {
 
         Log.d(LOG_TAG, "At onCreate")
 
-        intent = Intent("com.tutpro.baresip.EVENT")
-        intent.setPackage("com.tutpro.baresip")
+        intent = Intent("com.tutpro.baresip.plus.EVENT")
+        intent.setPackage("com.tutpro.baresip.plus")
 
         filesPath = filesDir.absolutePath
         downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
@@ -161,11 +161,11 @@ class BaresipService: Service() {
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         partialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "com.tutpro.baresip:partial_wakelog")
+                "com.tutpro.baresip.plus:partial_wakelog")
         partialWakeLock.acquire()
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                "com.tutpro.baresip:proximity_wakelog")
+                "com.tutpro.baresip.plus:proximity_wakelog")
 
         br = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
@@ -439,7 +439,7 @@ class BaresipService: Service() {
         if (am.isBluetoothScoOn) am.stopBluetoothSco()
         cleanService()
         if (isServiceRunning) {
-            val broadcastIntent = Intent("com.tutpro.baresip.Restart")
+            val broadcastIntent = Intent("com.tutpro.baresip.plus.Restart")
             sendBroadcast(broadcastIntent)
         }
     }
@@ -1099,8 +1099,8 @@ class BaresipService: Service() {
         val SAVE_REQ_CODE = 10
         val DELETE_REQ_CODE = 11
 
-        val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
-        val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
+        val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.plus.default"
+        val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
         var isServiceRunning = false
         var libraryLoaded = false
