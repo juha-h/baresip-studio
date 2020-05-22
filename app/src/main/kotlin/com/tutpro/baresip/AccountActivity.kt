@@ -7,15 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.LinearLayout.LayoutParams
 import android.widget.*
 
 import kotlinx.android.synthetic.main.activity_account.*
-
-import com.tutpro.baresip.Account.Companion.checkAuthPass
-import com.tutpro.baresip.Account.Companion.checkAuthUser
-import com.tutpro.baresip.Account.Companion.checkDisplayName
-import com.tutpro.baresip.MainActivity.Companion.aorPasswords
 
 class AccountActivity : AppCompatActivity() {
 
@@ -66,7 +60,7 @@ class AccountActivity : AppCompatActivity() {
         authUser.setText(acc.authUser)
 
         authPass = findViewById(R.id.AuthPass) as EditText
-        if (aorPasswords.containsKey(aor))
+        if (MainActivity.aorPasswords.containsKey(aor))
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
@@ -183,7 +177,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.checkIcon -> {
                 val dn = displayName.text.toString().trim()
                 if (dn != acc.displayName) {
-                    if (checkDisplayName(dn)) {
+                    if (Account.checkDisplayName(dn)) {
                         if (account_set_display_name(acc.accp, dn) == 0) {
                             acc.displayName = account_display_name(acc.accp);
                             Log.d("Baresip", "New display name is ${acc.displayName}")
@@ -202,7 +196,7 @@ class AccountActivity : AppCompatActivity() {
                 val ap = authPass.text.toString().trim()
 
                 if (au != acc.authUser) {
-                    if (checkAuthUser(au)) {
+                    if (Account.checkAuthUser(au)) {
                         if (account_set_auth_user(acc.accp, au) == 0) {
                             acc.authUser = account_auth_user(acc.accp);
                             Log.d("Baresip", "New auth user is ${acc.authUser}")
@@ -219,30 +213,30 @@ class AccountActivity : AppCompatActivity() {
 
                 if (ap != "") {
                     if (ap != acc.authPass) {
-                        if (checkAuthPass(ap)) {
+                        if (Account.checkAuthPass(ap)) {
                             setAuthPass(acc, ap)
-                            aorPasswords.remove(aor)
+                            MainActivity.aorPasswords.remove(aor)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_authentication_password), ap))
                             return false
                         }
                     } else {
-                        if (aorPasswords.containsKey(aor)) {
-                            aorPasswords.remove(aor)
+                        if (MainActivity.aorPasswords.containsKey(aor)) {
+                            MainActivity.aorPasswords.remove(aor)
                             save = true
                         }
                     }
                 } else { // ap == ""
                     if (acc.authUser != "") {
-                        if (!aorPasswords.containsKey(aor)) {
+                        if (!MainActivity.aorPasswords.containsKey(aor)) {
                             setAuthPass(acc, "")
-                            aorPasswords.put(aor, "")
+                            MainActivity.aorPasswords.put(aor, "")
                         }
                     } else {
                         if (acc.authPass != "") {
                             setAuthPass(acc, "")
-                            aorPasswords.remove(aor)
+                            MainActivity.aorPasswords.remove(aor)
                         }
                     }
                 }
@@ -521,7 +515,7 @@ class AccountActivity : AppCompatActivity() {
     private fun setAuthPass(acc: Account, ap: String) {
         if (account_set_auth_pass(acc.accp, ap) == 0) {
             acc.authPass = account_auth_pass(acc.accp)
-            aorPasswords.remove(acc.aor)
+            MainActivity.aorPasswords.remove(acc.aor)
             save = true
         } else {
             Log.e("Baresip", "Setting of auth pass failed")

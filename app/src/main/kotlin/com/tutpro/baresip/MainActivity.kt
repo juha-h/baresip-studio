@@ -22,7 +22,6 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.tutpro.baresip.Account.Companion.checkAuthPass
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -1189,7 +1188,7 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
             var password = input.text.toString().trim()
-            if (!checkAuthPass(password)) {
+            if (!Account.checkAuthPass(password)) {
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_authentication_password), password))
                 password = ""
@@ -1233,7 +1232,7 @@ class MainActivity : AppCompatActivity() {
                 builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     val password = input.text.toString().trim()
-                    if (!checkAuthPass(password)) {
+                    if (!Account.checkAuthPass(password)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_authentication_password),  password))
                     } else {
