@@ -4,9 +4,11 @@ Currently the application supports voice calling and messaging, UDP, TCP, and TL
 
 Motivated by need for a secure SIP user agent for Android that does not depend on third party push notification services.
 
+If you need video calling and have a device with Android version 7.0 or newer that supports Camera2 API at level FULL or LEVEL3, you can instead of this application install its sister application baresip+ from video branch.
+
 After cloning the project, generate static libraries and include files to distribution directory using master branch of https://github.com/juha-h/libbaresip-android.
 
-Then in Android Studio 3.6.2:
+Then in Android Studio 3.6.3:
 
 - Open an existing Android Studio project
 
