@@ -24,8 +24,8 @@
         tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
         <h2>Tunnetut ongelmat</h2>
         <ul>
-            <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
-            samanaikaisesti aktiivisia verkkoliittymiä.</li>
+            <li>Johtuen alla olevien kirjastojen rajoituksista useita,
+            samanaikaisesti aktiivisia verkkoliittymiä ei voi käyttää.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
             <li>Puhelun toinen osapuoli voi tällä hetkellä lisätä

@@ -24,9 +24,8 @@
         </ul>
         <h2>Known Issues</h2>
         <ul>
-            <li>Due to limitations in underlying libraries,
-            @string/app_name does not currently support multiple,
-            concurrently active network interfaces.</li>
+            <li>Due to limitations in underlying libraries, multiple
+            concurrently active network interfaces are not supported.</li>
             <li>In video calls, the device needs to be held in landscape
             mode rotated 90 degrees left from portrait orientation.</li>
             <li>Other party of the call can currently add video stream
