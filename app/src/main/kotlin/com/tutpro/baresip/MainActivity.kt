@@ -1118,43 +1118,54 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
-        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
-        if (!Utils.zip(files, "baresip.zip")) {
-            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+        val bsFile = getString(R.string.app_name) + ".bs"
+        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
+        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFilePath = BaresipService.filesPath + "/$zipFile"
+        if (!Utils.zip(files, zipFile)) {
+            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
         if (content == null) {
-            Log.w("Baresip", "Failed to read zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+            Log.w("Baresip", "Failed to read zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
         if (!Utils.encryptToFile(backupFilePath, content, password)) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
-        Utils.alertView(this, getString(R.string.info), getString(R.string.backed_up))
+        Utils.alertView(this, getString(R.string.info),
+                String.format(getString(R.string.backed_up), bsFile))
         Utils.deleteFile(File(zipFilePath))
     }
 
     private fun restore(password: String) {
-        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
-        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
+        val bsFile = getString(R.string.app_name) + ".bs"
+        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
+        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFilePath = BaresipService.filesPath + "/$zipFile"
         val zipData = Utils.decryptFromFile(backupFilePath, password)
         if (zipData == null) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
-            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
-            Log.w("Baresip", "Failed to unzip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Log.w("Baresip", "Failed to unzip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         Utils.deleteFile(File(zipFilePath))

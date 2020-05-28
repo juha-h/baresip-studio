@@ -246,10 +246,10 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-    <string name="backed_up">Se respaldaron los datos de la aplicación en el archivo de la carpeta Descargas «baresip.bs».</string>
-    <string name="backup_failed">Falló la creación de la copia de respaldo de los datos de la aplicación en el archivo «baresip.bs» en la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento</string>
+    <string name="backed_up">Se respaldaron los datos de la aplicación en el archivo de la carpeta Descargas «%1$s».</string>
+    <string name="backup_failed">Falló la creación de la copia de respaldo de los datos de la aplicación en el archivo «%1$s» en la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento</string>
     <string name="restored">Se restauraron los datos de la aplicación. Baresip necesita reiniciarse. ¿Quiere reiniciar ahora\?</string>
-    <string name="restore_failed">Falló la restauración de los datos de la aplicación desde la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento y si existe el archivo de la copia de respaldo «baresip.bs» en la carpeta; si es así, proporcione la contraseña de descifrado correcta.</string>
+    <string name="restore_failed">Falló la restauración de los datos de la aplicación desde la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento y si existe el archivo de la copia de respaldo «%1$s» en la carpeta; si es así, proporcione la contraseña de descifrado correcta.</string>
     <string name="config_restart">Es necesario reiniciar Baresip para que surta efecto la configuración nueva. ¿Quiere reiniciar ahora\?</string>
     <string name="audio_modules_title">Módulos de audio</string>
     <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>

@@ -7,10 +7,10 @@
     <string name="show_password">Mostrar Senha</string>
     <string name="account_password">Senha de Autenticação da Conta %1$s</string>
     <string name="no_calls">Você não pode fazer ou atender chamadas sem a permissão do Microfone.</string>
-    <string name="restore_failed">Falha ao restaurar os dados do aplicativo da pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento e se o arquivo de backup \'baresip.bs\' existe na pasta e, se houver, se você forneceu a Senha de Descriptografia correta.</string>
+    <string name="restore_failed">Falha ao restaurar os dados do aplicativo da pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento e se o arquivo de backup \'%1$s\' existe na pasta e, se houver, se você forneceu a Senha de Descriptografia correta.</string>
     <string name="restored">Dados do aplicativo restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
-    <string name="backup_failed">Falha ao fazer backup dos dados do aplicativo no arquivo \'baresip.bs\' na pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
-    <string name="backed_up">Dados do aplicativo armazenados em backup no arquivo \'baresip.bs\' na Download.</string>
+    <string name="backup_failed">Falha ao fazer backup dos dados do aplicativo no arquivo \'%1$s\' na pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
+    <string name="backed_up">Dados do aplicativo armazenados em backup no arquivo \'%1$s\' na Download.</string>
     <string name="unverify">Desverificar</string>
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>

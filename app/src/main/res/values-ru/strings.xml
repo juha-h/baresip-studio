@@ -133,7 +133,7 @@
     <string name="and">и</string>
     <string name="answer_mode">Режим ответа</string>
     <string name="answer_mode_help">Выберите как отвечать на входящие вызовы.</string>
-    <string name="backed_up">Данные приложения сохранены с папку Downloads , файл \'baresip.bs\'.</string>
+    <string name="backed_up">Данные приложения сохранены с папку Downloads , файл \'%1$s\'.</string>
     <string name="call_not_secure">Вызов не безопасен!</string>
     <string name="listen_address">Прослушивать адрес</string>
     <string name="outbound_proxies">Исходящие прокси</string>

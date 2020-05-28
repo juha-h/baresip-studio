@@ -343,17 +343,17 @@
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot talletettiin Download-kansion tiedostoon
-        \'baresip.bs\'.
+        \'%1$s\'.
     </string>
     <string name="backup_failed">Sovelluksen tietojen talletus Download-kansion tiedostoon
-        \'baresip.bs\' epäonnistui. Tarkista Asetukset → Sovellukset → baresip →
+        \'%1$s\' epäonnistui. Tarkista Asetukset → Sovellukset → baresip →
         Käyttöluvat → Tallennustila.</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt?
     </string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen Download-kansiosta epäonnistui.
         Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu
-        tiedosto \'baresip.bs\' on kansiossa ja (jos on) että annoit oikean salasanan.
+        tiedosto \'%1$s\' on kansiossa ja (jos on) että annoit oikean salasanan.
     </string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
