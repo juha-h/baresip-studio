@@ -621,6 +621,13 @@ class BaresipService: Service() {
                         return
                     }
                     "remote call offered", "remote call answered" -> {
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w(LOG_TAG, "Remote call $callp is not found")
+                            return
+                        }
+                        if (call.status != "connected")
+                            return
                         newEvent = "call update"
                     }
                     "call established" -> {
@@ -848,6 +855,39 @@ class BaresipService: Service() {
             return MainActivity.aorPasswords[aor]!!
         else
             return ""
+    }
+
+    @Keep
+    fun checkVideo(uap: String, callp: String): Int {
+        if (!isServiceRunning) return -1
+        val ua = UserAgent.ofUap(uap)
+        if (ua == null) {
+            Log.w(LOG_TAG, "checkVideo did not find ua $uap")
+            return -1
+        }
+        val call = Call.ofCallp(callp);
+        if (call != null) {
+            if (call.videoEnabled)
+                return 0
+            if (call.status != "connected")
+                return -1
+            Log.d(LOG_TAG, "checkVideo of $callp: ${call.videoAllowed}")
+            if (!call.videoAllowed) {
+                call.videoEnabled = false
+                val intent = Intent("service event")
+                intent.putExtra("event", "call video request")
+                intent.putExtra("params", arrayListOf(uap, callp))
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+                return -1
+            } else {
+                call.videoAllowed = false
+                call.videoEnabled = true
+                return 1
+            }
+        } else {
+            Log.d(LOG_TAG, "checkVideo did not find call $callp")
+            return -1
+        }
     }
 
     @Keep

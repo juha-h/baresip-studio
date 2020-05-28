@@ -10,6 +10,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var security = 0
     var zid = ""
     var hasHistory = false
+    var videoAllowed = false
     var videoEnabled = false
 
     init {
@@ -81,6 +82,9 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     }
 
     fun setVideo(enabled: Boolean): Int {
+        videoAllowed = enabled
+        if (!enabled)
+            videoEnabled = false
         return call_set_video(callp, enabled)
     }
 

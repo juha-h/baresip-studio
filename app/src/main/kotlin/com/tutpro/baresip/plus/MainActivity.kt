@@ -442,7 +442,10 @@ class MainActivity : AppCompatActivity() {
 
         videoButton.setOnClickListener {
             videoButton.isClickable = false
-            Call.call("connected")?.setVideo(true)
+            videoButton.setImageResource(R.drawable.video_pending)
+            Handler().postDelayed({
+                Call.call("connected")?.setVideo(true)
+            }, 250)
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -487,12 +490,7 @@ class MainActivity : AppCompatActivity() {
         prm.bottomMargin = 15
         vb.layoutParams = prm
         vb.setOnClickListener {
-            // Call.call("connected")?.setVideo(false)
-            val call = Call.call("connected")
-            if (call != null) {
-                call.disableVideoStream(true)
-                call.modify()
-            }
+            Call.call("connected")?.setVideo(false)
         }
         videoLayout.addView(vb)
 
@@ -792,9 +790,6 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        call.stopVideoSource()
-                        // Enable video stream so that video can be added during the call
-                        call.disableVideoStream(false)
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
@@ -809,14 +804,41 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Established call $callp not found")
                             return
                         }
-                        if (call.status != "connected")
-                            return
-                        call.videoEnabled = call.hasVideoStream()
-                        if (!call.hasVideoStream())
+                        if (!call.hasVideoStream()) {
+                            // this may not be needed
                             call.stopVideoDisplay()
-                        if (call.hasVideo())
-                            call.disableVideoStream(false)
+                            call.videoEnabled = false
+                        } else {
+                            if (!call.videoEnabled)
+			        // call.stopVideoSource()
+                                call.stopVideoDisplay()
+                            }
+                        }
                         showCall(ua)
+                    }
+                    "call video request" -> {
+                        val callp = params[1]
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w("Baresip", "Video request call $callp not found")
+                            return
+                        }
+                        if (!isFinishing()) {
+                            val videoDialog = AlertDialog.Builder(this)
+                            with(videoDialog) {
+                                setTitle(getString(R.string.video_request))
+                                setMessage(String.format(getString(R.string.allow_video),
+                                        Utils.friendlyUri(call.peerURI, Utils.aorDomain(call.ua.account.aor))))
+                                setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                                    videoButton.performClick()
+                                    dialog.dismiss()
+                                }
+                                setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                show()
+                            }
+                        }
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -1267,43 +1289,54 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
-        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
-        if (!Utils.zip(files, "baresip.zip")) {
-            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+        val bsFile = getString(R.string.app_name) + ".bs"
+        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
+        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFilePath = BaresipService.filesPath + "/$zipFile"
+        if (!Utils.zip(files, zipFile)) {
+            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
         if (content == null) {
-            Log.w("Baresip", "Failed to read zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+            Log.w("Baresip", "Failed to read zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
         if (!Utils.encryptToFile(backupFilePath, content, password)) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.backup_failed))
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.backup_failed), bsFile))
             return
         }
-        Utils.alertView(this, getString(R.string.info), getString(R.string.backed_up))
+        Utils.alertView(this, getString(R.string.info),
+                String.format(getString(R.string.backed_up), bsFile))
         Utils.deleteFile(File(zipFilePath))
     }
 
     private fun restore(password: String) {
-        val backupFilePath = BaresipService.downloadsPath + "/baresip.bs"
-        val zipFilePath = BaresipService.filesPath + "/baresip.zip"
+        val bsFile = getString(R.string.app_name) + ".bs"
+        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
+        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFilePath = BaresipService.filesPath + "/$zipFile"
         val zipData = Utils.decryptFromFile(backupFilePath, password)
         if (zipData == null) {
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
-            Log.w("Baresip", "Failed to write zip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
-            Log.w("Baresip", "Failed to unzip file 'baresip.zip")
-            Utils.alertView(this, getString(R.string.error), getString(R.string.restore_failed))
+            Log.w("Baresip", "Failed to unzip file '$zipFile'")
+            Utils.alertView(this, getString(R.string.error),
+                    String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         Utils.deleteFile(File(zipFilePath))
@@ -1475,6 +1508,7 @@ class MainActivity : AppCompatActivity() {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
                         if (call.hasVideo()) {
+                            videoButton.setImageResource(R.drawable.video_on)
                             videoButton.visibility = View.VISIBLE
                             videoButton.isClickable = true
                         }

@@ -135,6 +135,29 @@ static const char *translate_errorcode(uint16_t scode)
 	}
 }
 
+static int check_video(struct ua *ua, struct call *call)
+{
+    JavaVM *javaVM = g_ctx.javaVM;
+    JNIEnv *env;
+    jint err = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
+    if (err != JNI_OK) {
+        LOGE("failed to GetEnv, ErrorCode = %d", err);
+        return false;
+    }
+    char ua_buf[32];
+    char call_buf[32];
+    sprintf(ua_buf, "%lu", (unsigned long)ua);
+    jstring jUa = (*env)->NewStringUTF(env, ua_buf);
+    sprintf(call_buf, "%lu", (unsigned long)call);
+    jstring jCall = (*env)->NewStringUTF(env, call_buf);
+    jmethodID checkVideoId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "checkVideo",
+                                            "(Ljava/lang/String;Ljava/lang/String;)I");
+    jint res = (*env)->CallIntMethod(env, g_ctx.mainActivityObj, checkVideoId, jUa, jCall);
+    (*env)->DeleteLocalRef(env, jUa);
+    (*env)->DeleteLocalRef(env, jCall);
+    return res;
+}
+
 static void get_password(char *aor, char *password)
 {
     LOGD("getting password of AoR %s\n", aor);
@@ -143,11 +166,9 @@ static void get_password(char *aor, char *password)
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            return;
-        }
+        LOGE("failed to GetEnv, ErrorCode = %d", res);
+        strcpy(password, "");
+        return;
     }
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
@@ -157,6 +178,20 @@ static void get_password(char *aor, char *password)
     const char *pwd = (*env)->GetStringUTFChars(env, javaPassword, 0);
     strcpy(password, pwd);
     (*env)->ReleaseStringUTFChars(env, javaPassword, pwd);
+}
+
+static void log_call_video_info(struct call *call)
+{
+    if (call_has_video(call)) {
+        LOGD("****** call has video");
+    } else {
+        LOGD("****** call does NOT have video");
+    }
+    if (video_strm(call_video(call))) {
+        LOGD("****** call has video stream");
+    } else {
+        LOGD("****** call does NOT have video stream");
+    }
 }
 
 static void ua_event_handler(struct ua *ua, enum ua_event ev,
@@ -197,10 +232,40 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call answered");
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-            if (strcmp(prm, "offer") == 0)
+            if (strcmp(prm, "offer") == 0) {
+                if (video_strm(call_video(call))) {
+                    int res = check_video(ua, call);
+                    LOGD("check_video result = %d\n", res);
+                    switch (res) {
+                        case -1:
+                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))),
+                                                   true);
+                            break;
+                        case 1:
+                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))),
+                                                   false);
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "remote call offered");
-            else
+            } else {
+                if (call_has_video(call)) {
+                    int res = check_video(ua, call);
+                    switch(res) {
+                        case -1:
+                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), true);
+                            break;
+                        case 1:
+                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), false);
+                            break;
+                        default:
+                            return;
+                    }
+                }
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "remote call answered");
+            }
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
@@ -211,6 +276,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
             break;
         case UA_EVENT_CALL_ESTABLISHED:
+            video_stop(call_video(call));
+            video_stop_display(call_video(call));
             play = mem_deref(play);
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
