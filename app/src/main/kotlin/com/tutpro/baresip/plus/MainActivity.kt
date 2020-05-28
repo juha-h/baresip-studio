@@ -809,8 +809,8 @@ class MainActivity : AppCompatActivity() {
                             call.stopVideoDisplay()
                             call.videoEnabled = false
                         } else {
-                            if (!call.videoEnabled)
-			        // call.stopVideoSource()
+                            if (!call.videoEnabled) {
+                                // call.stopVideoSource()
                                 call.stopVideoDisplay()
                             }
                         }
