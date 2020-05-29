@@ -232,6 +232,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call answered");
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
+            // log_call_video_info(call);
             if (strcmp(prm, "offer") == 0) {
                 if (video_strm(call_video(call))) {
                     int res = check_video(ua, call);
@@ -251,8 +252,10 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 }
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "remote call offered");
             } else {
+                // log_call_video_info(call);
                 if (call_has_video(call)) {
                     int res = check_video(ua, call);
+                    LOGD("check_video result = %d\n", res);
                     switch(res) {
                         case -1:
                             sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), true);

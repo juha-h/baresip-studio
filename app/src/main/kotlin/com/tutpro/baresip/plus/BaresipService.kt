@@ -871,7 +871,6 @@ class BaresipService: Service() {
                 return 0
             if (call.status != "connected")
                 return -1
-            Log.d(LOG_TAG, "checkVideo of $callp: ${call.videoAllowed}")
             if (!call.videoAllowed) {
                 call.videoEnabled = false
                 val intent = Intent("service event")

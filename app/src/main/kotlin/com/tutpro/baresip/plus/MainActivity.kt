@@ -805,14 +805,8 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         if (!call.hasVideoStream()) {
-                            // this may not be needed
-                            call.stopVideoDisplay()
+                            Log.d("Baresip", "Call does not have video stream")
                             call.videoEnabled = false
-                        } else {
-                            if (!call.videoEnabled) {
-                                // call.stopVideoSource()
-                                call.stopVideoDisplay()
-                            }
                         }
                         showCall(ua)
                     }
