@@ -91,6 +91,16 @@ static void call_video_debug_log() {
     }
 }
 
+static void sdp_media_debug_log(const struct sdp_media *m) {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", sdp_media_debug, m);
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
 static struct re_printf pf_null = {vprintf_null, 0};
 
 static void signal_handler(int sig)
@@ -188,7 +198,11 @@ static void log_call_video_info(struct call *call)
         LOGD("****** call does NOT have video");
     }
     if (video_strm(call_video(call))) {
-        LOGD("****** call has video stream");
+        if (sdp_media_disabled(stream_sdpmedia(video_strm(call_video(call))))) {
+            LOGD("****** call has disabled video stream");
+        } else {
+            LOGD("****** call has enabled video stream");
+        }
     } else {
         LOGD("****** call does NOT have video stream");
     }
@@ -232,19 +246,19 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call answered");
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-            // log_call_video_info(call);
+            log_call_video_info(call);
+            sdp_media_debug_log(stream_sdpmedia(video_strm(call_video(call))));
             if (strcmp(prm, "offer") == 0) {
-                if (video_strm(call_video(call))) {
+                struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
+                if (list_head(sdp_media_format_lst(media, false))) {
                     int res = check_video(ua, call);
                     LOGD("check_video result = %d\n", res);
                     switch (res) {
                         case -1:
-                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))),
-                                                   true);
+                            sdp_media_set_disabled(media, true);
                             break;
                         case 1:
-                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))),
-                                                   false);
+                            sdp_media_set_disabled(media, false);
                             break;
                         default:
                             break;
@@ -252,16 +266,16 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 }
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "remote call offered");
             } else {
-                // log_call_video_info(call);
                 if (call_has_video(call)) {
                     int res = check_video(ua, call);
                     LOGD("check_video result = %d\n", res);
+                    struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
                     switch(res) {
                         case -1:
-                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), true);
+                            sdp_media_set_disabled(media, true);
                             break;
                         case 1:
-                            sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video(call))), false);
+                            sdp_media_set_disabled(media, false);
                             break;
                         default:
                             return;
