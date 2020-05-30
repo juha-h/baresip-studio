@@ -1,0 +1,3 @@
+- Ask if user allows video to be added to the call.
+- Show video icon in red color when video request is pending.
+- Use baresip+.bs as backup/restore file.

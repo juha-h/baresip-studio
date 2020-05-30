@@ -246,8 +246,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call answered");
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-            log_call_video_info(call);
-            sdp_media_debug_log(stream_sdpmedia(video_strm(call_video(call))));
+            // log_call_video_info(call);
+            // sdp_media_debug_log(stream_sdpmedia(video_strm(call_video(call))));
             if (strcmp(prm, "offer") == 0) {
                 struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
                 if (list_head(sdp_media_format_lst(media, false))) {
