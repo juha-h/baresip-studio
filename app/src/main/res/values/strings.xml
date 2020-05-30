@@ -275,7 +275,7 @@
     <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
-    <string name="allow_video">Allow video call with \'%1$s\'?</string>
+    <string name="allow_video">Accept video call with \'%1$s\'?</string>
     <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
