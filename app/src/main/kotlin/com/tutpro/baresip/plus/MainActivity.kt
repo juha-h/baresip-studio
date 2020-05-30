@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     internal var restart = false
     internal var atStartup = false
+    internal var alerting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -817,19 +818,22 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Video request call $callp not found")
                             return
                         }
-                        if (!isFinishing()) {
-                            val videoDialog = AlertDialog.Builder(this)
-                            with(videoDialog) {
+                        if (!isFinishing() && !alerting) {
+                            val builder = AlertDialog.Builder(this)
+                            with(builder) {
                                 setTitle(getString(R.string.video_request))
                                 setMessage(String.format(getString(R.string.allow_video),
                                         Utils.friendlyUri(call.peerURI, Utils.aorDomain(call.ua.account.aor))))
                                 setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                     videoButton.performClick()
                                     dialog.dismiss()
+                                    alerting = false
                                 }
                                 setNegativeButton(getString(R.string.no)) { dialog, _ ->
                                     dialog.dismiss()
+                                    alerting = false
                                 }
+                                alerting = true
                                 show()
                             }
                         }
