@@ -28,8 +28,6 @@
             samanaikaisesti aktiivisia verkkoliittymiä ei voi käyttää.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
-            <li>Puhelun toinen osapuoli voi tällä hetkellä lisätä
-            puheluun videomedian ilman käyttäjän suostumusta.</li>
         </ul>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
