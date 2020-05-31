@@ -1623,7 +1623,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 b.putString("peer", activity[2])
-                b.putString("focus", activity[3])
+                b.putBoolean("focus", activity[3] == "true")
                 i.putExtras(b)
                 startActivityForResult(i, CHAT_CODE)
             }
