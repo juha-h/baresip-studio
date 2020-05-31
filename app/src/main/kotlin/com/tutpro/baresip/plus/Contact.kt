@@ -73,14 +73,5 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
             return true
         }
 
-        fun import(): Boolean {
-            val contacts = Utils.getFileContents(BaresipService.downloadsPath + "/contacts.bs")
-            if (contacts != null) {
-                Utils.putFileContents(BaresipService.filesPath + "/contacts", contacts)
-                return restore()
-            }
-            return false
-        }
-
     }
 }
