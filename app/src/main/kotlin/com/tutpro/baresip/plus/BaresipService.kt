@@ -779,8 +779,8 @@ class BaresipService: Service() {
         }
         val timeStamp = System.currentTimeMillis().toString()
         Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
-        Message.add(Message(ua.account.aor, peer, text, timeStamp.toLong(),
-                R.drawable.arrow_down_green, 0, "", true))
+        Message(ua.account.aor, peer, text, timeStamp.toLong(),
+                R.drawable.arrow_down_green, 0, "", true).add()
         Message.save()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
