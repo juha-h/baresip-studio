@@ -614,8 +614,8 @@ class MainActivity : AppCompatActivity() {
         }
         val ev = event.split(",")
         Log.d("Baresip", "Handling service event '${ev[0]}' for $uap")
-        val aor = ua.account.aor
         val acc = ua.account
+        val aor = ua.account.aor
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
@@ -640,7 +640,7 @@ class MainActivity : AppCompatActivity() {
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                     }
                     "call rejected" -> {
-                        if (ua.account.aor == aorSpinner.tag) {
+                        if (aor == aorSpinner.tag) {
                             callsButton.setImageResource(R.drawable.calls_missed)
                         }
                     }
@@ -652,8 +652,8 @@ class MainActivity : AppCompatActivity() {
                         }
                         volumeControlStream = AudioManager.STREAM_RING
                         if (visible) {
-                            if (ua.account.aor != aorSpinner.tag)
-                                spinToAor(ua.account.aor)
+                            if (aor != aorSpinner.tag)
+                                spinToAor(aor)
                             showCall(ua)
                         } else {
                             Log.d("Baresip", "Reordering to front")
@@ -666,7 +666,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call established" -> {
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
-                        if (ua.account.aor == aorSpinner.tag) {
+                        if (aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
                             showCall(ua)
@@ -693,7 +693,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             call.security = security
                             call.zid = ev[3]
-                            if (ua.account.aor == aorSpinner.tag) {
+                            if (aor == aorSpinner.tag) {
                                 securityButton.setImageResource(security)
                                 setSecurityButtonTag(securityButton, security)
                                 securityButton.visibility = View.VISIBLE
@@ -703,7 +703,7 @@ class MainActivity : AppCompatActivity() {
                         verifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             call.security = R.drawable.box_yellow
                             call.zid = ev[3]
-                            if (ua.account.aor == aorSpinner.tag) {
+                            if (aor == aorSpinner.tag) {
                                 securityButton.setImageResource(R.drawable.box_yellow)
                                 securityButton.tag = "yellow"
                                 securityButton.visibility = View.VISIBLE
@@ -724,7 +724,7 @@ class MainActivity : AppCompatActivity() {
                             tag = "yellow"
                         else
                             tag = "green"
-                        if (ua.account.aor == aorSpinner.tag) {
+                        if (aor == aorSpinner.tag) {
                             securityButton.setImageResource(call.security)
                             securityButton.tag = tag
                         }
@@ -768,9 +768,9 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call closed" -> {
-                        if (ua.account.aor == aorSpinner.tag) {
+                        if (aor == aorSpinner.tag) {
                             showCall(ua)
-                            if (ua.account.missedCalls)
+                            if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
@@ -811,7 +811,7 @@ class MainActivity : AppCompatActivity() {
                                 break
                             }
                         }
-                        if (ua.account.aor == aorSpinner.tag) {
+                        if (aor == aorSpinner.tag) {
                             if (acc.vmNew > 0)
                                 voicemailButton.setImageResource(R.drawable.voicemail_new)
                             else
@@ -1433,7 +1433,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 b.putString("peer", activity[2])
-                b.putString("focus", activity[3])
+                b.putBoolean("focus", activity[3] == "true")
                 i.putExtras(b)
                 startActivityForResult(i, CHAT_CODE)
             }

@@ -7,28 +7,28 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
               var direction: Int, var responseCode: Int, var responseReason: String,
               var new: Boolean): Serializable {
 
+    fun add() {
+        BaresipService.messages.add(this)
+        var count = 0
+        var firstIndex = -1
+        for (i in BaresipService.messages.indices)
+            if (BaresipService.messages[i].aor == this.aor) {
+                if (count == 0) firstIndex = i
+                count++
+                if (count > MESSAGE_HISTORY_SIZE) {
+                    break
+                }
+            }
+        if (count > MESSAGE_HISTORY_SIZE)
+            BaresipService.messages.removeAt(firstIndex)
+    }
+
     companion object {
 
         val MESSAGE_HISTORY_SIZE = 100
 
         fun messages(): ArrayList<Message> {
             return BaresipService.messages
-        }
-
-        fun add(message: Message) {
-            BaresipService.messages.add(message)
-            var count = 0
-            var firstIndex = -1
-            for (i in BaresipService.messages.indices)
-                if (BaresipService.messages[i].aor == message.aor) {
-                    if (count == 0) firstIndex = i
-                    count++
-                    if (count > MESSAGE_HISTORY_SIZE) {
-                        break
-                    }
-                }
-            if (count > MESSAGE_HISTORY_SIZE)
-                BaresipService.messages.removeAt(firstIndex)
         }
 
         fun clear(aor: String) {

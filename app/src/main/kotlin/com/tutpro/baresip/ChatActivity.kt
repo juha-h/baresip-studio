@@ -137,7 +137,7 @@ class ChatActivity : AppCompatActivity() {
                 val time = System.currentTimeMillis()
                 val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
                         0, "", true)
-                Message.add(msg)
+                msg.add()
                 chatMessages.add(msg)
                 if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
                     Toast.makeText(getApplicationContext(), "${getString(R.string.message_failed)}!",
@@ -159,6 +159,7 @@ class ChatActivity : AppCompatActivity() {
                         intent.getStringExtra("time")!!)
             }
         }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,
                 IntentFilter("message response"))
 
@@ -177,12 +178,13 @@ class ChatActivity : AppCompatActivity() {
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
         MainActivity.activityAor = aor
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        val chatText = BaresipService.chatTexts.get("$aor::$peerUri")
+        val chatText = BaresipService.chatTexts["$aor::$peerUri"]
         if (chatText != null) {
             Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
             newMessage.setText(chatText)
@@ -193,11 +195,6 @@ class ChatActivity : AppCompatActivity() {
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
-    }
-
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
-        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
