@@ -650,11 +650,6 @@ class MainActivity : AppCompatActivity() {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w("Baresip", "Incoming call $callp not found")
-                            return
-                        }
                         volumeControlStream = AudioManager.STREAM_RING
                         if (visible) {
                             if (ua.account.aor != aorSpinner.tag)
@@ -667,16 +662,9 @@ class MainActivity : AppCompatActivity() {
                             i.putExtra("action", "call show")
                             i.putExtra("callp", callp)
                             startActivity(i)
-
                         }
                     }
                     "call established" -> {
-                        val callp = params[1]
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w("Baresip", "Established call $callp not found")
-                            return
-                        }
                         volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (ua.account.aor == aorSpinner.tag) {
                             dtmf.setText("")
