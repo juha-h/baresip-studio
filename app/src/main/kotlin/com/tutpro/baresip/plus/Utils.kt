@@ -1,9 +1,10 @@
 package com.tutpro.baresip.plus
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.AlertDialog
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -19,11 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Surface
-import android.view.WindowManager
-
-import kotlin.collections.ArrayList
-import kotlin.Exception
+import android.view.LayoutInflater
+import android.widget.TextView
 
 import java.io.*
 import java.security.SecureRandom
@@ -35,6 +33,9 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+
+import kotlin.collections.ArrayList
+import kotlin.Exception
 
 object Utils {
 
@@ -55,9 +56,12 @@ object Utils {
         return result
     }
 
+    @SuppressLint("InflateParams")
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
+        val titleView = LayoutInflater.from(context).inflate(R.layout.alert_title, null) as TextView
+        titleView.text = title
         val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
+        builder.setCustomTitle(titleView)
                 .setMessage(message)
                 .setPositiveButton(R.string.ok)
                 { dialog, _ ->

@@ -211,10 +211,13 @@ class MainActivity : AppCompatActivity() {
                             getString(R.string.peer_not_verified))
                 }
                 "green" -> {
-                    val unverifyDialog = AlertDialog.Builder(this)
-                    unverifyDialog.setTitle(getString(R.string.info))
-                    unverifyDialog.setMessage(getString(R.string.call_is_secure))
-                    unverifyDialog.setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
+                    val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                    titleView.text = getString(R.string.info)
+                    val builder = AlertDialog.Builder(this)
+                    builder.setCustomTitle(titleView)
+                    builder.setMessage(getString(R.string.call_is_secure))
+                    builder.setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
                         val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
                         if (calls.size > 0) {
                             if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
@@ -227,10 +230,10 @@ class MainActivity : AppCompatActivity() {
                         }
                         dialog.dismiss()
                     }
-                    unverifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                    builder.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                         dialog.dismiss()
                     }
-                    unverifyDialog.create().show()
+                    builder.create().show()
                 }
             }
         }
@@ -699,17 +702,16 @@ class MainActivity : AppCompatActivity() {
         if (event == "stopped") {
             Log.d("Baresip", "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
-                val alertDialog = AlertDialog.Builder(this).create()
-                alertDialog.setTitle(getString(R.string.notice))
-                alertDialog.setMessage(getString(R.string.start_failed))
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok)
-                ) { dialog, _ ->
+                val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.notice)
+                val builder = AlertDialog.Builder(this)
+                builder.setCustomTitle(titleView)
+                builder.setMessage(getString(R.string.start_failed))
+                builder.setNeutralButton(getString(R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
-                    //quitTimer.cancel()
-                    //finishAndRemoveTask()
-                    //System.exit(0)
                 }
-                alertDialog.show()
+                builder.create().show()
             } else {
                 quitTimer.cancel()
                 finishAndRemoveTask()
@@ -833,11 +835,14 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Call $callp to be verified is not found")
                             return
                         }
-                        val verifyDialog = AlertDialog.Builder(this@MainActivity)
-                        verifyDialog.setTitle(getString(R.string.verify))
-                        verifyDialog.setMessage(String.format(getString(R.string.verify_sas),
+                        val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                        val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                        titleView.text = getString(R.string.verify)
+                        val builder = AlertDialog.Builder(this)
+                        builder.setCustomTitle(titleView)
+                        builder.setMessage(String.format(getString(R.string.verify_sas),
                                 ev[1], ev[2]))
-                        verifyDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                        builder.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                             val security: Int
                             if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                                 Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
@@ -854,7 +859,7 @@ class MainActivity : AppCompatActivity() {
                                 dialog.dismiss()
                             }
                         }
-                        verifyDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                        builder.setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             call.security = R.drawable.box_yellow
                             call.zid = ev[3]
                             if (aor == aorSpinner.tag) {
@@ -864,7 +869,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             dialog.dismiss()
                         }
-                        if (!isFinishing()) verifyDialog.create().show()
+                        if (!isFinishing()) builder.create().show()
                     }
                     "call verified", "call secure" -> {
                         val callp = params[1]
@@ -1180,19 +1185,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(title)
-        val viewInflated = LayoutInflater.from(this)
+        val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
-        val input = viewInflated.findViewById(R.id.password) as EditText
-        val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+        val titleView = layout.findViewById(R.id.title) as TextView
+        titleView.text = title
+        val input = layout.findViewById(R.id.password) as EditText
+        val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
         checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
                 input.transformationMethod = HideReturnsTransformationMethod()
             else
                 input.transformationMethod = PasswordTransformationMethod()
         }
-        builder.setView(viewInflated)
+        builder.setView(layout)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
             var password = input.text.toString().trim()
@@ -1224,19 +1230,20 @@ class MainActivity : AppCompatActivity() {
                     (Utils.paramValue(params, "auth_pass") == "")) {
                 val aor = account.substringAfter("<").substringBefore(">")
                 val builder = AlertDialog.Builder(this)
-                builder.setTitle(String.format(getString(R.string.account_password), Utils.plainAor(aor)))
-                val viewInflated = LayoutInflater.from(this)
+                val layout = LayoutInflater.from(this)
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                                 false)
-                val input = viewInflated.findViewById(R.id.password) as EditText
-                val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+                val titleView = layout.findViewById(R.id.title) as TextView
+                titleView.text = String.format(getString(R.string.account_password), Utils.plainAor(aor))
+                val input = layout.findViewById(R.id.password) as EditText
+                val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked)
                         input.transformationMethod = HideReturnsTransformationMethod()
                     else
                         input.transformationMethod = PasswordTransformationMethod()
                 }
-                builder.setView(viewInflated)
+                builder.setView(layout)
                 builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     val password = input.text.toString().trim()
