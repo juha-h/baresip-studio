@@ -1,9 +1,9 @@
 package com.tutpro.baresip
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,24 +12,28 @@ import android.graphics.Color
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-
-import kotlin.collections.ArrayList
-import kotlin.Exception
+import android.view.LayoutInflater
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import java.io.*
 import java.security.SecureRandom
 import java.util.*
-import java.util.zip.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+
+import kotlin.collections.ArrayList
 
 object Utils {
 
@@ -50,9 +54,12 @@ object Utils {
         return result
     }
 
+    @SuppressLint("InflateParams")
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
+        val titleView = LayoutInflater.from(context).inflate(R.layout.alert_title, null) as TextView
+        titleView.text = title
         val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
+        builder.setCustomTitle(titleView)
                 .setMessage(message)
                 .setPositiveButton(R.string.ok)
                 { dialog, _ ->
