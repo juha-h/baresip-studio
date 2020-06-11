@@ -358,6 +358,5 @@
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
     </string>
-    <string name="account_password">Tilin %1$s salasana</string>
     <string name="show_password">Näytä salasana</string>
 </resources>
