@@ -1182,7 +1182,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun askPassword(title: String, ua: UserAgent? = null) {
+    private fun askPassword(title: String, ua: UserAgent? = null) {
         val builder = AlertDialog.Builder(this)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
