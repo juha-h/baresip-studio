@@ -5,7 +5,6 @@
     <string name="dtmf">DTMF</string>
     <string name="backup">Cópia de Segurança</string>
     <string name="show_password">Mostrar Senha</string>
-    <string name="account_password">Senha de Autenticação da Conta %1$s</string>
     <string name="no_calls">Você não pode fazer ou atender chamadas sem a permissão do Microfone.</string>
     <string name="restore_failed">Falha ao restaurar os dados do aplicativo da pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento e se o arquivo de backup \'%1$s\' existe na pasta e, se houver, se você forneceu a Senha de Descriptografia correta.</string>
     <string name="restored">Dados do aplicativo restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>

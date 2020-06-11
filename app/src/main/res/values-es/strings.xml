@@ -322,6 +322,5 @@
     <string name="no_calls">No puede realizar ni responder llamadas sin el permiso del micrófono.</string>
     <string name="no_video_calls">No puede realizar ni responder videollamadas sin permiso de la cámara.</string>
     <string name="no_cameras">No tienes ninguna cámara de video compatible.</string>
-    <string name="account_password">Cuenta %1$s Contraseña de autenticación</string>
     <string name="show_password">Mostrar contraseña</string>
 </resources>
