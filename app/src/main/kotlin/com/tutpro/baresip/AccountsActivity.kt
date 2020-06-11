@@ -83,29 +83,32 @@ class AccountsActivity : AppCompatActivity() {
                     val aor = data!!.getStringExtra("aor")!!
                     val ua = UserAgent.ofAor(aor)!!
                     if (MainActivity.aorPasswords.containsKey(aor) && MainActivity.aorPasswords[aor] == "")
-                        askPassword(String.format(getString(R.string.account_password),
-                                Utils.plainAor(aor)), ua)
+                        askPassword(ua)
                 }
             }
         }
 
     }
 
-    private fun askPassword(title: String, ua: UserAgent) {
+    private fun askPassword(ua: UserAgent) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(title)
-        val viewInflated = LayoutInflater.from(this)
+        val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
-        val input = viewInflated.findViewById(R.id.password) as EditText
-        val checkBox = viewInflated.findViewById(R.id.checkbox) as CheckBox
+        val titleView = layout.findViewById(R.id.title) as TextView
+        titleView.text = getString(R.string.authentication_password)
+        val messageView = layout.findViewById(R.id.message) as TextView
+        val message = getString(R.string.account) + " " + Utils.plainAor(ua.account.aor)
+        messageView.text = message
+        val input = layout.findViewById(R.id.password) as EditText
+        val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
         checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
                 input.transformationMethod = HideReturnsTransformationMethod()
             else
                 input.transformationMethod = PasswordTransformationMethod()
         }
-        builder.setView(viewInflated)
+        builder.setView(layout)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
             var password = input.text.toString().trim()

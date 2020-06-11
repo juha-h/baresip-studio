@@ -1,24 +1,28 @@
 package com.tutpro.baresip
 
 import android.Manifest
-import android.app.*
+import android.app.Activity
+import android.app.KeyguardManager
+import android.app.NotificationManager
 import android.content.*
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import android.media.AudioManager
-import android.os.*
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import android.view.inputmethod.InputMethodManager
+import android.os.Build
+import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.widget.*
 import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 import java.io.File
-import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -932,8 +936,7 @@ class MainActivity : AppCompatActivity() {
                 updateIcons(ua.account)
                 if (resultCode == Activity.RESULT_OK)
                     if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
-                        askPassword(String.format(getString(R.string.account_password),
-                                Utils.plainAor(activityAor)), ua)
+                        askPassword(getString(R.string.authentication_password), ua)
             }
 
             CONTACTS_CODE -> {
@@ -1014,13 +1017,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun askPassword(title: String, ua: UserAgent? = null) {
+    fun askPassword(title: String, ua: UserAgent? = null) {
         val builder = AlertDialog.Builder(this)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = title
+        if (ua != null) {
+            val messageView = layout.findViewById(R.id.message) as TextView
+            val message = getString(R.string.account) + " " + Utils.plainAor(activityAor)
+            messageView.text = message
+        }
         val input = layout.findViewById(R.id.password) as EditText
         val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
         checkBox.setOnCheckedChangeListener { _, isChecked ->
@@ -1065,7 +1073,10 @@ class MainActivity : AppCompatActivity() {
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                                 false)
                 val titleView = layout.findViewById(R.id.title) as TextView
-                titleView.text = String.format(getString(R.string.account_password), Utils.plainAor(aor))
+                titleView.text = getString(R.string.authentication_password)
+                val messageView = layout.findViewById(R.id.message) as TextView
+                val message = getString(R.string.account) + " " + Utils.plainAor(aor)
+                messageView.text = message
                 val input = layout.findViewById(R.id.password) as EditText
                 val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
@@ -1164,16 +1175,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.deleteFile(File(zipFilePath))
-        val restartDialog = AlertDialog.Builder(this)
-        restartDialog.setMessage(getString(R.string.restored))
-        restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+        val builder = AlertDialog.Builder(this)
+        val titleView = LayoutInflater.from(this).inflate(R.layout.alert_title, null) as TextView
+        titleView.text = getString(R.string.info)
+        builder.setCustomTitle(titleView)
+        builder.setMessage(getString(R.string.restored))
+        builder.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
             quitRestart(true)
             dialog.dismiss()
         }
-        restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+        builder.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
             dialog.dismiss()
         }
-        restartDialog.create().show()
+        builder.create().show()
     }
 
     private fun spinToAor(aor: String) {
