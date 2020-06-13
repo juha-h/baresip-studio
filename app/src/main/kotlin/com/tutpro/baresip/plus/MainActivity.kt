@@ -6,7 +6,6 @@ import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -52,7 +51,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var imm: InputMethodManager
     internal lateinit var nm: NotificationManager
     internal lateinit var kgm: KeyguardManager
-    internal lateinit var cm: CameraManager
     internal lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
@@ -102,8 +100,6 @@ class MainActivity : AppCompatActivity() {
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        cm = getSystemService(CAMERA_SERVICE) as CameraManager
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -1135,22 +1131,23 @@ class MainActivity : AppCompatActivity() {
                 if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.no_calls), ::startBaresip)
-                else
-                    Utils.requestPermission(this, Manifest.permission.CAMERA,
-                            CAMERA_PERMISSION_REQUEST_CODE)
+                else {
+                    BaresipService.cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
+                    if (BaresipService.cameraAvailable)
+                        Utils.requestPermission(this, Manifest.permission.CAMERA,
+                             CAMERA_PERMISSION_REQUEST_CODE)
+                    else {
+                        Utils.alertView(this,
+                                getString(R.string.notice), getString(R.string.no_cameras))
+                        startBaresip()
+                    }
+                }
             }
 
             CAMERA_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.no_video_calls), ::startBaresip)
-                } else {
-                    if (Utils.supportedCameras(cm).isEmpty())
-                        Utils.alertView(this, getString(R.string.notice),
-                                getString(R.string.no_cameras), ::startBaresip)
-                    else
-                        startBaresip()
-                }
+                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                    Utils.alertView(this, getString(R.string.notice), getString(R.string.no_video_calls))
+                startBaresip()
             }
 
             BACKUP_PERMISSION_REQUEST_CODE ->

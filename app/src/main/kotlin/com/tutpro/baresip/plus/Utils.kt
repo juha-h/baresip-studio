@@ -22,6 +22,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
 import java.io.*
 import java.security.SecureRandom
@@ -579,8 +580,9 @@ object Utils {
             BaresipService.activities.add(0, activity)
     }
 
-    fun supportedCameras(cm: CameraManager): Map<String, Int> {
+    fun supportedCameras(ctx: Context): Map<String, Int> {
         val cameras = mutableMapOf<String, Int>()
+        val cm = ctx.getSystemService(AppCompatActivity.CAMERA_SERVICE) as CameraManager
         try {
             for (id in cm.cameraIdList) {
                 val chars = cm.getCameraCharacteristics(id)

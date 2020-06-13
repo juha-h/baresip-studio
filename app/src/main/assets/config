@@ -62,4 +62,3 @@ video_selfview pip
 ice_turn no
 ice_nomination regular
 zrtp_hash yes
-

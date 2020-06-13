@@ -285,8 +285,10 @@ class BaresipService: Service() {
                     } else {
                         Log.d(LOG_TAG, "Asset '$a' already copied")
                     }
-                    if (a == "config")
+                    if (a == "config") {
+                        cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
                         Config.initialize()
+                    }
                 }
 
                 if (File(filesDir, "history").exists())
@@ -1145,6 +1147,7 @@ class BaresipService: Service() {
         var libraryLoaded = false
         var isServiceClean = false
         var speakerPhone = false
+        var cameraAvailable = false
         var cameraFront = true
         var callVolume = 0
         var dynDns = false

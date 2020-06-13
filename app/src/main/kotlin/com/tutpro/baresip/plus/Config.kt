@@ -14,37 +14,12 @@ object Config {
 
         Log.d("Baresip", "Config is '$config'")
 
-        if (!config.contains("zrtp_hash")) {
-            config = "${config}zrtp_hash yes\n"
-        }
-
-        if (!config.contains(Regex("ausrc_format s16"))) {
-            config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
-        }
-
-        if (config.contains(Regex("#module_app[ ]+mwi.so"))) {
-            config = config.replace(Regex("#module_app[ ]+mwi.so"),
-                    "module_app mwi.so")
-        }
-
-        if (!config.contains("opus_application")) {
-            config = "${config}opus_application voip\n"
-        }
-
-        if (!config.contains("opus_samplerate")) {
-            config = "${config}opus_samplerate 16000\n"
-            val accountsPath = BaresipService.filesPath + "/accounts"
-            var accounts = String(Utils.getFileContents(accountsPath)!!, StandardCharsets.ISO_8859_1)
-            accounts = accounts.replace("opus/48000/1", "opus/16000/1")
-            Utils.putFileContents(accountsPath, accounts.toByteArray())
-        }
-
-        if (!config.contains("opus_stereo")) {
-            config = "${config}opus_stereo no\n"
-        }
-
-        if (!config.contains("opus_sprop_stereo")) {
-            config = "${config}opus_sprop_stereo no\n"
+        if (BaresipService.cameraAvailable) {
+            if (!config.contains("module avformat.so"))
+                 config = "${config}module avformat.so\nmodule selfview.so\n"
+        } else {
+            removeLine("module avformat.so")
+            removeLine("module selfview.so")
         }
 
         if (!config.contains("log_level")) {
@@ -58,18 +33,11 @@ object Config {
             BaresipService.logLevel = ll
         }
 
-        if (config.contains("net_interface")) {
-           BaresipService.netInterface = variable("net_interface")[0]
-        }
-
         if (!config.contains("call_volume")) {
             config = "${config}call_volume 0\n"
         } else {
             BaresipService.callVolume = variable("call_volume")[0].toInt()
         }
-
-        if (!config.contains("video_size"))
-            config = "${config}video_size 640x360\n"
 
         if (!config.contains("dyn_dns")) {
             config = "${config}dyn_dns no\n"
