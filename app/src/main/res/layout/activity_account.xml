@@ -155,6 +155,24 @@
         </TextView>
 
         <TextView
+            android:id="@+id/MediaEncTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:onClick="onClick"
+            android:text="@string/media_encryption" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/mediaEncSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp" >
+        </Spinner>
+
+        <TextView
             android:id="@+id/MediaNatTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -198,22 +216,46 @@
         </EditText>
 
         <TextView
-            android:id="@+id/MediaEncTitle"
+            android:id="@+id/StunUserTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="@string/media_encryption" >
+            android:text="@string/stun_username" >
         </TextView>
 
-        <Spinner
-            android:id="@+id/mediaEncSpinner"
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/StunUser"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp" >
-        </Spinner>
+            android:layout_width="fill_parent"
+            android:hint="@string/user_id"
+            android:textSize="18sp"
+            android:inputType="textEmailAddress"
+            android:autofillHints="username" >
+        </EditText>
+
+        <TextView
+            android:id="@+id/StunPassTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:onClick="onClick"
+            android:text="@string/stun_password" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/StunPass"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/password"
+            android:textSize="18sp"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" >
+        </EditText>
 
         <RelativeLayout
             android:layout_width="wrap_content"
