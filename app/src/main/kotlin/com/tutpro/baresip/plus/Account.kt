@@ -105,7 +105,11 @@ class Account(val accp: String) {
 
         if (mediaNat != "") res = res + ";medianat=${mediaNat}"
 
-        if (stunServer != "") res = res + ";stunserver=\"${stunServer}\""
+        if (stunServer != "") {
+            if (!stunServer.startsWith("stun") && !stunServer.startsWith("turn"))
+                stunServer = "stun:$stunServer"
+            res += ";stunserver=\"${stunServer}\""
+        }
 
         if (stunUser != "") res = res + ";stunuser=\"${stunUser}\""
 
