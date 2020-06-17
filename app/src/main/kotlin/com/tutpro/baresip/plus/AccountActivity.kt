@@ -24,6 +24,8 @@ class AccountActivity : AppCompatActivity() {
     internal lateinit var outbound2: EditText
     internal lateinit var mediaNat: String
     internal lateinit var stunServer: EditText
+    internal lateinit var stunUser: EditText
+    internal lateinit var stunPass: EditText
     internal lateinit var regCheck: CheckBox
     internal lateinit var mediaEnc: String
     internal lateinit var ipV6MediaCheck: CheckBox
@@ -78,8 +80,8 @@ class AccountActivity : AppCompatActivity() {
 
         mediaNat = acc.mediaNat
         val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
-        val mediaNatKeys = arrayListOf("stun", "ice", "")
-        val mediaNatVals = arrayListOf("STUN", "ICE", "-")
+        val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
+        val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
         var keyVal = mediaNatVals.elementAt(keyIx)
         mediaNatKeys.removeAt(keyIx)
@@ -94,6 +96,8 @@ class AccountActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
                 stunServer.isEnabled = mediaNat != ""
+                stunUser.isEnabled = mediaNat != ""
+                stunPass.isEnabled = mediaNat != ""
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
@@ -102,6 +106,14 @@ class AccountActivity : AppCompatActivity() {
         stunServer = findViewById(R.id.StunServer) as EditText
         stunServer.setText(acc.stunServer)
         stunServer.isEnabled = mediaNat != ""
+
+        stunUser = findViewById(R.id.StunUser) as EditText
+        stunUser.setText(acc.stunUser)
+        stunUser.isEnabled = mediaNat != ""
+
+        stunPass = findViewById(R.id.StunPass) as EditText
+        stunPass.setText(acc.stunPass)
+        stunPass.isEnabled = mediaNat != ""
 
         mediaEnc = acc.mediaEnc
         val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
@@ -312,30 +324,63 @@ class AccountActivity : AppCompatActivity() {
                 }
 
                 if (mediaNat != "") {
-                    val newStunServer = stunServer.text.toString().trim()
+                    var newStunServer = stunServer.text.toString().trim()
+                    if (newStunServer == "")
+                        newStunServer =  resources.getString(R.string.stun_server_default)
                     if (acc.stunServer != newStunServer) {
-                        if (!Utils.checkHostPort(newStunServer)) {
+                        if (!Utils.checkStunUri(newStunServer)) {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_stun_server), newStunServer))
                             return false
                         }
+                        val p = newStunServer.split(":")
                         var host = ""
-                        var port = 0
-                        if (newStunServer != "") {
-                            val hostPort = newStunServer.split(":")
-                            host = hostPort[0]
-                            if (hostPort.size == 2) port = hostPort[1].toInt()
+                        val port: Int
+                        if (p.size == 2) {
+                            host = newStunServer
+                            port = 0
+                        } else {
+                            host = newStunServer.substringBeforeLast(":")
+                            port = newStunServer.substringAfterLast(":").toInt()
                         }
                         if ((account_set_stun_host(acc.accp, host) == 0) &&
                                 (account_set_stun_port(acc.accp, port) == 0)) {
                             acc.stunServer = account_stun_host(acc.accp)
                             if (port != 0)
                                 acc.stunServer += ":" + account_stun_port(acc.accp).toString()
-                            Log.d("Baresip", "New StunServer is '${acc.stunServer}'")
+                            Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of StunServer failed")
+                            Log.e("Baresip", "Setting of STUN/TURN URI server failed")
                         }
+                    }
+                    val su = stunUser.text.toString().trim()
+                    if (Account.checkAuthUser(su)) {
+                        if (account_set_stun_user(acc.accp, su) == 0) {
+                            acc.stunUser = account_stun_user(acc.accp);
+                            Log.d("Baresip", "New STUN/TURN user is ${acc.stunUser}")
+                            save = true
+                        } else {
+                            Log.e("Baresip", "Setting of STUN/TURN user failed")
+                        }
+                    } else {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_stun_username), su))
+                        return false
+                    }
+                    val sp = stunPass.text.toString().trim()
+                    if (sp.isEmpty() || Account.checkAuthPass(sp)) {
+                        if (account_set_stun_pass(acc.accp, sp) == 0) {
+                            acc.stunPass = account_stun_pass(acc.accp);
+                            Log.d("Baresip", "New stun pass is ${acc.stunPass}")
+                            save = true
+                        } else {
+                            Log.e("Baresip", "Setting of stun pass failed")
+                        }
+                    } else {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_stun_password), sp))
+                        return false
                     }
                 }
 
@@ -480,6 +525,14 @@ class AccountActivity : AppCompatActivity() {
             findViewById(R.id.StunServerTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.stun_server),
                         getString(R.string.stun_server_help))
+            }
+            findViewById(R.id.StunUserTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.stun_username),
+                        getString(R.string.stun_username_help))
+            }
+            findViewById(R.id.StunPassTitle) as TextView -> {
+                Utils.alertView(this, getString(R.string.stun_password),
+                        getString(R.string.stun_password_help))
             }
             findViewById(R.id.MediaEncTitle) as TextView -> {
                 Utils.alertView(this, getString(R.string.media_encryption),

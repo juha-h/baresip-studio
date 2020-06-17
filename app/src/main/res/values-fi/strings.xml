@@ -87,13 +87,18 @@
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
         for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment, RFC 5245).
     </string>
-    <string name="stun_server">STUN-palvelin</string>
-    <string name="stun_server_help">STUN-palvelimen muotoa palvelin[:portti]
-        oleva osoite. Oletusarvo on \'stun.l.google.com:19302\', joka
-        osoittaa Google:n julkiseen STUN-palvelimeen.  Käyttäjätunnusta ja
-        salasanaa ei voi tällä hetkellä antaa.
+    <string name="stun_server">STUN/TURN-palvelin</string>
+    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti]\'
+        oleva osoite, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletusarvo on
+        \'stun:stun.l.google.com:19302\', joka osoittaa Google:n julkiseen STUN-palvelimeen.
     </string>
-    <string name="invalid_stun_server">Virheellinen STUN-palvelin \'%1$s\'</string>
+    <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
+    <string name="stun_username">STUN/TURN-käyttäjätunnus</string>
+    <string name="stun_username_help">Käyttäjätunnus jos STUN/TURN-palvelin vaatii sellaisen</string>
+    <string name="invalid_stun_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
+    <string name="stun_password">STUN/TURN-salasana</string>
+    <string name="stun_password_help">Salasana jos STUN/TURN-palvelin vaatii sellaisen</string>
+    <string name="invalid_stun_password">Virheellinen salasana \'%1$s\'</string>
     <string name="media_encryption">Median salaus</string>
     <string name="media_encryption_help">Valitsee median salausprotokollan (vapaaehtoinen).
 \n • ZRTP (suositeltu) tarkoittaa, että ZRTP-salausta yritetään neuvotella sen jälkeen, kun puhelu on alkanut.

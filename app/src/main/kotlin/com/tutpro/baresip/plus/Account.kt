@@ -14,6 +14,8 @@ class Account(val accp: String) {
     var outbound = ArrayList<String>()
     var mediaNat = account_medianat(accp)
     var stunServer = ""
+    var stunUser = account_stun_user(accp)
+    var stunPass = account_stun_pass(accp)
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
     var regint = account_regint(accp)
@@ -103,7 +105,11 @@ class Account(val accp: String) {
 
         if (mediaNat != "") res = res + ";medianat=${mediaNat}"
 
-        if (stunServer != "") res = res + ";stunserver=\"stun:${stunServer}\""
+        if (stunServer != "") res = res + ";stunserver=\"${stunServer}\""
+
+        if (stunUser != "") res = res + ";stunuser=\"${stunUser}\""
+
+        if (stunPass != "") res = res + ";stunpass=\"${stunPass}\""
 
         if (audioCodec.size > 0) {
             var first = true
@@ -267,6 +273,10 @@ external fun account_stun_host(acc: String): String
 external fun account_stun_port(acc: String): Int
 external fun account_set_stun_host(acc: String, host: String): Int
 external fun account_set_stun_port(acc: String, port: Int): Int
+external fun account_stun_user(acc: String): String
+external fun account_set_stun_user(acc: String, user: String): Int
+external fun account_stun_pass(acc: String): String
+external fun account_set_stun_pass(acc: String, pass: String): Int
 external fun account_mediaenc(acc: String): String
 external fun account_set_mediaenc(acc: String, mediaenc: String): Int
 external fun account_medianat(acc: String): String

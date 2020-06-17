@@ -128,6 +128,13 @@ object Utils {
         return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
     }
 
+    fun checkStunUri(uri: String): Boolean {
+        if (!uri.startsWith("stun:") && !uri.startsWith("stuns:") &&
+                !uri.startsWith("turn:") && !uri.startsWith("turns:"))
+            return false
+        return checkHostPort(uri.substringAfter(":"))
+    }
+
     private fun checkPortTransport(portTransport: String): Boolean {
         val pt = portTransport.split(";transport=")
         if (pt.count() == 1)
