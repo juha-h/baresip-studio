@@ -991,64 +991,6 @@ Java_com_tutpro_baresip_plus_AccountKt_account_1mediaenc(JNIEnv *env, jobject th
     return (*env)->NewStringUTF(env, "");
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1stun_1user(JNIEnv *env, jobject thiz, jstring jAcc)
-{
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    if (acc) {
-        const char *stun_user = account_stun_user(acc);
-        if (stun_user) return (*env)->NewStringUTF(env, stun_user);
-    }
-    return (*env)->NewStringUTF(env, "");
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1user(JNIEnv *env, jobject thiz,
-                                                           jstring jAcc, jstring jUser) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
-    int res;
-    if (strlen(user) > 0)
-        res = account_set_stun_user(acc, user);
-    else
-        res = account_set_stun_user(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, jUser, user);
-    return res;
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1stun_1pass(JNIEnv *env, jobject thiz, jstring jAcc)
-{
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    if (acc) {
-        const char *stun_pass = account_stun_pass(acc);
-        if (stun_pass) return (*env)->NewStringUTF(env, stun_pass);
-    }
-    return (*env)->NewStringUTF(env, "");
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1pass(JNIEnv *env, jobject thiz,
-                                                           jstring jAcc, jstring jPass) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
-    int res;
-    if (strlen(pass) > 0)
-        res = account_set_stun_pass(acc, pass);
-    else
-        res = account_set_stun_pass(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, jPass, pass);
-    return res;
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_AccountKt_account_1set_1mediaenc(JNIEnv *env, jobject thiz,
                                                               jstring javaAcc, jstring javaMencid) {
@@ -1131,52 +1073,98 @@ Java_com_tutpro_baresip_plus_AccountKt_account_1set_1sipnat(JNIEnv *env, jobject
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_AccountKt_account_1stun_1host(JNIEnv *env, jobject thiz, jstring javaAcc)
+Java_com_tutpro_baresip_AccountKt_account_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
     if (acc) {
-        const char *stun_host = account_stun_host(acc);
-        if (stun_host) return (*env)->NewStringUTF(env, stun_host);
+        const struct stun_uri *stun_uri = account_stun_uri(acc);
+        if (stun_uri) {
+            char uri_str[256];
+            if (stun_uri->port != 0)
+                sprintf(uri_str, "%s:%s:%d", stunuri_scheme_name(stun_uri->scheme),
+                        stun_uri->host, stun_uri->port);
+            else
+                sprintf(uri_str, "%s:%s", stunuri_scheme_name(stun_uri->scheme),
+                        stun_uri->host);
+            return (*env)->NewStringUTF(env, uri_str);
+        }
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_AccountKt_account_1set_1stun_1host(JNIEnv *env, jobject thiz,
-                                                       jstring javaAcc, jstring javaStunHost) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc, jstring jUri) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *stun_host = (*env)->GetStringUTFChars(env, javaStunHost, 0);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     int res;
-    if (strlen(stun_host) > 0)
-        res = account_set_stun_host(acc, stun_host);
+    if (strlen(uri) > 0)
+        res = account_set_stun_uri(acc, uri);
     else
-        res = account_set_stun_host(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaStunHost, stun_host);
+        res = account_set_stun_uri(acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jUri, uri);
     return res;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_AccountKt_account_1stun_1port(JNIEnv *env, jobject thiz, jstring javaAcc)
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1stun_1user(JNIEnv *env, jobject thiz, jstring jAcc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    return account_stun_port(acc);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    if (acc) {
+        const char *stun_user = account_stun_user(acc);
+        if (stun_user) return (*env)->NewStringUTF(env, stun_user);
+    }
+    return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_AccountKt_account_1set_1stun_1port(JNIEnv *env, jobject thiz,
-                                                           jstring javaAcc, jint javaStunPort) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1user(JNIEnv *env, jobject thiz,
+                                                           jstring jAcc, jstring jUser) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const uint16_t native_port = javaStunPort;
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
     int res;
-    res = account_set_stun_port(acc, native_port);
+    if (strlen(user) > 0)
+        res = account_set_stun_user(acc, user);
+    else
+        res = account_set_stun_user(acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jUser, user);
+    return res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1stun_1pass(JNIEnv *env, jobject thiz, jstring jAcc)
+{
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    if (acc) {
+        const char *stun_pass = account_stun_pass(acc);
+        if (stun_pass) return (*env)->NewStringUTF(env, stun_pass);
+    }
+    return (*env)->NewStringUTF(env, "");
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1pass(JNIEnv *env, jobject thiz,
+                                                           jstring jAcc, jstring jPass) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
+    int res;
+    if (strlen(pass) > 0)
+        res = account_set_stun_pass(acc, pass);
+    else
+        res = account_set_stun_pass(acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jPass, pass);
     return res;
 }
 
