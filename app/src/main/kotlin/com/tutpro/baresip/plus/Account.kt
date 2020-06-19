@@ -13,7 +13,7 @@ class Account(val accp: String) {
     var authPass = account_auth_pass(accp)
     var outbound = ArrayList<String>()
     var mediaNat = account_medianat(accp)
-    var stunServer = ""
+    var stunServer = account_stun_uri(accp)
     var stunUser = account_stun_user(accp)
     var stunPass = account_stun_pass(accp)
     var audioCodec = ArrayList<String>()
@@ -30,15 +30,6 @@ class Account(val accp: String) {
     var callHistory = true
 
     init {
-
-        val stunHost = account_stun_host(accp)
-        if (stunHost != "") {
-            val stunPort = account_stun_port(accp)
-            if (stunPort == 0)
-                stunServer = stunHost
-            else
-                stunServer = "$stunHost:$stunPort"
-        }
 
         var i = 0
         while (true) {
@@ -111,9 +102,9 @@ class Account(val accp: String) {
             res += ";stunserver=\"${stunServer}\""
         }
 
-        if (stunUser != "") res = res + ";stunuser=\"${stunUser}\""
+        res += ";stunuser=\"${stunUser}\""
 
-        if (stunPass != "") res = res + ";stunpass=\"${stunPass}\""
+        if (stunPass != "") res += ";stunpass=\"${stunPass}\""
 
         if (audioCodec.size > 0) {
             var first = true
@@ -273,10 +264,8 @@ external fun account_audio_codec(acc: String, ix: Int): String
 external fun account_video_codec(acc: String, ix: Int): String
 external fun account_regint(acc: String): Int
 external fun account_set_regint(acc: String, regint: Int): Int
-external fun account_stun_host(acc: String): String
-external fun account_stun_port(acc: String): Int
-external fun account_set_stun_host(acc: String, host: String): Int
-external fun account_set_stun_port(acc: String, port: Int): Int
+external fun account_stun_uri(acc: String): String
+external fun account_set_stun_uri(acc: String, uri: String): Int
 external fun account_stun_user(acc: String): String
 external fun account_set_stun_user(acc: String, user: String): Int
 external fun account_stun_pass(acc: String): String
@@ -290,3 +279,5 @@ external fun account_set_video_codecs(acc: String, codecs: String): Int
 external fun account_set_mwi(acc: String, value: String): Int
 external fun account_vm_uri(acc: String): String
 external fun account_extra(acc: String): String
+external fun account_debug(acc: String)
+

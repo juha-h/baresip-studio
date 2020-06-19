@@ -1094,6 +1094,13 @@ Java_com_tutpro_baresip_plus_AccountKt_account_1set_1medianat(JNIEnv *env, jobje
     return res;
 }
 
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1debug(JNIEnv *env, jobject thiz, jstring javaAccount) {
+    const char *native_account = (*env)->GetStringUTFChars(env, javaAccount, 0);
+    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
+    account_debug_log(acc);
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_plus_AccountKt_account_1sipnat(JNIEnv *env, jobject thiz, jstring javaAcc)
 {
@@ -1409,13 +1416,6 @@ Java_com_tutpro_baresip_plus_Api_ua_1set_1media_1af(JNIEnv *env, jobject thiz, j
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("setting ua media af to '%d'\n", javaAf);
     ua_set_media_af(ua, javaAf);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_account_1debug(JNIEnv *env, jobject thiz, jstring javaAccount) {
-    const char *native_account = (*env)->GetStringUTFChars(env, javaAccount, 0);
-    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
-    account_debug_log(acc);
 }
 
 JNIEXPORT void JNICALL

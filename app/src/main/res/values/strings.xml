@@ -82,8 +82,9 @@
     </string>
     <string name="stun_server">STUN/TURN Server</string>
     <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port], where scheme
-        is \'stun\', \'stuns\', \'turn\', or \'turns\'. Factory default value is
-        \'stun:stun.l.google.com:19302\', pointing to public Google STUN server.
+        is \'stun\', \'stuns\', \'turn\', or \'turns\'. Factory default STUN server is
+        \'stun:stun.l.google.com:19302\', pointing to public Google STUN server.  There is no
+        factory default TURN server.
     </string>
     <string name="invalid_stun_server">Invalid STUN/TURN Server URI \'%1$s\'</string>
     <string name="stun_server_default" translatable="false">stun:stun.l.google.com:19302</string>

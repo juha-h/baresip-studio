@@ -89,8 +89,9 @@
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
     <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti]\'
-        oleva osoite, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletusarvo on
-        \'stun:stun.l.google.com:19302\', joka osoittaa Google:n julkiseen STUN-palvelimeen.
+        oleva osoite, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. STUN-palvelimen
+        oletusarvo \'stun:stun.l.google.com:19302\', joka osoittaa Google:n julkiseen STUN-palvelimeen.
+        TURN-palvelimella ei ole oletusarvoa.
     </string>
     <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
     <string name="stun_username">STUN/TURN-käyttäjätunnus</string>
