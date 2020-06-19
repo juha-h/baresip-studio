@@ -945,52 +945,39 @@ Java_com_tutpro_baresip_AccountKt_account_1set_1sipnat(JNIEnv *env, jobject thiz
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1stun_1host(JNIEnv *env, jobject thiz, jstring javaAcc)
+Java_com_tutpro_baresip_AccountKt_account_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
     if (acc) {
-        const char *stun_host = account_stun_host(acc);
-        if (stun_host) return (*env)->NewStringUTF(env, stun_host);
+        const struct stun_uri *stun_uri = account_stun_uri(acc);
+        if (stun_uri) {
+            char uri_str[256];
+            if (stun_uri->port != 0)
+                sprintf(uri_str, "%s:%s:%d", stunuri_scheme_name(stun_uri->scheme),
+                        stun_uri->host, stun_uri->port);
+            else
+                sprintf(uri_str, "%s:%s", stunuri_scheme_name(stun_uri->scheme),
+                        stun_uri->host);
+            return (*env)->NewStringUTF(env, uri_str);
+        }
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1host(JNIEnv *env, jobject thiz,
-                                                       jstring javaAcc, jstring javaStunHost) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
+Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc, jstring jUri) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
     struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *stun_host = (*env)->GetStringUTFChars(env, javaStunHost, 0);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     int res;
-    if (strlen(stun_host) > 0)
-        res = account_set_stun_host(acc, stun_host);
+    if (strlen(uri) > 0)
+        res = account_set_stun_uri(acc, uri);
     else
-        res = account_set_stun_host(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaStunHost, stun_host);
-    return res;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1stun_1port(JNIEnv *env, jobject thiz, jstring javaAcc)
-{
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    return account_stun_port(acc);
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_AccountKt_account_1set_1stun_1port(JNIEnv *env, jobject thiz,
-                                                           jstring javaAcc, jint javaStunPort) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const uint16_t native_port = javaStunPort;
-    int res;
-    res = account_set_stun_port(acc, native_port);
+        res = account_set_stun_uri(acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jUri, uri);
     return res;
 }
 
@@ -1097,6 +1084,13 @@ Java_com_tutpro_baresip_AccountKt_account_1extra(JNIEnv *env, jobject thiz, jstr
             return (*env)->NewStringUTF(env, extra);
     }
     return (*env)->NewStringUTF(env, "");
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_AccountKt_account_1debug(JNIEnv *env, jobject thiz, jstring javaAccount) {
+    const char *native_account = (*env)->GetStringUTFChars(env, javaAccount, 0);
+    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
+    account_debug_log(acc);
 }
 
 JNIEXPORT jstring JNICALL
@@ -1285,13 +1279,6 @@ Java_com_tutpro_baresip_Api_ua_1set_1media_1af(JNIEnv *env, jobject thiz, jstrin
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("setting ua media af to '%d'\n", javaAf);
     ua_set_media_af(ua, javaAf);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_account_1debug(JNIEnv *env, jobject thiz, jstring javaAccount) {
-    const char *native_account = (*env)->GetStringUTFChars(env, javaAccount, 0);
-    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
-    account_debug_log(acc);
 }
 
 JNIEXPORT void JNICALL

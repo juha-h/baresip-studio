@@ -325,30 +325,24 @@ class AccountActivity : AppCompatActivity() {
 
                 if (mediaNat != "") {
                     var newStunServer = stunServer.text.toString().trim()
-                    if (newStunServer == "")
-                        newStunServer =  resources.getString(R.string.stun_server_default)
+                    if (newStunServer == "") {
+                        if (mediaNat.startsWith("turn")) {
+                            Utils.alertView(this, getString(R.string.notice),
+                                    String.format(getString(R.string.invalid_stun_server), newStunServer))
+                            return false
+                        } else
+                            newStunServer =  resources.getString(R.string.stun_server_default)
+                    }
                     if (acc.stunServer != newStunServer) {
                         if (!Utils.checkStunUri(newStunServer)) {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_stun_server), newStunServer))
                             return false
                         }
-                        val p = newStunServer.split(":")
-                        var host = ""
-                        val port: Int
-                        if (p.size == 2) {
-                            host = newStunServer
-                            port = 0
-                        } else {
-                            host = newStunServer.substringBeforeLast(":")
-                            port = newStunServer.substringAfterLast(":").toInt()
-                        }
-                        if ((account_set_stun_host(acc.accp, host) == 0) &&
-                                (account_set_stun_port(acc.accp, port) == 0)) {
-                            acc.stunServer = account_stun_host(acc.accp)
-                            if (port != 0)
-                                acc.stunServer += ":" + account_stun_port(acc.accp).toString()
+                        if (account_set_stun_uri(acc.accp, newStunServer) == 0) {
+                            acc.stunServer = account_stun_uri(acc.accp)
                             Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
+                            account_debug(acc.accp);
                             save = true
                         } else {
                             Log.e("Baresip", "Setting of STUN/TURN URI server failed")
