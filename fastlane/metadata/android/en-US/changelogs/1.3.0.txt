@@ -1,0 +1,6 @@
+- Added TURN account medianat option.
+- Added possibility to give STUN/TURN server username/password.
+- STUN/TURN related strings for some languages have not been updated yet.
+- ES language update.
+- Improved checking of camera availability.
+- More dialog improvements.
