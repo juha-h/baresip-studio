@@ -342,7 +342,6 @@ class AccountActivity : AppCompatActivity() {
                         if (account_set_stun_uri(acc.accp, newStunServer) == 0) {
                             acc.stunServer = account_stun_uri(acc.accp)
                             Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
-                            account_debug(acc.accp);
                             save = true
                         } else {
                             Log.e("Baresip", "Setting of STUN/TURN URI server failed")
