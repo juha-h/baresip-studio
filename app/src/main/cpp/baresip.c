@@ -88,6 +88,8 @@ static void call_video_debug_log() {
     if (l != -1) {
         debug_buf[l] = '\0';
         LOGD("%s\n", debug_buf);
+	LOGD("local media dir %d\n", sdp_media_ldir(m));
+        LOGD("remote media dir %d\n", sdp_media_rdir(m));
     }
 }
 
@@ -240,16 +242,25 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
+	    if (call_state(call) != CALL_STATE_ESTABLISHED)
+                return;
             if (strcmp(prm, "offer") == 0)
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call offered");
             else
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "local call answered");
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-            // log_call_video_info(call);
-            // sdp_media_debug_log(stream_sdpmedia(video_strm(call_video(call))));
-            if (strcmp(prm, "offer") == 0) {
+	    if (call_state(call) != CALL_STATE_ESTABLISHED)
+                return;
+            log_call_video_info(call);
+            sdp_media_debug_log(stream_sdpmedia(video_strm(call_video(call))));
+	    if (strcmp(prm, "offer") == 0) {
                 struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
+                if (sdp_media_has_media(media)) {
+                    LOGD("**** offer has video media\n");
+                } else {
+                    LOGD("**** offer does NOT have video media %d\n", sdp_media_rport(media));
+                }
                 if (list_head(sdp_media_format_lst(media, false))) {
                     int res = check_video(ua, call);
                     LOGD("check_video result = %d\n", res);

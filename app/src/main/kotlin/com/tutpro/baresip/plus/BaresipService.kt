@@ -628,8 +628,6 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Remote call $callp is not found")
                             return
                         }
-                        if (call.status != "connected")
-                            return
                         newEvent = "call update"
                     }
                     "call established" -> {
@@ -871,8 +869,6 @@ class BaresipService: Service() {
         if (call != null) {
             if (call.videoEnabled)
                 return 0
-            if (call.status != "connected")
-                return -1
             if (!call.videoAllowed) {
                 call.videoEnabled = false
                 val intent = Intent("service event")
