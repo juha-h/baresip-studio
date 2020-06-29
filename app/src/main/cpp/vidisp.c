@@ -22,6 +22,8 @@ const char *egl_error(EGLint const err) {
             return "EGL_NOT_INITIALIZED";
         case EGL_BAD_SURFACE:
             return "EGL_BAD_SURFACE";
+        case EGL_BAD_ALLOC:
+            return "EGL_BAD_ALLOC";
         case EGL_CONTEXT_LOST:
             return "EGL_CONTEXT_LOST";
         default:
@@ -42,6 +44,8 @@ static bool resize = false;
 
 struct vidisp *vid;
 
+struct vidisp_st *gst = NULL;
+
 static void renderer_destroy(struct vidisp_st *st) {
 
     LOGD("Destroying renderer context");
@@ -54,6 +58,8 @@ static void renderer_destroy(struct vidisp_st *st) {
     st->display = EGL_NO_DISPLAY;
     st->surface = EGL_NO_SURFACE;
     st->context = EGL_NO_CONTEXT;
+
+    gst = NULL;
 
     return;
 }
@@ -107,7 +113,7 @@ static int context_initialize(struct vidisp_st *st)
     ANativeWindow_setBuffersGeometry(st->window, 0, 0, format);
 
     if (!(surface = eglCreateWindowSurface(display, config, st->window, NULL))) {
-        LOGW("eglCreateWindowSurface() returned error %d\n", eglGetError());
+        LOGW("eglCreateWindowSurface() returned error %s\n", egl_error(eglGetError()));
         renderer_destroy(st);
         return eglGetError();
     }
@@ -152,7 +158,6 @@ static int context_initialize(struct vidisp_st *st)
 int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidisp_prm *prm,
         const char *dev, vidisp_resize_h *resizeh, void *arg)
 {
-    struct vidisp_st *st;
     int err = 0;
 
     (void)prm;
@@ -162,14 +167,17 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 
     LOGD("At opengles_alloc() on thread %li\n", (long)pthread_self());
 
-    st = mem_zalloc(sizeof(*st), destructor);
-    if (!st)
+    if (gst)
+        renderer_destroy(gst);
+
+    gst = mem_zalloc(sizeof(*gst), destructor);
+    if (!gst)
         return ENOMEM;
 
-    st->vd = vd;
-    st->window = window;
+    gst->vd = vd;
+    gst->window = window;
 
-    if (st->window == NULL) {
+    if (gst->window == NULL) {
         LOGW("Window is NULL\n");
         err = EINVAL;
     }
@@ -178,9 +186,9 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     // err = context_initialize(st);
 
     if (err)
-        mem_deref(st);
+        mem_deref(gst);
     else
-        *stp = st;
+        *stp = gst;
 
     return err;
 }
