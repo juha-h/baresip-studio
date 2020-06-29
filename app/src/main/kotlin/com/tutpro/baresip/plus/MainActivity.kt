@@ -444,7 +444,14 @@ class MainActivity : AppCompatActivity() {
             videoButton.isClickable = false
             videoButton.setImageResource(R.drawable.video_pending)
             Handler().postDelayed({
-                Call.call("connected")?.setVideo(true)
+                val call = Call.call("connected")
+                if (call != null) {
+                    if (BaresipService.cameraAvailable)
+                        call.setVideoDirection(Call.SDP_SENDRECV)
+                    else
+                        call.setVideoDirection(Call.SDP_RECVONLY)
+                    call.setVideo(true)
+                }
             }, 250)
         }
 
@@ -785,16 +792,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call update" -> {
-                        val callp = params[1]
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w("Baresip", "Updated call $callp not found")
-                            return
-                        }
-                        if (!call.hasVideoStream()) {
-                            Log.d("Baresip", "Call does not have video stream")
-                            call.videoEnabled = false
-                        }
                         showCall(ua)
                     }
                     "call video request" -> {
@@ -1501,7 +1498,7 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
-                    if (call.videoEnabled) {
+                    if (call.video != Call.SDP_INACTIVE) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {

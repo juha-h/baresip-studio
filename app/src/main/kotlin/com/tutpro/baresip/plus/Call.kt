@@ -11,7 +11,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var zid = ""
     var hasHistory = false
     var videoAllowed = false
-    var videoEnabled = false
+    var video: Int = SDP_INACTIVE
 
     init {
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
@@ -31,14 +31,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
 
     fun startAudio() {
         call_start_audio(callp)
-    }
-
-    fun stopAudio() {
-        call_stop_audio(callp)
-    }
-
-    fun startVideo(): Int {
-        return call_start_video(callp)
     }
 
     fun startVideoDisplay(): Int {
@@ -73,18 +65,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_has_video(callp)
     }
 
-    fun stopVideoSource() {
-        return call_stop_video(callp)
-    }
-
-    fun hasVideoStream(): Boolean {
-        return call_has_video_stream(callp)
-    }
-
     fun setVideo(enabled: Boolean): Int {
         videoAllowed = enabled
         if (!enabled)
-            videoEnabled = false
+            video = SDP_INACTIVE
         return call_set_video(callp, enabled)
     }
 
@@ -92,8 +76,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         call_disable_video_stream(callp, disable)
     }
 
-    fun modify() {
-        call_modify(callp)
+    fun setVideoDirection(dir: Int) {
+        call_set_video_direction(callp, dir)
     }
 
     fun status(): String {
@@ -110,23 +94,24 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_send_digit(callp: String, digit: Char): Int
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
     private external fun call_start_audio(callp: String)
-    private external fun call_stop_audio(callp: String)
-    private external fun call_start_video(callp: String): Int
     private external fun call_start_video_display(callp: String): Int
     private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean
-    private external fun call_stop_video(callp: String)
-    private external fun call_has_video_stream(callp: String): Boolean
     private external fun call_set_video(callp: String, enabled: Boolean): Int
     private external fun call_set_video_source(callp: String, front: Boolean): Int
+    private external fun call_set_video_direction(callp: String, dir: Int)
     private external fun call_disable_video_stream(callp: String, disable: Boolean)
-    private external fun call_modify(callp: String)
 
     external fun call_video_debug()
 
     companion object {
+
+        val SDP_INACTIVE = 0
+        val SDP_RECVONLY = 1
+        val SDP_SENDONLY = 2
+        val SDP_SENDRECV = 3
 
         fun calls(): ArrayList<Call> {
             return BaresipService.calls

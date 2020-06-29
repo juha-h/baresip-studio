@@ -858,33 +858,47 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun checkVideo(uap: String, callp: String): Int {
+    fun checkVideo(uap: String, callp: String, dir: Int): Int {
         if (!isServiceRunning) return -1
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w(LOG_TAG, "checkVideo did not find ua $uap")
             return -1
         }
-        val call = Call.ofCallp(callp);
-        if (call != null) {
-            if (call.videoEnabled)
-                return 0
-            if (!call.videoAllowed) {
-                call.videoEnabled = false
-                val intent = Intent("service event")
-                intent.putExtra("event", "call video request")
-                intent.putExtra("params", arrayListOf(uap, callp))
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-                return -1
-            } else {
-                call.videoAllowed = false
-                call.videoEnabled = true
-                return 1
-            }
-        } else {
+        val call = Call.ofCallp(callp)
+        if (call == null) {
             Log.d(LOG_TAG, "checkVideo did not find call $callp")
             return -1
         }
+        Log.d(LOG_TAG, "checkVideo dir = $dir, videoAllowed = ${call.videoAllowed}, call.video = ${call.video}")
+        if (dir == Call.SDP_INACTIVE) {
+            if (call.video != Call.SDP_INACTIVE) {
+                call.video = Call.SDP_INACTIVE
+                return Call.SDP_INACTIVE
+            } else {
+                return -1
+            }
+        }
+        if ((call.video == Call.SDP_INACTIVE) && !call.videoAllowed) {
+            val intent = Intent("service event")
+            intent.putExtra("event", "call video request")
+            intent.putExtra("params", arrayListOf(uap, callp))
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+            return Call.SDP_INACTIVE
+        }
+        call.videoAllowed = false
+        if (cameraAvailable) {
+            call.video = dir
+        } else
+            when (dir) {
+                Call.SDP_SENDRECV, Call.SDP_RECVONLY -> {
+                    call.video = Call.SDP_RECVONLY
+                }
+                Call.SDP_SENDONLY -> {
+                    call.video = Call.SDP_INACTIVE
+                }
+            }
+        return call.video
     }
 
     @Keep
