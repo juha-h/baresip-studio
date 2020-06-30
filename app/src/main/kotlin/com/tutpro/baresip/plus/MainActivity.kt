@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
@@ -697,6 +698,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    @SuppressLint("InflateParams")
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
             Log.d("Baresip", "Omit service event '$event' for task -1")
@@ -802,9 +804,12 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         if (!isFinishing() && !alerting) {
-                            val builder = AlertDialog.Builder(this)
+                            val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                            val titleView = LayoutInflater.from(this).inflate(R.layout.alert_title, null)
+                                    as TextView
+                            titleView.text = getString(R.string.video_request)
                             with(builder) {
-                                setTitle(getString(R.string.video_request))
+                                setCustomTitle(titleView)
                                 setMessage(String.format(getString(R.string.allow_video),
                                         Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))))
                                 setPositiveButton(getString(R.string.yes)) { dialog, _ ->
@@ -1177,7 +1182,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
