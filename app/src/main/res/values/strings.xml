@@ -305,9 +305,10 @@
         Check Listen Address, TLS Certificate File, and TLS CA File.  Then restart baresip.
     </string>
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
-    <string name="verify">Verify</string>
+    <string name="verify">Verify Request</string>
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">Do you accept to transfer call to \'%1$s\'?</string>
+    <string name="transfer">Transfer Request</string>
+    <string name="transfer_query">Do you accept to transfer this call to \'%1$s\'?</string>
     <string name="call_failed">Call failed.</string>
     <string name="call_closed">Call is closed.</string>
     <string name="call_not_secure">This call is NOT secure!</string>
@@ -319,6 +320,7 @@
     <string name="backed_up">Application data backed up to Download folder file \'%1$s\'.</string>
     <string name="backup_failed">Failed to back up application data to Download folder file
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.</string>
+    <string name="restart_request">Restart Request</string>
     <string name="restored">Application data restored. baresip needs to be restarted.
         Restart now?
     </string>

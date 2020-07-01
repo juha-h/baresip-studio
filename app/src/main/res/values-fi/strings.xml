@@ -342,12 +342,11 @@
         Sen jälkeen käynnistä baresip uudelleen.
     </string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
-    <string name="verify">Todenna</string>
+    <string name="verify">Todennuspyyntö</string>
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt; &lt;%2$s&gt;?
     </string>
-    <string name="transfer_query">Hyväksytkö puhelun siirron kohteeseen
-    \'%1$s\'?
-    </string>
+    <string name="transfer">Siirtopyyntö</string>
+    <string name="transfer_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'?</string>
     <string name="call_failed">Puhelu epäonnistui.</string>
     <string name="call_closed">Puhelu on päättynyt.</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
@@ -363,6 +362,7 @@
     <string name="backup_failed">Sovelluksen tietojen talletus Download-kansion tiedostoon
         \'%1$s\' epäonnistui. Tarkista Asetukset → Sovellukset → baresip →
         Käyttöluvat → Tallennustila.</string>
+    <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt?
     </string>

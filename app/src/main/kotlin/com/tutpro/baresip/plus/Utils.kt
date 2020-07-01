@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -57,9 +58,8 @@ object Utils {
         return result
     }
 
-    @SuppressLint("InflateParams")
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        val titleView = LayoutInflater.from(context).inflate(R.layout.alert_title, null) as TextView
+        val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
         val builder = AlertDialog.Builder(context)
         builder.setCustomTitle(titleView)
