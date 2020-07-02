@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -54,19 +55,18 @@ object Utils {
         return result
     }
 
-    @SuppressLint("InflateParams")
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        val titleView = LayoutInflater.from(context).inflate(R.layout.alert_title, null) as TextView
+        val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        val builder = AlertDialog.Builder(context)
-        builder.setCustomTitle(titleView)
-                .setMessage(message)
-                .setPositiveButton(R.string.ok)
-                { dialog, _ ->
-                    dialog.dismiss()
-                    action()
-                }
-                .show()
+        with (AlertDialog.Builder(context)) {
+            setCustomTitle(titleView)
+            setMessage(message)
+            setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                action()
+            }
+            show()
+        }
     }
 
     fun uriHostPart(uri: String): String {
