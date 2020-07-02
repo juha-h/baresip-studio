@@ -201,29 +201,29 @@ class MainActivity : AppCompatActivity() {
                             getString(R.string.peer_not_verified))
                 }
                 "green" -> {
-                    val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                    val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.info)
-                    val builder = AlertDialog.Builder(this)
-                    builder.setCustomTitle(titleView)
-                    builder.setMessage(getString(R.string.call_is_secure))
-                    builder.setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
-                        val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
-                        if (calls.size > 0) {
-                            if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
-                                Log.e("Baresip",
-                                        "Command 'zrtp_unverify ${calls[0].zid}' failed")
-                            } else {
-                                securityButton.setImageResource(R.drawable.box_yellow)
-                                securityButton.tag = "yellow"
+                    with (AlertDialog.Builder(this)) {
+                        setCustomTitle(titleView)
+                        setMessage(getString(R.string.call_is_secure))
+                        setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
+                            val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
+                            if (calls.size > 0) {
+                                if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
+                                    Log.e("Baresip",
+                                            "Command 'zrtp_unverify ${calls[0].zid}' failed")
+                                } else {
+                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.tag = "yellow"
+                                }
                             }
+                            dialog.dismiss()
                         }
-                        dialog.dismiss()
+                        setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
                     }
-                    builder.setNegativeButton(getString(R.string.no)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    builder.create().show()
                 }
             }
         }
@@ -373,13 +373,15 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                    val builder = AlertDialog.Builder(this@MainActivity,
-                            R.style.Theme_AppCompat)
-                    builder.setTitle(getString(R.string.voicemail_messages))
-                    builder.setMessage(acc.vmMessages(this))
-                            .setPositiveButton(getString(R.string.listen), dialogClickListener)
-                            .setNegativeButton(getString(R.string.cancel), dialogClickListener)
-                            .show()
+                    val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                    titleView.text = getString(R.string.voicemail_messages)
+                    with (AlertDialog.Builder(this)) {
+                        setCustomTitle(titleView)
+                        setMessage(acc.vmMessages(this@MainActivity))
+                        setPositiveButton(getString(R.string.listen), dialogClickListener)
+                        setNegativeButton(getString(R.string.cancel), dialogClickListener)
+                        show()
+                    }
                 }
             }
         }
@@ -592,16 +594,16 @@ class MainActivity : AppCompatActivity() {
         if (event == "stopped") {
             Log.d("Baresip", "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
-                val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.notice)
-                val builder = AlertDialog.Builder(this)
-                builder.setCustomTitle(titleView)
-                builder.setMessage(getString(R.string.start_failed))
-                builder.setNeutralButton(getString(R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
+                with (AlertDialog.Builder(this)) {
+                    setCustomTitle(titleView)
+                    setMessage(getString(R.string.start_failed))
+                    setNeutralButton(getString(R.string.ok)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
                 }
-                builder.create().show()
             } else {
                 quitTimer.cancel()
                 finishAndRemoveTask()
@@ -685,41 +687,41 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Call $callp to be verified is not found")
                             return
                         }
-                        val inflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val titleView = inflater.inflate(R.layout.alert_title, null) as TextView
+                        val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.verify)
-                        val builder = AlertDialog.Builder(this)
-                        builder.setCustomTitle(titleView)
-                        builder.setMessage(String.format(getString(R.string.verify_sas),
-                                ev[1], ev[2]))
-                        builder.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                            val security: Int
-                            if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                                Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
-                                security = R.drawable.box_yellow
-                            } else {
-                                security = R.drawable.box_green
+                        with (AlertDialog.Builder(this)) {
+                            setCustomTitle(titleView)
+                            setMessage(String.format(getString(R.string.verify_sas),
+                                    ev[1], ev[2]))
+                            setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                                val security: Int
+                                if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                                    Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
+                                    security = R.drawable.box_yellow
+                                } else {
+                                    security = R.drawable.box_green
+                                }
+                                call.security = security
+                                call.zid = ev[3]
+                                if (aor == aorSpinner.tag) {
+                                    securityButton.setImageResource(security)
+                                    setSecurityButtonTag(securityButton, security)
+                                    securityButton.visibility = View.VISIBLE
+                                    dialog.dismiss()
+                                }
                             }
-                            call.security = security
-                            call.zid = ev[3]
-                            if (aor == aorSpinner.tag) {
-                                securityButton.setImageResource(security)
-                                setSecurityButtonTag(securityButton, security)
-                                securityButton.visibility = View.VISIBLE
+                            setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                                call.security = R.drawable.box_yellow
+                                call.zid = ev[3]
+                                if (aor == aorSpinner.tag) {
+                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.tag = "yellow"
+                                    securityButton.visibility = View.VISIBLE
+                                }
                                 dialog.dismiss()
                             }
+                            show()
                         }
-                        builder.setNegativeButton(getString(R.string.no)) { dialog, _ ->
-                            call.security = R.drawable.box_yellow
-                            call.zid = ev[3]
-                            if (aor == aorSpinner.tag) {
-                                securityButton.setImageResource(R.drawable.box_yellow)
-                                securityButton.tag = "yellow"
-                                securityButton.visibility = View.VISIBLE
-                            }
-                            dialog.dismiss()
-                        }
-                        if (!isFinishing()) builder.create().show()
                     }
                     "call verified", "call secure" -> {
                         val callp = params[1]
@@ -745,24 +747,28 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
                         }
-                        val transferDialog = AlertDialog.Builder(this)
+                        val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                        titleView.text = getString(R.string.transfer)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        transferDialog.setMessage(String.format(getString(R.string.transfer_query),
-                                target))
-                        transferDialog.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                            if (call in Call.calls())
-                                Api.ua_hangup(uap, callp, 0, "")
-                            call(ua, ev[1], "transferring")
-                            showCall(ua)
-                            dialog.dismiss()
+                        with (AlertDialog.Builder(this)) {
+                            setCustomTitle(titleView)
+                            setMessage(String.format(getString(R.string.transfer_query),
+                                    target))
+                            setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                                if (call in Call.calls())
+                                    Api.ua_hangup(uap, callp, 0, "")
+                                call(ua, ev[1], "transferring")
+                                showCall(ua)
+                                dialog.dismiss()
+                            }
+                            setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                                if (call in Call.calls())
+                                    call.notifySipfrag(603, "Decline")
+                                dialog.dismiss()
+                            }
+                            show()
                         }
-                        transferDialog.setNegativeButton(getString(R.string.no)) { dialog, _ ->
-                            if (call in Call.calls())
-                                call.notifySipfrag(603, "Decline")
-                            dialog.dismiss()
-                        }
-                        transferDialog.create().show()
                     }
                     "transfer accept" -> {
                         val callp = params[1]
@@ -946,16 +952,20 @@ class MainActivity : AppCompatActivity() {
 
             CONFIG_CODE -> {
                 if ((data != null) && data.hasExtra("restart")) {
-                    val restartDialog = AlertDialog.Builder(this)
-                    restartDialog.setMessage(getString(R.string.config_restart))
-                    restartDialog.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
-                        dialog.dismiss()
-                        quitRestart(true)
+                    val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                    titleView.text = getString(R.string.restart_request)
+                    with (AlertDialog.Builder(this)) {
+                        setCustomTitle(titleView)
+                        setMessage(getString(R.string.config_restart))
+                        setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+                            dialog.dismiss()
+                            quitRestart(true)
+                        }
+                        setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
                     }
-                    restartDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    restartDialog.create().show()
                 }
             }
 
@@ -1018,7 +1028,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
-        val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
@@ -1037,28 +1046,31 @@ class MainActivity : AppCompatActivity() {
             else
                 input.transformationMethod = PasswordTransformationMethod()
         }
-        builder.setView(layout)
-        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
-            dialog.dismiss()
-            var password = input.text.toString().trim()
-            if (!Account.checkAuthPass(password)) {
-                Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_authentication_password), password))
-                password = ""
+        val context = this
+        with (AlertDialog.Builder(this)) {
+            setView(layout)
+            setPositiveButton(android.R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                var password = input.text.toString().trim()
+                if (!Account.checkAuthPass(password)) {
+                    Utils.alertView(context, getString(R.string.notice),
+                            String.format(getString(R.string.invalid_authentication_password), password))
+                    password = ""
+                }
+                when (title) {
+                    getString(R.string.encrypt_password) ->
+                        if (password != "") backup(password)
+                    getString(R.string.decrypt_password) ->
+                        if (password != "") restore(password)
+                    else ->
+                        AccountsActivity.setAuthPass(ua!!, password)
+                }
             }
-            when (title) {
-                getString(R.string.encrypt_password) ->
-                    if (password != "") backup(password)
-                getString(R.string.decrypt_password) ->
-                    if (password != "") restore(password)
-                else ->
-                    AccountsActivity.setAuthPass(ua!!, password)
+            setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.cancel()
             }
+            show()
         }
-        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            dialog.cancel()
-        }
-        builder.show()
     }
 
     private fun askPasswords(accounts: MutableList<String>) {
@@ -1068,7 +1080,6 @@ class MainActivity : AppCompatActivity() {
             if ((Utils.paramValue(params, "auth_user") != "") &&
                     (Utils.paramValue(params, "auth_pass") == "")) {
                 val aor = account.substringAfter("<").substringBefore(">")
-                val builder = AlertDialog.Builder(this)
                 val layout = LayoutInflater.from(this)
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                                 false)
@@ -1085,24 +1096,27 @@ class MainActivity : AppCompatActivity() {
                     else
                         input.transformationMethod = PasswordTransformationMethod()
                 }
-                builder.setView(layout)
-                builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    dialog.dismiss()
-                    val password = input.text.toString().trim()
-                    if (!Account.checkAuthPass(password)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_authentication_password),  password))
-                    } else {
-                        aorPasswords.put(aor, password)
+                val context = this
+                with (AlertDialog.Builder(this)) {
+                    setView(layout)
+                    setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                        val password = input.text.toString().trim()
+                        if (!Account.checkAuthPass(password)) {
+                            Utils.alertView(context, getString(R.string.notice),
+                                    String.format(getString(R.string.invalid_authentication_password), password))
+                        } else {
+                            aorPasswords.put(aor, password)
+                        }
+                        askPasswords(accounts)
                     }
-                    askPasswords(accounts)
+                    setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                        aorPasswords.put(aor, "")
+                        askPasswords(accounts)
+                    }
+                    show()
                 }
-                builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                    dialog.cancel()
-                    aorPasswords.put(aor, "")
-                    askPasswords(accounts)
-                }
-                builder.show()
             } else {
                 askPasswords(accounts)
             }
@@ -1175,19 +1189,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.deleteFile(File(zipFilePath))
-        val builder = AlertDialog.Builder(this)
-        val titleView = LayoutInflater.from(this).inflate(R.layout.alert_title, null) as TextView
+        val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
         titleView.text = getString(R.string.info)
-        builder.setCustomTitle(titleView)
-        builder.setMessage(getString(R.string.restored))
-        builder.setPositiveButton(getText(R.string.restart)) { dialog, _ ->
-            quitRestart(true)
-            dialog.dismiss()
+        with (AlertDialog.Builder(this)) {
+            setCustomTitle(titleView)
+            setMessage(getString(R.string.restored))
+            setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+                quitRestart(true)
+                dialog.dismiss()
+            }
+            setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            show()
         }
-        builder.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
     }
 
     private fun spinToAor(aor: String) {
