@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
