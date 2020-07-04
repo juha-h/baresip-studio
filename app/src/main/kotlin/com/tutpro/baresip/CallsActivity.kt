@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.text.format.DateUtils.isToday
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
@@ -74,13 +75,14 @@ class CallsActivity : AppCompatActivity() {
             }
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
-                builder.setMessage(String.format(getString(R.string.calls_call_message_question),
-                        peerName))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.call), dialogClickListener)
-                        .setPositiveButton(getString(R.string.send_message), dialogClickListener)
-                        .show()
+                with (AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)) {
+                    setMessage(String.format(getString(R.string.calls_call_message_question),
+                            peerName))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.call), dialogClickListener)
+                    setPositiveButton(getString(R.string.send_message), dialogClickListener)
+                    show()
+                }
             }
         }
 
@@ -113,20 +115,22 @@ class CallsActivity : AppCompatActivity() {
                 callText = getString(R.string.calls_call)
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
             if (peerName.startsWith("sip:"))
-                builder.setMessage(String.format(getString(R.string.calls_add_delete_question),
-                        Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.add_contact), dialogClickListener)
-                        .setPositiveButton(String.format(getString(R.string.delete), callText),
-                                dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.calls_add_delete_question),
+                            Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.add_contact), dialogClickListener)
+                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    show()
+                }
             else
-                builder.setMessage(String.format(getString(R.string.calls_delete_question),
-                        Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setPositiveButton(String.format(getString(R.string.delete), callText),
-                                dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.calls_delete_question),
+                            Utils.friendlyUri(peerName, Utils.aorDomain(aor)), callText))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    show()
+                }
             true
         }
 
@@ -142,20 +146,24 @@ class CallsActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.delete_history -> {
-                val deleteDialog = AlertDialog.Builder(this@CallsActivity)
-                deleteDialog.setMessage(String.format(getString(R.string.delete_history_alert),
-                        aor.substringAfter(":")))
-                deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                    CallHistory.clear(aor)
-                    CallHistory.save()
-                    aorGenerateHistory(aor)
-                    clAdapter.notifyDataSetChanged()
-                    dialog.dismiss()
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.confirmation)
+                with (AlertDialog.Builder(this@CallsActivity)) {
+                    setCustomTitle(titleView)
+                    setMessage(String.format(getString(R.string.delete_history_alert),
+                            aor.substringAfter(":")))
+                    setPositiveButton(getText(R.string.delete)) { dialog, _ ->
+                        CallHistory.clear(aor)
+                        CallHistory.save()
+                        aorGenerateHistory(aor)
+                        clAdapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    }
+                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
                 }
-                deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                deleteDialog.create().show()
                 return true
             }
 

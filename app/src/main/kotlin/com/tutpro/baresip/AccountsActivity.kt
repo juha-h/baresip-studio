@@ -91,7 +91,6 @@ class AccountsActivity : AppCompatActivity() {
     }
 
     private fun askPassword(ua: UserAgent) {
-        val builder = AlertDialog.Builder(this)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
@@ -108,7 +107,7 @@ class AccountsActivity : AppCompatActivity() {
             else
                 input.transformationMethod = PasswordTransformationMethod()
         }
-        with (builder) {
+        with (AlertDialog.Builder(this)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
