@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 
 import java.util.*
@@ -81,17 +82,21 @@ class ChatsActivity: AppCompatActivity() {
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
             val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
-                builder.setMessage(String.format(getString(R.string.long_chat_question),
-                        Utils.friendlyUri(peer, Utils.aorDomain(aor))))
-                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
-                        .setPositiveButton(getText(R.string.add_contact), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.long_chat_question),
+                            Utils.friendlyUri(peer, Utils.aorDomain(aor))))
+                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getText(R.string.delete), dialogClickListener)
+                    setPositiveButton(getText(R.string.add_contact), dialogClickListener)
+                    show()
+                }
             else
-                builder.setMessage(String.format(getString(R.string.short_chat_question), peer))
-                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.short_chat_question), peer))
+                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getText(R.string.delete), dialogClickListener)
+                    show()
+                }
             true
         }
 
@@ -147,21 +152,25 @@ class ChatsActivity: AppCompatActivity() {
         when (item.itemId) {
 
             R.id.delete_chats -> {
-                val deleteDialog = AlertDialog.Builder(this@ChatsActivity)
-                deleteDialog.setMessage(String.format(getString(R.string.delete_chats_alert),
-                        aor.substringAfter(":")))
-                deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                    Message.clear(aor)
-                    Message.save()
-                    uaMessages.clear()
-                    clAdapter.notifyDataSetChanged()
-                    UserAgent.ofAor(aor)!!.account.unreadMessages = false
-                    dialog.dismiss()
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.confirmation)
+                with (AlertDialog.Builder(this@ChatsActivity)) {
+                    setCustomTitle(titleView)
+                    setMessage(String.format(getString(R.string.delete_chats_alert),
+                            aor.substringAfter(":")))
+                    setPositiveButton(getText(R.string.delete)) { dialog, _ ->
+                        Message.clear(aor)
+                        Message.save()
+                        uaMessages.clear()
+                        clAdapter.notifyDataSetChanged()
+                        UserAgent.ofAor(aor)!!.account.unreadMessages = false
+                        dialog.dismiss()
+                    }
+                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
                 }
-                deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                deleteDialog.create().show()
                 return true
             }
 

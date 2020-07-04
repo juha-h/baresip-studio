@@ -106,17 +106,21 @@ class ChatActivity : AppCompatActivity() {
             }
             val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
             if (ContactsActivity.contactName(peerUri) == peerUri)
-                builder.setMessage(String.format(getString(R.string.long_message_question),
-                        chatPeer))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
-                        .setPositiveButton(getString(R.string.add_contact), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.long_message_question),
+                    chatPeer))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.delete), dialogClickListener)
+                    setPositiveButton(getString(R.string.add_contact), dialogClickListener)
+                    show()
+                }
             else
-                builder.setMessage(getText(R.string.short_message_question))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(getText(R.string.short_message_question))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.delete), dialogClickListener)
+                    show()
+                }
             true
         }
 

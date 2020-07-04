@@ -21,9 +21,9 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
-class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>,
+class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<Contact>,
                          private val aor: String) :
-        ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
+        ArrayAdapter<Contact>(ctx, R.layout.contact_row, rows) {
 
     private var lastClick: Long = 0
 
@@ -59,7 +59,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
                         DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
-                            val i = Intent(cxt, MainActivity::class.java)
+                            val i = Intent(ctx, MainActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             if (which == DialogInterface.BUTTON_NEGATIVE)
@@ -73,7 +73,7 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
                                 i.putExtra("peer", Contact.contacts()[position].uri)
-                                (cxt as Activity).startActivity(i)
+                                (ctx as Activity).startActivity(i)
                             }
                         }
                         DialogInterface.BUTTON_NEUTRAL -> {
@@ -82,13 +82,14 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                     lastClick = SystemClock.elapsedRealtime()
-                    val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                    builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
-                            Contact.contacts()[position].name))
-                            .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
-                            .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
-                            .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
-                            .show()
+                    with (AlertDialog.Builder(ctx, R.style.Theme_AppCompat)) {
+                        setMessage(String.format(ctx.getString(R.string.contact_action_question),
+                                Contact.contacts()[position].name))
+                        setNeutralButton(ctx.getText(R.string.cancel), dialogClickListener)
+                        setNegativeButton(ctx.getText(R.string.call), dialogClickListener)
+                        setPositiveButton(ctx.getText(R.string.send_message), dialogClickListener)
+                        show()
+                    }
                 }
             }
         }
@@ -113,24 +114,28 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                     }
                 }
             }
-            val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-            builder.setMessage(String.format(cxt.getString(R.string.contact_delete_question),
-                    Contact.contacts()[position].name))
-                    .setNegativeButton(cxt.getText(R.string.cancel), dialogClickListener)
-                    .setPositiveButton(cxt.getText(R.string.delete), dialogClickListener)
-                    .show()
+            val titleView = View.inflate(ctx, R.layout.alert_title, null) as TextView
+            titleView.text = ctx.getString(R.string.confirmation)
+            with (AlertDialog.Builder(ctx)) {
+                setCustomTitle(titleView)
+                setMessage(String.format(ctx.getString(R.string.contact_delete_question),
+                        Contact.contacts()[position].name))
+                setNegativeButton(ctx.getText(R.string.cancel), dialogClickListener)
+                setPositiveButton(ctx.getText(R.string.delete), dialogClickListener)
+                show()
+            }
             true
         }
         val actionView = rowView.findViewById(R.id.edit) as ImageButton
         actionView.setOnClickListener { _ ->
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                val i = Intent(cxt, ContactActivity::class.java)
+                val i = Intent(ctx, ContactActivity::class.java)
                 val b = Bundle()
                 b.putBoolean("new", false)
                 b.putInt("index", position)
                 i.putExtras(b)
-                (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
+                (ctx as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
             }
         }
         return rowView
