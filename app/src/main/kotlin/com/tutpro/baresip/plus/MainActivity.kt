@@ -208,13 +208,12 @@ class MainActivity : AppCompatActivity() {
                             getString(R.string.peer_not_verified))
                 }
                 "green" -> {
-                    val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.info)
-                    with(builder) {
+                    with (AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.call_is_secure))
-                        setNegativeButton(getString(R.string.unverify)) { dialog, _ ->
+                        setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
                             val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
                             if (calls.size > 0) {
                                 if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
@@ -227,10 +226,10 @@ class MainActivity : AppCompatActivity() {
                             }
                             dialog.dismiss()
                         }
-                        setPositiveButton(getString(R.string.no)) { dialog, _ ->
+                        setNegativeButton(getString(R.string.no)) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        builder.create().show()
+                        show()
                     }
                 }
             }
@@ -382,13 +381,15 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                    val builder = AlertDialog.Builder(this@MainActivity,
-                            R.style.Theme_AppCompat)
-                    builder.setTitle(getString(R.string.voicemail_messages))
-                    builder.setMessage(acc.vmMessages(this))
-                            .setPositiveButton(getString(R.string.listen), dialogClickListener)
-                            .setNegativeButton(getString(R.string.cancel), dialogClickListener)
-                            .show()
+                    val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                    titleView.text = getString(R.string.voicemail_messages)
+                    with (AlertDialog.Builder(this)) {
+                        setCustomTitle(titleView)
+                        setMessage(acc.vmMessages(this@MainActivity))
+                        setPositiveButton(getString(R.string.listen), dialogClickListener)
+                        setNegativeButton(getString(R.string.cancel), dialogClickListener)
+                        show()
+                    }
                 }
             }
         }
@@ -707,16 +708,15 @@ class MainActivity : AppCompatActivity() {
         if (event == "stopped") {
             Log.d("Baresip", "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
-                val builder = AlertDialog.Builder(this)
                 val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.notice)
-                with (builder) {
+                with (AlertDialog.Builder(this)) {
                     setCustomTitle(titleView)
                     setMessage(getString(R.string.start_failed))
                     setNeutralButton(getString(R.string.ok)) { dialog, _ ->
                         dialog.dismiss()
                     }
-                    create().show()
+                    show()
                 }
             } else {
                 quitTimer.cancel()
@@ -805,10 +805,9 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         if (!isFinishing() && !alerting) {
-                            val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                             val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                             titleView.text = getString(R.string.video_request)
-                            with(builder) {
+                            with (AlertDialog.Builder(this)) {
                                 setCustomTitle(titleView)
                                 setMessage(String.format(getString(R.string.allow_video),
                                         Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))))
@@ -833,10 +832,9 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Call $callp to be verified is not found")
                             return
                         }
-                        val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.verify)
-                        with (builder) {
+                        with (AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.verify_sas),
                                     ev[1], ev[2]))
@@ -867,7 +865,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 dialog.dismiss()
                             }
-                            if (!isFinishing()) create().show()
+                            show()
                         }
                     }
                     "call verified", "call secure" -> {
@@ -894,12 +892,11 @@ class MainActivity : AppCompatActivity() {
                             Log.w("Baresip", "Call $callp to be transferred is not found")
                             return
                         }
-                        val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        with (builder) {
+                        with (AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_query),
                                     target))
@@ -915,7 +912,7 @@ class MainActivity : AppCompatActivity() {
                                     call.notifySipfrag(603, "Decline")
                                 dialog.dismiss()
                             }
-                            create().show()
+                            show()
                         }
                     }
                     "transfer accept" -> {
@@ -1101,10 +1098,9 @@ class MainActivity : AppCompatActivity() {
 
             CONFIG_CODE -> {
                 if ((data != null) && data.hasExtra("restart")) {
-                    val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.restart_request)
-                    with (builder) {
+                    with (AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.config_restart))
                         setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -1114,7 +1110,7 @@ class MainActivity : AppCompatActivity() {
                         setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        create().show()
+                        show()
                     }
                 }
             }
@@ -1193,7 +1189,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
-        val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
@@ -1213,7 +1208,7 @@ class MainActivity : AppCompatActivity() {
                 input.transformationMethod = PasswordTransformationMethod()
         }
         val context = this
-        with (builder) {
+        with (AlertDialog.Builder(this)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
@@ -1246,7 +1241,6 @@ class MainActivity : AppCompatActivity() {
             if ((Utils.paramValue(params, "auth_user") != "") &&
                     (Utils.paramValue(params, "auth_pass") == "")) {
                 val aor = account.substringAfter("<").substringBefore(">")
-                val builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 val layout = LayoutInflater.from(this)
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
                                 false)
@@ -1264,7 +1258,7 @@ class MainActivity : AppCompatActivity() {
                         input.transformationMethod = PasswordTransformationMethod()
                 }
                 val context = this
-                with (builder) {
+                with (AlertDialog.Builder(this)) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
@@ -1356,10 +1350,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.deleteFile(File(zipFilePath))
-        val builder = AlertDialog.Builder(this)
         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
         titleView.text = getString(R.string.info)
-        with (builder) {
+        with (AlertDialog.Builder(this)) {
             setCustomTitle(titleView)
             setMessage(getString(R.string.restored))
             setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -1369,7 +1362,7 @@ class MainActivity : AppCompatActivity() {
             setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
-            create().show()
+            show()
         }
     }
 

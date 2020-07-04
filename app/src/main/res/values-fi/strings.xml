@@ -302,6 +302,7 @@
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <string name="help">Apua</string>
+    <string name="confirmation">Vahvistus</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>

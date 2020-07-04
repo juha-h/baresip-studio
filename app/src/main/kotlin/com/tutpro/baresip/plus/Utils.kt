@@ -1,6 +1,5 @@
 package com.tutpro.baresip.plus
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.AlertDialog
@@ -20,7 +19,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -61,15 +59,15 @@ object Utils {
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        val builder = AlertDialog.Builder(context)
-        builder.setCustomTitle(titleView)
-                .setMessage(message)
-                .setPositiveButton(R.string.ok)
-                { dialog, _ ->
-                    dialog.dismiss()
-                    action()
-                }
-                .show()
+        with (AlertDialog.Builder(context)) {
+            setCustomTitle(titleView)
+            setMessage(message)
+            setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                action()
+            }
+            show()
+        }
     }
 
     fun uriHostPart(uri: String): String {

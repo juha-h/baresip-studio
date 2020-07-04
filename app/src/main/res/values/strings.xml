@@ -265,6 +265,7 @@
     <string name="status">Status</string>
     <string name="error">Error</string>
     <string name="help">Help</string>
+    <string name="confirmation">Confirmation</string>
     <string name="dots" translatable="false">…</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>

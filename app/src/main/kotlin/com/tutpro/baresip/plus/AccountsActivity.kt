@@ -108,21 +108,23 @@ class AccountsActivity : AppCompatActivity() {
             else
                 input.transformationMethod = PasswordTransformationMethod()
         }
-        builder.setView(layout)
-        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
-            dialog.dismiss()
-            var password = input.text.toString().trim()
-            if (!Account.checkAuthPass(password)) {
-                Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_authentication_password), password))
-                password = ""
+        with (builder) {
+            setView(layout)
+            setPositiveButton(android.R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                var password = input.text.toString().trim()
+                if (!Account.checkAuthPass(password)) {
+                    Utils.alertView(this@AccountsActivity, getString(R.string.notice),
+                            String.format(getString(R.string.invalid_authentication_password), password))
+                    password = ""
+                }
+                setAuthPass(ua, password)
             }
-            setAuthPass(ua, password)
+            setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            show()
         }
-        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            dialog.cancel()
-        }
-        builder.show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
