@@ -1,0 +1,3 @@
+- Initial support for one way (sendonly/recvonly) video.
+- Known issue: selfview is not shown when video stream is sendonly.
+- Alert dialog improvements.
