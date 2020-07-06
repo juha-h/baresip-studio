@@ -24,7 +24,6 @@ object Api {
     external fun ua_call_alloc(uap: String, xcallp: String, video: Int): String
     external fun ua_answer(uap: String, callp: String, video: Int)
     external fun ua_set_media_af(uap: String, af: Int)
-    external fun account_debug(accp: String)
     external fun ua_debug(uap: String)
     external fun call_peeruri(callp: String): String
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
