@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(distribution_DIR ${CMAKE_SOURCE_DIR}/../../../../distribution)
+set(distribution_DIR ${CMAKE_SOURCE_DIR}/../../../../distribution.video)
 
 add_library(lib_crypto STATIC IMPORTED)
 set_target_properties(lib_crypto PROPERTIES IMPORTED_LOCATION
