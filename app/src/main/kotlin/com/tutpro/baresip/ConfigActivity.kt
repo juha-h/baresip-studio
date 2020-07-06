@@ -37,7 +37,6 @@ class ConfigActivity : AppCompatActivity() {
     private var oldAec = false
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
-    private var oldIceMode = ""
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
     private var save = false
