@@ -230,13 +230,18 @@
         TLS-varmenninauktoriteettien julkiset varmentimen, on joko jo ladattu tai tullaan lataamaan
         Download-hakemistosta.
     </string>
+    <string name="audio">Audio</string>
     <string name="audio_modules_title">Audio-modulit</string>
     <string name="audio_modules_help">Merkittyjen modulien tarjoamat audio-koodekit ovat tilien
         käytettävissä.
     </string>
     <string name="failed_to_load_module">Modulin lataaminen epäonnistui.</string>
-    <string name="aec">Akustinen kaiun poisto</string>
+    <string name="aec">Akustinen kaiun poisto (AKP)</string>
     <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana.</string>
+    <string name="aec_extented_filter">AKP laajennettu suodatin</string>
+    <string name="aec_extented_filter_help">Jos merkitty, kaiun poistossa käytetään laajennettua
+        suodatinta.
+    </string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat

@@ -47,6 +47,10 @@ object Config {
             config = "${config}opus_sprop_stereo no\n"
         }
 
+        if (!config.contains("webrtc_aec_extended_filter")) {
+            config = "${config}webrtc_aec_extended_filter yes\n"
+        }
+
         if (!config.contains("log_level")) {
             config = "${config}log_level 2\n"
             Log.logLevel = Log.LogLevel.WARN

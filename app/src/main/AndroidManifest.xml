@@ -84,6 +84,12 @@
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
+            android:name=".AudioActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/audio"
+            android:parentActivityName=".ConfigActivity" >
+        </activity>
+        <activity
             android:name=".CallsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_history"

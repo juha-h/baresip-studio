@@ -200,12 +200,15 @@
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates
         of Certificate Authorities has been or will be loaded from Download directory.</string>
+    <string name="audio">Audio</string>
     <string name="audio_modules_title">Audio Modules</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.</string>
     <string name="failed_to_load_module">Failed to load module.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
     <string name="aec_help">If checked, echo cancellation is attempted on call audio.</string>
+    <string name="aec_extented_filter">AEC Extented Filter</string>
+    <string name="aec_extented_filter_help">If checked, echo cancellation is using extended filter.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>

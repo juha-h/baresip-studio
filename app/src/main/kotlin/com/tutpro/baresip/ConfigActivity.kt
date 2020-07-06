@@ -22,9 +22,6 @@ class ConfigActivity : AppCompatActivity() {
     internal lateinit var dnsServers: EditText
     internal lateinit var certificateFile: CheckBox
     internal lateinit var caFile: CheckBox
-    internal lateinit var aec: CheckBox
-    internal lateinit var opusBitRate: EditText
-    internal lateinit var opusPacketLoss: EditText
     internal lateinit var debug: CheckBox
     internal lateinit var reset: CheckBox
 
@@ -33,15 +30,10 @@ class ConfigActivity : AppCompatActivity() {
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldCAFile = false
-    private var oldAudioModules = mutableMapOf<String, Boolean>()
-    private var oldAec = false
-    private var oldOpusBitrate = ""
-    private var oldOpusPacketLoss = ""
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
     private var save = false
     private var restart = false
-    private val audioModules = listOf("opus", "amr", "ilbc", "g722", "g7221", "g726", "g711")
     private var menu: Menu? = null
 
     private val READ_CERT_PERMISSION_CODE = 1
@@ -83,52 +75,6 @@ class ConfigActivity : AppCompatActivity() {
         caFile = findViewById(R.id.CAFile) as CheckBox
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
         caFile.isChecked = oldCAFile
-
-        val audioModulesList = findViewById(R.id.AudioModulesList) as LinearLayout
-        var id = 1000
-        for (module in audioModules) {
-            val rl = RelativeLayout(this)
-            val rlParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-            rlParams.marginStart = 16
-            rl.layoutParams = rlParams
-            val tv = TextView(this)
-            tv.id = id++
-            val tvParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-            tvParams.addRule(RelativeLayout.ALIGN_PARENT_START)
-            tvParams.addRule(RelativeLayout.CENTER_VERTICAL)
-            tvParams.addRule(RelativeLayout.START_OF, id)
-            tv.layoutParams = tvParams
-            tv.text = "\u2022 $module"
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-            tv.setTextColor(Color.BLACK)
-            rl.addView(tv)
-            val cb = CheckBox(this)
-            cb.id = id++
-            val cbParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-            cbParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-            cbParams.addRule(RelativeLayout.CENTER_VERTICAL)
-            cb.layoutParams = cbParams
-            cb.gravity = Gravity.END
-            cb.isChecked = Config.variable("module $module.so").size > 0
-            oldAudioModules.put(module, cb.isChecked)
-            rl.addView(cb)
-            audioModulesList.addView(rl)
-        }
-
-        aec = findViewById(R.id.Aec) as CheckBox
-        val aecCv = Config.variable("module")
-        oldAec = aecCv.contains("webrtc_aec.so")
-        aec.isChecked = oldAec
-
-        opusBitRate = findViewById(R.id.OpusBitRate) as EditText
-        val obCv = Config.variable("opus_bitrate")
-        oldOpusBitrate = if (obCv.size == 0) "28000" else obCv[0]
-        opusBitRate.setText(oldOpusBitrate)
-
-        opusPacketLoss = findViewById(R.id.OpusPacketLoss) as EditText
-        val oplCv = Config.variable("opus_packet_loss")
-        oldOpusPacketLoss = if (oplCv.size == 0) "0" else oplCv[0]
-        opusPacketLoss.setText(oldOpusPacketLoss)
 
         val callVolSpinner = findViewById(R.id.VolumeSpinner) as Spinner
         val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -280,73 +226,6 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                var id = 1001
-                for (module in audioModules) {
-                    val box = findViewById<CheckBox>(id++)
-                    if (box.isChecked && !oldAudioModules[module]!!) {
-                        if (Api.module_load("$module.so") != 0) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    "${getString(R.string.failed_to_load_module)}: $module.so")
-                            return false
-                        }
-                        Config.addLine("module $module.so")
-                        save = true
-                    }
-                    if (!box.isChecked && oldAudioModules[module]!!) {
-                        Api.module_unload("$module.so")
-                        Config.removeLine("module $module.so")
-                        for (ua in UserAgent.uas()) ua.account.removeAudioCodecs(module)
-                        AccountsActivity.saveAccounts()
-                        save = true
-                    }
-                    id++
-                }
-
-                if (aec.isChecked != oldAec) {
-                    Config.removeLine("module webrtc_aec.so")
-                    if (aec.isChecked) {
-                        Config.addLine("module webrtc_aec.so")
-                        if (Api.module_load("webrtc_aec.so") != 0) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.failed_to_load_module))
-                            aec.isChecked = false
-                            return false
-                        }
-                    } else {
-                        Api.module_unload("webrtc_aec.so")
-                    }
-                    save = true
-                }
-
-                val opusBitRate = opusBitRate.text.toString().trim()
-                if (opusBitRate != oldOpusBitrate) {
-                    if (!checkOpusBitRate(opusBitRate)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
-                        return false
-                    }
-                    Config.removeVariable("opus_bitrate")
-                    Config.addLine("opus_bitrate $opusBitRate")
-                    save = true
-                    restart = true
-                }
-
-                val opusPacketLoss = opusPacketLoss.text.toString().trim()
-                if (opusPacketLoss != oldOpusPacketLoss) {
-                    if (!checkOpusPacketLoss(opusPacketLoss)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
-                        return false
-                    }
-                    Config.removeVariable("opus_inbandfec")
-                    Config.removeVariable("opus_packet_loss")
-                    if (opusPacketLoss != "0") {
-                        Config.addLine("opus_inbandfec yes")
-                        Config.addLine("opus_packet_loss $opusPacketLoss")
-                    }
-                    save = true
-                    restart = true
-                }
 
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
@@ -447,21 +326,9 @@ class ConfigActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.tls_ca_file),
                         getString(R.string.tls_ca_file_help))
             }
-            findViewById(R.id.AudioModulesTitle) as TextView -> {
-                Utils.alertView(this, getString(R.string.audio_modules_title),
-                        getString(R.string.audio_modules_help))
-            }
-            findViewById(R.id.AecTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.aec),
-                        getString(R.string.aec_help))
-            }
-            findViewById(R.id.OpusBitRateTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.opus_bit_rate),
-                        getString(R.string.opus_bit_rate_help))
-            }
-            findViewById(R.id.OpusPacketLossTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.opus_packet_loss),
-                        getString(R.string.opus_packet_loss_help))
+            findViewById(R.id.AudioTitle) as TextView -> {
+                val i = Intent(this, AudioActivity::class.java)
+                startActivity(i)
             }
             findViewById(R.id.VolumeTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.default_call_volume),
@@ -482,18 +349,6 @@ class ConfigActivity : AppCompatActivity() {
         for (server in dnsServers.split(","))
             if (!Utils.checkIpPort(server.trim())) return false
         return true
-    }
-
-    private fun checkOpusBitRate(opusBitRate: String): Boolean {
-        val number = opusBitRate.toIntOrNull()
-        if (number == null) return false
-        return (number >= 6000) && (number <= 510000)
-    }
-
-    private fun checkOpusPacketLoss(opusPacketLoss: String): Boolean {
-        val number = opusPacketLoss.toIntOrNull()
-        if (number == null) return false
-        return (number >= 0) && (number <= 100)
     }
 
     private fun addMissingPorts(addressList: String): String {
