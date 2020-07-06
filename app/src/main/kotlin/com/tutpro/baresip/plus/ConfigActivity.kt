@@ -2,17 +2,13 @@ package com.tutpro.baresip.plus
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.util.TypedValue
-import android.view.Gravity
+import android.content.pm.PackageManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import android.widget.RelativeLayout.LayoutParams
 import android.widget.AdapterView
 
 class ConfigActivity : AppCompatActivity() {
