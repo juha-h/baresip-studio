@@ -58,6 +58,7 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
+webrtc_aec_extended_filter yes
 video_selfview pip
 ice_turn no
 ice_nomination regular
