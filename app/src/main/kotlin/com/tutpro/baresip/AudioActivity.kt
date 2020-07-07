@@ -1,8 +1,6 @@
 package com.tutpro.baresip
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
-
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -10,6 +8,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+
+import androidx.appcompat.app.AppCompatActivity
 
 class AudioActivity : AppCompatActivity() {
 
@@ -232,7 +232,7 @@ class AudioActivity : AppCompatActivity() {
                         getString(R.string.aec_help))
             }
             findViewById(R.id.ExtendedFilterTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.aec),
+                Utils.alertView(this, getString(R.string.aec_extented_filter),
                         getString(R.string.aec_extented_filter_help))
             }
         }
