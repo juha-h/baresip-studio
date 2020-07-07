@@ -232,7 +232,7 @@ class AudioActivity : AppCompatActivity() {
                         getString(R.string.aec_help))
             }
             findViewById(R.id.ExtendedFilterTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.aec),
+                Utils.alertView(this, getString(R.string.aec_extented_filter),
                         getString(R.string.aec_extented_filter_help))
             }
         }
