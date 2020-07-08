@@ -73,8 +73,8 @@
     <string name="register_help">Jos merkitty, rekisteröinti on
         aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
     </string>
-    <string name="audio_codecs">Äänen koodausmenetelmät</string>
-    <string name="audio_codecs_help">Luettelo käytössä olevista äänen
+    <string name="audio_codecs">Audion koodausmenetelmät</string>
+    <string name="audio_codecs_help">Luettelo käytössä olevista audion
         koodausmenetelmistä prioriteettijärjestyksessä</string>
     <string name="video_codecs">Videon koodausmenetelmät</string>
     <string name="video_codecs_help">Luettelo käytössä olevista videon
@@ -247,8 +247,8 @@
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
     6000-510000. Oletusarvo on 28000.
     </string>
-    <string name="opus_packet_loss">Odotettu Opus pakettihäviö</string>
-    <string name="opus_packet_loss_help">Odotettu Opus audio virran pakettihäviö prosentteina.
+    <string name="opus_packet_loss">Odotettu opus-pakettihäviö</string>
+    <string name="opus_packet_loss_help">Odotettu opus audio virran pakettihäviö prosentteina.
         Mahdolliset arvot ovat 0-100. Oletusarvo on 0, jolloin ennakoiva virheenkorjaus
         ei ole käytössä.</string>
     <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
