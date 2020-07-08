@@ -1,0 +1,3 @@
+- Acoustic Echo Cancellation improvements.
+- Moved audio settings from Settings to new activity.
+- Added AEC Extented Filter setting.
