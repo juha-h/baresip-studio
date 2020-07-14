@@ -33,6 +33,7 @@ class AudioActivity : AppCompatActivity() {
         setContentView(R.layout.activity_audio)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        Utils.addActivity("audio")
 
         val audioModulesList = findViewById(R.id.AudioModulesList) as LinearLayout
         var id = 1000
@@ -87,8 +88,6 @@ class AudioActivity : AppCompatActivity() {
         oldExtendedFilter = Config.variable("webrtc_aec_extended_filter")[0] == "yes"
         extentedFilter.isChecked = oldExtendedFilter
 
-        Utils.addActivity("audio")
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -118,7 +117,7 @@ class AudioActivity : AppCompatActivity() {
                                     "${getString(R.string.failed_to_load_module)}: $module.so")
                             return false
                         }
-                        Config.addLine("module $module.so")
+                        Config.addModuleLine("module $module.so")
                         save = true
                     }
                     if (!box.isChecked && oldAudioModules[module]!!) {
@@ -164,7 +163,7 @@ class AudioActivity : AppCompatActivity() {
                 if (aec.isChecked != oldAec) {
                     Config.removeLine("module webrtc_aec.so")
                     if (aec.isChecked) {
-                        Config.addLine("module webrtc_aec.so")
+                        Config.addModuleLine("module webrtc_aec.so")
                         if (Api.module_load("webrtc_aec.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.failed_to_load_module))
