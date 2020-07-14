@@ -109,6 +109,11 @@ object Config {
         config = Utils.removeLinesStartingWithString(config, line)
     }
 
+    fun addModuleLine(line: String) {
+        // Make sure it goes before first 'module_tmp'
+        config = config.replace("module opensles.so", "$line\nmodule opensles.so")
+    }
+
     fun removeVariable(variable: String) {
         config = Utils.removeLinesStartingWithString(config, "$variable ")
     }
