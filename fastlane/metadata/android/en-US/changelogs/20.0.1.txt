@@ -1,0 +1,2 @@
+- Fixed returning to Audio Activity after pause.
+- Fixed adding of audio modules in Audio settings.
