@@ -1410,6 +1410,10 @@ class MainActivity : AppCompatActivity() {
                 val i = Intent(this, ConfigActivity::class.java)
                 startActivityForResult(i, CONFIG_CODE)
             }
+            "audio" -> {
+                val i = Intent(this, AudioActivity::class.java)
+                startActivity(i)
+            }
             "accounts" -> {
                 val i = Intent(this, AccountsActivity::class.java)
                 val b = Bundle()
