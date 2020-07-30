@@ -221,6 +221,9 @@
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
+    <string name="video_size">Video Frame Size</string>
+    <string name="video_size_help">Size of transmitted video frames (width x height).
+        Factory default is 640x360.</string>
     <string name="debug">Debug</string>
     <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
@@ -277,6 +280,9 @@
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
+    <string name="video_call">Video call</string>
+    <string name="video_request">Video Request</string>
+    <string name="allow_video">Accept video call with \'%1$s\'?</string>
     <string name="hold">Hold</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
@@ -325,5 +331,7 @@
         and, if so, you gave correct Decrypt Password.
     </string>
     <string name="no_calls">You are not able to place or answer calls without Microphone permission.</string>
+    <string name="no_video_calls">You are not able to place or answer video calls without Camera permission.</string>
+    <string name="no_cameras">You don\'t have any supported video cameras.</string>
     <string name="show_password">Show Password</string>
 </resources>
