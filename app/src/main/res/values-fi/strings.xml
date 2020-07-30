@@ -257,6 +257,9 @@
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
     asteikolla 1–10.
     </string>
+    <string name="video_size">Videon kehyskoko</string>
+    <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus).
+        Tehdasasetus on 640x360.</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="reset_config">Palauta oletusasetukset</string>
@@ -301,6 +304,7 @@
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <string name="help">Apua</string>
+    <string name="confirmation">Vahvistus</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>
@@ -313,6 +317,9 @@
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
+    <string name="video_call">Videopuhelu</string>
+    <string name="video_request">Videopyyntö</string>
+    <string name="allow_video">Salli video puhelussa \'%1$s\'?</string>
     <string name="hold">Aseta puhelu pitoon</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
@@ -369,5 +376,9 @@
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
     </string>
+    <string name="no_video_calls">Et voi soittaa video-puheluita tai vastata niihin
+        ilman Kamera-käyttöoikeutta.
+    </string>
+    <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>
 </resources>
