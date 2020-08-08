@@ -928,6 +928,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call closed" -> {
                         if (aor == aorSpinner.tag) {
+                            callUri.inputType = InputType.TYPE_CLASS_TEXT +
+                                    InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                            dialpadButton.setImageResource(R.drawable.dialpad_off)
+                            dialpadButton.tag = "off"
                             showCall(ua)
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
@@ -1466,6 +1470,7 @@ class MainActivity : AppCompatActivity() {
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
+            dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
             videoButton.visibility = View.INVISIBLE
         } else {
@@ -1498,6 +1503,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
+                    dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
                 }
                 "incoming" -> {
@@ -1511,6 +1517,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.isEnabled = true
                     holdButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
+                    dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
@@ -1550,6 +1557,10 @@ class MainActivity : AppCompatActivity() {
                     if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
                     dtmfWatcher = call.dtmfWatcher
                     dtmf.addTextChangedListener(dtmfWatcher)
+                    callUri.inputType = InputType.TYPE_CLASS_PHONE
+                    dialpadButton.setImageResource(R.drawable.dialpad_on)
+                    dialpadButton.tag = "on"
+                    dialpadButton.isEnabled = false
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
                 }
