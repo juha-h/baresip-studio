@@ -137,8 +137,6 @@
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
     <string name="opus_packet_loss">Forventet Opus-pakketap</string>
     <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0–100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>
-    <string name="ice_lite_mode">ICE Lite-modus</string>
-    <string name="ice_lite_mode_help">Bruker ICE Lite-modus.</string>
     <string name="default_call_volume">Forvalgt samtalelydstyrke</string>
     <string name="default_call_volume_help">Setter samtalelydstyrken på en skala fra 1-10.</string>
     <string name="debug">Feilretting</string>
@@ -208,5 +206,4 @@
     <string name="invalid_stun_server">Ugyldig STUN-tjener \"%1$s\"</string>
     <string name="call_info_not_available">Ingen info tilgjengelig</string>
     <string name="show_password">Vis passord</string>
-    <string name="account_password">Identitetsbekreftelsespassord for %1$s-kontoen</string>
 </resources>
