@@ -149,9 +149,7 @@
     <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls] \'%1$s\'
     </string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
-    <string name="account_allocation_failure">"Uuden tilin luonti
-    epäonnistui.
-    </string>
+    <string name="account_allocation_failure">Uuden tilin luonti epäonnistui.</string>
     <string name="encrypt_password">Tallenna salasanalla</string>
     <string name="decrypt_password">Palauta salasanalla</string>
     <string name="delete_account">Haluatko poistaa tilin \'%1$s\'?</string>
@@ -385,4 +383,5 @@
     </string>
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>
+    <string name="confirmation">Vahvistus</string>
 </resources>
