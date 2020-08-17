@@ -7,8 +7,8 @@
     <string name="show_password">Mostrar Senha</string>
     <string name="no_calls">Você não pode fazer ou atender chamadas sem a permissão do Microfone.</string>
     <string name="restore_failed">Falha ao restaurar os dados do aplicativo da pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento e se o arquivo de backup \'%1$s\' existe na pasta e, se houver, se você forneceu a Senha de Descriptografia correta.</string>
-    <string name="restored">Dados do aplicativo restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
-    <string name="backup_failed">Falha ao fazer backup dos dados do aplicativo no arquivo \'%1$s\' na pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
+    <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
+    <string name="backup_failed">Falha ao fazer o backup dos dados do aplicativo no arquivo \'%1$s\' na pasta Download. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
     <string name="backed_up">Dados do aplicativo armazenados em backup no arquivo \'%1$s\' na Download.</string>
     <string name="unverify">Desverificar</string>
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
@@ -16,9 +16,9 @@
     <string name="call_not_secure">Esta chamada NÃO é segura!</string>
     <string name="call_closed">A chamada está encerrada.</string>
     <string name="call_failed">Ligação falhou.</string>
-    <string name="transfer_query">Você aceitar transferir a chamada para \'%1$s\'\?</string>
+    <string name="transfer_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="verify_sas">Você quer verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
-    <string name="verify">Verificar</string>
+    <string name="verify">Verificar a Solicitação</string>
     <string name="registering_failed">O registro de %1$s falhou.</string>
     <string name="start_failed">Baresip falhou ao iniciar. Isso pode ser devido a um valor inválido das Configurações. Verifique Endereço de Escuta, Arquivo de Certificado TLS e Arquivo CA TLS. Em seguida, reinicie o baresip.</string>
     <string name="call_already_active">Você já tem uma chamada ativa.</string>
@@ -172,12 +172,12 @@
 \n • SRTP-MAND significa que RTP/SAVP é oferecido em chamadas efetuadas e requerido em chamadas recebidas. 
 \n • SRTP significa que RTP/AVP é oferecido em chamadas efetuadas e que RTP/SAVP ou RTP/SAVPF é usado se oferecido em chamadas recebidas.</string>
     <string name="media_encryption">Criptografia de Mídia</string>
-    <string name="invalid_stun_server">Servidor STUN Inválido \'%1$s\'</string>
-    <string name="stun_server_help">Um Servidor STUN da forma host[:porta]. O valor de ajuste padrão é \'stun.l.google.com:19302\', apontando para o servidor público STUN do Google. Atualmente usuário e senha não são suportados.</string>
-    <string name="stun_server">Servidor STUN</string>
+    <string name="invalid_stun_server">Servidor URI STUN/TURN Inválido \'%1$s\'</string>
+    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta]. Onde o scheme é \'stun\', \'stuns\', \'turn\', ou \'turns\'. O servidor STUN predefinido de fábrica é \'stun:stun.l.google.com:19302\', apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
+    <string name="stun_server">Servidor STUN/TURN</string>
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="audio_codecs_help">Lista de codecs de áudio suportados em ordem de prioridade.</string>
+    <string name="audio_codecs_help">Lista dos codecs de áudio compatíveis em ordem de prioridade</string>
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="register_help">Se selecionado, registro é habilitado e requisições de REGISTRO serão enviadas em intervalos de 12 minutos.</string>
     <string name="register">Registro</string>
@@ -202,4 +202,26 @@
     <string name="account">Conta</string>
     <string name="about_text">&lt;h1&gt;Biblioteca Baresip baseado em agente de usuário SIP&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Dicas de Uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Verifique se os ajustes padrões atendem suas necessidades (clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;Então crie uma ou mais contas (novamente clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;O estado de uma conta é mostrado com um ponto colorido: verde (registro bem sucedido), amarelo (registro em progresso), vermelho (registro falhou), branco (registro não foi ativado).&lt;/li&gt; &lt;li&gt;Peers de chamada e mensagens podem ser adicionadas aos contatos com toque longo.&lt;/li&gt; &lt;li&gt;Toques longos também podem ser usados para remover chamadas, chats, mensagens e contatos.&lt;/li&gt; &lt;li&gt;Toque/toque longo em ícones de contato podem ser usados para adicionar/remover avatar.&lt;/li&gt; &lt;li&gt;Você pode selecionar novamente a chamada anterior clicando no ícone de ligação quando Destino estiver vazio.&lt;/li&gt; &lt;li&gt;Se você não puder ouvir a outra parte durante a ligação, tente aumentar o volume de Mídia do dispositivo ou ajuste o Volume de Ligação Padrão nos Ajustes.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Problemas Conhecidos&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Devido a limitações em bibliotecas subjacentes, baresip atualmente não suporta múltiplas interfaces de rede ativas simultaneamente.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Código Fonte&lt;/h2&gt; Código fonte disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também falhas podem ser reportadas.</string>
     <string name="about_title">Sobre o baresip</string>
+    <string name="no_cameras">Você não possui câmeras de vídeo compatíveis.</string>
+    <string name="no_video_calls">Não é possível você fazer ou responder chamadas de vídeo sem a permissão da câmera.</string>
+    <string name="restart_request">Solicitação para Reinicialização</string>
+    <string name="transfer">Solicitação da Transferência</string>
+    <string name="allow_video">Aceitar a chamada de vídeo com \'%1$s\'\?</string>
+    <string name="video_request">Pedido de Vídeo</string>
+    <string name="video_call">Chamada de vídeo</string>
+    <string name="confirmation">Confirmação</string>
+    <string name="video_size_help">Tamanho dos quadros de vídeo que foram transmitidos (largura x altura). A configuração de fábrica é 640x360.</string>
+    <string name="video_size">Tamanho do Quadro do Vídeo</string>
+    <string name="aec_extented_filter_help">Caso esteja marcado, o cancelamento do eco estará utilizando um filtro estendido.</string>
+    <string name="aec_extented_filter">Filtro Estendido do AEC</string>
+    <string name="audio">Áudio</string>
+    <string name="tap_to_start">Toque para iniciar o aplicativo</string>
+    <string name="invalid_stun_password">Senha inválida \'%1$s\'</string>
+    <string name="stun_password_help">Senha, caso seja necessário pelo servidor STUN/TURN</string>
+    <string name="stun_password">Senha STUN/TURN</string>
+    <string name="invalid_stun_username">Nome do usuário inválido \'%1$s\'</string>
+    <string name="stun_username_help">Nome do usuário, caso seja necessário pelo servidor STUN/TURN</string>
+    <string name="stun_username">Nome do Usuário STUN/TURN</string>
+    <string name="video_codecs_help">Lista dos codecs de vídeo compatíveis em ordem de prioridade</string>
+    <string name="video_codecs">Codecs de Vídeo</string>
 </resources>
