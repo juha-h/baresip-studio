@@ -1483,7 +1483,7 @@ Java_com_tutpro_baresip_plus_Call_call_1send_1digit(JNIEnv *env, jobject thiz, j
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
+Java_com_tutpro_baresip_plus_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
         jstring jPeer) {
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
