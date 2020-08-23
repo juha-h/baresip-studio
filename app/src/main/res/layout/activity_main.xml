@@ -140,12 +140,26 @@
                 android:contentDescription="@string/hold" >
             </ImageButton>
 
-            <EditText
-                android:id="@+id/dtmf"
-                android:layout_width="@dimen/button_width"
+            <ImageButton
+                android:id="@+id/transferButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uriRow"
+                android:padding="0dp"
+                android:src="@drawable/call_transfer"
+                android:background="@null"
                 android:layout_marginStart="140dp"
+                android:clickable="false"
+                android:visibility="invisible"
+                android:contentDescription="@string/call_transfer" >
+            </ImageButton>
+
+            <EditText
+                android:id="@+id/dtmf"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/uriRow"
+                android:layout_marginStart="210dp"
                 android:inputType="phone"
                 android:textSize="20sp"
                 android:hint="@string/dtmf"

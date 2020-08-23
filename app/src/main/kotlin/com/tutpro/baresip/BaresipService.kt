@@ -695,7 +695,7 @@ class BaresipService: Service() {
                                     .setContentIntent(pi)
                                     .setDefaults(Notification.DEFAULT_SOUND)
                                     .setAutoCancel(true)
-                                    .setContentTitle(getString(R.string.transfer_request))
+                                    .setContentTitle(getString(R.string.transfer_request_to))
                                     .setContentText(target)
                             if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
@@ -757,7 +757,7 @@ class BaresipService: Service() {
                     "transfer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
                         Api.ua_hangup(uap, callp, 0, "")
-                        return
+                        if (!Utils.isVisible()) return
                     }
                 }
             }

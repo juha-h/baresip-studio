@@ -39,6 +39,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_unhold(callp)
     }
 
+    fun transfer(uri: String): Int {
+        return call_transfer(callp, uri)
+    }
+
     fun sendDigit(digit: Char): Int {
         return call_send_digit(callp, digit)
     }
@@ -66,6 +70,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_connect(callp: String, peer_uri: String): Int
     private external fun call_hold(callp: String): Int
     private external fun call_unhold(callp: String): Int
+    private external fun call_transfer(callp: String, peer_uri: String): Int
     private external fun call_send_digit(callp: String, digit: Char): Int
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
     private external fun call_start_audio(callp: String)

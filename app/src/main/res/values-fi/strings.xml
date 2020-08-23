@@ -153,7 +153,7 @@
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
-    <string name="transfer_request">Puhelun siirtopyyntö kohteeseen</string>
+    <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
     <!-- Boot Completed Receiver -->
     <string name="tap_to_start">Kosketa käynnistääksesi sovelluksen</string>
@@ -319,6 +319,10 @@
     <string name="video_request">Videopyyntö</string>
     <string name="allow_video">Salli video puhelussa \'%1$s\'?</string>
     <string name="hold">Aseta puhelu pitoon</string>
+    <string name="call_transfer">Puhelun siirto</string>
+    <string name="transfer_destination">Siirron kohde</string>
+    <string name="transfer">Siirto</string>
+    <string name="transfer_failed">Siirto epäonnistui</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
     <string name="call_info_not_available">Ei saatavilla</string>
@@ -346,10 +350,10 @@
     <string name="verify">Todennuspyyntö</string>
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt; &lt;%2$s&gt;?
     </string>
-    <string name="transfer">Siirtopyyntö</string>
-    <string name="transfer_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'?</string>
-    <string name="call_failed">Puhelu epäonnistui.</string>
-    <string name="call_closed">Puhelu on päättynyt.</string>
+    <string name="transfer_request">Siirtopyyntö</string>
+    <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'?</string>
+    <string name="call_failed">Puhelu epäonnistui</string>
+    <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
     <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta
     kohdetta ei ole todennettu!
