@@ -1392,7 +1392,6 @@ Java_com_tutpro_baresip_plus_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring ja
     ua_debug_log(ua);
 }
 
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
                                           jstring javaPeer) {
@@ -1481,6 +1480,22 @@ Java_com_tutpro_baresip_plus_Call_call_1send_1digit(JNIEnv *env, jobject thiz, j
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
+        jstring jPeer) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    LOGD("transfering call %s to %s\n", native_call, native_peer);
+    re_thread_enter();
+    int err = call_transfer(call, native_peer);
+    re_thread_leave();
+    if (err) LOGW("call_transfer error: %d\n", err);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
+    return err;
 }
 
 JNIEXPORT jstring JNICALL

@@ -135,7 +135,7 @@
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
     <string name="incoming_call_from">Call from</string>
-    <string name="transfer_request">Call transfer request to</string>
+    <string name="transfer_request_to">Call transfer request to</string>
     <string name="message_from">Message from</string>
     <!-- Boot Completed Receiver -->
     <string name="tap_to_start">Tap to start application</string>
@@ -287,6 +287,10 @@
     <string name="video_request">Video Request</string>
     <string name="allow_video">Accept video call with \'%1$s\'?</string>
     <string name="hold">Hold</string>
+    <string name="call_transfer">Call Transfer</string>
+    <string name="transfer_destination">Transfer destination</string>
+    <string name="transfer">Transfer</string>
+    <string name="transfer_failed">Transfer Failed</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
     <string name="call_info_not_available">No info available</string>
@@ -312,10 +316,10 @@
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
     <string name="verify">Verify Request</string>
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer">Transfer Request</string>
-    <string name="transfer_query">Do you accept to transfer this call to \'%1$s\'?</string>
-    <string name="call_failed">Call failed.</string>
-    <string name="call_closed">Call is closed.</string>
+    <string name="transfer_request">Transfer Request</string>
+    <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'?</string>
+    <string name="call_failed">Call failed</string>
+    <string name="call_closed">Call is closed</string>
     <string name="call_not_secure">This call is NOT secure!</string>
     <string name="peer_not_verified">This call is SECURE, but peer is NOT verified!</string>
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!

@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var answerButton: ImageButton
     internal lateinit var rejectButton: ImageButton
     internal lateinit var holdButton: ImageButton
+    internal lateinit var transferButton: ImageButton
     internal lateinit var videoButton: ImageButton
     internal lateinit var voicemailButton: ImageButton
     internal lateinit var contactsButton: ImageButton
@@ -87,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         answerButton = findViewById(R.id.answerButton) as ImageButton
         rejectButton = findViewById(R.id.rejectButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
+        transferButton = findViewById(R.id.transferButton) as ImageButton
         dtmf = findViewById(R.id.dtmf) as EditText
         infoButton = findViewById(R.id.info) as ImageButton
         voicemailButton = findViewById(R.id.voicemailButton) as ImageButton
@@ -334,6 +336,11 @@ class MainActivity : AppCompatActivity() {
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
             }
+        }
+
+        transferButton.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            callTransfer(Call.uaCalls(ua, "")[0])
         }
 
         infoButton.setOnClickListener {
@@ -892,12 +899,12 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
-                        titleView.text = getString(R.string.transfer)
+                        titleView.text = getString(R.string.transfer_request)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
                         with (AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
-                            setMessage(String.format(getString(R.string.transfer_query),
+                            setMessage(String.format(getString(R.string.transfer_request_query),
                                     target))
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 if (call in Call.calls())
@@ -925,6 +932,11 @@ class MainActivity : AppCompatActivity() {
                             Api.ua_hangup(uap, callp, 0, "")
                         call(ua, ev[1], "transferring")
                         showCall(ua)
+                    }
+                    "transfer failed" -> {
+                        Toast.makeText(applicationContext,
+                                "${getString(R.string.transfer_failed)}: ${ev[1].trim()}",
+                                Toast.LENGTH_LONG).show()
                     }
                     "call closed" -> {
                         if (aor == aorSpinner.tag) {
@@ -1188,6 +1200,45 @@ class MainActivity : AppCompatActivity() {
                 else
                     System.exit(0)
             }
+        }
+    }
+
+    private fun callTransfer(call: Call) {
+        val layout = LayoutInflater.from(this)
+                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content) as ViewGroup,
+                        false)
+        val titleView = layout.findViewById(R.id.title) as TextView
+        titleView.text = getString(R.string.call_transfer)
+        val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
+        transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                Contact.contacts().map { Contact -> Contact.name }))
+        transferUri.threshold = 2
+        with (AlertDialog.Builder(this)) {
+            setView(layout)
+            setPositiveButton(R.string.transfer) { dialog, _ ->
+                dialog.dismiss()
+                val uriText = transferUri.text.toString().trim()
+                if (uriText.length > 0) {
+                    var uri = ContactsActivity.findContactURI(uriText)
+                    if (!uri.startsWith("sip:")) {
+                        uri = "sip:$uri"
+                        if (!uri.contains("@")) {
+                            val aor = call.ua.account.aor
+                            val host = aor.substring(aor.indexOf("@") + 1)
+                            uri = "$uri@$host"
+                        }
+                    }
+                    if (!Utils.checkSipUri(uri))
+                        Utils.alertView(applicationContext, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_sip_uri), uri))
+                    else
+                        call.transfer(uri)
+                }
+            }
+            setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            show()
         }
     }
 
@@ -1469,6 +1520,7 @@ class MainActivity : AppCompatActivity() {
             answerButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
+            transferButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
@@ -1502,6 +1554,7 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
+                    transferButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
@@ -1516,6 +1569,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     holdButton.visibility = View.INVISIBLE
+                    transferButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
@@ -1551,6 +1605,7 @@ class MainActivity : AppCompatActivity() {
                         holdButton.setImageResource(R.drawable.pause)
                     }
                     holdButton.visibility = View.VISIBLE
+                    transferButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
