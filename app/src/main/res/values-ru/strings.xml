@@ -175,7 +175,7 @@
     <string name="read_cert_error">Не удалось прочитать файл cert.pem из каталога загрузки.</string>
     <string name="reset_config_help">Если этот флажок установлен, настройки сбрасываются до значений по умолчанию.</string>
     <string name="debug_help">Обеспечивает доступность сообщений журналов отладки и информации в Logcat.</string>
-    <string name="video_size_help">Размер передаваемых видеокадров (ширина x высота). Значение по умолчанию - 640x360.</string>
+    <string name="video_size_help">Размер передаваемых видеокадров (ширина x высота). Значение по умолчанию - 800x600.</string>
     <string name="video_size">Размер кадра видео</string>
     <string name="opus_packet_loss_help">Ожидаемый процент потери пакетов аудиопотока Opus, от 0 до 100. По умолчанию 0, выключает Opus Forward Error Correction (FEC).</string>
     <string name="opus_packet_loss">Ожидаемая потеря пакетов Opus</string>

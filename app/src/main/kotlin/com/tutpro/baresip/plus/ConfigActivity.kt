@@ -363,6 +363,10 @@ class ConfigActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.default_call_volume),
                         getString(R.string.default_call_volume_help))
             }
+            findViewById(R.id.VideoSizeTitle) as TextView-> {
+                Utils.alertView(this, getString(R.string.video_size),
+                        getString(R.string.video_size_help))
+            }
             findViewById(R.id.DebugTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
             }

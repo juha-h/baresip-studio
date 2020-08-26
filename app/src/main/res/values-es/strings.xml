@@ -215,7 +215,7 @@
     <string name="default_call_volume_help">Si está configurado, el volumen de audio predeterminado de la llamada en escala 1–10.</string>
 	<string name="video_size">Tamaño de fotograma de video</string>
     <string name="video_size_help">Tamaño de los cuadros de video transmitidos (ancho x alto).
-         El valor predeterminado de fábrica es 640x360.</string>
+         El valor predeterminado de fábrica es 800x600.</string>
     <string name="debug">Depurar</string>
     <string name="debug_help">Proporciona depuración y disponibilidad de mensajes de registro a nivel de información en Logcat.</string>
     <string name="reset_config">Restablecer los valores de fábrica</string>

@@ -261,7 +261,7 @@
     </string>
     <string name="video_size">Videon kehyskoko</string>
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus).
-        Tehdasasetus on 640x360.</string>
+        Tehdasasetus on 800x600.</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="reset_config">Palauta oletusasetukset</string>
