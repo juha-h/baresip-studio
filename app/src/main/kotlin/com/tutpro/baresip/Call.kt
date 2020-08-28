@@ -10,6 +10,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var security = 0
     var zid = ""
     var hasHistory = false
+    var referTo = ""
 
     fun add() {
         BaresipService.calls.add(this)
@@ -39,7 +40,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_unhold(callp)
     }
 
-    fun transfer(uri: String): Int {
+    fun refer(uri: String): Int {
+        referTo = uri
         return call_transfer(callp, uri)
     }
 

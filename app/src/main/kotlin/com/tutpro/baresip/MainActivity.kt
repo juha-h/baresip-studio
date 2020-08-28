@@ -332,8 +332,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         transferButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            callTransfer(Call.uaCalls(ua, "")[0])
+            callTransfer(UserAgent.uas()[aorSpinner.selectedItemPosition])
         }
 
         infoButton.setOnClickListener {
@@ -765,7 +764,7 @@ class MainActivity : AppCompatActivity() {
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 if (call in Call.calls())
                                     Api.ua_hangup(uap, callp, 0, "")
-                                call(ua, ev[1], "transferring")
+                                call(ua, ev[1], "outgoing")
                                 showCall(ua)
                                 dialog.dismiss()
                             }
@@ -786,10 +785,10 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
-                        call(ua, ev[1], "transferring")
+                        call(ua, ev[1], "outgoing")
                         showCall(ua)
                     }
-                    "transfer failed" -> {
+                    "refer failed" -> {
                         Toast.makeText(applicationContext,
                                 "${getString(R.string.transfer_failed)}: ${ev[1].trim()}",
                                 Toast.LENGTH_LONG).show()
@@ -1043,7 +1042,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callTransfer(call: Call) {
+    private fun callTransfer(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content) as ViewGroup,
                         false)
@@ -1063,16 +1062,20 @@ class MainActivity : AppCompatActivity() {
                     if (!uri.startsWith("sip:")) {
                         uri = "sip:$uri"
                         if (!uri.contains("@")) {
-                            val aor = call.ua.account.aor
+                            val aor = ua.account.aor
                             val host = aor.substring(aor.indexOf("@") + 1)
                             uri = "$uri@$host"
                         }
                     }
                     if (!Utils.checkSipUri(uri))
-                        Utils.alertView(applicationContext, getString(R.string.notice),
+                        Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_uri), uri))
-                    else
-                        call.transfer(uri)
+                    else {
+                        if (Call.uaCalls(ua, "").size > 0) {
+                            Call.uaCalls(ua, "")[0].refer(uri)
+                            showCall(ua)
+                        }
+                    }
                 }
             }
             setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -1359,26 +1362,14 @@ class MainActivity : AppCompatActivity() {
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
         } else {
-            val callsOut = Call.uaCalls(ua, "out")
-            val callsIn = Call.uaCalls(ua, "in")
-            val call: Call
-            if (callsOut.size > 0) {
-                call = callsOut[callsOut.size - 1]
-                if (call.status == "transferring")
-                    callTitle.text = getString(R.string.transferring_call_to_dots)
-                else
-                    callTitle.text = getString(R.string.outgoing_call_to_dots)
-            } else {
-                callTitle.text = getString(R.string.incoming_call_from_dots)
-                callUri.setAdapter(null)
-                call = callsIn[callsIn.size - 1]
-            }
-            callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
-                    Utils.aorDomain(ua.account.aor)))
+            val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
-                "outgoing", "transferring" -> {
+                "outgoing" -> {
+                    callTitle.text = getString(R.string.outgoing_call_to_dots)
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                            Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
@@ -1392,6 +1383,10 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "incoming" -> {
+                    callTitle.text = getString(R.string.incoming_call_from_dots)
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                            Utils.aorDomain(ua.account.aor)))
+                    callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.INVISIBLE
@@ -1406,6 +1401,20 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "connected" -> {
+                    if (call.referTo != "") {
+                        callTitle.text = getString(R.string.transferring_call_to_dots)
+                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.referTo),
+                                Utils.aorDomain(ua.account.aor)))
+                        transferButton.isEnabled = false
+                    } else {
+                        if (call.dir == "out")
+                            callTitle.text = getString(R.string.outgoing_call_to_dots)
+                        else
+                            callTitle.text = getString(R.string.incoming_call_from_dots)
+                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                                Utils.aorDomain(ua.account.aor)))
+                        transferButton.isEnabled = true
+                    }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
