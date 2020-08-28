@@ -10,6 +10,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var security = 0
     var zid = ""
     var hasHistory = false
+    var referTo = ""
     var videoAllowed = false
     var video: Int = SDP_INACTIVE
 
@@ -53,7 +54,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_unhold(callp)
     }
 
-    fun transfer(uri: String): Int {
+    fun refer(uri: String): Int {
+        referTo = uri
         return call_transfer(callp, uri)
     }
 

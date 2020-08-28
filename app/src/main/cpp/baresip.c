@@ -294,7 +294,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
             break;
         case UA_EVENT_CALL_TRANSFER_FAILED:
-            len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "refer failed,%s", prm);
             break;
         case UA_EVENT_CALL_CLOSED:
             play = mem_deref(play);

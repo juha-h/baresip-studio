@@ -748,9 +748,15 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible()) return
                     }
-                    "transfer failed" -> {
+                    "refer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
                         Api.ua_hangup(uap, callp, 0, "")
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w(LOG_TAG, "Call $callp with failed refer is not found")
+                        } else {
+                            call.referTo = ""
+                        }
                         if (!Utils.isVisible()) return
                     }
                 }
