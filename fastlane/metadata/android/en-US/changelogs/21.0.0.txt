@@ -1,0 +1,2 @@
+- Added initial support for baresip originated call transfer.
+- Added new language Portuguese from Weblate.
