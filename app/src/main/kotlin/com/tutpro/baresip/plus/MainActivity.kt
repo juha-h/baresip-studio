@@ -21,6 +21,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
+    internal lateinit var swipeRefresh: SwipeRefreshLayout
 
     internal var restart = false
     internal var atStartup = false
@@ -97,6 +99,7 @@ class MainActivity : AppCompatActivity() {
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
+        swipeRefresh = findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
 
         addVideoLayoutViews()
 
@@ -461,6 +464,17 @@ class MainActivity : AppCompatActivity() {
                     call.setVideo(true)
                 }
             }, 250)
+        }
+
+        swipeRefresh.setOnRefreshListener {
+            if (UserAgent.uas().size > 0) {
+                if (aorSpinner.selectedItemPosition == -1)
+                    aorSpinner.setSelection(0)
+                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                if (ua.account.regint > 0)
+                    Api.ua_register(ua.uap)
+            }
+            swipeRefresh.isRefreshing = false
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
