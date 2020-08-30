@@ -21,7 +21,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     internal lateinit var speakerIcon: MenuItem
+    internal lateinit var swipeRefresh: SwipeRefreshLayout
 
     internal var restart = false
     internal var atStartup = false
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         messagesButton = findViewById(R.id.messagesButton) as ImageButton
         callsButton = findViewById(R.id.callsButton) as ImageButton
         dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
+        swipeRefresh = findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -205,7 +207,7 @@ class MainActivity : AppCompatActivity() {
                 "green" -> {
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.info)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.call_is_secure))
                         setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
@@ -381,7 +383,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.voicemail_messages)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(acc.vmMessages(this@MainActivity))
                         setPositiveButton(getString(R.string.listen), dialogClickListener)
@@ -436,6 +438,17 @@ class MainActivity : AppCompatActivity() {
                 dialpadButton.setImageResource(R.drawable.dialpad_off)
                 dialpadButton.tag = "off"
             }
+        }
+
+        swipeRefresh.setOnRefreshListener {
+            if (UserAgent.uas().size > 0) {
+                if (aorSpinner.selectedItemPosition == -1)
+                    aorSpinner.setSelection(0)
+                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                if (ua.account.regint > 0)
+                    Api.ua_register(ua.uap)
+            }
+            swipeRefresh.isRefreshing = false
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -602,7 +615,7 @@ class MainActivity : AppCompatActivity() {
             if (params[0] != "") {
                 val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.notice)
-                with (AlertDialog.Builder(this)) {
+                with(AlertDialog.Builder(this)) {
                     setCustomTitle(titleView)
                     setMessage(getString(R.string.start_failed))
                     setNeutralButton(getString(R.string.ok)) { dialog, _ ->
@@ -695,7 +708,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.verify)
-                        with (AlertDialog.Builder(this)) {
+                        with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.verify_sas),
                                     ev[1], ev[2]))
@@ -757,7 +770,7 @@ class MainActivity : AppCompatActivity() {
                         titleView.text = getString(R.string.transfer_request)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        with (AlertDialog.Builder(this)) {
+                        with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_request_query),
                                     target))
@@ -912,7 +925,7 @@ class MainActivity : AppCompatActivity() {
             R.id.backup -> {
                 if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 BACKUP_PERMISSION_REQUEST_CODE))
-                        askPassword(getString(R.string.encrypt_password))
+                    askPassword(getString(R.string.encrypt_password))
             }
 
             R.id.restore -> {
@@ -962,14 +975,14 @@ class MainActivity : AppCompatActivity() {
 
             CONTACTS_CODE -> {
                 callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                        Contact.contacts().map{Contact -> Contact.name}))
+                        Contact.contacts().map { Contact -> Contact.name }))
             }
 
             CONFIG_CODE -> {
                 if ((data != null) && data.hasExtra("restart")) {
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.restart_request)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.config_restart))
                         setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -994,7 +1007,8 @@ class MainActivity : AppCompatActivity() {
                 updateIcons(Account.ofAor(activityAor)!!)
             }
 
-            ABOUT_CODE -> { }
+            ABOUT_CODE -> {
+            }
 
         }
     }
@@ -1052,7 +1066,7 @@ class MainActivity : AppCompatActivity() {
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map { Contact -> Contact.name }))
         transferUri.threshold = 2
-        with (AlertDialog.Builder(this)) {
+        with(AlertDialog.Builder(this)) {
             setView(layout)
             setPositiveButton(R.string.transfer) { dialog, _ ->
                 dialog.dismiss()
@@ -1105,7 +1119,7 @@ class MainActivity : AppCompatActivity() {
                 input.transformationMethod = PasswordTransformationMethod()
         }
         val context = this
-        with (AlertDialog.Builder(this)) {
+        with(AlertDialog.Builder(this)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
@@ -1155,7 +1169,7 @@ class MainActivity : AppCompatActivity() {
                         input.transformationMethod = PasswordTransformationMethod()
                 }
                 val context = this
-                with (AlertDialog.Builder(this)) {
+                with(AlertDialog.Builder(this)) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
@@ -1249,7 +1263,7 @@ class MainActivity : AppCompatActivity() {
         Utils.deleteFile(File(zipFilePath))
         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
         titleView.text = getString(R.string.info)
-        with (AlertDialog.Builder(this)) {
+        with(AlertDialog.Builder(this)) {
             setCustomTitle(titleView)
             setMessage(getString(R.string.restored))
             setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -1349,7 +1363,7 @@ class MainActivity : AppCompatActivity() {
             callUri.isFocusableInTouchMode = true
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Contact.contacts().map{Contact -> Contact.name}))
+                    Contact.contacts().map { Contact -> Contact.name }))
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true
