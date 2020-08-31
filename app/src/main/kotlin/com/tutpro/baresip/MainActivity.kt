@@ -1071,6 +1071,7 @@ class MainActivity : AppCompatActivity() {
         with(builder) {
             setView(layout)
             setPositiveButton(R.string.transfer) { dialog, _ ->
+                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.dismiss()
                 val uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
@@ -1095,6 +1096,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.cancel()
             }
         }
