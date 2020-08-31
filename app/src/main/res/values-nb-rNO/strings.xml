@@ -221,4 +221,11 @@
     <string name="stun_username">STUN/TURN-brukernavn</string>
     <string name="video_codecs_help">Liste over støttede videokodek i prioritetsrang</string>
     <string name="video_codecs">Videokodek</string>
+    <string name="transfer_destination">Videresend til</string>
+    <string name="no_video_calls">Du kan ikke utføre eller svare på videoanrop uten kamera-tilgang.</string>
+    <string name="transfer_request_query">Ønsker du å sette over denne samtalen til «%1$s»\?</string>
+    <string name="transfer_failed">Kunne ikke videresende anrop</string>
+    <string name="transfer">Sett over</string>
+    <string name="call_transfer">Videresending av anrop</string>
+    <string name="allow_video">Godta videosamtale med «%1$s»\?</string>
 </resources>
