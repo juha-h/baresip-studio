@@ -10,12 +10,12 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>Check that Settings default values meet your needs (touch item titles for help).</li>
-            <li>Then create one or more accounts (again touch item titles for help).</li>
+            <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
+            <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
             <li>Registration status of an account is shown with a colored dot:  green (registration
             succeeded, yellow (registration is in progress), red (registration failed), white (registration
             has not been activated).</li>
-            <li>Swipe down gesture causes re-registration of the shown account.</li>
+            <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>

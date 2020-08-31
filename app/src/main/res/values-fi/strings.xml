@@ -14,7 +14,7 @@
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
-        <li>Pyyhkäisy alas aikaansaa näytöllä olevan tilin uudelleen rekisteröinnin.</li>
+        <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
         <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
         <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
