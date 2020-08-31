@@ -1218,7 +1218,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun callTransfer(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content) as ViewGroup,
+                .inflate(R.layout.call_transfer_dialog, findViewById<ViewGroup>(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = getString(R.string.call_transfer)
@@ -1226,12 +1226,15 @@ class MainActivity : AppCompatActivity() {
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map { Contact -> Contact.name }))
         transferUri.threshold = 2
-        with (AlertDialog.Builder(this)) {
+        transferUri.requestFocus()
+        val builder = AlertDialog.Builder(this)
+        with(builder) {
             setView(layout)
             setPositiveButton(R.string.transfer) { dialog, _ ->
+                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.dismiss()
                 val uriText = transferUri.text.toString().trim()
-                if (uriText.length > 0) {
+                if (uriText.isNotEmpty()) {
                     var uri = ContactsActivity.findContactURI(uriText)
                     if (!uri.startsWith("sip:")) {
                         uri = "sip:$uri"
@@ -1253,10 +1256,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.cancel()
             }
-            show()
         }
+        val alertDialog = builder.create()
+        // This needs to be done after dialog has been created and before it is shown
+        alertDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        alertDialog.show()
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
