@@ -14,8 +14,8 @@
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
     <string name="call_not_secure">Esta chamada NÃO é segura!</string>
-    <string name="call_closed">A chamada está encerrada.</string>
-    <string name="call_failed">Ligação falhou.</string>
+    <string name="call_closed">A chamada está encerrada</string>
+    <string name="call_failed">A ligação falhou</string>
     <string name="transfer_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="verify_sas">Você quer verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="verify">Verificar a Solicitação</string>
@@ -140,7 +140,7 @@
     <string name="call">Chamada</string>
     <string name="call_history">Histórico de Chamadas</string>
     <string name="message_from">Mensagem de</string>
-    <string name="transfer_request">Solicitação de transferência de chamada para</string>
+    <string name="transfer_request">Pedido de Transferência</string>
     <string name="incoming_call_from">Chamada de</string>
     <string name="answer">Atender</string>
     <string name="reject">Rejeitar</string>
@@ -205,7 +205,7 @@
     <string name="no_cameras">Você não possui câmeras de vídeo compatíveis.</string>
     <string name="no_video_calls">Não é possível você fazer ou responder chamadas de vídeo sem a permissão da câmera.</string>
     <string name="restart_request">Solicitação para Reinicialização</string>
-    <string name="transfer">Solicitação da Transferência</string>
+    <string name="transfer">Transferir</string>
     <string name="allow_video">Aceitar a chamada de vídeo com \'%1$s\'\?</string>
     <string name="video_request">Pedido de Vídeo</string>
     <string name="video_call">Chamada de vídeo</string>
@@ -224,4 +224,9 @@
     <string name="stun_username">Nome do Usuário STUN/TURN</string>
     <string name="video_codecs_help">Lista dos codecs de vídeo compatíveis em ordem de prioridade</string>
     <string name="video_codecs">Codecs de Vídeo</string>
+    <string name="transfer_request_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
+    <string name="transfer_failed">A transferência falhou</string>
+    <string name="transfer_destination">Destino da transferência</string>
+    <string name="call_transfer">Transferência de chamada</string>
+    <string name="transfer_request_to">Chamada de solicitação de transferência para</string>
 </resources>

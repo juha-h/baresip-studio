@@ -206,4 +206,19 @@
     <string name="invalid_stun_server">Ugyldig STUN-tjener \"%1$s\"</string>
     <string name="call_info_not_available">Ingen info tilgjengelig</string>
     <string name="show_password">Vis passord</string>
+    <string name="no_cameras">Du har ikke noen støttede videokameraer.</string>
+    <string name="restart_request">Start forespørsel på ny</string>
+    <string name="video_request">Videoforespørsel</string>
+    <string name="video_call">Videosamtale</string>
+    <string name="confirmation">Bekreftelse</string>
+    <string name="audio">Lyd</string>
+    <string name="tap_to_start">Trykk for å starte program</string>
+    <string name="invalid_stun_password">«%1$s» er et ugyldig passord</string>
+    <string name="stun_password_help">Passord hvis påkrevd av STUN/TURN-tjener</string>
+    <string name="stun_password">STUN/TURN-passord</string>
+    <string name="invalid_stun_username">«%1$s» er et ugyldig brukernavn</string>
+    <string name="stun_username_help">Brukernavn hvis påkrevd av STUN/TURN-tjener</string>
+    <string name="stun_username">STUN/TURN-brukernavn</string>
+    <string name="video_codecs_help">Liste over støttede videokodek i prioritetsrang</string>
+    <string name="video_codecs">Videokodek</string>
 </resources>
