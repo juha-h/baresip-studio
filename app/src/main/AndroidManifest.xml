@@ -109,7 +109,7 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/about"
+            android:label="@string/about_title"
             android:parentActivityName=".MainActivity">
         </activity>
 
