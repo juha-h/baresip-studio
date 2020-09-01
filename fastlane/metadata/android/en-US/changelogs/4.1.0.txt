@@ -1,0 +1,4 @@
+- Added possibility to re-register selected account by swipe down gesture.
+- Automatically focus and show soft keyboard when passwords or transfer
+destination is asked.
+- Various string related fixes.
