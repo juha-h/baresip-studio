@@ -16,7 +16,7 @@
     <string name="call_not_secure">Esta chamada NÃO é segura!</string>
     <string name="call_closed">A chamada está encerrada</string>
     <string name="call_failed">A ligação falhou</string>
-    <string name="transfer_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
+    <string name="transfer_request_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="verify_sas">Você quer verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="verify">Verificar a Solicitação</string>
     <string name="registering_failed">O registro de %1$s falhou.</string>

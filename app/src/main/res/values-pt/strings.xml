@@ -132,7 +132,7 @@
     <string name="aec_extented_filter">Filtro Estendido do AEC</string>
     <string name="restore">Restaurar</string>
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
-    <string name="transfer_query">Aceita transferir esta chamada para \'%1$s\'\?</string>
+    <string name="transfer_request_query">Aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="cancel">Cancelar</string>
     <string name="delete_account">Quer apagar a conta \'%1$s\'\?</string>
     <string name="video_request">Pedido de Vídeo</string>
