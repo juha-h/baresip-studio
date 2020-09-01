@@ -246,7 +246,7 @@
     <string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
     <string name="verify">Потвърди</string>
     <string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
+    <string name="transfer_request_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
     <string name="call_failed">Обаждането не бе успешно</string>
     <string name="call_closed">Обаждането е затворено</string>
     <string name="call_not_secure">Това обаждане НЕ е сигурно!</string>

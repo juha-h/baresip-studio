@@ -146,7 +146,7 @@
     <string name="registering_failed">Регистрация `%1$s` не удалась.</string>
     <string name="restored">Данные приложения восстановлены. Нужна перезагрузка baresip. Перезагрузить\?</string>
     <string name="today">Сегодня</string>
-    <string name="transfer_query">Принять перевод этого вызова на \'%1$s\'\?</string>
+    <string name="transfer_request_query">Принять перевод этого вызова на \'%1$s\'\?</string>
     <string name="transfer_request">Запрос перевода на</string>
     <string name="transferring_call_to_dots">Перевод на …</string>
     <string name="unverify">Отменить подтверждение</string>

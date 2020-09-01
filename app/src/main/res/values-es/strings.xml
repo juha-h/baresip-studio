@@ -300,7 +300,7 @@
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
     <string name="verify">Verificar</string>
     <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">¿Acepta transferir la llamada a «%1$s»\?</string>
+    <string name="transfer_request_query">¿Acepta transferir la llamada a «%1$s»\?</string>
     <string name="call_failed">Llamada fallida</string>
     <string name="call_closed">Llamada cerrada</string>
     <string name="call_not_secure">¡Esta llamada NO es segura!</string>
