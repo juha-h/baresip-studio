@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- About Activity -->
-    <string name="about_title">baresip+ sovelluksesta</string>
-    <string name="about_text">
+    <string name="about_title">baresip sovelluksesta</string>
+    <string name="about_title_plus">baresip+ sovelluksesta</string>
+<string name="about_text">
         <![CDATA[
-        <h1>Baresip-kirjastoon perustuva, videopuhelut mahdollistava
-        SIP-sovellus</h1>
+        <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Versio %1$s</p>
+        <h2>Käyttövihjeitä</h2>
+        <ul>
+        <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+            keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
+            (rekisteröintiä ei ole aktivoitu).</li>
+        <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
+        <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
+        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
+        <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
+        <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
+        kun puhelun kohde on tyhjä.</li>
+        <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
+        tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
+        <h2>Tunnetut ongelmat</h2>
+        <ul>
+            <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
+            samanaikaisesti aktiivisia verkkoliittymiä.</li>
+        </ul>
+        <h2>Lähdekoodi</h2>
+        Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
+        missä voi myös raportoida virheistä.
+        ]]>
+    </string>
+    <string name="about_text_plus">
+        <![CDATA[
+        <h1>Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
