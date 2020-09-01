@@ -1278,6 +1278,7 @@ class MainActivity : AppCompatActivity() {
             messageView.text = message
         }
         val input = layout.findViewById(R.id.password) as EditText
+        input.requestFocus()
         val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
         checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
@@ -1286,9 +1287,11 @@ class MainActivity : AppCompatActivity() {
                 input.transformationMethod = PasswordTransformationMethod()
         }
         val context = this
-        with (AlertDialog.Builder(this)) {
+        val builder = AlertDialog.Builder(this)
+        with(builder) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
+                imm.hideSoftInputFromWindow(input.windowToken, 0)
                 dialog.dismiss()
                 var password = input.text.toString().trim()
                 if (!Account.checkAuthPass(password)) {
@@ -1306,9 +1309,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                imm.hideSoftInputFromWindow(input.windowToken, 0)
                 dialog.cancel()
             }
-            show()
+            val dialog = builder.create()
+            dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            dialog.show()
         }
     }
 
@@ -1328,6 +1334,7 @@ class MainActivity : AppCompatActivity() {
                 val message = getString(R.string.account) + " " + Utils.plainAor(aor)
                 messageView.text = message
                 val input = layout.findViewById(R.id.password) as EditText
+                input.requestFocus()
                 val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked)
@@ -1336,9 +1343,11 @@ class MainActivity : AppCompatActivity() {
                         input.transformationMethod = PasswordTransformationMethod()
                 }
                 val context = this
-                with (AlertDialog.Builder(this)) {
+                val builder = AlertDialog.Builder(this)
+                with(builder) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.dismiss()
                         val password = input.text.toString().trim()
                         if (!Account.checkAuthPass(password)) {
@@ -1350,11 +1359,14 @@ class MainActivity : AppCompatActivity() {
                         askPasswords(accounts)
                     }
                     setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.cancel()
                         aorPasswords.put(aor, "")
                         askPasswords(accounts)
                     }
-                    show()
+                    val dialog = builder.create()
+                    dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                    dialog.show()
                 }
             } else {
                 askPasswords(accounts)
