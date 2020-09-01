@@ -19,7 +19,7 @@ class AboutActivity : AppCompatActivity() {
         Utils.addActivity("about")
 
         val aboutText = findViewById<TextView>(R.id.aboutText)
-        val text = String.format(getString(R.string.about_text), BuildConfig.VERSION_NAME)
+        val text = String.format(getString(R.string.about_text_plus), BuildConfig.VERSION_NAME)
         aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         aboutText.setMovementMethod(LinkMovementMethod.getInstance())
 

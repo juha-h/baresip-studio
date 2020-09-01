@@ -37,7 +37,7 @@
         android:allowBackup="false"
         android:installLocation="internalOnly"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/app_name_plus"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
@@ -115,7 +115,7 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/about"
+            android:label="@string/about_title_plus"
             android:parentActivityName=".MainActivity">
         </activity>
 

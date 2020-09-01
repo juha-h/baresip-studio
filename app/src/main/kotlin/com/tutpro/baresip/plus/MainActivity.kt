@@ -1377,9 +1377,9 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        val bsFile = getString(R.string.app_name) + ".bs"
+        val bsFile = getString(R.string.app_name_plus) + ".bs"
         val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
-        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         if (!Utils.zip(files, zipFile)) {
             Log.w("Baresip", "Failed to write zip file '$zipFile'")
@@ -1405,9 +1405,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun restore(password: String) {
-        val bsFile = getString(R.string.app_name) + ".bs"
+        val bsFile = getString(R.string.app_name_plus) + ".bs"
         val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
-        val zipFile = getString(R.string.app_name) + ".zip"
+        val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         val zipData = Utils.decryptFromFile(backupFilePath, password)
         if (zipData == null) {
