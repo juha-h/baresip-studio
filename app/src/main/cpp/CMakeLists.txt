@@ -35,6 +35,14 @@ add_library(lib_amrnb STATIC IMPORTED)
 set_target_properties(lib_amrnb PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/amr/lib/${ANDROID_ABI}/libamrnb.a)
 
+add_library(lib_amrwb STATIC IMPORTED)
+set_target_properties(lib_amrwb PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/amr/lib/${ANDROID_ABI}/libamrwb.a)
+
+add_library(lib_amrwbenc STATIC IMPORTED)
+set_target_properties(lib_amrwbenc PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/amr/lib/${ANDROID_ABI}/libamrwbenc.a)
+
 add_library(lib_ilbc STATIC IMPORTED)
 set_target_properties(lib_ilbc PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ilbc/lib/${ANDROID_ABI}/libilbc.a)
@@ -76,6 +84,8 @@ target_link_libraries(baresip
         lib_g722_1
         lib_ilbc
         lib_amrnb
+        lib_amrwb
+        lib_amrwbenc
         lib_webrtc
         lib_zrtp
         lib_bn
