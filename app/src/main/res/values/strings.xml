@@ -66,6 +66,14 @@
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         where also issues can be reported.
+        <h2>Licenses</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> except the following</li>
+            <li><b>Apache 2.0</b> AMR codec</li>
+            <li><b>LGPL 2.1</b> G722 and G726 codecs</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU GPLv2</b> H264 video codec</li>
+        </ul>
         ]]>
     </string>
     <string name="baresip_link" translatable="false">
