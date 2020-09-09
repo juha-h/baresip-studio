@@ -1,0 +1,3 @@
+- Added AMR-WB (Adaptive Multi-Rate Wideband) speech codec.
+- Added Licenses section to About text.
+- New Portuguese (Brazil) translations.
