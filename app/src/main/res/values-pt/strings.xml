@@ -75,7 +75,7 @@
     <string name="backup_failed">Falha ao fazer o backup dos dados da aplicação no ficheiro \'%1$s\' na pasta Download. Verifique Apps → baresip → Permissões → Armazenamento.</string>
     <string name="hold">Reter</string>
     <string name="display_name_help">Nome (se houver) usado em From URI de solicitações de saída.</string>
-    <string name="call_failed">Ligação falhou.</string>
+    <string name="call_failed">A ligação falhou</string>
     <string name="password">Palavra-passe</string>
     <string name="verify">Verificar a Solicitação</string>
     <string name="voicemail">Correio de Voz</string>
@@ -143,7 +143,7 @@
     <string name="audio">Áudio</string>
     <string name="ok">OK</string>
     <string name="message_failed">Falhou</string>
-    <string name="call_closed">A chamada está encerrada.</string>
+    <string name="call_closed">A chamada está terminada</string>
     <string name="invalid_opus_bitrate">Taxa de bits Opus inválida</string>
     <string name="transfer_request">Solicitação de transferência de chamada para</string>
     <string name="authentication_password">Palavra-passe de Autenticação</string>
