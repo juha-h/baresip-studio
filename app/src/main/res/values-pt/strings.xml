@@ -221,7 +221,7 @@
     <string name="backed_up">Dados da aplicação armazenados em backup no ficheiro \'%1$s\' na Download.</string>
     <string name="quit">Sair</string>
     <string name="unverify">Desverificar</string>
-    <string name="tls_certificate_file_help">Se marcado, o ficheiro \'cert.pem\' que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado no diretório Download. Por motivos de segurança, exclua o ficheiro após o carregamento.</string>
+    <string name="tls_certificate_file_help">Se for marcado, o ficheiro \'cert.pem\' que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado no diretório Download. Por motivos de segurança, apague o ficheiro após o carregamento.</string>
     <string name="invalid_stun_username">Nome do utilizador inválido \'%1$s\'</string>
     <string name="calls_delete_question">Quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
 </resources>
