@@ -33,9 +33,9 @@
         missä voi myös raportoida virheistä.
         <h2>Lisenssit</h2>
         <ul>
-            <li><b>BSD-3-Clause</b> paitsi seuraavat</li>
-            <li><b>Apache 2.0</b> AMR puheen koodausmenetelmä</li>
-            <li><b>LGPL 2.1</b> G722 ja G726 puheen koodausmenetelmät</li>
+            <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
+            <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
+            <li><b>LGPL 2.1</b> G722 ja G726 koodausmenetelmät</li>
             <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
         </ul>
         ]]>
@@ -104,8 +104,9 @@
         Jos välityspalvelimen osoite SIP
         URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
 \nEsimerkkejä:
-\n • sip:foo.com:5060;transport=tls
-\n • sip:[2001:67c:223:777::10]:5060;transport=tcp
+\n • sip:example.com:5061;transport=tls
+\n • sip:[2001:67c:223:777::10];transport=tcp
+\n • sip:192.168.43.50:443;transport=wss
     </string>
     <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">Toisen
