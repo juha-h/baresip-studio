@@ -28,40 +28,40 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     internal lateinit var layout: RelativeLayout
-    internal lateinit var videoView: VideoView
+    private lateinit var videoView: VideoView
     internal lateinit var baresipService: Intent
-    internal lateinit var callTitle: TextView
-    internal lateinit var callUri: AutoCompleteTextView
-    internal lateinit var securityButton: ImageButton
-    internal lateinit var callButton: ImageButton
-    internal lateinit var hangupButton: ImageButton
-    internal lateinit var answerButton: ImageButton
-    internal lateinit var rejectButton: ImageButton
-    internal lateinit var holdButton: ImageButton
-    internal lateinit var transferButton: ImageButton
-    internal lateinit var videoButton: ImageButton
-    internal lateinit var voicemailButton: ImageButton
-    internal lateinit var contactsButton: ImageButton
-    internal lateinit var messagesButton: ImageButton
-    internal lateinit var callsButton: ImageButton
-    internal lateinit var dialpadButton: ImageButton
+    private lateinit var callTitle: TextView
+    private lateinit var callUri: AutoCompleteTextView
+    private lateinit var securityButton: ImageButton
+    private lateinit var callButton: ImageButton
+    private lateinit var hangupButton: ImageButton
+    private lateinit var answerButton: ImageButton
+    private lateinit var rejectButton: ImageButton
+    private lateinit var holdButton: ImageButton
+    private lateinit var transferButton: ImageButton
+    private lateinit var videoButton: ImageButton
+    private lateinit var voicemailButton: ImageButton
+    private lateinit var contactsButton: ImageButton
+    private lateinit var messagesButton: ImageButton
+    private lateinit var callsButton: ImageButton
+    private lateinit var dialpadButton: ImageButton
     internal lateinit var dtmf: EditText
-    internal var dtmfWatcher: TextWatcher? = null
-    internal lateinit var infoButton: ImageButton
-    internal lateinit var uaAdapter: UaSpinnerAdapter
+    private var dtmfWatcher: TextWatcher? = null
+    private lateinit var infoButton: ImageButton
+    private lateinit var uaAdapter: UaSpinnerAdapter
     internal lateinit var aorSpinner: Spinner
-    internal lateinit var imm: InputMethodManager
-    internal lateinit var nm: NotificationManager
-    internal lateinit var kgm: KeyguardManager
-    internal lateinit var serviceEventReceiver: BroadcastReceiver
+    private lateinit var imm: InputMethodManager
+    private lateinit var nm: NotificationManager
+    private lateinit var kgm: KeyguardManager
+    private lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
-    internal lateinit var speakerIcon: MenuItem
-    internal lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var speakerIcon: MenuItem
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     internal var restart = false
-    internal var atStartup = false
-    internal var alerting = false
+    private var atStartup = false
+    private var alerting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
