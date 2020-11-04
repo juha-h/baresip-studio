@@ -597,7 +597,7 @@ class BaresipService: Service() {
                             if (Build.VERSION.SDK_INT < 26)
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .setPriority(Notification.PRIORITY_HIGH)
+                                        .priority = Notification.PRIORITY_HIGH
                             val answerIntent = Intent(this, BaresipService::class.java)
                             answerIntent.action = "Call Answer"
                             answerIntent.putExtra("callp", callp)
@@ -695,7 +695,7 @@ class BaresipService: Service() {
                             if (Build.VERSION.SDK_INT < 26)
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .setPriority(Notification.PRIORITY_HIGH)
+                                        .priority = Notification.PRIORITY_HIGH
                             val acceptIntent = Intent(this, BaresipService::class.java)
                             acceptIntent.action = "Transfer Accept"
                             acceptIntent.putExtra("uap", uap)
