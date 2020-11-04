@@ -1,0 +1,2 @@
+- New Portuguese (Brazil) and Russian translations.
+- Update icons after resuming to the application.
