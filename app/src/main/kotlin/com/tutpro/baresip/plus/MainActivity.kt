@@ -704,8 +704,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 uaAdapter.notifyDataSetChanged()
-                if (UserAgent.uas().size > 0)
-                    showCall(UserAgent.uas()[aorSpinner.selectedItemPosition])
+                if (UserAgent.uas().size > 0) {
+                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                    showCall(ua)
+                    updateIcons(ua.account)
+                }
             }
         }
         resumeAction = ""
