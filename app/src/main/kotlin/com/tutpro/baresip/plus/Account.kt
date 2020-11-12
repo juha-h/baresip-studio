@@ -225,14 +225,14 @@ class Account(val accp: String) {
 
         fun checkDisplayName(dn: String): Boolean {
             if (dn == "") return true
-            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
+            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}\$")
             return dnRegex.matches(dn)
         }
 
         fun checkAuthUser(au: String): Boolean {
             if (au == "") return true
             val ud = au.split("@")
-            val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,63}\$")
+            val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}\$")
             val telnoRegex = Regex("^[+]?[0-9]{1,16}\$")
             if (ud.size == 1) {
                 return userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])
