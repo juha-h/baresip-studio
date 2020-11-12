@@ -365,7 +365,6 @@ class AccountActivity : AppCompatActivity() {
                     if (sp.isEmpty() || Account.checkAuthPass(sp)) {
                         if (account_set_stun_pass(acc.accp, sp) == 0) {
                             acc.stunPass = account_stun_pass(acc.accp);
-                            Log.d("Baresip", "New stun pass is ${acc.stunPass}")
                             save = true
                         } else {
                             Log.e("Baresip", "Setting of stun pass failed")
