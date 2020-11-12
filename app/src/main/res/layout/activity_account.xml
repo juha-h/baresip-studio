@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/AccountView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -77,15 +77,20 @@
             android:text="@string/authentication_password" >
         </TextView>
 
-        <EditText
-            android:id="@+id/AuthPass"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:textSize="18sp"
-            android:inputType="textPassword"
-            android:importantForAutofill="no"
-            android:layout_width="fill_parent">
-        </EditText>
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle">
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/AuthPass"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:hint="@string/password"
+                android:maxLines="1">
+            </androidx.appcompat.widget.AppCompatEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/OutboundProxyTitle"
@@ -246,15 +251,20 @@
             android:text="@string/stun_password" >
         </TextView>
 
-        <EditText
-            android:id="@+id/StunPass"
-            android:layout_width="fill_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:textSize="18sp"
-            android:inputType="textPassword"
-            android:importantForAutofill="no" >
-        </EditText>
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle">
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/StunPass"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:hint="@string/password"
+                android:maxLines="1">
+            </androidx.appcompat.widget.AppCompatEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
