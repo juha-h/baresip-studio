@@ -498,18 +498,22 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_VERSION_1_6;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_net_1set_1address(JNIEnv *env, jobject thiz, jstring javaIp);
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers);
+
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject instance,
-        jstring javaPath, jstring javaIpV4Addr, jstring javaIpV6Addr,
-        jstring javaNetInterface, jint javaNetAf, jint javaLogLevel) {
+        jstring jPath, jstring jIpV4Addr, jstring jIpV6Addr, jstring jNetInterface,
+        jstring jDnsServers, jint jNetAf, jint javaLogLevel) {
 
     LOGD("starting baresip\n");
 
     struct sa temp_sa;
-    const char *ipv4_addr = (*env)->GetStringUTFChars(env, javaIpV4Addr, 0);
-    const char *ipv6_addr = (*env)->GetStringUTFChars(env, javaIpV6Addr, 0);
-    const char *net_interface = (*env)->GetStringUTFChars(env, javaNetInterface, 0);
-    const int net_af = javaNetAf;
+    const char *net_interface = (*env)->GetStringUTFChars(env, jNetInterface, 0);
+    const int net_af = jNetAf;
 
     char start_error[64] = "";
 
@@ -525,7 +529,7 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
     g_ctx.env = env;
 
     int err;
-    const char *path = (*env)->GetStringUTFChars(env, javaPath, 0);
+    const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
     struct le *le;
 
     runLoggingThread();
@@ -561,17 +565,9 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
         goto out;
     }
 
-    if (strlen(ipv4_addr) > 0) {
-        sa_set_str(&temp_sa, ipv4_addr, 0);
-        LOGD("setting IPv4 address %s\n", ipv4_addr);
-        net_set_address(baresip_network(), &temp_sa);
-    }
-
-    if (strlen(ipv6_addr) > 0) {
-        sa_set_str(&temp_sa, ipv6_addr, 0);
-        LOGD("setting IPv6 address %s\n", ipv6_addr);
-        net_set_address(baresip_network(), &temp_sa);
-    }
+    Java_com_tutpro_baresip_plus_Api_net_1set_1address(env, instance, jIpV4Addr);
+    Java_com_tutpro_baresip_plus_Api_net_1set_1address(env, instance, jIpV6Addr);
+    Java_com_tutpro_baresip_plus_Api_net_1use_1nameserver(env, instance, jDnsServers);
 
     net_debug_log();
 
@@ -643,9 +639,6 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
     err = re_main(signal_handler);
 
     out:
-
-    (*env)->ReleaseStringUTFChars(env, javaIpV4Addr, ipv4_addr);
-    (*env)->ReleaseStringUTFChars(env, javaIpV6Addr, ipv6_addr);
 
     if (err) {
         LOGE("stopping UAs due to error: (%d)\n", err);
@@ -1822,6 +1815,10 @@ Java_com_tutpro_baresip_plus_Api_net_1set_1address(JNIEnv *env, jobject thiz, js
     struct sa temp_sa;
     char buf[256];
     LOGD("setting address '%s'\n", native_ip);
+    if (str_len(native_ip) == 0) {
+        (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+        return 0;
+    }
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
         sa_ntop(&temp_sa, buf, 256);
         net_set_address(baresip_network(), &temp_sa);

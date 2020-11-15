@@ -57,8 +57,9 @@ object Config {
             }
         }
 
-        Log.e("Baresip", "Initialized config to '$config'")
         Utils.putFileContents(configPath, config.toByteArray())
+        BaresipService.isConfigInitialized = true
+        Log.i("Baresip", "Initialized config to '$config'")
 
     }
 
@@ -110,9 +111,10 @@ object Config {
     }
 
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
+        Log.i("Baresip", "Updating dnsServers with $dnsServers")
         var servers = ""
         for (dnsServer in dnsServers) {
-            var address = dnsServer.hostAddress
+            var address = dnsServer.hostAddress.removePrefix("/")
             if (Utils.checkIpV4(address))
                 address = "${address}:53"
             else

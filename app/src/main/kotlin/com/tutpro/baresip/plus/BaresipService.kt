@@ -84,74 +84,27 @@ class BaresipService: Service() {
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        val linkProps = cm.getLinkProperties(network)
-                        if (linkProps != null) {
-                            val interfaceName = linkProps.interfaceName!!
-                            if (network == cm.activeNetwork) {
-                                Log.i(LOG_TAG, "Active network $network@$interfaceName " +
-                                        " is available: $linkProps")
-                                activeNetwork = "$network"
-                                if (isServiceRunning) {
-                                    Utils.updateLinkProperties(linkProps)
-                                } else {
-                                    dnsServers = linkProps.dnsServers
-                                    linkAddresses = linkProps.linkAddresses
-                                }
-                            } else {
-                                Log.i(LOG_TAG, "Non-active network $network@$interfaceName " +
-                                        " is available: $linkProps")
-                            }
-                        }
+                        Log.i(LOG_TAG, "Network $network is available")
+                        updateNetwork()
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        if (activeNetwork == "$network") {
-                            Log.d(LOG_TAG, "Currently active network $network is lost")
-                            var newNetwork: Network? = null
-                            for (net in cm.allNetworks)
-                                if (net != network) {
-                                    if (net == cm.activeNetwork)  {
-                                        Log.d(LOG_TAG, "New active network $net is available")
-                                        newNetwork = net
-                                        break
-                                    }
-                                }
-                            if (newNetwork != null) {
-                                val linkProps = cm.getLinkProperties(newNetwork)
-                                if (linkProps != null) {
-                                    val interfaceName = linkProps.interfaceName
-                                    Log.d(LOG_TAG, "Updating new active network " +
-                                            "$newNetwork@$interfaceName link properties: $linkProps")
-                                    activeNetwork = "$newNetwork"
-                                    Utils.updateLinkProperties(linkProps)
-                                }
-                            }
-                        } else {
-                            Log.d(LOG_TAG, "Network '$network' is lost")
-                        }
+                        Log.i(LOG_TAG, "Network $network is lost")
+                        if (activeNetwork == "$network")
+                            updateNetwork()
                     }
 
-                    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                        super.onLinkPropertiesChanged(network, linkProperties)
-                        val linkProps = cm.getLinkProperties(network)
-                        if (linkProps != null) {
-                            val interfaceName = linkProps.interfaceName
-                            if (network == cm.activeNetwork) {
-                                Log.d(LOG_TAG, "Active network $network@$interfaceName " +
-                                        " link properties changed: $linkProperties")
-                                activeNetwork = "$network"
-                                if (isServiceRunning) {
-                                    Utils.updateLinkProperties(linkProperties)
-                                } else {
-                                    dnsServers = linkProperties.dnsServers
-                                    linkAddresses = linkProperties.linkAddresses
-                                }
-                            } else {
-                                Log.d(LOG_TAG, "Network $network@$interfaceName " +
-                                        " link properties changed: $linkProperties")
-                            }
-                        }
+                    override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
+                        super.onLinkPropertiesChanged(network, props)
+                        Log.i(LOG_TAG, "Network $network link properties changed")
+                        if (activeNetwork == "$network")
+                            updateNetwork()
+                    }
+
+                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                        super.onCapabilitiesChanged(network, caps)
+                        Log.i(LOG_TAG, "Network $network capabilities changed: $caps")
                     }
                 }
         )
@@ -300,10 +253,11 @@ class BaresipService: Service() {
 
                 val ipV4Addr = Utils.findIpV4Address(linkAddresses)
                 val ipV6Addr = Utils.findIpV6Address(linkAddresses)
+                val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(LOG_TAG, "Starting baresip without IP addresses")
                 Thread(Runnable { baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
-                        Api.AF_UNSPEC, logLevel)
+                        dnsServers, Api.AF_UNSPEC, logLevel)
                 }).start()
 
                 isServiceRunning = true
@@ -509,9 +463,9 @@ class BaresipService: Service() {
                             if (dynDns) {
                                 val activeNetwork = cm.activeNetwork
                                 if (activeNetwork != null) {
-                                    val linkProps = cm.getLinkProperties(activeNetwork)
-                                    if (linkProps != null) {
-                                        val dnsServers = linkProps.dnsServers
+                                    val props = cm.getLinkProperties(activeNetwork)
+                                    if (props != null) {
+                                        val dnsServers = props.dnsServers
                                         Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
                                         if (Config.updateDnsServers(dnsServers) != 0) {
                                             Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
@@ -527,6 +481,10 @@ class BaresipService: Service() {
                                     Log.d(LOG_TAG, "No active network!")
                                 }
                             }
+                        }
+                        if ((ev.size > 1) && (ev[1] == "Software caused connection abort")) {
+                            // Perhaps due to VPN connect/disconnect
+                            updateNetwork()
                         }
                         if (!Utils.isVisible())
                             return
@@ -1116,6 +1074,80 @@ class BaresipService: Service() {
         }
     }
 
+    private fun updateNetwork() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            for (n in cm.allNetworks) {
+                val caps = cm.getNetworkCapabilities(n) ?: continue
+                val props = cm.getLinkProperties(n) ?: continue
+                Log.i(LOG_TAG, "Network $n ${n == cm.activeNetwork}" +
+                        " is available with caps: $caps, props: $props")
+            }
+            // Use VPN network if available
+            for (n in cm.allNetworks) {
+                val caps = cm.getNetworkCapabilities(n) ?: continue
+                val props = cm.getLinkProperties(n) ?: continue
+                if (n == cm.activeNetwork)
+                    Log.i("Baresip", "Network $n is active")
+                else
+                    Log.i("Baresip", "Network $n is NOT active")
+                if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN) &&
+                        (n == cm.activeNetwork)) {
+                    Log.i(LOG_TAG, "Active VPN network $n is available with caps: " +
+                            "$caps, props: $props")
+                    activeNetwork = "$n"
+                    if (!isConfigInitialized)
+                        Log.i("Baresip", "Config is NOT initialized")
+                    else
+                        Log.i("Baresip", "Config is initialized")
+                    if (isConfigInitialized) {
+                        Utils.updateLinkProperties(props)
+                    } else {
+                        for (s in props.dnsServers)
+                            Log.i(LOG_TAG, "DNS Server ${s.hostAddress}")
+                        dnsServers = props.dnsServers
+                        linkAddresses = props.linkAddresses
+                    }
+                    return
+                }
+            }
+            // Otherwise, use active network with Internet access
+            for (n in cm.allNetworks) {
+                val caps = cm.getNetworkCapabilities(n) ?: continue
+                val props = cm.getLinkProperties(n) ?: continue
+                if ((n == cm.activeNetwork) &&
+                        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                    Log.i(LOG_TAG, "Active Internet network $n is available with caps: " +
+                            "$caps, props: $props")
+                    activeNetwork = "$n"
+                    if (isServiceRunning) {
+                        Utils.updateLinkProperties(props)
+                    } else {
+                        dnsServers = props.dnsServers
+                        linkAddresses = props.linkAddresses
+                    }
+                    return
+                }
+            }
+            // Otherwise, use an active network
+            for (n in cm.allNetworks) {
+                val caps = cm.getNetworkCapabilities(n) ?: continue
+                val props = cm.getLinkProperties(n) ?: continue
+                if (n == cm.activeNetwork) {
+                    Log.i(LOG_TAG, "Active network $n is available with caps: " +
+                            "$caps, props: $props")
+                    activeNetwork = "$n"
+                    if (isServiceRunning) {
+                        Utils.updateLinkProperties(props)
+                    } else {
+                        dnsServers = props.dnsServers
+                        linkAddresses = props.linkAddresses
+                    }
+                    return
+                }
+            }
+        }
+    }
+
     private fun cleanService() {
         abandonAudioFocus()
         uas.clear()
@@ -1134,7 +1166,7 @@ class BaresipService: Service() {
     }
 
     external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, netInterface: String,
-                              netAf: Int, logLevel: Int)
+                              dnsServers: String, netAf: Int, logLevel: Int)
     external fun baresipStop(force: Boolean)
 
     companion object {
@@ -1160,6 +1192,7 @@ class BaresipService: Service() {
         val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
         var isServiceRunning = false
+        var isConfigInitialized = false
         var libraryLoaded = false
         var isServiceClean = false
         var speakerPhone = false
