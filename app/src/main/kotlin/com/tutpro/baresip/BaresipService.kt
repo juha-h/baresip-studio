@@ -1091,9 +1091,8 @@ class BaresipService: Service() {
     private fun isNetworkActive(network: Network): Boolean {
         if (Build.VERSION.SDK_INT >= 23)
             return network == cm.activeNetwork
-        if (Build.VERSION.SDK_INT < 23)
-            if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
-                return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
+        if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
+            return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
         return false
     }
 
