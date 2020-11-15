@@ -1029,77 +1029,72 @@ class BaresipService: Service() {
     }
 
     private fun updateNetwork() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            for (n in cm.allNetworks) {
-                val caps = cm.getNetworkCapabilities(n) ?: continue
-                val props = cm.getLinkProperties(n) ?: continue
-                Log.i(LOG_TAG, "Network $n ${n == cm.activeNetwork}" +
-                        " is available with caps: $caps, props: $props")
-            }
-            // Use VPN network if available
-            for (n in cm.allNetworks) {
-                val caps = cm.getNetworkCapabilities(n) ?: continue
-                val props = cm.getLinkProperties(n) ?: continue
-                if (n == cm.activeNetwork)
-                    Log.i("Baresip", "Network $n is active")
+        // Use VPN network if available
+        for (n in cm.allNetworks) {
+            val caps = cm.getNetworkCapabilities(n) ?: continue
+            val props = cm.getLinkProperties(n) ?: continue
+            if (isNetworkActive(n) && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                Log.i(LOG_TAG, "Active VPN network $n is available with caps: " +
+                        "$caps, props: $props")
+                activeNetwork = "$n"
+                if (!isConfigInitialized)
+                    Log.i("Baresip", "Config is NOT initialized")
                 else
-                    Log.i("Baresip", "Network $n is NOT active")
-                if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN) &&
-                        (n == cm.activeNetwork)) {
-                    Log.i(LOG_TAG, "Active VPN network $n is available with caps: " +
-                            "$caps, props: $props")
-                    activeNetwork = "$n"
-                    if (!isConfigInitialized)
-                        Log.i("Baresip", "Config is NOT initialized")
-                    else
-                        Log.i("Baresip", "Config is initialized")
-                    if (isConfigInitialized) {
-                        Utils.updateLinkProperties(props)
-                    } else {
-                        for (s in props.dnsServers)
-                            Log.i(LOG_TAG, "DNS Server ${s.hostAddress}")
-                        dnsServers = props.dnsServers
-                        linkAddresses = props.linkAddresses
-                    }
-                    return
+                    Log.i("Baresip", "Config is initialized")
+                if (isConfigInitialized) {
+                    Utils.updateLinkProperties(props)
+                } else {
+                    for (s in props.dnsServers)
+                        Log.i(LOG_TAG, "DNS Server ${s.hostAddress}")
+                    dnsServers = props.dnsServers
+                    linkAddresses = props.linkAddresses
                 }
-            }
-            // Otherwise, use active network with Internet access
-            for (n in cm.allNetworks) {
-                val caps = cm.getNetworkCapabilities(n) ?: continue
-                val props = cm.getLinkProperties(n) ?: continue
-                if ((n == cm.activeNetwork) &&
-                        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    Log.i(LOG_TAG, "Active Internet network $n is available with caps: " +
-                            "$caps, props: $props")
-                    activeNetwork = "$n"
-                    if (isServiceRunning) {
-                        Utils.updateLinkProperties(props)
-                    } else {
-                        dnsServers = props.dnsServers
-                        linkAddresses = props.linkAddresses
-                    }
-                    return
-                }
-            }
-            // Otherwise, use an active network
-            for (n in cm.allNetworks) {
-                val caps = cm.getNetworkCapabilities(n) ?: continue
-                val props = cm.getLinkProperties(n) ?: continue
-                if (n == cm.activeNetwork) {
-                    Log.i(LOG_TAG, "Active network $n is available with caps: " +
-                            "$caps, props: $props")
-                    activeNetwork = "$n"
-                    if (isServiceRunning) {
-                        Utils.updateLinkProperties(props)
-                    } else {
-                        dnsServers = props.dnsServers
-                        linkAddresses = props.linkAddresses
-                    }
-                    return
-                }
+                return
             }
         }
+        // Otherwise, use active network with Internet access
+        for (n in cm.allNetworks) {
+            val caps = cm.getNetworkCapabilities(n) ?: continue
+            val props = cm.getLinkProperties(n) ?: continue
+            if (isNetworkActive(n) && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                Log.i(LOG_TAG, "Active Internet network $n is available with caps: " +
+                        "$caps, props: $props")
+                activeNetwork = "$n"
+                if (isServiceRunning) {
+                    Utils.updateLinkProperties(props)
+                } else {
+                    dnsServers = props.dnsServers
+                    linkAddresses = props.linkAddresses
+                }
+                return
+            }
+        }
+        // Otherwise, use an active network
+        for (n in cm.allNetworks) {
+            val caps = cm.getNetworkCapabilities(n) ?: continue
+            val props = cm.getLinkProperties(n) ?: continue
+            if (isNetworkActive(n)) {
+                Log.i(LOG_TAG, "Active network $n is available with caps: " +
+                        "$caps, props: $props")
+                activeNetwork = "$n"
+                if (isServiceRunning) {
+                    Utils.updateLinkProperties(props)
+                } else {
+                    dnsServers = props.dnsServers
+                    linkAddresses = props.linkAddresses
+                }
+                return
+            }
+        }
+    }
+
+    private fun isNetworkActive(network: Network): Boolean {
+        if (Build.VERSION.SDK_INT >= 23)
+            return network == cm.activeNetwork
+        if (Build.VERSION.SDK_INT < 23)
+            if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
+                return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
+        return false
     }
 
     private fun cleanService() {
