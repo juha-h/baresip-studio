@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
@@ -14,7 +13,6 @@ import android.net.LinkProperties
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -22,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 import java.io.*
+import java.net.InetAddress
 import java.security.SecureRandom
 import java.util.*
 import java.util.zip.ZipEntry
@@ -269,6 +268,22 @@ object Utils {
         return ""
     }
 
+    fun findDnsServers(list: List<InetAddress>): String {
+        var servers = ""
+        for (dnsServer in list) {
+            var address = dnsServer.hostAddress.removePrefix("/")
+            if (Utils.checkIpV4(address))
+                address = "${address}:53"
+            else
+                address = "[${address}]:53"
+            if (servers == "")
+                servers = address
+            else
+                servers = "${servers},${address}"
+        }
+        return servers
+    }
+
     private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
         var updated = false
         val ipV6Addr = findIpV6Address(linkAddresses)
@@ -302,14 +317,17 @@ object Utils {
         }
     }
 
-    fun updateLinkProperties(linkProperties: LinkProperties) {
-        if (BaresipService.dynDns && (BaresipService.dnsServers != linkProperties.dnsServers)) {
-            if (Config.updateDnsServers(linkProperties.dnsServers) != 0)
-                Log.w("Baresip", "Failed to update DNS servers '${BaresipService.dnsServers}'")
+    fun updateLinkProperties(props: LinkProperties) {
+        if (BaresipService.dynDns && (BaresipService.dnsServers != props.dnsServers)) {
+            if (BaresipService.isServiceRunning)
+                    if (Config.updateDnsServers(props.dnsServers) != 0)
+                        Log.w("Baresip", "Failed to update DNS servers '${props.dnsServers}'")
+                    else
+                        BaresipService.dnsServers = props.dnsServers
             else
-                BaresipService.dnsServers = linkProperties.dnsServers
+                BaresipService.dnsServers = props.dnsServers
         }
-        updateLinkAddresses(linkProperties.linkAddresses)
+        updateLinkAddresses(props.linkAddresses)
     }
 
     fun implode(list: List<String>, sep: String): String {
