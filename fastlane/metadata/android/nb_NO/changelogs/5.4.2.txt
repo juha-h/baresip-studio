@@ -1,2 +1,2 @@
-- Fikset sjeldent kræsj som kan inntreffe når første konto opprettes og
+- Fikset sjeldent krasj som kan inntreffe når første konto opprettes og
 melding eller anrop kommer inn før brukeren har gått tilbake til hovedaktivitet.

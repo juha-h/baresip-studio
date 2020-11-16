@@ -1,2 +1,2 @@
-- DNS tjenere hentet dynamisk, også når baresip startes for første gang.
-- Mulig kræsj unngått under henting av kontoens lydkodeker.
+- DNS-tjenere hentet dynamisk, også når baresip startes for første gang.
+- Mulig krasj unngått under henting av kontoens lydkodeker.
