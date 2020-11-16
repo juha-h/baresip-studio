@@ -28,7 +28,8 @@
         <h2>Known Issues</h2>
         <ul>
             <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
-            concurrently active network interfaces.</li>
+            concurrently active network interfaces. Active network interface preference order is VPN,
+            Internet, other.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
@@ -64,8 +65,9 @@
         </ul>
         <h2>Known Issues</h2>
         <ul>
-            <li>Due to limitations in underlying libraries, multiple
-            concurrently active network interfaces are not supported.</li>
+            <li>Due to limitations in underlying libraries, multiple concurrently active network
+            interfaces are not supported. Active network interface preference order is VPN,
+            Internet, other.</li>
             <li>In video calls, the device needs to be held in landscape
             mode rotated 90 degrees left from portrait orientation.</li>
             <li>Selfview is not shown when video stream is sendonly.</li>
