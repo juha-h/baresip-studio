@@ -211,11 +211,9 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:textSize="18sp"
-            android:paddingTop="0dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="0dp"
             android:scrollHorizontally="true"
             android:importantForAutofill="no"
+            android:hint="@string/stun_server_uri"
             android:inputType="textEmailAddress" >
         </EditText>
 

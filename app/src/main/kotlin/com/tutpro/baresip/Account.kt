@@ -85,15 +85,14 @@ class Account(val accp: String) {
 
         if (mediaNat != "") res = res + ";medianat=${mediaNat}"
 
-        if (stunServer != "") {
-            if (!stunServer.startsWith("stun") && !stunServer.startsWith("turn"))
-                stunServer = "stun:$stunServer"
+        if (stunServer != "")
             res += ";stunserver=\"${stunServer}\""
-        }
 
-        res += ";stunuser=\"${stunUser}\""
+        if (stunUser != "")
+            res += ";stunuser=\"${stunUser}\""
 
-        if (stunPass != "") res += ";stunpass=\"${stunPass}\""
+        if (stunPass != "")
+            res += ";stunpass=\"${stunPass}\""
 
         if (audioCodec.size > 0) {
             var first = true
