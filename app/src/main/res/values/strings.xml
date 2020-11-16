@@ -28,7 +28,8 @@
         <h2>Known Issues</h2>
         <ul>
             <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
-            concurrently active network interfaces.</li>
+            concurrently active network interfaces.  Network interface preference order is VPN, Internet,
+            other.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
