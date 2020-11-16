@@ -227,4 +227,5 @@
     <string name="transfer">Sett over</string>
     <string name="call_transfer">Videresending av anrop</string>
     <string name="allow_video">Godta videosamtale med «%1$s»\?</string>
+    <string name="about_title_plus">Om baresip+</string>
 </resources>
