@@ -139,9 +139,9 @@
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
     <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti]\'
-        oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. STUN-palvelimen
-        oletusarvo \'stun:stun.l.google.com:19302\', joka osoittaa Google:n julkiseen STUN-palvelimeen.
-        TURN-palvelimella ei ole oletusarvoa.
+        oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletus STUN-palvelin
+        STUN ja ICE protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
+        julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
     </string>
     <string name="stun_server_uri">STUN/TURN-palvelimen URI</string>
     <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
