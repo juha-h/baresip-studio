@@ -100,6 +100,8 @@ class AccountActivity : AppCompatActivity() {
                 else if ((mediaNat == "stun") &&
                         (stunServer.text.startsWith("turn") || (stunServer.text.toString() == "")))
                     stunServer.setText(resources.getString(R.string.stun_server_default))
+                else if ((mediaNat == "ice") && (stunServer.text.toString() == ""))
+                    stunServer.setText(resources.getString(R.string.stun_server_default))
                 else if (mediaNat == "") {
                     stunServer.setText("")
                     stunUser.setText("")
