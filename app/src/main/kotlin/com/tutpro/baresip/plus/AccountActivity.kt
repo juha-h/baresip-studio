@@ -95,6 +95,16 @@ class AccountActivity : AppCompatActivity() {
         mediaNatSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
+                if ((mediaNat == "turn") && stunServer.text.startsWith("stun"))
+                    stunServer.setText("")
+                else if ((mediaNat == "stun") &&
+                        (stunServer.text.startsWith("turn") || (stunServer.text.toString() == "")))
+                    stunServer.setText(resources.getString(R.string.stun_server_default))
+                else if (mediaNat == "") {
+                    stunServer.setText("")
+                    stunUser.setText("")
+                    stunPass.setText("")
+                }
                 stunServer.isEnabled = mediaNat != ""
                 stunUser.isEnabled = mediaNat != ""
                 stunPass.isEnabled = mediaNat != ""
@@ -323,33 +333,32 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
+                var newStunServer = stunServer.text.toString().trim()
                 if (mediaNat != "") {
-                    var newStunServer = stunServer.text.toString().trim()
-                    if (newStunServer == "") {
-                        if (mediaNat.startsWith("turn")) {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_stun_server), newStunServer))
-                            return false
-                        } else
-                            newStunServer =  resources.getString(R.string.stun_server_default)
+                    if (((mediaNat == "stun") || (mediaNat == "ice")) && (newStunServer == ""))
+                        newStunServer = resources.getString(R.string.stun_server_default)
+                    if (!Utils.checkStunUri(newStunServer) ||
+                            ((mediaNat == "turn") && !newStunServer.startsWith("turn"))) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_stun_server), newStunServer))
+                        return false
                     }
-                    if (acc.stunServer != newStunServer) {
-                        if (!Utils.checkStunUri(newStunServer)) {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_stun_server), newStunServer))
-                            return false
-                        }
-                        if (account_set_stun_uri(acc.accp, newStunServer) == 0) {
-                            acc.stunServer = account_stun_uri(acc.accp)
-                            Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
-                            save = true
-                        } else {
-                            Log.e("Baresip", "Setting of STUN/TURN URI server failed")
-                        }
+                }
+
+                if (acc.stunServer != newStunServer) {
+                    if (account_set_stun_uri(acc.accp, newStunServer) == 0) {
+                        acc.stunServer = account_stun_uri(acc.accp)
+                        Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
+                        save = true
+                    } else {
+                        Log.e("Baresip", "Setting of STUN/TURN URI server failed")
                     }
-                    val su = stunUser.text.toString().trim()
-                    if (Account.checkAuthUser(su)) {
-                        if (account_set_stun_user(acc.accp, su) == 0) {
+                }
+
+                val newStunUser = stunUser.text.toString().trim()
+                if (acc.stunUser != newStunUser) {
+                    if (Account.checkAuthUser(newStunUser)) {
+                        if (account_set_stun_user(acc.accp, newStunUser) == 0) {
                             acc.stunUser = account_stun_user(acc.accp);
                             Log.d("Baresip", "New STUN/TURN user is ${acc.stunUser}")
                             save = true
@@ -357,13 +366,16 @@ class AccountActivity : AppCompatActivity() {
                             Log.e("Baresip", "Setting of STUN/TURN user failed")
                         }
                     } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_stun_username), su))
+                        Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
+                                newStunUser))
                         return false
                     }
-                    val sp = stunPass.text.toString().trim()
-                    if (sp.isEmpty() || Account.checkAuthPass(sp)) {
-                        if (account_set_stun_pass(acc.accp, sp) == 0) {
+                }
+
+                val newStunPass = stunPass.text.toString().trim()
+                if (acc.stunPass != newStunPass) {
+                    if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
+                        if (account_set_stun_pass(acc.accp, newStunPass) == 0) {
                             acc.stunPass = account_stun_pass(acc.accp);
                             save = true
                         } else {
@@ -371,7 +383,7 @@ class AccountActivity : AppCompatActivity() {
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_stun_password), sp))
+                                String.format(getString(R.string.invalid_stun_password), newStunPass))
                         return false
                     }
                 }
