@@ -85,21 +85,21 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.i(LOG_TAG, "Network $network is available")
-                        updateNetwork(false)
+                        updateNetwork()
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.i(LOG_TAG, "Network $network is lost")
                         if (activeNetwork == "$network")
-                            updateNetwork(false)
+                            updateNetwork()
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
                         Log.i(LOG_TAG, "Network $network link properties changed")
                         if (activeNetwork == "$network")
-                            updateNetwork(true)
+                            updateNetwork()
                     }
 
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
@@ -484,7 +484,7 @@ class BaresipService: Service() {
                         }
                         if ((ev.size > 1) && (ev[1] == "Software caused connection abort")) {
                             // Perhaps due to VPN connect/disconnect
-                            updateNetwork(true)
+                            updateNetwork()
                         }
                         if (!Utils.isVisible())
                             return
@@ -1074,7 +1074,7 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateNetwork(change: Boolean) {
+    private fun updateNetwork() {
         // Use VPN network if available
         for (n in cm.allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
@@ -1082,8 +1082,6 @@ class BaresipService: Service() {
             if ((n == cm.activeNetwork) && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
                 Log.i(LOG_TAG, "Active VPN network $n is available with caps: " +
                         "$caps, props: $props")
-                if (!change && ("$n" == activeNetwork))
-                    return
                 activeNetwork = "$n"
                 if (isConfigInitialized) {
                     Utils.updateLinkProperties(props)
@@ -1103,8 +1101,6 @@ class BaresipService: Service() {
             if ((n == cm.activeNetwork) && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                 Log.i(LOG_TAG, "Active Internet network $n is available with caps: " +
                         "$caps, props: $props")
-                if (!change && ("$n" == activeNetwork))
-                    return
                 activeNetwork = "$n"
                 if (isServiceRunning) {
                     Utils.updateLinkProperties(props)
@@ -1122,8 +1118,6 @@ class BaresipService: Service() {
             if (n == cm.activeNetwork) {
                 Log.i(LOG_TAG, "Active network $n is available with caps: " +
                         "$caps, props: $props")
-                if (!change && ("$n" == activeNetwork))
-                    return
                 activeNetwork = "$n"
                 if (isServiceRunning) {
                     Utils.updateLinkProperties(props)
