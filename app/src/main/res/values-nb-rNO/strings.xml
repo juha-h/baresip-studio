@@ -102,7 +102,7 @@
     <string name="peer_not_verified">Denne samtalen er SIKKER, men likemannen er IKKE bekreftet!</string>
     <string name="call_is_secure">Denne samtalen er SIKKER, og likemannen er BEKREFTET! Ønsker du å avkrefte likemannen\?</string>
     <string name="unverify">Avkreft</string>
-    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt for å ringe opp forrige samtalepartner.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
+    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt;&lt;li&gt;Registreringstatus for konto vises med en fargelagt prikk: Grønn (vellykket registrering, gul (registrering underveis), rød (mislykket registrering), hvit (registrering har ikke blitt aktivert).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Trykk/langt trykk på kontaktikon kan brukes for å installere/fjerne billedavatar.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt for å ringe opp forrige samtalepartner.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kjente problemer&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;På grunn av en biblioteksbegrensning, støtter ikke baresip flerfoldige samtidige nettverksgrensesnitt.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
     <string name="outbound_proxies_help">SIP URI-til én eller to mellomtjenere som må brukes ved forsendelse av forespørsler. Hvis to angis, vil REGISTER-forespørsler sendes til begge, og andre forespørsler sendes til den som svarer. Hvis ingen utgående mellomtjener angis, blir forespørsler sent basert på DNS NAPTR/SRV/A-oppføringsoppslag fra ringerens URI-vertspart. Hvis vertsdelen av en SIP URI er en IPv6-adresse, må adressen skrives i hakeparenteser [].
 \nEksempler:
 \n • sip:foo.com:5060;transport=tls
@@ -160,7 +160,6 @@
     <string name="start_failed">Baresip kunne ikke starte. Dette kan ha oppstått på grunn av en ugyldig oppstartsverdi. Sjekk lytteadressen, TLS-sertifikatsfilen, og TLS CA-filen. Start så programmet på ny.</string>
     <string name="registering_failed">Registrering av %1$s mislyktes.</string>
     <string name="verify_sas">Ønsker du å bekrefte SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
-    <string name="transfer_request_query">Godtar du å overføre samtalen til \"%1$s\"\?</string>
     <string name="call_failed">Anrop mislyktes.</string>
     <string name="call_closed">Samtale lukket.</string>
     <string name="tls_certificate_file">TLS-sertifikatsfil</string>
@@ -221,4 +220,12 @@
     <string name="stun_username">STUN/TURN-brukernavn</string>
     <string name="video_codecs_help">Liste over støttede videokodek i prioritetsrang</string>
     <string name="video_codecs">Videokodek</string>
+    <string name="transfer_destination">Videresend til</string>
+    <string name="no_video_calls">Du kan ikke utføre eller svare på videoanrop uten kamera-tilgang.</string>
+    <string name="transfer_request_query">Ønsker du å sette over denne samtalen til «%1$s»\?</string>
+    <string name="transfer_failed">Kunne ikke videresende anrop</string>
+    <string name="transfer">Sett over</string>
+    <string name="call_transfer">Videresending av anrop</string>
+    <string name="allow_video">Godta videosamtale med «%1$s»\?</string>
+    <string name="about_title_plus">Om baresip+</string>
 </resources>
