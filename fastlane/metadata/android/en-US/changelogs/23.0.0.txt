@@ -1,0 +1,7 @@
+- Added visibility toggle to Account's Authentication and STUN/TURN Passwords
+- Prefer VPN interface (if any) when choosing from available network interfaces
+- Added note to About text about interface preference order
+- Improved configuration of Account's Media NAT Traversal
+- Default to Google's STUN server also when Media NAT Traversal protocol is ICE
+- Increased maximum lengths of Account's Authentication and STUN/TURN Usernames and Display Name to 64 characters
+- Added/updated FR, NO, and FI string translations
