@@ -125,8 +125,7 @@ object Utils {
     }
 
     fun checkStunUri(uri: String): Boolean {
-        if (!uri.startsWith("stun:") && !uri.startsWith("stuns:") &&
-                !uri.startsWith("turn:") && !uri.startsWith("turns:"))
+        if (!uri.startsWith("stun:") && !uri.startsWith("turn:"))
             return false
         return checkHostPort(uri.substringAfter(":"))
     }
