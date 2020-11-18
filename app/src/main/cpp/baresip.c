@@ -1638,6 +1638,12 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject 
 }
 
 JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
+    LOGD("enabling sip trace (%d)\n", enable);
+    (void)uag_enable_sip_trace(enable);
+}
+
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();
 }

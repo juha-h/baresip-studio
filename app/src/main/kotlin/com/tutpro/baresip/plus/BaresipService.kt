@@ -1186,6 +1186,7 @@ class BaresipService: Service() {
         var filesPath = ""
         var downloadsPath = ""
         var logLevel = 2
+        var sipTrace = false
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()

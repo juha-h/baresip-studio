@@ -280,7 +280,10 @@
     <string name="video_size_help">Size of transmitted video frames (width x height).
         Factory default is 800x600.</string>
     <string name="debug">Debug</string>
-    <string name="debug_help">Provides debug and info level log message availability in Logcat.</string>
+    <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
+    <string name="sip_trace">SIP Trace</string>
+    <string name="sip_trace_help">If checked and if Debug is checked, provides also SIP
+        request and response trace to Logcat. Unchecked automatically at baresip start.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, settings are reset to factory default values.</string>
     <string name="read_cert_error">Failed to read file \'cert.pem\' from Download directory.</string>

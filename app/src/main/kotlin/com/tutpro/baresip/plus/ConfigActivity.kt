@@ -13,13 +13,14 @@ import android.widget.AdapterView
 
 class ConfigActivity : AppCompatActivity() {
 
-    internal lateinit var autoStart: CheckBox
-    internal lateinit var listenAddr: EditText
-    internal lateinit var dnsServers: EditText
-    internal lateinit var certificateFile: CheckBox
-    internal lateinit var caFile: CheckBox
-    internal lateinit var debug: CheckBox
-    internal lateinit var reset: CheckBox
+    private lateinit var autoStart: CheckBox
+    private lateinit var listenAddr: EditText
+    private lateinit var dnsServers: EditText
+    private lateinit var certificateFile: CheckBox
+    private lateinit var caFile: CheckBox
+    private lateinit var debug: CheckBox
+    private lateinit var sipTrace: CheckBox
+    private lateinit var reset: CheckBox
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
@@ -122,6 +123,9 @@ class ConfigActivity : AppCompatActivity() {
         else
             oldLogLevel = dbCv[0]
         debug.isChecked =  oldLogLevel == "0"
+
+        sipTrace = findViewById(R.id.SipTrace) as CheckBox
+        sipTrace.isChecked = BaresipService.sipTrace
 
         reset = findViewById(R.id.Reset) as CheckBox
         reset.isChecked = false
@@ -266,6 +270,9 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
+                BaresipService.sipTrace = sipTrace.isChecked
+                Api.uag_enable_sip_trace(sipTrace.isChecked)
+                
                 if (reset.isChecked) {
                     Config.reset(this)
                     save = false
@@ -369,6 +376,10 @@ class ConfigActivity : AppCompatActivity() {
             }
             findViewById(R.id.DebugTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
+            }
+            findViewById(R.id.SipTraceTitle) as TextView-> {
+                Utils.alertView(this, getString(R.string.sip_trace),
+                        getString(R.string.sip_trace_help))
             }
             findViewById(R.id.ResetTitle) as TextView-> {
                 Utils.alertView(this, getString(R.string.reset_config),
