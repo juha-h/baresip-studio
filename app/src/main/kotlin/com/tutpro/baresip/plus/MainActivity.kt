@@ -261,9 +261,6 @@ class MainActivity : AppCompatActivity() {
                                 String.format(getString(R.string.invalid_sip_uri), uri))
                     } else {
                         callUri.isFocusable = false
-                        // Set audio mode to MODE_IN_COMMUNICATION and wait 2.5 sec before
-                        // placing to call in order to avoid missing audio from callee due to
-                        // a bug in many Android devices.
                         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -271,16 +268,14 @@ class MainActivity : AppCompatActivity() {
                         callButton.isEnabled = false
                         hangupButton.visibility = View.VISIBLE
                         hangupButton.isEnabled = false
-                        Handler().postDelayed({
-                            hangupButton.isEnabled = true
-                            if (!call(ua, uri, "outgoing")) {
-                                am.mode = AudioManager.MODE_NORMAL
-                                callButton.visibility = View.VISIBLE
-                                callButton.isEnabled = true
-                                hangupButton.visibility = View.INVISIBLE
-                                hangupButton.isEnabled = false
-                            }
-                        }, 2500)
+                        hangupButton.isEnabled = true
+                        if (!call(ua, uri, "outgoing")) {
+                            am.mode = AudioManager.MODE_NORMAL
+                            callButton.visibility = View.VISIBLE
+                            callButton.isEnabled = true
+                            hangupButton.visibility = View.INVISIBLE
+                            hangupButton.isEnabled = false
+                        }
                     }
                 } else {
                     val latest = CallHistory.aorLatestHistory(aor)
