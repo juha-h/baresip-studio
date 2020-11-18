@@ -12,6 +12,7 @@ object Api {
     external fun video_codecs(): String
     external fun uag_current_set(uap: String)
     external fun uag_reset_transp(reg: Boolean, reinvite: Boolean)
+    external fun uag_enable_sip_trace(enable: Boolean)
     external fun ua_account(ua: String): String
     external fun ua_alloc(uri: String): String
     external fun ua_update_account(ua: String): Int

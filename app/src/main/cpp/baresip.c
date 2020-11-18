@@ -1658,6 +1658,12 @@ Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboole
 }
 
 JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
+    LOGD("enabling sip trace (%d)\n", enable);
+    (void)uag_enable_sip_trace(enable);
+}
+
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz) {
     net_debug_log();
 }
