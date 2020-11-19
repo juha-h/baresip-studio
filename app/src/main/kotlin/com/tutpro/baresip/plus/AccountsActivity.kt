@@ -54,7 +54,7 @@ class AccountsActivity : AppCompatActivity() {
                             getString(R.string.account_allocation_failure))
                 } else {
                     // Api.account_debug(ua.account.accp)
-                    Log.d("Baresip", "Allocated UA ${ua.uap} for ${account_luri(ua.account.accp)}")
+                    Log.d("Baresip", "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
                     newAorView.setText("")
                     newAorView.hint = getString(R.string.user_domain)
                     newAorView.clearFocus()
@@ -196,8 +196,8 @@ class AccountsActivity : AppCompatActivity() {
 
         fun setAuthPass(ua: UserAgent, ap: String) {
             val acc = ua.account
-            if (account_set_auth_pass(acc.accp, ap) == 0) {
-                acc.authPass = account_auth_pass(acc.accp)
+            if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
+                acc.authPass = Api.account_auth_pass(acc.accp)
                 MainActivity.aorPasswords[acc.aor] = ap
                 if ((ap != "") && (acc.regint > 0))
                     Api.ua_register(ua.uap)

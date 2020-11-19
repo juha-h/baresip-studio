@@ -202,8 +202,8 @@ class AccountActivity : AppCompatActivity() {
                 val dn = displayName.text.toString().trim()
                 if (dn != acc.displayName) {
                     if (Account.checkDisplayName(dn)) {
-                        if (account_set_display_name(acc.accp, dn) == 0) {
-                            acc.displayName = account_display_name(acc.accp);
+                        if (Api.account_set_display_name(acc.accp, dn) == 0) {
+                            acc.displayName = Api.account_display_name(acc.accp);
                             Log.d("Baresip", "New display name is ${acc.displayName}")
                             save = true
                         } else {
@@ -221,8 +221,8 @@ class AccountActivity : AppCompatActivity() {
 
                 if (au != acc.authUser) {
                     if (Account.checkAuthUser(au)) {
-                        if (account_set_auth_user(acc.accp, au) == 0) {
-                            acc.authUser = account_auth_user(acc.accp);
+                        if (Api.account_set_auth_user(acc.accp, au) == 0) {
+                            acc.authUser = Api.account_auth_user(acc.accp);
                             Log.d("Baresip", "New auth user is ${acc.authUser}")
                             save = true
                         } else {
@@ -281,9 +281,9 @@ class AccountActivity : AppCompatActivity() {
                     val outbound = ArrayList<String>()
                     for (i in ob.indices) {
                         if ((ob[i] == "") || checkOutboundUri(ob[i])) {
-                            if (account_set_outbound(acc.accp, ob[i], i) == 0) {
+                            if (Api.account_set_outbound(acc.accp, ob[i], i) == 0) {
                                 if (ob[i] != "")
-                                    outbound.add(account_outbound(acc.accp, i))
+                                    outbound.add(Api.account_outbound(acc.accp, i))
                             } else {
                                 Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
                                 break
@@ -297,9 +297,9 @@ class AccountActivity : AppCompatActivity() {
                     Log.d("Baresip", "New outbound proxies are ${outbound}")
                     acc.outbound = outbound
                     if (outbound.isEmpty())
-                        account_set_sipnat(acc.accp, "")
+                        Api.account_set_sipnat(acc.accp, "")
                     else
-                        account_set_sipnat(acc.accp, "outbound")
+                        Api.account_set_sipnat(acc.accp, "outbound")
                     save = true
                 }
 
@@ -317,8 +317,8 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
                 if (newRegint != -1)
-                    if (account_set_regint(acc.accp, newRegint) == 0) {
-                        acc.regint = account_regint(acc.accp)
+                    if (Api.account_set_regint(acc.accp, newRegint) == 0) {
+                        acc.regint = Api.account_regint(acc.accp)
                         Log.d("Baresip", "New regint is ${acc.regint}")
                         save = true
                     } else {
@@ -326,8 +326,8 @@ class AccountActivity : AppCompatActivity() {
                     }
 
                 if (mediaNat != acc.mediaNat) {
-                    if (account_set_medianat(acc.accp, mediaNat) == 0) {
-                        acc.mediaNat = account_medianat(acc.accp)
+                    if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
+                        acc.mediaNat = Api.account_medianat(acc.accp)
                         Log.d("Baresip", "New medianat is ${acc.mediaNat}")
                         save = true
                     } else {
@@ -348,8 +348,8 @@ class AccountActivity : AppCompatActivity() {
                 }
 
                 if (acc.stunServer != newStunServer) {
-                    if (account_set_stun_uri(acc.accp, newStunServer) == 0) {
-                        acc.stunServer = account_stun_uri(acc.accp)
+                    if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
+                        acc.stunServer = Api.account_stun_uri(acc.accp)
                         Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
                         save = true
                     } else {
@@ -360,8 +360,8 @@ class AccountActivity : AppCompatActivity() {
                 val newStunUser = stunUser.text.toString().trim()
                 if (acc.stunUser != newStunUser) {
                     if (Account.checkAuthUser(newStunUser)) {
-                        if (account_set_stun_user(acc.accp, newStunUser) == 0) {
-                            acc.stunUser = account_stun_user(acc.accp);
+                        if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
+                            acc.stunUser = Api.account_stun_user(acc.accp);
                             Log.d("Baresip", "New STUN/TURN user is ${acc.stunUser}")
                             save = true
                         } else {
@@ -377,8 +377,8 @@ class AccountActivity : AppCompatActivity() {
                 val newStunPass = stunPass.text.toString().trim()
                 if (acc.stunPass != newStunPass) {
                     if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
-                        if (account_set_stun_pass(acc.accp, newStunPass) == 0) {
-                            acc.stunPass = account_stun_pass(acc.accp);
+                        if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
+                            acc.stunPass = Api.account_stun_pass(acc.accp);
                             save = true
                         } else {
                             Log.e("Baresip", "Setting of stun pass failed")
@@ -391,8 +391,8 @@ class AccountActivity : AppCompatActivity() {
                 }
 
                 if (mediaEnc != acc.mediaEnc) {
-                    if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                        acc.mediaEnc = account_mediaenc(acc.accp)
+                    if (Api.account_set_mediaenc(acc.accp, mediaEnc) == 0) {
+                        acc.mediaEnc = Api.account_mediaenc(acc.accp)
                         Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
                         save = true
                     } else {
@@ -426,9 +426,9 @@ class AccountActivity : AppCompatActivity() {
                                     String.format(getString(R.string.invalid_voicemail_uri), tVmUri))
                             return false
                         }
-                        account_set_mwi(acc.accp, "yes")
+                        Api.account_set_mwi(acc.accp, "yes")
                     } else {
-                        account_set_mwi(acc.accp, "no")
+                        Api.account_set_mwi(acc.accp, "no")
                     }
                     acc.vmUri = tVmUri
                     save = true
@@ -572,8 +572,8 @@ class AccountActivity : AppCompatActivity() {
     }
 
     private fun setAuthPass(acc: Account, ap: String) {
-        if (account_set_auth_pass(acc.accp, ap) == 0) {
-            acc.authPass = account_auth_pass(acc.accp)
+        if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
+            acc.authPass = Api.account_auth_pass(acc.accp)
             MainActivity.aorPasswords.remove(acc.aor)
             save = true
         } else {

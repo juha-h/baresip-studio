@@ -111,7 +111,7 @@ class CodecsActivity : AppCompatActivity() {
 
                 if (media == "audio")
                     if (mc != acc.audioCodec) {
-                        if (account_set_audio_codecs(acc.accp, mcList) == 0) {
+                        if (Api.account_set_audio_codecs(acc.accp, mcList) == 0) {
                             Log.d("Baresip", "New audio codecs '$mcList'")
                             acc.audioCodec = mc
                             save = true
@@ -122,7 +122,7 @@ class CodecsActivity : AppCompatActivity() {
 
                 if (media == "video")
                     if (mc != acc.videoCodec) {
-                        if (account_set_video_codecs(acc.accp, mcList) == 0) {
+                        if (Api.account_set_video_codecs(acc.accp, mcList) == 0) {
                             Log.d("Baresip", "New video codecs '$mcList'")
                             acc.videoCodec = mc
                             save = true

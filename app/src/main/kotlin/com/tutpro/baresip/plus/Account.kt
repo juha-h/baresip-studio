@@ -6,23 +6,23 @@ import kotlin.collections.ArrayList
 
 class Account(val accp: String) {
 
-    var displayName = account_display_name(accp)
-    val aor = account_aor(accp)
-    var luri = account_luri(accp)
-    var authUser = account_auth_user(accp)
-    var authPass = account_auth_pass(accp)
+    var displayName = Api.account_display_name(accp)
+    val aor = Api.account_aor(accp)
+    var luri = Api.account_luri(accp)
+    var authUser = Api.account_auth_user(accp)
+    var authPass = Api.account_auth_pass(accp)
     var outbound = ArrayList<String>()
-    var mediaNat = account_medianat(accp)
-    var stunServer = account_stun_uri(accp)
-    var stunUser = account_stun_user(accp)
-    var stunPass = account_stun_pass(accp)
+    var mediaNat = Api.account_medianat(accp)
+    var stunServer = Api.account_stun_uri(accp)
+    var stunUser = Api.account_stun_user(accp)
+    var stunPass = Api.account_stun_pass(accp)
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
-    var regint = account_regint(accp)
-    var mediaEnc = account_mediaenc(accp)
+    var regint = Api.account_regint(accp)
+    var mediaEnc = Api.account_mediaenc(accp)
     var preferIPv6Media = false
     var answerMode = ""
-    var vmUri = account_vm_uri(accp)
+    var vmUri = Api.account_vm_uri(accp)
     var vmNew = 0
     var vmOld = 0
     var missedCalls = false
@@ -33,7 +33,7 @@ class Account(val accp: String) {
 
         var i = 0
         while (true) {
-            val ob = account_outbound(accp, i)
+            val ob = Api.account_outbound(accp, i)
             if (ob != "") {
                 outbound.add(ob)
                 i++
@@ -44,7 +44,7 @@ class Account(val accp: String) {
 
         i = 0
         while (true) {
-            val ac = account_audio_codec(accp, i)
+            val ac = Api.account_audio_codec(accp, i)
             if (ac != "") {
                 audioCodec.add(ac)
                 i++
@@ -55,7 +55,7 @@ class Account(val accp: String) {
 
         i = 0
         while (true) {
-            val ac = account_video_codec(accp, i)
+            val ac = Api.account_video_codec(accp, i)
             if (ac != "") {
                 videoCodec.add(ac)
                 i++
@@ -64,7 +64,7 @@ class Account(val accp: String) {
             }
         }
 
-        val extra = account_extra(accp)
+        val extra = Api.account_extra(accp)
         preferIPv6Media = Utils.paramValue(extra,"prefer_ipv6_media") == "yes"
         answerMode = Utils.paramValue(extra,"answer_mode")
         if (answerMode == "") answerMode = "manual"
@@ -247,36 +247,3 @@ class Account(val accp: String) {
         }
     }
 }
-
-external fun account_set_display_name(acc: String, dn: String): Int
-external fun account_display_name(acc: String): String
-external fun account_aor(acc: String): String
-external fun account_luri(acc: String): String
-external fun account_auth_user(acc: String): String
-external fun account_set_auth_user(acc: String, user: String): Int
-external fun account_auth_pass(acc: String): String
-external fun account_set_auth_pass(acc: String, pass: String): Int
-external fun account_outbound(acc: String, ix: Int): String
-external fun account_set_outbound(acc: String, ob: String, ix: Int): Int
-external fun account_set_sipnat(acc: String, sipnat: String): Int
-external fun account_audio_codec(acc: String, ix: Int): String
-external fun account_video_codec(acc: String, ix: Int): String
-external fun account_regint(acc: String): Int
-external fun account_set_regint(acc: String, regint: Int): Int
-external fun account_stun_uri(acc: String): String
-external fun account_set_stun_uri(acc: String, uri: String): Int
-external fun account_stun_user(acc: String): String
-external fun account_set_stun_user(acc: String, user: String): Int
-external fun account_stun_pass(acc: String): String
-external fun account_set_stun_pass(acc: String, pass: String): Int
-external fun account_mediaenc(acc: String): String
-external fun account_set_mediaenc(acc: String, mediaenc: String): Int
-external fun account_medianat(acc: String): String
-external fun account_set_medianat(acc: String, medianat: String): Int
-external fun account_set_audio_codecs(acc: String, codecs: String): Int
-external fun account_set_video_codecs(acc: String, codecs: String): Int
-external fun account_set_mwi(acc: String, value: String): Int
-external fun account_vm_uri(acc: String): String
-external fun account_extra(acc: String): String
-external fun account_debug(acc: String)
-
