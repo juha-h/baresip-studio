@@ -2,11 +2,11 @@ package com.tutpro.baresip
 
 object Api {
 
-    val AF_UNSPEC = 0
-    val AF_INET = 2
-    val AF_INET6 = 10
-    val VIDMODE_OFF = 0
-    val VIDMODE_ON = 1
+    const val AF_UNSPEC = 0
+    const val AF_INET = 2
+    const val AF_INET6 = 10
+    const val VIDMODE_OFF = 0
+    const val VIDMODE_ON = 1
 
     external fun audio_codecs(): String
     external fun video_codecs(): String
