@@ -224,35 +224,3 @@ class Account(val accp: String) {
         }
     }
 }
-
-external fun account_set_display_name(acc: String, dn: String): Int
-external fun account_display_name(acc: String): String
-external fun account_aor(acc: String): String
-external fun account_luri(acc: String): String
-external fun account_auth_user(acc: String): String
-external fun account_set_auth_user(acc: String, user: String): Int
-external fun account_auth_pass(acc: String): String
-external fun account_set_auth_pass(acc: String, pass: String): Int
-external fun account_outbound(acc: String, ix: Int): String
-external fun account_set_outbound(acc: String, ob: String, ix: Int): Int
-external fun account_set_sipnat(acc: String, sipnat: String): Int
-external fun account_audio_codec(acc: String, ix: Int): String
-external fun account_regint(acc: String): Int
-external fun account_set_regint(acc: String, regint: Int): Int
-external fun account_stun_uri(acc: String): String
-external fun account_set_stun_uri(acc: String, uri: String): Int
-external fun account_stun_user(acc: String): String
-external fun account_set_stun_user(acc: String, user: String): Int
-external fun account_stun_pass(acc: String): String
-external fun account_set_stun_pass(acc: String, pass: String): Int
-external fun account_mediaenc(acc: String): String
-external fun account_set_mediaenc(acc: String, mediaenc: String): Int
-external fun account_medianat(acc: String): String
-external fun account_set_medianat(acc: String, medianat: String): Int
-external fun account_set_audio_codecs(acc: String, codecs: String): Int
-external fun account_set_video_codecs(acc: String, codecs: String): Int
-external fun account_set_mwi(acc: String, value: String): Int
-external fun account_vm_uri(acc: String): String
-external fun account_extra(acc: String): String
-external fun account_debug(acc: String)
-
