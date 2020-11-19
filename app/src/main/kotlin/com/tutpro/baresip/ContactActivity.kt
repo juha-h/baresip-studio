@@ -16,8 +16,6 @@ import android.view.View
 
 import java.io.File
 
-private const val READ_REQUEST_CODE = 42
-
 class ContactActivity : AppCompatActivity() {
 
     lateinit var textAvatarView: TextView
@@ -33,6 +31,8 @@ class ContactActivity : AppCompatActivity() {
     private var index = 0
     private var color = 0
     private var id: Long = 0
+
+    private val READ_REQUEST_CODE = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
