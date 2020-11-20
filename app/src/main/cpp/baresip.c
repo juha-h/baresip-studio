@@ -114,10 +114,16 @@ static void ua_exit_handler(void *arg)
 static const char *ua_event_reg_str(enum ua_event ev)
 {
     switch (ev) {
-        case UA_EVENT_REGISTERING:      return "registering";
-        case UA_EVENT_REGISTER_OK:      return "registered";
-        case UA_EVENT_REGISTER_FAIL:    return "registering failed";
-        case UA_EVENT_UNREGISTERING:    return "unregistering";
+        case UA_EVENT_REGISTERING:
+            return "registering";
+        case UA_EVENT_REGISTER_OK:
+        case UA_EVENT_FALLBACK_OK:
+            return "registered";
+        case UA_EVENT_REGISTER_FAIL:
+        case UA_EVENT_FALLBACK_FAIL:
+            return "registering failed";
+        case UA_EVENT_UNREGISTERING:
+            return "unregistering";
         default: return "?";
     }
 }
@@ -174,9 +180,11 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
+        case UA_EVENT_FALLBACK_OK:
             len = re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
             break;
         case UA_EVENT_REGISTER_FAIL:
+        case UA_EVENT_FALLBACK_FAIL:
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
@@ -187,7 +195,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
-            if (strcmp(prm, "offer"))
+            if (strcmp(prm, "offer") != 0)
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "call offered");
             else
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", "call answered");
@@ -413,9 +421,9 @@ static int runLoggingThread() {
     dup2(pfd[1], 1);
     dup2(pfd[1], 2);
 
-    if (pthread_create(&loggingThread, 0, loggingFunction, 0) == -1) {
-        return -1;
-    }
+    int ret = pthread_create(&loggingThread, 0, loggingFunction, 0);
+    if (ret != 0)
+        return ret;
 
     pthread_detach(loggingThread);
 
