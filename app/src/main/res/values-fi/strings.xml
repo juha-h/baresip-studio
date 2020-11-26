@@ -36,8 +36,9 @@
         <ul>
             <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
             <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
-            <li><b>LGPL 2.1</b> G722 ja G726 koodausmenetelmät</li>
+            <li><b>LGPL 2.1</b> G.722 ja G.726 koodausmenetelmät</li>
             <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
+            <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
         </ul>
         ]]>
     </string>
@@ -63,9 +64,9 @@
         tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
         <h2>Tunnetut ongelmat</h2>
         <ul>
-            <li>Johtuen alla olevien kirjastojen rajoituksista useita, samanaikaisesti aktiivisia
-            verkkoliittymiä ei voi käyttää. Aktiivisia verkkoliittymiä suositaan
-            järjestyksessä VPN, Internet, muu.</li>
+            <li>Johtuen alla olevien kirjastojen rajoituksista useita,
+            samanaikaisesti aktiivisia verkkoliittymiä ei voi käyttää. Aktiivisia verkkoliittymiä
+            suositaan järjestyksessä VPN, Internet, muu.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
             <li>Omaa videokuvaa ei näy, jos video on yksisuuntainen.</li>
@@ -77,9 +78,10 @@
         <ul>
             <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
             <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
-            <li><b>LGPL 2.1</b> G722, G726, VP8 ja VP9 koodausmenetelmät</li>
-            <li><b>GPL-2.0</b> H264 koodausmenetelmä</li>
+            <li><b>LGPL 2.1</b> G.722 ja G.726 koodausmenetelmät</li>
             <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
+            <li><b>GNU GPLv2</b> H.264 koodausmenetelmä</li>
+            <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
         </ul>
         ]]>
     </string>
