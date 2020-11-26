@@ -31,6 +31,10 @@ add_library(lib_g722_1 STATIC IMPORTED)
 set_target_properties(lib_g722_1 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/g7221/lib/${ANDROID_ABI}/libg722_1.a)
 
+add_library(lib_g729 STATIC IMPORTED)
+set_target_properties(lib_g729 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/g729/lib/${ANDROID_ABI}/libbcg729.a)
+
 add_library(lib_amrnb STATIC IMPORTED)
 set_target_properties(lib_amrnb PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/amr/lib/${ANDROID_ABI}/libamrnb.a)
@@ -82,6 +86,7 @@ target_link_libraries(baresip
         lib_opus
         lib_spandsp
         lib_g722_1
+        lib_g729
         lib_ilbc
         lib_amrnb
         lib_amrwb
