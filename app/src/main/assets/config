@@ -29,6 +29,7 @@ module ilbc.so
 module g722.so
 module g7221.so
 module g726.so
+module g729.so
 module g711.so
 module vp9.so
 module vp8.so
