@@ -1,0 +1,4 @@
+- Added G.729 audio codec.
+- Added a Setting to turn on/off tracing of SIP messages to logcat.
+- STUN/TURN Server URI schemes 'stuns' and 'turns' are not currently supported.
+- New Portuguese (Brazil) string translations.
