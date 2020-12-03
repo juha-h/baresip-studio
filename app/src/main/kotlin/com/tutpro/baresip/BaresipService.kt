@@ -78,6 +78,7 @@ class BaresipService: Service() {
 
         cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val builder = NetworkRequest.Builder()
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         cm.registerNetworkCallback(
                 builder.build(),
                 object : ConnectivityManager.NetworkCallback() {
