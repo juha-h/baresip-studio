@@ -257,7 +257,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             sdp_media_debug_log(media);
             int res;
             if (remote_has_video) {
-                res = check_video(ua, call, sdp_media_dir(media));
+                res = check_video(ua, call, sdp_media_rdir(media));
                 LOGD("check_video result = %d\n", res);
                 if (res == SDP_INACTIVE) {
                     sdp_media_set_disabled(media, true);
