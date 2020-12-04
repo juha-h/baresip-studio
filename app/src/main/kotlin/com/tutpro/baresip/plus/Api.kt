@@ -5,8 +5,14 @@ object Api {
     const val AF_UNSPEC = 0
     const val AF_INET = 2
     const val AF_INET6 = 10
+
     const val VIDMODE_OFF = 0
     const val VIDMODE_ON = 1
+
+    val SDP_INACTIVE = 0
+    val SDP_RECVONLY = 1
+    val SDP_SENDONLY = 2
+    val SDP_SENDRECV = 3
 
     external fun account_set_display_name(acc: String, dn: String): Int
     external fun account_display_name(acc: String): String
@@ -51,7 +57,7 @@ object Api {
     external fun ua_register(ua: String): Int
     external fun ua_isregistered(ua: String): Boolean
     external fun ua_unregister(ua: String)
-    external fun ua_connect(uap: String, peer_uri: String, video: Int): String
+    external fun ua_connect_dir(uap: String, peer_uri: String, vmode: Int, adir: Int, vdir: Int): String
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
     external fun ua_call_alloc(uap: String, xcallp: String, video: Int): String
     external fun ua_call_answer(uap: String, callp: String, vmode: Int)

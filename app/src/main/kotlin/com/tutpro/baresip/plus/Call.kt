@@ -12,7 +12,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var hasHistory = false
     var referTo = ""
     var videoAllowed = false
-    var video: Int = SDP_INACTIVE
+    var video: Int = Api.SDP_INACTIVE
 
     init {
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
@@ -74,7 +74,7 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     fun setVideo(enabled: Boolean): Int {
         videoAllowed = enabled
         if (!enabled)
-            video = SDP_INACTIVE
+            video = Api.SDP_INACTIVE
         return call_set_video(callp, enabled)
     }
 
@@ -114,11 +114,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     external fun call_video_debug()
 
     companion object {
-
-        val SDP_INACTIVE = 0
-        val SDP_RECVONLY = 1
-        val SDP_SENDONLY = 2
-        val SDP_SENDRECV = 3
 
         fun calls(): ArrayList<Call> {
             return BaresipService.calls

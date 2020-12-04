@@ -1308,18 +1308,20 @@ Java_com_tutpro_baresip_plus_Api_ua_1hangup(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaURI, jint javaVidMode) {
+Java_com_tutpro_baresip_plus_Api_ua_1connect_1dir(JNIEnv *env, jobject thiz, jstring jUA,
+        jstring jURI, jint vmode, jint adir, jint vdir) {
     struct call *call;
     struct ua *ua;
     int err;
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_uri = (*env)->GetStringUTFChars(env, javaURI, 0);
+    const char *native_ua = (*env)->GetStringUTFChars(env, jUA, 0);
+    const char *native_uri = (*env)->GetStringUTFChars(env, jURI, 0);
     char call_buf[32];
-    LOGD("connecting ua %s to %s %s video\n", native_ua, native_uri,
-            javaVidMode == 0 ? "without" : "with");
+    LOGD("connecting ua %s to %s with vmode %u, adir: %u, vdir: %u\n", native_ua, native_uri,
+         vmode, adir, vdir);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
     re_thread_enter();
-    err = ua_connect(ua, &call, NULL, native_uri, (enum vidmode)javaVidMode);
+    err = ua_connect_dir(ua, &call, NULL, native_uri, (enum vidmode)vmode,
+            (enum sdp_dir)adir, (enum sdp_dir)vdir);
     re_thread_leave();
     if (err) {
         LOGW("connecting to %s failed with error %d\n", native_uri, err);
@@ -1327,8 +1329,8 @@ Java_com_tutpro_baresip_plus_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring 
     } else {
         sprintf(call_buf, "%lu", (unsigned long)call);
     }
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaURI, native_uri);
+    (*env)->ReleaseStringUTFChars(env, jUA, native_ua);
+    (*env)->ReleaseStringUTFChars(env, jURI, native_uri);
     return (*env)->NewStringUTF(env, call_buf);
 }
 
@@ -1646,12 +1648,6 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject 
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
-    LOGD("enabling sip trace (%d)\n", enable);
-    (void)uag_enable_sip_trace(enable);
-}
-
-JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();
 }
@@ -1856,6 +1852,13 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg, jboolean reinvite) {
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
     (void)uag_reset_transp(reg, reinvite);
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_plus_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
+    LOGD("enabling sip trace (%d)\n", enable);
+    (void)uag_enable_sip_trace(enable);
 }
 
 JNIEXPORT void JNICALL

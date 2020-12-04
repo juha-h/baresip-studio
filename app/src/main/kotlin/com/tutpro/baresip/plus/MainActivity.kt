@@ -453,9 +453,9 @@ class MainActivity : AppCompatActivity() {
                 val call = Call.call("connected")
                 if (call != null) {
                     if (BaresipService.cameraAvailable)
-                        call.setVideoDirection(Call.SDP_SENDRECV)
+                        call.setVideoDirection(Api.SDP_SENDRECV)
                     else
-                        call.setVideoDirection(Call.SDP_RECVONLY)
+                        call.setVideoDirection(Api.SDP_RECVONLY)
                     call.setVideo(true)
                 }
             }, 250)
@@ -1478,14 +1478,10 @@ class MainActivity : AppCompatActivity() {
         }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
+        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, Api.SDP_INACTIVE)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp))
-            call.add()
-            // At this point call has video, but we don't want to offer video stream to callee
-            call.disableVideoStream(true)
-            call.connect(uri)
+            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
             showCall(ua)
             return true
         } else {
@@ -1615,7 +1611,7 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    if (call.video != Call.SDP_INACTIVE) {
+                    if (call.video != Api.SDP_INACTIVE) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {

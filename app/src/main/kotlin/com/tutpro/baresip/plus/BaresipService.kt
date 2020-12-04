@@ -836,31 +836,31 @@ class BaresipService: Service() {
             return -1
         }
         Log.d(LOG_TAG, "checkVideo dir = $dir, videoAllowed = ${call.videoAllowed}, call.video = ${call.video}")
-        if (dir == Call.SDP_INACTIVE) {
-            if (call.video != Call.SDP_INACTIVE) {
-                call.video = Call.SDP_INACTIVE
-                return Call.SDP_INACTIVE
+        if (dir == Api.SDP_INACTIVE) {
+            if (call.video != Api.SDP_INACTIVE) {
+                call.video = Api.SDP_INACTIVE
+                return Api.SDP_INACTIVE
             } else {
                 return -1
             }
         }
-        if ((call.video == Call.SDP_INACTIVE) && !call.videoAllowed) {
+        if ((call.video == Api.SDP_INACTIVE) && !call.videoAllowed) {
             val intent = Intent("service event")
             intent.putExtra("event", "call video request")
             intent.putExtra("params", arrayListOf(uap, callp))
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-            return Call.SDP_INACTIVE
+            return Api.SDP_INACTIVE
         }
         call.videoAllowed = false
         if (cameraAvailable) {
             call.video = dir
         } else
             when (dir) {
-                Call.SDP_SENDRECV, Call.SDP_RECVONLY -> {
-                    call.video = Call.SDP_RECVONLY
+                Api.SDP_SENDRECV, Api.SDP_RECVONLY -> {
+                    call.video = Api.SDP_RECVONLY
                 }
-                Call.SDP_SENDONLY -> {
-                    call.video = Call.SDP_INACTIVE
+                Api.SDP_SENDONLY -> {
+                    call.video = Api.SDP_INACTIVE
                 }
             }
         return call.video
