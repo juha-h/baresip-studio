@@ -4,15 +4,14 @@ import android.text.TextWatcher
 import java.util.ArrayList
 
 class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: String,
-           var status: String, val dtmfWatcher: TextWatcher?) {
+           var status: String, val dtmfWatcher: TextWatcher?, var video: Int) {
 
     var onhold = false
     var security = 0
     var zid = ""
     var hasHistory = false
     var referTo = ""
-    var videoAllowed = false
-    var video: Int = Api.SDP_INACTIVE
+    var videoAllowed = video != Api.SDP_INACTIVE
 
     init {
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
@@ -78,12 +77,16 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_set_video(callp, enabled)
     }
 
-    fun disableVideoStream(disable: Boolean) {
-        call_disable_video_stream(callp, disable)
+    fun videoDirection(kind: String): Int {
+        return when (kind) {
+            "local" -> call_video_direction(callp, 1)
+            "remote" -> call_video_direction(callp, 2)
+            else -> call_video_direction(callp, 3)
+        }
     }
 
-    fun setVideoDirection(dir: Int) {
-        call_set_video_direction(callp, dir)
+    fun setMediaDirection(adir: Int, vdir: Int): Int {
+        return call_set_media_direction(callp, adir, vdir)
     }
 
     fun status(): String {
@@ -109,6 +112,8 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_set_video(callp: String, enabled: Boolean): Int
     private external fun call_set_video_source(callp: String, front: Boolean): Int
     private external fun call_set_video_direction(callp: String, dir: Int)
+    private external fun call_video_direction(callp: String, kind: Int): Int
+    private external fun call_set_media_direction(callp: String, adir: Int, vdir: Int): Int
     private external fun call_disable_video_stream(callp: String, disable: Boolean)
 
     external fun call_video_debug()

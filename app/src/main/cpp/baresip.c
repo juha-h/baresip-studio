@@ -283,8 +283,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
             break;
         case UA_EVENT_CALL_ESTABLISHED:
-            video_stop(call_video(call));
-            video_stop_display(call_video(call));
             play = mem_deref(play);
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
@@ -1551,7 +1549,7 @@ Java_com_tutpro_baresip_plus_Call_call_1has_1video(JNIEnv *env, jobject thiz, js
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    return call_video(call) == NULL ? false : true;
+    return call_has_video(call);
 }
 
 JNIEXPORT void JNICALL
@@ -1572,6 +1570,29 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1direction(JNIEnv *env, jobje
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     sdp_media_set_ldir(stream_sdpmedia(video_strm(call_video(call))), (enum sdp_dir)dir);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1set_1media_1direction(JNIEnv *env, jobject thiz,
+                                                              jstring jCall, jint adir, jint vdir) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    return call_set_media_direction(call, (enum sdp_dir)adir, (enum sdp_dir)vdir);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1video_1direction(JNIEnv *env, jobject thiz, jstring jCall,
+    jint kind) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    if (kind == 0)
+        return sdp_media_ldir(stream_sdpmedia(video_strm(call_video(call))));
+    else if (kind == 1)
+        return sdp_media_rdir(stream_sdpmedia(video_strm(call_video(call))));
+    else
+        return sdp_media_dir(stream_sdpmedia(video_strm(call_video(call))));
 }
 
 JNIEXPORT jint JNICALL

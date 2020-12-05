@@ -34,8 +34,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
     private lateinit var callButton: ImageButton
+    private lateinit var callVideoButton: ImageButton
     private lateinit var hangupButton: ImageButton
     private lateinit var answerButton: ImageButton
+    private lateinit var answerVideoButton: ImageButton
     private lateinit var rejectButton: ImageButton
     private lateinit var holdButton: ImageButton
     private lateinit var transferButton: ImageButton
@@ -86,8 +88,10 @@ class MainActivity : AppCompatActivity() {
         callUri = findViewById(R.id.callUri) as AutoCompleteTextView
         securityButton = findViewById(R.id.securityButton) as ImageButton
         callButton = findViewById(R.id.callButton) as ImageButton
+        callVideoButton = findViewById(R.id.callVideoButton) as ImageButton
         hangupButton = findViewById(R.id.hangupButton) as ImageButton
         answerButton = findViewById(R.id.answerButton) as ImageButton
+        answerVideoButton = findViewById(R.id.answerVideoButton) as ImageButton
         rejectButton = findViewById(R.id.rejectButton) as ImageButton
         holdButton = findViewById(R.id.holdButton) as ImageButton
         transferButton = findViewById(R.id.transferButton) as ImageButton
@@ -181,6 +185,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                view.performClick()
                 false
             }
         }
@@ -242,48 +247,13 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            callUri.setAdapter(null)
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            if (Call.calls().isEmpty()) {
-                val uriText = callUri.text.toString().trim()
-                if (uriText.length > 0) {
-                    var uri = ContactsActivity.findContactURI(uriText)
-                    if (!uri.startsWith("sip:")) {
-                        uri = "sip:$uri"
-                        if (!uri.contains("@")) {
-                            val host = aor.substring(aor.indexOf("@") + 1)
-                            uri = "$uri@$host"
-                        }
-                    }
-                    if (!Utils.checkSipUri(uri)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_uri), uri))
-                    } else {
-                        callUri.isFocusable = false
-                        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        callButton.visibility = View.INVISIBLE
-                        callButton.isEnabled = false
-                        hangupButton.visibility = View.VISIBLE
-                        hangupButton.isEnabled = false
-                        hangupButton.isEnabled = true
-                        if (!call(ua, uri, "outgoing")) {
-                            am.mode = AudioManager.MODE_NORMAL
-                            callButton.visibility = View.VISIBLE
-                            callButton.isEnabled = true
-                            hangupButton.visibility = View.INVISIBLE
-                            hangupButton.isEnabled = false
-                        }
-                    }
-                } else {
-                    val latest = CallHistory.aorLatestHistory(aor)
-                    if (latest != null)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerURI),
-                                Utils.aorDomain(ua.account.aor)))
-                }
-            }
+            makeCall("voice")
+        }
+
+        callVideoButton.setOnClickListener {
+            if (aorSpinner.selectedItemPosition == -1)
+                return@setOnClickListener
+            makeCall("video")
         }
 
         hangupButton.setOnClickListener {
@@ -304,8 +274,21 @@ class MainActivity : AppCompatActivity() {
             val call = Call.uaCalls(ua, "in")[0]
             Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
+            answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
-            call.disableVideoStream(true)
+            call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
+            Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
+        }
+
+        answerVideoButton.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val aor = ua.account.aor
+            val call = Call.uaCalls(ua, "in")[0]
+            Log.d("Baresip", "AoR $aor answering video call ${call.callp} from ${callUri.text}")
+            answerButton.isEnabled = false
+            answerVideoButton.isEnabled = false
+            rejectButton.isEnabled = false
+            call.setMediaDirection(Api.SDP_SENDRECV, call.videoDirection("remote"))
             Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
 
@@ -315,6 +298,7 @@ class MainActivity : AppCompatActivity() {
             val callp = Call.uaCalls(ua, "in")[0].callp
             Log.d("Baresip", "AoR $aor rejecting call $callp from ${callUri.text}")
             answerButton.isEnabled = false
+            answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
             Api.ua_hangup(ua.uap, callp, 486, "Rejected")
         }
@@ -453,9 +437,9 @@ class MainActivity : AppCompatActivity() {
                 val call = Call.call("connected")
                 if (call != null) {
                     if (BaresipService.cameraAvailable)
-                        call.setVideoDirection(Api.SDP_SENDRECV)
+                        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_SENDRECV)
                     else
-                        call.setVideoDirection(Api.SDP_RECVONLY)
+                        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_RECVONLY)
                     call.setVideo(true)
                 }
             }, 250)
@@ -920,7 +904,7 @@ class MainActivity : AppCompatActivity() {
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 if (call in Call.calls())
                                     Api.ua_hangup(uap, callp, 0, "")
-                                call(ua, ev[1], "outgoing")
+                                call(ua, ev[1], "outgoing", "voice")
                                 showCall(ua)
                                 dialog.dismiss()
                             }
@@ -941,7 +925,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
-                        call(ua, ev[1], "outgoing")
+                        call(ua, ev[1], "outgoing", "voice")
                         showCall(ua)
                     }
                     "refer failed" -> {
@@ -1470,7 +1454,56 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun call(ua: UserAgent, uri: String, status: String): Boolean {
+    private fun makeCall(kind: String) {
+        callUri.setAdapter(null)
+        val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+        val aor = ua.account.aor
+        if (Call.calls().isEmpty()) {
+            val uriText = callUri.text.toString().trim()
+            if (uriText.isNotEmpty()) {
+                var uri = ContactsActivity.findContactURI(uriText)
+                if (!uri.startsWith("sip:")) {
+                    uri = "sip:$uri"
+                    if (!uri.contains("@")) {
+                        val host = aor.substring(aor.indexOf("@") + 1)
+                        uri = "$uri@$host"
+                    }
+                }
+                if (!Utils.checkSipUri(uri)) {
+                    Utils.alertView(this, getString(R.string.notice),
+                            String.format(getString(R.string.invalid_sip_uri), uri))
+                } else {
+                    callUri.isFocusable = false
+                    val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                    callButton.visibility = View.INVISIBLE
+                    callButton.isEnabled = false
+                    callVideoButton.visibility = View.INVISIBLE
+                    callVideoButton.isEnabled = false
+                    hangupButton.visibility = View.VISIBLE
+                    hangupButton.isEnabled = false
+                    hangupButton.isEnabled = true
+                    if (!call(ua, uri, "outgoing", kind)) {
+                        am.mode = AudioManager.MODE_NORMAL
+                        callButton.visibility = View.VISIBLE
+                        callButton.isEnabled = true
+                        callVideoButton.visibility = View.VISIBLE
+                        callVideoButton.isEnabled = true
+                        hangupButton.visibility = View.INVISIBLE
+                        hangupButton.isEnabled = false
+                    }
+                }
+            } else {
+                val latest = CallHistory.aorLatestHistory(aor)
+                if (latest != null)
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerURI),
+                            Utils.aorDomain(ua.account.aor)))
+            }
+        }
+    }
+
+    private fun call(ua: UserAgent, uri: String, status: String, kind: String): Boolean {
         if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
             Toast.makeText(applicationContext, getString(R.string.no_calls),
                     Toast.LENGTH_LONG).show()
@@ -1478,10 +1511,15 @@ class MainActivity : AppCompatActivity() {
         }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, Api.SDP_INACTIVE)
+        val video = when {
+            kind == "voice" -> Api.SDP_INACTIVE
+            BaresipService.cameraAvailable -> Api.SDP_SENDRECV
+            else -> Api.SDP_RECVONLY
+        }
+        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, video)
         if (callp != "") {
-            Log.d("Baresip", "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
+            Log.d("Baresip", "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
+            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp), video).add()
             showCall(ua)
             return true
         } else {
@@ -1496,7 +1534,7 @@ class MainActivity : AppCompatActivity() {
         if (newCallp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
-                    Utils.dtmfWatcher(newCallp))
+                    Utils.dtmfWatcher(newCallp), Api.SDP_INACTIVE)
             newCall.add()
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
@@ -1546,8 +1584,11 @@ class MainActivity : AppCompatActivity() {
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true
+            callVideoButton.visibility = View.VISIBLE
+            callVideoButton.isEnabled = true
             hangupButton.visibility = View.INVISIBLE
             answerButton.visibility = View.INVISIBLE
+            answerVideoButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
             transferButton.visibility = View.INVISIBLE
@@ -1570,6 +1611,7 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
+                    answerVideoButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
                     transferButton.visibility = View.INVISIBLE
@@ -1578,16 +1620,24 @@ class MainActivity : AppCompatActivity() {
                     infoButton.visibility = View.INVISIBLE
                 }
                 "incoming" -> {
-                    callTitle.text = getString(R.string.outgoing_call_to_dots)
+                    callTitle.text = getString(R.string.incoming_call_from_dots)
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
+                    callVideoButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.INVISIBLE
                     answerButton.visibility = View.VISIBLE
                     answerButton.isEnabled = true
+                    if (call.videoDirection("remote") == Api.SDP_INACTIVE) {
+                        answerVideoButton.visibility = View.INVISIBLE
+                        answerVideoButton.isEnabled = false
+                    } else {
+                        answerVideoButton.visibility = View.VISIBLE
+                        answerVideoButton.isEnabled = true
+                    }
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     holdButton.visibility = View.INVISIBLE
@@ -1611,17 +1661,15 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    if (call.video != Api.SDP_INACTIVE) {
+                    if (call.hasVideo()) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {
                         defaultLayout.visibility = View.VISIBLE
                         videoLayout.visibility = View.INVISIBLE
-                        if (call.hasVideo()) {
-                            videoButton.setImageResource(R.drawable.video_on)
-                            videoButton.visibility = View.VISIBLE
-                            videoButton.isClickable = true
-                        }
+                        videoButton.setImageResource(R.drawable.video_on)
+                        videoButton.visibility = View.VISIBLE
+                        videoButton.isClickable = true
                     }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
@@ -1634,6 +1682,7 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
+                    answerVideoButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     if (call.onhold) {
                         holdButton.setImageResource(R.drawable.play)

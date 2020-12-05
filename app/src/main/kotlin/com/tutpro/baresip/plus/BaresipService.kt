@@ -151,7 +151,7 @@ class BaresipService: Service() {
                     }
                     BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
                         val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
+                                BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
                                 Log.d(LOG_TAG, "Bluetooth headset audio is connected")
@@ -257,8 +257,9 @@ class BaresipService: Service() {
                 val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(LOG_TAG, "Starting baresip without IP addresses")
-                Thread(Runnable { baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
-                        dnsServers, Api.AF_UNSPEC, logLevel)
+                Thread(Runnable {
+                    baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
+                            dnsServers, Api.AF_UNSPEC, logLevel)
                 }).start()
 
                 isServiceRunning = true
@@ -520,7 +521,7 @@ class BaresipService: Service() {
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming",
-                                    Utils.dtmfWatcher(callp)).add()
+                                    Utils.dtmfWatcher(callp), Api.SDP_INACTIVE).add()
                             if (ua.account.answerMode == "manual") {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
@@ -587,6 +588,8 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Remote call $callp is not found")
                             return
                         }
+                        call.video = call.videoDirection("combined")
+                        Log.d(LOG_TAG, "Set call video to ${call.video}")
                         newEvent = "call update"
                     }
                     "call established" -> {
@@ -609,6 +612,7 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
+                        call.video = call.videoDirection("combined")
                         if (!Utils.isVisible())
                             return
                     }
@@ -844,7 +848,7 @@ class BaresipService: Service() {
                 return -1
             }
         }
-        if ((call.video == Api.SDP_INACTIVE) && !call.videoAllowed) {
+        if (!call.hasVideo() && !call.videoAllowed) {
             val intent = Intent("service event")
             intent.putExtra("event", "call video request")
             intent.putExtra("params", arrayListOf(uap, callp))
@@ -925,7 +929,6 @@ class BaresipService: Service() {
     }
 
 
-
     private fun requestAudioFocus(usage: Int) {
         if (audioFocusUsage != -1) {
             if (audioFocusUsage == usage)
@@ -941,8 +944,8 @@ class BaresipService: Service() {
                             setUsage(usage)
                             build()
                         })
-                build()
-            }
+                        build()
+                    }
             @TargetApi(26)
             if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(LOG_TAG, "Audio focus granted for usage $usage")
@@ -1150,6 +1153,7 @@ class BaresipService: Service() {
 
     external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, netInterface: String,
                               dnsServers: String, netAf: Int, logLevel: Int)
+
     external fun baresipStop(force: Boolean)
 
     companion object {

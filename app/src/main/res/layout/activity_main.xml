@@ -130,6 +130,17 @@
                         </ImageButton>
 
                         <ImageButton
+                            android:id="@+id/callVideoButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:layout_marginStart="70dp"
+                            android:background="@null"
+                            android:src="@drawable/call_video"
+                            android:contentDescription="@string/video_call" >
+                        </ImageButton>
+
+                        <ImageButton
                             android:id="@+id/hangupButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -150,6 +161,20 @@
                             android:layout_marginEnd="10dp"
                             android:background="@null"
                             android:src="@drawable/call_green"
+                            android:clickable="false"
+                            android:visibility="invisible"
+                            android:contentDescription="@string/answer" >
+                        </ImageButton>
+
+                        <ImageButton
+                            android:id="@+id/answerVideoButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="80dp"
+                            android:background="@null"
+                            android:src="@drawable/call_video"
                             android:clickable="false"
                             android:visibility="invisible"
                             android:contentDescription="@string/answer" >
