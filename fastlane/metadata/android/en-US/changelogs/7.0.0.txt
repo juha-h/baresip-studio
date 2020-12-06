@@ -1,0 +1,4 @@
+- Added video call and video answer capability
+- When calling from Contacts and Call History, let user choose between
+  voice and video call
+- Improved detection of VPN connectivity changes
