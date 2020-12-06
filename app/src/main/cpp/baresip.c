@@ -1569,7 +1569,9 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1direction(JNIEnv *env, jobje
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    sdp_media_set_ldir(stream_sdpmedia(video_strm(call_video(call))), (enum sdp_dir)dir);
+    re_thread_enter();
+    call_set_video_dir(call, (enum sdp_dir)dir);
+    re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL
@@ -1596,19 +1598,19 @@ Java_com_tutpro_baresip_plus_Call_call_1video_1direction(JNIEnv *env, jobject th
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring jCall,
-        jboolean enable) {
+Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring jCall, jboolean enable) {
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    int err;
+    int err = 0;
     re_thread_enter();
     struct video *v = call_video(call);
     struct sdp_media *m = stream_sdpmedia(video_strm(v));
     struct media_ctx **ctx = NULL;
     if (!enable) {
         video_stop(v);
-        // video_stop_display(v);
+        sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), !enable);
+        err = call_modify(call);
     } else {
         if (sdp_media_ldir(m) & SDP_SENDONLY) {
             err = video_start_source(v, ctx);
@@ -1627,8 +1629,6 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, js
             }
         }
     }
-    sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), !enable);
-    err = call_modify(call);
     re_thread_leave();
     return err;
 }

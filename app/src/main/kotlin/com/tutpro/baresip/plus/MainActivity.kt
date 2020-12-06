@@ -436,11 +436,11 @@ class MainActivity : AppCompatActivity() {
             Handler().postDelayed({
                 val call = Call.call("connected")
                 if (call != null) {
-                    if (BaresipService.cameraAvailable)
-                        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_SENDRECV)
-                    else
-                        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_RECVONLY)
                     call.setVideo(true)
+                    if (BaresipService.cameraAvailable)
+                        call.setVideoDirection(Api.SDP_SENDRECV)
+                    else
+                        call.setVideoDirection(Api.SDP_RECVONLY)
                 }
             }, 250)
         }

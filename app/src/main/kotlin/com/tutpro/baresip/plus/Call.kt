@@ -85,6 +85,10 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         }
     }
 
+    fun setVideoDirection(vdir: Int) {
+        call_set_video_direction(callp, vdir)
+    }
+
     fun setMediaDirection(adir: Int, vdir: Int): Int {
         return call_set_media_direction(callp, adir, vdir)
     }
