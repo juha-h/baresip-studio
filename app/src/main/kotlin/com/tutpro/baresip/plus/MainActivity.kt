@@ -1630,12 +1630,12 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.INVISIBLE
                     answerButton.visibility = View.VISIBLE
                     answerButton.isEnabled = true
-                    if (call.videoDirection("remote") == Api.SDP_INACTIVE) {
-                        answerVideoButton.visibility = View.INVISIBLE
-                        answerVideoButton.isEnabled = false
-                    } else {
+                    if (call.hasVideo()) {
                         answerVideoButton.visibility = View.VISIBLE
                         answerVideoButton.isEnabled = true
+                    } else {
+                        answerVideoButton.visibility = View.INVISIBLE
+                        answerVideoButton.isEnabled = false
                     }
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
