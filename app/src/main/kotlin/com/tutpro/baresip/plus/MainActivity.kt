@@ -1660,7 +1660,7 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    if (call.hasVideo()) {
+                    if (call.video != Api.SDP_INACTIVE) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {

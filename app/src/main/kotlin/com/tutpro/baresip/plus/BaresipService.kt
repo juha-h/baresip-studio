@@ -588,8 +588,6 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Remote call $callp is not found")
                             return
                         }
-                        call.video = call.videoDirection("combined")
-                        Log.d(LOG_TAG, "Set call video to ${call.video}")
                         newEvent = "call update"
                     }
                     "call established" -> {
@@ -841,12 +839,8 @@ class BaresipService: Service() {
         }
         Log.d(LOG_TAG, "checkVideo dir = $dir, videoAllowed = ${call.videoAllowed}, call.video = ${call.video}")
         if (dir == Api.SDP_INACTIVE) {
-            if (call.video != Api.SDP_INACTIVE) {
-                call.video = Api.SDP_INACTIVE
-                return Api.SDP_INACTIVE
-            } else {
-                return -1
-            }
+            call.video = Api.SDP_INACTIVE
+            return Api.SDP_INACTIVE
         }
         if (!call.hasVideo() && !call.videoAllowed) {
             val intent = Intent("service event")

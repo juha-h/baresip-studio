@@ -253,7 +253,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             struct sdp_media *media = stream_sdpmedia(video_strm(v));
             int remote_has_video = sdp_media_rport(media) != 0 &&
                                    list_head(sdp_media_format_lst(media, false)) != NULL;
-            LOGD("call has video: %d\n", call_has_video(call));
+            LOGD("call vid: %d, rvid: %d, rdir: %d\n", call_has_video(call), remote_has_video,
+                    sdp_media_rdir(media));
             sdp_media_debug_log(media);
             int res;
             if (remote_has_video) {
@@ -262,14 +263,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                 if (res == SDP_INACTIVE) {
                     sdp_media_set_disabled(media, true);
                 } else {
-                    if ((res == SDP_RECVONLY) || (res == SDP_SENDONLY))
-                        sdp_media_set_ldir(media, (enum sdp_dir)res);
+                    sdp_media_set_ldir(media, (enum sdp_dir)res);
                     sdp_media_set_disabled(media, false);
                 }
             } else {
                 res = check_video(ua, call, SDP_INACTIVE);
-                if (res == SDP_INACTIVE)
-                    sdp_media_set_disabled(media, true);
+                sdp_media_set_disabled(media, true);
             }
             stream_debug_log(video_strm(call_video(call)));
 	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed", prm);
