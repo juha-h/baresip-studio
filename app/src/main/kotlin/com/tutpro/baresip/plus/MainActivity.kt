@@ -284,11 +284,12 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "in")[0]
-            Log.d("Baresip", "AoR $aor answering video call ${call.callp} from ${callUri.text}")
+            val vdir = call.videoDirection("remote")
+            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text} with vdir $vdir")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
-            call.setMediaDirection(Api.SDP_SENDRECV, call.videoDirection("remote"))
+            call.setMediaDirection(Api.SDP_SENDRECV, vdir)
             Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
 
