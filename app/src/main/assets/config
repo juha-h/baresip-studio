@@ -18,7 +18,9 @@ video_fps 24
 videoenc_format yuv420p
 rtp_tos 184
 rtcp_mux no
+jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
+jitter_buffer_wish 6
 rtp_stats no
 dyn_dns yes
 module opus.so
