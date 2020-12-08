@@ -264,6 +264,7 @@ class MainActivity : AppCompatActivity() {
                 val callp = uaCalls[uaCalls.size - 1].callp
                 Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
                 hangupButton.isEnabled = false
+                uaCalls[uaCalls.size - 1].stopVideoDisplay();
                 Api.ua_hangup(ua.uap, callp, 0, "")
             }
         }
@@ -278,7 +279,7 @@ class MainActivity : AppCompatActivity() {
             rejectButton.isEnabled = false
             call.video = Api.SDP_INACTIVE
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
-            Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
+            Api.ua_call_answer(ua.uap, call.callp)
         }
 
         answerVideoButton.setOnClickListener {
@@ -291,7 +292,7 @@ class MainActivity : AppCompatActivity() {
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
             call.setMediaDirection(Api.SDP_SENDRECV, call.video)
-            Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
+            Api.ua_call_answer(ua.uap, call.callp)
         }
 
         rejectButton.setOnClickListener {
