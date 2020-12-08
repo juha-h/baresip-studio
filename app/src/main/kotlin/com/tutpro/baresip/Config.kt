@@ -86,6 +86,11 @@ object Config {
             }
         }
 
+        if (!config.contains("jitter_buffer_type")) {
+            config = "${config}jitter_buffer_type adaptive\n"
+            config = "${config}jitter_buffer_wish 6\n"
+        }
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i("Baresip", "Initialized config to '$config'")
