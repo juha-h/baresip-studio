@@ -1639,20 +1639,6 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, js
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1stop_1video(JNIEnv *env, jobject thiz, jstring jCall) {
-    re_thread_enter();
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    int err = 0;
-    struct video *v = call_video(call);
-    video_stop(v);
-    video_stop_display(v);
-    re_thread_leave();
-    return err;
-}
-
-JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1start_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
     int err;
     re_thread_enter();
