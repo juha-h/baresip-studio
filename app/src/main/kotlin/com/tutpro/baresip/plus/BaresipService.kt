@@ -520,8 +520,13 @@ class BaresipService: Service() {
                             newEvent = "call rejected"
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
-                            Call(callp, ua, peerUri, "in", "incoming",
-                                    Utils.dtmfWatcher(callp), Api.SDP_INACTIVE).add()
+                            val call = Call(callp, ua, peerUri, "in", "incoming",
+                                    Utils.dtmfWatcher(callp), Api.SDP_INACTIVE)
+                            if (call.hasVideo())
+                                call.video =  call.videoDirection("remote")
+                            if (!cameraAvailable && (call.video == Api.SDP_RECVONLY))
+                                call.video = Api.SDP_INACTIVE
+                            call.add()
                             if (ua.account.answerMode == "manual") {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
@@ -825,7 +830,7 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun checkVideo(uap: String, callp: String, dir: Int): Int {
+    fun checkVideo(uap: String, callp: String, reqDir: Int): Int {
         if (!isServiceRunning) return -1
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
@@ -837,12 +842,13 @@ class BaresipService: Service() {
             Log.d(LOG_TAG, "checkVideo did not find call $callp")
             return -1
         }
-        Log.d(LOG_TAG, "checkVideo dir = $dir, videoAllowed = ${call.videoAllowed}, call.video = ${call.video}")
-        if (dir == Api.SDP_INACTIVE) {
+        Log.d(LOG_TAG, "checkVideo reqDir = $reqDir, videoAllowed = ${call.videoAllowed}," +
+                " call.video = ${call.video}")
+        if ((reqDir == Api.SDP_INACTIVE) || (!cameraAvailable && (reqDir == Api.SDP_SENDONLY))) {
             call.video = Api.SDP_INACTIVE
             return Api.SDP_INACTIVE
         }
-        if (!call.hasVideo() && !call.videoAllowed) {
+        if ((call.video == Api.SDP_INACTIVE) && !call.videoAllowed) {
             val intent = Intent("service event")
             intent.putExtra("event", "call video request")
             intent.putExtra("params", arrayListOf(uap, callp))
@@ -850,17 +856,10 @@ class BaresipService: Service() {
             return Api.SDP_INACTIVE
         }
         call.videoAllowed = false
-        if (cameraAvailable) {
-            call.video = dir
-        } else
-            when (dir) {
-                Api.SDP_SENDRECV, Api.SDP_RECVONLY -> {
-                    call.video = Api.SDP_RECVONLY
-                }
-                Api.SDP_SENDONLY -> {
-                    call.video = Api.SDP_INACTIVE
-                }
-            }
+        if (cameraAvailable)
+            call.video = reqDir
+        else
+            call.video = Api.SDP_RECVONLY
         return call.video
     }
 

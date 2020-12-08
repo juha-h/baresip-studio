@@ -276,6 +276,7 @@ class MainActivity : AppCompatActivity() {
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
+            call.video = Api.SDP_INACTIVE
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
             Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
@@ -284,12 +285,12 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "in")[0]
-            val vdir = call.videoDirection("remote")
-            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text} with vdir $vdir")
+            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}" +
+                    " with vdir ${call.video}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
-            call.setMediaDirection(Api.SDP_SENDRECV, vdir)
+            call.setMediaDirection(Api.SDP_SENDRECV, call.video)
             Api.ua_call_answer(ua.uap, call.callp, Api.VIDMODE_ON)
         }
 
@@ -1631,12 +1632,12 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.INVISIBLE
                     answerButton.visibility = View.VISIBLE
                     answerButton.isEnabled = true
-                    if (call.hasVideo()) {
-                        answerVideoButton.visibility = View.VISIBLE
-                        answerVideoButton.isEnabled = true
-                    } else {
+                    if (call.video == Api.SDP_INACTIVE) {
                         answerVideoButton.visibility = View.INVISIBLE
                         answerVideoButton.isEnabled = false
+                    } else {
+                        answerVideoButton.visibility = View.VISIBLE
+                        answerVideoButton.isEnabled = true
                     }
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
