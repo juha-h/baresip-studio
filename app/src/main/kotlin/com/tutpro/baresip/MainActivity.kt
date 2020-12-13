@@ -10,7 +10,6 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
@@ -49,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
     private lateinit var nm: NotificationManager
+    private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var serviceEventReceiver: BroadcastReceiver
     internal lateinit var quitTimer: CountDownTimer
@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        am = getSystemService(AUDIO_SERVICE) as AudioManager
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -254,7 +255,6 @@ class MainActivity : AppCompatActivity() {
                                 String.format(getString(R.string.invalid_sip_uri), uri))
                     } else {
                         callUri.isFocusable = false
-                        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                         callButton.visibility = View.INVISIBLE
@@ -603,6 +603,21 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
+                Log.d("Baresip", "Adjusting volume $keyCode of stream ${volumeControlStream}")
+                am.adjustStreamVolume(volumeControlStream,
+                        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+                            AudioManager.ADJUST_LOWER else
+                            AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_SHOW_UI)
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
             Log.d("Baresip", "Omit service event '$event' for task -1")
@@ -662,7 +677,7 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing", "call progress" -> {
-                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
+                        volumeControlStream = AudioManager.STREAM_MUSIC
                     }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
@@ -690,7 +705,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call established" -> {
-                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
+                        volumeControlStream = AudioManager.STREAM_MUSIC
                         if (aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
@@ -1392,6 +1407,7 @@ class MainActivity : AppCompatActivity() {
             dtmf.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
+            volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
         } else {
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
@@ -1412,6 +1428,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
+                    volumeControlStream = AudioManager.STREAM_MUSIC
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
@@ -1430,6 +1447,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
+                    volumeControlStream = AudioManager.STREAM_RING
                 }
                 "connected" -> {
                     if (call.referTo != "") {
@@ -1477,6 +1495,7 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
+                    volumeControlStream = AudioManager.STREAM_MUSIC
                 }
             }
         }
