@@ -362,11 +362,6 @@ class BaresipService: Service() {
                 updateStatusNotification()
             }
 
-            "SetSpeaker" -> {
-                Log.d(LOG_TAG, "Set speakerphone $speakerPhone")
-                am.isSpeakerphoneOn = speakerPhone
-            }
-
             "Stop", "Stop Force" -> {
                 if (!isServiceClean) cleanService()
                 if (isServiceRunning) baresipStop(action == "Stop Force")
@@ -686,15 +681,13 @@ class BaresipService: Service() {
                             resetCallVolume()
                             if (am.mode != AudioManager.MODE_NORMAL)
                                 am.mode = AudioManager.MODE_NORMAL
-                            if (am.isSpeakerphoneOn) am.isSpeakerphoneOn = false
+                            am.isSpeakerphoneOn = false
                             if (am.isBluetoothScoOn) {
                                 Log.d(LOG_TAG, "Stopping Bluetooth SCO")
                                 am.stopBluetoothSco()
                             } else {
                                 abandonAudioFocus()
                             }
-                            speakerPhone = false
-                            am.isSpeakerphoneOn = false
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
@@ -1140,7 +1133,6 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var isServiceClean = false
-        var speakerPhone = false
         var callVolume = 0
         var dynDns = false
         var netInterface = ""

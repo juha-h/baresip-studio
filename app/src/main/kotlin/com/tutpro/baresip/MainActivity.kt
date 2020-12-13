@@ -902,6 +902,10 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
+        if (am.isSpeakerphoneOn)
+            speakerIcon.setIcon(R.drawable.speaker_on)
+        else
+            speakerIcon.setIcon(R.drawable.speaker_off)
         return true
     }
 
@@ -912,13 +916,11 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.speakerIcon -> {
-                if (BaresipService.speakerPhone)
-                    item.setIcon(R.drawable.speaker_off)
-                else
+                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
+                if (am.isSpeakerphoneOn)
                     item.setIcon(R.drawable.speaker_on)
-                BaresipService.speakerPhone = !BaresipService.speakerPhone
-                baresipService.setAction("SetSpeaker")
-                startService(baresipService)
+                else
+                    item.setIcon(R.drawable.speaker_off)
             }
 
             R.id.config -> {
