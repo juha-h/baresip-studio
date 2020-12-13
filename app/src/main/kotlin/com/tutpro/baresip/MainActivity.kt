@@ -690,7 +690,6 @@ class MainActivity : AppCompatActivity() {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
-                        volumeControlStream = AudioManager.STREAM_RING
                         if (visible) {
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
