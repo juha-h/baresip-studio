@@ -906,7 +906,7 @@ class MainActivity : AppCompatActivity() {
             speakerIcon.setIcon(R.drawable.speaker_on)
         else
             speakerIcon.setIcon(R.drawable.speaker_off)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
