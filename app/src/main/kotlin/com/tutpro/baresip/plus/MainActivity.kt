@@ -1714,6 +1714,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
+                    imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
                     if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
                     dtmfWatcher = call.dtmfWatcher
                     dtmf.addTextChangedListener(dtmfWatcher)
