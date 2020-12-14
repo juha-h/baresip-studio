@@ -173,6 +173,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                view.performClick()
                 false
             }
         }
