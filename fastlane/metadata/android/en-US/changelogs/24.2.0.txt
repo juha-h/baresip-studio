@@ -1,0 +1,2 @@
+- Automatically show DTMF soft keyboard when call is connected
+- Avoid crash caused by pressing volume control keys when not in call
