@@ -1409,7 +1409,7 @@ class MainActivity : AppCompatActivity() {
             dtmf.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
-            volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
+            volumeControlStream = AudioManager.STREAM_MUSIC
         } else {
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
