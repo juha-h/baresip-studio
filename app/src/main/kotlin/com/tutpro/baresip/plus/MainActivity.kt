@@ -960,7 +960,7 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
-                        volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
+                        volumeControlStream = AudioManager.STREAM_MUSIC
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param.get(0).isDigit())
@@ -1613,7 +1613,7 @@ class MainActivity : AppCompatActivity() {
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
             videoButton.visibility = View.INVISIBLE
-            volumeControlStream = AudioManager.USE_DEFAULT_STREAM_TYPE
+            volumeControlStream = AudioManager.STREAM_MUSIC
         } else {
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
