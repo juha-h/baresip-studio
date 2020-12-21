@@ -19,7 +19,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Surface
 import android.view.View
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -623,4 +625,8 @@ object Utils {
         return cameras
     }
 
+    fun displayIsVertical(ctx: Context): Boolean {
+        val rot = (ctx.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        return rot == Surface.ROTATION_0 || rot == Surface.ROTATION_180
+    }
 }

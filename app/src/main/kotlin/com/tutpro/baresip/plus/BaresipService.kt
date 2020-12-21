@@ -516,11 +516,7 @@ class BaresipService: Service() {
                         } else {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
                             val call = Call(callp, ua, peerUri, "in", "incoming",
-                                    Utils.dtmfWatcher(callp), Api.SDP_INACTIVE)
-                            if (call.hasVideo())
-                                call.video =  call.videoDirection("remote")
-                            if (!cameraAvailable && (call.video == Api.SDP_RECVONLY))
-                                call.video = Api.SDP_INACTIVE
+                                    Utils.dtmfWatcher(callp))
                             call.add()
                             if (ua.account.answerMode == "manual") {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
@@ -588,6 +584,26 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Remote call $callp is not found")
                             return
                         }
+                        val ldir = ev[1].toInt()
+                        val rdir = ev[2].toInt()
+                        var dir = 0
+                        val mask = if (cameraAvailable) Api.SDP_SENDRECV else Api.SDP_RECVONLY
+                        if ((rdir != Api.SDP_INACTIVE) && (ldir != rdir)) {
+                            if (ldir == Api.SDP_INACTIVE)
+                                dir = rdir and mask
+                            else if (rdir == Api.SDP_SENDRECV)
+                                dir = Api.SDP_SENDRECV and mask
+                            else if ((rdir == Api.SDP_SENDONLY) && (ldir != Api.SDP_RECVONLY))
+                                dir = Api.SDP_RECVONLY
+                            else if ((rdir == Api.SDP_RECVONLY) && (ldir != Api.SDP_SENDONLY))
+                                dir = Api.SDP_RECVONLY and mask
+                            if (dir != 0) {
+                                val intent = Intent("service event")
+                                intent.putExtra("event", "call video request")
+                                intent.putExtra("params", arrayListOf(uap, callp, "$dir"))
+                                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+                            }
+                        }
                         newEvent = "call update"
                     }
                     "call established" -> {
@@ -610,7 +626,6 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
-                        call.video = call.videoDirection("combined")
                         if (!Utils.isVisible())
                             return
                     }
@@ -822,6 +837,7 @@ class BaresipService: Service() {
             return ""
     }
 
+    /*
     @Keep
     fun checkVideo(uap: String, callp: String, reqDir: Int): Int {
         if (!isServiceRunning) return -1
@@ -854,7 +870,7 @@ class BaresipService: Service() {
         else
             call.video = Api.SDP_RECVONLY
         return call.video
-    }
+    }*/
 
     @Keep
     fun stopped(error: String) {

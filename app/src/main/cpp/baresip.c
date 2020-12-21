@@ -253,10 +253,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             struct sdp_media *media = stream_sdpmedia(video_strm(v));
             int remote_has_video = sdp_media_rport(media) != 0 &&
                                    list_head(sdp_media_format_lst(media, false)) != NULL;
-            LOGD("call vid: %d, rvid: %d, rdir: %d\n", call_has_video(call), remote_has_video,
-                    sdp_media_rdir(media));
+            int ldir = sdp_media_ldir(media);
+            int rdir = sdp_media_rdir(media);
+            LOGD("call vid %d, remote video %d, ldir %d, rdir %d\n", call_has_video(call),
+                    remote_has_video, ldir, rdir);
             sdp_media_debug_log(media);
-            int res;
+            /*int res;
             if (remote_has_video) {
                 res = check_video(ua, call, sdp_media_rdir(media));
                 if (res == SDP_INACTIVE) {
@@ -268,9 +270,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             } else {
                 res = check_video(ua, call, SDP_INACTIVE);
                 sdp_media_set_disabled(media, true);
-            }
+            } */
             stream_debug_log(video_strm(call_video(call)));
-	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed", prm);
+	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d", prm, ldir, rdir);
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
@@ -1601,7 +1603,7 @@ Java_com_tutpro_baresip_plus_Call_call_1video_1direction(JNIEnv *env, jobject th
         return sdp_media_dir(stream_sdpmedia(video_strm(call_video(call))));
 }
 
-JNIEXPORT jint JNICALL
+/*JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring jCall, jboolean enable) {
     int err = 0;
     re_thread_enter();
@@ -1636,7 +1638,7 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, js
     }
     re_thread_leave();
     return err;
-}
+}*/
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1start_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
@@ -1650,7 +1652,7 @@ Java_com_tutpro_baresip_plus_Call_call_1start_1video_1display(JNIEnv *env, jobje
     return err;
 }
 
-JNIEXPORT void JNICALL
+/*JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1stop_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
     re_thread_enter();
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
@@ -1658,7 +1660,7 @@ Java_com_tutpro_baresip_plus_Call_call_1stop_1video_1display(JNIEnv *env, jobjec
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     video_stop_display(call_video(call));
     re_thread_leave();
-}
+}*/
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject thiz, jstring jCall,

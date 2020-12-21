@@ -18,12 +18,14 @@ import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import android.content.res.Configuration
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
+import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private var portrait by Delegates.notNull<Boolean>()
 
     internal var restart = false
     private var atStartup = false
@@ -81,6 +84,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        portrait = Utils.displayIsVertical(applicationContext)
 
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         videoView = VideoView(applicationContext)
@@ -111,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
+
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -266,7 +272,6 @@ class MainActivity : AppCompatActivity() {
                 val callp = uaCalls[uaCalls.size - 1].callp
                 Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
                 hangupButton.isEnabled = false
-                uaCalls[uaCalls.size - 1].stopVideoDisplay();
                 Api.ua_hangup(ua.uap, callp, 0, "")
             }
         }
@@ -279,7 +284,6 @@ class MainActivity : AppCompatActivity() {
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
-            call.video = Api.SDP_INACTIVE
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
             Api.ua_call_answer(ua.uap, call.callp)
         }
@@ -288,12 +292,12 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "in")[0]
-            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}" +
-                    " with vdir ${call.video}")
+            Log.d("Baresip", "AoR $aor answering video call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
-            call.setMediaDirection(Api.SDP_SENDRECV, call.video)
+            val videoDir = if (BaresipService.cameraAvailable) Api.SDP_SENDRECV else Api.SDP_RECVONLY
+            call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
             Api.ua_call_answer(ua.uap, call.callp)
         }
 
@@ -441,11 +445,16 @@ class MainActivity : AppCompatActivity() {
             Handler().postDelayed({
                 val call = Call.call("connected")
                 if (call != null) {
-                    call.setVideo(true)
-                    if (BaresipService.cameraAvailable)
-                        call.setVideoDirection(Api.SDP_SENDRECV)
-                    else
-                        call.setVideoDirection(Api.SDP_RECVONLY)
+                    val dir = call.videoRequest
+                    if (dir != 0) {
+                        call.videoRequest = 0
+                        call.setVideoDirection(dir)
+                    } else {
+                        if (BaresipService.cameraAvailable)
+                            call.setVideoDirection(Api.SDP_SENDRECV)
+                        else
+                            call.setVideoDirection(Api.SDP_RECVONLY)
+                    }
                 }
             }, 250)
         }
@@ -503,7 +512,7 @@ class MainActivity : AppCompatActivity() {
         prm.bottomMargin = 15
         vb.layoutParams = prm
         vb.setOnClickListener {
-            Call.call("connected")?.setVideo(false)
+            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
         }
         videoLayout.addView(vb)
 
@@ -718,6 +727,12 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Log.d("Baresip", "Orientation changed to ${newConfig.orientation}")
+        portrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
+   }
+
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
             Log.d("Baresip", "Omit service event '$event' for task -1")
@@ -816,6 +831,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call video request" -> {
                         val callp = params[1]
+                        val dir = params[2].toInt()
                         val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w("Baresip", "Video request call $callp not found")
@@ -826,9 +842,10 @@ class MainActivity : AppCompatActivity() {
                             titleView.text = getString(R.string.video_request)
                             with (AlertDialog.Builder(this)) {
                                 setCustomTitle(titleView)
-                                setMessage(String.format(getString(R.string.allow_video),
+                                setMessage(String.format(getString(R.string.allow_video) + " direction $dir",
                                         Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))))
                                 setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                                    call.videoRequest = dir
                                     videoButton.performClick()
                                     dialog.dismiss()
                                     alerting = false
@@ -1528,15 +1545,15 @@ class MainActivity : AppCompatActivity() {
         }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val video = when {
+        val videoDir = when {
             kind == "voice" -> Api.SDP_INACTIVE
             BaresipService.cameraAvailable -> Api.SDP_SENDRECV
             else -> Api.SDP_RECVONLY
         }
-        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, video)
+        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, videoDir)
         if (callp != "") {
             Log.d("Baresip", "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
-            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp), video).add()
+            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
             showCall(ua)
             return true
         } else {
@@ -1551,7 +1568,7 @@ class MainActivity : AppCompatActivity() {
         if (newCallp != "") {
             Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
-                    Utils.dtmfWatcher(newCallp), Api.SDP_INACTIVE)
+                    Utils.dtmfWatcher(newCallp))
             newCall.add()
             Api.ua_hangup(ua.uap, call.callp, 0, "")
             // Api.call_stop_audio(call.callp)
@@ -1650,7 +1667,9 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.INVISIBLE
                     answerButton.visibility = View.VISIBLE
                     answerButton.isEnabled = true
-                    if (call.video == Api.SDP_INACTIVE) {
+                    Log.d("Baresip", "callHasVideo ${call.hasVideo()}, " +
+                            "rdir ${call.videoDirection("remote")}")
+                    if (call.hasVideo()) {
                         answerVideoButton.visibility = View.INVISIBLE
                         answerVideoButton.isEnabled = false
                     } else {
@@ -1681,7 +1700,10 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    if (call.video != Api.SDP_INACTIVE) {
+                    dtmf.visibility = View.VISIBLE
+                    dtmf.isEnabled = true
+                    dtmf.requestFocus()
+                    if (call.hasVideo()) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {
@@ -1690,6 +1712,11 @@ class MainActivity : AppCompatActivity() {
                         videoButton.setImageResource(R.drawable.video_on)
                         videoButton.visibility = View.VISIBLE
                         videoButton.isClickable = true
+                        if (portrait)
+                            imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
+                        if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
+                        dtmfWatcher = call.dtmfWatcher
+                        dtmf.addTextChangedListener(dtmfWatcher)
                     }
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
@@ -1711,13 +1738,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     holdButton.visibility = View.VISIBLE
                     transferButton.visibility = View.VISIBLE
-                    dtmf.visibility = View.VISIBLE
-                    dtmf.isEnabled = true
-                    dtmf.requestFocus()
-                    imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
-                    if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
-                    dtmfWatcher = call.dtmfWatcher
-                    dtmf.addTextChangedListener(dtmfWatcher)
                     callUri.inputType = InputType.TYPE_CLASS_PHONE
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
                     dialpadButton.tag = "on"
