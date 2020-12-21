@@ -18,14 +18,13 @@ import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
-import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,7 +62,6 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
     private lateinit var swipeRefresh: SwipeRefreshLayout
-    private var portrait by Delegates.notNull<Boolean>()
 
     internal var restart = false
     private var atStartup = false
@@ -84,8 +82,6 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-
-        portrait = Utils.displayIsVertical(applicationContext)
 
         layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
         videoView = VideoView(applicationContext)
@@ -726,12 +722,6 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        Log.d("Baresip", "Orientation changed to ${newConfig.orientation}")
-        portrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
-   }
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
@@ -1712,7 +1702,7 @@ class MainActivity : AppCompatActivity() {
                         videoButton.setImageResource(R.drawable.video_on)
                         videoButton.visibility = View.VISIBLE
                         videoButton.isClickable = true
-                        if (portrait)
+                        if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
                             imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
                         if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
                         dtmfWatcher = call.dtmfWatcher

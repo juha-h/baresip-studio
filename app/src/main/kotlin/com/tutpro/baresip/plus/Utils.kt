@@ -625,8 +625,4 @@ object Utils {
         return cameras
     }
 
-    fun displayIsVertical(ctx: Context): Boolean {
-        val rot = (ctx.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
-        return rot == Surface.ROTATION_0 || rot == Surface.ROTATION_180
-    }
 }
