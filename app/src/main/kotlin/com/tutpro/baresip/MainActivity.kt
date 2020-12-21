@@ -6,6 +6,7 @@ import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -1488,7 +1489,8 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
-                    imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
+                    if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
+                        imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
                     if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
                     dtmfWatcher = call.dtmfWatcher
                     dtmf.addTextChangedListener(dtmfWatcher)
