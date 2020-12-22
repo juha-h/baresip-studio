@@ -14,21 +14,20 @@
         <ul>
             <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
-            <li>Registration status of an account is shown with a colored dot:  green (registration
+            <li>Registration status of an account is shown with a colored dot: green (registration
             succeeded, yellow (registration is in progress), red (registration failed), white (registration
             has not been activated).</li>
+            <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
             <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
-            <li>If you cannot hear the other party during call, try to increase Media volume of
-            the device or set Default Call Volume in Settings.</li>
         </ul>
         <h2>Known Issues</h2>
         <ul>
             <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
-            concurrently active network interfaces.  Active network interface preference order is VPN,
+            concurrently active network interfaces. Active network interface preference order is VPN,
             Internet, other.</li>
         </ul>
         <h2>Source code</h2>
@@ -56,22 +55,21 @@
             <li>Registration status of an account is shown with a colored dot:  green (registration
             succeeded, yellow (registration is in progress), red (registration failed), white (registration
             has not been activated).</li>
+            <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
             <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
-            <li>If you cannot hear the other party during call, try to increase Media volume of
-            the device or set Default Call Volume in Settings.</li>
         </ul>
         <h2>Known Issues</h2>
         <ul>
             <li>Due to limitations in underlying libraries, multiple concurrently active network
-            interfaces are not supported.   Active network interface preference order is VPN,
+            interfaces are not supported. Active network interface preference order is VPN,
             Internet, other.</li>
             <li>In video calls, the device needs to be held in landscape
             mode rotated 90 degrees left from portrait orientation.</li>
-            <li>Selfview is not shown when video stream is sendonly.</li>
+            <li>Selfview is not properly shown when video stream is sendonly.</li>
         </ul>
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
@@ -342,7 +340,9 @@
     <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
-    <string name="allow_video">Accept video call with \'%1$s\'?</string>
+    <string name="allow_video">Accept sending and receiving video with \'%1$s\'?</string>
+    <string name="allow_video_send">Accept sending of video to \'%1$s\'?</string>
+    <string name="allow_video_recv">Accept receiving video from \'%1$s\'?</string>
     <string name="hold">Hold</string>
     <string name="call_transfer">Call Transfer</string>
     <string name="transfer_destination">Transfer destination</string>
