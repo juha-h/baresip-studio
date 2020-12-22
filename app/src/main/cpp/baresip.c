@@ -235,10 +235,10 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            if (list_count(ua_calls(ua)) > 1) {
-                play = mem_deref(play);
-                (void)play_file(&play, player, "callwaiting.wav", 3, NULL, NULL);
-            }
+            //if (list_count(ua_calls(ua)) > 1) {
+            //    play = mem_deref(play);
+            //    (void)play_file(&play, player, "callwaiting.wav", 3, NULL, NULL);
+            //}
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
@@ -247,7 +247,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "local call %sed", prm);
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-	        if (call_state(call) != CALL_STATE_ESTABLISHED)
+	        if ((call_state(call) != CALL_STATE_ESTABLISHED) || call_has_video(call))
                 return;
 	        struct video *v = call_video(call);
             struct sdp_media *media = stream_sdpmedia(video_strm(v));
@@ -255,22 +255,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
                                    list_head(sdp_media_format_lst(media, false)) != NULL;
             int ldir = sdp_media_ldir(media);
             int rdir = sdp_media_rdir(media);
-            LOGD("call vid %d, remote video %d, ldir %d, rdir %d\n", call_has_video(call),
-                    remote_has_video, ldir, rdir);
+            LOGD("call video %d, sdp video media %d, remote video %d, ldir %d, rdir %d\n",
+                    call_has_video(call), !sdp_media_disabled(media), remote_has_video, ldir, rdir);
             sdp_media_debug_log(media);
-            /*int res;
-            if (remote_has_video) {
-                res = check_video(ua, call, sdp_media_rdir(media));
-                if (res == SDP_INACTIVE) {
-                    sdp_media_set_disabled(media, true);
-                } else {
-                    sdp_media_set_ldir(media, (enum sdp_dir)res);
-                    sdp_media_set_disabled(media, false);
-                }
-            } else {
-                res = check_video(ua, call, SDP_INACTIVE);
-                sdp_media_set_disabled(media, true);
-            } */
             stream_debug_log(video_strm(call_video(call)));
 	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d", prm, ldir, rdir);
             break;
@@ -1286,25 +1273,22 @@ Java_com_tutpro_baresip_plus_Api_uag_1current_1set(JNIEnv *env, jobject thiz, js
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1hangup(JNIEnv *env, jobject thiz,
-                                                jstring javaUA, jstring javaCall, jint code,
-                                                jstring reason) {
-    re_thread_enter();
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+Java_com_tutpro_baresip_plus_Api_ua_1hangup(JNIEnv *env, jobject thiz, jstring jUA, jstring jCall,
+        jint jCode, jstring jReason) {
+    const char *native_ua = (*env)->GetStringUTFChars(env, jUA, 0);
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    const uint16_t native_code = code;
-    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("hanging up call %s/%s\n", native_ua, native_call);
-    if (strlen(native_reason) == 0)
-        ua_hangup(ua, call, native_code, NULL);
+    const uint16_t code = jCode;
+    const char *reason = (*env)->GetStringUTFChars(env, jReason, 0);
+    LOGD("hanging up call %s/%s with %d %s\n", native_ua, native_call, code, reason);
+    if (strlen(reason) == 0)
+        ua_hangup(ua, call, code, NULL);
     else
-        ua_hangup(ua, call, native_code, native_reason);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
-    re_thread_leave();
+        ua_hangup(ua, call, code, reason);
+    (*env)->ReleaseStringUTFChars(env, jUA, native_ua);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, jReason, reason);
 }
 
 JNIEXPORT jstring JNICALL
@@ -1548,10 +1532,14 @@ Java_com_tutpro_baresip_plus_Call_call_1status(JNIEnv *env, jobject thiz, jstrin
 JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring jCall)
 {
+    int res;
+    re_thread_enter();
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    return call_has_video(call);
+    res = call_has_video(call);
+    re_thread_leave();
+    return res;
 }
 
 JNIEXPORT void JNICALL
@@ -1589,56 +1577,17 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1media_1direction(JNIEnv *env, jobje
     return err;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1video_1direction(JNIEnv *env, jobject thiz, jstring jCall,
-    jint kind) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    if (kind == 0)
-        return sdp_media_ldir(stream_sdpmedia(video_strm(call_video(call))));
-    else if (kind == 1)
-        return sdp_media_rdir(stream_sdpmedia(video_strm(call_video(call))));
-    else
-        return sdp_media_dir(stream_sdpmedia(video_strm(call_video(call))));
-}
-
-/*JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1set_1video(JNIEnv *env, jobject thiz, jstring jCall, jboolean enable) {
-    int err = 0;
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1video_1enabled(JNIEnv *env, jobject thiz, jstring jCall) {
+    int res;
     re_thread_enter();
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    struct video *v = call_video(call);
-    struct sdp_media *m = stream_sdpmedia(video_strm(v));
-    struct media_ctx **ctx = NULL;
-    if (!enable) {
-        video_stop(v);
-        video_stop_display(v);
-        sdp_media_set_disabled(stream_sdpmedia(video_strm(v)), !enable);
-        err = call_modify(call);
-    } else {
-        if (sdp_media_ldir(m) & SDP_SENDONLY) {
-            err = video_start_source(v, ctx);
-            if (err) {
-                LOGE("video_start_source failed with error %d\n", err);
-                re_thread_leave();
-                return err;
-            }
-        }
-        if (sdp_media_ldir(m) & SDP_RECVONLY) {
-            err = video_start_display(v, NULL);
-            if (err) {
-                LOGE("video_start_display failed with error %d\n", err);
-                re_thread_leave();
-                return err;
-            }
-        }
-    }
+    res = !sdp_media_disabled(stream_sdpmedia(video_strm(call_video(call))));
     re_thread_leave();
-    return err;
-}*/
+    return res;
+}
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1start_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
@@ -1651,16 +1600,6 @@ Java_com_tutpro_baresip_plus_Call_call_1start_1video_1display(JNIEnv *env, jobje
     re_thread_leave();
     return err;
 }
-
-/*JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1stop_1video_1display(JNIEnv *env, jobject thiz, jstring jCall) {
-    re_thread_enter();
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    video_stop_display(call_video(call));
-    re_thread_leave();
-}*/
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject thiz, jstring jCall,

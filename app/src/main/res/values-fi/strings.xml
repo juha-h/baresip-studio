@@ -15,14 +15,13 @@
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
+        <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
         <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
         <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
         <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
         <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
         kun puhelun kohde on tyhjä.</li>
-        <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
-        tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
         <h2>Tunnetut ongelmat</h2>
         <ul>
             <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
@@ -54,6 +53,7 @@
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
+        <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
         <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
         <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
@@ -69,7 +69,7 @@
             suositaan järjestyksessä VPN, Internet, muu.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
-            <li>Omaa videokuvaa ei näy, jos video on yksisuuntainen.</li>
+            <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
         </ul>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
@@ -377,7 +377,9 @@
     <string name="hangup">Lopeta</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>
-    <string name="allow_video">Salli video puhelussa \'%1$s\'?</string>
+    <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'?</string>
+    <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
+    <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
     <string name="hold">Aseta puhelu pitoon</string>
     <string name="call_transfer">Puhelun siirto</string>
     <string name="transfer_destination">Siirron kohde</string>

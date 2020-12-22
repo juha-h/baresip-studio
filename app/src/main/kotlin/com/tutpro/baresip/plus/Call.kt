@@ -38,10 +38,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_start_video_display(callp)
     }
 
-    /*fun stopVideoDisplay() {
-        call_stop_video_display(callp)
-    }*/
-
     fun setVideoSource(front: Boolean): Int {
         return call_set_video_source(callp, front)
     }
@@ -71,19 +67,12 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
         return call_has_video(callp)
     }
 
-    /*fun setVideo(enabled: Boolean): Int {
-        videoAllowed = enabled
-        if (!enabled)
-            video = Api.SDP_INACTIVE
-        return call_set_video(callp, enabled)
-    }*/
+    fun videoEnabled(): Boolean {
+        return call_video_enabled(callp)
+    }
 
-    fun videoDirection(kind: String): Int {
-        return when (kind) {
-            "local" -> call_video_direction(callp, 1)
-            "remote" -> call_video_direction(callp, 2)
-            else -> call_video_direction(callp, 3)
-        }
+    fun disableVideoStream(disable: Boolean) {
+        call_disable_video_stream(callp, disable)
     }
 
     fun setVideoDirection(vdir: Int) {
@@ -110,16 +99,14 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
     private external fun call_start_audio(callp: String)
     private external fun call_start_video_display(callp: String): Int
-    //private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
     private external fun call_status(callp: String): String
     private external fun call_has_video(callp: String): Boolean
-    //private external fun call_set_video(callp: String, enabled: Boolean): Int
     private external fun call_set_video_source(callp: String, front: Boolean): Int
     private external fun call_set_video_direction(callp: String, dir: Int)
-    private external fun call_video_direction(callp: String, kind: Int): Int
     private external fun call_set_media_direction(callp: String, adir: Int, vdir: Int): Int
     private external fun call_disable_video_stream(callp: String, disable: Boolean)
+    private external fun call_video_enabled(callp: String): Boolean
 
     external fun call_video_debug()
 

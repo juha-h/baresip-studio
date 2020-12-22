@@ -578,7 +578,15 @@ class BaresipService: Service() {
                         proximitySensing(true)
                         return
                     }
-                    "remote call offered", "remote call answered" -> {
+                    "remote call answered" -> {
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w(LOG_TAG, "Remote call $callp is not found")
+                            return
+                        }
+                        newEvent = "call update"
+                    }
+                    "remote call offered" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w(LOG_TAG, "Remote call $callp is not found")

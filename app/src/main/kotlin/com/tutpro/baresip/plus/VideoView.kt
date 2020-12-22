@@ -56,9 +56,11 @@ class VideoView(val context: Context) {
             set_surface(holder.surface)
             if (afterCreate) {
                 for (call in Call.calls())
-                    if (call.hasVideo())
+                    if (call.hasVideo()) {
                         if (call.startVideoDisplay() != 0)
-                            Log.e("Baresip","Failed to start video display")
+                            Log.e("Baresip", "Failed to start video display")
+                        break;
+                    }
                 afterCreate = false
             }
         }

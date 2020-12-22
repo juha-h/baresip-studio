@@ -9,10 +9,10 @@ object Api {
     const val VIDMODE_OFF = 0
     const val VIDMODE_ON = 1
 
-    val SDP_INACTIVE = 0
-    val SDP_RECVONLY = 1
-    val SDP_SENDONLY = 2
-    val SDP_SENDRECV = 3
+    const val SDP_INACTIVE = 0
+    const val SDP_RECVONLY = 1
+    const val SDP_SENDONLY = 2
+    const val SDP_SENDRECV = 3
 
     external fun account_set_display_name(acc: String, dn: String): Int
     external fun account_display_name(acc: String): String

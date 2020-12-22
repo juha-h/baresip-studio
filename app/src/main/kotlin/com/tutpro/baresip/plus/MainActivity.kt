@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
 
-
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 handleServiceEvent(intent.getStringExtra("event")!!,
@@ -281,6 +280,7 @@ class MainActivity : AppCompatActivity() {
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
+            call.disableVideoStream(true)
             Api.ua_call_answer(ua.uap, call.callp)
         }
 
@@ -832,8 +832,14 @@ class MainActivity : AppCompatActivity() {
                             titleView.text = getString(R.string.video_request)
                             with (AlertDialog.Builder(this)) {
                                 setCustomTitle(titleView)
-                                setMessage(String.format(getString(R.string.allow_video) + " direction $dir",
-                                        Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))))
+                                val peerUri = Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))
+                                val msg = when (dir) {
+                                    1 -> String.format(getString(R.string.allow_video_recv), peerUri)
+                                    2 -> String.format(getString(R.string.allow_video_send), peerUri)
+                                    3 -> String.format(getString(R.string.allow_video), peerUri)
+                                    else -> ""
+                                }
+                                setMessage(msg)
                                 setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                     call.videoRequest = dir
                                     videoButton.performClick()
@@ -1657,14 +1663,12 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.INVISIBLE
                     answerButton.visibility = View.VISIBLE
                     answerButton.isEnabled = true
-                    Log.d("Baresip", "callHasVideo ${call.hasVideo()}, " +
-                            "rdir ${call.videoDirection("remote")}")
                     if (call.hasVideo()) {
-                        answerVideoButton.visibility = View.INVISIBLE
-                        answerVideoButton.isEnabled = false
-                    } else {
                         answerVideoButton.visibility = View.VISIBLE
                         answerVideoButton.isEnabled = true
+                    } else {
+                        answerVideoButton.visibility = View.INVISIBLE
+                        answerVideoButton.isEnabled = false
                     }
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
@@ -1693,7 +1697,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
-                    if (call.hasVideo()) {
+                    if (call.videoEnabled()) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {
