@@ -1,0 +1,7 @@
+- Several video call related bug fixes (some may still remain)
+- Video request now tells direction of the request
+- Avoid volume control key related crash
+- Automatically show DTMF soft keyboard when non-video call is connected
+- Use adaptive jitter buffer
+- Volume control keys now control ring or media volume
+- New RU translations
