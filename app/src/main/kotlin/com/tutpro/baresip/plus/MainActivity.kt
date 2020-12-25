@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var quitTimer: CountDownTimer
     internal lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
+    private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
     internal var restart = false
@@ -539,24 +540,26 @@ class MainActivity : AppCompatActivity() {
         videoLayout.addView(cb)
 
         // Speaker Button
-        val sb = ImageButton(this)
-        sb.setImageResource(R.drawable.speaker_off_button)
-        sb.setBackgroundResource(0)
+        speakerButton = ImageButton(this)
+        speakerButton.setBackgroundResource(0)
         prm  = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         prm.marginEnd = 15
         prm.topMargin = 15
-        sb.layoutParams = prm
-        sb.setOnClickListener {
+        speakerButton.layoutParams = prm
+        speakerButton.setOnClickListener {
             am.isSpeakerphoneOn = !am.isSpeakerphoneOn
-            if (am.isSpeakerphoneOn)
-                sb.setImageResource(R.drawable.speaker_on_button)
-            else
-                sb.setImageResource(R.drawable.speaker_off_button)
+            if (am.isSpeakerphoneOn) {
+                speakerButton.setImageResource(R.drawable.speaker_on_button)
+                speakerIcon.setIcon(R.drawable.speaker_on)
+            } else {
+                speakerButton.setImageResource(R.drawable.speaker_off_button)
+                speakerIcon.setIcon(R.drawable.speaker_off)
+            }
         }
-        videoLayout.addView(sb)
+        videoLayout.addView(speakerButton)
 
         // Hangup Button
         val hb = ImageButton(this)
@@ -810,6 +813,11 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call established" -> {
                         volumeControlStream = AudioManager.STREAM_MUSIC
+                        if (Call.ofCallp(params[1])!!.videoEnabled()) {
+                            am.isSpeakerphoneOn = true
+                            speakerButton.setImageResource(R.drawable.speaker_on_button)
+                            speakerIcon.setIcon(R.drawable.speaker_on)
+                        }
                         if (aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
@@ -973,6 +981,7 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         speakerIcon.setIcon(R.drawable.speaker_off)
+                        speakerButton.setImageResource(R.drawable.speaker_off_button)
                         volumeControlStream = AudioManager.STREAM_MUSIC
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -1047,10 +1056,13 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
-        if (am.isSpeakerphoneOn)
+        if (am.isSpeakerphoneOn) {
             speakerIcon.setIcon(R.drawable.speaker_on)
-       else
+            speakerButton.setImageResource(R.drawable.speaker_on_button)
+        } else {
             speakerIcon.setIcon(R.drawable.speaker_off)
+            speakerButton.setImageResource(R.drawable.speaker_off_button)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -1062,10 +1074,13 @@ class MainActivity : AppCompatActivity() {
 
             R.id.speakerIcon -> {
                 am.isSpeakerphoneOn = !am.isSpeakerphoneOn
-                if (am.isSpeakerphoneOn)
+                if (am.isSpeakerphoneOn) {
                     item.setIcon(R.drawable.speaker_on)
-                else
+                    speakerButton.setImageResource(R.drawable.speaker_on_button)
+                } else {
                     item.setIcon(R.drawable.speaker_off)
+                    speakerButton.setImageResource(R.drawable.speaker_off_button)
+                }
             }
 
             R.id.config -> {
@@ -1697,7 +1712,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
-                    if (call.hasVideo()) {
+                    if (call.videoEnabled()) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {

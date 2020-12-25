@@ -11,7 +11,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     var zid = ""
     var hasHistory = false
     var referTo = ""
-    //var videoAllowed = video != Api.SDP_INACTIVE
     var videoRequest = 0
 
     init {

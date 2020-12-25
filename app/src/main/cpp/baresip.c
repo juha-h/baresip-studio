@@ -163,29 +163,6 @@ static const char *translate_errorcode(uint16_t scode)
 	}
 }
 
-static int check_video(struct ua *ua, struct call *call, int dir)
-{
-    JavaVM *javaVM = g_ctx.javaVM;
-    JNIEnv *env;
-    jint err = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
-    if (err != JNI_OK) {
-        LOGE("failed to GetEnv, ErrorCode = %d", err);
-        return false;
-    }
-    char ua_buf[32];
-    char call_buf[32];
-    sprintf(ua_buf, "%lu", (unsigned long)ua);
-    jstring jUa = (*env)->NewStringUTF(env, ua_buf);
-    sprintf(call_buf, "%lu", (unsigned long)call);
-    jstring jCall = (*env)->NewStringUTF(env, call_buf);
-    jmethodID checkVideoId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "checkVideo",
-                                                 "(Ljava/lang/String;Ljava/lang/String;I)I");
-    jint res = (*env)->CallIntMethod(env, g_ctx.mainActivityObj, checkVideoId, jUa, jCall, dir);
-    (*env)->DeleteLocalRef(env, jUa);
-    (*env)->DeleteLocalRef(env, jCall);
-    return res;
-}
-
 static void get_password(char *aor, char *password)
 {
     LOGD("getting password of AoR %s\n", aor);
@@ -216,7 +193,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     char event_buf[256];
     char ua_buf[32];
     char call_buf[32];
-    int len;
+    int len, ldir, rdir;
+    struct sdp_media *media;
+    int remote_has_video;
     ANativeWindow **win;
 
     struct player *player = baresip_player();
@@ -247,13 +226,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "local call %sed", prm);
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-	        if (call_state(call) != CALL_STATE_ESTABLISHED)
+            if (call_state(call) != CALL_STATE_ESTABLISHED)
                 return;
-            struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
-            int remote_has_video = sdp_media_rport(media) != 0 &&
-                                   list_head(sdp_media_format_lst(media, false)) != NULL;
-            int ldir = sdp_media_ldir(media);
-            int rdir = sdp_media_rdir(media);
+            media = stream_sdpmedia(video_strm(call_video(call)));
+            remote_has_video = sdp_media_rport(media) != 0 &&
+                    list_head(sdp_media_format_lst(media, false)) != NULL;
+            ldir = sdp_media_ldir(media);
+            rdir = sdp_media_rdir(media);
             sdp_media_debug_log(media);
             // stream_debug_log(video_strm(call_video(call)));
 	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d", prm,
@@ -1582,7 +1561,8 @@ Java_com_tutpro_baresip_plus_Call_call_1video_1enabled(JNIEnv *env, jobject thiz
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    res = !sdp_media_disabled(stream_sdpmedia(video_strm(call_video(call))));
+    res = call_has_video(call) &&
+            sdp_media_dir(stream_sdpmedia(video_strm(call_video(call)))) != SDP_INACTIVE;
     re_thread_leave();
     return res;
 }
