@@ -48,20 +48,23 @@ struct vidisp_st *gst = NULL;
 
 static void renderer_destroy(struct vidisp_st *st) {
 
-    LOGD("Destroying renderer context");
+    LOGD("At renderer_destroy() on thread %li\n", (long)pthread_self());
 
-    eglMakeCurrent(st->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-    eglDestroyContext(st->display, st->context);
-    eglDestroySurface(st->display, st->surface);
-    eglTerminate(st->display);
-
-    st->display = EGL_NO_DISPLAY;
-    st->surface = EGL_NO_SURFACE;
-    st->context = EGL_NO_CONTEXT;
-
+    if (st->display != EGL_NO_DISPLAY) {
+        eglMakeCurrent(st->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        if (st->surface != EGL_NO_SURFACE) {
+            eglDestroySurface(st->display, st->surface);
+            st->surface = EGL_NO_SURFACE;
+        }
+        if (st->context != EGL_NO_CONTEXT) {
+            eglDestroyContext(st->display, st->context);
+            st->context = EGL_NO_CONTEXT;
+        }
+        eglTerminate(st->display);
+        st->display = EGL_NO_DISPLAY;
+    }
+    eglReleaseThread();
     gst = NULL;
-
-    return;
 }
 
 static void destructor(void *arg)
@@ -183,7 +186,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     }
 
     // context should be initialized here and not in opengles_display
-    // err = context_initialize(st);
+    // err = context_initialize(gst);
 
     if (err)
         mem_deref(gst);
