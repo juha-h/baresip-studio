@@ -1,0 +1,4 @@
+- Turn speakerphone on automatically when video call is established
+- Fixed crash related to closing of video stream
+- Video negotiation fixes and improvements
+- Portuguese (Brazil) translations from Weblate
