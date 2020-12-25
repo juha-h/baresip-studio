@@ -67,9 +67,9 @@ class VideoView(val context: Context) {
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             Log.d("Baresip", "Surface destroyed")
-            /*for (call in Call.calls())
+            for (call in Call.calls())
                 if (call.hasVideo())
-                    call.stopVideoDisplay()*/
+                    call.stopVideoDisplay()
             set_surface(null)
         }
 
