@@ -1697,7 +1697,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
-                    if (call.videoEnabled()) {
+                    if (call.hasVideo()) {
                         defaultLayout.visibility = View.INVISIBLE
                         videoLayout.visibility = View.VISIBLE
                     } else {

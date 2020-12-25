@@ -247,19 +247,17 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "local call %sed", prm);
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-	        if ((call_state(call) != CALL_STATE_ESTABLISHED) || call_has_video(call))
+	        if (call_state(call) != CALL_STATE_ESTABLISHED)
                 return;
-	        struct video *v = call_video(call);
-            struct sdp_media *media = stream_sdpmedia(video_strm(v));
+            struct sdp_media *media = stream_sdpmedia(video_strm(call_video(call)));
             int remote_has_video = sdp_media_rport(media) != 0 &&
                                    list_head(sdp_media_format_lst(media, false)) != NULL;
             int ldir = sdp_media_ldir(media);
             int rdir = sdp_media_rdir(media);
-            LOGD("call video %d, sdp video media %d, remote video %d, ldir %d, rdir %d\n",
-                    call_has_video(call), !sdp_media_disabled(media), remote_has_video, ldir, rdir);
             sdp_media_debug_log(media);
-            stream_debug_log(video_strm(call_video(call)));
-	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d", prm, ldir, rdir);
+            // stream_debug_log(video_strm(call_video(call)));
+	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d", prm,
+	                call_has_video(call), remote_has_video, ldir, rdir);
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
@@ -1277,11 +1275,11 @@ Java_com_tutpro_baresip_plus_Api_ua_1hangup(JNIEnv *env, jobject thiz, jstring j
         jint jCode, jstring jReason) {
     const char *native_ua = (*env)->GetStringUTFChars(env, jUA, 0);
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     const uint16_t code = jCode;
     const char *reason = (*env)->GetStringUTFChars(env, jReason, 0);
     LOGD("hanging up call %s/%s with %d %s\n", native_ua, native_call, code, reason);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
     if (strlen(reason) == 0)
         ua_hangup(ua, call, code, NULL);
     else

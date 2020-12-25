@@ -592,25 +592,17 @@ class BaresipService: Service() {
                             Log.w(LOG_TAG, "Remote call $callp is not found")
                             return
                         }
-                        val ldir = ev[1].toInt()
-                        val rdir = ev[2].toInt()
-                        var dir = 0
-                        val mask = if (cameraAvailable) Api.SDP_SENDRECV else Api.SDP_RECVONLY
-                        if ((rdir != Api.SDP_INACTIVE) && (ldir != rdir)) {
-                            if (ldir == Api.SDP_INACTIVE)
-                                dir = rdir and mask
-                            else if (rdir == Api.SDP_SENDRECV)
-                                dir = Api.SDP_SENDRECV and mask
-                            else if ((rdir == Api.SDP_SENDONLY) && (ldir != Api.SDP_RECVONLY))
-                                dir = Api.SDP_RECVONLY
-                            else if ((rdir == Api.SDP_RECVONLY) && (ldir != Api.SDP_SENDONLY))
-                                dir = Api.SDP_RECVONLY and mask
-                            if (dir != 0) {
-                                val intent = Intent("service event")
-                                intent.putExtra("event", "call video request")
-                                intent.putExtra("params", arrayListOf(uap, callp, "$dir"))
-                                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-                            }
+                        val callHasVideo = ev[1] == "1"
+                        val remoteHasVideo = ev[2] == "1"
+                        val ldir = ev[3].toInt()
+                        val rdir = if (cameraAvailable) ev[4].toInt() else ev[4].toInt() and Api.SDP_RECVONLY
+                        if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
+                                (!callHasVideo && remoteHasVideo &&
+                                        (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
+                            val intent = Intent("service event")
+                            intent.putExtra("event", "call video request")
+                            intent.putExtra("params", arrayListOf(uap, callp, "$rdir"))
+                            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
                         }
                         newEvent = "call update"
                     }
