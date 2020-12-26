@@ -11,7 +11,7 @@
         android:layout_gravity="center"
         android:paddingStart="10dp"
         android:paddingEnd="5dp"
-        android:src="@drawable/baresip"
+        android:src="@drawable/baresip_plus"
         android:contentDescription="@string/app_name_plus" />
 
     <TextView android:id="@+id/text"
