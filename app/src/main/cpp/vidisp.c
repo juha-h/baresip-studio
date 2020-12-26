@@ -121,6 +121,12 @@ static int context_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
+    if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+        LOGW("eglBindApi failed with error %s\n", egl_error(eglGetError()));
+        renderer_destroy(st);
+        return eglGetError();
+    }
+
     if (!(context = eglCreateContext(display, config, EGL_NO_CONTEXT, NULL))) {
         LOGW("eglCreateContext() returned error %d\n", eglGetError());
         renderer_destroy(st);
