@@ -1,0 +1,3 @@
+- Do not default STUN/TURN server Username/Password to Authentication Username/Password
+- Replaced baresip launcher and notification icons with baresip+ ones
+- Avoided more video related crashes
