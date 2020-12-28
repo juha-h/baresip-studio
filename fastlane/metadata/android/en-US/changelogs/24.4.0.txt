@@ -1,0 +1,1 @@
+- Do not default STUN/TURN server Username/Password to Authentication Username/Password
