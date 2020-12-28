@@ -234,7 +234,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             ldir = sdp_media_ldir(media);
             rdir = sdp_media_rdir(media);
             sdp_media_debug_log(media);
-            // stream_debug_log(video_strm(call_video(call)));
+            //stream_debug_log(video_strm(call_video(call)));
+            //call_video_debug_log();
 	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d", prm,
 	                call_has_video(call), remote_has_video, ldir, rdir);
             break;
