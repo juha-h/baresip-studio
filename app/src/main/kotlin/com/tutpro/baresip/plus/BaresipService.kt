@@ -284,6 +284,15 @@ class BaresipService: Service() {
                 startActivity(newIntent)
             }
 
+            "Call Missed" -> {
+                val newIntent = Intent(this, MainActivity::class.java)
+                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
+                newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
+                startActivity(newIntent)
+            }
+
             "Call Reject" -> {
                 val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
@@ -720,7 +729,31 @@ class BaresipService: Service() {
                             CallHistory.save()
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
-                        if (!Utils.isVisible()) return
+                        if (!Utils.isVisible() && !call.hasHistory && call.dir == "in") {
+                            val caller = Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                                    Utils.aorDomain(aor))
+                            val intent = Intent(this, BaresipService::class.java)
+                            intent.action = "Call Missed"
+                            intent.putExtra("uap", uap)
+                            val pi = PendingIntent.getService(this, CALL_REQ_CODE, intent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                            nb.setSmallIcon(R.drawable.ic_stat)
+                                    .setColor(ContextCompat.getColor(this,
+                                            R.color.colorBaresip))
+                                    .setContentIntent(pi)
+                                    .setCategory(Notification.CATEGORY_CALL)
+                                    .setAutoCancel(true)
+                                    .setContentTitle(getString(R.string.missed_call_from))
+                                    .setContentText(caller)
+                            if (Build.VERSION.SDK_INT < 26) {
+                                nb.setVibrate(LongArray(0))
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                        .priority = Notification.PRIORITY_HIGH
+                            }
+                            nm.notify(CALL_NOTIFICATION_ID, nb.build())
+                            return
+                        }
                     }
                     "refer failed" -> {
                         Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")

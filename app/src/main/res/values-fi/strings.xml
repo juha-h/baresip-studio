@@ -209,6 +209,7 @@
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
+    <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
     <!-- Boot Completed Receiver -->
