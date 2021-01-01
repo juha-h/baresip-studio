@@ -186,7 +186,7 @@
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
-    <string name="incoming_call_from">Call from</string>
+    <string name="incoming_call_from">Incoming call from</string>
     <string name="missed_call_from">Missed call from</string>
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="message_from">Message from</string>
