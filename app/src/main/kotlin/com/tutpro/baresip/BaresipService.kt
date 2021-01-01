@@ -11,15 +11,21 @@ import android.media.*
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.*
-import androidx.annotation.Keep
-import androidx.core.app.NotificationCompat
-import android.view.View
-import android.widget.RemoteViews
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.core.content.ContextCompat
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.provider.Settings
 import android.telephony.TelephonyManager
-
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.view.View
+import android.widget.RemoteViews
+import androidx.annotation.ColorRes
+import androidx.annotation.Keep
+import androidx.annotation.StringRes
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
@@ -151,7 +157,7 @@ class BaresipService: Service() {
                     }
                     BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
                         val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
+                                BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
                                 Log.d(LOG_TAG, "Bluetooth headset audio is connected")
@@ -255,8 +261,9 @@ class BaresipService: Service() {
                 val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(LOG_TAG, "Starting baresip without IP addresses")
-                Thread(Runnable { baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
-                        dnsServers, Api.AF_UNSPEC, logLevel)
+                Thread(Runnable {
+                    baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
+                            dnsServers, Api.AF_UNSPEC, logLevel)
                 }).start()
 
                 isServiceRunning = true
@@ -564,6 +571,8 @@ class BaresipService: Service() {
                                     .setOngoing(true)
                                     .setContentTitle(getString(R.string.incoming_call_from))
                                     .setContentText(caller)
+                                    .setShowWhen(true)
+                                    .setFullScreenIntent(pi, true)
                             if (Build.VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
@@ -579,8 +588,12 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rejectPendingIntent = PendingIntent.getService(this,
                                     REJECT_REQ_CODE, rejectIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.answer), answerPendingIntent)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.reject), rejectPendingIntent)
+                            nb.addAction(R.drawable.ic_stat,
+                                    getActionText(R.string.answer, R.color.colorGreen),
+                                    answerPendingIntent)
+                            nb.addAction(R.drawable.ic_stat,
+                                    getActionText(R.string.reject, R.color.colorRed),
+                                    rejectPendingIntent)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -904,7 +917,15 @@ class BaresipService: Service() {
         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
-
+    private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable? {
+        val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
+        if (VERSION.SDK_INT >= VERSION_CODES.N_MR1) {
+            spannable.setSpan(
+                    ForegroundColorSpan(applicationContext.getColor(colorRes)),
+                    0, spannable.length, 0)
+        }
+        return spannable
+    }
 
     private fun requestAudioFocus(usage: Int) {
         if (audioFocusUsage != -1) {
