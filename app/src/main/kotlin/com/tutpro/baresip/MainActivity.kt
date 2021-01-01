@@ -518,6 +518,17 @@ class MainActivity : AppCompatActivity() {
                 resumeAction = action
                 resumeCall = call
             }
+            "call missed" -> {
+                val uap = intent.getStringExtra("uap")!!
+                val ua = UserAgent.ofUap(uap)
+                if (ua == null) {
+                    Log.w("Baresip", "onNewIntent did not find ua $uap")
+                    return
+                }
+                if (ua.account.aor != aorSpinner.tag)
+                    spinToAor(ua.account.aor)
+                resumeAction = action
+            }
             "transfer show", "transfer accept" -> {
                 val callp = intent.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
@@ -557,6 +568,9 @@ class MainActivity : AppCompatActivity() {
             "call answer" -> {
                 answerButton.performClick()
                 showCall(resumeCall!!.ua)
+            }
+            "call missed" -> {
+                callsButton.performClick()
             }
             "call reject" ->
                 rejectButton.performClick()
