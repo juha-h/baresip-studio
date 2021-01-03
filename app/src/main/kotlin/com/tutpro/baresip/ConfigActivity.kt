@@ -3,20 +3,18 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.util.TypedValue
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import android.widget.RelativeLayout.LayoutParams
 import android.widget.AdapterView
+import com.tutpro.baresip.databinding.ActivityConfigBinding
 
 class ConfigActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityConfigBinding
     private lateinit var autoStart: CheckBox
     private lateinit var listenAddr: EditText
     private lateinit var dnsServers: EditText
@@ -43,21 +41,22 @@ class ConfigActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_config)
+        binding = ActivityConfigBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         Utils.addActivity("config")
 
-        autoStart = findViewById(R.id.AutoStart) as CheckBox
+        autoStart = binding.AutoStart
         val asCv = Config.variable("auto_start")
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
 
-        listenAddr = findViewById(R.id.ListenAddress) as EditText
+        listenAddr = binding.ListenAddress
         val laCv = Config.variable("sip_listen")
         oldListenAddr = if (laCv.size == 0) "" else laCv[0]
         listenAddr.setText(oldListenAddr)
 
-        dnsServers = findViewById(R.id.DnsServers) as EditText
+        dnsServers = binding.DnsServers
         val ddCv = Config.variable("dyn_dns")
         if (ddCv[0] == "yes") {
             oldDnsServers = ""
@@ -69,15 +68,15 @@ class ConfigActivity : AppCompatActivity() {
         }
         dnsServers.setText(oldDnsServers)
 
-        certificateFile = findViewById(R.id.CertificateFile) as CheckBox
+        certificateFile = binding.CertificateFile
         oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
         certificateFile.isChecked = oldCertificateFile
 
-        caFile = findViewById(R.id.CAFile) as CheckBox
+        caFile = binding.CAFile
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
         caFile.isChecked = oldCAFile
 
-        val callVolSpinner = findViewById(R.id.VolumeSpinner) as Spinner
+        val callVolSpinner = binding.VolumeSpinner
         val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
         val volVals = arrayListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         val curVal = callVolume
@@ -98,7 +97,7 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
-        debug = findViewById(R.id.Debug) as CheckBox
+        debug = binding.Debug
         val dbCv = Config.variable("log_level")
         if (dbCv.size == 0)
             oldLogLevel = "2"
@@ -106,10 +105,10 @@ class ConfigActivity : AppCompatActivity() {
             oldLogLevel = dbCv[0]
         debug.isChecked =  oldLogLevel == "0"
 
-        sipTrace = findViewById(R.id.SipTrace) as CheckBox
+        sipTrace = binding.SipTrace
         sipTrace.isChecked = BaresipService.sipTrace
 
-        reset = findViewById(R.id.Reset) as CheckBox
+        reset = binding.Reset
         reset.isChecked = false
 
     }
@@ -313,42 +312,42 @@ class ConfigActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.AutoStartTitle) as TextView-> {
+            binding.AutoStartTitle -> {
                 Utils.alertView(this, getString(R.string.start_automatically),
                         getString(R.string.start_automatically_help))
             }
-            findViewById(R.id.ListenAddressTitle) as TextView-> {
+            binding.ListenAddressTitle -> {
                 Utils.alertView(this, getString(R.string.listen_address),
                         getString(R.string.listen_address_help))
             }
-            findViewById(R.id.DnsServersTitle) as TextView -> {
+            binding.DnsServersTitle  -> {
                 Utils.alertView(this, getString(R.string.dns_servers),
                         getString(R.string.dns_servers_help))
             }
-            findViewById(R.id.CertificateFileTitle) as TextView -> {
+            binding.CertificateFileTitle  -> {
                 Utils.alertView(this, getString(R.string.tls_certificate_file),
                         getString(R.string.tls_certificate_file_help))
             }
-            findViewById(R.id.CAFileTitle) as TextView -> {
+            binding.CAFileTitle -> {
                 Utils.alertView(this, getString(R.string.tls_ca_file),
                         getString(R.string.tls_ca_file_help))
             }
-            findViewById(R.id.AudioTitle) as TextView -> {
+            binding.AudioTitle  -> {
                 val i = Intent(this, AudioActivity::class.java)
                 startActivity(i)
             }
-            findViewById(R.id.VolumeTitle) as TextView-> {
+            binding.VolumeTitle -> {
                 Utils.alertView(this, getString(R.string.default_call_volume),
                         getString(R.string.default_call_volume_help))
             }
-            findViewById(R.id.DebugTitle) as TextView-> {
+            binding.DebugTitle -> {
                 Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
             }
-            findViewById(R.id.SipTraceTitle) as TextView-> {
+            binding.SipTraceTitle -> {
                 Utils.alertView(this, getString(R.string.sip_trace),
                         getString(R.string.sip_trace_help))
             }
-            findViewById(R.id.ResetTitle) as TextView-> {
+            binding.ResetTitle -> {
                 Utils.alertView(this, getString(R.string.reset_config),
                         getString(R.string.reset_config_help))
             }
