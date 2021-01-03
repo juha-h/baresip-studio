@@ -293,8 +293,8 @@
     <string name="failed_to_load_module">Modulin lataaminen epäonnistui.</string>
     <string name="aec">Akustinen kaiun poisto (AKP)</string>
     <string name="aec_help">Jos merkitty, kaikua yritetään poistaa puheluiden aikana.</string>
-    <string name="aec_extented_filter">AKP laajennettu suodatin</string>
-    <string name="aec_extented_filter_help">Jos merkitty, kaiun poistossa käytetään laajennettua
+    <string name="aec_extended_filter">AKP laajennettu suodatin</string>
+    <string name="aec_extended_filter_help">Jos merkitty, kaiun poistossa käytetään laajennettua
         suodatinta.
     </string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>

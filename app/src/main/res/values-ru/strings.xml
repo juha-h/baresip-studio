@@ -181,8 +181,8 @@
     <string name="opus_packet_loss">Ожидаемая потеря пакетов Opus</string>
     <string name="opus_bit_rate_help">Средняя максимальная скорость передачи данных, используемая в аудиопотоке Opus. Допустимые значения: 6000-510000. Значение по умолчанию - 28000.</string>
     <string name="opus_bit_rate">Скорость передачи данных Opus</string>
-    <string name="aec_extented_filter_help">Если этот флажок установлен, для подавления эха используется расширенный фильтр.</string>
-    <string name="aec_extented_filter">Расширенный фильтр AEC</string>
+    <string name="aec_extended_filter_help">Если этот флажок установлен, для подавления эха используется расширенный фильтр.</string>
+    <string name="aec_extended_filter">Расширенный фильтр AEC</string>
     <string name="audio_modules_help">Аудиокодеки, предоставленные выбранными модулями, доступны для использования в аккаунтах.</string>
     <string name="audio">Аудио</string>
     <string name="tls_ca_file_help">Если этот флажок установлен, файл ca_certs.crt, содержащий сертификаты TLS центров сертификации, был или будет загружен из каталога загрузки.</string>

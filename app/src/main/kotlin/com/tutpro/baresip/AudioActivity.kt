@@ -8,15 +8,16 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-
 import androidx.appcompat.app.AppCompatActivity
+import com.tutpro.baresip.databinding.ActivityAudioBinding
 
 class AudioActivity : AppCompatActivity() {
 
-    internal lateinit var opusBitRate: EditText
-    internal lateinit var opusPacketLoss: EditText
-    internal lateinit var aec: CheckBox
-    internal lateinit var extentedFilter: CheckBox
+    private lateinit var binding: ActivityAudioBinding
+    private lateinit var opusBitRate: EditText
+    private lateinit var opusPacketLoss: EditText
+    private lateinit var aec: CheckBox
+    private lateinit var extendedFilter: CheckBox
 
     private var save = false
     private var reload = false
@@ -30,12 +31,13 @@ class AudioActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_audio)
+        binding = ActivityAudioBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Utils.addActivity("audio")
 
-        val audioModulesList = findViewById(R.id.AudioModulesList) as LinearLayout
+        val audioModulesList = binding.AudioModulesList
         var id = 1000
         for (module in audioModules) {
             val rl = RelativeLayout(this)
@@ -69,24 +71,24 @@ class AudioActivity : AppCompatActivity() {
             audioModulesList.addView(rl)
         }
 
-        opusBitRate = findViewById(R.id.OpusBitRate) as EditText
+        opusBitRate = binding.OpusBitRate
         val obCv = Config.variable("opus_bitrate")
         oldOpusBitrate = if (obCv.size == 0) "28000" else obCv[0]
         opusBitRate.setText(oldOpusBitrate)
 
-        opusPacketLoss = findViewById(R.id.OpusPacketLoss) as EditText
+        opusPacketLoss = binding.OpusPacketLoss
         val oplCv = Config.variable("opus_packet_loss")
         oldOpusPacketLoss = if (oplCv.size == 0) "0" else oplCv[0]
         opusPacketLoss.setText(oldOpusPacketLoss)
 
-        aec = findViewById(R.id.Aec) as CheckBox
+        aec = binding.Aec
         val aecCv = Config.variable("module")
         oldAec = aecCv.contains("webrtc_aec.so")
         aec.isChecked = oldAec
 
-        extentedFilter = findViewById(R.id.ExtendedFilter) as CheckBox
+        extendedFilter = binding.ExtendedFilter
         oldExtendedFilter = Config.variable("webrtc_aec_extended_filter")[0] == "yes"
-        extentedFilter.isChecked = oldExtendedFilter
+        extendedFilter.isChecked = oldExtendedFilter
 
     }
 
@@ -176,9 +178,9 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (extentedFilter.isChecked != oldExtendedFilter) {
+                if (extendedFilter.isChecked != oldExtendedFilter) {
                     Config.removeVariable("webrtc_aec_extended_filter")
-                    if (extentedFilter.isChecked)
+                    if (extendedFilter.isChecked)
                         Config.addLine("webrtc_aec_extended_filter yes")
                     else
                         Config.addLine("webrtc_aec_extended_filter no")
@@ -214,25 +216,25 @@ class AudioActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.AudioModulesTitle) as TextView -> {
+            binding.AudioModulesTitle -> {
                 Utils.alertView(this, getString(R.string.audio_modules_title),
                         getString(R.string.audio_modules_help))
             }
-            findViewById(R.id.OpusBitRateTitle) as TextView-> {
+            binding.OpusBitRateTitle -> {
                 Utils.alertView(this, getString(R.string.opus_bit_rate),
                         getString(R.string.opus_bit_rate_help))
             }
-            findViewById(R.id.OpusPacketLossTitle) as TextView-> {
+            binding.OpusPacketLossTitle -> {
                 Utils.alertView(this, getString(R.string.opus_packet_loss),
                         getString(R.string.opus_packet_loss_help))
             }
-            findViewById(R.id.AecTitle) as TextView-> {
+            binding.AecTitle -> {
                 Utils.alertView(this, getString(R.string.aec),
                         getString(R.string.aec_help))
             }
-            findViewById(R.id.ExtendedFilterTitle) as TextView-> {
-                Utils.alertView(this, getString(R.string.aec_extented_filter),
-                        getString(R.string.aec_extented_filter_help))
+            binding.ExtendedFilterTitle -> {
+                Utils.alertView(this, getString(R.string.aec_extended_filter),
+                        getString(R.string.aec_extended_filter_help))
             }
         }
     }
