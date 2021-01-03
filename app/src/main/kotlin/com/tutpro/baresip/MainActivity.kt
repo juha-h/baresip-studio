@@ -27,7 +27,8 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    internal lateinit var layout: RelativeLayout
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var layout: RelativeLayout
     private lateinit var callTitle: TextView
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
@@ -52,15 +53,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var serviceEventReceiver: BroadcastReceiver
-    internal lateinit var quitTimer: CountDownTimer
-    internal lateinit var stopState: String
+    private lateinit var quitTimer: CountDownTimer
+    private lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
     private lateinit var swipeRefresh: SwipeRefreshLayout
-    private lateinit var binding: ActivityMainBinding
 
-    internal lateinit var baresipService: Intent
+    private lateinit var baresipService: Intent
 
-    internal var restart = false
+    private var restart = false
     private var atStartup = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
