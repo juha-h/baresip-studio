@@ -13,20 +13,22 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import androidx.cardview.widget.CardView
 import android.view.View
+import com.tutpro.baresip.plus.databinding.ActivityContactBinding
 
 import java.io.File
 
 class ContactActivity : AppCompatActivity() {
 
-    lateinit var textAvatarView: TextView
-    lateinit var cardAvatarView: CardView
-    lateinit var cardImageAvatarView: ImageView
-    lateinit var nameView: EditText
-    lateinit var uriView: EditText
+    private lateinit var binding: ActivityContactBinding
+    private lateinit var textAvatarView: TextView
+    private lateinit var cardAvatarView: CardView
+    private lateinit var cardImageAvatarView: ImageView
+    private lateinit var nameView: EditText
+    private lateinit var uriView: EditText
 
-    internal var newContact = false
-    internal var newAvatar = ""
-    internal var uOrI = ""
+    private var newContact = false
+    private var newAvatar = ""
+    private var uOrI = ""
 
     private var index = 0
     private var color = 0
@@ -37,13 +39,14 @@ class ContactActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contact)
+        binding = ActivityContactBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        textAvatarView = findViewById(R.id.TextAvatar) as TextView
-        cardAvatarView = findViewById(R.id.CardAvatar) as CardView
-        cardImageAvatarView = findViewById(R.id.ImageAvatar) as ImageView
-        nameView = findViewById(R.id.Name) as EditText
-        uriView = findViewById(R.id.Uri) as EditText
+        textAvatarView = binding.TextAvatar
+        cardAvatarView = binding.CardAvatar
+        cardImageAvatarView = binding.ImageAvatar
+        nameView = binding.Name
+        uriView = binding.Uri
 
         newContact = intent.getBooleanExtra("new", false)
 

@@ -24,13 +24,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    internal lateinit var layout: RelativeLayout
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var layout: RelativeLayout
     private lateinit var videoView: VideoView
-    internal lateinit var baresipService: Intent
     private lateinit var callTitle: TextView
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
@@ -48,29 +49,32 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messagesButton: ImageButton
     private lateinit var callsButton: ImageButton
     private lateinit var dialpadButton: ImageButton
-    internal lateinit var dtmf: EditText
+    private lateinit var dtmf: EditText
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
     private lateinit var uaAdapter: UaSpinnerAdapter
-    internal lateinit var aorSpinner: Spinner
+    private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var serviceEventReceiver: BroadcastReceiver
-    internal lateinit var quitTimer: CountDownTimer
-    internal lateinit var stopState: String
+    private lateinit var quitTimer: CountDownTimer
+    private lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
-    internal var restart = false
+    private lateinit var baresipService: Intent
+
+    private var restart = false
     private var atStartup = false
     private var alerting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
         val intentAction = intent.getStringExtra("action")
 
@@ -81,32 +85,32 @@ class MainActivity : AppCompatActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
+        layout = binding.mainActivityLayout
         videoView = VideoView(applicationContext)
-        aorSpinner = findViewById(R.id.AoRList)
-        callTitle = findViewById(R.id.callTitle) as TextView
-        callUri = findViewById(R.id.callUri) as AutoCompleteTextView
-        securityButton = findViewById(R.id.securityButton) as ImageButton
-        callButton = findViewById(R.id.callButton) as ImageButton
-        callVideoButton = findViewById(R.id.callVideoButton) as ImageButton
-        hangupButton = findViewById(R.id.hangupButton) as ImageButton
-        answerButton = findViewById(R.id.answerButton) as ImageButton
-        answerVideoButton = findViewById(R.id.answerVideoButton) as ImageButton
-        rejectButton = findViewById(R.id.rejectButton) as ImageButton
-        holdButton = findViewById(R.id.holdButton) as ImageButton
-        transferButton = findViewById(R.id.transferButton) as ImageButton
-        dtmf = findViewById(R.id.dtmf) as EditText
-        infoButton = findViewById(R.id.info) as ImageButton
-        voicemailButton = findViewById(R.id.voicemailButton) as ImageButton
-        videoButton = findViewById(R.id.videoButton) as ImageButton
-        contactsButton = findViewById(R.id.contactsButton) as ImageButton
-        messagesButton = findViewById(R.id.messagesButton) as ImageButton
-        callsButton = findViewById(R.id.callsButton) as ImageButton
-        dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
-        swipeRefresh = findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
+        aorSpinner = binding.aorSpinner
+        callTitle = binding.callTitle
+        callUri = binding.callUri
+        securityButton = binding.securityButton
+        callButton = binding.callButton
+        callVideoButton = binding.callVideoButton
+        hangupButton = binding.hangupButton
+        answerButton = binding.answerButton
+        answerVideoButton = binding.answerVideoButton
+        rejectButton = binding.rejectButton
+        holdButton = binding.holdButton
+        transferButton = binding.transferButton
+        dtmf = binding.dtmf
+        infoButton = binding.info
+        voicemailButton = binding.voicemailButton
+        videoButton = binding.videoButton
+        contactsButton = binding.contactsButton
+        messagesButton = binding.messagesButton
+        callsButton = binding.callsButton
+        dialpadButton = binding.dialpadButton
+        swipeRefresh = binding.swipeRefresh
 
         addVideoLayoutViews()
 
@@ -1260,7 +1264,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun callTransfer(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.call_transfer_dialog, findViewById<ViewGroup>(android.R.id.content),
+                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = getString(R.string.call_transfer)
@@ -1310,7 +1314,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = title
@@ -1368,7 +1372,7 @@ class MainActivity : AppCompatActivity() {
                     (Utils.paramValue(params, "auth_pass") == "")) {
                 val aor = account.substringAfter("<").substringBefore(">")
                 val layout = LayoutInflater.from(this)
-                        .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                        .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                                 false)
                 val titleView = layout.findViewById(R.id.title) as TextView
                 titleView.text = getString(R.string.authentication_password)

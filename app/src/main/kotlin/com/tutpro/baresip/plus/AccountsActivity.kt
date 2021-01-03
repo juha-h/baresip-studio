@@ -10,31 +10,33 @@ import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.*
+import com.tutpro.baresip.plus.databinding.ActivityAccountsBinding
 
 import java.util.ArrayList
 
 class AccountsActivity : AppCompatActivity() {
 
-    internal lateinit var alAdapter: AccountListAdapter
+    private lateinit var binding: ActivityAccountsBinding
+    private lateinit var alAdapter: AccountListAdapter
     internal lateinit var aor: String
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_accounts)
+        binding = ActivityAccountsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("accounts,$aor")
 
-        val listView = findViewById(R.id.accounts) as ListView
+        val listView = binding.accounts
         generateAccounts()
         alAdapter = AccountListAdapter(this, accounts)
         listView.adapter = alAdapter
 
-        val addAccountButton = findViewById(R.id.addAccount) as ImageButton
-        val newAorView = findViewById(R.id.newAor) as EditText
+        val addAccountButton = binding.addAccount
+        val newAorView = binding.newAor
         addAccountButton.setOnClickListener {
             val aor = newAorView.text.toString().trim()
             if (!Utils.checkAor(aor)) {
@@ -82,7 +84,8 @@ class AccountsActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     val aor = data!!.getStringExtra("aor")!!
                     val ua = UserAgent.ofAor(aor)!!
-                    if (MainActivity.aorPasswords.containsKey(aor) && MainActivity.aorPasswords[aor] == "")
+                    if (MainActivity.aorPasswords.containsKey(aor) &&
+                            MainActivity.aorPasswords[aor] == "")
                         askPassword(ua)
                 }
             }
@@ -92,7 +95,7 @@ class AccountsActivity : AppCompatActivity() {
 
     private fun askPassword(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = getString(R.string.authentication_password)

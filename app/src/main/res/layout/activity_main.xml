@@ -61,7 +61,7 @@
                     android:paddingTop="@dimen/activity_vertical_margin">
 
                     <Spinner
-                        android:id="@+id/AoRList"
+                        android:id="@+id/aorSpinner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:drawable/btn_dropdown"
@@ -71,7 +71,7 @@
                         android:id="@+id/callTitle"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/AoRList"
+                        android:layout_below="@id/aorSpinner"
                         android:paddingTop="16dp"
                         android:paddingStart="3dp"
                         android:paddingEnd="0dp"

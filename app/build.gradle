@@ -32,6 +32,9 @@ android {
                     'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }

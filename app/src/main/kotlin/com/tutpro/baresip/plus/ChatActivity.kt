@@ -13,19 +13,21 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.tutpro.baresip.plus.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
 
-    internal lateinit var chatMessages: ArrayList<Message>
-    internal lateinit var mlAdapter: MessageListAdapter
-    internal lateinit var listView: ListView
-    internal lateinit var newMessage: EditText
-    internal lateinit var sendButton: ImageButton
-    internal lateinit var imm: InputMethodManager
-    internal lateinit var aor: String
-    internal lateinit var peerUri: String
-    internal lateinit var ua: UserAgent
-    internal lateinit var messageResponseReceiver: BroadcastReceiver
+    private lateinit var binding: ActivityChatBinding
+    private lateinit var chatMessages: ArrayList<Message>
+    private lateinit var mlAdapter: MessageListAdapter
+    private lateinit var listView: ListView
+    private lateinit var newMessage: EditText
+    private lateinit var sendButton: ImageButton
+    private lateinit var imm: InputMethodManager
+    private lateinit var aor: String
+    private lateinit var peerUri: String
+    private lateinit var ua: UserAgent
+    private lateinit var messageResponseReceiver: BroadcastReceiver
 
     private var focus = false
     private var lastCall: Long = 0
@@ -33,7 +35,8 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
+        binding = ActivityChatBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -67,11 +70,11 @@ class ChatActivity : AppCompatActivity() {
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
-        val headerView = findViewById(R.id.account) as TextView
+        val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
         headerView.text = headerText
 
-        listView = findViewById(R.id.messages) as ListView
+        listView = binding.messages
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
@@ -124,7 +127,7 @@ class ChatActivity : AppCompatActivity() {
             true
         }
 
-        newMessage = findViewById(R.id.text) as EditText
+        newMessage = binding.text
         newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -133,7 +136,7 @@ class ChatActivity : AppCompatActivity() {
 
         if (focus) newMessage.requestFocus()
 
-        sendButton = findViewById(R.id.sendButton) as ImageButton
+        sendButton = binding.sendButton
         sendButton.setOnClickListener {
             val msgText = newMessage.text.toString()
             if (msgText.length > 0) {

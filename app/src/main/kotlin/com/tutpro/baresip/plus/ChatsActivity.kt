@@ -9,11 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.tutpro.baresip.plus.databinding.ActivityChatsBinding
 
 import java.util.*
 
 class ChatsActivity: AppCompatActivity() {
 
+    private lateinit var binding: ActivityChatsBinding
     internal lateinit var uaMessages: ArrayList<Message>
     internal lateinit var listView: ListView
     internal lateinit var clAdapter: ChatListAdapter
@@ -24,15 +26,16 @@ class ChatsActivity: AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chats)
+        binding = ActivityChatsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        listView = findViewById(R.id.chats) as ListView
-        plusButton = findViewById(R.id.plusButton) as ImageButton
+        listView = binding.chats
+        plusButton = binding.plusButton
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
 
-        val headerView = findViewById(R.id.account) as TextView
+        val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
         headerView.text = headerText
 
@@ -100,7 +103,7 @@ class ChatsActivity: AppCompatActivity() {
             true
         }
 
-        peerUri = findViewById(R.id.peer) as AutoCompleteTextView
+        peerUri = binding.peer
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))

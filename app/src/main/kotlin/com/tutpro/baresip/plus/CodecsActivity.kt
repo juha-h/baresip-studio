@@ -1,18 +1,18 @@
 package com.tutpro.baresip.plus
 
-import android.app.Activity
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import android.widget.LinearLayout.LayoutParams
+import androidx.appcompat.app.AppCompatActivity
+
+import com.tutpro.baresip.plus.databinding.ActivityCodecsBinding
 
 class CodecsActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityCodecsBinding
     private lateinit var acc: Account
     private lateinit var ua: UserAgent
     private var aor = ""
@@ -22,7 +22,8 @@ class CodecsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_codecs)
+        binding = ActivityCodecsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -37,7 +38,7 @@ class CodecsActivity : AppCompatActivity() {
         val codecs: ArrayList<String>
         val accCodecs: ArrayList<String>
 
-        val title = findViewById(R.id.CodecsTitle) as TextView
+        val title = binding.CodecsTitle
 
         if (media == "audio") {
             title.text = getString(R.string.audio_codecs)
@@ -53,7 +54,7 @@ class CodecsActivity : AppCompatActivity() {
 
         while (newCodecs.size < codecs.size) newCodecs.add("-")
 
-        val layout = findViewById(R.id.SpinnerTable) as TableLayout
+        val layout = binding.SpinnerTable
         val spinnerList = Array(codecs.size, {_ -> ArrayList<String>()})
         for (i in codecs.indices) {
             val spinner = Spinner(applicationContext)
@@ -169,7 +170,7 @@ class CodecsActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.CodecsTitle) as TextView -> {
+            binding.CodecsTitle -> {
                 if (media == "audio")
                     Utils.alertView(this, getString(R.string.audio_codecs),
                             getString(R.string.audio_codecs_help))

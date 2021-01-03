@@ -141,7 +141,7 @@
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:onClick="onClick"
-                android:text="@string/aec_extented_filter" >
+                android:text="@string/aec_extended_filter" >
             </TextView>
             <CheckBox
                 android:id="@+id/ExtendedFilter"
