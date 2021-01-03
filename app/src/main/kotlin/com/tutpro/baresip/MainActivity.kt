@@ -22,12 +22,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     internal lateinit var layout: RelativeLayout
-    internal lateinit var baresipService: Intent
     private lateinit var callTitle: TextView
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
     private lateinit var uaAdapter: UaSpinnerAdapter
-    internal lateinit var aorSpinner: Spinner
+    private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
@@ -56,6 +56,9 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var stopState: String
     private lateinit var speakerIcon: MenuItem
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var binding: ActivityMainBinding
+
+    internal lateinit var baresipService: Intent
 
     internal var restart = false
     private var atStartup = false
@@ -63,6 +66,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
         val intentAction = intent.getStringExtra("action")
 
@@ -73,27 +77,27 @@ class MainActivity : AppCompatActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
-        layout = findViewById(R.id.mainActivityLayout) as RelativeLayout
-        aorSpinner = findViewById(R.id.AoRList)
-        callTitle = findViewById(R.id.callTitle) as TextView
-        callUri = findViewById(R.id.callUri) as AutoCompleteTextView
-        securityButton = findViewById(R.id.securityButton) as ImageButton
-        callButton = findViewById(R.id.callButton) as ImageButton
-        hangupButton = findViewById(R.id.hangupButton) as ImageButton
-        answerButton = findViewById(R.id.answerButton) as ImageButton
-        rejectButton = findViewById(R.id.rejectButton) as ImageButton
-        holdButton = findViewById(R.id.holdButton) as ImageButton
-        transferButton = findViewById(R.id.transferButton) as ImageButton
-        dtmf = findViewById(R.id.dtmf) as EditText
-        infoButton = findViewById(R.id.info) as ImageButton
-        voicemailButton = findViewById(R.id.voicemailButton) as ImageButton
-        contactsButton = findViewById(R.id.contactsButton) as ImageButton
-        messagesButton = findViewById(R.id.messagesButton) as ImageButton
-        callsButton = findViewById(R.id.callsButton) as ImageButton
-        dialpadButton = findViewById(R.id.dialpadButton) as ImageButton
-        swipeRefresh = findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
+        layout = binding.mainActivityLayout
+        aorSpinner = binding.aorSpinner
+        callTitle = binding.callTitle
+        callUri = binding.callUri
+        securityButton = binding.securityButton
+        callButton = binding.callButton
+        hangupButton = binding.hangupButton
+        answerButton = binding.answerButton
+        rejectButton = binding.rejectButton
+        holdButton = binding.holdButton
+        transferButton = binding.transferButton
+        dtmf = binding.dtmf
+        infoButton = binding.info
+        voicemailButton = binding.voicemailButton
+        contactsButton = binding.contactsButton
+        messagesButton = binding.messagesButton
+        callsButton = binding.callsButton
+        dialpadButton = binding.dialpadButton
+        swipeRefresh = binding.swipeRefresh
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -1088,7 +1092,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun callTransfer(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.call_transfer_dialog, findViewById<ViewGroup>(android.R.id.content),
+                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = getString(R.string.call_transfer)
@@ -1138,7 +1142,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                         false)
         val titleView = layout.findViewById(R.id.title) as TextView
         titleView.text = title
@@ -1196,7 +1200,7 @@ class MainActivity : AppCompatActivity() {
                     (Utils.paramValue(params, "auth_pass") == "")) {
                 val aor = account.substringAfter("<").substringBefore(">")
                 val layout = LayoutInflater.from(this)
-                        .inflate(R.layout.password_dialog, findViewById(android.R.id.content) as ViewGroup,
+                        .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                                 false)
                 val titleView = layout.findViewById(R.id.title) as TextView
                 titleView.text = getString(R.string.authentication_password)
