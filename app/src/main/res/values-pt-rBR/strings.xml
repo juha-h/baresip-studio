@@ -140,7 +140,7 @@
     <string name="call_history">Histórico de Chamadas</string>
     <string name="message_from">Mensagem de</string>
     <string name="transfer_request">Pedido de Transferência</string>
-    <string name="incoming_call_from">Chamada de</string>
+    <string name="incoming_call_from">Recebendo chamada de</string>
     <string name="answer">Atender</string>
     <string name="reject">Rejeitar</string>
     <string name="delete_account">Você quer excluir a conta \'%1$s\'\?</string>
@@ -236,4 +236,5 @@
     <string name="sip_trace">Rastreio SIP</string>
     <string name="allow_video_recv">Aceitar o recebimento de vídeo a partir do \'%1$s\'\?</string>
     <string name="allow_video_send">Aceitar o envio de vídeo para \'%1$s\'\?</string>
+    <string name="missed_call_from">Ligação perdida de</string>
 </resources>
