@@ -14,23 +14,26 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
+import com.tutpro.baresip.databinding.ActivityCallsBinding
 
 import java.util.ArrayList
 import java.text.DateFormat
 
 class CallsActivity : AppCompatActivity() {
 
-    internal lateinit var account: Account
-    internal lateinit var clAdapter: CallListAdapter
+    private lateinit var binding: ActivityCallsBinding
+    private lateinit var account: Account
+    private lateinit var clAdapter: CallListAdapter
 
-    internal var uaHistory = ArrayList<CallRow>()
-    internal var aor = ""
+    private var uaHistory = ArrayList<CallRow>()
+    private var aor = ""
     private var lastClick: Long = 0
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_calls)
+        binding = ActivityCallsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("calls,$aor")
@@ -38,11 +41,11 @@ class CallsActivity : AppCompatActivity() {
         val ua = UserAgent.ofAor(aor)!!
         account = ua.account
 
-        val headerView = findViewById(R.id.account) as TextView
+        val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
         headerView.text = headerText
 
-        val listView = findViewById(R.id.calls) as ListView
+        val listView = binding.calls
         aorGenerateHistory(aor)
         clAdapter = CallListAdapter(this, uaHistory)
         listView.adapter = clAdapter
