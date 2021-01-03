@@ -8,30 +8,32 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.tutpro.baresip.databinding.ActivityAccountBinding
 
 import kotlinx.android.synthetic.main.activity_account.*
 
 class AccountActivity : AppCompatActivity() {
 
-    internal lateinit var acc: Account
-    internal lateinit var ua: UserAgent
-    internal lateinit var uri: TextView
-    internal lateinit var displayName: EditText
-    internal lateinit var aor: String
-    internal lateinit var authUser: EditText
-    internal lateinit var authPass: EditText
-    internal lateinit var outbound1: EditText
-    internal lateinit var outbound2: EditText
-    internal lateinit var mediaNat: String
-    internal lateinit var stunServer: EditText
-    internal lateinit var stunUser: EditText
-    internal lateinit var stunPass: EditText
-    internal lateinit var regCheck: CheckBox
-    internal lateinit var mediaEnc: String
-    internal lateinit var ipV6MediaCheck: CheckBox
-    internal lateinit var answerMode: String
-    internal lateinit var vmUri: EditText
-    internal lateinit var defaultCheck: CheckBox
+    private lateinit var binding: ActivityAccountBinding
+    private lateinit var acc: Account
+    private lateinit var ua: UserAgent
+    private lateinit var uri: TextView
+    private lateinit var displayName: EditText
+    private lateinit var aor: String
+    private lateinit var authUser: EditText
+    private lateinit var authPass: EditText
+    private lateinit var outbound1: EditText
+    private lateinit var outbound2: EditText
+    private lateinit var mediaNat: String
+    private lateinit var stunServer: EditText
+    private lateinit var stunUser: EditText
+    private lateinit var stunPass: EditText
+    private lateinit var regCheck: CheckBox
+    private lateinit var mediaEnc: String
+    private lateinit var ipV6MediaCheck: CheckBox
+    private lateinit var answerMode: String
+    private lateinit var vmUri: EditText
+    private lateinit var defaultCheck: CheckBox
 
     private var save = false
     private var uaIndex= -1
@@ -39,7 +41,8 @@ class AccountActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_account)
+        binding = ActivityAccountBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -52,34 +55,34 @@ class AccountActivity : AppCompatActivity() {
 
         setTitle(aor.split(":")[1])
 
-        uri = findViewById(R.id.Uri) as TextView
+        uri = binding.Uri
         uri.setText(acc.luri)
 
-        displayName = findViewById(R.id.DisplayName) as EditText
+        displayName = binding.DisplayName
         displayName.setText(acc.displayName)
 
-        authUser = findViewById(R.id.AuthUser) as EditText
+        authUser = binding.AuthUser
         authUser.setText(acc.authUser)
 
-        authPass = findViewById(R.id.AuthPass) as EditText
+        authPass = binding.AuthPass
         if (MainActivity.aorPasswords.containsKey(aor))
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
 
-        outbound1 = findViewById(R.id.Outbound1) as EditText
-        outbound2 = findViewById(R.id.Outbound2) as EditText
+        outbound1 = binding.Outbound1
+        outbound2 = binding.Outbound2
         if (acc.outbound.size > 0) {
             outbound1.setText(acc.outbound[0])
             if (acc.outbound.size > 1)
                 outbound2.setText(acc.outbound[1])
         }
 
-        regCheck = findViewById(R.id.Register) as CheckBox
+        regCheck = binding.Register
         regCheck.isChecked = acc.regint > 0
 
         mediaNat = acc.mediaNat
-        val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
+        val mediaNatSpinner = binding.mediaNatSpinner
         val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
         val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
@@ -115,20 +118,20 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        stunServer = findViewById(R.id.StunServer) as EditText
+        stunServer = binding.StunServer
         stunServer.setText(acc.stunServer)
         stunServer.isEnabled = mediaNat != ""
 
-        stunUser = findViewById(R.id.StunUser) as EditText
+        stunUser = binding.StunUser
         stunUser.setText(acc.stunUser)
         stunUser.isEnabled = mediaNat != ""
 
-        stunPass = findViewById(R.id.StunPass) as EditText
+        stunPass = binding.StunPass
         stunPass.setText(acc.stunPass)
         stunPass.isEnabled = mediaNat != ""
 
         mediaEnc = acc.mediaEnc
-        val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
+        val mediaEncSpinner = binding.mediaEncSpinner
         val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
         val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
         keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
@@ -149,11 +152,11 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        ipV6MediaCheck = findViewById(R.id.PreferIPv6Media) as CheckBox
+        ipV6MediaCheck = binding.PreferIPv6Media
         ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
         answerMode = acc.answerMode
-        val answerModeSpinner = findViewById(R.id.answerModeSpinner) as Spinner
+        val answerModeSpinner = binding.answerModeSpinner
         val answerModeKeys = arrayListOf("manual", "auto")
         val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
         keyIx = answerModeKeys.indexOf(acc.answerMode)
@@ -174,10 +177,10 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        vmUri = findViewById(R.id.voicemailUri) as EditText
+        vmUri = binding.voicemailUri
         vmUri.setText(acc.vmUri)
 
-        defaultCheck = findViewById(R.id.Default) as CheckBox
+        defaultCheck = binding.Default
         defaultCheck.isChecked = uaIndex == 0
 
     }
@@ -484,27 +487,27 @@ class AccountActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.DisplayNameTitle) as TextView-> {
+            binding.DisplayNameTitle -> {
                 Utils.alertView(this, getString(R.string.display_name),
                         getString(R.string.display_name_help))
             }
-            findViewById(R.id.AuthUserTitle) as TextView -> {
+            binding.AuthUserTitle -> {
                 Utils.alertView(this, getString(R.string.authentication_username),
                         getString(R.string.authentication_username_help))
             }
-            findViewById(R.id.AuthPassTitle) as TextView-> {
+            binding.AuthPassTitle -> {
                 Utils.alertView(this, getString(R.string.authentication_password),
                         getString(R.string.authentication_password_help))
             }
-            findViewById(R.id.OutboundProxyTitle) as TextView -> {
+            binding.OutboundProxyTitle -> {
                 Utils.alertView(this, getString(R.string.outbound_proxies),
                         getString(R.string.outbound_proxies_help))
             }
-            findViewById(R.id.RegTitle) as TextView -> {
+            binding.RegTitle -> {
                 Utils.alertView(this, getString(R.string.register),
                         getString(R.string.register_help))
             }
-            findViewById(R.id.AudioCodecsTitle) as TextView -> {
+            binding.AudioCodecsTitle -> {
                 val i = Intent(this, CodecsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aor)
@@ -512,39 +515,39 @@ class AccountActivity : AppCompatActivity() {
                 i.putExtras(b)
                 startActivity(i)
             }
-            findViewById(R.id.MediaNatTitle) as TextView -> {
+            binding.MediaNatTitle -> {
                 Utils.alertView(this, getString(R.string.media_nat),
                         getString(R.string.media_nat_help))
             }
-            findViewById(R.id.StunServerTitle) as TextView -> {
+            binding.StunServerTitle -> {
                 Utils.alertView(this, getString(R.string.stun_server),
                         getString(R.string.stun_server_help))
             }
-            findViewById(R.id.StunUserTitle) as TextView -> {
+            binding.StunUserTitle -> {
                 Utils.alertView(this, getString(R.string.stun_username),
                         getString(R.string.stun_username_help))
             }
-            findViewById(R.id.StunPassTitle) as TextView -> {
+            binding.StunPassTitle -> {
                 Utils.alertView(this, getString(R.string.stun_password),
                         getString(R.string.stun_password_help))
             }
-            findViewById(R.id.MediaEncTitle) as TextView -> {
+            binding.MediaEncTitle -> {
                 Utils.alertView(this, getString(R.string.media_encryption),
                         getString(R.string.media_encryption_help))
             }
-            findViewById(R.id.PreferIPv6MediaTitle) as TextView -> {
+            binding.PreferIPv6MediaTitle -> {
                 Utils.alertView(this, getString(R.string.prefer_ipv6_media),
                         getString(R.string.prefer_ipv6_media_help))
             }
-            findViewById(R.id.AnswerModeTitle) as TextView -> {
+            binding.AnswerModeTitle -> {
                 Utils.alertView(this, getString(R.string.answer_mode),
                         getString(R.string.answer_mode_help))
             }
-            findViewById(R.id.VoicemailUriTitle) as TextView -> {
+            binding.VoicemailUriTitle -> {
                 Utils.alertView(this, getString(R.string.voicemail_uri),
                         getString(R.string.voicemain_uri_help))
             }
-            findViewById(R.id.DefaultTitle) as TextView -> {
+            binding.DefaultTitle -> {
                 Utils.alertView(this, getString(R.string.default_account),
                         getString(R.string.default_account_help))
             }
