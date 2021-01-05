@@ -568,17 +568,17 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
         goto out;
     }
 
+    err = vidisp_register(&vid, baresip_vidispl(), "opengles", opengles_alloc, NULL,
+                          opengles_display, NULL);
+    if (err) {
+        LOGW("vidisp_register failed (%d)\n", err);
+        goto out;
+    }
+
     err = conf_modules();
     if (err) {
         LOGW("conf_modules() failed (%d)\n", err);
         strcpy(start_error, "conf_modules");
-        goto out;
-    }
-
-    err = vidisp_register(&vid, baresip_vidispl(), "opengles", opengles_alloc, NULL,
-            opengles_display, NULL);
-    if (err) {
-        LOGW("vidisp_register failed (%d)\n", err);
         goto out;
     }
 
@@ -1605,7 +1605,7 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject 
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1video_1debug(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_plus_Api_call_1video_1debug(JNIEnv *env, jobject thiz) {
     call_video_debug_log();
 }
 
