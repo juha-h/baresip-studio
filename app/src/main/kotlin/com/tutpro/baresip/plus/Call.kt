@@ -112,8 +112,6 @@ class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: S
     private external fun call_disable_video_stream(callp: String, disable: Boolean)
     private external fun call_video_enabled(callp: String): Boolean
 
-    external fun call_video_debug()
-
     companion object {
 
         fun calls(): ArrayList<Call> {

@@ -65,6 +65,7 @@ object Api {
     external fun ua_debug(uap: String)
 
     external fun call_peeruri(callp: String): String
+    external fun call_video_debug()
 
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
 
