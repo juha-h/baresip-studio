@@ -236,7 +236,7 @@ class CallsActivity : AppCompatActivity() {
                         direction = R.drawable.arrow_up_green
                     else
                         direction = R.drawable.arrow_up_red
-                if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerURI)) {
+                if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri)) {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
@@ -246,7 +246,7 @@ class CallsActivity : AppCompatActivity() {
                     else
                         fmt = DateFormat.getDateInstance(DateFormat.SHORT)
                     val time = fmt.format(h.time.time)
-                    uaHistory.add(CallRow(h.aor, h.peerURI, direction, time, i))
+                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, time, i))
                 }
             }
         }

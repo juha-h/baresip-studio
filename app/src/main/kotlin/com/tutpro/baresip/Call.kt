@@ -3,7 +3,7 @@ package com.tutpro.baresip
 import android.text.TextWatcher
 import java.util.ArrayList
 
-class Call(val callp: String, val ua: UserAgent, val peerURI: String, val dir: String,
+class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: String,
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false

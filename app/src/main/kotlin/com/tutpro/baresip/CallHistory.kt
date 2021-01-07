@@ -4,7 +4,7 @@ import java.io.*
 import java.util.ArrayList
 import java.util.GregorianCalendar
 
-class CallHistory(val aor: String, val peerURI: String, val direction: String,
+class CallHistory(val aor: String, val peerUri: String, val direction: String,
               val connected: Boolean) : Serializable {
 
     val time: GregorianCalendar = GregorianCalendar()
@@ -74,7 +74,7 @@ class CallHistory(val aor: String, val peerURI: String, val direction: String,
 
         fun print() {
             for (h in BaresipService.callHistory)
-                Log.d("Baresip", "[${h.aor}, ${h.peerURI}, ${h.direction}, ${h.connected}]")
+                Log.d("Baresip", "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.connected}]")
         }
     }
 

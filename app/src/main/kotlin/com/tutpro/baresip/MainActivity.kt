@@ -279,7 +279,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val latest = CallHistory.aorLatestHistory(aor)
                     if (latest != null)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerURI),
+                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                 }
             }
@@ -1436,7 +1436,7 @@ class MainActivity : AppCompatActivity() {
             when (call.status) {
                 "outgoing" -> {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
@@ -1453,7 +1453,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
@@ -1481,7 +1481,7 @@ class MainActivity : AppCompatActivity() {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }

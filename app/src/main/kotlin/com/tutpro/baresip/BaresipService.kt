@@ -303,7 +303,7 @@ class BaresipService: Service() {
                 if (call == null) {
                     Log.w(LOG_TAG, "onStartCommand did not find call $callp")
                 } else {
-                    val peerUri = call.peerURI
+                    val peerUri = call.peerUri
                     val aor = call.ua.account.aor
                     Log.d(LOG_TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
@@ -613,7 +613,7 @@ class BaresipService: Service() {
                         call.status = "connected"
                         call.onhold = false
                         if (ua.account.callHistory) {
-                            CallHistory.add(CallHistory(aor, call.peerURI, call.dir, true))
+                            CallHistory.add(CallHistory(aor, call.peerUri, call.dir, true))
                             CallHistory.save()
                             call.hasHistory = true
                         }
@@ -713,12 +713,12 @@ class BaresipService: Service() {
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
-                            CallHistory.add(CallHistory(aor, call.peerURI, call.dir, false))
+                            CallHistory.add(CallHistory(aor, call.peerUri, call.dir, false))
                             CallHistory.save()
                             if (call.dir == "in") ua.account.missedCalls = true
                         }
                         if (!Utils.isVisible() && !call.hasHistory && call.dir == "in") {
-                            val caller = Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                            val caller = Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                                     Utils.aorDomain(aor))
                             val intent = Intent(this, BaresipService::class.java)
                             intent.action = "Call Missed"
