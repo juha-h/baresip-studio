@@ -858,7 +858,7 @@ class MainActivity : AppCompatActivity() {
                             titleView.text = getString(R.string.video_request)
                             with (AlertDialog.Builder(this)) {
                                 setCustomTitle(titleView)
-                                val peerUri = Utils.friendlyUri(call.peerURI, Utils.aorDomain(aor))
+                                val peerUri = Utils.friendlyUri(call.peerUri, Utils.aorDomain(aor))
                                 val msg = when (dir) {
                                     1 -> String.format(getString(R.string.allow_video_recv), peerUri)
                                     2 -> String.format(getString(R.string.allow_video_send), peerUri)
@@ -1560,7 +1560,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val latest = CallHistory.aorLatestHistory(aor)
                 if (latest != null)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerURI),
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerUri),
                             Utils.aorDomain(ua.account.aor)))
             }
         }
@@ -1667,7 +1667,7 @@ class MainActivity : AppCompatActivity() {
             when (call.status) {
                 "outgoing" -> {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
@@ -1686,7 +1686,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
@@ -1723,7 +1723,7 @@ class MainActivity : AppCompatActivity() {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerURI),
+                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
