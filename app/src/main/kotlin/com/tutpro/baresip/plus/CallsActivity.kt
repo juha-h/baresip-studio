@@ -12,7 +12,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ListView
 import android.widget.TextView
 import com.tutpro.baresip.plus.databinding.ActivityCallsBinding
 
@@ -206,9 +205,9 @@ class CallsActivity : AppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 
         if (account.callHistory)
-            menu.findItem(R.id.history_on_off).setTitle(getString(R.string.disable_history))
+            menu.findItem(R.id.history_on_off).title = getString(R.string.disable_history)
         else
-            menu.findItem(R.id.history_on_off).setTitle(getString(R.string.enable_history))
+            menu.findItem(R.id.history_on_off).title = getString(R.string.enable_history)
         return super.onPrepareOptionsMenu(menu)
 
     }

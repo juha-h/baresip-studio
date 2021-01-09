@@ -28,7 +28,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/AutoStart"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/start_automatically" >
             </TextView>
@@ -49,7 +48,6 @@
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="@string/listen_address"
-            android:textColor="@android:color/black"
             android:textSize="18sp" >
         </TextView>
 
@@ -70,7 +68,6 @@
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="@string/dns_servers"
-            android:textColor="@android:color/black"
             android:textSize="18sp">
         </TextView>
 
@@ -97,7 +94,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/CertificateFile"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/tls_certificate_file" >
             </TextView>
@@ -125,7 +121,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/CAFile"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/tls_ca_file" >
             </TextView>
@@ -147,7 +142,6 @@
             android:layout_marginBottom="16dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/audio" >
         </TextView>
@@ -165,7 +159,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/VolumeSpinner"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/default_call_volume" >
             </TextView>
@@ -218,7 +211,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Debug"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/debug" >
             </TextView>
@@ -246,7 +238,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/SipTrace"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/sip_trace" >
             </TextView>
@@ -274,7 +265,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Reset"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/reset_config" >
             </TextView>

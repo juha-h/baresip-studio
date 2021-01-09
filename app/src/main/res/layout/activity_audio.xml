@@ -25,7 +25,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/audio_modules_title" >
             </TextView>
@@ -50,7 +49,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/opus_bit_rate" >
             </TextView>
@@ -81,7 +79,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/opus_packet_loss" >
             </TextView>
@@ -112,7 +109,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Aec"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/aec" >
             </TextView>
@@ -139,7 +135,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/ExtendedFilter"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/aec_extended_filter" >
             </TextView>

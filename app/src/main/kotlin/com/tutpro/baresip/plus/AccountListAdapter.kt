@@ -38,7 +38,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         actionView.setOnClickListener {
             val titleView = View.inflate(cxt, R.layout.alert_title, null) as TextView
             titleView.text = cxt.getString(R.string.confirmation)
-            with (AlertDialog.Builder(cxt)) {
+            with (AlertDialog.Builder(cxt, R.style.AlertDialog)) {
                 setCustomTitle(titleView)
                 setMessage(String.format(cxt.getString(R.string.delete_account),
                         aorView.text))

@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
@@ -62,7 +63,7 @@ object Utils {
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        with (AlertDialog.Builder(context)) {
+        with (AlertDialog.Builder(context, R.style.AlertDialog)) {
             setCustomTitle(titleView)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
@@ -623,6 +624,11 @@ object Utils {
             Log.e("Baresip", "Could not get supportedCameras: ${e.printStackTrace()}")
         }
         return cameras
+    }
+
+    fun darkTheme(ctx: Context): Boolean {
+        return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
     }
 
 }

@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     private var atStartup = false
     private var alerting = false
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -193,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                view.performClick()
+                // view.performClick()
                 false
             }
         }
@@ -1333,8 +1335,8 @@ class MainActivity : AppCompatActivity() {
                 input.transformationMethod = PasswordTransformationMethod()
         }
         val context = this
-        val builder = AlertDialog.Builder(this)
-        with(builder) {
+        val builder = AlertDialog.Builder(this, R.style.AlertDialog)
+        with (builder) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1389,8 +1391,8 @@ class MainActivity : AppCompatActivity() {
                         input.transformationMethod = PasswordTransformationMethod()
                 }
                 val context = this
-                val builder = AlertDialog.Builder(this)
-                with(builder) {
+                val builder = AlertDialog.Builder(this, R.style.AlertDialog)
+                with (builder) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1516,6 +1518,7 @@ class MainActivity : AppCompatActivity() {
             aorSpinner.setSelection(-1)
             aorSpinner.tag = ""
         }
+
     }
 
     private fun makeCall(kind: String) {

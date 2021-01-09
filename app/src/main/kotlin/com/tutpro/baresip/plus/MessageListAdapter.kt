@@ -12,8 +12,8 @@ import android.widget.*
 import java.text.DateFormat
 import java.util.*
 
-class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<Message>) :
-        ArrayAdapter<Message>(cxt, R.layout.message, rows) {
+class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
+        ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val message = rows[position]
@@ -26,11 +26,17 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         val peer: String
         if (up) {
             lp.setMargins(75, 10, 0, 10)
-            layout.setBackgroundResource(R.drawable.message_out_bg)
-            peer = cxt.getString(R.string.you)
+            if (Utils.darkTheme(ctx))
+                layout.setBackgroundResource(R.drawable.message_out_dark_bg)
+            else
+                 layout.setBackgroundResource(R.drawable.message_out_bg)
+            peer = ctx.getString(R.string.you)
         } else {
             lp.setMargins(0, 10, 75, 10)
-            layout.setBackgroundResource(R.drawable.message_in_bg)
+            if (Utils.darkTheme(ctx))
+                layout.setBackgroundResource(R.drawable.message_in_dark_bg)
+            else
+                layout.setBackgroundResource(R.drawable.message_in_bg)
             val contactName = ContactsActivity.contactName(message.peerUri)
             if (contactName.startsWith("sip:") &&
                     (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
@@ -49,14 +55,14 @@ class MessageListAdapter(private val cxt: Context, private val rows: ArrayList<M
         else
             fmt = DateFormat.getDateInstance(DateFormat.SHORT)
         info = fmt.format(cal.time)
-        if (info.length < 6) info = "${cxt.getString(R.string.today)} $info"
+        if (info.length < 6) info = "${ctx.getString(R.string.today)} $info"
         info = "$info - $peer"
         if (message.direction == R.drawable.arrow_up_red) {
             if (message.responseCode != 0)
-                info = "$info - ${cxt.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
+                info = "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
             else
-                info = "$info - ${cxt.getString(R.string.sending_failed)}"
-            infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
+                info = "$info - ${ctx.getString(R.string.sending_failed)}"
+            infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         }
         infoView.text = info
         val textView = messageView.findViewById(R.id.text) as TextView
