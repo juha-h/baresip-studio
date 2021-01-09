@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity() {
                             "${getString(R.string.duration)}: $duration\n" +
                                     "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "${getString(R.string.rate)}: $audio")
+                                    "${getString(R.string.rate)}: $audio (bit/s)")
                 } else {
                     Utils.alertView(this, getString(R.string.call_info),
                             getString(R.string.call_info_not_available))
