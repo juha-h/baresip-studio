@@ -19,7 +19,7 @@
             android:textColor="@color/colorWhite"
             android:textColorSecondary="@color/colorWhite"
             android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" >
+            android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar" >
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -76,7 +76,6 @@
                         android:paddingStart="3dp"
                         android:paddingEnd="0dp"
                         android:textSize="20sp"
-                        android:textColor="@android:color/black"
                         android:text="@string/outgoing_call_to_dots" >
                     </TextView>
 

@@ -20,9 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Surface
 import android.view.View
-import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -70,7 +68,10 @@ object Utils {
                 dialog.dismiss()
                 action()
             }
-            show()
+            val dialog = this.create()
+            dialog.show()
+            if (darkTheme(context))
+                dialog.window!!.setBackgroundDrawableResource(R.color.colorDark)
         }
     }
 

@@ -22,6 +22,7 @@ import android.widget.*
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.android.synthetic.main.activity_main.*
@@ -86,6 +87,8 @@ class MainActivity : AppCompatActivity() {
         dismissKeyguard()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
+        if (Utils.darkTheme(this))
+            window.setBackgroundDrawableResource(R.color.colorDark)
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -345,14 +348,15 @@ class MainActivity : AppCompatActivity() {
                 if (status.contains('[') && status.contains(']') &&
                         status.contains('=') && codecs.contains(',')) {
                     val duration = status.split("[")[1].split("]")[0]
-                    val rate = status.split('=')[1]
+                    val audio = status.split(' ')[1].split('=')[1]
+                    // val video = status.split(' ')[2]
                     val txCodec = codecs.split(',')[0].split("/")
                     val rxCodec = codecs.split(',')[1].split("/")
                     Utils.alertView(this, getString(R.string.call_info),
                             "${getString(R.string.duration)}: $duration\n" +
                                     "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "${getString(R.string.rate)}: $rate")
+                                    "${getString(R.string.rate)}: $audio")
                 } else {
                     Utils.alertView(this, getString(R.string.call_info),
                             getString(R.string.call_info_not_available))
@@ -1640,6 +1644,12 @@ class MainActivity : AppCompatActivity() {
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
+            if (Utils.darkTheme(applicationContext)) {
+                val color = ContextCompat.getColor(this, R.color.colorGrayLight)
+                callTitle.setTextColor(color)
+                callUri.setTextColor(color)
+                callUri.setHintTextColor(ContextCompat.getColor(this, R.color.colorGray))
+            }
             callUri.text.clear()
             callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
