@@ -33,6 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:drawable/btn_dropdown"
+                    android:popupBackground="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
 
                 <TextView
@@ -44,7 +45,6 @@
                     android:paddingStart="3dp"
                     android:paddingEnd="0dp"
                     android:textSize="20sp"
-                    android:textColor="@android:color/black"
                     android:text="@string/outgoing_call_to_dots" >
                 </TextView>
 

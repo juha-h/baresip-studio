@@ -46,7 +46,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="@android:color/black"
         android:paddingTop="10dp"
         android:text="@string/contact_name" >
     </TextView>
@@ -64,7 +63,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:paddingTop="10dp"
             android:text="@string/sip_uri" >
     </TextView>

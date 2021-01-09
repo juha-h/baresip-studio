@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
@@ -57,7 +58,7 @@ object Utils {
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        with (AlertDialog.Builder(context)) {
+        with (AlertDialog.Builder(context, R.style.AlertDialog)) {
             setCustomTitle(titleView)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
@@ -599,6 +600,11 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
+    }
+
+    fun darkTheme(ctx: Context): Boolean {
+        return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
     }
 
 }
