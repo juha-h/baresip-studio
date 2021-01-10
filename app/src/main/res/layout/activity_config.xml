@@ -178,6 +178,33 @@
             android:layout_marginBottom="12dp"
             android:orientation="horizontal" >
             <TextView
+                android:id="@+id/DarkThemeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/DarkTheme"
+                android:textSize="18sp"
+                android:onClick="onClick"
+                android:text="@string/dark_theme" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/DarkTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal" >
+            <TextView
                 android:id="@+id/VideoSizeTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

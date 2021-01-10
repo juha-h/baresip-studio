@@ -47,17 +47,10 @@ class ChatListAdapter(private val ctx: Context, private var rows: ArrayList<Mess
             textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
         if ((message.direction == R.drawable.arrow_down_green) ||
-                (message.direction == R.drawable.arrow_down_red)) {
-            if (Utils.darkTheme(ctx))
-                layout.setBackgroundResource(R.drawable.message_in_dark_bg)
-            else
+                (message.direction == R.drawable.arrow_down_red))
                 layout.setBackgroundResource(R.drawable.message_in_bg)
-        } else {
-            if (Utils.darkTheme(ctx))
-                layout.setBackgroundResource(R.drawable.message_out_dark_bg)
-            else
+        else
                 layout.setBackgroundResource(R.drawable.message_out_bg)
-        }
         val peerView = rowView.findViewById(R.id.peer) as TextView
         peerView.setText(peer)
         val infoView = rowView.findViewById(R.id.info) as TextView

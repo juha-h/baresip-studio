@@ -22,6 +22,7 @@ import android.widget.*
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -75,6 +76,9 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode())
+            AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -735,6 +739,11 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    override fun recreate() {
+        Log.d("Baresip", "Main onCreate")
+        super.recreate()
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
@@ -778,6 +787,7 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
+
         val uap = params[0]
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
@@ -1192,6 +1202,11 @@ class MainActivity : AppCompatActivity() {
                         }
                         show()
                     }
+                }
+                val displayTheme = Preferences(applicationContext).displayTheme
+                if (displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+                    AppCompatDelegate.setDefaultNightMode(displayTheme)
+                    delegate.applyDayNight()
                 }
             }
 
