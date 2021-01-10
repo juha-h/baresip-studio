@@ -23,6 +23,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 
 import java.io.*
 import java.net.InetAddress
@@ -628,8 +629,7 @@ object Utils {
     }
 
     fun darkTheme(ctx: Context): Boolean {
-        return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
-                Configuration.UI_MODE_NIGHT_YES
+        return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
     }
 
 }

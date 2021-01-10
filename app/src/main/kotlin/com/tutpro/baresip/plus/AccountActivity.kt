@@ -515,17 +515,13 @@ class AccountActivity : AppCompatActivity() {
                 i.putExtras(b)
                 startActivity(i)
             }
-            findViewById(R.id.VideoCodecsTitle) as TextView -> {
+            binding.VideoCodecsTitle -> {
                 val i = Intent(this, CodecsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aor)
                 b.putString("media", "video")
                 i.putExtras(b)
                 startActivity(i)
-            }
-            findViewById(R.id.VideoCodecsTitle) as TextView -> {
-                Utils.alertView(this, getString(R.string.video_codecs),
-                        getString(R.string.video_codecs_help))
             }
             binding.MediaNatTitle -> {
                 Utils.alertView(this, getString(R.string.media_nat),
