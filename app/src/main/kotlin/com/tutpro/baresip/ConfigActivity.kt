@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatDelegate
 import com.tutpro.baresip.databinding.ActivityConfigBinding
 
 class ConfigActivity : AppCompatActivity() {
@@ -20,6 +21,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var dnsServers: EditText
     private lateinit var certificateFile: CheckBox
     private lateinit var caFile: CheckBox
+    private lateinit var darkTheme: CheckBox
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
@@ -96,6 +98,10 @@ class ConfigActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        darkTheme = binding.DarkTheme
+        val oldDisplayTheme = Preferences(applicationContext).displayTheme
+        darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
         debug = binding.Debug
         val dbCv = Config.variable("log_level")
@@ -236,6 +242,12 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
+                val newDisplayTheme = if (darkTheme.isChecked)
+                    AppCompatDelegate.MODE_NIGHT_YES
+                else
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                Preferences(applicationContext).displayTheme = newDisplayTheme
+
                 var logLevelString = "2"
                 if (debug.isChecked) logLevelString = "0"
                 if (oldLogLevel != logLevelString) {
@@ -339,6 +351,10 @@ class ConfigActivity : AppCompatActivity() {
             binding.VolumeTitle -> {
                 Utils.alertView(this, getString(R.string.default_call_volume),
                         getString(R.string.default_call_volume_help))
+            }
+            binding.DarkThemeTitle -> {
+                Utils.alertView(this, getString(R.string.dark_theme),
+                        getString(R.string.dark_theme_help))
             }
             binding.DebugTitle -> {
                 Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
