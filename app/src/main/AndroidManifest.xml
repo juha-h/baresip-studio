@@ -46,7 +46,7 @@
         tools:targetApi="q">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask">
             <intent-filter>

@@ -9,7 +9,7 @@
         <item name="actionOverflowMenuStyle">@style/ActionBarMenu</item>
     </style>
 
-    <style name="Spinner" parent="Theme.AppCompat.DayNight">
+    <style name="Spinner" parent="ThemeOverlay.AppCompat.DayNight">
         <item name="android:dividerHeight">1dp</item>
         <item name="android:divider">@color/colorGray</item>
     </style>
