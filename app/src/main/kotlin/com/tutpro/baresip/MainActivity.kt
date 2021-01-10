@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         layout = binding.mainActivityLayout
         aorSpinner = binding.aorSpinner

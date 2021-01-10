@@ -3,14 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="10dp"
     tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/MainActionBar" >
+    </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true" >
+        android:fillViewport="true"
+        android:layout_below="@id/toolbar" >
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefresh"
@@ -33,8 +42,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:drawable/btn_dropdown"
-                    android:popupBackground="@android:drawable/btn_dropdown"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown" />
 
                 <TextView
                     android:id="@+id/callTitle"
@@ -207,6 +215,7 @@
         android:layout_toStartOf="@id/contactsButton"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
         android:visibility="invisible"
         android:contentDescription="@string/voicemail" >
     </ImageButton>
@@ -220,6 +229,7 @@
         android:layout_toStartOf="@id/messagesButton"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
         android:contentDescription="@string/contacts" >
     </ImageButton>
 
@@ -232,6 +242,7 @@
         android:layout_toStartOf="@id/callsButton"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
         android:contentDescription="@string/messages" >
     </ImageButton>
 
@@ -242,6 +253,7 @@
         android:layout_toStartOf="@id/dialpadButton"
         android:layout_marginEnd="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
         android:padding="0dp"
         android:background="@null"
         android:src="@drawable/calls"
@@ -252,9 +264,9 @@
         android:id="@+id/dialpadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="15dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="8dp"
         android:layout_alignParentEnd="true"
         android:background="@null"
         android:src="@drawable/dialpad_off"
