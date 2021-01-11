@@ -11,7 +11,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/MainActionBar" >
+        android:theme="@style/ActionBar.Main" >
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -40,9 +40,11 @@
                 <Spinner
                     android:id="@+id/aorSpinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:spinnerMode="dropdown" />
+                    android:layout_height="48dp"
+                    android:background="@drawable/spinner_bg"
+                    android:popupBackground="@color/colorSpinnerDropdown"
+                    android:gravity="center_vertical"
+                    android:spinnerMode="dropdown"/>
 
                 <TextView
                     android:id="@+id/callTitle"

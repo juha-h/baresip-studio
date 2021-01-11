@@ -9,18 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="UselessParent"
-        android:padding="5sp" >
+        android:padding="11dp" >
 
         <ImageView
             android:id="@+id/spinnerImage"
+            android:layout_marginStart="5dp"
             android:contentDescription="@string/status" />
 
         <TextView
             android:id="@+id/spinnerText"
-            android:textSize="18sp"
-            android:textColor="@color/colorSecondaryDark"
-            android:paddingStart="8sp"
-            android:paddingEnd="0sp" />
+            android:textColor="@color/colorSpinnerText"
+            android:paddingStart="8dp"
+            android:paddingEnd="0dp" />
 
     </TableRow>
 
