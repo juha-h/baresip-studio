@@ -15,6 +15,6 @@
     <color name="colorRed">#df0101</color>
     <color name="colorDark">#383838</color>
     <color name="colorSpinnerText">@color/colorDark</color>
-    <color name="colorSpinnerDropdown">@color/colorGrayLight</color>
-    <color name="colorSpinnerDivider">@color/colorGray</color>
+    <color name="colorSpinnerDropdown">@color/colorGray</color>
+    <color name="colorSpinnerDivider">@color/colorGrayLight</color>
 </resources>

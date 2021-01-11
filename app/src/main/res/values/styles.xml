@@ -9,9 +9,14 @@
         <item name="actionOverflowMenuStyle">@style/ActionBarMenu</item>
     </style>
 
-    <style name="Spinner" parent="ThemeOverlay.AppCompat.DayNight">
+    <style name="AppTheme.Main" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Spinner" parent="Widget.AppCompat.ListView.DropDown">
         <item name="android:dividerHeight">1dp</item>
-        <item name="android:divider">@color/colorGray</item>
+        <item name="android:divider">@color/colorSpinnerDivider</item>
     </style>
 
     <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
@@ -23,14 +28,9 @@
         <item name="android:popupBackground">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="MainActionBar" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
+    <style name="ActionBar.Main" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
         <item name="android:textColorPrimary">@color/colorWhite</item>
         <item name="actionOverflowMenuStyle">@style/ActionBarMenu</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
