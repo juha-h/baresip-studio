@@ -68,11 +68,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
-            AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
-            delegate.applyDayNight()
-        }
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -483,6 +478,8 @@ class MainActivity : AppCompatActivity() {
                         // Some old devices have granted Mic permission without a need to ask
                         startBaresip()
                 }
+
+        intent.removeExtra("action")
 
     } // OnCreate
 
