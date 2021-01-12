@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceEventReceiver: BroadcastReceiver
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
-    private lateinit var speakerIcon: MenuItem
+    private var speakerIcon: MenuItem? = null
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
@@ -76,9 +76,6 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode())
-            AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -504,6 +501,8 @@ class MainActivity : AppCompatActivity() {
                         startBaresip()
                 }
 
+        intent.removeExtra("action")
+
     } // OnCreate
 
     private fun addVideoLayoutViews() {
@@ -567,10 +566,10 @@ class MainActivity : AppCompatActivity() {
             am.isSpeakerphoneOn = !am.isSpeakerphoneOn
             if (am.isSpeakerphoneOn) {
                 speakerButton.setImageResource(R.drawable.speaker_on_button)
-                speakerIcon.setIcon(R.drawable.speaker_on)
+                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
             } else {
                 speakerButton.setImageResource(R.drawable.speaker_off_button)
-                speakerIcon.setIcon(R.drawable.speaker_off)
+                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
             }
         }
         videoLayout.addView(speakerButton)
@@ -850,7 +849,7 @@ class MainActivity : AppCompatActivity() {
                         if (Call.ofCallp(params[1])!!.videoEnabled()) {
                             am.isSpeakerphoneOn = true
                             speakerButton.setImageResource(R.drawable.speaker_on_button)
-                            speakerIcon.setIcon(R.drawable.speaker_on)
+                            if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
                         }
                         if (aor == aorSpinner.tag) {
                             dtmf.setText("")
@@ -1014,7 +1013,7 @@ class MainActivity : AppCompatActivity() {
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
-                        speakerIcon.setIcon(R.drawable.speaker_off)
+                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
                         volumeControlStream = AudioManager.STREAM_MUSIC
                         val param = ev[1].trim()
@@ -1082,6 +1081,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         Log.d("Baresip", "Main onDestroy")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
         super.onDestroy()
     }
@@ -1091,10 +1091,10 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
         if (am.isSpeakerphoneOn) {
-            speakerIcon.setIcon(R.drawable.speaker_on)
+            speakerIcon!!.setIcon(R.drawable.speaker_on)
             speakerButton.setImageResource(R.drawable.speaker_on_button)
         } else {
-            speakerIcon.setIcon(R.drawable.speaker_off)
+            speakerIcon!!.setIcon(R.drawable.speaker_off)
             speakerButton.setImageResource(R.drawable.speaker_off_button)
         }
         return super.onCreateOptionsMenu(menu)

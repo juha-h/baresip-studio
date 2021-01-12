@@ -33,6 +33,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldCAFile = false
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
+    private var oldDisplayTheme = -1
     private var videoSize = ""
     private var oldVideoSize = Config.variable("video_size")[0]
     private var save = false
@@ -46,6 +47,7 @@ class ConfigActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -122,7 +124,7 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         darkTheme = binding.DarkTheme
-        val oldDisplayTheme = Preferences(applicationContext).displayTheme
+        oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
         debug = binding.Debug
@@ -257,7 +259,6 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
                     Config.replaceVariable("call_volume", callVolume.toString())
@@ -274,7 +275,8 @@ class ConfigActivity : AppCompatActivity() {
                     AppCompatDelegate.MODE_NIGHT_YES
                 else
                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                Preferences(applicationContext).displayTheme = newDisplayTheme
+                if (oldDisplayTheme != newDisplayTheme)
+                    Preferences(applicationContext).displayTheme = newDisplayTheme
 
                 var logLevelString = "2"
                 if (debug.isChecked) logLevelString = "0"
@@ -287,7 +289,7 @@ class ConfigActivity : AppCompatActivity() {
 
                 BaresipService.sipTrace = sipTrace.isChecked
                 Api.uag_enable_sip_trace(sipTrace.isChecked)
-                
+
                 if (reset.isChecked) {
                     Config.reset(this)
                     save = false
