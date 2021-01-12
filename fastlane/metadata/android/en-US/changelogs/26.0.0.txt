@@ -1,2 +1,2 @@
-Added dark theme and dark theme setting.
-Account spinner enhancements.
+- Added dark theme and dark theme setting.
+- Account spinner enhancements.
