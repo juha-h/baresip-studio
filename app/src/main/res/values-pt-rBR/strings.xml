@@ -237,4 +237,6 @@
     <string name="allow_video_recv">Aceitar o recebimento de vídeo a partir do \'%1$s\'\?</string>
     <string name="allow_video_send">Aceitar o envio de vídeo para \'%1$s\'\?</string>
     <string name="missed_call_from">Ligação perdida de</string>
+    <string name="dark_theme_help">Impor o uso do tema escuro na tela</string>
+    <string name="dark_theme">Tema Escuro</string>
 </resources>
