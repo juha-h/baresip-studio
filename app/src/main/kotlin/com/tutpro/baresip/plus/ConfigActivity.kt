@@ -106,7 +106,8 @@ class ConfigActivity : AppCompatActivity() {
 
         Log.d("Baresip", "Old video_size $oldVideoSize")
         val videoSizeSpinner = findViewById(R.id.VideoSizeSpinner) as Spinner
-        val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720")
+        val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720",
+            "1920x1080")
         sizes.removeIf{it == oldVideoSize}
         sizes.add(0, oldVideoSize)
         Log.d("Baresip", "sizes = $sizes")
