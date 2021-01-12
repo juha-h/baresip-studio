@@ -1,0 +1,2 @@
+- Added support for dark theme and dark theme setting.
+- Account spinner enhancements.
