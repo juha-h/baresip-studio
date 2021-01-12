@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceEventReceiver: BroadcastReceiver
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
-    private lateinit var speakerIcon: MenuItem
+    private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private lateinit var baresipService: Intent
@@ -68,8 +68,10 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode())
+        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
+            delegate.applyDayNight()
+        }
 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -568,6 +570,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        Log.d("Baresip", "Main onStart")
+        super.onStart()
+    }
+
     override fun onResume() {
         super.onResume()
         Log.d("Baresip", "Main onResume with action '$resumeAction'")
@@ -628,6 +635,11 @@ class MainActivity : AppCompatActivity() {
         Utils.addActivity("main")
         visible = false
         super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d("Baresip", "Main onStop")
+        super.onStop()
     }
 
     override fun recreate() {
@@ -861,7 +873,7 @@ class MainActivity : AppCompatActivity() {
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
-                        speakerIcon.setIcon(R.drawable.speaker_off)
+                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
                         volumeControlStream = AudioManager.STREAM_MUSIC
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
@@ -928,6 +940,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         Log.d("Baresip", "Main onDestroy")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
         super.onDestroy()
     }
@@ -937,9 +950,9 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
         if (am.isSpeakerphoneOn)
-            speakerIcon.setIcon(R.drawable.speaker_on)
+            speakerIcon!!.setIcon(R.drawable.speaker_on)
         else
-            speakerIcon.setIcon(R.drawable.speaker_off)
+            speakerIcon!!.setIcon(R.drawable.speaker_off)
         return super.onCreateOptionsMenu(menu)
     }
 
