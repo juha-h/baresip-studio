@@ -81,10 +81,10 @@ static void ua_print_status_log(struct ua *ua) {
     }
 }
 
-static void call_video_debug_log() {
+static void call_video_debug_log(struct call *call) {
     char debug_buf[2048];
     int l;
-    l = re_snprintf(&(debug_buf[0]), 2047, "%H", video_debug, call_video(ua_call(uag_current())));
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", video_debug, call_video(call));
     if (l != -1) {
         debug_buf[l] = '\0';
         LOGD("%s\n", debug_buf);
@@ -235,7 +235,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             rdir = sdp_media_rdir(media);
             sdp_media_debug_log(media);
             //stream_debug_log(video_strm(call_video(call)));
-            //call_video_debug_log();
+            //call_video_debug_log(call);
 	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d", prm,
 	                call_has_video(call), remote_has_video, ldir, rdir);
             break;
@@ -1238,16 +1238,6 @@ Java_com_tutpro_baresip_plus_Api_ua_1account(JNIEnv *env, jobject thiz, jstring 
         if (acc) sprintf(acc_buf, "%lu", (unsigned long) acc);
     }
     return (*env)->NewStringUTF(env, acc_buf);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring javaUA)
-{
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    LOGD("running uag_current_set on %s\n", native_ua);
-    uag_current_set(ua);
 }
 
 JNIEXPORT void JNICALL
