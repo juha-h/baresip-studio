@@ -1,0 +1,3 @@
+- Fixed turning on dark theme when baresip application is launched
+- Added "1920x1080" option to Video Frame Size setting
+- New translations (Portuguese (Brazil))
