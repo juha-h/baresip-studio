@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         val intentAction = intent.getStringExtra("action")
@@ -478,6 +479,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
         intent.removeExtra("action")
+
+        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+            AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
+            delegate.applyDayNight()
+        }
 
     } // OnCreate
 
