@@ -39,7 +39,6 @@ object Api {
     external fun account_extra(acc: String): String
     external fun account_debug(acc: String)
 
-    external fun uag_current_set(uap: String)
     external fun uag_reset_transp(reg: Boolean, reinvite: Boolean)
     external fun uag_enable_sip_trace(enable: Boolean)
 

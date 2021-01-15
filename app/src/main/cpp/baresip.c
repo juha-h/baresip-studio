@@ -1175,16 +1175,6 @@ Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jstring javaU
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_uag_1current_1set(JNIEnv *env, jobject thiz, jstring javaUA)
-{
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    LOGD("running uag_current_set on %s\n", native_ua);
-    uag_current_set(ua);
-}
-
-JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
                                                 jstring javaUA, jstring javaCall, jint code,
                                                 jstring reason) {

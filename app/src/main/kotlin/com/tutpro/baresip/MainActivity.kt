@@ -151,8 +151,6 @@ class MainActivity : AppCompatActivity() {
                 val acc = UserAgent.uas()[position].account
                 aorSpinner.tag = acc.aor
                 val ua = UserAgent.uas()[position]
-                Log.d("Baresip", "Setting ${aorSpinner.tag} current")
-                Api.uag_current_set(UserAgent.uas()[position].uap)
                 showCall(ua)
                 updateIcons(acc)
             }
