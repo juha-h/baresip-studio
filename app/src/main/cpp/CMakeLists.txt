@@ -30,37 +30,49 @@ add_library(lib_x264 STATIC IMPORTED)
 set_target_properties(lib_x264 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/x264/lib/${ANDROID_ABI}/libx264.a)
 
-add_library(lib_avcodec STATIC IMPORTED)
+add_library(lib_cpu_features STATIC IMPORTED)
+set_target_properties(lib_cpu_features PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/cpu_features/lib/${ANDROID_ABI}/libcpu_features.a)
+
+add_library(lib_ndk_compat STATIC IMPORTED)
+set_target_properties(lib_ndk_compat PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/cpu_features/lib/${ANDROID_ABI}/libndk_compat.a)
+
+add_library(lib_x265 STATIC IMPORTED)
+set_target_properties(lib_x265 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/x265/lib/${ANDROID_ABI}/libx265.a)
+
+add_library(lib_avcodec SHARED IMPORTED)
 set_target_properties(lib_avcodec PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavcodec.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavcodec.so)
 
-add_library(lib_avutil STATIC IMPORTED)
+add_library(lib_avutil SHARED IMPORTED)
 set_target_properties(lib_avutil PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavutil.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavutil.so)
 
-add_library(lib_swresample STATIC IMPORTED)
+add_library(lib_swresample SHARED IMPORTED)
 set_target_properties(lib_swresample PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswresample.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswresample.so)
 
-add_library(lib_avdevice STATIC IMPORTED)
+add_library(lib_avdevice SHARED IMPORTED)
 set_target_properties(lib_avdevice PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavdevice.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavdevice.so)
 
-add_library(lib_avfilter STATIC IMPORTED)
+add_library(lib_avfilter SHARED IMPORTED)
 set_target_properties(lib_avfilter PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavfilter.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavfilter.so)
 
-add_library(lib_postproc STATIC IMPORTED)
+add_library(lib_postproc SHARED IMPORTED)
 set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.so)
 
-add_library(lib_swscale STATIC IMPORTED)
+add_library(lib_swscale SHARED IMPORTED)
 set_target_properties(lib_swscale PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswscale.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswscale.so)
 
-add_library(lib_avformat STATIC IMPORTED)
+add_library(lib_avformat SHARED IMPORTED)
 set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.a)
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.so)
 
 add_library(lib_spandsp STATIC IMPORTED)
 set_target_properties(lib_spandsp PROPERTIES IMPORTED_LOCATION
@@ -136,6 +148,7 @@ target_link_libraries(baresip
         lib_avformat
         lib_avcodec
         lib_x264
+        lib_x265
         lib_vpx
         lib_avutil
         lib_swresample
@@ -153,4 +166,6 @@ target_link_libraries(baresip
         z
         log
         camera2ndk
+        lib_cpu_features
+        lib_ndk_compat
         mediandk)

@@ -12,7 +12,8 @@ android {
         versionName = '10.1.0'
         externalNativeBuild {
             cmake {
-                cFlags '-DHAVE_INTTYPES_H'
+                cFlags '-DHAVE_INTTYPES_H -lstdc++'
+                arguments "-DANDROID_STL=c++_shared"
             }
         }
         ndk {

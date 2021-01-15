@@ -62,6 +62,8 @@ object Config {
             config = "${config}jitter_buffer_wish 6\n"
         }
 
+        removeLine("avcodec")
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i("Baresip", "Initialized config to '$config'")
