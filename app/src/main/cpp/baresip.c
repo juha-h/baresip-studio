@@ -1594,11 +1594,6 @@ Java_com_tutpro_baresip_plus_Call_call_1set_1video_1source(JNIEnv *env, jobject 
     return err;
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_call_1video_1debug(JNIEnv *env, jobject thiz) {
-    call_video_debug_log();
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Api_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
                                           jstring javaPeer, jstring javaMsg, jstring javaTime) {
