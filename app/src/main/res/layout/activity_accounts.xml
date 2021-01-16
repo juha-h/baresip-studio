@@ -42,7 +42,8 @@
             android:layout_alignParentBottom="true"
             android:layout_gravity="end"
             android:layout_marginStart="6dp"
-            android:src="@drawable/action_add"
+            android:src="@drawable/plus"
+            android:background="@null"
             android:contentDescription="@string/add"
             android:scaleType="centerCrop" >
         </ImageButton>
