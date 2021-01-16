@@ -7,6 +7,7 @@
         <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="android:dropDownListViewStyle">@style/Spinner</item>
         <item name="actionOverflowMenuStyle">@style/ActionBarMenu</item>
+        <item name="android:itemTextAppearance">@style/itemTextStyle.AppTheme</item>
     </style>
 
     <style name="AppTheme.Main" parent="AppTheme">
@@ -21,16 +22,21 @@
 
     <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/colorAlertText</item>
     </style>
 
     <style name="ActionBarMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:popupBackground">@color/colorSecondaryDark</item>
+        <item name="android:textColorPrimary">@color/colorBaresip</item>
     </style>
 
     <style name="ActionBar.Main" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
         <item name="android:textColorPrimary">@color/colorWhite</item>
         <item name="actionOverflowMenuStyle">@style/ActionBarMenu</item>
+    </style>
+
+    <style name="itemTextStyle.AppTheme" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/colorItemText</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
