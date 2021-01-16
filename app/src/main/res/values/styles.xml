@@ -20,12 +20,12 @@
     </style>
 
     <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
     </style>
 
     <style name="ActionBarMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
-        <item name="android:popupBackground">@color/colorPrimaryDark</item>
+        <item name="android:popupBackground">@color/colorSecondaryDark</item>
     </style>
 
     <style name="ActionBar.Main" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
