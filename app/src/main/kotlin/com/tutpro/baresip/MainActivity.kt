@@ -6,9 +6,11 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
+import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -26,6 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
+import java.net.URLDecoder
 
 class MainActivity : AppCompatActivity() {
 
@@ -177,6 +180,8 @@ class MainActivity : AppCompatActivity() {
                         startActivityForResult(i, ACCOUNT_CODE)
                         true
                     } else {
+                        UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri =
+                                callUri.text.toString()
                         false
                     }
                 }
@@ -490,9 +495,44 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
-        val action = intent.getStringExtra("action")
-        Log.d("Baresip", "onNewIntent action '$action'")
-        if (action != null) handleIntent(intent)
+        resumeAction = ""
+        resumeUri = ""
+        Log.i("Baresip", "onNewIntent ${intent.action} ${intent.data}")
+        if (intent.action == ACTION_CALL) {
+            if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty()) {
+                return
+            }
+            val uri: Uri? = intent.data
+            if (uri != null) {
+                val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                when (uri.scheme) {
+                    "sip" -> {
+                        Log.d("Baresip", "Got sip URI $uriStr")
+                        var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
+                        if (ua == null)
+                            ua = BaresipService.uas[0]
+                        spinToAor(ua.account.aor)
+                        resumeAction = "call"
+                        ua.account.resumeUri = uriStr
+                    }
+                    "tel" -> {
+                        Log.d("Baresip", "Got tel URI $uriStr")
+                        val acc = BaresipService.uas[0].account
+                        spinToAor(acc.aor)
+                        resumeAction = "call"
+                        acc.resumeUri = uriStr.replace("tel", "sip") + "@" + acc.aor
+                    }
+                    else -> {
+                        Toast.makeText(applicationContext, getString(R.string.invalid_sip_uri),
+                                Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                }
+            }
+        } else {
+            if (intent.getStringExtra("action") != null)
+                handleIntent(intent)
+        }
     }
 
     private fun handleIntent(intent: Intent) {
@@ -517,7 +557,7 @@ class MainActivity : AppCompatActivity() {
                 if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
-                resumeUri = intent.getStringExtra("peer")!!
+                ua.account.resumeUri = intent.getStringExtra("peer")!!
             }
             "call show", "call answer" -> {
                 val callp = intent.getStringExtra("callp")!!
@@ -594,7 +634,7 @@ class MainActivity : AppCompatActivity() {
             "call reject" ->
                 rejectButton.performClick()
             "call" -> {
-                callUri.setText(resumeUri)
+                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
             "transfer show", "transfer accept" ->
@@ -628,13 +668,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         resumeAction = ""
-        resumeUri = ""
     }
 
     override fun onPause() {
         Log.d("Baresip", "Main onPause")
         Utils.addActivity("main")
         visible = false
+        if (UserAgent.uas().isNotEmpty() && aorSpinner.selectedItemPosition >= 0)
+            UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri = callUri.text.toString()
         super.onPause()
     }
 
@@ -870,6 +911,7 @@ class MainActivity : AppCompatActivity() {
                                     InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
                             dialpadButton.setImageResource(R.drawable.dialpad_off)
                             dialpadButton.tag = "off"
+                            ua.account.resumeUri = ""
                             showCall(ua)
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
@@ -1195,7 +1237,7 @@ class MainActivity : AppCompatActivity() {
         }
         val context = this
         val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-        with (builder) {
+        with(builder) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1251,7 +1293,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 val context = this
                 val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-                with (builder) {
+                with(builder) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1444,7 +1486,10 @@ class MainActivity : AppCompatActivity() {
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
             callTitle.text = getString(R.string.outgoing_call_to_dots)
-            callUri.text.clear()
+            if (ua.account.resumeUri != "")
+                callUri.setText(ua.account.resumeUri)
+            else
+                callUri.text.clear()
             callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
             callUri.isFocusableInTouchMode = true

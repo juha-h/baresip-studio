@@ -28,6 +28,7 @@ class Account(val accp: String) {
     var missedCalls = false
     var unreadMessages = false
     var callHistory = true
+    var resumeUri = ""
 
     init {
 
