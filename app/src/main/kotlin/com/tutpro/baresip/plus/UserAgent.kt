@@ -36,6 +36,12 @@ class UserAgent(val uap: String) {
             return null
         }
 
+        fun ofDomain(domain: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (Utils.aorDomain(ua.account.aor) == domain) return ua
+            return null
+        }
+
         fun ofUap(uap: String): UserAgent? {
             for (ua in BaresipService.uas)
                 if (ua.uap == uap) return ua
