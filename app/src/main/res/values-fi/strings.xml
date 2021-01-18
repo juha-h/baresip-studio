@@ -80,7 +80,7 @@
             <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
             <li><b>LGPL 2.1</b> G.722 ja G.726 koodausmenetelmät</li>
             <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
-            <li><b>GNU GPLv2</b> H.264 koodausmenetelmä</li>
+            <li><b>GNU GPLv2</b> H.264 ja H.265 koodausmenetelmät</li>
             <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
         </ul>
         ]]>
