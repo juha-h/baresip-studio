@@ -77,6 +77,11 @@ class MainActivity : AppCompatActivity() {
     private var atStartup = false
     private var alerting = false
 
+    private var resumeUri = ""
+    private var resumeUap = ""
+    private var resumeCall: Call? = null
+    private var resumeAction = ""
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -779,8 +784,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Baresip", "Main onPause")
         Utils.addActivity("main")
         visible = false
-        if (UserAgent.uas().isNotEmpty() && aorSpinner.selectedItemPosition >= 0)
-            UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri = callUri.text.toString()
+        saveCallUri()
         super.onPause()
     }
 
@@ -1609,13 +1613,6 @@ class MainActivity : AppCompatActivity() {
                     callUri.isFocusable = false
                     if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
-                    callButton.visibility = View.INVISIBLE
-                    callButton.isEnabled = false
-                    callVideoButton.visibility = View.INVISIBLE
-                    callVideoButton.isEnabled = false
-                    hangupButton.visibility = View.VISIBLE
-                    hangupButton.isEnabled = false
-                    hangupButton.isEnabled = true
                     if (!call(ua, uri, "outgoing", kind)) {
                         am.mode = AudioManager.MODE_NORMAL
                         callButton.visibility = View.VISIBLE
@@ -1624,6 +1621,13 @@ class MainActivity : AppCompatActivity() {
                         callVideoButton.isEnabled = true
                         hangupButton.visibility = View.INVISIBLE
                         hangupButton.isEnabled = false
+                    } else {
+                        callButton.visibility = View.INVISIBLE
+                        callButton.isEnabled = false
+                        callVideoButton.visibility = View.INVISIBLE
+                        callVideoButton.isEnabled = false
+                        hangupButton.visibility = View.VISIBLE
+                        hangupButton.isEnabled = true
                     }
                 }
             } else {
@@ -1967,6 +1971,16 @@ class MainActivity : AppCompatActivity() {
         return
     }
 
+    private fun saveCallUri() {
+        if (UserAgent.uas().isNotEmpty() && aorSpinner.selectedItemPosition >= 0) {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            if (Call.uaCalls(ua, "").size == 0)
+                ua.account.resumeUri = callUri.text.toString()
+            else
+                ua.account.resumeUri = ""
+        }
+    }
+
     @Suppress("DEPRECATION")
     private fun dismissKeyguard() {
         if (Build.VERSION.SDK_INT >= 27) {
@@ -1983,11 +1997,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
 
         var visible = false
-
-        var resumeAction = ""
-        var resumeUap = ""
-        var resumeCall: Call? = null
-        var resumeUri = ""
         var activityAor = ""
 
         // <aor, password> of those accounts that have auth username without auth password
