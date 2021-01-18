@@ -1835,6 +1835,7 @@ class MainActivity : AppCompatActivity() {
                         securityButton.visibility = View.VISIBLE
                     }
                     callButton.visibility = View.INVISIBLE
+                    callVideoButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
