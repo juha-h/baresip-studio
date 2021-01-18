@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         dismissKeyguard()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
-        if (Utils.darkTheme(this))
+        if (Utils.darkTheme())
             window.setBackgroundDrawableResource(R.color.colorDark)
 
         setContentView(binding.root)
@@ -1710,7 +1710,7 @@ class MainActivity : AppCompatActivity() {
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
-            if (Utils.darkTheme(applicationContext)) {
+            if (Utils.darkTheme()) {
                 val color = ContextCompat.getColor(this, R.color.colorGrayLight)
                 callTitle.setTextColor(color)
                 callUri.setTextColor(color)

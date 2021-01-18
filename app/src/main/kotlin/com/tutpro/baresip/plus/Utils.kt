@@ -71,7 +71,7 @@ object Utils {
             }
             val dialog = this.create()
             dialog.show()
-            if (darkTheme(context))
+            if (darkTheme())
                 dialog.window!!.setBackgroundDrawableResource(R.color.colorDark)
         }
     }
@@ -628,7 +628,7 @@ object Utils {
         return cameras
     }
 
-    fun darkTheme(ctx: Context): Boolean {
+    fun darkTheme(): Boolean {
         return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
     }
 
