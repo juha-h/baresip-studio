@@ -637,8 +637,7 @@ class MainActivity : AppCompatActivity() {
                         acc.resumeUri = uriStr.replace("tel", "sip") + "@" + acc.aor
                     }
                     else -> {
-                        Toast.makeText(applicationContext, getString(R.string.invalid_sip_uri),
-                                Toast.LENGTH_SHORT).show()
+                        Log.w("Baresip", "Unsupported URI scheme ${uri.scheme}")
                         return
                     }
                 }
