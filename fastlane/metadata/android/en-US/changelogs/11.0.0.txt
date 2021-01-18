@@ -1,4 +1,5 @@
 - Added H.265 video codec
 - Other apps can now see baresip as a phone app for sip: and tel: URIs
 - Improved save/restore of call URI text when main activity is paused
+- Introduced Japanese translation
 - Color enhancements
