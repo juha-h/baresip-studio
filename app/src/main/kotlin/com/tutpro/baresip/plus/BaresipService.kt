@@ -863,6 +863,18 @@ class BaresipService: Service() {
     }
 
     @Keep
+    fun started() {
+        Log.d(LOG_TAG, "Received 'started' from baresip")
+        if (callActionUri != "") {
+            val intent = Intent("service event")
+            intent.putExtra("event", "started")
+            intent.putExtra("params", arrayListOf(callActionUri))
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+            callActionUri = ""
+        }
+    }
+
+    @Keep
     fun messageResponse(responseCode: Int, responseReason: String, time: String) {
         Log.d(LOG_TAG, "Message response '$responseCode $responseReason' at $time")
         val intent = Intent("message response")
@@ -1247,6 +1259,7 @@ class BaresipService: Service() {
         var downloadsPath = ""
         var logLevel = 2
         var sipTrace = false
+        var callActionUri = ""
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()
