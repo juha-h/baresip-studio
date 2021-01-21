@@ -281,7 +281,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
-        case UA_EVENT_GET_PASSWORD:
+        case UA_EVENT_CUSTOM:
             get_password((char *)ua, (char *)call);
             return;
         default:
@@ -605,7 +605,6 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
 
     for (le = list_head(uag_list()); le != NULL; le = le->next)
         ua_print_status_log(le->data);
-
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
 
