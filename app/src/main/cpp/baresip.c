@@ -242,7 +242,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
-        case UA_EVENT_GET_PASSWORD:
+        case UA_EVENT_CUSTOM:
             get_password((char *)ua, (char *)call);
             return;
         default:
@@ -265,18 +265,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
             return;
         }
-    }
-
-    if (ev == UA_EVENT_GET_PASSWORD) {
-        jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
-                                                 "(Ljava/lang/String;)Ljava/lang/String;");
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
-        jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        jstring javaPassword = (*env)->CallObjectMethod(env, g_ctx.mainActivityObj, methodId, javaUA);
-        const char *password = (*env)->GetStringUTFChars(env, javaPassword, 0);
-        strcpy((char *)call, password);
-        (*env)->ReleaseStringUTFChars(env, javaPassword, password);
-        return;
     }
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz,
