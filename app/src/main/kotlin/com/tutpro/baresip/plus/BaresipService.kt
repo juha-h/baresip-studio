@@ -429,11 +429,6 @@ class BaresipService: Service() {
             else
                 status.add(R.drawable.dot_yellow)
         }
-        val intent = Intent("service event")
-        intent.putExtra("event", "ua added")
-        intent.putExtra("params", arrayListOf(uap))
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-        updateStatusNotification()
     }
 
     @Keep
@@ -865,13 +860,11 @@ class BaresipService: Service() {
     @Keep
     fun started() {
         Log.d(LOG_TAG, "Received 'started' from baresip")
-        if (callActionUri != "") {
-            val intent = Intent("service event")
-            intent.putExtra("event", "started")
-            intent.putExtra("params", arrayListOf(callActionUri))
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-            callActionUri = ""
-        }
+        val intent = Intent("service event")
+        intent.putExtra("event", "started")
+        intent.putExtra("params", arrayListOf(callActionUri))
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        callActionUri = ""
     }
 
     @Keep

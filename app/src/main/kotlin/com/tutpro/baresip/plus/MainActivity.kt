@@ -818,18 +818,26 @@ class MainActivity : AppCompatActivity() {
         if (event == "started") {
             val callActionUri = params[0]
             Log.d("Baresip", "Handling service event 'started' with '$callActionUri'")
-            var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
-            if (ua == null)
-                if (BaresipService.uas.size > 0) {
-                    ua = BaresipService.uas[0]
-                } else {
-                    Log.w("Baresip", "No UAs to make the call to $callActionUri")
-                    return
+            uaAdapter.notifyDataSetChanged()
+            if (callActionUri != "") {
+                var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
+                if (ua == null)
+                    if (BaresipService.uas.size > 0) {
+                        ua = BaresipService.uas[0]
+                    } else {
+                        Log.w("Baresip", "No UAs to make the call to '$callActionUri'")
+                        return
+                    }
+                spinToAor(ua.account.aor)
+                ua.account.resumeUri = callActionUri
+                callUri.setText(callActionUri)
+                callButton.performClick()
+            } else {
+                if (aorSpinner.selectedItemPosition == -1) {
+                    aorSpinner.setSelection(0)
+                    aorSpinner.tag = UserAgent.uas()[0].account.aor
                 }
-            spinToAor(ua.account.aor)
-            ua.account.resumeUri = callActionUri
-            callUri.setText(callActionUri)
-            callButton.performClick()
+            }
             return
         }
         if (event == "stopped") {
@@ -869,13 +877,6 @@ class MainActivity : AppCompatActivity() {
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "ua added" -> {
-                        uaAdapter.notifyDataSetChanged()
-                        if (aorSpinner.selectedItemPosition == -1) {
-                            aorSpinner.setSelection(0)
-                            aorSpinner.tag = UserAgent.uas()[0].account.aor
-                        }
-                    }
                     "registered", "unregistering" -> {
                         uaAdapter.notifyDataSetChanged()
                     }
