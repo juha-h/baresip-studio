@@ -860,6 +860,18 @@ class BaresipService: Service() {
     }
 
     @Keep
+    fun started() {
+        Log.d(LOG_TAG, "Received 'started' from baresip")
+        if (callActionUri != "") {
+            val intent = Intent("service event")
+            intent.putExtra("event", "started")
+            intent.putExtra("params", arrayListOf(callActionUri))
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+            callActionUri = ""
+        }
+    }
+
+    @Keep
     fun stopped(error: String) {
         Log.d(LOG_TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false
@@ -1194,6 +1206,7 @@ class BaresipService: Service() {
         var downloadsPath = ""
         var logLevel = 2
         var sipTrace = false
+        var callActionUri = ""
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()

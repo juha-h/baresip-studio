@@ -82,7 +82,10 @@ class MainActivity : AppCompatActivity() {
 
         val intentAction = intent.getStringExtra("action")
 
-        Log.d("Baresip", "At MainActivity onCreate with action '$intentAction'")
+        Log.d("Baresip", "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
+
+        if (intent?.action == ACTION_CALL && BaresipService.callActionUri == "")
+            BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         dismissKeyguard()
@@ -710,6 +713,23 @@ class MainActivity : AppCompatActivity() {
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
             Log.d("Baresip", "Omit service event '$event' for task -1")
+            return
+        }
+        if (event == "started") {
+            val callActionUri = params[0]
+            Log.d("Baresip", "Handling service event 'started' with '$callActionUri'")
+            var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
+            if (ua == null)
+                if (BaresipService.uas.size > 0) {
+                    ua = BaresipService.uas[0]
+                } else {
+                    Log.w("Baresip", "No UAs to make the call to $callActionUri")
+                    return
+                }
+            spinToAor(ua.account.aor)
+            ua.account.resumeUri = callActionUri
+            callUri.setText(callActionUri)
+            callButton.performClick()
             return
         }
         if (event == "stopped") {

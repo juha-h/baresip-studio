@@ -562,6 +562,9 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     for (le = list_head(uag_list()); le != NULL; le = le->next)
         ua_print_status_log(le->data);
 
+    jmethodID startedId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "started", "()V");
+    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, startedId);
+
     LOGI("running main loop ...\n");
     err = re_main(signal_handler);
 
