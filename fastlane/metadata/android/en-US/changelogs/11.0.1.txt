@@ -1,0 +1,1 @@
+- Fixed handling of call action when baresip app is not running.
