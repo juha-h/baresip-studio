@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("Baresip", "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
 
-        if (intent?.action == ACTION_CALL && BaresipService.callActionUri == "")
+        if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
