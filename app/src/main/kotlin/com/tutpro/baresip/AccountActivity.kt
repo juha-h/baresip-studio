@@ -10,8 +10,6 @@ import android.view.View
 import android.widget.*
 import com.tutpro.baresip.databinding.ActivityAccountBinding
 
-import kotlinx.android.synthetic.main.activity_account.*
-
 class AccountActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAccountBinding
@@ -419,7 +417,7 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var tVmUri = voicemailUri.text.toString().trim()
+                var tVmUri = vmUri.text.toString().trim()
                 if (tVmUri != acc.vmUri) {
                     if (tVmUri != "") {
                         if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
