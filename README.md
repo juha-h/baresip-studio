@@ -8,7 +8,7 @@ If you need video calling and have a device with Android version 7.0 or newer th
 
 After cloning the project, generate static libraries and include files to distribution directory using master branch of https://github.com/juha-h/libbaresip-android.
 
-Then in Android Studio 4.1.1:
+Then in Android Studio 4.1.2:
 
 - Open an existing Android Studio project
 
