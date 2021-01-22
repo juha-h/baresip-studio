@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
         val intentAction = intent.getStringExtra("action")
 
-        Log.d("Baresip", "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
+        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
 
         if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         stopState = "initial"
         quitTimer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                Log.d("Baresip", "Seconds remaining: ${millisUntilFinished / 1000}")
+                Log.d(TAG, "Seconds remaining: ${millisUntilFinished / 1000}")
             }
             override fun onFinish() {
                 when (stopState) {
@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity() {
             // Have to allow NULL view, since sometimes when onItemSelected is called, view is NULL.
             // Haven't found any explanation why this can happen.
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                Log.d("Baresip", "aorSpinner selecting $position")
+                Log.d(TAG, "aorSpinner selecting $position")
                 val acc = UserAgent.uas()[position].account
                 aorSpinner.tag = acc.aor
                 val ua = UserAgent.uas()[position]
@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                 updateIcons(acc)
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
-                Log.d("Baresip", "Nothing selected")
+                Log.d(TAG, "Nothing selected")
             }
         }
         aorSpinner.setOnTouchListener { view, event ->
@@ -252,8 +252,7 @@ class MainActivity : AppCompatActivity() {
                             val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
                             if (calls.size > 0) {
                                 if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
-                                    Log.e("Baresip",
-                                            "Command 'zrtp_unverify ${calls[0].zid}' failed")
+                                    Log.e(TAG, "Command 'zrtp_unverify ${calls[0].zid}' failed")
                                 } else {
                                     securityButton.setImageResource(R.drawable.box_yellow)
                                     securityButton.tag = "yellow"
@@ -288,7 +287,7 @@ class MainActivity : AppCompatActivity() {
             val uaCalls = Call.uaCalls(ua, "")
             if (uaCalls.size > 0) {
                 val callp = uaCalls[uaCalls.size - 1].callp
-                Log.d("Baresip", "AoR $aor hanging up call $callp with ${callUri.text}")
+                Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.text}")
                 hangupButton.isEnabled = false
                 Api.ua_hangup(ua.uap, callp, 0, "")
             }
@@ -298,7 +297,7 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "in")[0]
-            Log.d("Baresip", "AoR $aor answering call ${call.callp} from ${callUri.text}")
+            Log.d(TAG, "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
@@ -311,7 +310,7 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "in")[0]
-            Log.d("Baresip", "AoR $aor answering video call ${call.callp} from ${callUri.text}")
+            Log.d(TAG, "AoR $aor answering video call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
@@ -324,7 +323,7 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val callp = Call.uaCalls(ua, "in")[0].callp
-            Log.d("Baresip", "AoR $aor rejecting call $callp from ${callUri.text}")
+            Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
@@ -336,12 +335,12 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             val call = Call.uaCalls(ua, "")[0]
             if (call.onhold) {
-                Log.d("Baresip", "AoR $aor resuming call ${call.callp} with ${callUri.text}")
+                Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.unhold()
                 call.onhold = false
                 holdButton.setImageResource(R.drawable.pause)
             } else {
-                Log.d("Baresip", "AoR $aor holding call ${call.callp} with ${callUri.text}")
+                Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
@@ -448,7 +447,7 @@ class MainActivity : AppCompatActivity() {
                 callUri.inputType = InputType.TYPE_CLASS_PHONE
                 dialpadButton.setImageResource(R.drawable.dialpad_on)
                 dialpadButton.tag = "on"
-                //Log.d("Baresip", "Screen ${Utils.getScreenOrientation(applicationContext)}")
+                //Log.d(TAG, "Screen ${Utils.getScreenOrientation(applicationContext)}")
                 //val path = BaresipService.downloadsPath + "/video.mp4"
                 //Utils.ffmpegExecute("-video_size hd720 -f android_camera -camera_index 1 -i anything -r 10 -t 5 -y $path")
             } else {
@@ -558,7 +557,7 @@ class MainActivity : AppCompatActivity() {
             val call = Call.call("connected")
             if (call != null) {
                 if (call.setVideoSource(!BaresipService.cameraFront) != 0)
-                    Log.w("Baresip", "Failed to set video source")
+                    Log.w(TAG, "Failed to set video source")
                 else
                     BaresipService.cameraFront = !BaresipService.cameraFront
                 if (BaresipService.cameraFront)
@@ -614,7 +613,7 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         resumeAction = ""
         resumeUri = ""
-        Log.i("Baresip", "onNewIntent ${intent.action} ${intent.data}")
+        Log.d(TAG, "onNewIntent ${intent.action} ${intent.data}")
         if (intent.action == ACTION_CALL) {
             if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty()) {
                 return
@@ -624,7 +623,6 @@ class MainActivity : AppCompatActivity() {
                 val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
                 when (uri.scheme) {
                     "sip" -> {
-                        Log.d("Baresip", "Got sip URI $uriStr")
                         var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
                         if (ua == null)
                             ua = BaresipService.uas[0]
@@ -633,14 +631,13 @@ class MainActivity : AppCompatActivity() {
                         ua.account.resumeUri = uriStr
                     }
                     "tel" -> {
-                        Log.d("Baresip", "Got tel URI $uriStr")
                         val acc = BaresipService.uas[0].account
                         spinToAor(acc.aor)
                         resumeAction = "call"
                         acc.resumeUri = uriStr.replace("tel", "sip") + "@" + acc.aor
                     }
                     else -> {
-                        Log.w("Baresip", "Unsupported URI scheme ${uri.scheme}")
+                        Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
                         return
                     }
                 }
@@ -653,7 +650,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleIntent(intent: Intent) {
         val action = intent.getStringExtra("action")
-        Log.d("Baresip", "Handling intent '$action'")
+        Log.d(TAG, "Handling intent '$action'")
         when (action) {
             "accounts" -> {
                 resumeAction = "accounts"
@@ -667,7 +664,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w("Baresip", "handleIntent 'call' did not find ua $uap")
+                    Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
@@ -679,7 +676,7 @@ class MainActivity : AppCompatActivity() {
                 val callp = intent.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null) {
-                    Log.w("Baresip", "handleIntent '$action' did not find call $callp")
+                    Log.w(TAG, "handleIntent '$action' did not find call $callp")
                     return
                 }
                 val ua = call.ua
@@ -692,7 +689,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w("Baresip", "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "onNewIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
@@ -703,7 +700,7 @@ class MainActivity : AppCompatActivity() {
                 val callp = intent.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null) {
-                    Log.w("Baresip", "handleIntent '$action' did not find call $callp")
+                    Log.w(TAG, "handleIntent '$action' did not find call $callp")
                     moveTaskToBack(true)
                     return
                 }
@@ -715,7 +712,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w("Baresip", "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "onNewIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
@@ -729,7 +726,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("Baresip", "Main onResume with action '$resumeAction'")
+        Log.d(TAG, "Main onResume with action '$resumeAction'")
         visible = true
         when (resumeAction) {
             "call show" ->
@@ -764,7 +761,6 @@ class MainActivity : AppCompatActivity() {
                             if (Call.calls().size > 0)
                                 spinToAor(Call.calls()[0].ua.account.aor)
                             else {
-                                Log.w("Baresip", "Setting selection to 0")
                                 aorSpinner.setSelection(0)
                                 aorSpinner.tag = UserAgent.uas()[0].account.aor
                             }
@@ -783,7 +779,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        Log.d("Baresip", "Main onPause")
+        Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
         visible = false
         saveCallUri()
@@ -791,14 +787,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun recreate() {
-        Log.d("Baresip", "Main onCreate")
+        Log.d(TAG, "Main onCreate")
         super.recreate()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
-                Log.d("Baresip", "Adjusting volume $keyCode of stream ${volumeControlStream}")
+                Log.d(TAG, "Adjusting volume $keyCode of stream ${volumeControlStream}")
                 am.adjustStreamVolume(volumeControlStream,
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
                             AudioManager.ADJUST_LOWER else
@@ -812,12 +808,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
         if (taskId == -1) {
-            Log.d("Baresip", "Omit service event '$event' for task -1")
+            Log.d(TAG, "Omit service event '$event' for task -1")
             return
         }
         if (event == "started") {
             val callActionUri = params[0]
-            Log.d("Baresip", "Handling service event 'started' with '$callActionUri'")
+            Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
             uaAdapter.notifyDataSetChanged()
             if (callActionUri != "") {
                 var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
@@ -825,7 +821,7 @@ class MainActivity : AppCompatActivity() {
                     if (BaresipService.uas.size > 0) {
                         ua = BaresipService.uas[0]
                     } else {
-                        Log.w("Baresip", "No UAs to make the call to '$callActionUri'")
+                        Log.w(TAG, "No UAs to make the call to '$callActionUri'")
                         return
                     }
                 spinToAor(ua.account.aor)
@@ -841,7 +837,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (event == "stopped") {
-            Log.d("Baresip", "Handling service event 'stopped' with param '${params[0]}'")
+            Log.d(TAG, "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
                 val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.notice)
@@ -867,11 +863,11 @@ class MainActivity : AppCompatActivity() {
         val uap = params[0]
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
-            Log.w("Baresip", "handleServiceEvent '$event' did not find ua $uap")
+            Log.w(TAG, "handleServiceEvent '$event' did not find ua $uap")
             return
         }
         val ev = event.split(",")
-        Log.d("Baresip", "Handling service event '${ev[0]}' for $uap")
+        Log.d(TAG, "Handling service event '${ev[0]}' for $uap")
         val acc = ua.account
         val aor = ua.account.aor
         for (account_index in UserAgent.uas().indices) {
@@ -906,7 +902,7 @@ class MainActivity : AppCompatActivity() {
                                 spinToAor(aor)
                             showCall(ua)
                         } else {
-                            Log.d("Baresip", "Reordering to front")
+                            Log.d(TAG, "Reordering to front")
                             val i = Intent(applicationContext, MainActivity::class.java)
                             i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
                             i.putExtra("action", "call show")
@@ -935,7 +931,7 @@ class MainActivity : AppCompatActivity() {
                         val dir = params[2].toInt()
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Video request call $callp not found")
+                            Log.w(TAG, "Video request call $callp not found")
                             return
                         }
                         if (!isFinishing() && !alerting) {
@@ -970,7 +966,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Call $callp to be verified is not found")
+                            Log.w(TAG, "Call $callp to be verified is not found")
                             return
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
@@ -982,7 +978,7 @@ class MainActivity : AppCompatActivity() {
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 val security: Int
                                 if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                                    Log.e("Baresip", "Command 'zrtp_verify ${ev[3]}' failed")
+                                    Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
                                     security = R.drawable.box_yellow
                                 } else {
                                     security = R.drawable.box_green
@@ -1013,7 +1009,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Call $callp that is verified is not found")
+                            Log.w(TAG, "Call $callp that is verified is not found")
                             return
                         }
                         val tag: String
@@ -1030,7 +1026,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Call $callp to be transferred is not found")
+                            Log.w(TAG, "Call $callp to be transferred is not found")
                             return
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
@@ -1060,7 +1056,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Call $callp to be transferred is not found")
+                            Log.w(TAG, "Call $callp to be transferred is not found")
                             return
                         }
                         if (call in Call.calls())
@@ -1102,8 +1098,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
-                        Log.d("Baresip", "Message for $aor from $peer")
-                        Log.d("Baresip", "Activity stack ${BaresipService.activities.toString()}")
                         val i = Intent(applicationContext, ChatActivity::class.java)
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         val b = Bundle()
@@ -1130,7 +1124,7 @@ class MainActivity : AppCompatActivity() {
                                 voicemailButton.setImageResource(R.drawable.voicemail)
                         }
                     }
-                    else -> Log.e("Baresip", "Unknown event '${ev[0]}'")
+                    else -> Log.e(TAG, "Unknown event '${ev[0]}'")
                 }
                 break
             }
@@ -1138,7 +1132,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun reStart() {
-        Log.d("Baresip", "Trigger restart")
+        Log.d(TAG, "Trigger restart")
         val pm = applicationContext.packageManager
         val intent = pm.getLaunchIntentForPackage(this.getPackageName())
         this.finishAffinity()
@@ -1151,7 +1145,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        Log.d("Baresip", "Main onDestroy")
+        Log.d(TAG, "Main onDestroy")
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
         super.onDestroy()
@@ -1228,7 +1222,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        Log.d("Baresip", "onActivity result $requestCode $resultCode")
+        Log.d(TAG, "onActivity result $requestCode $resultCode")
 
         when (requestCode) {
 
@@ -1338,7 +1332,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun quitRestart(reStart: Boolean) {
         if (stopState == "initial") {
-            Log.d("Baresip", "quitRestart Restart = $reStart")
+            Log.d(TAG, "quitRestart Restart = $reStart")
             if (BaresipService.isServiceRunning) {
                 restart = reStart
                 baresipService.setAction("Stop");
@@ -1532,14 +1526,14 @@ class MainActivity : AppCompatActivity() {
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         if (!Utils.zip(files, zipFile)) {
-            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.backup_failed), bsFile))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
         if (content == null) {
-            Log.w("Baresip", "Failed to read zip file '$zipFile'")
+            Log.w(TAG, "Failed to read zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.backup_failed), bsFile))
             return
@@ -1566,13 +1560,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
-            Log.w("Baresip", "Failed to write zip file '$zipFile'")
+            Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.restore_failed), bsFile))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
-            Log.w("Baresip", "Failed to unzip file '$zipFile'")
+            Log.w(TAG, "Failed to unzip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.restore_failed), bsFile))
             return
@@ -1674,12 +1668,12 @@ class MainActivity : AppCompatActivity() {
         }
         val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, videoDir)
         if (callp != "") {
-            Log.d("Baresip", "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
+            Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
             showCall(ua)
             return true
         } else {
-            Log.e("Baresip", "ua_call_alloc ${ua.uap}/$uri failed")
+            Log.e(TAG, "ua_call_alloc ${ua.uap}/$uri failed")
             return false
         }
     }
@@ -1688,7 +1682,7 @@ class MainActivity : AppCompatActivity() {
     private fun transfer(ua: UserAgent, call: Call, uri: String) {
         val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
         if (newCallp != "") {
-            Log.d("Baresip", "Adding outgoing call ${ua.uap}/$newCallp/$uri")
+            Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))
             newCall.add()
@@ -1702,11 +1696,11 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
             } else {
                 call.startAudio()
-                Log.e("Baresip", "call_connect $newCallp failed with error $err")
+                Log.e(TAG, "call_connect $newCallp failed with error $err")
                 call.notifySipfrag(500, "Call Error")
             }
         } else {
-            Log.e("Baresip", "ua_call_alloc ${ua.uap}/${call.callp} failed")
+            Log.e(TAG, "ua_call_alloc ${ua.uap}/${call.callp} failed")
             call.notifySipfrag(500, "Call Error")
         }
     }
@@ -1902,7 +1896,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun restoreActivities() {
         if (BaresipService.activities.isEmpty()) return
-        Log.d("Baresip", "Activity stack ${BaresipService.activities}")
+        Log.d(TAG, "Activity stack ${BaresipService.activities}")
         val activity = BaresipService.activities[0].split(",")
         BaresipService.activities.removeAt(0)
         when (activity[0]) {
@@ -2023,6 +2017,8 @@ class MainActivity : AppCompatActivity() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 
+        private const val TAG = "Baresip"
+
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
         const val CONFIG_CODE = 3
@@ -2042,7 +2038,7 @@ class MainActivity : AppCompatActivity() {
 
     init {
         if (!BaresipService.libraryLoaded) {
-            Log.d("Baresip", "Loading baresip library")
+            Log.d(TAG, "Loading baresip library")
             System.loadLibrary("baresip")
             BaresipService.libraryLoaded = true
         }
