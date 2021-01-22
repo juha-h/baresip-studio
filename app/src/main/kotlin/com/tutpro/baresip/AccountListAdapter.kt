@@ -17,31 +17,49 @@ import java.util.*
 class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<AccountRow>) :
         ArrayAdapter<AccountRow>(cxt, R.layout.account_row, rows) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private val layoutInflater = LayoutInflater.from(context)
+
+    private class ViewHolder(view: View?) {
+        val aorView = view?.findViewById(R.id.aor) as TextView
+        val actionView = view?.findViewById(R.id.action) as ImageButton
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+        val ua = UserAgent.uas()[position]
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.account_row, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val row = rows[position]
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.account_row, parent, false)
-        val aorView = rowView.findViewById(R.id.aor) as TextView
-        aorView.text = row.aor.split(":")[0]
-        aorView.textSize = 20f
-        aorView.setPadding(6, 6, 0, 6)
-        aorView.setOnClickListener {
+        viewHolder.aorView.text = row.aor.split(":")[0]
+        viewHolder.aorView.textSize = 20f
+        viewHolder.aorView.setPadding(6, 6, 0, 6)
+        viewHolder.actionView.setImageResource(row.action)
+
+        viewHolder.aorView.setOnClickListener {
             val i = Intent(cxt, AccountActivity::class.java)
             val b = Bundle()
             b.putString("aor", UserAgent.uas()[position].account.aor)
             i.putExtras(b)
             (cxt as Activity).startActivityForResult(i, MainActivity.ACCOUNT_CODE)
         }
-        val ua = UserAgent.uas()[position]
-        val actionView = rowView.findViewById(R.id.action) as ImageButton
-        actionView.setImageResource(row.action)
-        actionView.setOnClickListener {
+
+        viewHolder.actionView.setOnClickListener {
             val titleView = View.inflate(cxt, R.layout.alert_title, null) as TextView
             titleView.text = cxt.getString(R.string.confirmation)
             with (AlertDialog.Builder(cxt, R.style.AlertDialog)) {
                 setCustomTitle(titleView)
                 setMessage(String.format(cxt.getString(R.string.delete_account),
-                        aorView.text))
+                        viewHolder.aorView.text))
                 setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
                     Api.ua_destroy(ua.uap)
                     CallHistory.clear(ua.account.aor)
@@ -58,6 +76,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                 show()
             }
         }
+
         return rowView
     }
 
