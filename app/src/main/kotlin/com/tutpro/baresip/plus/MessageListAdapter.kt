@@ -15,31 +15,50 @@ import java.util.*
 class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private val layoutInflater = LayoutInflater.from(context)
+
+    private class ViewHolder(view: View?) {
+        val layoutView = view?.findViewById(R.id.message) as LinearLayout
+        val infoView = view?.findViewById(R.id.info) as TextView
+        val textView = view?.findViewById(R.id.text) as TextView
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.message, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val message = rows[position]
+
         val up = (message.direction == R.drawable.arrow_up_green) ||
             (message.direction == R.drawable.arrow_up_red)
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val messageView = inflater.inflate(R.layout.message, parent, false)
-        val layout = messageView.findViewById(R.id.message) as LinearLayout
-        val lp = layout.layoutParams as LinearLayout.LayoutParams
+        val lp = viewHolder.layoutView.layoutParams as LinearLayout.LayoutParams
         val peer: String
-        if (up) {
+        peer = if (up) {
             lp.setMargins(75, 10, 0, 10)
-            layout.setBackgroundResource(R.drawable.message_out_bg)
-            peer = ctx.getString(R.string.you)
+            viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
+            ctx.getString(R.string.you)
         } else {
             lp.setMargins(0, 10, 75, 10)
-            layout.setBackgroundResource(R.drawable.message_in_bg)
+            viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
             val contactName = ContactsActivity.contactName(message.peerUri)
             if (contactName.startsWith("sip:") &&
                     (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
-                peer = Utils.uriUserPart(message.peerUri)
+                Utils.uriUserPart(message.peerUri)
             else
-                peer = contactName
+                contactName
         }
-        layout.layoutParams = lp
-        val infoView = messageView.findViewById(R.id.info) as TextView
+        viewHolder.layoutView.layoutParams = lp
+
         var info: String
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
@@ -56,14 +75,15 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
                 info = "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
             else
                 info = "$info - ${ctx.getString(R.string.sending_failed)}"
-            infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
+            viewHolder.infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         }
-        infoView.text = info
-        val textView = messageView.findViewById(R.id.text) as TextView
-        textView.text = message.message
+        viewHolder.infoView.text = info
+
+        viewHolder.textView.text = message.message
         if (message.new)
-            textView.setTypeface(null, Typeface.BOLD)
-        return messageView
+            viewHolder.textView.setTypeface(null, Typeface.BOLD)
+
+        return rowView
     }
 
 }

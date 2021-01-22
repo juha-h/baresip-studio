@@ -25,37 +25,56 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                          private val aor: String) :
         ArrayAdapter<Contact>(ctx, R.layout.contact_row, rows) {
 
+    private val layoutInflater = LayoutInflater.from(context)
     private var lastClick: Long = 0
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private class ViewHolder(view: View?) {
+        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
+        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
+        val nameView = view?.findViewById(R.id.contactName) as TextView
+        val actionView = view?.findViewById(R.id.edit) as ImageButton
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.contact_row, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val contact = rows[position]
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.contact_row, parent, false)
-        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
-        val imageAvatarView = rowView.findViewById(R.id.ImageAvatar) as ImageView
+
         val avatarImage = contact.avatarImage
         if (avatarImage != null) {
-            textAvatarView.visibility = View.GONE
-            cardAvatarView.visibility = View.VISIBLE
-            imageAvatarView.visibility = View.VISIBLE
-            imageAvatarView.setImageBitmap(avatarImage)
+            viewHolder.textAvatarView.visibility = View.GONE
+            viewHolder.cardAvatarView.visibility = View.VISIBLE
+            viewHolder.imageAvatarView.visibility = View.VISIBLE
+            viewHolder.imageAvatarView.setImageBitmap(avatarImage)
         } else {
-            textAvatarView.visibility = View.VISIBLE
-            cardAvatarView.visibility = View.GONE
-            imageAvatarView.visibility = View.GONE
-            (textAvatarView.background as GradientDrawable).setColor(contact.color)
+            viewHolder.textAvatarView.visibility = View.VISIBLE
+            viewHolder.cardAvatarView.visibility = View.GONE
+            viewHolder.imageAvatarView.visibility = View.GONE
+            (viewHolder.textAvatarView.background as GradientDrawable).setColor(contact.color)
             if (contact.name.isNotEmpty())
-                textAvatarView.text = "${contact.name[0]}"
+                viewHolder.textAvatarView.text = "${contact.name[0]}"
             else
-                textAvatarView.text = ""
+                viewHolder.textAvatarView.text = ""
         }
-        val nameView = rowView.findViewById(R.id.contactName) as TextView
-        nameView.text = contact.name
-        nameView.textSize = 20f
-        nameView.setPadding(6, 6, 0, 6)
+
+        viewHolder.nameView.text = contact.name
+        viewHolder.nameView.textSize = 20f
+        viewHolder.nameView.setPadding(6, 6, 0, 6)
+
         if (aor != "") {
-            nameView.setOnClickListener { _ ->
+            viewHolder.nameView.setOnClickListener { _ ->
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
                         DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
@@ -93,7 +112,8 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                 }
             }
         }
-        nameView.setOnLongClickListener { _ ->
+
+        viewHolder.nameView.setOnLongClickListener { _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -126,8 +146,8 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
             }
             true
         }
-        val actionView = rowView.findViewById(R.id.edit) as ImageButton
-        actionView.setOnClickListener { _ ->
+
+        viewHolder.actionView.setOnClickListener { _ ->
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
                 val i = Intent(ctx, ContactActivity::class.java)
@@ -138,6 +158,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                 (ctx as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
             }
         }
+
         return rowView
     }
 }
