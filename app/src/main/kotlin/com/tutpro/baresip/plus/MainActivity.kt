@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.activity_main.*
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
 import java.net.URLDecoder
@@ -36,7 +35,8 @@ import java.net.URLDecoder
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var layout: RelativeLayout
+    private lateinit var defaultLayout: RelativeLayout
+    private lateinit var videoLayout: RelativeLayout
     private lateinit var videoView: VideoView
     private lateinit var callTitle: TextView
     private lateinit var callUri: AutoCompleteTextView
@@ -106,7 +106,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        layout = binding.mainActivityLayout
+        defaultLayout = binding.defaultLayout
+        videoLayout = binding.videoLayout
         videoView = VideoView(applicationContext)
         aorSpinner = binding.aorSpinner
         callTitle = binding.callTitle
