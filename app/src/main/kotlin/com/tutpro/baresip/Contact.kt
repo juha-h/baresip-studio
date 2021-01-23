@@ -9,6 +9,7 @@ import java.util.ArrayList
 class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
 
     var avatarImage: Bitmap? = null
+    var androidContact = false
 
     companion object {
 

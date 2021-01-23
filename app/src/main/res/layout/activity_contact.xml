@@ -77,5 +77,30 @@
             android:importantForAutofill="no" >
     </EditText>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:orientation="horizontal" >
+        <TextView
+            android:id="@+id/AndroidTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/Android"
+            android:textSize="18sp"
+            android:onClick="onClick"
+            android:text="@string/android" >
+        </TextView>
+        <CheckBox
+            android:id="@+id/Android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:checked="false" >
+        </CheckBox>
+    </RelativeLayout>
+
 </LinearLayout>
 

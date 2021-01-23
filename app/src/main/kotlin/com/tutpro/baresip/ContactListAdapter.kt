@@ -127,6 +127,8 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                             }
                         }
                         Contact.contacts().removeAt(position)
+                        if (contact.androidContact)
+                            ContactActivity.deleteAndroidContact(ctx, contact)
                         Contact.save()
                         this.notifyDataSetChanged()
                     }
