@@ -1,20 +1,24 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import androidx.cardview.widget.CardView
 import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.exifinterface.media.ExifInterface
 import com.tutpro.baresip.databinding.ActivityContactBinding
-
 import java.io.File
 
 class ContactActivity : AppCompatActivity() {
@@ -133,12 +137,18 @@ class ContactActivity : AppCompatActivity() {
             resultData?.data?.also { uri ->
                 try {
                     val inputStream = baseContext.contentResolver.openInputStream(uri)
-                    val avatarImage = BitmapFactory.decodeStream(inputStream)
-                    showImageAvatar(avatarImage)
-                    if (Utils.saveBitmap(avatarImage, File(BaresipService.filesPath, "tmp.png")))
-                            newAvatar = "image"
+                    val avatarBitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+                    val scaledBitmap = Bitmap.createScaledBitmap(avatarBitmap, 192, 192, true)
+                    val exif = ExifInterface(baseContext.contentResolver.openInputStream(uri)!!)
+                    val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_NORMAL)
+                    val rotatedBitmap = rotateBitmap(scaledBitmap, orientation)
+                    showImageAvatar(rotatedBitmap)
+                    if (Utils.saveBitmap(rotatedBitmap, File(BaresipService.filesPath, "tmp.png")))
+                        newAvatar = "image"
                 } catch (e: Exception) {
-                    Log.e("Baresip", "Could not read avatar image")
+                    Log.e("Baresip", "Could not read avatar image: $e")
                 }
             }
         }
@@ -224,7 +234,7 @@ class ContactActivity : AppCompatActivity() {
                             Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
                         }
                     }
-                    "image" ->  {
+                    "image" -> {
                         contact.avatarImage = (cardImageAvatarView.drawable as BitmapDrawable).bitmap
                         Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
                         File(BaresipService.filesPath, "tmp.png")
@@ -278,5 +288,48 @@ class ContactActivity : AppCompatActivity() {
         textAvatarView.visibility = View.GONE
         cardAvatarView.visibility = View.VISIBLE
         cardImageAvatarView.setImageBitmap(image)
+    }
+
+    private fun getThumbnailSize(ctx: Context): Int {
+        var thumbnailSize = 96
+        if (Utils.checkPermission(this, Manifest.permission.READ_CONTACTS)) {
+            val c = ctx.contentResolver.query(ContactsContract.DisplayPhoto.CONTENT_MAX_DIMENSIONS_URI,
+                    arrayOf(ContactsContract.DisplayPhoto.THUMBNAIL_MAX_DIM),
+                    null, null, null)
+            if (c != null && c.moveToFirst())
+                thumbnailSize = c.getInt(0)
+            else
+                Log.e("Baresip", "Could not get THUMBNAIL_MAX_DIM")
+            c?.close()
+        }
+        return thumbnailSize
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_NORMAL -> return bitmap
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                matrix.setRotate(180f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.setRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.setRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
+            else -> return bitmap
+        }
+        val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.width, bitmap.height, matrix, true)
+        bitmap.recycle()
+        return rotatedBitmap
     }
 }
