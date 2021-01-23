@@ -544,7 +544,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         ua = le->data;
         sprintf(ua_buf, "%lu", (unsigned long) ua);
         jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        LOGD("adding UA for AoR %s/%s\n", ua_aor(ua), ua_buf);
+        LOGD("adding UA for AoR %s/%s\n", account_aor(ua_account(ua)), ua_buf);
         jmethodID uaAddId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaAdd",
                                                   "(Ljava/lang/String;)V");
         (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, javaUA);
