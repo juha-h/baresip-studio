@@ -6,6 +6,7 @@ import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -36,6 +37,7 @@ class ContactActivity : AppCompatActivity() {
     private lateinit var nameView: EditText
     private lateinit var uriView: EditText
     private lateinit var androidCheck: CheckBox
+    private lateinit var menu: Menu
 
     private var newContact = false
     private var newAvatar = ""
@@ -168,12 +170,13 @@ class ContactActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(optionsMenu: Menu): Boolean {
 
-        super.onCreateOptionsMenu(menu)
+        super.onCreateOptionsMenu(optionsMenu)
 
         val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
+        inflater.inflate(R.menu.check_icon, optionsMenu)
+        menu = optionsMenu
         return true
 
     }
@@ -259,7 +262,8 @@ class ContactActivity : AppCompatActivity() {
 
                 Contact.contacts().sortBy { Contact -> Contact.name }
 
-                if (Utils.checkPermission(this, Manifest.permission.WRITE_CONTACTS)) {
+                if (Utils.checkPermission(this, Manifest.permission.READ_CONTACTS +
+                                "|" + Manifest.permission.WRITE_CONTACTS)) {
                     if (contact.androidContact)
                         addOrUpdateAndroidContact(this, contact)
                     else
@@ -267,9 +271,9 @@ class ContactActivity : AppCompatActivity() {
                             deleteAndroidContact(this, contact)
                 } else {
                     if (contact.androidContact) {
-                        Utils.requestPermission(this,
-                                "Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_CONTACTS",
-                                MainActivity.CONTACT_PERMISSION_REQUEST_CODE)
+                        Utils.requestPermission(this, Manifest.permission.READ_CONTACTS +
+                                "|" + Manifest.permission.WRITE_CONTACTS,
+                                MainActivity.CONTACTS_PERMISSION_REQUEST_CODE)
                         return false
                     }
                 }
@@ -297,6 +301,22 @@ class ContactActivity : AppCompatActivity() {
 
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+
+        when (requestCode) {
+
+            MainActivity.CONTACTS_PERMISSION_REQUEST_CODE ->
+                if (grantResults.isNotEmpty() && permissions.size == grantResults.size) {
+                    for (res in grantResults)
+                        if (res != PackageManager.PERMISSION_GRANTED)
+                            return
+                    menu.performIdentifierAction(R.id.checkIcon, 0)
+                }
+        }
+
+    }
+
     override fun onBackPressed() {
 
         BaresipService.activities.remove("contact,$newContact,$uOrI")
@@ -309,10 +329,8 @@ class ContactActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v) {
-            binding.AndroidTitle -> {
-                Utils.alertView(this, getString(R.string.android),
-                        getString(R.string.android_contact_help))
-            }
+            binding.AndroidTitle ->
+                Utils.alertView(this, getString(R.string.android), getString(R.string.android_contact_help))
         }
     }
 
@@ -374,7 +392,6 @@ class ContactActivity : AppCompatActivity() {
     }
 
     private fun addAndroidContact(ctx: Context, contact: Contact): Boolean {
-        val cameraRotationMatrix = Matrix()
         val ops = ArrayList<ContentProviderOperation>()
         val rawContactInsertIndex = ops.size
         ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
@@ -393,13 +410,8 @@ class ContactActivity : AppCompatActivity() {
                 .withValue(Data.DATA1, contact.uri.substringAfter(":"))
                 .build())
         if (contact.avatarImage != null) {
-            cameraRotationMatrix.postRotate(180F)
-            val rotatedPhoto = Bitmap.createBitmap(contact.avatarImage!!, 0, 0,
-                    contact.avatarImage!!.width, contact.avatarImage!!.height,
-                    cameraRotationMatrix, false);
-            val photoData: ByteArray? = bitmapToPNGByteArray(rotatedPhoto)
+            val photoData: ByteArray? = bitmapToPNGByteArray(contact.avatarImage!!)
             if (photoData != null) {
-                Log.d("Baresip", "Adding photo")
                 ops.add(ContentProviderOperation
                         .newInsert(ContactsContract.Data.CONTENT_URI)
                         .withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
@@ -420,8 +432,7 @@ class ContactActivity : AppCompatActivity() {
     private fun updateAndroidContact(ctx: Context, contactId: Long, contact: Contact) {
         val ops = ArrayList<ContentProviderOperation>()
         val selection = ContactsContract.Data.CONTACT_ID + "='" + contactId.toString() +
-                "' AND " +
-                Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'"
+                "' AND " + Data.MIMETYPE + "='" + CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'"
         if (contact.avatarImage != null) {
             val stream = ByteArrayOutputStream()
             contact.avatarImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
@@ -441,7 +452,7 @@ class ContactActivity : AppCompatActivity() {
             Log.e("Baresip", "Update of contact $contactId failed")
         }
         val contentValues = ContentValues()
-        contentValues.put(ContactsContract.Data.DATA1, contact.uri)
+        contentValues.put(ContactsContract.Data.DATA1, contact.uri.substringAfter("sip:"))
         val where = ContactsContract.Data.CONTACT_ID + "=?" + " AND " + Data.MIMETYPE + "=?"
         val args = arrayOf((contactId).toString(), CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, args)
@@ -462,6 +473,8 @@ class ContactActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        var contact: Contact? = null
 
         fun deleteAndroidContact(ctx: Context, contact: Contact): Int {
             return ctx.contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
