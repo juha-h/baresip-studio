@@ -17,9 +17,9 @@
             (rekisteröintiä ei ole aktivoitu).</li>
         <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
         <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-        <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
-        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
-        <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
+        <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
+        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
+        <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
         <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
         kun puhelun kohde on tyhjä.</li>
         <h2>Tunnetut ongelmat</h2>
@@ -55,9 +55,9 @@
             (rekisteröintiä ei ole aktivoitu).</li>
         <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
         <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-        <li>Voit lisätä puheluiden ja viestien kohteet kontakteihin pitkällä kosketuksella.</li>
-        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja kontakteja.</li>
-        <li>Voit lisätä/poistaa kontaktin avatar-kuvan koskettamalla kontaktin ikonia lyhyesti/pitkästi.</li>
+        <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
+        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
+        <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
         <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
         kun puhelun kohde on tyhjä.</li>
         <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
@@ -222,7 +222,7 @@
     <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
         \'%1$s\'?
     </string>
-    <string name="calls_add_delete_question">Haluatko luoda uuden kontaktin \'%1$s\' tai poistaa
+    <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
         %2$s puheluhistoriasta?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta?</string>
@@ -235,9 +235,9 @@
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
     <string name="long_message_question">Haluatko poistaa viestin tai
-    luoda uuden kontaktin \'%1$s\'?</string>
+    luoda uuden yhteystiedon \'%1$s\'?</string>
     <string name="short_message_question">Haluatko poistaa viestin?</string>
-    <string name="add_contact">Lisää kontakti</string>
+    <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
     <!-- Chats Activity -->
@@ -247,7 +247,7 @@
     <string name="new_chat_peer">Uusi viestin kohde</string>
     <string name="invalid_chat_peer_uri">Virheellinen SIP URI</string>
     <string name="long_chat_question">Haluatko poistaa viestiketjun tai
-    luoda uuden kontaktin \'%1$s\'?</string>
+    luoda uuden yhteystiedon \'%1$s\'?</string>
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'?</string>
     <string name="delete_chats">Tyhjennä</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian?</string>
@@ -333,19 +333,21 @@
         käyttöön. Käynnistä nyt?
     </string>
     <!-- Contact Activity -->
-    <string name="contact">Kontakti</string>
-    <string name="new_contact">Uusi kontakti</string>
+    <string name="contact">Yhteystieto</string>
+    <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
-    <string name="invalid_contact">Virheellinen kontaktin nimi \'%1$s\'</string>
-    <string name="contact_already_exists">Kontakti \'%1$s\' on jo olemassa.</string>
+    <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
+    <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
+    <string name="android_contact_help">Jos merkitty, tämä yhteystieto näkyy myös Androidin
+        yhteystiedoissa.</string>
     <!-- Contacts Activity -->
-    <string name="contacts">Kontaktit</string>
+    <string name="contacts">Yhteystiedot</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää
-    viestin kontaktille \'%1$s\'?</string>
+    viestin ositteeseen \'%1$s\'?</string>
     <string name="send_message">Lähetä viesti</string>
-    <string name="contact_delete_question">Haluatko poistaa kontaktin \'%1$s\'?</string>
-    <string name="contacts_exceeded">Kontaktiesi enimmäismäärä %1$d on ylittynyt.</string>
+    <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'?</string>
+    <string name="contacts_exceeded">Yhteystietojesi enimmäismäärä %1$d on ylittynyt.</string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>

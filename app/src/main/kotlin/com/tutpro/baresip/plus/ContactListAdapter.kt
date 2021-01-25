@@ -1,5 +1,6 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -126,6 +127,9 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                 Log.e("Baresip", "Could not delete file '$id.img")
                             }
                         }
+                        if (contact.androidContact &&
+                                Utils.checkPermission(ctx, Manifest.permission.WRITE_CONTACTS))
+                            ContactActivity.deleteAndroidContact(ctx, contact)
                         Contact.contacts().removeAt(position)
                         Contact.save()
                         this.notifyDataSetChanged()

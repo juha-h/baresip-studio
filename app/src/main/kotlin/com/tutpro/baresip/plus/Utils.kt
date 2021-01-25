@@ -378,16 +378,21 @@ object Utils {
         }
     }
 
-    fun checkPermission(ctx: Context, permission: String) : Boolean {
-        return ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
+    fun checkPermission(ctx: Context, permissions: String) : Boolean {
+        for (p in permissions.split("|")) {
+            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED)
+                return false
+        }
+        return true
     }
 
-    fun requestPermission(ctx: Context, permission: String, requestCode: Int) : Boolean {
-        if (ContextCompat.checkSelfPermission(ctx, permission) != PackageManager.PERMISSION_GRANTED) {
-            Log.w("Baresip", "Baresip does not have $permission permission")
-            ActivityCompat.requestPermissions(ctx as Activity, arrayOf(permission), requestCode)
-            return false
-        }
+    fun requestPermission(ctx: Context, permissions: String, requestCode: Int) : Boolean {
+        val pArray = permissions.split("|").toTypedArray()
+        for (p in pArray)
+            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ctx as Activity, pArray, requestCode)
+                return false
+            }
         return true
     }
 
