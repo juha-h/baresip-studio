@@ -376,14 +376,14 @@ class ContactActivity : AppCompatActivity() {
     }
 
     private fun addOrUpdateAndroidContact(ctx: Context, contact: Contact) {
-        val projection = arrayOf(ContactsContract.Data.CONTACT_ID)
+        val projection = arrayOf(ContactsContract.Data.RAW_CONTACT_ID)
         val selection = ContactsContract.Data.MIMETYPE + "='" +
                 CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE + "' AND " +
                 CommonDataKinds.StructuredName.DISPLAY_NAME + "='" + contact.name + "'"
         val c: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                 selection, null, null)
         if (c != null && c.moveToFirst()) {
-            updateAndroidContact(ctx, c.getLong(0), contact)
+            updateAndroidContact(c.getLong(0), contact)
         } else {
             addAndroidContact(ctx, contact)
         }
@@ -393,19 +393,18 @@ class ContactActivity : AppCompatActivity() {
 
     private fun addAndroidContact(ctx: Context, contact: Contact): Boolean {
         val ops = ArrayList<ContentProviderOperation>()
-        val rawContactInsertIndex = ops.size
         ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build())
         ops.add(ContentProviderOperation
                 .newInsert(ContactsContract.Data.CONTENT_URI)
-                .withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
                 .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
                 .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name)
                 .build())
         ops.add(ContentProviderOperation
                 .newInsert(ContactsContract.Data.CONTENT_URI)
-                .withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
                 .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
                 .withValue(Data.DATA1, contact.uri.substringAfter(":"))
                 .build())
@@ -414,7 +413,7 @@ class ContactActivity : AppCompatActivity() {
             if (photoData != null) {
                 ops.add(ContentProviderOperation
                         .newInsert(ContactsContract.Data.CONTENT_URI)
-                        .withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                        .withValueBackReference(Data.RAW_CONTACT_ID, 0)
                         .withValue(Data.MIMETYPE, CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
                         .withValue(CommonDataKinds.Photo.PHOTO, photoData)
                         .build())
@@ -429,33 +428,75 @@ class ContactActivity : AppCompatActivity() {
         return true
     }
 
-    private fun updateAndroidContact(ctx: Context, contactId: Long, contact: Contact) {
+    private fun updateAndroidContact(rawContactId: Long, contact: Contact) {
+        if (updateAndroidSipUri(rawContactId, contact.uri) == 0)
+            addAndroidSipUri(rawContactId, contact.uri)
+        if (updateAndroidPhoto(rawContactId, contact.avatarImage) == 0)
+            if (contact.avatarImage != null)
+                addAndroidPhoto(rawContactId, contact.avatarImage!!)
+    }
+
+    private fun addAndroidSipUri(rawContactId: Long, sipUri: String) {
         val ops = ArrayList<ContentProviderOperation>()
-        val selection = ContactsContract.Data.CONTACT_ID + "='" + contactId.toString() +
-                "' AND " + Data.MIMETYPE + "='" + CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'"
-        if (contact.avatarImage != null) {
-            val stream = ByteArrayOutputStream()
-            contact.avatarImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            ops.add(ContentProviderOperation
-                    .newUpdate(ContactsContract.Data.CONTENT_URI)
-                    .withSelection(selection, arrayOf())
-                    .withValue(CommonDataKinds.Photo.PHOTO, stream.toByteArray()).build())
-        } else {
-            ops.add(ContentProviderOperation
-                    .newUpdate(ContactsContract.Data.CONTENT_URI)
-                    .withSelection(selection, arrayOf())
-                    .withValue(CommonDataKinds.Photo.PHOTO, null).build())
-        }
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValue(Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
+                .withValue(Data.DATA1, sipUri.substringAfter(":"))
+                .build())
         try {
-            ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e("Baresip", "Update of contact $contactId failed")
+            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
         }
+    }
+
+    private fun updateAndroidSipUri(rawContactId: Long, sipUri: String): Int {
         val contentValues = ContentValues()
-        contentValues.put(ContactsContract.Data.DATA1, contact.uri.substringAfter("sip:"))
-        val where = ContactsContract.Data.CONTACT_ID + "=?" + " AND " + Data.MIMETYPE + "=?"
-        val args = arrayOf((contactId).toString(), CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
-        ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, args)
+        contentValues.put(ContactsContract.Data.DATA1, sipUri)
+        val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+                "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE}'"
+        return try {
+            contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
+        }  catch (e: Exception) {
+            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
+            0
+        }
+    }
+
+    private fun addAndroidPhoto(rawContactId: Long, photoBits: Bitmap) {
+        val photoBytes = bitmapToPNGByteArray(photoBits)
+        if (photoBytes != null) {
+            val ops = ArrayList<ContentProviderOperation>()
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValue(Data.RAW_CONTACT_ID, rawContactId)
+                    .withValue(Data.MIMETYPE, CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+                    .withValue(CommonDataKinds.Photo.PHOTO, photoBytes)
+                    .build())
+            try {
+                contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+            } catch (e: Exception) {
+                Log.e("Baresip", "Adding of Android photo failed")
+            }
+        }
+    }
+
+    private fun updateAndroidPhoto(rawContactId: Long, photoBits: Bitmap?): Int {
+        val photoBytes = if (photoBits == null)
+            null
+        else
+            bitmapToPNGByteArray(photoBits)
+        val contentValues = ContentValues()
+        contentValues.put(CommonDataKinds.Photo.PHOTO, photoBytes)
+        val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+                "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Photo.CONTENT_ITEM_TYPE}'"
+        return try {
+            contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
+        }  catch (e: Exception) {
+            Log.e("Baresip", "updateAndroidPhoto failed")
+            0
+        }
     }
 
     private fun bitmapToPNGByteArray(bitmap: Bitmap): ByteArray? {
