@@ -82,6 +82,7 @@
             <li><b>AGPLv4</b> ZRTP media encryption</li>
             <li><b>GNU GPLv2</b> H.264 and H.265 codecs</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
+            <li><b>AOMedia</b> AV1 codec</li>
         </ul>
         ]]>
     </string>
