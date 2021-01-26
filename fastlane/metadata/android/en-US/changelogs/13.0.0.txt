@@ -1,0 +1,2 @@
+- Fixed crash when baresip is started the first time
+- Added AV1 video codec
