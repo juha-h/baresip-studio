@@ -1,0 +1,1 @@
+- Fixed crash when baresip is started the first time
