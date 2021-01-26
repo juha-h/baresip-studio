@@ -15,15 +15,17 @@ object Config {
         Log.d("Baresip", "Config is '$config'")
 
         if (BaresipService.cameraAvailable) {
-            if (!config.contains("module avformat.so"))
-                 config = "${config}module avformat.so\nmodule selfview.so\n"
+            if (!config.contains("module avformat.so")) {
+                addModuleLine("module avformat.so")
+                addModuleLine("module selfview.so")
+            }
         } else {
             removeLine("module avformat.so")
             removeLine("module selfview.so")
         }
 
         if (!config.contains("module av1.so"))
-            config = "${config}module av1.so\n"
+            addModuleLine("module av1.so")
 
         if (!config.contains("webrtc_aec_extended_filter")) {
             config = "${config}webrtc_aec_extended_filter yes\n"

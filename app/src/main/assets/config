@@ -37,7 +37,6 @@ module vp8.so
 module avcodec.so
 module avformat.so
 module webrtc_aec.so
-module opensles.so
 module selfview.so
 module stun.so
 module turn.so
@@ -45,6 +44,7 @@ module ice.so
 module srtp.so
 module dtls_srtp.so
 module zrtp.so
+module opensles.so
 module_tmp uuid.so
 module_tmp account.so
 module_app contact.so
