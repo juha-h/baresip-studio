@@ -22,6 +22,9 @@ object Config {
             removeLine("module selfview.so")
         }
 
+        if (!config.contains("module av1.so"))
+            config = "${config}module av1.so\n"
+
         if (!config.contains("webrtc_aec_extended_filter")) {
             config = "${config}webrtc_aec_extended_filter yes\n"
         }
