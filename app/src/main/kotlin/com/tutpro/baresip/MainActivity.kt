@@ -730,7 +730,7 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(callActionUri)
                 callButton.performClick()
             } else {
-                if (aorSpinner.selectedItemPosition == -1) {
+                if ((aorSpinner.selectedItemPosition == -1) && (UserAgent.uas().size > 0)) {
                     aorSpinner.setSelection(0)
                     aorSpinner.tag = UserAgent.uas()[0].account.aor
                 }
