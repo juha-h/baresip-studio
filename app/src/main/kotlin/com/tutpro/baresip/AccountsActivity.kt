@@ -20,7 +20,6 @@ class AccountsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAccountsBinding
     private lateinit var alAdapter: AccountListAdapter
     internal lateinit var aor: String
-    internal var accountConfig = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
