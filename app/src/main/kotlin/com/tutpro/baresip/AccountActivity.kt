@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -9,6 +10,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.tutpro.baresip.databinding.ActivityAccountBinding
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
+import java.io.StringReader
+import java.lang.ref.WeakReference
+import java.net.URL
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AccountActivity : AppCompatActivity() {
 
@@ -27,11 +35,19 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var stunUser: EditText
     private lateinit var stunPass: EditText
     private lateinit var regCheck: CheckBox
+    private lateinit var mediaNatSpinner: Spinner
     private lateinit var mediaEnc: String
+    private lateinit var mediaEncSpinner: Spinner
     private lateinit var ipV6MediaCheck: CheckBox
     private lateinit var answerMode: String
+    private lateinit var answerModeSpinner: Spinner
     private lateinit var vmUri: EditText
     private lateinit var defaultCheck: CheckBox
+
+    private val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
+    private val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
+    private val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
+    private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
 
     private var save = false
     private var uaIndex= -1
@@ -44,6 +60,23 @@ class AccountActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        uri = binding.Uri
+        displayName = binding.DisplayName
+        authUser = binding.AuthUser
+        authPass = binding.AuthPass
+        outbound1 = binding.Outbound1
+        outbound2 = binding.Outbound2
+        regCheck = binding.Register
+        mediaNatSpinner = binding.mediaNatSpinner
+        stunServer = binding.StunServer
+        stunUser = binding.StunUser
+        stunPass = binding.StunPass
+        mediaEncSpinner = binding.mediaEncSpinner
+        ipV6MediaCheck = binding.PreferIPv6Media
+        answerModeSpinner = binding.answerModeSpinner
+        vmUri = binding.voicemailUri
+        defaultCheck = binding.Default
+
         aor = intent.getStringExtra("aor")!!
         ua = UserAgent.ofAor(aor)!!
         acc = ua.account
@@ -51,38 +84,37 @@ class AccountActivity : AppCompatActivity() {
 
         Utils.addActivity("account,$aor")
 
-        setTitle(aor.split(":")[1])
+        if (intent.getBooleanExtra("new", false)) {
+            val url = "https://${Utils.uriHostPart(aor)}/baresip/account_config.xml"
+            GetAccountConfigAsyncTask(this).execute(url)
+        }
 
-        uri = binding.Uri
-        uri.setText(acc.luri)
+        title = aor.split(":")[1]
 
-        displayName = binding.DisplayName
+        initLayoutFromAccount()
+
+    }
+
+    private fun initLayoutFromAccount() {
+
+        uri.text = acc.luri
         displayName.setText(acc.displayName)
-
-        authUser = binding.AuthUser
         authUser.setText(acc.authUser)
 
-        authPass = binding.AuthPass
         if (MainActivity.aorPasswords.containsKey(aor))
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
 
-        outbound1 = binding.Outbound1
-        outbound2 = binding.Outbound2
         if (acc.outbound.size > 0) {
             outbound1.setText(acc.outbound[0])
             if (acc.outbound.size > 1)
                 outbound2.setText(acc.outbound[1])
         }
 
-        regCheck = binding.Register
         regCheck.isChecked = acc.regint > 0
 
         mediaNat = acc.mediaNat
-        val mediaNatSpinner = binding.mediaNatSpinner
-        val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
-        val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
         var keyVal = mediaNatVals.elementAt(keyIx)
         mediaNatKeys.removeAt(keyIx)
@@ -116,27 +148,21 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        stunServer = binding.StunServer
         stunServer.setText(acc.stunServer)
         stunServer.isEnabled = mediaNat != ""
 
-        stunUser = binding.StunUser
         stunUser.setText(acc.stunUser)
         stunUser.isEnabled = mediaNat != ""
 
-        stunPass = binding.StunPass
         stunPass.setText(acc.stunPass)
         stunPass.isEnabled = mediaNat != ""
 
         mediaEnc = acc.mediaEnc
-        val mediaEncSpinner = binding.mediaEncSpinner
-        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
-        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
-        keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
+        keyIx = mediaEncKeys.indexOf(mediaEnc)
         keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)
         mediaEncVals.removeAt(keyIx)
-        mediaEncKeys.add(0, acc.mediaEnc)
+        mediaEncKeys.add(0, mediaEnc)
         mediaEncVals.add(0, keyVal)
         val mediaEncAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
                 mediaEncVals)
@@ -150,11 +176,9 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        ipV6MediaCheck = binding.PreferIPv6Media
         ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
         answerMode = acc.answerMode
-        val answerModeSpinner = binding.answerModeSpinner
         val answerModeKeys = arrayListOf("manual", "auto")
         val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
         keyIx = answerModeKeys.indexOf(acc.answerMode)
@@ -175,10 +199,8 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        vmUri = binding.voicemailUri
         vmUri.setText(acc.vmUri)
 
-        defaultCheck = binding.Default
         defaultCheck.isChecked = uaIndex == 0
 
     }
@@ -549,6 +571,64 @@ class AccountActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.default_account),
                         getString(R.string.default_account_help))
             }
+        }
+    }
+
+    private class GetAccountConfigAsyncTask(context: AccountActivity):
+            AsyncTask<String, String, String>() {
+
+        private val activityReference: WeakReference<AccountActivity> = WeakReference(context)
+
+        override fun doInBackground(vararg url: String?): String? {
+            val result = try {
+                URL(url[0]).readText()
+            } catch (e: Exception) {
+                Log.e("Baresip", "Could not get account config from ${url[0]}: $e")
+                null
+            }
+            Log.d("Baresip", "Got account config $result")
+            return result
+        }
+
+        override fun onPostExecute(result: String?) {
+            Log.d("Baresip", "%%%%%%%%% got account config $result")
+            val activity = activityReference.get()
+            if (activity == null || activity.isFinishing || result == null)
+                return
+            val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
+            val parser: XmlPullParser = parserFactory.newPullParser()
+            parser.setInput(StringReader(result))
+            var tag: String?
+            var text = ""
+            var event = parser.eventType
+            while (event != XmlPullParser.END_DOCUMENT) {
+                tag = parser.name
+                when (event) {
+                    XmlPullParser.TEXT ->
+                        text = parser.text
+                    XmlPullParser.START_TAG ->
+                        if (tag == "audio-codecs")
+                            activity.acc.audioCodec.clear()
+                    XmlPullParser.END_TAG ->
+                        when (tag) {
+                            "outbound-proxy-1" ->
+                                activity.acc.outbound.add(text)
+                            "outbound-proxy-2" ->
+                                activity.acc.outbound.add(text)
+                            "register" ->
+                                activity.acc.regint = if (text == "yes") 3600 else 0
+                            "media-encoding" -> {
+                                val enc = text.toLowerCase(Locale.ROOT)
+                                if (enc in activity.mediaEncKeys && enc.isNotEmpty())
+                                    activity.acc.mediaEnc = enc
+                            }
+                            "audio-codec" ->
+                                activity.acc.audioCodec.add(text)
+                    }
+                }
+                event = parser.next()
+            }
+            activity.initLayoutFromAccount()
         }
     }
 
