@@ -239,4 +239,5 @@
     <string name="missed_call_from">Ligação perdida de</string>
     <string name="dark_theme_help">Impor o uso do tema escuro na tela</string>
     <string name="dark_theme">Tema Escuro</string>
+    <string name="android_contact_help">Se for marcado, este contato também estará disponível nos contatos do Android.</string>
 </resources>
