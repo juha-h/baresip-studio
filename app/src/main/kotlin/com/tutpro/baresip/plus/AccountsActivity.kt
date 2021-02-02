@@ -67,6 +67,7 @@ class AccountsActivity : AppCompatActivity() {
                     val i = Intent(this, AccountActivity::class.java)
                     val b = Bundle()
                     b.putString("aor", ua.account.aor)
+                    b.putBoolean("new", true)
                     i.putExtras(b)
                     startActivityForResult(i, MainActivity.ACCOUNT_CODE)
                 }
