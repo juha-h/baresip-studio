@@ -51,6 +51,7 @@ class AccountActivity : AppCompatActivity() {
 
     private var save = false
     private var uaIndex= -1
+    private val TAG = "Baresip"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -91,11 +92,11 @@ class AccountActivity : AppCompatActivity() {
 
         title = aor.split(":")[1]
 
-        initLayoutFromAccount()
+        initLayoutFromAccount(acc)
 
     }
 
-    private fun initLayoutFromAccount() {
+    private fun initLayoutFromAccount(acc: Account) {
 
         uri.text = acc.luri
         displayName.setText(acc.displayName)
@@ -121,7 +122,7 @@ class AccountActivity : AppCompatActivity() {
         mediaNatVals.removeAt(keyIx)
         mediaNatKeys.add(0, acc.mediaNat)
         mediaNatVals.add(0, keyVal)
-        val mediaNatAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+        val mediaNatAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
                 mediaNatVals)
         mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mediaNatSpinner.adapter = mediaNatAdapter
@@ -164,7 +165,7 @@ class AccountActivity : AppCompatActivity() {
         mediaEncVals.removeAt(keyIx)
         mediaEncKeys.add(0, mediaEnc)
         mediaEncVals.add(0, keyVal)
-        val mediaEncAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val mediaEncAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
                 mediaEncVals)
         mediaEncAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mediaEncSpinner.adapter = mediaEncAdapter
@@ -187,7 +188,7 @@ class AccountActivity : AppCompatActivity() {
         answerModeVals.removeAt(keyIx)
         answerModeKeys.add(0, acc.answerMode)
         answerModeVals.add(0, keyVal)
-        val answerModeAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val answerModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
                 answerModeVals)
         answerModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         answerModeSpinner.adapter = answerModeAdapter
@@ -227,10 +228,10 @@ class AccountActivity : AppCompatActivity() {
                     if (Account.checkDisplayName(dn)) {
                         if (Api.account_set_display_name(acc.accp, dn) == 0) {
                             acc.displayName = Api.account_display_name(acc.accp);
-                            Log.d("Baresip", "New display name is ${acc.displayName}")
+                            Log.d(TAG, "New display name is ${acc.displayName}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of display name failed")
+                            Log.e(TAG, "Setting of display name failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
@@ -246,10 +247,10 @@ class AccountActivity : AppCompatActivity() {
                     if (Account.checkAuthUser(au)) {
                         if (Api.account_set_auth_user(acc.accp, au) == 0) {
                             acc.authUser = Api.account_auth_user(acc.accp);
-                            Log.d("Baresip", "New auth user is ${acc.authUser}")
+                            Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of auth user failed")
+                            Log.e(TAG, "Setting of auth user failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
@@ -308,7 +309,7 @@ class AccountActivity : AppCompatActivity() {
                                 if (ob[i] != "")
                                     outbound.add(Api.account_outbound(acc.accp, i))
                             } else {
-                                Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
+                                Log.e(TAG, "Setting of outbound proxy ${ob[i]} failed")
                                 break
                             }
                         } else {
@@ -317,7 +318,7 @@ class AccountActivity : AppCompatActivity() {
                             return false
                         }
                     }
-                    Log.d("Baresip", "New outbound proxies are ${outbound}")
+                    Log.d(TAG, "New outbound proxies are ${outbound}")
                     acc.outbound = outbound
                     if (outbound.isEmpty())
                         Api.account_set_sipnat(acc.accp, "")
@@ -342,19 +343,19 @@ class AccountActivity : AppCompatActivity() {
                 if (newRegint != -1)
                     if (Api.account_set_regint(acc.accp, newRegint) == 0) {
                         acc.regint = Api.account_regint(acc.accp)
-                        Log.d("Baresip", "New regint is ${acc.regint}")
+                        Log.d(TAG, "New regint is ${acc.regint}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of regint failed")
+                        Log.e(TAG, "Setting of regint failed")
                     }
 
                 if (mediaNat != acc.mediaNat) {
                     if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
                         acc.mediaNat = Api.account_medianat(acc.accp)
-                        Log.d("Baresip", "New medianat is ${acc.mediaNat}")
+                        Log.d(TAG, "New medianat is ${acc.mediaNat}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of medianat failed")
+                        Log.e(TAG, "Setting of medianat failed")
                     }
                 }
 
@@ -373,10 +374,10 @@ class AccountActivity : AppCompatActivity() {
                 if (acc.stunServer != newStunServer) {
                     if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
                         acc.stunServer = Api.account_stun_uri(acc.accp)
-                        Log.d("Baresip", "New STUN/TURN server URI is '${acc.stunServer}'")
+                        Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of STUN/TURN URI server failed")
+                        Log.e(TAG, "Setting of STUN/TURN URI server failed")
                     }
                 }
 
@@ -385,10 +386,10 @@ class AccountActivity : AppCompatActivity() {
                     if (Account.checkAuthUser(newStunUser)) {
                         if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
                             acc.stunUser = Api.account_stun_user(acc.accp);
-                            Log.d("Baresip", "New STUN/TURN user is ${acc.stunUser}")
+                            Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of STUN/TURN user failed")
+                            Log.e(TAG, "Setting of STUN/TURN user failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
@@ -404,7 +405,7 @@ class AccountActivity : AppCompatActivity() {
                             acc.stunPass = Api.account_stun_pass(acc.accp);
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of stun pass failed")
+                            Log.e(TAG, "Setting of stun pass failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
@@ -416,16 +417,16 @@ class AccountActivity : AppCompatActivity() {
                 if (mediaEnc != acc.mediaEnc) {
                     if (Api.account_set_mediaenc(acc.accp, mediaEnc) == 0) {
                         acc.mediaEnc = Api.account_mediaenc(acc.accp)
-                        Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
+                        Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
+                        Log.e(TAG, "Setting of mediaenc $mediaEnc failed")
                     }
                 }
 
                 if (ipV6MediaCheck.isChecked != acc.preferIPv6Media) {
                     acc.preferIPv6Media = ipV6MediaCheck.isChecked
-                    Log.d("Baresip", "New preferIPv6Media is ${acc.preferIPv6Media}")
+                    Log.d(TAG, "New preferIPv6Media is ${acc.preferIPv6Media}")
                     if (acc.preferIPv6Media)
                         Api.ua_set_media_af(ua.uap, Api.AF_INET6)
                     else
@@ -435,7 +436,7 @@ class AccountActivity : AppCompatActivity() {
 
                 if (answerMode != acc.answerMode) {
                     acc.answerMode = answerMode
-                    Log.d("Baresip", "New answermode is ${acc.answerMode}")
+                    Log.d(TAG, "New answermode is ${acc.answerMode}")
                     save = true
                 }
 
@@ -470,7 +471,7 @@ class AccountActivity : AppCompatActivity() {
                 if (save) {
                     AccountsActivity.saveAccounts()
                     if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
+                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
                     //else
                         //Api.ua_debug(ua.uap)
                 }
@@ -578,57 +579,85 @@ class AccountActivity : AppCompatActivity() {
             AsyncTask<String, String, String>() {
 
         private val activityReference: WeakReference<AccountActivity> = WeakReference(context)
+        private val TAG = "Baresip"
 
         override fun doInBackground(vararg url: String?): String? {
             val result = try {
                 URL(url[0]).readText()
             } catch (e: Exception) {
-                Log.e("Baresip", "Could not get account config from ${url[0]}: $e")
+                Log.e(TAG, "Could not get account config from ${url[0]}: $e")
                 null
             }
-            Log.d("Baresip", "Got account config $result")
+            Log.d(TAG, "Got account config $result")
             return result
         }
 
         override fun onPostExecute(result: String?) {
-            Log.d("Baresip", "%%%%%%%%% got account config $result")
             val activity = activityReference.get()
             if (activity == null || activity.isFinishing || result == null)
                 return
+            val acc = Account(activity.acc.accp)
             val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
             val parser: XmlPullParser = parserFactory.newPullParser()
             parser.setInput(StringReader(result))
             var tag: String?
             var text = ""
             var event = parser.eventType
+            val audioCodecs = ArrayList(Api.audio_codecs().split(","))
+            val videoCodecs = ArrayList(Api.video_codecs().split(","))
             while (event != XmlPullParser.END_DOCUMENT) {
                 tag = parser.name
                 when (event) {
                     XmlPullParser.TEXT ->
                         text = parser.text
-                    XmlPullParser.START_TAG ->
+                    XmlPullParser.START_TAG -> {
                         if (tag == "audio-codecs")
-                            activity.acc.audioCodec.clear()
+                            acc.audioCodec.clear()
+                        if (tag == "video-codecs")
+                            acc.audioCodec.clear()
+                    }
                     XmlPullParser.END_TAG ->
                         when (tag) {
                             "outbound-proxy-1" ->
-                                activity.acc.outbound.add(text)
+                                if (text.isNotEmpty())
+                                    acc.outbound.add(text)
                             "outbound-proxy-2" ->
-                                activity.acc.outbound.add(text)
+                                if (text.isNotEmpty())
+                                    acc.outbound.add(text)
                             "register" ->
-                                activity.acc.regint = if (text == "yes") 3600 else 0
+                                acc.regint = if (text == "yes") 3600 else 0
+                            "audio-codec" ->
+                                if (text in audioCodecs)
+                                    acc.audioCodec.add(text)
+                            "video-codec" ->
+                                if (text in videoCodecs)
+                                    acc.videoCodec.add(text)
                             "media-encoding" -> {
                                 val enc = text.toLowerCase(Locale.ROOT)
                                 if (enc in activity.mediaEncKeys && enc.isNotEmpty())
-                                    activity.acc.mediaEnc = enc
+                                    acc.mediaEnc = enc
                             }
-                            "audio-codec" ->
-                                activity.acc.audioCodec.add(text)
+                            "media-nat" -> {
+                                val nat = text.toLowerCase(Locale.ROOT)
+                                if (nat in activity.mediaNatKeys && nat.isNotEmpty())
+                                    acc.mediaNat = nat
+                            }
+                            "stun-turn-server" ->
+                                if (text.isNotEmpty())
+                                    acc.stunServer = text
+                            "prefer-ipv6-media" ->
+                                acc.preferIPv6Media = text == "yes"
+                            "answer-mode" ->
+                                if (text in arrayOf("manual", "auto"))
+                                    acc.answerMode = text
+                            "voicemail-uri" ->
+                                if (text.isNotEmpty())
+                                    acc.vmUri = text
                     }
                 }
                 event = parser.next()
             }
-            activity.initLayoutFromAccount()
+            activity.initLayoutFromAccount(acc)
         }
     }
 
@@ -646,7 +675,7 @@ class AccountActivity : AppCompatActivity() {
             MainActivity.aorPasswords.remove(acc.aor)
             save = true
         } else {
-            Log.e("Baresip", "Setting of auth pass failed")
+            Log.e(TAG, "Setting of auth pass failed")
         }
     }
 
