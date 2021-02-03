@@ -14,6 +14,9 @@
         <ul>
             <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
+            <li>A new account can be partially configured automatically. See
+            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
+            for more information.</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
             succeeded, yellow (registration is in progress), red (registration failed), white (registration
             has not been activated).</li>
@@ -52,6 +55,9 @@
         <ul>
             <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
+            <li>A new account can be partially configured automatically. See
+            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
+            for more information.</li>
             <li>Registration status of an account is shown with a colored dot:  green (registration
             succeeded, yellow (registration is in progress), red (registration failed), white (registration
             has not been activated).</li>
@@ -176,7 +182,13 @@
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">New Account</string>
-    <string name="accounts_help">Account\'s port number and transport protocol may be optionally given when a new account is created: username@domain[:port][;transport=udp|tcp|tls]. If port is given and transport protocol is not given, transport protocol defaults to udp. If port is not given and transport protocol is given, port defaults to 5060 or 5061 (TLS). If neither is given and no outbound proxy is specified, account\'s registrar (if any) is determined solely based on domain\'s DNS information.</string>
+    <string name="accounts_help">When a new account is created, account\'s port number and transport
+        protocol may be optionally given: &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
+        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to udp.
+        If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 or 5061 (TLS).
+        If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
+        determined solely based on domain\'s DNS information.
+    </string>
     <string name="user_domain">user@domain</string>
     <string name="invalid_aor">Invalid user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="account_exists">Account \'%1$s\' already exists.</string>

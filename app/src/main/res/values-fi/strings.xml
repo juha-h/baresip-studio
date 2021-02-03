@@ -3,7 +3,7 @@
     <!-- About Activity -->
     <string name="about_title">baresip sovelluksesta</string>
     <string name="about_title_plus">baresip+ sovelluksesta</string>
-<string name="about_text">
+    <string name="about_text">
         <![CDATA[
         <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -12,6 +12,9 @@
         <ul>
         <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
+            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
+            Wiki</a>-sivulta</li>
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
@@ -50,6 +53,9 @@
         <ul>
         <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
+            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
+            Wiki</a>-sivulta</li>
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
@@ -190,13 +196,12 @@
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
     <string name="new_account">Uusi tili</string>
-    <string name="accounts_help">Uutta tiliä luotaessa voidaan käyttäjän ja domainin lisäksi
-        tarvittaessa antaa myös porttinumero ja tiedonsiirtoprotokolla:
-        käyttäjä@domain[:portti][;transport=udp|tcp|tls]. Jos portti on
-        annettu, mutta protokollaa ei ole annettu, protokolla on udp. Jos porttia ei ole annettu,
-        mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).  Jos kumpaakaan ei ole
-        annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen rekisteröintipalvelin
-        päätellään pelkästään domainin DNS-informaation perusteella.
+    <string name="accounts_help">Kun uusi tili luodaan, voidaan haluttaessa antaa myös porttinumero
+        ja tiedonsiirtoprotokolla: &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls].
+        Jos &lt;portti&gt; on annettu, mutta protokollaa ei ole annettu, protokolla on udp.
+        Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).
+        Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
+        rekisteröintipalvelin päätellään pelkästään domainin DNS-informaation perusteella.
     </string>
     <string name="user_domain">käyttäjä@domain</string>
     <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls] \'%1$s\'
