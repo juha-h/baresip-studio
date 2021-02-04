@@ -6,29 +6,30 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
-import android.widget.ImageButton
-import android.widget.ListView
+import com.tutpro.baresip.databinding.ActivityContactsBinding
 
 class ContactsActivity : AppCompatActivity() {
 
-    internal lateinit var clAdapter: ContactListAdapter
-    internal lateinit var aor: String
+    private lateinit var binding: ActivityContactsBinding
+    private lateinit var clAdapter: ContactListAdapter
+    private lateinit var aor: String
     private var lastClick: Long = 0
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contacts)
+        binding = ActivityContactsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("contacts,$aor")
 
-        val listView = findViewById(R.id.contacts) as ListView
+        val listView = binding.contacts
         clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
-        val plusButton = findViewById(R.id.plusButton) as ImageButton
+        val plusButton = binding.plusButton
         plusButton.setOnClickListener {
             if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
                 Utils.alertView(this, getString(R.string.notice),

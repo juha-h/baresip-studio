@@ -47,6 +47,10 @@ object Config {
             config = "${config}opus_sprop_stereo no\n"
         }
 
+        if (!config.contains("webrtc_aec_extended_filter")) {
+            config = "${config}webrtc_aec_extended_filter yes\n"
+        }
+
         if (!config.contains("log_level")) {
             config = "${config}log_level 2\n"
             Log.logLevel = Log.LogLevel.WARN
@@ -82,8 +86,14 @@ object Config {
             }
         }
 
-        Log.e("Baresip", "Initialized config to '$config'")
+        if (!config.contains("jitter_buffer_type")) {
+            config = "${config}jitter_buffer_type adaptive\n"
+            config = "${config}jitter_buffer_wish 6\n"
+        }
+
         Utils.putFileContents(configPath, config.toByteArray())
+        BaresipService.isConfigInitialized = true
+        Log.i("Baresip", "Initialized config to '$config'")
 
     }
 
@@ -103,6 +113,11 @@ object Config {
 
     fun removeLine(line: String) {
         config = Utils.removeLinesStartingWithString(config, line)
+    }
+
+    fun addModuleLine(line: String) {
+        // Make sure it goes before first 'module_tmp'
+        config = config.replace("module opensles.so", "$line\nmodule opensles.so")
     }
 
     fun removeVariable(variable: String) {
@@ -130,9 +145,10 @@ object Config {
     }
 
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
+        Log.i("Baresip", "Updating dnsServers with $dnsServers")
         var servers = ""
         for (dnsServer in dnsServers) {
-            var address = dnsServer.hostAddress
+            var address = dnsServer.hostAddress.removePrefix("/")
             if (Utils.checkIpV4(address))
                 address = "${address}:53"
             else

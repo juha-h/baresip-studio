@@ -9,6 +9,7 @@ import java.util.ArrayList
 class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
 
     var avatarImage: Bitmap? = null
+    var androidContact = false
 
     companion object {
 
@@ -21,7 +22,7 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
         fun save(): Boolean {
             var contents = ""
             for (c in BaresipService.contacts) contents +=
-                    "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}\n"
+                    "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color};android=${c.androidContact}\n"
             return Utils.putFileContents(BaresipService.filesPath + "/contacts",
                     contents.toByteArray())
         }
@@ -48,14 +49,16 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                         color = colorValue.toInt()
                     else
                         color = Utils.randomColor()
+                    val androidContact = Utils.paramValue(params, "android" ) == "true"
                     val idValue = Utils.paramValue(params, "id" )
                     val id: Long
                     if (idValue != "")
                         id = idValue.toLong()
                     else
                         id = baseId + contactNo
-                    Log.d("Baresip", "Restoring contact $name, $uri, $color, $id")
+                    Log.d("Baresip", "Restoring contact $name, $uri, $color, $id, $androidContact")
                     val contact = Contact(name, uri, color, id)
+                    contact.androidContact = androidContact
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {
@@ -71,15 +74,6 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                 }
             }
             return true
-        }
-
-        fun import(): Boolean {
-            val contacts = Utils.getFileContents(BaresipService.downloadsPath + "/contacts.bs")
-            if (contacts != null) {
-                Utils.putFileContents(BaresipService.filesPath + "/contacts", contacts)
-                return restore()
-            }
-            return false
         }
 
     }

@@ -7,8 +7,6 @@ call_max_calls 4
 audio_player opensles,nil
 audio_source opensles,nil
 audio_alert opensles,nil
-audio_srate 8000-48000
-audio_channels 1-2
 audio_level no
 ausrc_format s16
 auenc_format s16
@@ -16,7 +14,9 @@ auplay_format s16
 audec_format s16
 rtp_tos 184
 rtcp_mux no
+jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
+jitter_buffer_wish 6
 rtp_stats no
 dyn_dns yes
 module opus.so
@@ -25,6 +25,7 @@ module ilbc.so
 module g722.so
 module g7221.so
 module g726.so
+module g729.so
 module g711.so
 module webrtc_aec.so
 module opensles.so
@@ -47,8 +48,7 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
+webrtc_aec_extended_filter yes
 ice_turn no
-ice_debug no
 ice_nomination regular
-ice_mode full
 zrtp_hash yes

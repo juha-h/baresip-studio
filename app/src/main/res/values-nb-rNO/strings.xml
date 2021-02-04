@@ -9,9 +9,9 @@
     <string name="your_name">Ditt navn</string>
     <string name="display_name_help">Navn (hvis noe) brukt i skjema-URI for utgående forespørsler.</string>
     <string name="authentication_username">Brukernavn for identitetsbekreftelse</string>
-    <string name="authentication_username_help">Brukernavn for identitetsbekreftelse hvis påkrevd av utgående mellomtjener.</string>
+    <string name="authentication_username_help">Brukernavn for identitetsbekreftelse av SIP-forespørsler er påkrevd. Forvalgt verdi er kontoens brukernavn.</string>
     <string name="authentication_password">Passord for identitetsbekreftelse</string>
-    <string name="authentication_password_help">Passord for identitetsbekreftelse hvis påkrevd av utgående mellomtjener.</string>
+    <string name="authentication_password_help">Passord for identitetsbekreftelse opptil 64 tegn. Hvis det angis, og passord ikke angis, vil det bli anmodet inntastet når baresip startes.</string>
     <string name="outbound_proxies">Utgående mellomtjenere</string>
     <string name="audio_codecs">Lyd-kodeker</string>
     <string name="audio_codecs_help">Liste over støttede lydkodeker i prioritetsforordning.</string>
@@ -102,7 +102,7 @@
     <string name="peer_not_verified">Denne samtalen er SIKKER, men likemannen er IKKE bekreftet!</string>
     <string name="call_is_secure">Denne samtalen er SIKKER, og likemannen er BEKREFTET! Ønsker du å avkrefte likemannen\?</string>
     <string name="unverify">Avkreft</string>
-    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt for å ringe opp forrige samtalepartner.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
+    <string name="about_text">&lt;h1&gt;Baresip-bibliotek basert på SIP-brukeragent&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Brukshint&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Sjekk at oppsettets forvalgte verdier passer for deg (klikk på elementtitlene for hjelp).&lt;/li&gt;&lt;li&gt;Registreringstatus for konto vises med en fargelagt prikk: Grønn (vellykket registrering, gul (registrering underveis), rød (mislykket registrering), hvit (registrering har ikke blitt aktivert).&lt;/li&gt; &lt;li&gt;Opprett så én eller flere kontoer (igjen, klikk på elementtitlene for hjelp).&lt;/li&gt; &lt;li&gt;Likemenn i samtaler og meldinger kan legges til ved lange trykk.&lt;/li&gt; &lt;li&gt;Lange trykk kan også brukes til å fjerne samtaler, sludringer, meldinger, og kontakter.&lt;/li&gt; &lt;li&gt;Trykk/langt trykk på kontaktikon kan brukes for å installere/fjerne billedavatar.&lt;/li&gt; &lt;li&gt;Klikk når ringeren ikke er angitt for å ringe opp forrige samtalepartner.&lt;/li&gt; &lt;li&gt;Hvis du ikke kan høre motparten, prøv å øke media-lydstyrken.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kjente problemer&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;På grunn av en biblioteksbegrensning, støtter ikke baresip flerfoldige samtidige nettverksgrensesnitt.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kildekode&lt;/h2&gt; Tilgjengelig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, der feil også kan innrapporteres.</string>
     <string name="outbound_proxies_help">SIP URI-til én eller to mellomtjenere som må brukes ved forsendelse av forespørsler. Hvis to angis, vil REGISTER-forespørsler sendes til begge, og andre forespørsler sendes til den som svarer. Hvis ingen utgående mellomtjener angis, blir forespørsler sent basert på DNS NAPTR/SRV/A-oppføringsoppslag fra ringerens URI-vertspart. Hvis vertsdelen av en SIP URI er en IPv6-adresse, må adressen skrives i hakeparenteser [].
 \nEksempler:
 \n • sip:foo.com:5060;transport=tls
@@ -137,8 +137,6 @@
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
     <string name="opus_packet_loss">Forventet Opus-pakketap</string>
     <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0–100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>
-    <string name="ice_lite_mode">ICE Lite-modus</string>
-    <string name="ice_lite_mode_help">Bruker ICE Lite-modus.</string>
     <string name="default_call_volume">Forvalgt samtalelydstyrke</string>
     <string name="default_call_volume_help">Setter samtalelydstyrken på en skala fra 1-10.</string>
     <string name="debug">Feilretting</string>
@@ -159,12 +157,11 @@
     <string name="voicemail_messages">Telefonsvarermeldinger</string>
     <string name="dialpad">Nummerskive</string>
     <string name="call_already_active">Du har allerede et aktivt anrop.</string>
-    <string name="start_failed">Baresip kunne ikke starte. Lytteadressen ble tilbakestilt. Start programmet på ny.</string>
+    <string name="start_failed">Baresip kunne ikke starte. Dette kan ha oppstått på grunn av en ugyldig oppstartsverdi. Sjekk lytteadressen, TLS-sertifikatsfilen, og TLS CA-filen. Start så programmet på ny.</string>
     <string name="registering_failed">Registrering av %1$s mislyktes.</string>
     <string name="verify_sas">Ønsker du å bekrefte SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
-    <string name="transfer_query">Godtar du å overføre samtalen til \"%1$s\"\?</string>
-    <string name="call_failed">Anrop mislyktes</string>
-    <string name="call_closed">Samtale lukket</string>
+    <string name="call_failed">Anrop mislyktes.</string>
+    <string name="call_closed">Samtale lukket.</string>
     <string name="tls_certificate_file">TLS-sertifikatsfil</string>
     <string name="tls_certificate_file_help">Hvis valgt vil eller har filen \"cert.pem\" som inneholder TLS-sertifikatet og den private nøkkelen tilhørende denne baresip-instansen blitt lastet inn fra Nedlastinger. Av sikkerhetshensyn må du slette filen etter innlasting.</string>
     <string name="tls_ca_file">TLS-CA-fil</string>
@@ -189,7 +186,7 @@
     <string name="backup">Sikkerhetskopier</string>
     <string name="restore">Gjenopprett</string>
     <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \"baresip.bs\".</string>
-    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'baresip.bs\'. Sjekk \"Programmer → baresip → Tilganger → Lagring</string>
+    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'baresip.bs\'. Sjekk \"Programmer → baresip → Tilganger → Lagring.</string>
     <string name="restored">Programdata gjenopprettet. Start baresip på ny nå\?</string>
     <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \"baresip.bs\" finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
     <string name="audio_modules_title">Lydmoduler</string>
@@ -197,7 +194,38 @@
     <string name="help">Hjelp</string>
     <string name="new_account">Ny konto</string>
     <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
-    <string name="accounts_help">"Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en  ny konto. UDP brukes hvis kun port angis. Port  5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis."</string>
+    <string name="accounts_help">Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en ny konto. UDP brukes hvis kun port angis. Port 5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis.</string>
     <string name="prefer_ipv6_media">Foretrekk IPv6-media</string>
     <string name="prefer_ipv6_media_help">Tilby bruk av IPv6-mediaprotokoll (hvis tilgjengelig) når likemanns mediaprotokoll ikke kan bestemmes.</string>
+    <string name="invalid_voicemail_uri">Ugyldig talepostkasse-URI \"%1$s\"</string>
+    <string name="invalid_proxy_server_uri">Ugyldig mellomtjener-URI \"%1$s\"</string>
+    <string name="invalid_authentication_password">Ugyldig identitetsbekreftelsespassord \"%1$s\"</string>
+    <string name="invalid_authentication_username">Ugylidg identitetsbekreftelsesbrukernavn \"%1$s\"</string>
+    <string name="invalid_display_name">Ugyldig visningsnavn \"%1$s\"</string>
+    <string name="invalid_stun_server">Ugyldig STUN-tjener \"%1$s\"</string>
+    <string name="call_info_not_available">Ingen info tilgjengelig</string>
+    <string name="show_password">Vis passord</string>
+    <string name="no_cameras">Du har ikke noen støttede videokameraer.</string>
+    <string name="restart_request">Start forespørsel på ny</string>
+    <string name="video_request">Videoforespørsel</string>
+    <string name="video_call">Videosamtale</string>
+    <string name="confirmation">Bekreftelse</string>
+    <string name="audio">Lyd</string>
+    <string name="tap_to_start">Trykk for å starte program</string>
+    <string name="invalid_stun_password">«%1$s» er et ugyldig passord</string>
+    <string name="stun_password_help">Passord hvis påkrevd av STUN/TURN-tjener</string>
+    <string name="stun_password">STUN/TURN-passord</string>
+    <string name="invalid_stun_username">«%1$s» er et ugyldig brukernavn</string>
+    <string name="stun_username_help">Brukernavn hvis påkrevd av STUN/TURN-tjener</string>
+    <string name="stun_username">STUN/TURN-brukernavn</string>
+    <string name="video_codecs_help">Liste over støttede videokodek i prioritetsrang</string>
+    <string name="video_codecs">Videokodek</string>
+    <string name="transfer_destination">Videresend til</string>
+    <string name="no_video_calls">Du kan ikke utføre eller svare på videoanrop uten kamera-tilgang.</string>
+    <string name="transfer_request_query">Ønsker du å sette over denne samtalen til «%1$s»\?</string>
+    <string name="transfer_failed">Kunne ikke videresende anrop</string>
+    <string name="transfer">Sett over</string>
+    <string name="call_transfer">Videresending av anrop</string>
+    <string name="allow_video">Godta videosamtale med «%1$s»\?</string>
+    <string name="about_title_plus">Om baresip+</string>
 </resources>

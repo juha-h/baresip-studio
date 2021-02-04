@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/AccountView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:paddingBottom="10dp"
             android:text="" >
         </TextView>
@@ -32,7 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/display_name" >
         </TextView>
@@ -52,7 +50,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/authentication_username" >
         </TextView>
@@ -72,27 +69,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/authentication_password" >
         </TextView>
 
-        <EditText
-            android:id="@+id/AuthPass"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:textSize="18sp"
-            android:inputType="textPassword"
-            android:importantForAutofill="no"
-            android:layout_width="fill_parent">
-        </EditText>
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle">
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/AuthPass"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:hint="@string/password"
+                android:maxLines="1">
+            </androidx.appcompat.widget.AppCompatEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/OutboundProxyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/outbound_proxies" >
         </TextView>
@@ -128,7 +128,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/Register"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/register" >
             </TextView>
@@ -146,27 +145,36 @@
             android:id="@+id/AudioCodecsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
+            android:textStyle="bold"
             android:onClick="onClick"
             android:text="@string/audio_codecs" >
         </TextView>
 
-        <LinearLayout
-            android:id="@+id/CodecSpinners"
+        <TextView
+            android:id="@+id/MediaEncTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:onClick="onClick"
+            android:text="@string/media_encryption" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/mediaEncSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:orientation="vertical" >
-        </LinearLayout>
+            android:paddingTop="8dp" >
+        </Spinner>
 
         <TextView
             android:id="@+id/MediaNatTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="16dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/media_nat" >
         </TextView>
@@ -184,7 +192,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/stun_server" >
         </TextView>
@@ -194,32 +201,56 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:textSize="18sp"
-            android:paddingTop="0dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="0dp"
             android:scrollHorizontally="true"
-            android:hint="@string/stun_server_default"
             android:importantForAutofill="no"
+            android:hint="@string/stun_server_uri"
             android:inputType="textEmailAddress" >
         </EditText>
 
         <TextView
-            android:id="@+id/MediaEncTitle"
+            android:id="@+id/StunUserTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
-            android:text="@string/media_encryption" >
+            android:text="@string/stun_username" >
         </TextView>
 
-        <Spinner
-            android:id="@+id/mediaEncSpinner"
+        <EditText
+            android:id="@+id/StunUser"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:hint="@string/user_id"
+            android:textSize="18sp"
+            android:inputType="textEmailAddress"
+            android:autofillHints="username" >
+        </EditText>
+
+        <TextView
+            android:id="@+id/StunPassTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:onClick="onClick"
+            android:text="@string/stun_password" >
+        </TextView>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp" >
-        </Spinner>
+            app:hintEnabled="false"
+            app:endIconMode="password_toggle">
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/StunPass"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:hint="@string/password"
+                android:maxLines="1">
+            </androidx.appcompat.widget.AppCompatEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -233,7 +264,6 @@
                 android:layout_toStartOf="@id/PreferIPv6Media"
                 android:paddingTop="10dp"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/prefer_ipv6_media" >
             </TextView>
@@ -253,7 +283,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/answer_mode" >
         </TextView>
@@ -271,7 +300,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
             android:onClick="onClick"
             android:text="@string/voicemail_uri" >
         </TextView>
@@ -298,7 +326,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/Default"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
                 android:onClick="onClick"
                 android:text="@string/default_account" >
             </TextView>

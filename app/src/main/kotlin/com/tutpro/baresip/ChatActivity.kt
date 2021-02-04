@@ -13,19 +13,21 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.tutpro.baresip.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
 
-    internal lateinit var chatMessages: ArrayList<Message>
-    internal lateinit var mlAdapter: MessageListAdapter
-    internal lateinit var listView: ListView
-    internal lateinit var newMessage: EditText
-    internal lateinit var sendButton: ImageButton
-    internal lateinit var imm: InputMethodManager
-    internal lateinit var aor: String
-    internal lateinit var peerUri: String
-    internal lateinit var ua: UserAgent
-    internal lateinit var messageResponseReceiver: BroadcastReceiver
+    private lateinit var binding: ActivityChatBinding
+    private lateinit var chatMessages: ArrayList<Message>
+    private lateinit var mlAdapter: MessageListAdapter
+    private lateinit var listView: ListView
+    private lateinit var newMessage: EditText
+    private lateinit var sendButton: ImageButton
+    private lateinit var imm: InputMethodManager
+    private lateinit var aor: String
+    private lateinit var peerUri: String
+    private lateinit var ua: UserAgent
+    private lateinit var messageResponseReceiver: BroadcastReceiver
 
     private var focus = false
     private var lastCall: Long = 0
@@ -33,27 +35,27 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        binding = ActivityChatBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setContentView(R.layout.activity_chat)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         aor = intent.getStringExtra("aor")!!
         peerUri = intent.getStringExtra("peer")!!
         focus = intent.getBooleanExtra("focus", false)
 
         if (BaresipService.activities.first().startsWith("chat,$aor,$peerUri")) {
-            val i = Intent()
-            setResult(Activity.RESULT_CANCELED, i)
-            finish()
+            returnResult(Activity.RESULT_CANCELED)
+            return
         } else {
             Utils.addActivity("chat,$aor,$peerUri,$focus")
         }
 
-        val userAgent = Account.findUa(aor)
+        val userAgent = UserAgent.ofAor(aor)
         if (userAgent == null) {
             Log.w("Baresip", "MessageActivity did not find ua of $aor")
-            val i = Intent()
-            setResult(Activity.RESULT_CANCELED, i)
-            finish()
+            MainActivity.activityAor = aor
+            returnResult(Activity.RESULT_CANCELED)
             return
         } else {
             ua = userAgent
@@ -68,11 +70,11 @@ class ChatActivity : AppCompatActivity() {
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
-        val headerView = findViewById(R.id.account) as TextView
+        val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
         headerView.text = headerText
 
-        listView = findViewById(R.id.messages) as ListView
+        listView = binding.messages
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
@@ -107,21 +109,25 @@ class ChatActivity : AppCompatActivity() {
             }
             val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
             if (ContactsActivity.contactName(peerUri) == peerUri)
-                builder.setMessage(String.format(getString(R.string.long_message_question),
-                        chatPeer))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
-                        .setPositiveButton(getString(R.string.add_contact), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.long_message_question),
+                    chatPeer))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.delete), dialogClickListener)
+                    setPositiveButton(getString(R.string.add_contact), dialogClickListener)
+                    show()
+                }
             else
-                builder.setMessage(getText(R.string.short_message_question))
-                        .setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getString(R.string.delete), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(getText(R.string.short_message_question))
+                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getString(R.string.delete), dialogClickListener)
+                    show()
+                }
             true
         }
 
-        newMessage = findViewById(R.id.text) as EditText
+        newMessage = binding.text
         newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -130,7 +136,7 @@ class ChatActivity : AppCompatActivity() {
 
         if (focus) newMessage.requestFocus()
 
-        sendButton = findViewById(R.id.sendButton) as ImageButton
+        sendButton = binding.sendButton
         sendButton.setOnClickListener {
             val msgText = newMessage.text.toString()
             if (msgText.length > 0) {
@@ -138,7 +144,7 @@ class ChatActivity : AppCompatActivity() {
                 val time = System.currentTimeMillis()
                 val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
                         0, "", true)
-                Message.add(msg)
+                msg.add()
                 chatMessages.add(msg)
                 if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
                     Toast.makeText(getApplicationContext(), "${getString(R.string.message_failed)}!",
@@ -160,6 +166,7 @@ class ChatActivity : AppCompatActivity() {
                         intent.getStringExtra("time")!!)
             }
         }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,
                 IntentFilter("message response"))
 
@@ -168,27 +175,23 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.call_icon, menu)
         return true
-
     }
 
     override fun onPause() {
-
         if (newMessage.text.toString() != "") {
             Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
+        MainActivity.activityAor = aor
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
         super.onPause()
-
     }
 
     override fun onResume() {
-
         super.onResume()
-
-        val chatText = BaresipService.chatTexts.get("$aor::$peerUri")
+        val chatText = BaresipService.chatTexts["$aor::$peerUri"]
         if (chatText != null) {
             Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
             newMessage.setText(chatText)
@@ -199,14 +202,6 @@ class ChatActivity : AppCompatActivity() {
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
-
-    }
-
-    override fun onDestroy() {
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
-        super.onDestroy()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -216,23 +211,6 @@ class ChatActivity : AppCompatActivity() {
                 return true
 
         when (item.itemId) {
-
-            android.R.id.home -> {
-                var save = false
-                for (m in chatMessages) {
-                    if (m.new) {
-                        m.new = false
-                        save = true
-                    }
-                }
-                if (save) Message.save()
-                imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
-                BaresipService.activities.remove("chat,$aor,$peerUri,false")
-                BaresipService.activities.remove("chat,$aor,$peerUri,true")
-                val i = Intent()
-                setResult(Activity.RESULT_OK, i)
-                finish()
-            }
 
             R.id.callIcon -> {
                 if (SystemClock.elapsedRealtime() - lastCall > 1000) {
@@ -245,23 +223,45 @@ class ChatActivity : AppCompatActivity() {
                     intent.putExtra("peer", peerUri)
                     startActivity(intent)
                     finish()
+                    return true
                 }
+            }
+
+            android.R.id.home -> {
+                onBackPressed()
+                return true
             }
 
         }
 
-        return true
+        return super.onOptionsItemSelected(item)
 
     }
 
     override fun onBackPressed() {
 
+        var save = false
+        for (m in chatMessages) {
+            if (m.new) {
+                m.new = false
+                save = true
+            }
+        }
+        if (save) Message.save()
+
+        imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
+
         BaresipService.activities.remove("chat,$aor,$peerUri,false")
         BaresipService.activities.remove("chat,$aor,$peerUri,true")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
-        finish()
+        returnResult(Activity.RESULT_OK)
+        super.onBackPressed()
 
+    }
+
+    private fun returnResult(code: Int) {
+        val i = Intent()
+        setResult(code, i)
+        finish()
     }
 
     private fun uaPeerMessages(aor: String, peerUri: String): ArrayList<Message> {

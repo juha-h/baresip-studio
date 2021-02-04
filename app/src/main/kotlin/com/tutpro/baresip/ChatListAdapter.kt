@@ -14,47 +14,67 @@ import android.widget.*
 import java.util.*
 import java.text.DateFormat
 
-class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Message>) :
-        ArrayAdapter<Message>(cxt, R.layout.message, rows) {
+class ChatListAdapter(private val ctx: Context, private var rows: ArrayList<Message>) :
+        ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private val layoutInflater = LayoutInflater.from(context)
+
+    private class ViewHolder(view: View?) {
+        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
+        val cardImageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
+        val layoutView = view?.findViewById(R.id.chat) as LinearLayout
+        val peerView = view?.findViewById(R.id.peer) as TextView
+        val infoView = view?.findViewById(R.id.info) as TextView
+        val textView = view?.findViewById(R.id.text) as TextView
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.chat_row, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val message = rows[position]
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.chat_row, parent, false)
-        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
-        val cardImageAvatarView = rowView.findViewById(R.id.ImageAvatar) as ImageView
-        val layout = rowView.findViewById(R.id.chat) as LinearLayout
+
         val contact = ContactsActivity.findContact(message.peerUri)
         val peer: String
         if (contact != null) {
             peer = contact.name
             val avatarImage = contact.avatarImage
             if (avatarImage != null) {
-                textAvatarView.visibility = View.GONE
-                cardAvatarView.visibility = View.VISIBLE
-                cardImageAvatarView.setImageBitmap(avatarImage)
+                viewHolder.textAvatarView.visibility = View.GONE
+                viewHolder.cardAvatarView.visibility = View.VISIBLE
+                viewHolder.cardImageAvatarView.setImageBitmap(avatarImage)
             } else {
-                textAvatarView.visibility = View.VISIBLE
-                cardAvatarView.visibility = View.GONE
-                (textAvatarView.background as GradientDrawable).setColor(contact.color)
-                textAvatarView.text = "${peer[0]}"
+                viewHolder.textAvatarView.visibility = View.VISIBLE
+                viewHolder.cardAvatarView.visibility = View.GONE
+                (viewHolder.textAvatarView.background as GradientDrawable).setColor(contact.color)
+                viewHolder.textAvatarView.text = "${peer[0]}"
             }
         } else {
             peer = Utils.friendlyUri(message.peerUri, message.aor)
-            textAvatarView.visibility = View.VISIBLE
-            cardAvatarView.visibility = View.GONE
-            textAvatarView.setBackgroundResource(R.drawable.person_image)
+            viewHolder.textAvatarView.visibility = View.VISIBLE
+            viewHolder.cardAvatarView.visibility = View.GONE
+            viewHolder.textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
+
         if ((message.direction == R.drawable.arrow_down_green) ||
-                (message.direction == R.drawable.arrow_down_red)) {
-            layout.setBackgroundResource(R.drawable.message_in_bg)
-        } else {
-            layout.setBackgroundResource(R.drawable.message_out_bg)
-        }
-        val peerView = rowView.findViewById(R.id.peer) as TextView
-        peerView.setText(peer)
-        val infoView = rowView.findViewById(R.id.info) as TextView
+                (message.direction == R.drawable.arrow_down_red))
+            viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
+        else
+            viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
+
+        viewHolder.peerView.setText(peer)
+
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
         val fmt: DateFormat
@@ -62,21 +82,22 @@ class ChatListAdapter(private val cxt: Context, private var rows: ArrayList<Mess
             fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
         else
             fmt = DateFormat.getDateInstance(DateFormat.SHORT)
-        infoView.text = fmt.format(cal.time)
+        viewHolder.infoView.text = fmt.format(cal.time)
         if (message.direction == R.drawable.arrow_up_red) {
             val info: String
             if (message.responseCode != 0)
-                info = "${infoView.text} - ${cxt.getString(R.string.message_failed)}: " +
+                info = "${viewHolder.infoView.text} - ${ctx.getString(R.string.message_failed)}: " +
                     "${message.responseCode} ${message.responseReason}"
             else
-                info = "${infoView.text} - ${cxt.getString(R.string.sending_failed)}"
-            infoView.text = info
-            infoView.setTextColor(ContextCompat.getColor(cxt, R.color.colorAccent))
+                info = "${viewHolder.infoView.text} - ${ctx.getString(R.string.sending_failed)}"
+            viewHolder.infoView.text = info
+            viewHolder.infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         }
-        val textView = rowView.findViewById(R.id.text) as TextView
-        textView.text = message.message
+
+        viewHolder.textView.text = message.message
         if (message.new)
-            textView.setTypeface(null, Typeface.BOLD)
+            viewHolder.textView.setTypeface(null, Typeface.BOLD)
+
         return rowView
     }
 

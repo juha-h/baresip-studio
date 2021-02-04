@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -21,59 +22,78 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
-class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<Contact>,
+class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<Contact>,
                          private val aor: String) :
-        ArrayAdapter<Contact>(cxt, R.layout.contact_row, rows) {
+        ArrayAdapter<Contact>(ctx, R.layout.contact_row, rows) {
 
+    private val layoutInflater = LayoutInflater.from(context)
     private var lastClick: Long = 0
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private class ViewHolder(view: View?) {
+        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
+        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
+        val nameView = view?.findViewById(R.id.contactName) as TextView
+        val actionView = view?.findViewById(R.id.edit) as ImageButton
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.contact_row, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val contact = rows[position]
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.contact_row, parent, false)
-        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
-        val imageAvatarView = rowView.findViewById(R.id.ImageAvatar) as ImageView
+
         val avatarImage = contact.avatarImage
         if (avatarImage != null) {
-            textAvatarView.visibility = View.GONE
-            cardAvatarView.visibility = View.VISIBLE
-            imageAvatarView.visibility = View.VISIBLE
-            imageAvatarView.setImageBitmap(avatarImage)
+            viewHolder.textAvatarView.visibility = View.GONE
+            viewHolder.cardAvatarView.visibility = View.VISIBLE
+            viewHolder.imageAvatarView.visibility = View.VISIBLE
+            viewHolder.imageAvatarView.setImageBitmap(avatarImage)
         } else {
-            textAvatarView.visibility = View.VISIBLE
-            cardAvatarView.visibility = View.GONE
-            imageAvatarView.visibility = View.GONE
-            (textAvatarView.background as GradientDrawable).setColor(contact.color)
+            viewHolder.textAvatarView.visibility = View.VISIBLE
+            viewHolder.cardAvatarView.visibility = View.GONE
+            viewHolder.imageAvatarView.visibility = View.GONE
+            (viewHolder.textAvatarView.background as GradientDrawable).setColor(contact.color)
             if (contact.name.isNotEmpty())
-                textAvatarView.text = "${contact.name[0]}"
+                viewHolder.textAvatarView.text = "${contact.name[0]}"
             else
-                textAvatarView.text = ""
+                viewHolder.textAvatarView.text = ""
         }
-        val nameView = rowView.findViewById(R.id.contactName) as TextView
-        nameView.text = contact.name
-        nameView.textSize = 20f
-        nameView.setPadding(6, 6, 0, 6)
+
+        viewHolder.nameView.text = contact.name
+        viewHolder.nameView.textSize = 20f
+        viewHolder.nameView.setPadding(6, 6, 0, 6)
+
         if (aor != "") {
-            nameView.setOnClickListener { _ ->
+            viewHolder.nameView.setOnClickListener { _ ->
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
                         DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
-                            val i = Intent(cxt, MainActivity::class.java)
+                            val i = Intent(ctx, MainActivity::class.java)
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             if (which == DialogInterface.BUTTON_NEGATIVE)
                                 i.putExtra("action", "call")
                             else
                                 i.putExtra("action", "message")
-                            val ua = Account.findUa(aor)
+                            val ua = UserAgent.ofAor(aor)
                             if (ua == null) {
                                 Log.w("Baresip", "onClickListener did not find AoR $aor")
                             } else {
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
                                 i.putExtra("peer", Contact.contacts()[position].uri)
-                                (cxt as Activity).startActivity(i)
+                                (ctx as Activity).startActivity(i)
                             }
                         }
                         DialogInterface.BUTTON_NEUTRAL -> {
@@ -82,17 +102,19 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                 }
                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                     lastClick = SystemClock.elapsedRealtime()
-                    val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-                    builder.setMessage(String.format(cxt.getString(R.string.contact_action_question),
-                            Contact.contacts()[position].name))
-                            .setNeutralButton(cxt.getText(R.string.cancel), dialogClickListener)
-                            .setNegativeButton(cxt.getText(R.string.call), dialogClickListener)
-                            .setPositiveButton(cxt.getText(R.string.send_message), dialogClickListener)
-                            .show()
+                    with (AlertDialog.Builder(ctx, R.style.Theme_AppCompat)) {
+                        setMessage(String.format(ctx.getString(R.string.contact_action_question),
+                                Contact.contacts()[position].name))
+                        setNeutralButton(ctx.getText(R.string.cancel), dialogClickListener)
+                        setNegativeButton(ctx.getText(R.string.call), dialogClickListener)
+                        setPositiveButton(ctx.getText(R.string.send_message), dialogClickListener)
+                        show()
+                    }
                 }
             }
         }
-        nameView.setOnLongClickListener { _ ->
+
+        viewHolder.nameView.setOnLongClickListener { _ ->
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -105,6 +127,9 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                                 Log.e("Baresip", "Could not delete file '$id.img")
                             }
                         }
+                        if (contact.androidContact &&
+                                Utils.checkPermission(ctx, Manifest.permission.WRITE_CONTACTS))
+                            ContactActivity.deleteAndroidContact(ctx, contact)
                         Contact.contacts().removeAt(position)
                         Contact.save()
                         this.notifyDataSetChanged()
@@ -113,26 +138,31 @@ class ContactListAdapter(private val cxt: Context, private val rows: ArrayList<C
                     }
                 }
             }
-            val builder = AlertDialog.Builder(cxt, R.style.Theme_AppCompat)
-            builder.setMessage(String.format(cxt.getString(R.string.contact_delete_question),
-                    Contact.contacts()[position].name))
-                    .setNegativeButton(cxt.getText(R.string.cancel), dialogClickListener)
-                    .setPositiveButton(cxt.getText(R.string.delete), dialogClickListener)
-                    .show()
+            val titleView = View.inflate(ctx, R.layout.alert_title, null) as TextView
+            titleView.text = ctx.getString(R.string.confirmation)
+            with (AlertDialog.Builder(ctx)) {
+                setCustomTitle(titleView)
+                setMessage(String.format(ctx.getString(R.string.contact_delete_question),
+                        Contact.contacts()[position].name))
+                setNegativeButton(ctx.getText(R.string.cancel), dialogClickListener)
+                setPositiveButton(ctx.getText(R.string.delete), dialogClickListener)
+                show()
+            }
             true
         }
-        val actionView = rowView.findViewById(R.id.edit) as ImageButton
-        actionView.setOnClickListener { _ ->
+
+        viewHolder.actionView.setOnClickListener { _ ->
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                val i = Intent(cxt, ContactActivity::class.java)
+                val i = Intent(ctx, ContactActivity::class.java)
                 val b = Bundle()
                 b.putBoolean("new", false)
                 b.putInt("index", position)
                 i.putExtras(b)
-                (cxt as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
+                (ctx as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
             }
         }
+
         return rowView
     }
 }

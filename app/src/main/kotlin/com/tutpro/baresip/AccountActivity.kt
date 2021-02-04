@@ -2,159 +2,170 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.LinearLayout.LayoutParams
 import android.widget.*
-
-import kotlinx.android.synthetic.main.activity_account.*
-
-import com.tutpro.baresip.Account.Companion.checkAuthPass
-import com.tutpro.baresip.Account.Companion.checkAuthUser
-import com.tutpro.baresip.Account.Companion.checkDisplayName
-import com.tutpro.baresip.MainActivity.Companion.aorPasswords
+import com.tutpro.baresip.databinding.ActivityAccountBinding
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
+import java.io.StringReader
+import java.lang.ref.WeakReference
+import java.net.URL
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AccountActivity : AppCompatActivity() {
 
-    internal lateinit var acc: Account
-    internal lateinit var ua: UserAgent
-    internal lateinit var uri: TextView
-    internal lateinit var displayName: EditText
-    internal lateinit var aor: String
-    internal lateinit var authUser: EditText
-    internal lateinit var authPass: EditText
-    internal lateinit var outbound1: EditText
-    internal lateinit var outbound2: EditText
-    internal lateinit var mediaNat: String
-    internal lateinit var stunServer: EditText
-    internal lateinit var regCheck: CheckBox
-    internal lateinit var mediaEnc: String
-    internal lateinit var ipV6MediaCheck: CheckBox
-    internal lateinit var answerMode: String
-    internal lateinit var vmUri: EditText
-    internal lateinit var defaultCheck: CheckBox
+    private lateinit var binding: ActivityAccountBinding
+    private lateinit var acc: Account
+    private lateinit var ua: UserAgent
+    private lateinit var uri: TextView
+    private lateinit var displayName: EditText
+    private lateinit var aor: String
+    private lateinit var authUser: EditText
+    private lateinit var authPass: EditText
+    private lateinit var outbound1: EditText
+    private lateinit var outbound2: EditText
+    private lateinit var mediaNat: String
+    private lateinit var stunServer: EditText
+    private lateinit var stunUser: EditText
+    private lateinit var stunPass: EditText
+    private lateinit var regCheck: CheckBox
+    private lateinit var mediaNatSpinner: Spinner
+    private lateinit var mediaEnc: String
+    private lateinit var mediaEncSpinner: Spinner
+    private lateinit var ipV6MediaCheck: CheckBox
+    private lateinit var answerMode: String
+    private lateinit var answerModeSpinner: Spinner
+    private lateinit var vmUri: EditText
+    private lateinit var defaultCheck: CheckBox
 
-    private var newCodecs = ArrayList<String>()
+    private val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
+    private val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
+    private val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
+    private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
+
     private var save = false
     private var uaIndex= -1
-    private var accp = ""
+    private val TAG = "Baresip"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_account)
+        binding = ActivityAccountBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        accp = intent.getStringExtra("accp")!!
-        Utils.addActivity("account,$accp")
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        acc = Account.find(accp)!!
-        aor = acc.aor
+        uri = binding.Uri
+        displayName = binding.DisplayName
+        authUser = binding.AuthUser
+        authPass = binding.AuthPass
+        outbound1 = binding.Outbound1
+        outbound2 = binding.Outbound2
+        regCheck = binding.Register
+        mediaNatSpinner = binding.mediaNatSpinner
+        stunServer = binding.StunServer
+        stunUser = binding.StunUser
+        stunPass = binding.StunPass
+        mediaEncSpinner = binding.mediaEncSpinner
+        ipV6MediaCheck = binding.PreferIPv6Media
+        answerModeSpinner = binding.answerModeSpinner
+        vmUri = binding.voicemailUri
+        defaultCheck = binding.Default
+
+        aor = intent.getStringExtra("aor")!!
+        ua = UserAgent.ofAor(aor)!!
+        acc = ua.account
         uaIndex = UserAgent.findAorIndex(aor)!!
-        ua = UserAgent.uas()[uaIndex]
 
-        setTitle(aor.split(":")[1])
+        Utils.addActivity("account,$aor")
 
-        uri = findViewById(R.id.Uri) as TextView
-        uri.setText(acc.luri)
+        if (intent.getBooleanExtra("new", false)) {
+            val url = "https://${Utils.uriHostPart(aor)}/baresip/account_config.xml"
+            GetAccountConfigAsyncTask(this).execute(url)
+        }
 
-        displayName = findViewById(R.id.DisplayName) as EditText
+        title = aor.split(":")[1]
+
+        initLayoutFromAccount(acc)
+
+    }
+
+    private fun initLayoutFromAccount(acc: Account) {
+
+        uri.text = acc.luri
         displayName.setText(acc.displayName)
-
-        authUser = findViewById(R.id.AuthUser) as EditText
         authUser.setText(acc.authUser)
 
-        authPass = findViewById(R.id.AuthPass) as EditText
-        if (aorPasswords.containsKey(aor))
+        if (MainActivity.aorPasswords.containsKey(aor))
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
 
-        outbound1 = findViewById(R.id.Outbound1) as EditText
-        outbound2 = findViewById(R.id.Outbound2) as EditText
         if (acc.outbound.size > 0) {
             outbound1.setText(acc.outbound[0])
             if (acc.outbound.size > 1)
                 outbound2.setText(acc.outbound[1])
         }
 
-        regCheck = findViewById(R.id.Register) as CheckBox
         regCheck.isChecked = acc.regint > 0
 
-        val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-        newCodecs.addAll(audioCodecs)
-        while (newCodecs.size < audioCodecs.size) newCodecs.add("")
-
-        val layout = findViewById(R.id.CodecSpinners) as LinearLayout
-        val spinnerList = Array(audioCodecs.size, {_ -> ArrayList<String>()})
-        for (i in audioCodecs.indices) {
-            val spinner = Spinner(applicationContext)
-            spinner.id = i + 100
-            spinner.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            layout.addView(spinner)
-            if (acc.audioCodec.size > i) {
-                val codec = acc.audioCodec[i]
-                spinnerList[i].add(codec)
-                for (c in audioCodecs) if (c != codec) spinnerList[i].add(c)
-                spinnerList[i].add("-")
-            } else {
-                spinnerList[i].addAll(audioCodecs)
-                spinnerList[i].add(0, "-")
-            }
-            val codecSpinner = findViewById(spinner.id) as Spinner
-            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                spinnerList[i])
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            codecSpinner.adapter = adapter
-            codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newCodecs.set(parent.id - 100, parent.selectedItem.toString())
-                }
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                }
-            }
-        }
-
         mediaNat = acc.mediaNat
-        val mediaNatSpinner = findViewById(R.id.mediaNatSpinner) as Spinner
-        val mediaNatKeys = arrayListOf("stun", "ice", "")
-        val mediaNatVals = arrayListOf("STUN", "ICE", "-")
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
         var keyVal = mediaNatVals.elementAt(keyIx)
         mediaNatKeys.removeAt(keyIx)
         mediaNatVals.removeAt(keyIx)
         mediaNatKeys.add(0, acc.mediaNat)
         mediaNatVals.add(0, keyVal)
-        val mediaNatAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+        val mediaNatAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
                 mediaNatVals)
         mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mediaNatSpinner.adapter = mediaNatAdapter
         mediaNatSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
+                if ((mediaNat == "turn") && stunServer.text.startsWith("stun"))
+                    stunServer.setText("")
+                else if ((mediaNat == "stun") &&
+                        (stunServer.text.startsWith("turn") || (stunServer.text.toString() == "")))
+                    stunServer.setText(resources.getString(R.string.stun_server_default))
+                else if ((mediaNat == "ice") && (stunServer.text.toString() == ""))
+                    stunServer.setText(resources.getString(R.string.stun_server_default))
+                else if (mediaNat == "") {
+                    stunServer.setText("")
+                    stunUser.setText("")
+                    stunPass.setText("")
+                }
                 stunServer.isEnabled = mediaNat != ""
+                stunUser.isEnabled = mediaNat != ""
+                stunPass.isEnabled = mediaNat != ""
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
 
-        stunServer = findViewById(R.id.StunServer) as EditText
         stunServer.setText(acc.stunServer)
         stunServer.isEnabled = mediaNat != ""
 
+        stunUser.setText(acc.stunUser)
+        stunUser.isEnabled = mediaNat != ""
+
+        stunPass.setText(acc.stunPass)
+        stunPass.isEnabled = mediaNat != ""
+
         mediaEnc = acc.mediaEnc
-        val mediaEncSpinner = findViewById(R.id.mediaEncSpinner) as Spinner
-        val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
-        val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
-        keyIx = mediaEncKeys.indexOf(acc.mediaEnc)
+        keyIx = mediaEncKeys.indexOf(mediaEnc)
         keyVal = mediaEncVals.elementAt(keyIx)
         mediaEncKeys.removeAt(keyIx)
         mediaEncVals.removeAt(keyIx)
-        mediaEncKeys.add(0, acc.mediaEnc)
+        mediaEncKeys.add(0, mediaEnc)
         mediaEncVals.add(0, keyVal)
-        val mediaEncAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val mediaEncAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
                 mediaEncVals)
         mediaEncAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mediaEncSpinner.adapter = mediaEncAdapter
@@ -166,11 +177,9 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        ipV6MediaCheck = findViewById(R.id.PreferIPv6Media) as CheckBox
         ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
         answerMode = acc.answerMode
-        val answerModeSpinner = findViewById(R.id.answerModeSpinner) as Spinner
         val answerModeKeys = arrayListOf("manual", "auto")
         val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
         keyIx = answerModeKeys.indexOf(acc.answerMode)
@@ -179,7 +188,7 @@ class AccountActivity : AppCompatActivity() {
         answerModeVals.removeAt(keyIx)
         answerModeKeys.add(0, acc.answerMode)
         answerModeVals.add(0, keyVal)
-        val answerModeAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val answerModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
                 answerModeVals)
         answerModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         answerModeSpinner.adapter = answerModeAdapter
@@ -191,10 +200,8 @@ class AccountActivity : AppCompatActivity() {
             }
         }
 
-        vmUri = findViewById(R.id.voicemailUri) as EditText
         vmUri.setText(acc.vmUri)
 
-        defaultCheck = findViewById(R.id.Default) as CheckBox
         defaultCheck.isChecked = uaIndex == 0
 
     }
@@ -210,23 +217,21 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (BaresipService.activities.indexOf("account,$accp") == -1) return true
-
-        val intent = Intent()
-        intent.putExtra("aor", aor)
+        if (BaresipService.activities.indexOf("account,$aor") == -1)
+            return true
 
         when (item.itemId) {
 
             R.id.checkIcon -> {
                 val dn = displayName.text.toString().trim()
                 if (dn != acc.displayName) {
-                    if (checkDisplayName(dn)) {
-                        if (account_set_display_name(acc.accp, dn) == 0) {
-                            acc.displayName = account_display_name(acc.accp);
-                            Log.d("Baresip", "New display name is ${acc.displayName}")
+                    if (Account.checkDisplayName(dn)) {
+                        if (Api.account_set_display_name(acc.accp, dn) == 0) {
+                            acc.displayName = Api.account_display_name(acc.accp);
+                            Log.d(TAG, "New display name is ${acc.displayName}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of display name failed")
+                            Log.e(TAG, "Setting of display name failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
@@ -239,13 +244,13 @@ class AccountActivity : AppCompatActivity() {
                 val ap = authPass.text.toString().trim()
 
                 if (au != acc.authUser) {
-                    if (checkAuthUser(au)) {
-                        if (account_set_auth_user(acc.accp, au) == 0) {
-                            acc.authUser = account_auth_user(acc.accp);
-                            Log.d("Baresip", "New auth user is ${acc.authUser}")
+                    if (Account.checkAuthUser(au)) {
+                        if (Api.account_set_auth_user(acc.accp, au) == 0) {
+                            acc.authUser = Api.account_auth_user(acc.accp);
+                            Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of auth user failed")
+                            Log.e(TAG, "Setting of auth user failed")
                         }
                     } else {
                         Utils.alertView(this, getString(R.string.notice),
@@ -256,30 +261,30 @@ class AccountActivity : AppCompatActivity() {
 
                 if (ap != "") {
                     if (ap != acc.authPass) {
-                        if (checkAuthPass(ap)) {
+                        if (Account.checkAuthPass(ap)) {
                             setAuthPass(acc, ap)
-                            aorPasswords.remove(aor)
+                            MainActivity.aorPasswords.remove(aor)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_authentication_password), ap))
                             return false
                         }
                     } else {
-                        if (aorPasswords.containsKey(aor)) {
-                            aorPasswords.remove(aor)
+                        if (MainActivity.aorPasswords.containsKey(aor)) {
+                            MainActivity.aorPasswords.remove(aor)
                             save = true
                         }
                     }
                 } else { // ap == ""
                     if (acc.authUser != "") {
-                        if (!aorPasswords.containsKey(aor)) {
+                        if (!MainActivity.aorPasswords.containsKey(aor)) {
                             setAuthPass(acc, "")
-                            aorPasswords.put(aor, "")
+                            MainActivity.aorPasswords.put(aor, "")
                         }
                     } else {
                         if (acc.authPass != "") {
                             setAuthPass(acc, "")
-                            aorPasswords.remove(aor)
+                            MainActivity.aorPasswords.remove(aor)
                         }
                     }
                 }
@@ -300,11 +305,11 @@ class AccountActivity : AppCompatActivity() {
                     val outbound = ArrayList<String>()
                     for (i in ob.indices) {
                         if ((ob[i] == "") || checkOutboundUri(ob[i])) {
-                            if (account_set_outbound(acc.accp, ob[i], i) == 0) {
+                            if (Api.account_set_outbound(acc.accp, ob[i], i) == 0) {
                                 if (ob[i] != "")
-                                    outbound.add(account_outbound(acc.accp, i))
+                                    outbound.add(Api.account_outbound(acc.accp, i))
                             } else {
-                                Log.e("Baresip", "Setting of outbound proxy ${ob[i]} failed")
+                                Log.e(TAG, "Setting of outbound proxy ${ob[i]} failed")
                                 break
                             }
                         } else {
@@ -313,12 +318,12 @@ class AccountActivity : AppCompatActivity() {
                             return false
                         }
                     }
-                    Log.d("Baresip", "New outbound proxies are ${outbound}")
+                    Log.d(TAG, "New outbound proxies are ${outbound}")
                     acc.outbound = outbound
                     if (outbound.isEmpty())
-                        account_set_sipnat(acc.accp, "")
+                        Api.account_set_sipnat(acc.accp, "")
                     else
-                        account_set_sipnat(acc.accp, "outbound")
+                        Api.account_set_sipnat(acc.accp, "outbound")
                     save = true
                 }
 
@@ -326,97 +331,102 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked) {
                     if (acc.regint != 3600) {
                         newRegint = 3600
-                        UserAgent.updateStatus(ua, R.drawable.dot_yellow)
+                        ua.updateStatus(R.drawable.dot_yellow)
                     }
                 } else {
                     if (acc.regint != 0) {
                         Api.ua_unregister(ua.uap)
-                        UserAgent.updateStatus(ua, R.drawable.dot_white)
+                        ua.updateStatus(R.drawable.dot_white)
                         newRegint = 0
                     }
                 }
                 if (newRegint != -1)
-                    if (account_set_regint(acc.accp, newRegint) == 0) {
-                        acc.regint = account_regint(acc.accp)
-                        Log.d("Baresip", "New regint is ${acc.regint}")
+                    if (Api.account_set_regint(acc.accp, newRegint) == 0) {
+                        acc.regint = Api.account_regint(acc.accp)
+                        Log.d(TAG, "New regint is ${acc.regint}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of regint failed")
+                        Log.e(TAG, "Setting of regint failed")
                     }
 
                 if (mediaNat != acc.mediaNat) {
-                    if (account_set_medianat(acc.accp, mediaNat) == 0) {
-                        acc.mediaNat = account_medianat(acc.accp)
-                        Log.d("Baresip", "New medianat is ${acc.mediaNat}")
+                    if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
+                        acc.mediaNat = Api.account_medianat(acc.accp)
+                        Log.d(TAG, "New medianat is ${acc.mediaNat}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of medianat failed")
+                        Log.e(TAG, "Setting of medianat failed")
                     }
                 }
 
+                var newStunServer = stunServer.text.toString().trim()
                 if (mediaNat != "") {
-                    val newStunServer = stunServer.text.toString().trim()
-                    if (acc.stunServer != newStunServer) {
-                        if (!Utils.checkHostPort(newStunServer)) {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_stun_server), newStunServer))
-                            return false
-                        }
-                        var host = ""
-                        var port = 0
-                        if (newStunServer != "") {
-                            val hostPort = newStunServer.split(":")
-                            host = hostPort[0]
-                            if (hostPort.size == 2) port = hostPort[1].toInt()
-                        }
-                        if ((account_set_stun_host(acc.accp, host) == 0) &&
-                                (account_set_stun_port(acc.accp, port) == 0)) {
-                            acc.stunServer = account_stun_host(acc.accp)
-                            if (port != 0)
-                                acc.stunServer += ":" + account_stun_port(acc.accp).toString()
-                            Log.d("Baresip", "New StunServer is '${acc.stunServer}'")
+                    if (((mediaNat == "stun") || (mediaNat == "ice")) && (newStunServer == ""))
+                        newStunServer = resources.getString(R.string.stun_server_default)
+                    if (!Utils.checkStunUri(newStunServer) ||
+                            ((mediaNat == "turn") && !newStunServer.startsWith("turn:"))) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_stun_server), newStunServer))
+                        return false
+                    }
+                }
+
+                if (acc.stunServer != newStunServer) {
+                    if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
+                        acc.stunServer = Api.account_stun_uri(acc.accp)
+                        Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
+                        save = true
+                    } else {
+                        Log.e(TAG, "Setting of STUN/TURN URI server failed")
+                    }
+                }
+
+                val newStunUser = stunUser.text.toString().trim()
+                if (acc.stunUser != newStunUser) {
+                    if (Account.checkAuthUser(newStunUser)) {
+                        if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
+                            acc.stunUser = Api.account_stun_user(acc.accp);
+                            Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of StunServer failed")
+                            Log.e(TAG, "Setting of STUN/TURN user failed")
                         }
+                    } else {
+                        Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
+                                newStunUser))
+                        return false
                     }
                 }
 
-                val ac = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
-                if (ac != acc.audioCodec) {
-                    Log.d("Baresip", "New codecs ${newCodecs.filter { it != "-" }}")
-                    val acParam = ";audio_codecs=" + Utils.implode(ac, ",")
-                    if (account_set_audio_codecs(acc.accp, acParam) == 0) {
-                        var i = 0
-                        while (true) {
-                            val codec = account_audio_codec(acc.accp, i)
-                            if (codec != "") {
-                                Log.d("Baresip", "Found audio codec '$codec'")
-                                i++
-                            } else {
-                                break
-                            }
+                val newStunPass = stunPass.text.toString().trim()
+                if (acc.stunPass != newStunPass) {
+                    if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
+                        if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
+                            acc.stunPass = Api.account_stun_pass(acc.accp);
+                            save = true
+                        } else {
+                            Log.e(TAG, "Setting of stun pass failed")
                         }
-                        acc.audioCodec = ac
-                        save = true
                     } else {
-                        Log.e("Baresip", "Setting of audio codecs '$acParam' failed")
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_stun_password), newStunPass))
+                        return false
                     }
                 }
 
                 if (mediaEnc != acc.mediaEnc) {
-                    if (account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                        acc.mediaEnc = account_mediaenc(acc.accp)
-                        Log.d("Baresip", "New mediaenc is ${acc.mediaEnc}")
+                    if (Api.account_set_mediaenc(acc.accp, mediaEnc) == 0) {
+                        acc.mediaEnc = Api.account_mediaenc(acc.accp)
+                        Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
                         save = true
                     } else {
-                        Log.e("Baresip", "Setting of mediaenc $mediaEnc failed")
+                        Log.e(TAG, "Setting of mediaenc $mediaEnc failed")
                     }
                 }
 
                 if (ipV6MediaCheck.isChecked != acc.preferIPv6Media) {
                     acc.preferIPv6Media = ipV6MediaCheck.isChecked
-                    Log.d("Baresip", "New preferIPv6Media is ${acc.preferIPv6Media}")
+                    Log.d(TAG, "New preferIPv6Media is ${acc.preferIPv6Media}")
                     if (acc.preferIPv6Media)
                         Api.ua_set_media_af(ua.uap, Api.AF_INET6)
                     else
@@ -426,11 +436,11 @@ class AccountActivity : AppCompatActivity() {
 
                 if (answerMode != acc.answerMode) {
                     acc.answerMode = answerMode
-                    Log.d("Baresip", "New answermode is ${acc.answerMode}")
+                    Log.d(TAG, "New answermode is ${acc.answerMode}")
                     save = true
                 }
 
-                var tVmUri = voicemailUri.text.toString().trim()
+                var tVmUri = vmUri.text.toString().trim()
                 if (tVmUri != acc.vmUri) {
                     if (tVmUri != "") {
                         if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
@@ -440,9 +450,9 @@ class AccountActivity : AppCompatActivity() {
                                     String.format(getString(R.string.invalid_voicemail_uri), tVmUri))
                             return false
                         }
-                        account_set_mwi(acc.accp, "yes")
+                        Api.account_set_mwi(acc.accp, "yes")
                     } else {
-                        account_set_mwi(acc.accp, "no")
+                        Api.account_set_mwi(acc.accp, "no")
                     }
                     acc.vmUri = tVmUri
                     save = true
@@ -461,7 +471,7 @@ class AccountActivity : AppCompatActivity() {
                 if (save) {
                     AccountsActivity.saveAccounts()
                     if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
+                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
                     //else
                         //Api.ua_debug(ua.uap)
                 }
@@ -469,96 +479,203 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
                     Api.ua_register(ua.uap)
 
-                setResult(Activity.RESULT_OK, intent)
+                BaresipService.activities.remove("account,$aor")
+                returnResult(Activity.RESULT_OK)
+                return true
             }
 
-            android.R.id.home ->
-                setResult(Activity.RESULT_CANCELED, intent)
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
 
         }
 
-        BaresipService.activities.remove("account,$accp")
-        finish()
-
-        return true
+        return super.onOptionsItemSelected(item)
 
     }
 
     override fun onBackPressed() {
-
-        BaresipService.activities.remove("account,$accp")
-        val intent = Intent()
-        intent.putExtra("aor", aor)
-        setResult(Activity.RESULT_CANCELED, intent)
-        finish()
+        BaresipService.activities.remove("account,$aor")
+        returnResult(Activity.RESULT_CANCELED)
         super.onBackPressed()
+    }
 
+    override fun onPause() {
+        MainActivity.activityAor = aor
+        super.onPause()
     }
 
     fun onClick(v: View) {
         when (v) {
-            findViewById(R.id.DisplayNameTitle) as TextView-> {
+            binding.DisplayNameTitle -> {
                 Utils.alertView(this, getString(R.string.display_name),
                         getString(R.string.display_name_help))
             }
-            findViewById(R.id.AuthUserTitle) as TextView -> {
+            binding.AuthUserTitle -> {
                 Utils.alertView(this, getString(R.string.authentication_username),
                         getString(R.string.authentication_username_help))
             }
-            findViewById(R.id.AuthPassTitle) as TextView-> {
+            binding.AuthPassTitle -> {
                 Utils.alertView(this, getString(R.string.authentication_password),
                         getString(R.string.authentication_password_help))
             }
-            findViewById(R.id.OutboundProxyTitle) as TextView -> {
+            binding.OutboundProxyTitle -> {
                 Utils.alertView(this, getString(R.string.outbound_proxies),
                         getString(R.string.outbound_proxies_help))
             }
-            findViewById(R.id.RegTitle) as TextView -> {
+            binding.RegTitle -> {
                 Utils.alertView(this, getString(R.string.register),
                         getString(R.string.register_help))
             }
-            findViewById(R.id.AudioCodecsTitle) as TextView -> {
-                Utils.alertView(this, getString(R.string.audio_codecs),
-                        getString(R.string.audio_codecs_help))
+            binding.AudioCodecsTitle -> {
+                val i = Intent(this, CodecsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", aor)
+                b.putString("media", "audio")
+                i.putExtras(b)
+                startActivity(i)
             }
-            findViewById(R.id.MediaNatTitle) as TextView -> {
+            binding.MediaNatTitle -> {
                 Utils.alertView(this, getString(R.string.media_nat),
                         getString(R.string.media_nat_help))
             }
-            findViewById(R.id.StunServerTitle) as TextView -> {
+            binding.StunServerTitle -> {
                 Utils.alertView(this, getString(R.string.stun_server),
                         getString(R.string.stun_server_help))
             }
-            findViewById(R.id.MediaEncTitle) as TextView -> {
+            binding.StunUserTitle -> {
+                Utils.alertView(this, getString(R.string.stun_username),
+                        getString(R.string.stun_username_help))
+            }
+            binding.StunPassTitle -> {
+                Utils.alertView(this, getString(R.string.stun_password),
+                        getString(R.string.stun_password_help))
+            }
+            binding.MediaEncTitle -> {
                 Utils.alertView(this, getString(R.string.media_encryption),
                         getString(R.string.media_encryption_help))
             }
-            findViewById(R.id.PreferIPv6MediaTitle) as TextView -> {
+            binding.PreferIPv6MediaTitle -> {
                 Utils.alertView(this, getString(R.string.prefer_ipv6_media),
                         getString(R.string.prefer_ipv6_media_help))
             }
-            findViewById(R.id.AnswerModeTitle) as TextView -> {
+            binding.AnswerModeTitle -> {
                 Utils.alertView(this, getString(R.string.answer_mode),
                         getString(R.string.answer_mode_help))
             }
-            findViewById(R.id.VoicemailUriTitle) as TextView -> {
+            binding.VoicemailUriTitle -> {
                 Utils.alertView(this, getString(R.string.voicemail_uri),
                         getString(R.string.voicemain_uri_help))
             }
-            findViewById(R.id.DefaultTitle) as TextView -> {
+            binding.DefaultTitle -> {
                 Utils.alertView(this, getString(R.string.default_account),
                         getString(R.string.default_account_help))
             }
         }
     }
 
+    private class GetAccountConfigAsyncTask(context: AccountActivity):
+            AsyncTask<String, String, String>() {
+
+        private val activityReference: WeakReference<AccountActivity> = WeakReference(context)
+        private val TAG = "Baresip"
+
+        override fun doInBackground(vararg url: String?): String? {
+            val result = try {
+                URL(url[0]).readText()
+            } catch (e: Exception) {
+                Log.e(TAG, "Could not get account config from ${url[0]}: $e")
+                null
+            }
+            Log.d(TAG, "Got account config $result")
+            return result
+        }
+
+        override fun onPostExecute(result: String?) {
+            val activity = activityReference.get()
+            if (activity == null || activity.isFinishing || result == null)
+                return
+            val acc = Account(activity.acc.accp)
+            val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
+            val parser: XmlPullParser = parserFactory.newPullParser()
+            parser.setInput(StringReader(result))
+            var tag: String?
+            var text = ""
+            var event = parser.eventType
+            val audioCodecs = ArrayList(Api.audio_codecs().split(","))
+            val videoCodecs = ArrayList(Api.video_codecs().split(","))
+            while (event != XmlPullParser.END_DOCUMENT) {
+                tag = parser.name
+                when (event) {
+                    XmlPullParser.TEXT ->
+                        text = parser.text
+                    XmlPullParser.START_TAG -> {
+                        if (tag == "audio-codecs")
+                            acc.audioCodec.clear()
+                        if (tag == "video-codecs")
+                            acc.audioCodec.clear()
+                    }
+                    XmlPullParser.END_TAG ->
+                        when (tag) {
+                            "outbound-proxy-1" ->
+                                if (text.isNotEmpty())
+                                    acc.outbound.add(text)
+                            "outbound-proxy-2" ->
+                                if (text.isNotEmpty())
+                                    acc.outbound.add(text)
+                            "register" ->
+                                acc.regint = if (text == "yes") 3600 else 0
+                            "audio-codec" ->
+                                if (text in audioCodecs)
+                                    acc.audioCodec.add(text)
+                            "video-codec" ->
+                                if (text in videoCodecs)
+                                    acc.videoCodec.add(text)
+                            "media-encoding" -> {
+                                val enc = text.toLowerCase(Locale.ROOT)
+                                if (enc in activity.mediaEncKeys && enc.isNotEmpty())
+                                    acc.mediaEnc = enc
+                            }
+                            "media-nat" -> {
+                                val nat = text.toLowerCase(Locale.ROOT)
+                                if (nat in activity.mediaNatKeys && nat.isNotEmpty())
+                                    acc.mediaNat = nat
+                            }
+                            "stun-turn-server" ->
+                                if (text.isNotEmpty())
+                                    acc.stunServer = text
+                            "prefer-ipv6-media" ->
+                                acc.preferIPv6Media = text == "yes"
+                            "answer-mode" ->
+                                if (text in arrayOf("manual", "auto"))
+                                    acc.answerMode = text
+                            "voicemail-uri" ->
+                                if (text.isNotEmpty())
+                                    acc.vmUri = text
+                    }
+                }
+                event = parser.next()
+            }
+            activity.initLayoutFromAccount(acc)
+        }
+    }
+
+    private fun returnResult(code: Int) {
+        val i = Intent()
+        if (code == Activity.RESULT_OK)
+            i.putExtra("aor", aor)
+        setResult(code, i)
+        finish()
+    }
+
     private fun setAuthPass(acc: Account, ap: String) {
-        if (account_set_auth_pass(acc.accp, ap) == 0) {
-            acc.authPass = account_auth_pass(acc.accp)
-            aorPasswords.remove(acc.aor)
+        if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
+            acc.authPass = Api.account_auth_pass(acc.accp)
+            MainActivity.aorPasswords.remove(acc.aor)
             save = true
         } else {
-            Log.e("Baresip", "Setting of auth pass failed")
+            Log.e(TAG, "Setting of auth pass failed")
         }
     }
 

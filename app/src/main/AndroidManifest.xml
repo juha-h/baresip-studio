@@ -12,21 +12,22 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="false"
@@ -40,24 +41,38 @@
         tools:targetApi="q">
         <activity
             android:name=".MainActivity"
+            android:theme="@style/AppTheme.Main"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+                <action android:name="android.intent.action.CALL" />
+                <action android:name="android.intent.action.CALL_PRIVILEGED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="tel" />
+                <data android:scheme="sip" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/account"
-            android:parentActivityName=".AccountsActivity">
+            android:label="@string/account" >
+        </activity>
+        <activity
+            android:name=".CodecsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/codecs"
+            android:parentActivityName=".AccountActivity" >
         </activity>
         <activity
             android:name=".ContactsActivity"
@@ -79,6 +94,12 @@
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
+            android:name=".AudioActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/audio"
+            android:parentActivityName=".ConfigActivity" >
+        </activity>
+        <activity
             android:name=".CallsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_history"
@@ -93,13 +114,12 @@
         <activity
             android:name=".ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/chat"
-            android:parentActivityName=".ChatsActivity" >
+            android:label="@string/chat" >
         </activity>
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/about"
+            android:label="@string/about_title"
             android:parentActivityName=".MainActivity">
         </activity>
 
@@ -110,13 +130,12 @@
         </service>
 
         <receiver
-            android:name=".RunOnStartup"
+            android:name=".BootCompletedReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.tutpro.baresip.Restart" />
             </intent-filter>
         </receiver>
 

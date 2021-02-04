@@ -7,32 +7,35 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
+import com.tutpro.baresip.databinding.ActivityChatsBinding
 
 import java.util.*
 
 class ChatsActivity: AppCompatActivity() {
 
+    private lateinit var binding: ActivityChatsBinding
     internal lateinit var uaMessages: ArrayList<Message>
     internal lateinit var listView: ListView
     internal lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
-
-    private var aor = ""
+    internal lateinit var aor: String
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chats)
+        binding = ActivityChatsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        listView = findViewById(R.id.chats) as ListView
-        plusButton = findViewById(R.id.plusButton) as ImageButton
+        listView = binding.chats
+        plusButton = binding.plusButton
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
 
-        val headerView = findViewById(R.id.account) as TextView
+        val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
         headerView.text = headerText
 
@@ -82,21 +85,25 @@ class ChatsActivity: AppCompatActivity() {
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
             val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
-                builder.setMessage(String.format(getString(R.string.long_chat_question),
-                        Utils.friendlyUri(peer, Utils.aorDomain(aor))))
-                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
-                        .setPositiveButton(getText(R.string.add_contact), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.long_chat_question),
+                            Utils.friendlyUri(peer, Utils.aorDomain(aor))))
+                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getText(R.string.delete), dialogClickListener)
+                    setPositiveButton(getText(R.string.add_contact), dialogClickListener)
+                    show()
+                }
             else
-                builder.setMessage(String.format(getString(R.string.short_chat_question), peer))
-                        .setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                        .setNegativeButton(getText(R.string.delete), dialogClickListener)
-                        .show()
+                with (builder) {
+                    setMessage(String.format(getString(R.string.short_chat_question), peer))
+                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
+                    setNegativeButton(getText(R.string.delete), dialogClickListener)
+                    show()
+                }
             true
         }
 
-        peerUri = findViewById(R.id.peer) as AutoCompleteTextView
+        peerUri = binding.peer
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contacts().map{Contact -> Contact.name}))
@@ -131,21 +138,16 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     override fun onResume() {
-
         super.onResume()
-
         clAdapter.clear()
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
         listView.adapter = clAdapter
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.chats_menu, menu)
         return true
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -153,39 +155,40 @@ class ChatsActivity: AppCompatActivity() {
         when (item.itemId) {
 
             R.id.delete_chats -> {
-                val deleteDialog = AlertDialog.Builder(this@ChatsActivity)
-                deleteDialog.setMessage(String.format(getString(R.string.delete_chats_alert),
-                        aor.substringAfter(":")))
-                deleteDialog.setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                    Message.clear(aor)
-                    Message.save()
-                    uaMessages.clear()
-                    clAdapter.notifyDataSetChanged()
-                    Account.findUa(aor)!!.account.unreadMessages = false
-                    dialog.dismiss()
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.confirmation)
+                with (AlertDialog.Builder(this@ChatsActivity)) {
+                    setCustomTitle(titleView)
+                    setMessage(String.format(getString(R.string.delete_chats_alert),
+                            aor.substringAfter(":")))
+                    setPositiveButton(getText(R.string.delete)) { dialog, _ ->
+                        Message.clear(aor)
+                        Message.save()
+                        uaMessages.clear()
+                        clAdapter.notifyDataSetChanged()
+                        UserAgent.ofAor(aor)!!.account.unreadMessages = false
+                        dialog.dismiss()
+                    }
+                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
                 }
-                deleteDialog.setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                deleteDialog.create().show()
+                return true
             }
 
             android.R.id.home -> {
-                BaresipService.activities.remove("chats,$aor")
-                val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
-                finish()
+                onBackPressed()
+                return true
             }
 
         }
 
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == MainActivity.CHAT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 clAdapter.clear()
@@ -194,17 +197,23 @@ class ChatsActivity: AppCompatActivity() {
                 listView.adapter = clAdapter
             }
         }
-
     }
 
     override fun onBackPressed() {
-
         BaresipService.activities.remove("chats,$aor")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
-        finish()
+        returnResult()
         super.onBackPressed()
+    }
 
+    override fun onPause() {
+        MainActivity.activityAor = aor
+        super.onPause()
+    }
+
+    private fun returnResult() {
+        val i = Intent()
+        setResult(Activity.RESULT_CANCELED, i)
+        finish()
     }
 
     private fun uaMessages(aor: String) : ArrayList<Message> {

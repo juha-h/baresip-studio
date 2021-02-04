@@ -7,21 +7,24 @@ import androidx.core.text.HtmlCompat
 import androidx.appcompat.app.AppCompatActivity
 import android.text.method.LinkMovementMethod
 import android.view.MenuItem
-import android.widget.TextView
+import com.tutpro.baresip.databinding.ActivityAboutBinding
 
 class AboutActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityAboutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about)
+        binding = ActivityAboutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         Utils.addActivity("about")
 
-        val aboutText = findViewById<TextView>(R.id.aboutText)
-        val text = String.format(getString(R.string.about_text), BuildConfig.VERSION_NAME)
-        aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        aboutText.setMovementMethod(LinkMovementMethod.getInstance())
+        val text = String.format(getString(R.string.about_text),
+                BuildConfig.VERSION_NAME)
+        binding.aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.aboutText.setMovementMethod(LinkMovementMethod.getInstance())
 
     }
 

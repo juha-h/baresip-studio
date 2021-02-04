@@ -167,8 +167,6 @@
 	</string>
     <string name="invalid_opus_bitrate">Невалиден битрейт на Opus</string>
     <string name="invalid_opus_packet_loss">Невалиден процент загуба на пакет Opus</string>
-    <string name="ice_lite_mode">ICE Lite режим</string>
-    <string name="ice_lite_mode_help">Ако е отметнато, се използва режим ICE Lite.</string>
     <string name="default_call_volume">Усилване на повикването по подразбиране</string>
     <string name="default_call_volume_help">Ако се задава, трябва да се избира сила на звука при 
 		повикване по подразбиране в мащаб 1–10.
@@ -248,17 +246,17 @@
     <string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
     <string name="verify">Потвърди</string>
     <string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
+    <string name="transfer_request_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
     <string name="call_failed">Обаждането не бе успешно</string>
     <string name="call_closed">Обаждането е затворено</string>
     <string name="call_not_secure">Това обаждане НЕ е сигурно!</string>
     <string name="peer_not_verified">Това обаждане е СИГУРНО, но другият абонат НЕ е потвърдил!</string>
     <string name="call_is_secure">Този разговор е СИГУРЕН и другият абонат е ПРОВЕРЕН! Искате ли да го потвърдите? </string>
     <string name="unverify">Отмяна на потвърждението</string>
-    <string name="backed_up">Данните от приложението са архивирани във файла за изтегляне на папки \'baresip.bs\'.</string>
-    <string name="backup_failed">Неуспешно архивиране на данни от приложението за изтегляне на файла с папки \'baresip.bs\'. Проверете Приложения → baresip → Разрешения → Съхранение</string>
+    <string name="backed_up">Данните от приложението са архивирани във файла за изтегляне на папки \'%1$s\'.</string>
+    <string name="backup_failed">Неуспешно архивиране на данни от приложението за изтегляне на файла с папки \'%1$s\'. Проверете Приложения → baresip → Разрешения → Съхранение</string>
     <string name="restored">Данните за приложението са възстановени. baresip трябва да се рестартира. Рестартирай сега?</string>
-    <string name="restore_failed">Възстановяването на данните на приложението от папката за изтегляне не бе успешно. Проверете Приложения → baresip → Разрешения → Съхранение и този архивен файл \'baresip.bs\' съществува в папката и ако е така, вие сте дали правилна парола за дешифриране.</string>
+    <string name="restore_failed">Възстановяването на данните на приложението от папката за изтегляне не бе успешно. Проверете Приложения → baresip → Разрешения → Съхранение и този архивен файл \'%1$s\' съществува в папката и ако е така, вие сте дали правилна парола за дешифриране.</string>
     <string name="audio_modules_title">Аудио модули</string>
     <string name="audio_modules_help">Аудио кодеци предоставени от проверените модули могат да бъдат използвани от акаунтите.</string>
     <string name="failed_to_load_module">Не могат да бъдат заредени модулите.</string>

@@ -3,33 +3,38 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
-
-import kotlin.collections.ArrayList
-import kotlin.Exception
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import java.io.*
+import java.net.InetAddress
 import java.security.SecureRandom
 import java.util.*
-import java.util.zip.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+
+import kotlin.collections.ArrayList
 
 object Utils {
 
@@ -51,15 +56,17 @@ object Utils {
     }
 
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(R.string.ok)
-                { dialog, _ ->
-                    dialog.dismiss()
-                    action()
-                }
-                .show()
+        val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
+        titleView.text = title
+        with (AlertDialog.Builder(context, R.style.AlertDialog)) {
+            setCustomTitle(titleView)
+            setMessage(message)
+            setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                action()
+            }
+            show()
+        }
     }
 
     fun uriHostPart(uri: String): String {
@@ -116,6 +123,12 @@ object Utils {
             return checkUriUser(aorUser(t[0])) && checkDomain(aorDomain(t[0])) &&
                     t[1] in arrayOf("udp", "tcp", "tls")
         return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+    }
+
+    fun checkStunUri(uri: String): Boolean {
+        if (!uri.startsWith("stun:") && !uri.startsWith("turn:"))
+            return false
+        return checkHostPort(uri.substringAfter(":"))
     }
 
     private fun checkPortTransport(portTransport: String): Boolean {
@@ -255,6 +268,22 @@ object Utils {
         return ""
     }
 
+    fun findDnsServers(list: List<InetAddress>): String {
+        var servers = ""
+        for (dnsServer in list) {
+            var address = dnsServer.hostAddress.removePrefix("/")
+            if (Utils.checkIpV4(address))
+                address = "${address}:53"
+            else
+                address = "[${address}]:53"
+            if (servers == "")
+                servers = address
+            else
+                servers = "${servers},${address}"
+        }
+        return servers
+    }
+
     private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
         var updated = false
         val ipV6Addr = findIpV6Address(linkAddresses)
@@ -284,18 +313,21 @@ object Utils {
             Api.uag_reset_transp(true, true)
             Api.net_debug()
         } else {
-            UserAgent.register(false)
+            UserAgent.register()
         }
     }
 
-    fun updateLinkProperties(linkProperties: LinkProperties) {
-        if (BaresipService.dynDns && (BaresipService.dnsServers != linkProperties.dnsServers)) {
-            if (Config.updateDnsServers(linkProperties.dnsServers) != 0)
-                Log.w("Baresip", "Failed to update DNS servers '${BaresipService.dnsServers}'")
+    fun updateLinkProperties(props: LinkProperties) {
+        if (BaresipService.dynDns && (BaresipService.dnsServers != props.dnsServers)) {
+            if (BaresipService.isServiceRunning)
+                    if (Config.updateDnsServers(props.dnsServers) != 0)
+                        Log.w("Baresip", "Failed to update DNS servers '${props.dnsServers}'")
+                    else
+                        BaresipService.dnsServers = props.dnsServers
             else
-                BaresipService.dnsServers = linkProperties.dnsServers
+                BaresipService.dnsServers = props.dnsServers
         }
-        updateLinkAddresses(linkProperties.linkAddresses)
+        updateLinkAddresses(props.linkAddresses)
     }
 
     fun implode(list: List<String>, sep: String): String {
@@ -322,9 +354,14 @@ object Utils {
                 val text = sequence.subSequence(start, start + count).toString()
                 if (text.length > 0) {
                     val digit = text[0]
-                    Log.d("Baresip", "Got DTMF digit '$digit'")
-                    if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
-                        Api.call_send_digit(callp, digit)
+                    val call = Call.ofCallp(callp)
+                    if (call == null) {
+                        Log.w("Baresip", "dtmfWatcher did not find call $callp")
+                    } else {
+                        Log.d("Baresip", "Got DTMF digit '$digit'")
+                        if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
+                            call.sendDigit(digit)
+                    }
                 }
             }
             override fun afterTextChanged(sequence: Editable) {
@@ -334,16 +371,21 @@ object Utils {
         }
     }
 
-    fun checkPermission(ctx: Context, permission: String) : Boolean {
-        return ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
+    fun checkPermission(ctx: Context, permissions: String) : Boolean {
+        for (p in permissions.split("|")) {
+            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED)
+                return false
+        }
+        return true
     }
 
-    fun requestPermission(ctx: Context, permission: String, requestCode: Int) : Boolean {
-        if (ContextCompat.checkSelfPermission(ctx, permission) != PackageManager.PERMISSION_GRANTED) {
-            Log.w("Baresip", "Baresip does not have $permission permission")
-            ActivityCompat.requestPermissions(ctx as Activity, arrayOf(permission), requestCode)
-            return false
-        }
+    fun requestPermission(ctx: Context, permissions: String, requestCode: Int) : Boolean {
+        val pArray = permissions.split("|").toTypedArray()
+        for (p in pArray)
+            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ctx as Activity, pArray, requestCode)
+                return false
+            }
         return true
     }
 
@@ -563,6 +605,11 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
+    }
+
+    fun darkTheme(ctx: Context): Boolean {
+        return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
     }
 
 }

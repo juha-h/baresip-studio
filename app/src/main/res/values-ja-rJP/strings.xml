@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_text">
+        <![CDATA[
+        <h1>Baresip library based SIP User Agent</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Version %1$s</p>
+        <h2>Usage Hints</h2>
+        <ul>
+            <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
+            <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
+            <li>Registration status of an account is shown with a colored dot: green (registration
+            succeeded, yellow (registration is in progress), red (registration failed), white (registration
+            has not been activated).</li>
+            <li>Touch on the dot leads directly to account configuration.</li>
+            <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Peers of calls and messages can be added to contacts by long touches.</li>
+            <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
+            <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
+            <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
+        </ul>
+        <h2>Known Issues</h2>
+        <ul>
+            <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
+            concurrently active network interfaces. Active network interface preference order is VPN,
+            Internet, other.</li>
+        </ul>
+        <h2>Source code</h2>
+        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        where also issues can be reported.
+        <h2>Licenses</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> except the following:</li>
+            <li><b>Apache 2.0</b> AMR codec and TLS security</li>
+            <li><b>LGPL 2.1</b> G.722 and G.726 codecs</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]>
+    </string>
+    <string name="about_text_plus">
+        <![CDATA[
+        <h1>Baresip library based SIP User Agent with video calls</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Version %1$s</p>
+        <h2>Usage Hints</h2>
+        <ul>
+            <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
+            <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
+            <li>Registration status of an account is shown with a colored dot:  green (registration
+            succeeded, yellow (registration is in progress), red (registration failed), white (registration
+            has not been activated).</li>
+            <li>Touch on the dot leads directly to account configuration.</li>
+            <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Peers of calls and messages can be added to contacts by long touches.</li>
+            <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
+            <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
+            <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
+        </ul>
+        <h2>Known Issues</h2>
+        <ul>
+            <li>Due to limitations in underlying libraries, multiple concurrently active network
+            interfaces are not supported. Active network interface preference order is VPN,
+            Internet, other.</li>
+            <li>In video calls, the device needs to be held in landscape
+            mode rotated 90 degrees left from portrait orientation.</li>
+            <li>Selfview is not properly shown when video stream is sendonly.</li>
+        </ul>
+        <h2>Source code</h2>
+        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        where also issues can be reported.
+        <h2>Licenses</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> except the following:</li>
+            <li><b>Apache 2.0</b> AMR codec and TLS security</li>
+            <li><b>LGPL 2.1</b> G.722 and G.726 codecs</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU GPLv2</b> H.264 codec</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]>
+    </string>
+    <string name="authentication_username_help">SIPリクエストの認証が必要な場合は、認証ユーザー名を入力して下さい。
+        デフォルト値はアカウントのユーザー名です。
+    </string>
+    <string name="authentication_password_help">認証パスワードは64文字までです。
+        もし、ユーザー名を入力したのにパスワードが入力されていない場合は、baresipの起動時に問い合わせます。
+    </string>
+    <string name="outbound_proxies_help">リクエストを送るときに、1つか2つSIP URIを使う必要がある。
+        2つとも入力された場合、両方にREGISTERリクエストが送られ、他のリクエストは応答する方に送られます。
+        outboundプロキシが与えられない場合、リクエストはcalllee URI hostpartのDNS NAPTR/SRV/Aレコード検索に基づいて送信される。
+        SIP URIのhostpartがIPv6アドレスの場合、アドレスは括弧[]内に記載しなければなりません。
+        \n記入例:
+        \n • sip:example.com:5061;transport=tls
+        \n • sip:[2001:67c:223:777::10];transport=tcp
+        \n • sip:192.168.43.50:443;transport=wss
+    </string>
+    <string name="register_help">チェックを入れると、登録が有効になり、12 分間隔で REGISTER 要求が送信されます。</string>
+    <string name="audio_codecs_help">対応しているオーディオコーデックの優先順位一覧</string>
+    <string name="video_codecs_help">対応しているビデオコーデックの優先順位一覧</string>
+    <string name="media_nat_help">必要であればメディアのNAT探索プロトコルを選択してください。
+        選択肢としては、STUN（Session Traversal Utilities for NAT、RFC 5389）
+        とICE（Interactive Connectivity Establishment、RFC 5245）があります。
+    </string>
+    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port], where scheme
+        is \'stun\' or \'turn\'. Factory default STUN Server for STUN and
+        ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google STUN server.
+        There is no factory default TURN server.
+    </string>
+    <string name="media_encryption_help">Selects media transport encryption protocol (if any).
+        \n • ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
+        the call has been established.
+        \n • DTLS-SRTPF means that UDP/TLS/RTP/SAVPF is offered in outgoing call and that RTP/SAVP,
+        RTP/SAVPF, UDP/TLS/RTP/SAVP, or UDP/TLS/RTP/SAVPF is used if offered in incoming call.
+        \n • SRTP-MANDF means that RTP/SAVPF is offered in outgoing call and required in incoming call.
+        \n • SRTP-MAND means that RTP/SAVP is offered in outgoing call and required in incoming call.
+        \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
+        if offered in incoming call.
+    </string>
+    <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
+        messages (Message Waiting Indications) are not subscribed to.
+    </string>
+    <string name="default_account_help">If checked, this account is selected when baresip is started.</string>
+    <string name="accounts_help">Account\'s port number and transport protocol may be optionally given when a new
+        account is created: username@domain[:port][;transport=udp|tcp|tls]. If port is given and transport protocol is
+        not given, transport protocol defaults to udp. If port is not given and transport protocol is given, port
+        defaults to 5060 or 5061 (TLS). If neither is given and no outbound proxy is specified, account\'s registrar (if
+        any) is determined solely based on domain\'s DNS information.
+    </string>
+    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete %2$s from call history?
+    </string>
+    <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or add peer to contacts?</string>
+    <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
+        for incoming SIP requests. If IP address is an IPv6 address, it must be written inside
+        brackets []. IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all
+        available addresses. If left empty (factory default), baresip listens at port 5060 of
+        all available addresses.
+    </string>
+    <string name="dns_servers_help">Comma separated list of addresses of DNS servers. If not given,
+        DNS server addresses are obtained dynamically from the system. Each DNS address is of form
+        \'ip:port\' or \'ip\'. If port is omitted, it defaults to 53. If ip is an IPv6 address and
+        also port is given, ip must
+        be written inside brackets []. As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
+        points to IPv4 and IPv6 addresses of public Google DNS servers.
+    </string>
+    <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing
+        TLS certificate and private key of this baresip instance has been or will be loaded from
+        Download directory. For security reasons, delete the file after loading.
+    </string>
+    <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates
+        of Certificate Authorities has been or will be loaded from Download directory.
+    </string>
+    <string name="audio_modules_help">Audio codecs provided by the checked modules are
+        available for use by the accounts.
+    </string>
+    <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
+        Valid values are 6000-510000. Factory default is 28000.
+    </string>
+    <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage,
+        from 0–100. By default 0, turning off Opus Forward Error Correction (FEC).
+    </string>
+    <string name="video_size_help">Size of transmitted video frames (width x height). Factory default is 800x600.
+    </string>
+    <string name="sip_trace_help">If checked and if Debug is checked, provides also SIP
+        request and response trace to Logcat. Unchecked automatically at baresip start.
+    </string>
+    <string name="config_restart">You need to restart baresip in order to activate the new settings. Restart now?
+    </string>
+    <string name="start_failed">Baresip failed to start. This may be due to an invalid Settings value.
+        Check Listen Address, TLS Certificate File, and TLS CA File. Then restart baresip.
+    </string>
+    <string name="call_is_secure">This call is SECURE and peer is VERIFIED! Do you want to unverify the peer?</string>
+    <string name="backup_failed">Failed to back up application data to Download folder file
+        \'%1$s\'. Check Apps → baresip → Permissions → Storage.
+    </string>
+    <string name="restore_failed">Failed to restore application data from Download folder. Check Apps →
+        baresip → Permissions → Storage and that backup file \'%1$s\' exists in the folder
+        and, if so, you gave correct Decrypt Password.
+    </string>
+    <string name="restored">Application data restored. baresip needs to be restarted. Restart now?</string>
+    <string name="calls_delete_question"> %1$s  %2$s を通話履歴から削除してもよいですか?</string>
+    <string name="long_message_question"> %1$s のメッセージと連絡先を削除してもよいですか?</string>
+    <string name="invalid_authentication_username">無効な認証ユーザー名 %1$s です</string>
+    <string name="transfer">転送</string>
+    <string name="video_request">テレビ電話リクエスト</string>
+    <string name="video_call">テレビ電話</string>
+    <string name="hangup">切断</string>
+    <string name="transferring_call_to_dots">転送中</string>
+    <string name="incoming_call_from_dots">着信中</string>
+    <string name="outgoing_call_to_dots">発信中</string>
+    <string name="quit">終了</string>
+    <string name="restart">再起動</string>
+    <string name="about">詳細</string>
+    <string name="restore">復元</string>
+    <string name="backup">バックアップ</string>
+    <string name="confirmation">確認</string>
+    <string name="help">ヘルプ</string>
+    <string name="error">エラー</string>
+    <string name="status">状態</string>
+    <string name="send">送信</string>
+    <string name="edit">編集</string>
+    <string name="delete">削除</string>
+    <string name="add">追加</string>
+    <string name="password">パスワード</string>
+    <string name="deny">拒否</string>
+    <string name="accept">承認</string>
+    <string name="no">いいえ</string>
+    <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
+    <string name="info">情報</string>
+    <string name="send_message">メッセージ送信</string>
+    <string name="contacts">連絡先</string>
+    <string name="contact_already_exists">連絡先名 %1$s は既に存在します</string>
+    <string name="invalid_contact">無効な連絡先名 %1$s です</string>
+    <string name="contact_name">名前</string>
+    <string name="new_contact">新規連絡先</string>
+    <string name="contact">連絡先</string>
+    <string name="debug">デバック</string>
+    <string name="dns_servers">DNSサーバー</string>
+    <string name="start_automatically">自動的に開始</string>
+    <string name="configuration">設定</string>
+    <string name="delete_chats">削除</string>
+    <string name="you">あなた</string>
+    <string name="today">今日</string>
+    <string name="sending_failed">メッセージの送信に失敗</string>
+    <string name="add_contact">連絡先の追加</string>
+    <string name="new_message">新規メッセージ</string>
+    <string name="delete_history_alert">アカウント %1$s の通話履歴を削除しますか?</string>
+    <string name="enable_history">有効化</string>
+    <string name="disable_history">無効化</string>
+    <string name="delete_history">削除</string>
+    <string name="calls_call_message_question"> %1$s に電話をかけるか、メッセージを送信しますか?</string>
+    <string name="calls_call">通話</string>
+    <string name="calls_calls">通話</string>
+    <string name="call">着信中</string>
+    <string name="call_history">通話履歴</string>
+    <string name="tap_to_start">アプリを起動するにはタップしてください</string>
+    <string name="message_from">メッセージ着信</string>
+    <string name="transfer_request_to">転送リクエスト</string>
+    <string name="incoming_call_from">着信</string>
+    <string name="reject">拒否</string>
+    <string name="answer">応答</string>
+    <string name="delete_account">アカウント %1$s を削除しますか?</string>
+    <string name="decrypt_password">復号化パスワード</string>
+    <string name="encrypt_password">暗号化パスワード</string>
+    <string name="new_account">新規アカウント</string>
+    <string name="accounts">アカウント</string>
+    <string name="media_encryption">メディアの暗号化</string>
+    <string name="stun_password">STUN/TURNパスワード</string>
+    <string name="invalid_stun_username">無効な表示名 %1$s です</string>
+    <string name="stun_username">STUN/TURNユーザー名</string>
+    <string name="voicemail_messages">Voicemailメッセージ</string>
+    <string name="voicemail">Voicemail</string>
+    <string name="voicemail_uri">VoicemailのURI</string>
+    <string name="authentication_username">認証ユーザー名</string>
+    <string name="display_name_help">必要であればFrom URIで使用される名前を入力</string>
+    <string name="your_name">Votre nom</string>
+    <string name="display_name">表示名</string>
+    <string name="account">アカウント</string>
+    <string name="about_title_plus">baresip+について</string>
+    <string name="about_title">baresipについて</string>
+    <string name="invalid_display_name">無効な表示名 %1$s です</string>
+    <string name="invalid_stun_password">無効な表示名 %1$s です</string>
+    <string name="missed_call_from">着信失敗</string>
+    <string name="yes">はい</string>
+    <string name="show_password">パスワード表示</string>
+    <string name="authentication_password">認証パスワード</string>
+    <string name="invalid_authentication_password">無効な認証パスワード %1$s です</string>
+    <string name="outbound_proxies">発信プレフィクス</string>
+    <string name="sip_uri_of_proxy_server">SIP URIのプロキシサーバー</string>
+    <string name="sip_uri_of_another_proxy_server">SIP URIの認証プロキシサーバー</string>
+    <string name="invalid_proxy_server_uri">無効なプロキシサーバー %1$s です</string>
+    <string name="register">登録</string>
+    <string name="audio_codecs">オーディオコーデック</string>
+    <string name="video_codecs">ビデオコーデック</string>
+    <string name="media_nat">メディアのNAT探索</string>
+    <string name="stun_server">STUN/TURNサーバー</string>
+    <string name="stun_server_uri">STUN/TURNサーバーのURI</string>
+    <string name="invalid_stun_server">無効なSTUN/TURNサーバーのURI %1$s です</string>
+    <string name="invalid_voicemail_uri">無効なVoicemail URI %1$s です</string>
+    <string name="invalid_aor">無効なuser@domain[:port][;transport=udp|tcp|tls] %1$s です</string>
+    <string name="prefer_ipv6_media">IPv6メディアを優先</string>
+    <string name="answer_mode">応答モード</string>
+    <string name="manual">マニュアル</string>
+    <string name="auto">自動</string>
+    <string name="default_account">既定のアカウント</string>
+    <string name="user_domain">user@domain</string>
+    <string name="account_exists">アカウント %1$s は既に存在します</string>
+    <string name="account_allocation_failure">新しいアカウントの割り当てに失敗しました。</string>
+    <string name="chat">チャットメッセージ</string>
+    <string name="chat_with"> %1$s とチャット</string>
+    <string name="short_message_question">メッセージを削除しますか?</string>
+    <string name="message_failed">失敗</string>
+    <string name="chats">チャット履歴</string>
+    <string name="new_chat_peer">新しいチャット相手</string>
+    <string name="invalid_chat_peer_uri">SIP URIが無効です</string>
+    <string name="short_chat_question"> %1$s とのチャットを削除しますか?</string>
+    <string name="delete_chats_alert">アカウント %1$s とのチャット履歴を削除しますか?</string>
+    <string name="listen_address">受信対象アドレス</string>
+    <string name="invalid_listen_address">受信対象アドレスが無効です</string>
+    <string name="invalid_dns_servers">DNSサーバーが無効です</string>
+    <string name="failed_to_set_dns_servers">DNSサーバーの設定に失敗しました</string>
+    <string name="tls_certificate_file">TLS証明書ファイル</string>
+    <string name="tls_ca_file">TLS CA証明書ファイル</string>
+    <string name="audio">オーディオ</string>
+    <string name="audio_modules_title">オーディオモジュール</string>
+    <string name="failed_to_load_module">モジュールの読み込みに失敗しました</string>
+    <string name="aec_help">チェックを入れると、通話音声のエコーキャンセルを試みます</string>
+    <string name="aec_extended_filter">音響エコーキャンセル拡張フィルタ</string>
+    <string name="opus_bit_rate">Opusのビットレート</string>
+    <string name="opus_packet_loss">期待されるOpusのパケットロス</string>
+    <string name="invalid_opus_bitrate">Opusのビットレートが無効です</string>
+    <string name="invalid_opus_packet_loss">Opusパケットロス率が無効です</string>
+    <string name="default_call_volume">既定の通話ボリューム</string>
+    <string name="dark_theme">ダークテーマ</string>
+    <string name="video_size">ビデオフレームサイズ</string>
+    <string name="sip_trace">SIP追跡</string>
+    <string name="reset_config">工場出荷時設定にリセット</string>
+    <string name="read_cert_error">ダウンロード・ディレクトリから \'cert.pem\' の読み込みに失敗しました。</string>
+    <string name="read_ca_certs_error">ダウンロード・ディレクトリから \'ca_certs.crt\' の読み込みに失敗しました。</string>
+    <string name="invalid_contact_uri">無効なSIP URI %1$s です</string>
+    <string name="alert">警告</string>
+    <string name="notice">通知</string>
+    <string name="user_id">ユーザーID</string>
+    <string name="invalid_sip_uri">無効なSIP URI %1$s です</string>
+    <string name="callee">呼び出し先</string>
+    <string name="hold">保留</string>
+    <string name="call_transfer">通話転送</string>
+    <string name="transfer_destination">転送先</string>
+    <string name="transfer_failed">転送失敗</string>
+    <string name="dtmf">DTMF</string>
+    <string name="call_info_not_available">情報はありません</string>
+    <string name="call_info">電話情報</string>
+    <string name="duration">通話時間</string>
+    <string name="codecs">コーデック</string>
+    <string name="rate">レート</string>
+    <string name="you_have">あなたは</string>
+    <string name="one_new_message">1件のメッセージ</string>
+    <string name="new_messages">新規メッセージ</string>
+    <string name="one_old_message">1件の古いメッセージ</string>
+    <string name="old_messages">古いメッセージ</string>
+    <string name="and">と</string>
+    <string name="no_messages">メッセージはありません</string>
+    <string name="messages">メッセージ</string>
+    <string name="dialpad">ダイヤルパット</string>
+    <string name="call_already_active">すでに通話中です</string>
+    <string name="verify">確認要求</string>
+    <string name="transfer_request">転送要求</string>
+    <string name="call_failed">呼び出し失敗</string>
+    <string name="call_closed">通話終了</string>
+    <string name="call_not_secure">この通話は安全ではありません!</string>
+    <string name="peer_not_verified">この通話は安全ですが、相手は確認されていません!</string>
+    <string name="unverify">未検証</string>
+    <string name="restart_request">再起動要求</string>
+    <string name="no_video_calls">カメラにビデオ通話の許可を与えます</string>
+    <string name="no_cameras">対応しているビデオカメラがありません</string>
+    <string name="stun_username_help">STUN/TURN サーバーで必要な場合のユーザー名</string>
+    <string name="stun_password_help">STUN/TURN サーバーで必要な場合のパスワード</string>
+    <string name="prefer_ipv6_media_help">チェックを入れると、ピアのメディアプロトコルが自動的に決定できない場合に、IPv6メディアプロトコルの使用をオファーします(使用可能な場合)
+    </string>
+    <string name="answer_mode_help">着信した電話にどのように応答するかを選択します。</string>
+    <string name="start_automatically_help">チェックを入れると、デバイスの再起動後に自動的にbaresipが起動します</string>
+    <string name="aec">音響エコーキャンセル</string>
+    <string name="aec_extended_filter_help">チェックを入れると、エコーキャンセルは拡張フィルタを使用しています。</string>
+    <string name="default_call_volume_help">設定されている場合、デフォルトの通話音声の音量は1～10段階です</string>
+    <string name="dark_theme_help">ダークテーマを強制する</string>
+    <string name="debug_help">チェックを入れると、デバッグおよび情報レベルのログメッセージをLogcatに提供します。</string>
+    <string name="reset_config_help">チェックを入れると、設定は工場出荷時のデフォルト値にリセットされます。</string>
+    <string name="contact_action_question"> %1$s に電話をかけるか、メッセージを送信しますか？</string>
+    <string name="contact_delete_question">連絡先 %1$s を削除しますか?</string>
+    <string name="contacts_exceeded">連絡先の最大数 %1$s を超えました</string>
+    <string name="allow_video"> %1$s でテレビ通話の送受信を許可しますか?</string>
+    <string name="allow_video_send"> %1$s へのテレビ通話を許可しますか?</string>
+    <string name="allow_video_recv"> %1$s からのテレビ通話を許可しますか?</string>
+    <string name="listen">受信</string>
+    <string name="registering_failed"> %1$s への登録失敗</string>
+    <string name="verify_sas">SASを検証しますか?</string>
+    <string name="transfer_request_query"> %1$s への通話転送を許可しますか?</string>
+    <string name="backed_up">アプリケーションデータがダウンロードフォルダ %1$s にバックアップされました</string>
+    <string name="no_calls">マイクへの権限付与がなく電話をかけたり、応答したりすることはできません。</string>
+</resources>

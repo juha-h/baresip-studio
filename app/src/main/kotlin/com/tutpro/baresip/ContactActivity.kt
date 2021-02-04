@@ -1,49 +1,67 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.app.Activity
+import android.content.ContentProviderOperation
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.provider.ContactsContract
+import android.provider.ContactsContract.CommonDataKinds
+import android.provider.ContactsContract.Contacts.Data
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import androidx.cardview.widget.CardView
 import android.view.View
-
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.exifinterface.media.ExifInterface
+import com.tutpro.baresip.databinding.ActivityContactBinding
+import java.io.ByteArrayOutputStream
 import java.io.File
-
-private const val READ_REQUEST_CODE = 42
 
 class ContactActivity : AppCompatActivity() {
 
-    lateinit var textAvatarView: TextView
-    lateinit var cardAvatarView: CardView
-    lateinit var cardImageAvatarView: ImageView
-    lateinit var nameView: EditText
-    lateinit var uriView: EditText
+    private lateinit var binding: ActivityContactBinding
+    private lateinit var textAvatarView: TextView
+    private lateinit var cardAvatarView: CardView
+    private lateinit var cardImageAvatarView: ImageView
+    private lateinit var nameView: EditText
+    private lateinit var uriView: EditText
+    private lateinit var androidCheck: CheckBox
+    private lateinit var menu: Menu
 
-    internal var newContact = false
-    internal var newAvatar = ""
-    internal var uOrI = ""
+    private var newContact = false
+    private var newAvatar = ""
+    private var uOrI = ""
 
     private var index = 0
     private var color = 0
     private var id: Long = 0
+    private var oldAndroid = false
+
+    private val READ_REQUEST_CODE = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contact)
+        binding = ActivityContactBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        textAvatarView = findViewById(R.id.TextAvatar) as TextView
-        cardAvatarView = findViewById(R.id.CardAvatar) as CardView
-        cardImageAvatarView = findViewById(R.id.ImageAvatar) as ImageView
-        nameView = findViewById(R.id.Name) as EditText
-        uriView = findViewById(R.id.Uri) as EditText
+        textAvatarView = binding.TextAvatar
+        cardAvatarView = binding.CardAvatar
+        cardImageAvatarView = binding.ImageAvatar
+        nameView = binding.Name
+        uriView = binding.Uri
+        androidCheck = binding.Android
 
         newContact = intent.getBooleanExtra("new", false)
 
@@ -63,6 +81,7 @@ class ContactActivity : AppCompatActivity() {
                 uriView.setText(uri)
             }
             uOrI = uri
+            androidCheck.isChecked = false
         } else {
             index = intent.getIntExtra("index", 0)
             val contact = Contact.contacts()[index]
@@ -78,7 +97,10 @@ class ContactActivity : AppCompatActivity() {
             nameView.setText(name)
             uriView.setText(contact.uri)
             uOrI = index.toString()
+            androidCheck.isChecked = contact.androidContact
         }
+
+        oldAndroid = androidCheck.isChecked
 
         textAvatarView.setOnClickListener { _ ->
 
@@ -130,24 +152,31 @@ class ContactActivity : AppCompatActivity() {
             resultData?.data?.also { uri ->
                 try {
                     val inputStream = baseContext.contentResolver.openInputStream(uri)
-                    val avatarImage = BitmapFactory.decodeStream(inputStream)
-                    showImageAvatar(avatarImage)
-                    if (Utils.saveBitmap(avatarImage, File(BaresipService.filesPath, "tmp.png")))
-                            newAvatar = "image"
+                    val avatarBitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+                    val scaledBitmap = Bitmap.createScaledBitmap(avatarBitmap, 192, 192, true)
+                    val exif = ExifInterface(baseContext.contentResolver.openInputStream(uri)!!)
+                    val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_NORMAL)
+                    val rotatedBitmap = rotateBitmap(scaledBitmap, orientation)
+                    showImageAvatar(rotatedBitmap)
+                    if (Utils.saveBitmap(rotatedBitmap, File(BaresipService.filesPath, "tmp.png")))
+                        newAvatar = "image"
                 } catch (e: Exception) {
-                    Log.e("Baresip", "Could not read avatar image")
+                    Log.e("Baresip", "Could not read avatar image: $e")
                 }
             }
         }
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(optionsMenu: Menu): Boolean {
 
-        super.onCreateOptionsMenu(menu)
+        super.onCreateOptionsMenu(optionsMenu)
 
         val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
+        inflater.inflate(R.menu.check_icon, optionsMenu)
+        menu = optionsMenu
         return true
 
     }
@@ -205,6 +234,7 @@ class ContactActivity : AppCompatActivity() {
                         return true
                     } else {
                         contact = Contact(newName, newUri, color, id)
+                        contact.androidContact = androidCheck.isChecked
                         Contact.contacts().add(contact)
                     }
                 } else {
@@ -212,6 +242,7 @@ class ContactActivity : AppCompatActivity() {
                     contact.uri = newUri
                     contact.name = newName
                     contact.color = color
+                    contact.androidContact = androidCheck.isChecked
                 }
 
                 when (newAvatar) {
@@ -221,7 +252,7 @@ class ContactActivity : AppCompatActivity() {
                             Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
                         }
                     }
-                    "image" ->  {
+                    "image" -> {
                         contact.avatarImage = (cardImageAvatarView.drawable as BitmapDrawable).bitmap
                         Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
                         File(BaresipService.filesPath, "tmp.png")
@@ -230,6 +261,22 @@ class ContactActivity : AppCompatActivity() {
                 }
 
                 Contact.contacts().sortBy { Contact -> Contact.name }
+
+                if (Utils.checkPermission(this, Manifest.permission.READ_CONTACTS +
+                                "|" + Manifest.permission.WRITE_CONTACTS)) {
+                    if (contact.androidContact)
+                        addOrUpdateAndroidContact(this, contact)
+                    else
+                        if (oldAndroid)
+                            deleteAndroidContact(this, contact)
+                } else {
+                    if (contact.androidContact) {
+                        Utils.requestPermission(this, Manifest.permission.READ_CONTACTS +
+                                "|" + Manifest.permission.WRITE_CONTACTS,
+                                MainActivity.CONTACTS_PERMISSION_REQUEST_CODE)
+                        return false
+                    }
+                }
 
                 Contact.save()
 
@@ -254,6 +301,22 @@ class ContactActivity : AppCompatActivity() {
 
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+
+        when (requestCode) {
+
+            MainActivity.CONTACTS_PERMISSION_REQUEST_CODE ->
+                if (grantResults.isNotEmpty() && permissions.size == grantResults.size) {
+                    for (res in grantResults)
+                        if (res != PackageManager.PERMISSION_GRANTED)
+                            return
+                    menu.performIdentifierAction(R.id.checkIcon, 0)
+                }
+        }
+
+    }
+
     override fun onBackPressed() {
 
         BaresipService.activities.remove("contact,$newContact,$uOrI")
@@ -262,6 +325,13 @@ class ContactActivity : AppCompatActivity() {
         finish()
         super.onBackPressed()
 
+    }
+
+    fun onClick(v: View) {
+        when (v) {
+            binding.AndroidTitle ->
+                Utils.alertView(this, getString(R.string.android), getString(R.string.android_contact_help))
+        }
     }
 
     private fun showTextAvatar(name: String, color: Int) {
@@ -276,4 +346,221 @@ class ContactActivity : AppCompatActivity() {
         cardAvatarView.visibility = View.VISIBLE
         cardImageAvatarView.setImageBitmap(image)
     }
+
+    private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_NORMAL -> return bitmap
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                matrix.setRotate(180f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.setRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.setRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
+            else -> return bitmap
+        }
+        val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.width, bitmap.height, matrix, true)
+        bitmap.recycle()
+        return rotatedBitmap
+    }
+
+    private fun addOrUpdateAndroidContact(ctx: Context, contact: Contact) {
+        val projection = arrayOf(ContactsContract.Data.RAW_CONTACT_ID)
+        val selection = ContactsContract.Data.MIMETYPE + "='" +
+                CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE + "' AND " +
+                CommonDataKinds.StructuredName.DISPLAY_NAME + "='" + contact.name + "'"
+        val c: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
+                selection, null, null)
+        if (c != null && c.moveToFirst()) {
+            updateAndroidContact(c.getLong(0), contact)
+        } else {
+            addAndroidContact(ctx, contact)
+        }
+        c?.close()
+        contact.androidContact = true
+    }
+
+    private fun addAndroidContact(ctx: Context, contact: Contact): Boolean {
+        val ops = ArrayList<ContentProviderOperation>()
+        ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build())
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name)
+                .build())
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
+                .withValue(Data.DATA1, contact.uri.substringAfter(":"))
+                .build())
+        if (contact.avatarImage != null) {
+            val photoData: ByteArray? = bitmapToPNGByteArray(contact.avatarImage!!)
+            if (photoData != null) {
+                ops.add(ContentProviderOperation
+                        .newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                        .withValue(Data.MIMETYPE, CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+                        .withValue(CommonDataKinds.Photo.PHOTO, photoData)
+                        .build())
+            }
+        }
+        try {
+            ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+        } catch (e: Exception) {
+            Log.e("Baresip", "Adding of contact ${contact.name} failed")
+            return false
+        }
+        return true
+    }
+
+    private fun updateAndroidContact(rawContactId: Long, contact: Contact) {
+        if (updateAndroidSipUri(rawContactId, contact.uri) == 0)
+            addAndroidSipUri(rawContactId, contact.uri)
+        if (updateAndroidPhoto(rawContactId, contact.avatarImage) == 0)
+            if (contact.avatarImage != null)
+                addAndroidPhoto(rawContactId, contact.avatarImage!!)
+    }
+
+    private fun addAndroidSipUri(rawContactId: Long, sipUri: String) {
+        val ops = ArrayList<ContentProviderOperation>()
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValue(Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
+                .withValue(Data.DATA1, sipUri.substringAfter(":"))
+                .build())
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+        } catch (e: Exception) {
+            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
+        }
+    }
+
+    private fun updateAndroidSipUri(rawContactId: Long, sipUri: String): Int {
+        val contentValues = ContentValues()
+        contentValues.put(ContactsContract.Data.DATA1, sipUri)
+        val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+                "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE}'"
+        return try {
+            contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
+        }  catch (e: Exception) {
+            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
+            0
+        }
+    }
+
+    private fun addAndroidPhoto(rawContactId: Long, photoBits: Bitmap) {
+        val photoBytes = bitmapToPNGByteArray(photoBits)
+        if (photoBytes != null) {
+            val ops = ArrayList<ContentProviderOperation>()
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValue(Data.RAW_CONTACT_ID, rawContactId)
+                    .withValue(Data.MIMETYPE, CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+                    .withValue(CommonDataKinds.Photo.PHOTO, photoBytes)
+                    .build())
+            try {
+                contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+            } catch (e: Exception) {
+                Log.e("Baresip", "Adding of Android photo failed")
+            }
+        }
+    }
+
+    private fun updateAndroidPhoto(rawContactId: Long, photoBits: Bitmap?): Int {
+        val photoBytes = if (photoBits == null)
+            null
+        else
+            bitmapToPNGByteArray(photoBits)
+        val contentValues = ContentValues()
+        contentValues.put(CommonDataKinds.Photo.PHOTO, photoBytes)
+        val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+                "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Photo.CONTENT_ITEM_TYPE}'"
+        return try {
+            contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
+        }  catch (e: Exception) {
+            Log.e("Baresip", "updateAndroidPhoto failed")
+            0
+        }
+    }
+
+    private fun bitmapToPNGByteArray(bitmap: Bitmap): ByteArray? {
+        val size = bitmap.width * bitmap.height * 4
+        val out = ByteArrayOutputStream(size)
+        return try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+            out.toByteArray()
+        } catch (e: Exception) {
+            Log.w("Baresip", "Unable to serialize photo: $e")
+            null
+        }
+    }
+
+    companion object {
+
+        var contact: Contact? = null
+
+        fun deleteAndroidContact(ctx: Context, contact: Contact): Int {
+            return ctx.contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
+                    ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name + "'",
+                    null)
+        }
+
+        fun logAndroidSipContacts(ctx: Context): HashMap<Long, MutableList<String>> {
+            val contacts = HashMap<Long, MutableList<String>>()
+            val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
+                    ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
+                    ContactsContract.Data.PHOTO_THUMBNAIL_URI)
+            val selection = ContactsContract.Data.MIMETYPE + "='" +
+                    CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "'"
+            val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
+                    selection, null, null)
+            while (cur != null && cur.moveToNext()) {
+                val id = cur.getLong(0);
+                val name = cur.getString(1)  // display name
+                val mime = cur.getString(2)  // type of data
+                val data = cur.getString(3)  // info
+                val thumb = cur.getString(4) // thumbnail
+                var kind = "unknown"
+                when (mime) {
+                    CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> kind = "sip"
+                    CommonDataKinds.Photo.CONTENT_ITEM_TYPE -> kind = "thumb"
+                }
+                Log.d("Baresip", "got $id, $name, $kind - $data")
+                var info: MutableList<String>
+                if (contacts.containsKey(id)) {
+                    info = contacts[id]!!
+                } else {
+                    info = mutableListOf()
+                    info.add("name = $name")
+                    info.add("thumb = $thumb")
+                    contacts[id] = info
+                }
+                info.add("$kind = $data")
+            }
+            cur?.close()
+            return contacts
+        }
+
+    }
+
 }
+
+

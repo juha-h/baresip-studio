@@ -1,0 +1,2 @@
+- Fixed turning on dark theme when baresip application is launched
+- New translations (Portuguese (Brazil))

@@ -81,7 +81,7 @@
     <!-- Accounts Activity -->
     <string name="accounts">Cuentas</string>
     <string name="user_domain">usuario@dominio</string>
-    <string name="invalid_aor">"usuario@dominio[:puerto][;transport=udp|tcp|tls]  «%1$s» no válido"</string>
+    <string name="invalid_aor">usuario@dominio[:puerto][;transport=udp|tcp|tls] «%1$s» no válido</string>
     <string name="account_exists">Ya existe la cuenta «%1$s».</string>
     <string name="account_allocation_failure">Error al asignar la cuenta nueva.</string>
     <string name="encrypt_password">Contraseña de cifrado</string>
@@ -162,8 +162,6 @@
     <string name="opus_packet_loss_help">Porcentaje esperado de pérdida de paquetes de transmisión de audio Opus, de 0 a 100. Por defecto 0, desactiva Opus Forward Error Correction (FEC).</string>
     <string name="invalid_opus_bitrate">Tasa de bits de Opus no válida</string>
     <string name="invalid_opus_packet_loss">Porcentaje de pérdida de paquetes opus no válido</string>
-    <string name="ice_lite_mode">ICE Lite Mode</string>
-    <string name="ice_lite_mode_help">Si está marcado, se utiliza el modo ICE Lite.</string>
     <string name="default_call_volume">Volumen de llamada predeterminado</string>
     <string name="default_call_volume_help">Si está configurado, el volumen de audio predeterminado de la llamada en escala 1–10.</string>
     <string name="debug">Depurar</string>
@@ -240,7 +238,7 @@
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
     <string name="verify">Verificar</string>
     <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
-    <string name="transfer_query">¿Acepta transferir la llamada a «%1$s»\?</string>
+    <string name="transfer_request_query">¿Acepta transferir la llamada a «%1$s»\?</string>
     <string name="call_failed">Llamada fallida</string>
     <string name="call_closed">Llamada cerrada</string>
     <string name="call_not_secure">¡Esta llamada NO es segura!</string>
@@ -248,10 +246,10 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-    <string name="backed_up">Se respaldaron los datos de la aplicación en el archivo de la carpeta Descargas «baresip.bs».</string>
-    <string name="backup_failed">Falló la creación de la copia de respaldo de los datos de la aplicación en el archivo «baresip.bs» en la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento</string>
+    <string name="backed_up">Se respaldaron los datos de la aplicación en el archivo de la carpeta Descargas «%1$s».</string>
+    <string name="backup_failed">Falló la creación de la copia de respaldo de los datos de la aplicación en el archivo «%1$s» en la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento</string>
     <string name="restored">Se restauraron los datos de la aplicación. Baresip necesita reiniciarse. ¿Quiere reiniciar ahora\?</string>
-    <string name="restore_failed">Falló la restauración de los datos de la aplicación desde la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento y si existe el archivo de la copia de respaldo «baresip.bs» en la carpeta; si es así, proporcione la contraseña de descifrado correcta.</string>
+    <string name="restore_failed">Falló la restauración de los datos de la aplicación desde la carpeta Descargas. Revise Aplicaciones ▸ baresip ▸ Permisos ▸ Almacenamiento y si existe el archivo de la copia de respaldo «%1$s» en la carpeta; si es así, proporcione la contraseña de descifrado correcta.</string>
     <string name="config_restart">Es necesario reiniciar Baresip para que surta efecto la configuración nueva. ¿Quiere reiniciar ahora\?</string>
     <string name="audio_modules_title">Módulos de audio</string>
     <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>

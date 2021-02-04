@@ -5,6 +5,21 @@ class UserAgent(val uap: String) {
     val account = Account(Api.ua_account(uap))
     var registrationFailed = false
 
+    fun add(status: Int) {
+        BaresipService.uas.add(this)
+        BaresipService.status.add(status)
+    }
+
+    fun remove() {
+        val index = BaresipService.uas.indexOf(this)
+        BaresipService.uas.remove(this)
+        BaresipService.status.removeAt(index)
+    }
+
+    fun updateStatus(status: Int) {
+        BaresipService.status[BaresipService.uas.indexOf(this)] = status
+    }
+
     companion object {
 
         fun uas(): ArrayList<UserAgent> {
@@ -15,37 +30,28 @@ class UserAgent(val uap: String) {
             return BaresipService.status
         }
 
-        fun add(ua: UserAgent, status: Int) {
-            BaresipService.uas.add(ua)
-            BaresipService.status.add(status)
+        fun ofAor(aor: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (ua.account.aor == aor) return ua
+            return null
         }
 
-        fun remove(ua: UserAgent) {
-            val index = BaresipService.uas.indexOf(ua)
-            if (index != -1) {
-                BaresipService.uas.removeAt(index)
-                BaresipService.status.removeAt(index)
-            }
+        fun ofDomain(domain: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (Utils.aorDomain(ua.account.aor) == domain) return ua
+            return null
         }
 
-        fun updateStatus(ua: UserAgent, status: Int) {
-            val index = BaresipService.uas.indexOf(ua)
-            if (index != -1) {
-                BaresipService.status[index] = status
-            }
+        fun ofUap(uap: String): UserAgent? {
+            for (ua in BaresipService.uas)
+                if (ua.uap == uap) return ua
+            return null
         }
 
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)
             Log.e("Baresip", "Failed to allocate UserAgent for $uri")
-            return null
-        }
-
-        fun find(uap: String): UserAgent? {
-            for (ua in BaresipService.uas) {
-                if (ua.uap == uap) return ua
-            }
             return null
         }
 
@@ -56,11 +62,9 @@ class UserAgent(val uap: String) {
             return null
         }
 
-        fun register(reRegister: Boolean) {
+        fun register() {
             for (ua in BaresipService.uas) {
                 if (ua.account.regint > 0) {
-                    if ((reRegister == false) && Api.ua_isregistered(ua.uap))
-                        continue
                     if (Api.ua_register(ua.uap) != 0)
                         Log.d("Baresip", "Failed to register ${ua.account.aor}")
                 }
