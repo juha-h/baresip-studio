@@ -172,15 +172,12 @@ class Account(val accp: String) {
 
     fun removeAudioCodecs(codecModule: String) {
         when (codecModule) {
-            "g711" -> {
+            "g711" ->
                 removeAudioCodecsStartingWith("pcm")
-            }
-            "g722" -> {
+            "g722" ->
                 removeAudioCodecsStartingWith("g722/")
-            }
-            else -> {
+            else ->
                 removeAudioCodecsStartingWith(codecModule)
-            }
         }
     }
 
@@ -220,7 +217,7 @@ class Account(val accp: String) {
         }
 
         fun checkAuthPass(ap: String): Boolean {
-            return (ap.length > 0) && (ap.length <= 64) &&
+            return (ap.isNotEmpty()) && (ap.length <= 64) &&
                     Regex("^[ -~]*\$").matches(ap) && !ap.contains('"')
         }
     }
