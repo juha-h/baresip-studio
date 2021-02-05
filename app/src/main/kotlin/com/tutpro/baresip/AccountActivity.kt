@@ -115,6 +115,8 @@ class AccountActivity : AppCompatActivity() {
 
         regCheck.isChecked = acc.regint > 0
 
+        this.acc.audioCodec = acc.audioCodec
+
         mediaNat = acc.mediaNat
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
         var keyVal = mediaNatVals.elementAt(keyIx)
@@ -614,7 +616,7 @@ class AccountActivity : AppCompatActivity() {
                         if (tag == "audio-codecs")
                             acc.audioCodec.clear()
                         if (tag == "video-codecs")
-                            acc.audioCodec.clear()
+                            acc.videoCodec.clear()
                     }
                     XmlPullParser.END_TAG ->
                         when (tag) {
