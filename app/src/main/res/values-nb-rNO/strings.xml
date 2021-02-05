@@ -228,4 +228,9 @@
     <string name="call_transfer">Videresending av anrop</string>
     <string name="allow_video">Godta videosamtale med «%1$s»\?</string>
     <string name="about_title_plus">Om baresip+</string>
+    <string name="allow_video_recv">Godta mottak av video fra «%1$s»\?</string>
+    <string name="allow_video_send">Godta forsendelse av video til «%1$s»\?</string>
+    <string name="video_size">Videorammestørrelse</string>
+    <string name="dark_theme">Mørk drakt</string>
+    <string name="missed_call_from">Tapt anrop fra</string>
 </resources>
