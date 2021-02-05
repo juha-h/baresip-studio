@@ -157,9 +157,8 @@ object Utils {
     }
 
     private fun checkUriUser(user: String): Boolean {
-        for (c in user)
-            if (!(c.isLetterOrDigit() || c in "-_.!~*'()&=+$,;?/")) return false
-        return user.length > 0
+        user.forEach { if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
+        return user.isNotEmpty()
     }
 
     fun checkDomain(domain: String): Boolean {
