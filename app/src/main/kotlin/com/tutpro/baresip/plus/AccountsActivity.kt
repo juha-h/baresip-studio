@@ -43,35 +43,37 @@ class AccountsActivity : AppCompatActivity() {
                 Log.d("Baresip", "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
-            } else if (Account.ofAor(aor) != null) {
+                return@setOnClickListener
+            }
+            if (Account.ofAor("sip:$aor") != null) {
                 Log.d("Baresip", "Account $aor already exists")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
-            } else {
-                val laddr = "sip:$aor"
-                val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;mwi=no")
-                if (ua == null) {
-                    Log.e("Baresip", "Failed to allocate UA for $aor")
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.account_allocation_failure))
-                } else {
-                    // Api.account_debug(ua.account.accp)
-                    Log.d("Baresip", "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
-                    newAorView.setText("")
-                    newAorView.hint = getString(R.string.user_domain)
-                    newAorView.clearFocus()
-                    ua.add(R.drawable.dot_white)
-                    generateAccounts()
-                    alAdapter.notifyDataSetChanged()
-                    saveAccounts()
-                    val i = Intent(this, AccountActivity::class.java)
-                    val b = Bundle()
-                    b.putString("aor", ua.account.aor)
-                    b.putBoolean("new", true)
-                    i.putExtras(b)
-                    startActivityForResult(i, MainActivity.ACCOUNT_CODE)
-                }
+                return@setOnClickListener
             }
+            val laddr = "sip:$aor"
+            val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;mwi=no")
+            if (ua == null) {
+                Log.e("Baresip", "Failed to allocate UA for $aor")
+                Utils.alertView(this, getString(R.string.notice),
+                        getString(R.string.account_allocation_failure))
+                return@setOnClickListener
+            }
+            // Api.account_debug(ua.account.accp)
+            Log.d("Baresip", "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
+            newAorView.setText("")
+            newAorView.hint = getString(R.string.user_domain)
+            newAorView.clearFocus()
+            ua.add(R.drawable.dot_white)
+            generateAccounts()
+            alAdapter.notifyDataSetChanged()
+            saveAccounts()
+            val i = Intent(this, AccountActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", ua.account.aor)
+            b.putBoolean("new", true)
+            i.putExtras(b)
+            startActivityForResult(i, MainActivity.ACCOUNT_CODE)
         }
 
     }
