@@ -1,0 +1,1 @@
+- Added possibility to partially auto-configure new account from web page (see https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration for details)
