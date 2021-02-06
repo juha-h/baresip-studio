@@ -116,6 +116,7 @@ class AccountActivity : AppCompatActivity() {
         regCheck.isChecked = acc.regint > 0
 
         this.acc.audioCodec = acc.audioCodec
+        this.acc.videoCodec = acc.videoCodec
 
         mediaNat = acc.mediaNat
         var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
