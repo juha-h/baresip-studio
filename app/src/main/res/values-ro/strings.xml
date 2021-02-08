@@ -163,4 +163,6 @@
     <string name="backup">Copie de rezervă</string>
     <string name="restore">Restaurare</string>
     <string name="audio_modules_help">Codecurile audio furnizate de modulele bifate sunt disponibile pentru utilizare de către conturi.</string>
+    <string name="invalid_display_name">Nume afișat nevalid \"%1$s\'</string>
+    <string name="about_title_plus">Despre baresip+</string>
 </resources>
