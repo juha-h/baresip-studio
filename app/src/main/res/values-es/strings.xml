@@ -29,7 +29,7 @@
     <string name="authentication_username">Nombre de usuario de autenticación</string>
     <string name="authentication_username_help">Nombre de usuario de autenticación si lo requiere el proxy saliente.</string>
     <string name="authentication_password">Contraseña de autenticación</string>
-    <string name="authentication_password_help">Contraseña de autenticación si es requerida por el proxy saliente.</string>
+    <string name="authentication_password_help">Contraseña de autenticación de hasta 64 caracteres. Si se proporciona el nombre de usuario, pero no la contraseña, esta se le pedirá cuando inicie baresip.</string>
     <string name="outbound_proxies">Proxies salientes</string>
     <string name="outbound_proxies_help">SIP URI de uno o dos proxies que deben usarse al enviar solicitudes.
         Si se dan dos, las solicitudes de REGISTRO se envían a ambas y se envían otras solicitudes a
@@ -255,4 +255,6 @@
     <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>
     <string name="failed_to_load_module">Falló la carga del módulo.</string>
     <string name="no_calls">No es posible hacer o responder llamadas sin el permiso Micrófono.</string>
+    <string name="invalid_authentication_password">Contraseña incorrecta%1$s</string>
+    <string name="invalid_authentication_username">Nombre de usuario no válido \'%1$s\'</string>
 </resources>
