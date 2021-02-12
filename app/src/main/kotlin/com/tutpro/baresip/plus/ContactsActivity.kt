@@ -109,10 +109,15 @@ class ContactsActivity : AppCompatActivity() {
         }
 
         fun contactName(uri: String): String {
-            for (c in Contact.contacts())
-                if ((Utils.uriUserPart(c.uri) == Utils.uriUserPart(uri)) &&
-                        (Utils.uriHostPart(c.uri) == Utils.uriHostPart(uri)))
+            val uriUser = Utils.uriUserPart(uri)
+            val uriHost = Utils.uriHostPart(uri)
+            for (c in Contact.contacts()) {
+                val contactUser = Utils.uriUserPart(c.uri)
+                if ((contactUser == uriUser) &&
+                        (Utils.isE164Number(contactUser) ||
+                                (Utils.uriHostPart(c.uri) == uriHost)))
                     return c.name
+            }
             return uri
         }
     }
