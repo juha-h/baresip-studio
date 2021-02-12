@@ -84,16 +84,15 @@ object Utils {
         var u = uri
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
-        if (u.contains("@") && !u.substring(4).contains(":") &&
-                !u.contains(";")) {
+        if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (checkE164Number(user) || (host == domain))
-                return user
+            return if (isE164Number(user) || (host == domain))
+                user
             else
-                return "$user@$host"
+                "$user@$host"
         } else {
-            return uri
+            return u
         }
     }
 
@@ -139,7 +138,7 @@ object Utils {
             return checkPort(pt[0]) && pt[1] in arrayOf("udp", "tcp", "tls")
     }
 
-    private fun checkE164Number(no: String): Boolean {
+    fun isE164Number(no: String): Boolean {
         return Regex("^[+][1-9][0-9]{0,14}\$").matches(no)
     }
 
