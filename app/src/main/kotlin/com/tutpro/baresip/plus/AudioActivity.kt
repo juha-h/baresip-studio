@@ -1,6 +1,5 @@
 package com.tutpro.baresip.plus
 
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.TypedValue
@@ -9,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.core.content.ContextCompat
 import com.tutpro.baresip.plus.databinding.ActivityAudioBinding
 
 class AudioActivity : AppCompatActivity() {
@@ -55,7 +55,7 @@ class AudioActivity : AppCompatActivity() {
             tv.layoutParams = tvParams
             tv.text = "\u2022 $module"
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-            tv.setTextColor(Color.BLACK)
+            tv.setTextColor(ContextCompat.getColor(this, R.color.colorItemText))
             rl.addView(tv)
             val cb = CheckBox(this)
             cb.id = id++
