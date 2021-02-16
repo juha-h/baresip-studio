@@ -19,5 +19,6 @@
     <color name="colorSpinnerText">@color/colorDark</color>
     <color name="colorSpinnerDropdown">@color/colorGray</color>
     <color name="colorSpinnerDivider">@color/colorGrayLight</color>
+    <color name="colorItemText">@color/colorGrayLight</color>
     <color name="colorAlertText">@color/colorGrayLight</color>
 </resources>
