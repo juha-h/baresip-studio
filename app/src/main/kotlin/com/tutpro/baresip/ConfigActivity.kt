@@ -20,6 +20,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var listenAddr: EditText
     private lateinit var dnsServers: EditText
     private lateinit var certificateFile: CheckBox
+    private lateinit var verifyServer: CheckBox
     private lateinit var caFile: CheckBox
     private lateinit var darkTheme: CheckBox
     private lateinit var debug: CheckBox
@@ -30,6 +31,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldListenAddr = ""
     private var oldDnsServers = ""
     private var oldCertificateFile = false
+    private var oldVerifyServer = ""
     private var oldCAFile = false
     private var oldLogLevel = ""
     private var callVolume = BaresipService.callVolume
@@ -75,6 +77,11 @@ class ConfigActivity : AppCompatActivity() {
         certificateFile = binding.CertificateFile
         oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
         certificateFile.isChecked = oldCertificateFile
+
+        verifyServer = binding.VerifyServer
+        val vsCv = Config.variable("sip_verify_server")
+        oldVerifyServer = if (vsCv.size == 0) "no" else vsCv[0]
+        verifyServer.isChecked = oldVerifyServer == "yes"
 
         caFile = binding.CAFile
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
@@ -216,8 +223,10 @@ class ConfigActivity : AppCompatActivity() {
                     if (caFile.isChecked) {
                         if (!Utils.requestPermission(this,
                                         android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        READ_CA_PERMISSION_CODE))
+                                        READ_CA_PERMISSION_CODE)) {
+                            caFile.isChecked = false
                             return false
+                        }
                         val content = Utils.getFileContents(BaresipService.downloadsPath +
                                 "/ca_certs.crt")
                         if (content == null) {
@@ -237,6 +246,19 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
+                if (verifyServer.isChecked && !caFile.isChecked) {
+                    Utils.alertView(this, getString(R.string.error),
+                            getString(R.string.verify_server_error))
+                    verifyServer.isChecked = false
+                    return false
+                }
+
+                val verifyServerString = if (verifyServer.isChecked) "yes" else "no"
+                if (oldVerifyServer != verifyServerString) {
+                    Config.replaceVariable("sip_verify_server", verifyServerString)
+                    save = true
+                    restart = true
+                }
 
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
@@ -342,6 +364,10 @@ class ConfigActivity : AppCompatActivity() {
             binding.CertificateFileTitle  -> {
                 Utils.alertView(this, getString(R.string.tls_certificate_file),
                         getString(R.string.tls_certificate_file_help))
+            }
+            binding.VerifyServerTitle  -> {
+                Utils.alertView(this, getString(R.string.verify_server),
+                        getString(R.string.verify_server_help))
             }
             binding.CAFileTitle -> {
                 Utils.alertView(this, getString(R.string.tls_ca_file),

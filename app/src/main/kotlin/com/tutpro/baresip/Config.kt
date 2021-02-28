@@ -14,8 +14,8 @@ object Config {
 
         Log.d("Baresip", "Config is '$config'")
 
-        if (!config.contains("zrtp_hash")) {
-            config = "${config}zrtp_hash yes\n"
+        if (!config.contains("sip_verify_server")) {
+            config = "${config}sip_verify_server no\n"
         }
 
         if (!config.contains(Regex("ausrc_format s16"))) {

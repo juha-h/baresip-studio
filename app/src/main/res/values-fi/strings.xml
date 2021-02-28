@@ -285,6 +285,14 @@
         tämän baresip-sovelluksen julkisen ja yksityisen TLS-varmentimen, on joko jo ladattu tai tullaan
         lataamaan Download-hakemistosta.  Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
     </string>
+    <string name="verify_server">Tarkista palvelinten varmentimet</string>
+    <string name="verify_server_error">Palvelinten varmentimia ei voi tarkistaa ilman TLS
+        CA-tiedostoa.
+    </string>
+    <string name="verify_server_help">Jos merkitty, baresip tarkistaa SIP-palvelinten
+        varmenteet, kun TLS-tiedonsiirto on käytössä.  Tällöin myös TLS CA-tiedoston on oltava
+        ladattuna.
+    </string>
     <string name="tls_ca_file">TLS CA-tiedosto</string>
     <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
         TLS-varmenninauktoriteettien julkiset varmentimen, on joko jo ladattu tai tullaan lataamaan
