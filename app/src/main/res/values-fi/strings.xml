@@ -281,23 +281,24 @@
         DNS-palvelijoihin.</string>
     <string name="invalid_dns_servers">Virheelliset DNS-palvelimet</string>
     <string name="failed_to_set_dns_servers">DNS-palvelinten asetus epäonnistui</string>
-    <string name="tls_certificate_file">TLS-varmennintiedosto</string>
+    <string name="tls_certificate_file">TLS-sertifikaattitiedosto</string>
     <string name="tls_certificate_file_help">Jos merkitty, tiedosto \'cert.pem\', joka sisältää
-        tämän baresip-sovelluksen julkisen ja yksityisen TLS-varmentimen, on joko jo ladattu tai tullaan
-        lataamaan Download-hakemistosta.  Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
+        tämän baresip-sovelluksen julkisen ja yksityisen TLS-sertifikaatin, on joko jo ladattu
+        tai tullaan lataamaan Download-hakemistosta.  Turvallisuusyistä tuhoa tiedosto heti
+        lataamisen jälkeen.
     </string>
-    <string name="verify_server">Tarkista palvelinten varmentimet</string>
-    <string name="verify_server_error">Palvelinten varmentimia ei voi tarkistaa ilman TLS
+    <string name="verify_server">Tarkista palvelinten sertifikaatit</string>
+    <string name="verify_server_error">Palvelinten sertifikaatteja ei voi tarkistaa ilman TLS
         CA-tiedostoa.
     </string>
     <string name="verify_server_help">Jos merkitty, baresip tarkistaa SIP-palvelinten
-        varmenteet, kun TLS-tiedonsiirto on käytössä.  Tällöin myös TLS CA-tiedoston on oltava
+        sertifikaatit, kun TLS-tiedonsiirto on käytössä.  Tällöin myös TLS CA-tiedoston on oltava
         ladattuna.
     </string>
     <string name="tls_ca_file">TLS CA-tiedosto</string>
     <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
-        TLS-varmenninauktoriteettien julkiset varmentimen, on joko jo ladattu tai tullaan lataamaan
-        Download-hakemistosta.
+        sertifikaattiauktoriteettien (CA) julkiset sertifikaatit, on joko jo ladattu tai tullaan
+        lataamaan Download-hakemistosta.
     </string>
     <string name="audio">Audio</string>
     <string name="audio_modules_title">Audio-modulit</string>
