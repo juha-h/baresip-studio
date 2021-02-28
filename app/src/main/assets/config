@@ -2,6 +2,7 @@ auto_start yes
 log_level 2
 poll_method epoll
 sip_trans_bsize 128
+sip_verify_server no
 call_local_timeout 120
 call_max_calls 4
 audio_player opensles,nil

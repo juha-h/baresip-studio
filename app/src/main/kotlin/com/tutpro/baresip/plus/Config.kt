@@ -14,6 +14,9 @@ object Config {
 
         Log.d("Baresip", "Config is '$config'")
 
+	    if (!config.contains("sip_verify_server"))
+           config = "${config}sip_verify_server no\n"
+
         if (BaresipService.cameraAvailable) {
             if (!config.contains("module avformat.so")) {
                 addModuleLine("module avformat.so")

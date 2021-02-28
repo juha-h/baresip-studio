@@ -266,6 +266,12 @@
     <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing
         TLS certificate and private key of this baresip instance has been or will be loaded from
         Download directory. For security reasons, delete the file after loading.</string>
+    <string name="verify_server">Verify Server Certificates</string>
+    <string name="verify_server_error">Server Certificates cannot be verified without
+        TLS CA file.</string>
+    <string name="verify_server_help">If checked, baresip verifies TLS certificates of SIP User
+        Agent and SIP Proxy Servers when TLS transport is used.  If checked, also TLS CA File has
+        to be loaded.</string>
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates
         of Certificate Authorities has been or will be loaded from Download directory.</string>
