@@ -80,4 +80,8 @@
     <string name="account">Compte</string>
     <string name="about_title_plus">À propos de baresip+</string>
     <string name="about_title">À propos de baresip</string>
+    <string name="invalid_authentication_password">Mot de passe d\'authentification invalide « %1$s »</string>
+    <string name="authentication_password_help">Mot de passe d\'authentification jusqu\'à 64 caractères. Si le nom d\'utilisateur d\'authentification est donné mais que le mot de passe n\'est pas donné, il sera demandé au démarrage de baresip.</string>
+    <string name="authentication_password">Mot de passe d\'authentification</string>
+    <string name="invalid_authentication_username">Nom d\'utilisateur d\'authentification invalide « %1$s »</string>
 </resources>
