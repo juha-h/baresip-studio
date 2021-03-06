@@ -456,6 +456,40 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        swipeRefresh.setOnTouchListener(object : OnSwipeTouchListener(this@MainActivity) {
+
+            override fun onSwipeLeft() {
+                super.onSwipeLeft()
+                if (UserAgent.uas().size > 0) {
+                    val curPos = aorSpinner.selectedItemPosition
+                    val newPos = if (curPos == -1)
+                        0
+                    else
+                        (curPos + 1) % UserAgent.uas().size
+                    if (curPos != newPos) {
+                        aorSpinner.setSelection(newPos)
+                        showCall(UserAgent.uas()[newPos])
+                    }
+                }
+            }
+
+            override fun onSwipeRight() {
+                super.onSwipeRight()
+                if (UserAgent.uas().size > 0) {
+                    val curPos = aorSpinner.selectedItemPosition
+                    val newPos = when (curPos) {
+                        -1 -> 0
+                        0 -> UserAgent.uas().size - 1
+                        else -> curPos - 1
+                    }
+                    if (curPos != newPos) {
+                        aorSpinner.setSelection(newPos)
+                        showCall(UserAgent.uas()[newPos])
+                    }
+                }
+            }
+        })
+
         swipeRefresh.setOnRefreshListener {
             if (UserAgent.uas().size > 0) {
                 if (aorSpinner.selectedItemPosition == -1)
