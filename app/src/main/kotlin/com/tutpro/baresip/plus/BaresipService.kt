@@ -528,7 +528,7 @@ class BaresipService: Service() {
                             val call = Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp))
                             call.add()
-                            if (ua.account.answerMode == "manual") {
+                            if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
                                 Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                     startRinging()
