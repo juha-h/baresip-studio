@@ -179,7 +179,7 @@
         ei saada automaattisesti selvitettyä.
     </string>
     <string name="dtmf_mode">DTMF-moodi</string>
-    <string name="dtmf_mode_help">Valitsee tapa, miten DTMF-merkit 0–9, #, * ja A-D lähetetään.</string>
+    <string name="dtmf_mode_help">Valitsee tavan, miten DTMF-merkit 0–9, #, * ja A-D lähetetään.</string>
     <string name="dtmf_inband">RTP</string>
     <string name="dtmf_info">SIP INFO</string>
     <string name="answer_mode">Vastaustapa</string>
