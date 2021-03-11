@@ -39,7 +39,9 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
     private lateinit var ipV6MediaCheck: CheckBox
-    private lateinit var answerMode: String
+    private var dtmfMode = Api.DTMFMODE_RTP_EVENT
+    private lateinit var dtmfModeSpinner: Spinner
+    private var answerMode = Api.ANSWERMODE_MANUAL
     private lateinit var answerModeSpinner: Spinner
     private lateinit var vmUri: EditText
     private lateinit var defaultCheck: CheckBox
@@ -74,6 +76,7 @@ class AccountActivity : AppCompatActivity() {
         stunPass = binding.StunPass
         mediaEncSpinner = binding.mediaEncSpinner
         ipV6MediaCheck = binding.PreferIPv6Media
+        dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         vmUri = binding.voicemailUri
         defaultCheck = binding.Default
@@ -181,8 +184,29 @@ class AccountActivity : AppCompatActivity() {
 
         ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
+        dtmfMode = acc.dtmfMode
+        val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO)
+        val dtmfModeVals = arrayListOf(getString(R.string.dtmf_inband), getString(R.string.dtmf_info))
+        keyIx = dtmfModeKeys.indexOf(acc.dtmfMode)
+        keyVal = dtmfModeVals.elementAt(keyIx)
+        dtmfModeKeys.removeAt(keyIx)
+        dtmfModeVals.removeAt(keyIx)
+        dtmfModeKeys.add(0, acc.dtmfMode)
+        dtmfModeVals.add(0, keyVal)
+        val dtmfModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
+                dtmfModeVals)
+        dtmfModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        dtmfModeSpinner.adapter = dtmfModeAdapter
+        dtmfModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                dtmfMode = dtmfModeKeys[dtmfModeVals.indexOf(parent.selectedItem.toString())]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+
         answerMode = acc.answerMode
-        val answerModeKeys = arrayListOf("manual", "auto")
+        val answerModeKeys = arrayListOf(Api.ANSWERMODE_MANUAL, Api.ANSWERMODE_AUTO)
         val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
         keyIx = answerModeKeys.indexOf(acc.answerMode)
         keyVal = answerModeVals.elementAt(keyIx)
@@ -436,10 +460,24 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
+                if (dtmfMode != acc.dtmfMode) {
+                    if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
+                        acc.dtmfMode = Api.account_dtmfmode(acc.accp)
+                        Log.d(TAG, "New dtmfmode is ${acc.dtmfMode}")
+                        save = true
+                    } else {
+                        Log.e(TAG, "Setting of dtmfmode $dtmfMode failed")
+                    }
+                }
+
                 if (answerMode != acc.answerMode) {
-                    acc.answerMode = answerMode
-                    Log.d(TAG, "New answermode is ${acc.answerMode}")
-                    save = true
+                    if (Api.account_set_answermode(acc.accp, answerMode) == 0) {
+                        acc.answerMode = Api.account_answermode(acc.accp)
+                        Log.d(TAG, "New answermode is ${acc.answerMode}")
+                        save = true
+                    } else {
+                        Log.e(TAG, "Setting of answermode $answerMode failed")
+                    }
                 }
 
                 var tVmUri = vmUri.text.toString().trim()
@@ -562,6 +600,10 @@ class AccountActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.prefer_ipv6_media),
                         getString(R.string.prefer_ipv6_media_help))
             }
+            binding.DtmfModeTitle -> {
+                Utils.alertView(this, getString(R.string.dtmf_mode),
+                        getString(R.string.dtmf_mode_help))
+            }
             binding.AnswerModeTitle -> {
                 Utils.alertView(this, getString(R.string.answer_mode),
                         getString(R.string.answer_mode_help))
@@ -649,9 +691,20 @@ class AccountActivity : AppCompatActivity() {
                                     acc.stunServer = text
                             "prefer-ipv6-media" ->
                                 acc.preferIPv6Media = text == "yes"
+                            "dtmf-mode" ->
+                                if (text in arrayOf("rtp-event", "sip-info")) {
+                                    acc.dtmfMode = if (text == "rtp-event")
+                                        Api.DTMFMODE_RTP_EVENT
+                                    else
+                                        Api.DTMFMODE_SIP_INFO
+                                }
                             "answer-mode" ->
-                                if (text in arrayOf("manual", "auto"))
-                                    acc.answerMode = text
+                                if (text in arrayOf("manual", "auto")) {
+                                    acc.answerMode = if (text == "manual")
+                                        Api.ANSWERMODE_MANUAL
+                                    else
+                                        Api.ANSWERMODE_AUTO
+                                }
                             "voicemail-uri" ->
                                 if (text.isNotEmpty())
                                     acc.vmUri = text

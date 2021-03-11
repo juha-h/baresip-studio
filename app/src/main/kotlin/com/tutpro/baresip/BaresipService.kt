@@ -530,7 +530,7 @@ class BaresipService: Service() {
                             Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)).add()
-                            if (ua.account.answerMode == "manual") {
+                            if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
                                 if (Build.VERSION.SDK_INT >= 23) {
                                     Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                     if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)

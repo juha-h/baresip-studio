@@ -1062,6 +1062,42 @@ Java_com_tutpro_baresip_Api_account_1vm_1uri(JNIEnv *env, jobject thiz, jstring 
         return (*env)->NewStringUTF(env, "");
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1answermode(JNIEnv *env, jobject thiz, jstring jAcc) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    return account_answermode(acc);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1set_1answermode(JNIEnv *env, jobject thiz,
+        jstring jAcc, jint jMode) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const uint32_t mode = (uint32_t)jMode;
+    return account_set_answermode(acc, mode);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1dtmfmode(JNIEnv *env, jobject thiz, jstring jAcc) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    return account_dtmfmode(acc);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1set_1dtmfmode(JNIEnv *env, jobject thiz,
+        jstring jAcc, jint jMode) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    const uint32_t mode = (uint32_t)jMode;
+    return account_set_dtmfmode(acc, mode);
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_account_1extra(JNIEnv *env, jobject thiz, jstring javaAcc)
 {

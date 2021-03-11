@@ -166,6 +166,10 @@
     </string>
     <string name="prefer_ipv6_media">Prefer IPv6 Media</string>
     <string name="prefer_ipv6_media_help">If checked, offer to use IPv6 media protocol (if available) when media protocol of peer cannot be automatically determined.</string>
+    <string name="dtmf_mode">DTMF Mode</string>
+    <string name="dtmf_mode_help">Selects how DTMF tones 0–9, #, *, and A-D are sent.</string>
+    <string name="dtmf_inband">In-band RTP Events</string>
+    <string name="dtmf_info">SIP INFO Requests</string>
     <string name="answer_mode">Answer Mode</string>
     <string name="answer_mode_help">Selects how incoming calls are answered.</string>
     <string name="manual">Manual</string>

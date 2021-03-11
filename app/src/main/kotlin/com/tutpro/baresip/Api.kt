@@ -7,6 +7,10 @@ object Api {
     const val AF_INET6 = 10
     const val VIDMODE_OFF = 0
     const val VIDMODE_ON = 1
+    const val ANSWERMODE_MANUAL = 0
+    const val ANSWERMODE_AUTO = 2
+    const val DTMFMODE_RTP_EVENT = 0
+    const val DTMFMODE_SIP_INFO = 1
 
     external fun account_set_display_name(acc: String, dn: String): Int
     external fun account_display_name(acc: String): String
@@ -36,6 +40,10 @@ object Api {
     external fun account_set_video_codecs(acc: String, codecs: String): Int
     external fun account_set_mwi(acc: String, value: String): Int
     external fun account_vm_uri(acc: String): String
+    external fun account_answermode(acc: String): Int
+    external fun account_set_answermode(acc: String, mode: Int): Int
+    external fun account_dtmfmode(acc: String): Int
+    external fun account_set_dtmfmode(acc: String, mode: Int): Int
     external fun account_extra(acc: String): String
     external fun account_debug(acc: String)
 
