@@ -70,20 +70,20 @@ class Account(val accp: String) {
         else
             res = ""
 
-        res = res + "<$luri>"
+        res = "$res<$luri>"
 
         if (authUser != "") res = res + ";auth_user=\"${authUser}\""
 
         if ((authPass != "") && !MainActivity.aorPasswords.containsKey(aor))
-            res = res + ";auth_pass=\"${authPass}\""
+            res += ";auth_pass=\"${authPass}\""
 
         if (outbound.size > 0) {
             res = res + ";outbound=\"${outbound[0]}\""
             if (outbound.size > 1) res = res + ";outbound2=\"${outbound[1]}\""
-            res = res + ";sipnat=outbound"
+            res = "$res;sipnat=outbound"
         }
 
-        if (mediaNat != "") res = res + ";medianat=${mediaNat}"
+        if (mediaNat != "") res += ";medianat=${mediaNat}"
 
         if (stunServer != "")
             res += ";stunserver=\"${stunServer}\""
@@ -96,22 +96,22 @@ class Account(val accp: String) {
 
         if (audioCodec.size > 0) {
             var first = true
-            res = res + ";audio_codecs="
+            res = "$res;audio_codecs="
             for (c in audioCodec)
                 if (first) {
-                    res = res + c
+                    res += c
                     first = false
                 } else {
-                    res = res + ",$c"
+                    res = "$res,$c"
                 }
         }
 
-        if (mediaEnc != "") res = res + ";mediaenc=${mediaEnc}"
+        if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
 
         if (vmUri == "")
-            res = res + ";mwi=no"
+            res = "$res;mwi=no"
         else
-            res = res + ";mwi=yes;vm_uri=\"$vmUri\""
+            res = "$res;mwi=yes;vm_uri=\"$vmUri\""
 
         if (answerMode == Api.ANSWERMODE_AUTO)
             res += ";answermode=auto"
