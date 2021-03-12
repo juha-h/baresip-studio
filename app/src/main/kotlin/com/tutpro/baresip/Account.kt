@@ -72,13 +72,13 @@ class Account(val accp: String) {
 
         res = "$res<$luri>"
 
-        if (authUser != "") res = res + ";auth_user=\"${authUser}\""
+        if (authUser != "") res += ";auth_user=\"${authUser}\""
 
         if ((authPass != "") && !MainActivity.aorPasswords.containsKey(aor))
             res += ";auth_pass=\"${authPass}\""
 
         if (outbound.size > 0) {
-            res = res + ";outbound=\"${outbound[0]}\""
+            res += ";outbound=\"${outbound[0]}\""
             if (outbound.size > 1) res = res + ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
         }
