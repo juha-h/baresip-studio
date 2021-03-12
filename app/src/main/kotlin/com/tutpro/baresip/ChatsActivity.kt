@@ -202,7 +202,6 @@ class ChatsActivity: AppCompatActivity() {
     override fun onBackPressed() {
         BaresipService.activities.remove("chats,$aor")
         returnResult()
-        super.onBackPressed()
     }
 
     override fun onPause() {
