@@ -188,7 +188,6 @@ class CallsActivity : AppCompatActivity() {
     override fun onBackPressed() {
         BaresipService.activities.remove("calls,$aor")
         returnResult()
-        super.onBackPressed()
     }
 
     override fun onPause() {
