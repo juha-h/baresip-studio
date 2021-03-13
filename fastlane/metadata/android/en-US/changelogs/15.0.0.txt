@@ -1,0 +1,3 @@
+- Enabled swipe left/right to toggle between accounts
+- Added DTMF Mode account setting
+- Translations update from Weblate (French)
