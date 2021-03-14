@@ -14,6 +14,8 @@ import androidx.core.app.NotificationCompat
 
 import java.nio.charset.StandardCharsets
 
+const val START_NOTIFICATION_IN = 105
+
 class BootCompletedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -42,7 +44,6 @@ class BootCompletedReceiver : BroadcastReceiver() {
                 val channel = NotificationChannel("default", "default",
                         NotificationManager.IMPORTANCE_DEFAULT)
                 nm.createNotificationChannel(channel)
-                val START_NOTIFICATION_IN = 105
                 val pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_ONE_SHOT)
                 with(NotificationCompat.Builder(context, "default")) {
                     setSmallIcon(R.drawable.ic_stat)
