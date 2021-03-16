@@ -538,7 +538,6 @@ class AccountActivity : AppCompatActivity() {
     override fun onBackPressed() {
         BaresipService.activities.remove("account,$aor")
         returnResult(Activity.RESULT_CANCELED)
-        super.onBackPressed()
     }
 
     override fun onPause() {
