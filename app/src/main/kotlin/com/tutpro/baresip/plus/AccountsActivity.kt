@@ -165,7 +165,6 @@ class AccountsActivity : AppCompatActivity() {
         val i = Intent()
         setResult(Activity.RESULT_CANCELED, i)
         finish()
-        super.onBackPressed()
     }
 
     override fun onPause() {
