@@ -73,7 +73,7 @@ class ChatListAdapter(private val ctx: Context, private var rows: ArrayList<Mess
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
 
-        viewHolder.peerView.setText(peer)
+        viewHolder.peerView.text = peer
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp

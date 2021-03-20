@@ -24,7 +24,7 @@ class AboutActivity : AppCompatActivity() {
         val text = String.format(getString(R.string.about_text_plus),
                 BuildConfig.VERSION_NAME)
         binding.aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.aboutText.setMovementMethod(LinkMovementMethod.getInstance())
+        binding.aboutText.movementMethod = LinkMovementMethod.getInstance()
 
     }
 

@@ -55,7 +55,7 @@ class CodecsActivity : AppCompatActivity() {
         while (newCodecs.size < codecs.size) newCodecs.add("-")
 
         val layout = binding.SpinnerTable
-        val spinnerList = Array(codecs.size, {_ -> ArrayList<String>()})
+        val spinnerList = Array(codecs.size) { ArrayList<String>() }
         for (i in codecs.indices) {
             val spinner = Spinner(applicationContext)
             spinner.id = i + 100
@@ -72,7 +72,7 @@ class CodecsActivity : AppCompatActivity() {
                 spinnerList[i].addAll(codecs)
                 spinnerList[i].add(0, "-")
             }
-            val codecSpinner = findViewById(spinner.id) as Spinner
+            val codecSpinner = findViewById<Spinner>(spinner.id)
             val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
                     spinnerList[i])
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

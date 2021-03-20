@@ -75,13 +75,13 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
         viewHolder.nameView.setPadding(6, 6, 0, 6)
 
         if (aor != "") {
-            viewHolder.nameView.setOnClickListener { _ ->
+            viewHolder.nameView.setOnClickListener {
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                     when (which) {
                         DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
                             val i = Intent(ctx, MainActivity::class.java)
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                             if (which == DialogInterface.BUTTON_NEGATIVE)
                                 i.putExtra("action", "call")
                             else
@@ -114,7 +114,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
             }
         }
 
-        viewHolder.nameView.setOnLongClickListener { _ ->
+        viewHolder.nameView.setOnLongClickListener {
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
@@ -151,7 +151,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
             true
         }
 
-        viewHolder.actionView.setOnClickListener { _ ->
+        viewHolder.actionView.setOnClickListener {
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
                 val i = Intent(ctx, ContactActivity::class.java)
