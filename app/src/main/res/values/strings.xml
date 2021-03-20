@@ -91,9 +91,6 @@
         </ul>
         ]]>
     </string>
-    <string name="baresip_link" translatable="false">
-        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
-    </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
     <string name="display_name">Display Name</string>

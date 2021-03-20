@@ -128,11 +128,11 @@ class ChatActivity : AppCompatActivity() {
         }
 
         newMessage = binding.text
-        newMessage.setOnFocusChangeListener(View.OnFocusChangeListener { _, hasFocus ->
+        newMessage.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             }
-        })
+        }
 
         if (focus) newMessage.requestFocus()
 
@@ -147,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
                 msg.add()
                 chatMessages.add(msg)
                 if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
-                    Toast.makeText(getApplicationContext(), "${getString(R.string.message_failed)}!",
+                    Toast.makeText(applicationContext, "${getString(R.string.message_failed)}!",
                             Toast.LENGTH_SHORT).show()
                     msg.direction = R.drawable.arrow_up_red
                     msg.responseReason = getString(R.string.message_failed)
@@ -216,8 +216,8 @@ class ChatActivity : AppCompatActivity() {
                 if (SystemClock.elapsedRealtime() - lastCall > 1000) {
                     lastCall = SystemClock.elapsedRealtime()
                     val intent = Intent(this, MainActivity::class.java)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intent.putExtra("action", "call")
                     intent.putExtra("uap", ua.uap)
                     intent.putExtra("peer", peerUri)

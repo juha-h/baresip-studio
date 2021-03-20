@@ -28,10 +28,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         call_start_audio(callp)
     }
 
-    fun stopAudio() {
-        call_stop_audio(callp)
-    }
-
     fun hold(): Int {
         return call_hold(callp)
     }
@@ -51,10 +47,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
 
     fun notifySipfrag(code: Int, reason: String) {
         call_notify_sipfrag(callp, code, reason)
-    }
-
-    fun hasVideo(): Boolean {
-        return call_has_video(callp)
     }
 
     fun status(): String {

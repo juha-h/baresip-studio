@@ -261,7 +261,7 @@ class BaresipService: Service() {
                 val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(LOG_TAG, "Starting baresip without IP addresses")
-                Thread(Runnable {
+                Thread({
                     baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
                             dnsServers, Api.AF_UNSPEC, logLevel)
                 }).start()
@@ -466,7 +466,7 @@ class BaresipService: Service() {
                             newEvent = "registering failed,DNS lookup failed"
                             Api.net_dns_debug()
                             if (dynDns)
-                                if (Build.VERSION.SDK_INT >= 23) {
+                                if (VERSION.SDK_INT >= 23) {
                                     val activeNetwork = cm.activeNetwork
                                     if (activeNetwork != null) {
                                         val props = cm.getLinkProperties(activeNetwork)
@@ -531,7 +531,7 @@ class BaresipService: Service() {
                             Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                                if (Build.VERSION.SDK_INT >= 23) {
+                                if (VERSION.SDK_INT >= 23) {
                                     Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                     if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                         startRinging()
@@ -568,7 +568,7 @@ class BaresipService: Service() {
                                     .setContentText(caller)
                                     .setShowWhen(true)
                                     .setFullScreenIntent(pi, true)
-                            if (Build.VERSION.SDK_INT < 26) {
+                            if (VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .priority = Notification.PRIORITY_HIGH
@@ -659,10 +659,9 @@ class BaresipService: Service() {
                                     .setAutoCancel(true)
                                     .setContentTitle(getString(R.string.transfer_request_to))
                                     .setContentText(target)
-                            if (Build.VERSION.SDK_INT < 26) {
+                            if (VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .setPriority(Notification.PRIORITY_HIGH)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).priority = Notification.PRIORITY_HIGH
                             }
                             val acceptIntent = Intent(this, BaresipService::class.java)
                             acceptIntent.action = "Transfer Accept"
@@ -729,7 +728,7 @@ class BaresipService: Service() {
                                     .setAutoCancel(true)
                                     .setContentTitle(getString(R.string.missed_call_from))
                                     .setContentText(caller)
-                            if (Build.VERSION.SDK_INT < 26) {
+                            if (VERSION.SDK_INT < 26) {
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .priority = Notification.PRIORITY_HIGH
@@ -796,7 +795,7 @@ class BaresipService: Service() {
                     .setAutoCancel(true)
                     .setContentTitle(getString(R.string.message_from) + " " + sender)
                     .setContentText(text)
-            if (Build.VERSION.SDK_INT < 26) {
+            if (VERSION.SDK_INT < 26) {
                 nb.setVibrate(LongArray(0))
                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .priority = Notification.PRIORITY_HIGH
@@ -877,7 +876,7 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (VERSION.SDK_INT >= 26) {
             val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
                     NotificationManager.IMPORTANCE_LOW)
             defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -904,7 +903,7 @@ class BaresipService: Service() {
     }
 
     private fun updateStatusNotification() {
-        val contentView = RemoteViews(getPackageName(), R.layout.status_notification)
+        val contentView = RemoteViews(packageName, R.layout.status_notification)
         for (i: Int in 0..5) {
             val resID = resources.getIdentifier("status$i", "id", packageName)
             if (i < status.size) {
@@ -922,7 +921,7 @@ class BaresipService: Service() {
         nm.notify(STATUS_NOTIFICATION_ID, snb.build())
     }
 
-    private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable? {
+    private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
         val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
         if (VERSION.SDK_INT >= VERSION_CODES.N_MR1) {
             spannable.setSpan(
@@ -939,7 +938,7 @@ class BaresipService: Service() {
             else
                 abandonAudioFocus()
         }
-        if ((Build.VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
+        if ((VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
             @TargetApi(26)
             audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
                     .run {
@@ -987,7 +986,7 @@ class BaresipService: Service() {
     }
 
     private fun abandonAudioFocus() {
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (VERSION.SDK_INT >= 26) {
             if (audioFocusRequest != null) {
                 if (am.abandonAudioFocusRequest(audioFocusRequest!!) ==
                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -1013,7 +1012,7 @@ class BaresipService: Service() {
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
         requestAudioFocus(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-        if (Build.VERSION.SDK_INT >= 28) {
+        if (VERSION.SDK_INT >= 28) {
             rt.isLooping = true
             rt.play()
         } else {
@@ -1021,7 +1020,7 @@ class BaresipService: Service() {
             rtTimer = Timer()
             rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    if (!rt.isPlaying()) {
+                    if (!rt.isPlaying) {
                         rt.play()
                     }
                 }
@@ -1031,7 +1030,7 @@ class BaresipService: Service() {
 
     private fun stopRinging() {
         if (am.mode == AudioManager.MODE_RINGTONE) {
-            if ((Build.VERSION.SDK_INT < 28) && (rtTimer != null)) {
+            if ((VERSION.SDK_INT < 28) && (rtTimer != null)) {
                 rtTimer!!.cancel()
                 rtTimer = null
             }
@@ -1065,14 +1064,14 @@ class BaresipService: Service() {
 
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
-            if (!proximityWakeLock.isHeld()) {
+            if (!proximityWakeLock.isHeld) {
                 Log.d(LOG_TAG, "Acquiring proximity wake lock")
                 proximityWakeLock.acquire()
             } else {
                 Log.d(LOG_TAG, "Proximity wake lock already acquired")
             }
         } else {
-            if (proximityWakeLock.isHeld()) {
+            if (proximityWakeLock.isHeld) {
                 proximityWakeLock.release()
                 Log.d(LOG_TAG, "Released proximity wake lock")
             } else {
@@ -1138,7 +1137,7 @@ class BaresipService: Service() {
     }
 
     private fun isNetworkActive(network: Network): Boolean {
-        if (Build.VERSION.SDK_INT >= 23)
+        if (VERSION.SDK_INT >= 23)
             return network == cm.activeNetwork
         if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
             return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
@@ -1207,7 +1206,7 @@ class BaresipService: Service() {
         var callHistory = ArrayList<CallHistory>()
         var messages = ArrayList<Message>()
         val contacts = ArrayList<Contact>()
-        val chatTexts: MutableMap<String, String> = mutableMapOf<String, String>()
+        val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var linkAddresses = listOf<LinkAddress>()
         var dnsServers = listOf<InetAddress>()

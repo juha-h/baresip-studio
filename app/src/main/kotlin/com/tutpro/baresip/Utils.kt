@@ -270,7 +270,7 @@ object Utils {
         var servers = ""
         for (dnsServer in list) {
             var address = dnsServer.hostAddress.removePrefix("/")
-            if (Utils.checkIpV4(address))
+            if (checkIpV4(address))
                 address = "${address}:53"
             else
                 address = "[${address}]:53"
@@ -518,7 +518,7 @@ object Utils {
     fun decryptFromFile(filePath: String, password: String): ByteArray? {
         var plainData: ByteArray? = null
         try {
-            ObjectInputStream(FileInputStream(File(filePath))).use { it ->
+            ObjectInputStream(FileInputStream(File(filePath))).use {
                 val obj = it.readObject() as Crypto
                 plainData = decrypt(obj, password.toCharArray())
             }
@@ -577,7 +577,7 @@ object Utils {
             return false
         }
         (allFiles - zipFiles).iterator().forEach {
-            deleteFile(File(BaresipService.filesPath, "$it"))
+            deleteFile(File(BaresipService.filesPath, it))
         }
         return true
     }
@@ -589,7 +589,7 @@ object Utils {
         Log.d("Baresip", "Dumping intent start")
         while (it.hasNext()) {
             val key = it.next()
-            Log.d("Baresip","[" + key + "=" + bundle.get(key)+"]");
+            Log.d("Baresip", "[" + key + "=" + bundle.get(key) + "]")
         }
         Log.d("Baresip", "Dumping intent finish")
     }

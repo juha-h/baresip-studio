@@ -253,7 +253,7 @@ class AccountActivity : AppCompatActivity() {
                 if (dn != acc.displayName) {
                     if (Account.checkDisplayName(dn)) {
                         if (Api.account_set_display_name(acc.accp, dn) == 0) {
-                            acc.displayName = Api.account_display_name(acc.accp);
+                            acc.displayName = Api.account_display_name(acc.accp)
                             Log.d(TAG, "New display name is ${acc.displayName}")
                             save = true
                         } else {
@@ -272,7 +272,7 @@ class AccountActivity : AppCompatActivity() {
                 if (au != acc.authUser) {
                     if (Account.checkAuthUser(au)) {
                         if (Api.account_set_auth_user(acc.accp, au) == 0) {
-                            acc.authUser = Api.account_auth_user(acc.accp);
+                            acc.authUser = Api.account_auth_user(acc.accp)
                             Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
                         } else {
@@ -344,7 +344,7 @@ class AccountActivity : AppCompatActivity() {
                             return false
                         }
                     }
-                    Log.d(TAG, "New outbound proxies are ${outbound}")
+                    Log.d(TAG, "New outbound proxies are $outbound")
                     acc.outbound = outbound
                     if (outbound.isEmpty())
                         Api.account_set_sipnat(acc.accp, "")
@@ -411,7 +411,7 @@ class AccountActivity : AppCompatActivity() {
                 if (acc.stunUser != newStunUser) {
                     if (Account.checkAuthUser(newStunUser)) {
                         if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
-                            acc.stunUser = Api.account_stun_user(acc.accp);
+                            acc.stunUser = Api.account_stun_user(acc.accp)
                             Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
                             save = true
                         } else {
@@ -428,7 +428,7 @@ class AccountActivity : AppCompatActivity() {
                 if (acc.stunPass != newStunPass) {
                     if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
                         if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
-                            acc.stunPass = Api.account_stun_pass(acc.accp);
+                            acc.stunPass = Api.account_stun_pass(acc.accp)
                             save = true
                         } else {
                             Log.e(TAG, "Setting of stun pass failed")

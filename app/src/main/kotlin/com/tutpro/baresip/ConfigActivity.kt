@@ -96,7 +96,7 @@ class ConfigActivity : AppCompatActivity() {
         volVals.removeAt(curVal)
         volKeys.add(0, curKey)
         volVals.add(0, curVal)
-        val callVolAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,
+        val callVolAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
                 volKeys)
         callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         callVolSpinner.adapter = callVolAdapter

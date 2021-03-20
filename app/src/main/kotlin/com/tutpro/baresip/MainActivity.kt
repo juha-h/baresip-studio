@@ -136,13 +136,13 @@ class MainActivity : AppCompatActivity() {
             override fun onFinish() {
                 when (stopState) {
                     "initial" -> {
-                        baresipService.setAction("Stop Force");
+                        baresipService.action = "Stop Force"
                         startService(baresipService)
                         stopState = "force"
                         quitTimer.start()
                     }
                     "force" -> {
-                        baresipService.setAction("Kill");
+                        baresipService.action = "Kill"
                         startService(baresipService)
                         finishAndRemoveTask()
                         System.exit(0)
@@ -386,8 +386,8 @@ class MainActivity : AppCompatActivity() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 val callIntent = Intent(this, MainActivity::class.java)
-                                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                callIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                                 callIntent.putExtra("action", "call")
                                 callIntent.putExtra("uap", ua.uap)
                                 callIntent.putExtra("peer", acc.vmUri)
@@ -729,7 +729,7 @@ class MainActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
-                Log.d(TAG, "Adjusting volume $keyCode of stream ${volumeControlStream}")
+                Log.d(TAG, "Adjusting volume $keyCode of stream $volumeControlStream")
                 am.adjustStreamVolume(volumeControlStream,
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
                             AudioManager.ADJUST_LOWER else
@@ -989,7 +989,7 @@ class MainActivity : AppCompatActivity() {
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
                         val i = Intent(applicationContext, ChatActivity::class.java)
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                         val b = Bundle()
                         b.putString("aor", aor)
                         b.putString("peer", peer)
@@ -1024,7 +1024,7 @@ class MainActivity : AppCompatActivity() {
     private fun reStart() {
         Log.d(TAG, "Trigger restart")
         val pm = applicationContext.packageManager
-        val intent = pm.getLaunchIntentForPackage(this.getPackageName())
+        val intent = pm.getLaunchIntentForPackage(this.packageName)
         this.finishAffinity()
         this.startActivity(intent)
         System.exit(0)
@@ -1116,7 +1116,7 @@ class MainActivity : AppCompatActivity() {
                 if (aorSpinner.tag != "")
                     updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
                 if (BaresipService.isServiceRunning) {
-                    baresipService.setAction("UpdateNotification")
+                    baresipService.action = "UpdateNotification"
                     startService(baresipService)
                 }
             }
@@ -1205,7 +1205,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "quitRestart Restart = $reStart")
             if (BaresipService.isServiceRunning) {
                 restart = reStart
-                baresipService.setAction("Stop");
+                baresipService.action = "Stop"
                 startService(baresipService)
                 quitTimer.start()
             } else {
@@ -1379,7 +1379,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBaresip() {
-        baresipService.setAction("Start")
+        baresipService.action = "Start"
         startService(baresipService)
         if (atStartup)
             moveTaskToBack(true)

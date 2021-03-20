@@ -102,7 +102,7 @@ class ContactActivity : AppCompatActivity() {
 
         oldAndroid = androidCheck.isChecked
 
-        textAvatarView.setOnClickListener { _ ->
+        textAvatarView.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -112,7 +112,7 @@ class ContactActivity : AppCompatActivity() {
 
         }
 
-        textAvatarView.setOnLongClickListener { _ ->
+        textAvatarView.setOnLongClickListener {
 
             color = Utils.randomColor()
             showTextAvatar(textAvatarView.text.toString(), color)
@@ -121,7 +121,7 @@ class ContactActivity : AppCompatActivity() {
 
         }
 
-        cardAvatarView.setOnClickListener { _ ->
+        cardAvatarView.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -131,7 +131,7 @@ class ContactActivity : AppCompatActivity() {
 
         }
 
-        cardAvatarView.setOnLongClickListener { _ ->
+        cardAvatarView.setOnLongClickListener {
 
             color = Utils.randomColor()
             showTextAvatar(nameView.text.toString(), color)
@@ -533,7 +533,7 @@ class ContactActivity : AppCompatActivity() {
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
             while (cur != null && cur.moveToNext()) {
-                val id = cur.getLong(0);
+                val id = cur.getLong(0)
                 val name = cur.getString(1)  // display name
                 val mime = cur.getString(2)  // type of data
                 val data = cur.getString(3)  // info
