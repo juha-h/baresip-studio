@@ -659,10 +659,10 @@ class BaresipService: Service() {
                                     .setAutoCancel(true)
                                     .setContentTitle(getString(R.string.transfer_request_to))
                                     .setContentText(target)
-                            if (VERSION.SDK_INT < 26) {
+                            if (VERSION.SDK_INT < 26)
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).priority = Notification.PRIORITY_HIGH
-                            }
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).priority =
+                                        Notification.PRIORITY_HIGH
                             val acceptIntent = Intent(this, BaresipService::class.java)
                             acceptIntent.action = "Transfer Accept"
                             acceptIntent.putExtra("uap", uap)
