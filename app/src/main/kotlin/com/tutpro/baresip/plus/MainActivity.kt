@@ -1120,7 +1120,7 @@ class MainActivity : AppCompatActivity() {
                         volumeControlStream = AudioManager.STREAM_MUSIC
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
-                            if (param.get(0).isDigit())
+                            if (param[0].isDigit())
                                 Toast.makeText(applicationContext,
                                         "${getString(R.string.call_failed)}: $param",
                                         Toast.LENGTH_LONG).show()

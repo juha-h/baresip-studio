@@ -33,9 +33,9 @@ import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
-class BaresipService: Service() {
+private const val TAG = "Baresip Service"
 
-    private val LOG_TAG = "Baresip Service"
+class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
@@ -60,7 +60,7 @@ class BaresipService: Service() {
 
     override fun onCreate() {
 
-        Log.d(LOG_TAG, "At onCreate")
+        Log.d(TAG, "At onCreate")
 
         intent = Intent("com.tutpro.baresip.plus.EVENT")
         intent.setPackage("com.tutpro.baresip.plus")
@@ -91,27 +91,27 @@ class BaresipService: Service() {
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        Log.i(LOG_TAG, "Network $network is available")
+                        Log.i(TAG, "Network $network is available")
                         updateNetwork()
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        Log.i(LOG_TAG, "Network $network is lost")
+                        Log.i(TAG, "Network $network is lost")
                         if (activeNetwork == "$network")
                             updateNetwork()
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
-                        Log.i(LOG_TAG, "Network $network link properties changed")
+                        Log.i(TAG, "Network $network link properties changed")
                         if (activeNetwork == "$network")
                             updateNetwork()
                     }
 
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                         super.onCapabilitiesChanged(network, caps)
-                        Log.i(LOG_TAG, "Network $network capabilities changed: $caps")
+                        Log.i(TAG, "Network $network capabilities changed: $caps")
                     }
                 }
         )
@@ -135,20 +135,20 @@ class BaresipService: Service() {
                                 BluetoothHeadset.STATE_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_CONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset is connected")
+                                Log.d(TAG, "Bluetooth headset is connected")
                                 if (isAudioFocused()) {
                                     // Without delay, SCO_AUDIO_STATE_CONNECTING ->
                                     // SCO_AUDIO_STATE_DISCONNECTED
                                     Timer("Sco", false).schedule(1000) {
-                                        Log.d(LOG_TAG, "Starting Bluetooth SCO")
+                                        Log.d(TAG, "Starting Bluetooth SCO")
                                         am.startBluetoothSco()
                                     }
                                 }
                             }
                             BluetoothHeadset.STATE_DISCONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset is disconnected")
+                                Log.d(TAG, "Bluetooth headset is disconnected")
                                 if (am.isBluetoothScoOn) {
-                                    Log.d(LOG_TAG, "Stopping Bluetooth SCO")
+                                    Log.d(TAG, "Stopping Bluetooth SCO")
                                     am.stopBluetoothSco()
                                 }
                             }
@@ -160,12 +160,12 @@ class BaresipService: Service() {
                                 BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset audio is connected")
+                                Log.d(TAG, "Bluetooth headset audio is connected")
                             }
                             BluetoothHeadset.STATE_AUDIO_DISCONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset audio is disconnected")
+                                Log.d(TAG, "Bluetooth headset audio is disconnected")
                                 if (am.isBluetoothScoOn) {
-                                    Log.d(LOG_TAG, "Stopping Bluetooth SCO")
+                                    Log.d(TAG, "Stopping Bluetooth SCO")
                                     am.stopBluetoothSco()
                                 }
                             }
@@ -177,17 +177,17 @@ class BaresipService: Service() {
                                 AudioManager.SCO_AUDIO_STATE_DISCONNECTED)
                         when (state) {
                             AudioManager.SCO_AUDIO_STATE_CONNECTING -> {
-                                Log.d(LOG_TAG, "Bluetooth headset SCO is connecting")
+                                Log.d(TAG, "Bluetooth headset SCO is connecting")
                             }
                             AudioManager.SCO_AUDIO_STATE_CONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset SCO is connected")
+                                Log.d(TAG, "Bluetooth headset SCO is connected")
                             }
                             AudioManager.SCO_AUDIO_STATE_DISCONNECTED -> {
-                                Log.d(LOG_TAG, "Bluetooth headset SCO is disconnected")
+                                Log.d(TAG, "Bluetooth headset SCO is disconnected")
                                 abandonAudioFocus()
                             }
                             AudioManager.SCO_AUDIO_STATE_ERROR -> {
-                                Log.d(LOG_TAG, "Bluetooth headset SCO state ERROR")
+                                Log.d(TAG, "Bluetooth headset SCO state ERROR")
                             }
                         }
                     }
@@ -213,11 +213,11 @@ class BaresipService: Service() {
 
         if (intent == null) {
             action = "Start"
-            Log.d(LOG_TAG, "Received onStartCommand with null intent")
+            Log.d(TAG, "Received onStartCommand with null intent")
         } else {
             // Utils.dumpIntent(intent)
             action = intent.action!!
-            Log.d(LOG_TAG, "Received onStartCommand action $action")
+            Log.d(TAG, "Received onStartCommand action $action")
         }
 
         when (action) {
@@ -230,20 +230,20 @@ class BaresipService: Service() {
                         "error.wav", "notfound.wav", "ring.wav", "ringback.wav")
                 var file = File(filesPath)
                 if (!file.exists()) {
-                    Log.d(LOG_TAG, "Creating baresip directory")
+                    Log.d(TAG, "Creating baresip directory")
                     try {
                         File(filesPath).mkdirs()
                     } catch (e: Error) {
-                        Log.e(LOG_TAG, "Failed to create directory: $e")
+                        Log.e(TAG, "Failed to create directory: $e")
                     }
                 }
                 for (a in assets) {
                     file = File("${filesPath}/$a")
                     if (!file.exists()) {
-                        Log.d(LOG_TAG, "Copying asset '$a'")
+                        Log.d(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
-                        Log.d(LOG_TAG, "Asset '$a' already copied")
+                        Log.d(TAG, "Asset '$a' already copied")
                     }
                     if (a == "config") {
                         cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
@@ -262,7 +262,7 @@ class BaresipService: Service() {
                 val ipV6Addr = Utils.findIpV6Address(linkAddresses)
                 val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
-                    Log.w(LOG_TAG, "Starting baresip without IP addresses")
+                    Log.w(TAG, "Starting baresip without IP addresses")
                 Thread({
                     baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
                             dnsServers, Api.AF_UNSPEC, logLevel)
@@ -303,11 +303,11 @@ class BaresipService: Service() {
                 val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null) {
-                    Log.w(LOG_TAG, "onStartCommand did not find call $callp")
+                    Log.w(TAG, "onStartCommand did not find call $callp")
                 } else {
                     val peerUri = call.peerUri
                     val aor = call.ua.account.aor
-                    Log.d(LOG_TAG, "Aor $aor rejected incoming call $callp from $peerUri")
+                    Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
                     if (call.ua.account.callHistory) {
                         CallHistory.add(CallHistory(aor, peerUri, "in", false))
@@ -320,7 +320,7 @@ class BaresipService: Service() {
                 val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w(LOG_TAG, "onStartCommand did not find ua $uap")
+                    Log.w(TAG, "onStartCommand did not find ua $uap")
                 } else {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
@@ -337,7 +337,7 @@ class BaresipService: Service() {
                 val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null)
-                    Log.w(LOG_TAG, "onStartCommand did not find call $callp")
+                    Log.w(TAG, "onStartCommand did not find call $callp")
                 else
                     call.notifySipfrag(603, "Decline")
                 nm.cancel(TRANSFER_NOTIFICATION_ID)
@@ -358,7 +358,7 @@ class BaresipService: Service() {
                 val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
-                    Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
+                    Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.saveUaMessage(ua.account.aor,
                             intent.getStringExtra("time")!!.toLong())
@@ -369,7 +369,7 @@ class BaresipService: Service() {
                 val uap = intent!!.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
-                    Log.w(LOG_TAG, "onStartCommand did not find UA $uap")
+                    Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
                     ChatsActivity.deleteUaMessage(ua.account.aor,
                             intent.getStringExtra("time")!!.toLong())
@@ -401,7 +401,7 @@ class BaresipService: Service() {
     }
 
     override fun onDestroy() {
-        Log.d(LOG_TAG, "At Baresip Service onDestroy")
+        Log.d(TAG, "At Baresip Service onDestroy")
         super.onDestroy()
         this.unregisterReceiver(br)
         if (am.isBluetoothScoOn) am.stopBluetoothSco()
@@ -415,15 +415,15 @@ class BaresipService: Service() {
     @Keep
     fun uaAdd(uap: String) {
         val ua = UserAgent(uap)
-        Log.d(LOG_TAG, "uaAdd ${ua.account.aor} at BaresipService")
+        Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
         uas.add(ua)
         if (ua.account.preferIPv6Media)
             Api.ua_set_media_af(ua.uap, Api.AF_INET6)
         if (Api.ua_isregistered(uap)) {
-            Log.d(LOG_TAG, "Ua ${ua.account.aor} is registered")
+            Log.d(TAG, "Ua ${ua.account.aor} is registered")
             status.add(R.drawable.dot_green)
         } else {
-            Log.d(LOG_TAG, "Ua ${ua.account.aor} is NOT registered")
+            Log.d(TAG, "Ua ${ua.account.aor} is NOT registered")
             if (ua.account.regint == 0)
                 status.add(R.drawable.dot_white)
             else
@@ -436,10 +436,10 @@ class BaresipService: Service() {
         if (!isServiceRunning) return
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
-            Log.w(LOG_TAG, "uaEvent did not find ua $uap")
+            Log.w(TAG, "uaEvent did not find ua $uap")
             return
         }
-        Log.d(LOG_TAG, "got uaEvent $event/${ua.account.aor}/$callp")
+        Log.d(TAG, "got uaEvent $event/${ua.account.aor}/$callp")
 
         val aor = ua.account.aor
         var newEvent: String? = null
@@ -473,9 +473,9 @@ class BaresipService: Service() {
                                     val props = cm.getLinkProperties(activeNetwork)
                                     if (props != null) {
                                         val dnsServers = props.dnsServers
-                                        Log.d(LOG_TAG, "Updating DNS Servers = $dnsServers")
+                                        Log.d(TAG, "Updating DNS Servers = $dnsServers")
                                         if (Config.updateDnsServers(dnsServers) != 0) {
-                                            Log.w(LOG_TAG, "Failed to update DNS servers '$dnsServers'")
+                                            Log.w(TAG, "Failed to update DNS servers '$dnsServers'")
                                         } else {
                                             Api.net_dns_debug()
                                             if (!ua.registrationFailed) {
@@ -485,7 +485,7 @@ class BaresipService: Service() {
                                         }
                                     }
                                 } else {
-                                    Log.d(LOG_TAG, "No active network!")
+                                    Log.d(TAG, "No active network!")
                                 }
                             }
                         }
@@ -513,7 +513,7 @@ class BaresipService: Service() {
                                 (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
                                 !Utils.checkPermission(applicationContext,
                                         Manifest.permission.RECORD_AUDIO)) {
-                            Log.d(LOG_TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in", false))
@@ -524,12 +524,12 @@ class BaresipService: Service() {
                                 return
                             newEvent = "call rejected"
                         } else {
-                            Log.d(LOG_TAG, "Incoming call $uap/$callp/$peerUri")
+                            Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             val call = Call(callp, ua, peerUri, "in", "incoming",
                                     Utils.dtmfWatcher(callp))
                             call.add()
                             if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                                Log.d(LOG_TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                                Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                     startRinging()
                             } else {
@@ -597,7 +597,7 @@ class BaresipService: Service() {
                     "remote call answered" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Remote call $callp is not found")
+                            Log.w(TAG, "Remote call $callp is not found")
                             return
                         }
                         newEvent = "call update"
@@ -605,7 +605,7 @@ class BaresipService: Service() {
                     "remote call offered" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Remote call $callp is not found")
+                            Log.w(TAG, "Remote call $callp is not found")
                             return
                         }
                         val callHasVideo = ev[1] == "1"
@@ -626,12 +626,12 @@ class BaresipService: Service() {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Call $callp that is established is not found")
+                            Log.w(TAG, "Call $callp that is established is not found")
                             return
                         }
                         call.status = "connected"
                         call.onhold = false
-                        Log.d(LOG_TAG, "AoR $aor call $callp established")
+                        Log.d(TAG, "AoR $aor call $callp established")
                         if (ua.account.callHistory) {
                             CallHistory.add(CallHistory(aor, call.peerUri, call.dir, true))
                             CallHistory.save()
@@ -663,7 +663,7 @@ class BaresipService: Service() {
                     "call transfer" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Call $callp to be transferred is not found")
+                            Log.w(TAG, "Call $callp to be transferred is not found")
                             return
                         }
                         if (!Utils.isVisible()) {
@@ -712,10 +712,10 @@ class BaresipService: Service() {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.d(LOG_TAG, "AoR $aor call $callp that is closed is not found")
+                            Log.d(TAG, "AoR $aor call $callp that is closed is not found")
                             return
                         }
-                        Log.d(LOG_TAG, "AoR $aor call $callp is closed")
+                        Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
                         call.remove()
                         if (Call.calls().size == 0) {
@@ -724,7 +724,7 @@ class BaresipService: Service() {
                                 am.mode = AudioManager.MODE_NORMAL
                             am.isSpeakerphoneOn = false
                             if (am.isBluetoothScoOn) {
-                                Log.d(LOG_TAG, "Stopping Bluetooth SCO")
+                                Log.d(TAG, "Stopping Bluetooth SCO")
                                 am.stopBluetoothSco()
                             } else {
                                 abandonAudioFocus()
@@ -763,11 +763,11 @@ class BaresipService: Service() {
                         }
                     }
                     "refer failed" -> {
-                        Log.d(LOG_TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
+                        Log.d(TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
                         Api.ua_hangup(uap, callp, 0, "")
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(LOG_TAG, "Call $callp with failed refer is not found")
+                            Log.w(TAG, "Call $callp with failed refer is not found")
                         } else {
                             call.referTo = ""
                         }
@@ -790,15 +790,15 @@ class BaresipService: Service() {
         try {
             text = String(msg, StandardCharsets.UTF_8)
         } catch (e: Exception) {
-            Log.w(LOG_TAG, "UTF-8 decode failed")
+            Log.w(TAG, "UTF-8 decode failed")
         }
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
-            Log.w(LOG_TAG, "messageEvent did not find ua $uap")
+            Log.w(TAG, "messageEvent did not find ua $uap")
             return
         }
         val timeStamp = System.currentTimeMillis().toString()
-        Log.d(LOG_TAG, "Message event for $uap from $peer at $timeStamp")
+        Log.d(TAG, "Message event for $uap from $peer at $timeStamp")
         Message(ua.account.aor, peer, text, timeStamp.toLong(),
                 R.drawable.arrow_down_green, 0, "", true).add()
         Message.save()
@@ -859,7 +859,7 @@ class BaresipService: Service() {
 
     @Keep
     fun started() {
-        Log.d(LOG_TAG, "Received 'started' from baresip")
+        Log.d(TAG, "Received 'started' from baresip")
         val intent = Intent("service event")
         intent.putExtra("event", "started")
         intent.putExtra("params", arrayListOf(callActionUri))
@@ -869,7 +869,7 @@ class BaresipService: Service() {
 
     @Keep
     fun messageResponse(responseCode: Int, responseReason: String, time: String) {
-        Log.d(LOG_TAG, "Message response '$responseCode $responseReason' at $time")
+        Log.d(TAG, "Message response '$responseCode $responseReason' at $time")
         val intent = Intent("message response")
         intent.putExtra("response code", responseCode)
         intent.putExtra("response reason", responseReason)
@@ -880,7 +880,7 @@ class BaresipService: Service() {
     @Keep
     fun getPassword(aor: String): String {
         if (!isServiceRunning) return ""
-        Log.d(LOG_TAG, "getPassword of $aor")
+        Log.d(TAG, "getPassword of $aor")
         if (MainActivity.aorPasswords[aor] != null)
             return MainActivity.aorPasswords[aor]!!
         else
@@ -924,7 +924,7 @@ class BaresipService: Service() {
 
     @Keep
     fun stopped(error: String) {
-        Log.d(LOG_TAG, "Received 'stopped' from baresip with param '$error'")
+        Log.d(TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false
         val intent = Intent("service event")
         intent.putExtra("event", "stopped")
@@ -1009,26 +1009,26 @@ class BaresipService: Service() {
                     }
             @TargetApi(26)
             if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(LOG_TAG, "Audio focus granted for usage $usage")
+                Log.d(TAG, "Audio focus granted for usage $usage")
                 audioFocusUsage = usage
                 if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
-                    Log.d(LOG_TAG, "Starting Bluetooth Sco")
+                    Log.d(TAG, "Starting Bluetooth Sco")
                     am.startBluetoothSco()
                 }
             } else {
-                Log.d(LOG_TAG, "Audio focus denied")
+                Log.d(TAG, "Audio focus denied")
                 audioFocusRequest = null
                 audioFocusUsage = -1
             }
         } else {
             if (am.requestAudioFocus(null, usage, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(LOG_TAG, "Audio focus granted for usage $usage")
+                Log.d(TAG, "Audio focus granted for usage $usage")
                 audioFocusUsage = usage
                 if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn)
                     am.startBluetoothSco()
             } else {
-                Log.d(LOG_TAG, "Audio focus denied")
+                Log.d(TAG, "Audio focus denied")
                 audioFocusUsage = -1
             }
         }
@@ -1049,20 +1049,20 @@ class BaresipService: Service() {
             if (audioFocusRequest != null) {
                 if (am.abandonAudioFocusRequest(audioFocusRequest!!) ==
                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Log.d(LOG_TAG, "Audio focus abandoned")
+                    Log.d(TAG, "Audio focus abandoned")
                     audioFocusRequest = null
                     audioFocusUsage = -1
                 } else {
-                    Log.d(LOG_TAG, "Failed to abandon audio focus")
+                    Log.d(TAG, "Failed to abandon audio focus")
                 }
             }
         } else {
             if (audioFocusUsage != -1) {
                 if (am.abandonAudioFocus(null) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Log.d(LOG_TAG, "Audio focus abandoned")
+                    Log.d(TAG, "Audio focus abandoned")
                     audioFocusUsage = -1
                 } else {
-                    Log.d(LOG_TAG, "Failed to abandon audio focus")
+                    Log.d(TAG, "Failed to abandon audio focus")
                 }
             }
         }
@@ -1104,7 +1104,7 @@ class BaresipService: Service() {
                 am.setStreamVolume(streamType,
                         (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
                         0)
-                Log.d(LOG_TAG, "Orig/new call volume of stream type $streamType is " +
+                Log.d(TAG, "Orig/new call volume of stream type $streamType is " +
                         "${origVolumes[streamType]}/${am.getStreamVolume(streamType)}")
             }
         }
@@ -1114,7 +1114,7 @@ class BaresipService: Service() {
         for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_MUSIC)) {
             if (origVolumes[streamType] != -1) {
                 am.setStreamVolume(streamType, origVolumes[streamType], 0)
-                Log.d(LOG_TAG, "Reset volume of stream type $streamType to " +
+                Log.d(TAG, "Reset volume of stream type $streamType to " +
                         "${am.getStreamVolume(streamType)}")
                 origVolumes[streamType] = -1
             }
@@ -1124,17 +1124,17 @@ class BaresipService: Service() {
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
             if (!proximityWakeLock.isHeld) {
-                Log.d(LOG_TAG, "Acquiring proximity wake lock")
+                Log.d(TAG, "Acquiring proximity wake lock")
                 proximityWakeLock.acquire()
             } else {
-                Log.d(LOG_TAG, "Proximity wake lock already acquired")
+                Log.d(TAG, "Proximity wake lock already acquired")
             }
         } else {
             if (proximityWakeLock.isHeld) {
                 proximityWakeLock.release()
-                Log.d(LOG_TAG, "Released proximity wake lock")
+                Log.d(TAG, "Released proximity wake lock")
             } else {
-                Log.d(LOG_TAG, "Proximity wake lock is not held")
+                Log.d(TAG, "Proximity wake lock is not held")
             }
         }
     }
@@ -1145,14 +1145,14 @@ class BaresipService: Service() {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             val props = cm.getLinkProperties(n) ?: continue
             if ((n == cm.activeNetwork) && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-                Log.i(LOG_TAG, "Active VPN network $n is available with caps: " +
+                Log.i(TAG, "Active VPN network $n is available with caps: " +
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isConfigInitialized) {
                     Utils.updateLinkProperties(props)
                 } else {
                     for (s in props.dnsServers)
-                        Log.i(LOG_TAG, "DNS Server ${s.hostAddress}")
+                        Log.i(TAG, "DNS Server ${s.hostAddress}")
                     dnsServers = props.dnsServers
                     linkAddresses = props.linkAddresses
                 }
@@ -1164,7 +1164,7 @@ class BaresipService: Service() {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             val props = cm.getLinkProperties(n) ?: continue
             if ((n == cm.activeNetwork) && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                Log.i(LOG_TAG, "Active Internet network $n is available with caps: " +
+                Log.i(TAG, "Active Internet network $n is available with caps: " +
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isServiceRunning) {
@@ -1181,7 +1181,7 @@ class BaresipService: Service() {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             val props = cm.getLinkProperties(n) ?: continue
             if (n == cm.activeNetwork) {
-                Log.i(LOG_TAG, "Active network $n is available with caps: " +
+                Log.i(TAG, "Active network $n is available with caps: " +
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isServiceRunning) {

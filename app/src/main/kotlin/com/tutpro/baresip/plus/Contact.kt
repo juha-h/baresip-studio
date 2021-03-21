@@ -29,7 +29,7 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
 
         fun restore(): Boolean {
             val content = Utils.getFileContents(BaresipService.filesPath + "/contacts")
-            if (content == null) return false
+                    ?: return false
             val contacts = String(content)
             Api.contacts_remove()
             BaresipService.contacts.clear()

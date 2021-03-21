@@ -178,8 +178,7 @@ object Utils {
     }
 
     private fun checkPort(port: String): Boolean {
-        val number = port.toIntOrNull()
-        if (number == null) return false
+        val number = port.toIntOrNull() ?: return false
         return (number > 0) && (number < 65536)
     }
 
@@ -237,12 +236,13 @@ object Utils {
     fun checkSipUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
         val userRest = uri.substring(4).split("@")
-        if (userRest.size == 1) {
-            return checkHostPortParams(userRest[0])
-        } else if (userRest.size == 2) {
-            return checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
-        } else
-            return false
+        return when (userRest.size) {
+            1 ->
+                checkHostPortParams(userRest[0])
+            2 ->
+                checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
+            else -> false
+        }
     }
 
     fun checkName(name: String): Boolean {
@@ -315,7 +315,7 @@ object Utils {
         }
         if (updated) {
             BaresipService.linkAddresses = linkAddresses
-            Api.uag_reset_transp(true, true)
+            Api.uag_reset_transp(register = true, reinvite = true)
             Api.net_debug()
         } else {
             UserAgent.register()

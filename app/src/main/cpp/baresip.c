@@ -337,7 +337,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
         LOGE("message peer is too long (max 255 charcaters)\n");
         return;
     }
-    BaresipContext *pctx = (BaresipContext*)(&g_ctx);
+    BaresipContext *pctx = &g_ctx;
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -385,7 +385,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode,
             reason_buf, (char *)arg);
 
-    BaresipContext *pctx = (BaresipContext*)(&g_ctx);
+    BaresipContext *pctx = &g_ctx;
     JavaVM *javaVM = pctx->javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
@@ -1839,7 +1839,7 @@ Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, j
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
     LOGD("enabling sip trace (%d)\n", enable);
-    (void)uag_enable_sip_trace(enable);
+    uag_enable_sip_trace(enable);
 }
 
 JNIEXPORT void JNICALL
