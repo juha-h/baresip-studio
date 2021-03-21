@@ -53,7 +53,7 @@ class AudioActivity : AppCompatActivity() {
             tvParams.addRule(RelativeLayout.CENTER_VERTICAL)
             tvParams.addRule(RelativeLayout.START_OF, id)
             tv.layoutParams = tvParams
-            tv.text = "\u2022 $module"
+            tv.text = String.format(getString(R.string.bullet_item), module)
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
             tv.setTextColor(ContextCompat.getColor(this, R.color.colorItemText))
             rl.addView(tv)
@@ -240,14 +240,12 @@ class AudioActivity : AppCompatActivity() {
     }
 
     private fun checkOpusBitRate(opusBitRate: String): Boolean {
-        val number = opusBitRate.toIntOrNull()
-        if (number == null) return false
+        val number = opusBitRate.toIntOrNull() ?: return false
         return (number >= 6000) && (number <= 510000)
     }
 
     private fun checkOpusPacketLoss(opusPacketLoss: String): Boolean {
-        val number = opusPacketLoss.toIntOrNull()
-        if (number == null) return false
+        val number = opusPacketLoss.toIntOrNull() ?: return false
         return (number >= 0) && (number <= 100)
     }
 

@@ -28,6 +28,8 @@ import com.tutpro.baresip.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+private const val READ_REQUEST_CODE = 42
+
 class ContactActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactBinding
@@ -47,8 +49,6 @@ class ContactActivity : AppCompatActivity() {
     private var color = 0
     private var id: Long = 0
     private var oldAndroid = false
-
-    private val READ_REQUEST_CODE = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

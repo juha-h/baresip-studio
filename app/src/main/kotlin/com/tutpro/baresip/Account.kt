@@ -79,7 +79,7 @@ class Account(val accp: String) {
 
         if (outbound.size > 0) {
             res += ";outbound=\"${outbound[0]}\""
-            if (outbound.size > 1) res = res + ";outbound2=\"${outbound[1]}\""
+            if (outbound.size > 1) res += ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
         }
 

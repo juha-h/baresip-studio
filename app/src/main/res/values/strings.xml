@@ -350,6 +350,7 @@
     <string name="help">Help</string>
     <string name="confirmation">Confirmation</string>
     <string name="dots" translatable="false">…</string>
+    <string name="bullet_item" translatable="false">\u2022 %1$s</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>

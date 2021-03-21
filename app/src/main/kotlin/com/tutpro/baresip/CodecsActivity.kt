@@ -79,7 +79,7 @@ class CodecsActivity : AppCompatActivity() {
             codecSpinner.adapter = adapter
             codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newCodecs.set(parent.id - 100, parent.selectedItem.toString())
+                    newCodecs[parent.id - 100] = parent.selectedItem.toString()
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {
                 }

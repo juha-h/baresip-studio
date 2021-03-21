@@ -18,6 +18,8 @@ import java.net.URL
 import java.util.*
 import kotlin.collections.ArrayList
 
+private const val TAG = "Baresip"
+
 class AccountActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAccountBinding
@@ -53,7 +55,6 @@ class AccountActivity : AppCompatActivity() {
 
     private var save = false
     private var uaIndex= -1
-    private val TAG = "Baresip"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -622,7 +623,6 @@ class AccountActivity : AppCompatActivity() {
             AsyncTask<String, String, String>() {
 
         private val activityReference: WeakReference<AccountActivity> = WeakReference(context)
-        private val TAG = "Baresip"
 
         override fun doInBackground(vararg url: String?): String? {
             val result = try {
