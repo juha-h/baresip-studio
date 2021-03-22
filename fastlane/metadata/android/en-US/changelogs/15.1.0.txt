@@ -1,0 +1,5 @@
+- Fixed light mode color of hangup button
+- Portuguese (Brazil) translations from Weblate
+- Fixed F-Droid nb-NO locale tag
+- Avoid 'duplicate finish request' warnings
+- New baresip+ icon for F-Droid
