@@ -65,7 +65,7 @@
     <string name="notice">Aviso</string>
     <string name="info">Informações</string>
     <string name="alert">Alerta</string>
-    <string name="contacts_exceeded">Seu número máximo de contatos %1%d foi excedido.</string>
+    <string name="contacts_exceeded">O seu número máximo de %1$d contatos foi excedido.</string>
     <string name="contact_delete_question">Você quer excluir o contato \'%1$s\'\?</string>
     <string name="send_message">Enviar Mensagem</string>
     <string name="contact_action_question">Você quer ligar ou enviar mensagem para \'%1$s\'\?</string>
