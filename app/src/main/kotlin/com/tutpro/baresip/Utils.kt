@@ -95,7 +95,7 @@ object Utils {
 
     private fun uriParams(uri: String): List<String> {
         val params = uri.split(";")
-        return if (params.size == 1) listOf<String>() else params.subList(1, params.size)
+        return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
     fun friendlyUri(uri: String, domain: String): String {

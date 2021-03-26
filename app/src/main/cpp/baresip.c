@@ -387,7 +387,7 @@ static void mqueue_handler(int id, void *data, void *arg)
 static int pfd[2];
 static pthread_t loggingThread;
 
-static void *loggingFunction() {
+static void *loggingFunction(void *arg) {
     ssize_t readSize;
     char buf[128];
 
@@ -410,7 +410,7 @@ static int runLoggingThread() {
     dup2(pfd[1], 1);
     dup2(pfd[1], 2);
 
-    int ret = pthread_create(&loggingThread, 0, loggingFunction, 0);
+    int ret = pthread_create(&loggingThread, NULL, loggingFunction, NULL);
     if (ret != 0)
         return ret;
 
@@ -446,7 +446,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGD("starting baresip\n");
 
-    struct sa temp_sa;
     const char *net_interface = (*env)->GetStringUTFChars(env, jNetInterface, 0);
     const int net_af = jNetAf;
 
@@ -1370,8 +1369,8 @@ Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jstring javaC
     LOGD("holding call %s\n", native_call);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     re_thread_enter();
-    struct audio *au = call_audio(call);
-    //audio_set_hold(au, true);
+    // struct audio *au = call_audio(call);
+    // audio_set_hold(au, true);
     // audio_set_source(au, NULL, NULL);
     ret = call_hold(call, true);
     re_thread_leave();
@@ -1386,7 +1385,7 @@ Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring jav
     LOGD("unholding call %s\n", native_call);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     re_thread_enter();
-    struct audio *au = call_audio(call);
+    // struct audio *au = call_audio(call);
     // audio_set_hold(au, false);
     // audio_set_source(au, "opensles", "nil");
     ret = call_hold(call, false);
@@ -1579,8 +1578,6 @@ Java_com_tutpro_baresip_Api_video_1codecs(JNIEnv *env, jobject thiz)
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring javaContact) {
     struct pl pl_addr;
-    const struct list *lst;
-    struct le *le;
     const char *native_contact = (*env)->GetStringUTFChars(env, javaContact, 0);
     pl_set_str(&pl_addr, native_contact);
     if (contact_add(baresip_contacts(), NULL, &pl_addr) != 0) {
@@ -1594,7 +1591,6 @@ Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring java
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_contacts_1remove(JNIEnv *env, jobject thiz) {
     struct le *le;
-    le = list_head(contact_list(baresip_contacts()));
     while ((le = list_head(contact_list(baresip_contacts())))) {
         struct contact *c = le->data;
         contact_remove(baresip_contacts(), c);
