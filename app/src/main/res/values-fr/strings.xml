@@ -57,7 +57,7 @@
     <string name="tap_to_start">Appuyez pour démarrer l’application</string>
     <string name="message_from">Message de</string>
     <string name="transfer_request_to">Demande de transfert d’appel vers</string>
-    <string name="incoming_call_from">Appel de</string>
+    <string name="incoming_call_from">Appel entrant de</string>
     <string name="reject">Refuser</string>
     <string name="answer">Répondre</string>
     <string name="delete_account">Voulez-vous supprimer le compte « %1$s » \?</string>
@@ -84,4 +84,20 @@
     <string name="authentication_password_help">Mot de passe d\'authentification jusqu\'à 64 caractères. Si le nom d\'utilisateur d\'authentification est donné mais que le mot de passe n\'est pas donné, il sera demandé au démarrage de baresip.</string>
     <string name="authentication_password">Mot de passe d\'authentification</string>
     <string name="invalid_authentication_username">Nom d\'utilisateur d\'authentification invalide « %1$s »</string>
+    <string name="call_already_active">Vous avez déjà un appel actif.</string>
+    <string name="dialpad">Clavier</string>
+    <string name="messages">Messages</string>
+    <string name="listen">Écouter</string>
+    <string name="no_messages">Vous n\'avez aucun message</string>
+    <string name="and">et</string>
+    <string name="old_messages">anciens messages</string>
+    <string name="one_old_message">un ancien message</string>
+    <string name="new_messages">nouveaux messages</string>
+    <string name="one_new_message">un nouveau message</string>
+    <string name="you_have">Vous avez</string>
+    <string name="rate">Débit</string>
+    <string name="call_info">Infos de l\'appel</string>
+    <string name="duration">Durée</string>
+    <string name="call_info_not_available">Aucune information disponible</string>
+    <string name="authentication_username_help">Nom d\'utilisateur d\'authentification si l\'authentification des demandes SIP est requise. La valeur par défaut est le nom d\'utilisateur du compte.</string>
 </resources>
