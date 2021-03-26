@@ -7,8 +7,6 @@ local.properties
 *.rej
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 build
 /captures
 .externalNativeBuild
@@ -16,3 +14,4 @@ build
 /app/.cxx
 gradle/wrapper/gradle-wrapper.jar
 /distribution/*
+/distribution.video/*
