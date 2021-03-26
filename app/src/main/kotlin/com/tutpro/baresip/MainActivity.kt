@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                         callUri.isFocusable = false
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        if (!call(ua, uri, "outgoing")) {
+                        if (!call(ua, uri)) {
                             am.mode = AudioManager.MODE_NORMAL
                             callButton.visibility = View.VISIBLE
                             callButton.isEnabled = true
@@ -925,7 +925,7 @@ class MainActivity : AppCompatActivity() {
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 if (call in Call.calls())
                                     Api.ua_hangup(uap, callp, 0, "")
-                                call(ua, ev[1], "outgoing")
+                                call(ua, ev[1])
                                 showCall(ua)
                                 dialog.dismiss()
                             }
@@ -946,7 +946,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
-                        call(ua, ev[1], "outgoing")
+                        call(ua, ev[1])
                         showCall(ua)
                     }
                     "refer failed" -> {
@@ -1462,7 +1462,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun call(ua: UserAgent, uri: String, status: String): Boolean {
+    private fun call(ua: UserAgent, uri: String): Boolean {
         if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
             Toast.makeText(applicationContext, getString(R.string.no_calls),
                     Toast.LENGTH_LONG).show()
@@ -1473,7 +1473,7 @@ class MainActivity : AppCompatActivity() {
         val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)
         if (callp != "") {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
+            Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp)).add()
             showCall(ua)
             return true
         } else {
