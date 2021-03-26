@@ -39,7 +39,7 @@ class AccountsActivity : AppCompatActivity() {
         val newAorView = binding.newAor
         addAccountButton.setOnClickListener {
             val aor = newAorView.text.toString().trim()
-            if (!Utils.checkAor(aor)) {
+            if (!Utils.checkAor("sip:$aor")) {
                 Log.d("Baresip", "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
