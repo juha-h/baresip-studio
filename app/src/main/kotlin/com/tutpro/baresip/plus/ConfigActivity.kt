@@ -13,10 +13,10 @@ import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatDelegate
 import com.tutpro.baresip.plus.databinding.ActivityConfigBinding
 
-private const val READ_CERT_PERMISSION_CODE = 1
-private const val READ_CA_PERMISSION_CODE = 2
-
 class ConfigActivity : AppCompatActivity() {
+
+    private val READ_CERT_PERMISSION_CODE = 1
+    private val READ_CA_PERMISSION_CODE = 2
 
     private lateinit var binding: ActivityConfigBinding
     private lateinit var autoStart: CheckBox

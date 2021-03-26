@@ -13,9 +13,9 @@ import androidx.core.app.NotificationCompat
 
 import java.nio.charset.StandardCharsets
 
-const val START_NOTIFICATION_IN = 105
-
 class BootCompletedReceiver : BroadcastReceiver() {
+
+    private val START_NOTIFICATION_IN = 105
 
     override fun onReceive(context: Context, intent: Intent) {
 

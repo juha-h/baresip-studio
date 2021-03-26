@@ -28,9 +28,9 @@ import com.tutpro.baresip.plus.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-private const val READ_REQUEST_CODE = 42
-
 class ContactActivity : AppCompatActivity() {
+
+    private val READ_REQUEST_CODE = 42
 
     private lateinit var binding: ActivityContactBinding
     private lateinit var textAvatarView: TextView
