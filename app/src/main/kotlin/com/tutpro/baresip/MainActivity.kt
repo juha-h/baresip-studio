@@ -263,14 +263,8 @@ class MainActivity : AppCompatActivity() {
             if (Call.calls().isEmpty()) {
                 val uriText = callUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    var uri = ContactsActivity.findContactURI(uriText)
-                    if (!uri.startsWith("sip:")) {
-                        uri = "sip:$uri"
-                        if (!uri.contains("@")) {
-                            val host = aor.substring(aor.indexOf("@") + 1)
-                            uri = "$uri@$host"
-                        }
-                    }
+                    val uri = Utils.uriComplete(ContactsActivity.findContactURI(uriText),
+                            Utils.aorDomain(aor))
                     if (!Utils.checkSipUri(uri)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_uri), uri))
@@ -1237,15 +1231,8 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 val uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    var uri = ContactsActivity.findContactURI(uriText)
-                    if (!uri.startsWith("sip:")) {
-                        uri = "sip:$uri"
-                        if (!uri.contains("@")) {
-                            val aor = ua.account.aor
-                            val host = aor.substring(aor.indexOf("@") + 1)
-                            uri = "$uri@$host"
-                        }
-                    }
+                    val uri = Utils.uriComplete(ContactsActivity.findContactURI(uriText),
+                            Utils.aorDomain(ua.account.aor))
                     if (!Utils.checkSipUri(uri))
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_uri), uri))

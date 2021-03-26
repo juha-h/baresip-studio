@@ -70,14 +70,32 @@ object Utils {
     }
 
     fun uriHostPart(uri: String): String {
-        return uri.substringAfter("@")
-                .substringBefore(":")
-                .substringBefore(";")
-                .substringBefore(">")
+        return if (uri.contains("@")) {
+            uri.substringAfter("@")
+                    .substringBefore(":")
+                    .substringBefore(";")
+                    .substringBefore(">")
+        } else {
+            val parts = uri.split(":")
+            when (parts.size) {
+                2 -> parts[1].substringBefore(";")
+                        .substringBefore(">")
+                3 -> parts[1]
+                else -> ""
+            }
+        }
     }
 
     fun uriUserPart(uri: String): String {
-        return uri.substringAfter(":").substringBefore("@")
+        return if (uri.contains("@"))
+            uri.substringAfter(":").substringBefore("@")
+        else
+            ""
+    }
+
+    private fun uriParams(uri: String): List<String> {
+        val params = uri.split(";")
+        return if (params.size == 1) listOf<String>() else params.subList(1, params.size)
     }
 
     fun friendlyUri(uri: String, domain: String): String {
@@ -96,46 +114,31 @@ object Utils {
         }
     }
 
-    private fun aorUser(aor: String): String {
-        val user = aor.substringBefore("@")
-        return if (user == aor) "" else user
+    fun uriComplete(uri: String, domain: String): String {
+        val res = if (!uri.startsWith("sip:")) "sip:$uri" else uri
+        return if (checkUriUser(uri)) "$res@$domain" else res
     }
 
     fun aorDomain(aor: String): String {
-        val domain = aor.substringAfter("@")
-        return if (domain == aor) "" else domain
+        return uriHostPart(aor)
     }
 
     fun plainAor(aor: String): String {
-        return aor.substringAfter(":").substringBefore("@")  + "@" +
-                aor.substringAfter("@").substringBefore(";")
-                        .substringBefore(":")
+        return uriUserPart(aor) + "@" + uriHostPart(aor)
     }
 
     fun checkAor(aor: String): Boolean {
-        val p = aor.split(":")
-        if (p.size == 2)
-            return checkUriUser(aorUser(p[0])) && checkDomain(aorDomain(p[0])) &&
-                checkPortTransport(p[1])
-        val t = aor.split(";transport=")
-        if (t.size == 2)
-            return checkUriUser(aorUser(t[0])) && checkDomain(aorDomain(t[0])) &&
-                    t[1] in arrayOf("udp", "tcp", "tls")
-        return checkUriUser(aorUser(aor)) && checkDomain(aorDomain(aor))
+        if (!checkSipUri(aor)) return false
+        val params = uriParams(aor)
+        return params.isEmpty() ||
+                ((params.size == 1) &&
+                        params[0] in arrayOf("transport=udp", "transport=tcp","transport=tls"))
     }
 
     fun checkStunUri(uri: String): Boolean {
         if (!uri.startsWith("stun:") && !uri.startsWith("turn:"))
             return false
         return checkHostPort(uri.substringAfter(":"))
-    }
-
-    private fun checkPortTransport(portTransport: String): Boolean {
-        val pt = portTransport.split(";transport=")
-        if (pt.count() == 1)
-            return checkPort(pt[0])
-        else
-            return checkPort(pt[0]) && pt[1] in arrayOf("udp", "tcp", "tls")
     }
 
     fun isE164Number(no: String): Boolean {
@@ -189,7 +192,7 @@ object Utils {
                 checkPort(domainPort.substringAfterLast(":"))
     }
 
-    fun checkHostPort(hostPort: String): Boolean {
+    private fun checkHostPort(hostPort: String): Boolean {
         return checkIpV4(hostPort) || checkIpv6InBrackets(hostPort) || checkDomain(hostPort) ||
                 checkIpPort(hostPort) || checkDomainPort(hostPort)
     }
