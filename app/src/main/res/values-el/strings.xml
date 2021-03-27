@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_title">Σχετικά για το baresip</string>
-    <string name="baresip_link">
-        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
-    </string>
     <string name="account">Λογαριασμός</string>
     <string name="display_name">Εμφανιζόμενο όνομα</string>
     <string name="your_name">Το όνομά σου</string>
