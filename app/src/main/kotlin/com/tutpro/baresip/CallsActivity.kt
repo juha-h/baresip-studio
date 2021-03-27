@@ -140,6 +140,14 @@ class CallsActivity : AppCompatActivity() {
         invalidateOptionsMenu()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
+
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (BaresipService.activities.indexOf("calls,$aor") == -1)

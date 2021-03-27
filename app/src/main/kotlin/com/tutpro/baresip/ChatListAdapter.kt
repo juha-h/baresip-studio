@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import androidx.core.content.ContextCompat
 import androidx.cardview.widget.CardView
 import android.text.format.DateUtils.isToday
@@ -14,7 +13,7 @@ import android.widget.*
 import java.util.*
 import java.text.DateFormat
 
-class ChatListAdapter(private val ctx: Context, private var rows: ArrayList<Message>) :
+class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
     private val layoutInflater = LayoutInflater.from(context)
@@ -57,7 +56,7 @@ class ChatListAdapter(private val ctx: Context, private var rows: ArrayList<Mess
             } else {
                 viewHolder.textAvatarView.visibility = View.VISIBLE
                 viewHolder.cardAvatarView.visibility = View.GONE
-                (viewHolder.textAvatarView.background as GradientDrawable).setColor(contact.color)
+                viewHolder.textAvatarView.background.setTint(contact.color)
                 viewHolder.textAvatarView.text = "${peer[0]}"
             }
         } else {

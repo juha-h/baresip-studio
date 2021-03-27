@@ -50,6 +50,13 @@ class ContactsActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+
+        super.onResume()
+
+        clAdapter.notifyDataSetChanged()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         super.onActivityResult(requestCode, resultCode, data)

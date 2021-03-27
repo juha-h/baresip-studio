@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AlertDialog
@@ -63,7 +62,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
             viewHolder.textAvatarView.visibility = View.VISIBLE
             viewHolder.cardAvatarView.visibility = View.GONE
             viewHolder.imageAvatarView.visibility = View.GONE
-            (viewHolder.textAvatarView.background as GradientDrawable).setColor(contact.color)
+            viewHolder.textAvatarView.background.setTint(contact.color)
             if (contact.name.isNotEmpty())
                 viewHolder.textAvatarView.text = "${contact.name[0]}"
             else
