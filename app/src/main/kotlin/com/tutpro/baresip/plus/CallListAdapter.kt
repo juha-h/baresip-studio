@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
-import android.graphics.drawable.GradientDrawable
 import androidx.cardview.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +32,7 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
             } else {
                 textAvatarView.visibility = View.VISIBLE
                 cardAvatarView.visibility = View.GONE
-                (textAvatarView.background as GradientDrawable).setColor(contact.color)
+                textAvatarView.background.setTint(contact.color)
                 textAvatarView.text = "${contact.name[0]}"
             }
         } else {

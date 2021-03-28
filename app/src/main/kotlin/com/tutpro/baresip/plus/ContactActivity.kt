@@ -12,7 +12,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
@@ -337,7 +336,7 @@ class ContactActivity : AppCompatActivity() {
     private fun showTextAvatar(name: String, color: Int) {
         textAvatarView.visibility = View.VISIBLE
         cardAvatarView.visibility = View.GONE
-        (textAvatarView.background as GradientDrawable).setColor(color)
+        textAvatarView.background.setTint(color)
         textAvatarView.text = "${name[0]}"
     }
 
