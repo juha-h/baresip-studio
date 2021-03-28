@@ -1,0 +1,3 @@
+- Chat, call history, and contact related bug fixes
+- Fixed URI completion bugs and improved URI related checks
+- Translations from Weblate (French, Portuguese (Brazil))
