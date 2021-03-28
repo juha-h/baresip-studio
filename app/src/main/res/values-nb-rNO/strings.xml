@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_title">Om</string>
-    <string name="baresip_link">
-        <a href="https://github.com/juha-h/baresip-studio">GitHub</a>
-    </string>
     <string name="account">Konto</string>
     <string name="display_name">Visningsnavn</string>
     <string name="your_name">Ditt navn</string>
