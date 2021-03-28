@@ -160,7 +160,7 @@ object Utils {
 
     private fun checkUriUser(user: String): Boolean {
         user.forEach { if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
-        return user.isNotEmpty()
+        return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
     }
 
     fun checkDomain(domain: String): Boolean {
