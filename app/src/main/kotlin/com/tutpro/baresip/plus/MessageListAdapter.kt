@@ -39,15 +39,10 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
 
         val message = rows[position]
 
-        val up = (message.direction == R.drawable.arrow_up_green) ||
-            (message.direction == R.drawable.arrow_up_red)
+        val down = (message.direction == R.drawable.arrow_down_green) ||
+            (message.direction == R.drawable.arrow_down_red)
         val lp = viewHolder.layoutView.layoutParams as LinearLayout.LayoutParams
-        val peer: String
-        peer = if (up) {
-            lp.setMargins(75, 10, 0, 10)
-            viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
-            ctx.getString(R.string.you)
-        } else {
+        val peer: String = if (down) {
             lp.setMargins(0, 10, 75, 10)
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
             val contactName = ContactsActivity.contactName(message.peerUri)
@@ -56,7 +51,12 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
                 Utils.uriUserPart(message.peerUri)
             else
                 contactName
+        } else {
+            lp.setMargins(75, 10, 0, 10)
+            viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
+            ctx.getString(R.string.you)
         }
+
         viewHolder.layoutView.layoutParams = lp
 
         var info: String
