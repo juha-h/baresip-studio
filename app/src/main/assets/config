@@ -39,6 +39,7 @@ module avcodec.so
 module avformat.so
 module webrtc_aec.so
 module selfview.so
+module snapshot.so
 module stun.so
 module turn.so
 module ice.so

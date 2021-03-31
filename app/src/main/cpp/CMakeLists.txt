@@ -34,6 +34,10 @@ add_library(lib_aom STATIC IMPORTED)
 set_target_properties(lib_aom PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/aom/lib/${ANDROID_ABI}/libaom.a)
 
+add_library(lib_png STATIC IMPORTED)
+set_target_properties(lib_png PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/png/lib/${ANDROID_ABI}/libpng.a)
+
 add_library(lib_cpu_features STATIC IMPORTED)
 set_target_properties(lib_cpu_features PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/cpu_features/lib/${ANDROID_ABI}/libcpu_features.a)
@@ -154,6 +158,7 @@ target_link_libraries(baresip
         lib_x264
         lib_x265
         lib_aom
+        lib_png
         lib_vpx
         lib_avutil
         lib_swresample

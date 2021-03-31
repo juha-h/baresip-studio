@@ -27,6 +27,9 @@ object Config {
         if (!config.contains("module av1.so"))
             addModuleLine("module av1.so")
 
+        if (!config.contains("module snapshot.so"))
+            addModuleLine("module snapshot.so")
+
         if (!config.contains("webrtc_aec_extended_filter")) {
             config = "${config}webrtc_aec_extended_filter yes\n"
         }

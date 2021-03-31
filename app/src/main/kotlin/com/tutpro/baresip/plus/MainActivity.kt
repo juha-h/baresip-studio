@@ -8,7 +8,9 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
+import android.media.MediaActionSound
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,7 +23,6 @@ import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -31,6 +32,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
 import java.net.URLDecoder
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -246,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                 "green" -> {
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.info)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.call_is_secure))
                         setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
@@ -399,7 +402,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.voicemail_messages)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(acc.vmMessages(this@MainActivity))
                         setPositiveButton(getString(R.string.listen), dialogClickListener)
@@ -576,6 +579,29 @@ class MainActivity : AppCompatActivity() {
             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
         }
         videoLayout.addView(vb)
+
+        // Snapshot Button
+        if (Utils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            val sb = ImageButton(this)
+            sb.setImageResource(R.drawable.snapshot)
+            sb.setBackgroundResource(0)
+            prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT)
+            prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            prm.addRule(RelativeLayout.CENTER_VERTICAL)
+            prm.marginStart = 15
+            sb.layoutParams = prm
+            sb.setOnClickListener {
+                val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
+                val file = BaresipService.downloadsPath + "/IMG_" + sdf.format(Date()) + ".png"
+                if (Api.cmd_exec("snapshot_recv $file") != 0) {
+                    Log.e(TAG, "Command 'snapshot_recv $file' failed")
+                } else {
+                    MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
+                }
+            }
+            videoLayout.addView(sb)
+        }
 
         // Camera Button
         val cb = ImageButton(this)
@@ -876,7 +902,7 @@ class MainActivity : AppCompatActivity() {
             if (params[0] != "") {
                 val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.notice)
-                with (AlertDialog.Builder(this)) {
+                with(AlertDialog.Builder(this)) {
                     setCustomTitle(titleView)
                     setMessage(getString(R.string.start_failed))
                     setNeutralButton(getString(R.string.ok)) { dialog, _ ->
@@ -972,7 +998,7 @@ class MainActivity : AppCompatActivity() {
                         if (!isFinishing() && !alerting) {
                             val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                             titleView.text = getString(R.string.video_request)
-                            with (AlertDialog.Builder(this)) {
+                            with(AlertDialog.Builder(this)) {
                                 setCustomTitle(titleView)
                                 val peerUri = Utils.friendlyUri(call.peerUri, Utils.aorDomain(aor))
                                 val msg = when (dir) {
@@ -1006,7 +1032,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.verify)
-                        with (AlertDialog.Builder(this)) {
+                        with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.verify_sas),
                                     ev[1], ev[2]))
@@ -1068,7 +1094,7 @@ class MainActivity : AppCompatActivity() {
                         titleView.text = getString(R.string.transfer_request)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                 Utils.aorDomain(aor))
-                        with (AlertDialog.Builder(this)) {
+                        with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_request_query),
                                     target))
@@ -1233,7 +1259,7 @@ class MainActivity : AppCompatActivity() {
             R.id.backup -> {
                 if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 BACKUP_PERMISSION_REQUEST_CODE))
-                        askPassword(getString(R.string.encrypt_password))
+                    askPassword(getString(R.string.encrypt_password))
             }
 
             R.id.restore -> {
@@ -1283,14 +1309,14 @@ class MainActivity : AppCompatActivity() {
 
             CONTACTS_CODE -> {
                 callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                        Contact.contacts().map{Contact -> Contact.name}))
+                        Contact.contacts().map { Contact -> Contact.name }))
             }
 
             CONFIG_CODE -> {
                 if ((data != null) && data.hasExtra("restart")) {
                     val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                     titleView.text = getString(R.string.restart_request)
-                    with (AlertDialog.Builder(this)) {
+                    with(AlertDialog.Builder(this)) {
                         setCustomTitle(titleView)
                         setMessage(getString(R.string.config_restart))
                         setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -1320,7 +1346,8 @@ class MainActivity : AppCompatActivity() {
                 updateIcons(Account.ofAor(activityAor)!!)
             }
 
-            ABOUT_CODE -> { }
+            ABOUT_CODE -> {
+            }
 
         }
     }
@@ -1339,7 +1366,7 @@ class MainActivity : AppCompatActivity() {
                     BaresipService.cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
                     if (BaresipService.cameraAvailable)
                         Utils.requestPermission(this, Manifest.permission.CAMERA,
-                             CAMERA_PERMISSION_REQUEST_CODE)
+                                CAMERA_PERMISSION_REQUEST_CODE)
                     else {
                         Utils.alertView(this,
                                 getString(R.string.notice), getString(R.string.no_cameras))
@@ -1602,7 +1629,7 @@ class MainActivity : AppCompatActivity() {
         Utils.deleteFile(File(zipFilePath))
         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
         titleView.text = getString(R.string.info)
-        with (AlertDialog.Builder(this)) {
+        with(AlertDialog.Builder(this)) {
             setCustomTitle(titleView)
             setMessage(getString(R.string.restored))
             setPositiveButton(getText(R.string.restart)) { dialog, _ ->
@@ -1761,7 +1788,7 @@ class MainActivity : AppCompatActivity() {
             callUri.isFocusableInTouchMode = true
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Contact.contacts().map{Contact -> Contact.name}))
+                    Contact.contacts().map { Contact -> Contact.name }))
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true
