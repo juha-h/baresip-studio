@@ -12,7 +12,6 @@ import android.net.*
 import android.net.wifi.WifiManager
 import android.os.*
 import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.Spannable
@@ -923,7 +922,7 @@ class BaresipService: Service() {
 
     private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
         val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
-        if (VERSION.SDK_INT >= VERSION_CODES.N_MR1) {
+        if (VERSION.SDK_INT >= 25) {
             spannable.setSpan(
                     ForegroundColorSpan(applicationContext.getColor(colorRes)),
                     0, spannable.length, 0)
