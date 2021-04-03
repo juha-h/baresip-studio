@@ -3,10 +3,11 @@ package com.tutpro.baresip.plus
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.AlertDialog
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
@@ -15,30 +16,29 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.net.LinkAddress
 import android.net.LinkProperties
+import android.os.Build
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.io.*
 import java.net.InetAddress
 import java.security.SecureRandom
 import java.util.*
 import java.util.zip.*
-
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-
 import kotlin.collections.ArrayList
-import kotlin.Exception
 
 object Utils {
 
@@ -62,7 +62,7 @@ object Utils {
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        with (AlertDialog.Builder(context, R.style.AlertDialog)) {
+        with(AlertDialog.Builder(context, R.style.AlertDialog)) {
             setCustomTitle(titleView)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
@@ -139,7 +139,7 @@ object Utils {
         val params = uriParams(aor)
         return params.isEmpty() ||
                 ((params.size == 1) &&
-                        params[0] in arrayOf("transport=udp", "transport=tcp","transport=tls"))
+                        params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
     }
 
     fun checkStunUri(uri: String): Boolean {
@@ -360,7 +360,7 @@ object Utils {
             override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
                 val text = sequence.subSequence(start, start + count).toString()
-                if (text.length > 0) {
+                if (text.isNotEmpty()) {
                     val digit = text[0]
                     val call = Call.ofCallp(callp)
                     if (call == null) {
@@ -427,7 +427,7 @@ object Utils {
     fun getFileContents(filePath: String): ByteArray? {
         try {
             return File(filePath).readBytes()
-        } catch(e: FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             Log.e("Baresip", "File '$filePath' not found: ${e.printStackTrace()}")
             return null
         } catch (e: Exception) {
@@ -451,7 +451,7 @@ object Utils {
         if (file.exists()) file.delete()
         try {
             val out = FileOutputStream(file)
-            val scaledBitmap = createScaledBitmap (bitmap, 96, 96, true)
+            val scaledBitmap = createScaledBitmap(bitmap, 96, 96, true)
             scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
@@ -638,4 +638,34 @@ object Utils {
         return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
     }
 
+    @Suppress("DEPRECATION")
+    @Throws(IOException::class)
+    fun savePicture(ctx: Context, bitmap: Bitmap, name: String) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            val contentValues = ContentValues()
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            val resolver: ContentResolver = ctx.contentResolver
+            val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val uri = resolver.insert(contentUri, contentValues)
+                    ?: throw IOException("Failed to create new MediaStore record")
+            val stream = resolver.openOutputStream(uri)
+                    ?: throw IOException("Failed to open output stream")
+            if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
+                resolver.delete(uri, null, null)
+                stream.close()
+                throw IOException("Failed to save bitmap")
+            }
+            stream.close()
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+            val stream = FileOutputStream(File(imagesDir, name))
+            if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
+                stream.close()
+                throw IOException("Failed to save bitmap")
+            }
+            stream.close()
+        }
+    }
 }

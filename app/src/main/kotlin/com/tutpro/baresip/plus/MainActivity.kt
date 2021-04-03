@@ -9,13 +9,11 @@ import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Handler
+import android.os.*
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
@@ -31,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
+import java.io.IOException
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -154,6 +153,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
                 Log.d(TAG, "Seconds remaining: ${millisUntilFinished / 1000}")
             }
+
             override fun onFinish() {
                 when (stopState) {
                     "initial" -> {
@@ -187,6 +187,7 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
                 updateIcons(acc)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {
                 Log.d(TAG, "Nothing selected")
             }
@@ -581,7 +582,8 @@ class MainActivity : AppCompatActivity() {
         videoLayout.addView(vb)
 
         // Snapshot Button
-        if (Utils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if ((Build.VERSION.SDK_INT >= 29) ||
+                Utils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             val sb = ImageButton(this)
             sb.setImageResource(R.drawable.snapshot)
             sb.setBackgroundResource(0)
@@ -593,11 +595,13 @@ class MainActivity : AppCompatActivity() {
             sb.layoutParams = prm
             sb.setOnClickListener {
                 val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
-                val file = BaresipService.downloadsPath + "/IMG_" + sdf.format(Date()) + ".png"
-                if (Api.cmd_exec("snapshot_recv $file") != 0) {
-                    Log.e(TAG, "Command 'snapshot_recv $file' failed")
+                val fileName = "IMG_" + sdf.format(Date()) + ".png"
+                val filePath = BaresipService.filesPath + "/" + fileName
+                if (Api.cmd_exec("snapshot_recv $filePath") != 0) {
+                    Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
                 } else {
                     MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
+                    saveSnapshot(fileName)
                 }
             }
             videoLayout.addView(sb)
@@ -632,7 +636,7 @@ class MainActivity : AppCompatActivity() {
         // Speaker Button
         speakerButton = ImageButton(this)
         speakerButton.setBackgroundResource(0)
-        prm  = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
@@ -655,7 +659,7 @@ class MainActivity : AppCompatActivity() {
         val hb = ImageButton(this)
         hb.setImageResource(R.drawable.hangup)
         hb.setBackgroundResource(0)
-        prm  = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
@@ -1782,7 +1786,7 @@ class MainActivity : AppCompatActivity() {
             if (ua.account.resumeUri != "")
                 callUri.setText(ua.account.resumeUri)
             else
-               callUri.text.clear()
+                callUri.text.clear()
             callUri.hint = getString(R.string.callee)
             callUri.isFocusable = true
             callUri.isFocusableInTouchMode = true
@@ -2043,6 +2047,21 @@ class MainActivity : AppCompatActivity() {
             else
                 ua.account.resumeUri = ""
         }
+    }
+
+    private fun saveSnapshot(fileName: String) {
+        val file = File(this.filesDir, fileName)
+        Handler().postDelayed({
+            if (file.length() > 0) {
+                try {
+                    val bitmap = BitmapFactory.decodeStream(file.inputStream())
+                    Utils.savePicture(this, bitmap, fileName)
+                } catch (e: IOException) {
+                    Log.d(TAG, "Failed to save snapshot")
+                }
+            }
+            file.delete()
+        }, 1000)
     }
 
     @Suppress("DEPRECATION")
