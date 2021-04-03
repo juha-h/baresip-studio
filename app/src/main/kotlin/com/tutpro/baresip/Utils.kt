@@ -58,7 +58,7 @@ object Utils {
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
         val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
         titleView.text = title
-        with (AlertDialog.Builder(context, R.style.AlertDialog)) {
+        with(AlertDialog.Builder(context, R.style.AlertDialog)) {
             setCustomTitle(titleView)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
@@ -132,7 +132,7 @@ object Utils {
         val params = uriParams(aor)
         return params.isEmpty() ||
                 ((params.size == 1) &&
-                        params[0] in arrayOf("transport=udp", "transport=tcp","transport=tls"))
+                        params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
     }
 
     fun checkStunUri(uri: String): Boolean {
@@ -353,7 +353,7 @@ object Utils {
             override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
                 val text = sequence.subSequence(start, start + count).toString()
-                if (text.length > 0) {
+                if (text.isNotEmpty()) {
                     val digit = text[0]
                     val call = Call.ofCallp(callp)
                     if (call == null) {
@@ -420,7 +420,7 @@ object Utils {
     fun getFileContents(filePath: String): ByteArray? {
         try {
             return File(filePath).readBytes()
-        } catch(e: FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             Log.e("Baresip", "File '$filePath' not found: ${e.printStackTrace()}")
             return null
         } catch (e: Exception) {
@@ -444,7 +444,7 @@ object Utils {
         if (file.exists()) file.delete()
         try {
             val out = FileOutputStream(file)
-            val scaledBitmap = createScaledBitmap (bitmap, 96, 96, true)
+            val scaledBitmap = createScaledBitmap(bitmap, 96, 96, true)
             scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
