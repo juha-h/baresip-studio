@@ -1576,28 +1576,6 @@ Java_com_tutpro_baresip_Api_video_1codecs(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_contact_1add(JNIEnv *env, jobject thiz, jstring javaContact) {
-    struct pl pl_addr;
-    const char *native_contact = (*env)->GetStringUTFChars(env, javaContact, 0);
-    pl_set_str(&pl_addr, native_contact);
-    if (contact_add(baresip_contacts(), NULL, &pl_addr) != 0) {
-        LOGE("failed to add contact %s\n", native_contact);
-    } else {
-        LOGD("added contact %s\n", native_contact);
-    }
-    (*env)->ReleaseStringUTFChars(env, javaContact, native_contact);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_contacts_1remove(JNIEnv *env, jobject thiz) {
-    struct le *le;
-    while ((le = list_head(contact_list(baresip_contacts())))) {
-        struct contact *c = le->data;
-        contact_remove(baresip_contacts(), c);
-    }
-}
-
-JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint level) {
     const enum log_level native_level = (enum log_level)level;
     LOGD("setting log level to '%u'\n", native_level);
