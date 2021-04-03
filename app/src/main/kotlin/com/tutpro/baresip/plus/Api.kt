@@ -75,9 +75,6 @@ object Api {
 
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
 
-    external fun contact_add(contact: String)
-    external fun contacts_remove()
-
     external fun audio_codecs(): String
     external fun video_codecs(): String
 

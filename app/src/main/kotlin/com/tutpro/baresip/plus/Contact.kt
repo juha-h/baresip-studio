@@ -31,7 +31,6 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
             val content = Utils.getFileContents(BaresipService.filesPath + "/contacts")
                     ?: return false
             val contacts = String(content)
-            Api.contacts_remove()
             BaresipService.contacts.clear()
             var contactNo = 0
             val baseId = System.currentTimeMillis()
