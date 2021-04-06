@@ -1,0 +1,1 @@
+- Avoid possible contacts related crash at baresip start
