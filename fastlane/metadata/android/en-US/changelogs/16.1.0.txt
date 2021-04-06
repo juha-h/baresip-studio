@@ -1,0 +1,2 @@
+- Store snapshots to Pictures folder instead of Downloads folder
+- Avoid possible contacts related crash at baresip start
