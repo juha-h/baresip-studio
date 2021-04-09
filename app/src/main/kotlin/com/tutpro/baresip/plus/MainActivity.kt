@@ -9,7 +9,6 @@ import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
@@ -29,7 +28,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
-import java.io.IOException
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -597,12 +595,10 @@ class MainActivity : AppCompatActivity() {
                 val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
                 val fileName = "IMG_" + sdf.format(Date()) + ".png"
                 val filePath = BaresipService.filesPath + "/" + fileName
-                if (Api.cmd_exec("snapshot_recv $filePath") != 0) {
+                if (Api.cmd_exec("snapshot_recv $filePath") != 0)
                     Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
-                } else {
+                else
                     MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
-                    saveSnapshot(fileName)
-                }
             }
             videoLayout.addView(sb)
         }
@@ -2047,21 +2043,6 @@ class MainActivity : AppCompatActivity() {
             else
                 ua.account.resumeUri = ""
         }
-    }
-
-    private fun saveSnapshot(fileName: String) {
-        val file = File(this.filesDir, fileName)
-        Handler().postDelayed({
-            if (file.length() > 0) {
-                try {
-                    val bitmap = BitmapFactory.decodeStream(file.inputStream())
-                    Utils.savePicture(this, bitmap, fileName)
-                } catch (e: IOException) {
-                    Log.d(TAG, "Failed to save snapshot")
-                }
-            }
-            file.delete()
-        }, 1000)
     }
 
     @Suppress("DEPRECATION")

@@ -7,6 +7,7 @@ import android.app.PendingIntent.getActivity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.content.*
+import android.graphics.BitmapFactory
 import android.media.*
 import android.net.*
 import android.net.wifi.WifiManager
@@ -26,6 +27,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.File
+import java.io.IOException
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -432,17 +434,39 @@ class BaresipService: Service() {
 
     @Keep
     fun uaEvent(event: String, uap: String, callp: String) {
+
         if (!isServiceRunning) return
+
+        val ev = event.split(",")
         val ua = UserAgent.ofUap(uap)
+        val aor = ua?.account?.aor
+
+        Log.d(TAG, "got uaEvent $event/$aor/$callp")
+
         if (ua == null) {
-            Log.w(TAG, "uaEvent did not find ua $uap")
+            when (ev[0]) {
+                "snapshot" -> {
+                    val file = File(ev[2])
+                    if (file.length() > 0) {
+                        val fileName = ev[2].split("/").last()
+                        try {
+                            val bitmap = BitmapFactory.decodeStream(file.inputStream())
+                            Utils.savePicture(this, bitmap, fileName)
+                            Log.d(TAG, "Saved snapshot $fileName")
+                        } catch (e: IOException) {
+                            Log.d(TAG, "Failed to save snapshot $fileName")
+                        }
+                    }
+                    file.delete()
+                }
+                else -> {
+                    Log.w(TAG, "uaEvent did not find ua $uap")
+                }
+            }
             return
         }
-        Log.d(TAG, "got uaEvent $event/${ua.account.aor}/$callp")
 
-        val aor = ua.account.aor
         var newEvent: String? = null
-        val ev = event.split(",")
         for (account_index in uas.indices) {
             if (uas[account_index].account.aor == aor) {
                 when (ev[0]) {

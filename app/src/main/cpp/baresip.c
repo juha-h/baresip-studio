@@ -282,6 +282,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
+        case UA_EVENT_MODULE:
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
+            break;
         case UA_EVENT_CUSTOM:
             get_password((char *)ua, (char *)call);
             return;
