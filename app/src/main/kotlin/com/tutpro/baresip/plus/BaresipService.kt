@@ -609,11 +609,7 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "local call offered" -> {
-                        proximitySensing(true)
-                        return
-                    }
-                    "local call answered" -> {
+                    "local call offered", "local call answered" -> {
                         proximitySensing(true)
                         return
                     }

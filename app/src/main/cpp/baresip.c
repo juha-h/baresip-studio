@@ -222,8 +222,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
-	        if (call_state(call) != CALL_STATE_ESTABLISHED)
-                return;
             len = re_snprintf(event_buf, sizeof event_buf, "local call %sed", prm);
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
