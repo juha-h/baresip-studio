@@ -1,0 +1,1 @@
+- Fixed proximity sensing after making an outgoing call.
