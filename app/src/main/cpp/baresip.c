@@ -196,10 +196,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
-            if (strcmp(prm, "offer") != 0)
-                len = re_snprintf(event_buf, sizeof event_buf, "%s", "call offered");
-            else
-                len = re_snprintf(event_buf, sizeof event_buf, "%s", "call answered");
+            len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
         case UA_EVENT_CALL_RINGING:
             play = mem_deref(play);
