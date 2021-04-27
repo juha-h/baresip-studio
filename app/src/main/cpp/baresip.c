@@ -1095,6 +1095,23 @@ Java_com_tutpro_baresip_Api_account_1set_1dtmfmode(JNIEnv *env, jobject thiz,
     return account_set_dtmfmode(acc, mode);
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1mediaaf(JNIEnv *env, jobject thiz, jstring jAcc) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    return account_mediaaf(acc);
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_account_1set_1mediaaf(JNIEnv *env, jobject thiz, jstring jAcc, jint jAf) {
+    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
+    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+    LOGD("setting account mediaaf to '%d'\n", jAf);
+    account_set_mediaaf(acc, jAf);
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_account_1extra(JNIEnv *env, jobject thiz, jstring javaAcc)
 {
@@ -1283,15 +1300,6 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1set_1media_1af(JNIEnv *env, jobject thiz, jstring javaUA,
-                                               jint javaAf) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    LOGD("setting ua media af to '%d'\n", javaAf);
-    ua_set_media_af(ua, javaAf);
 }
 
 JNIEXPORT void JNICALL

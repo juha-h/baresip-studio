@@ -455,9 +455,9 @@ class AccountActivity : AppCompatActivity() {
                     acc.preferIPv6Media = ipV6MediaCheck.isChecked
                     Log.d(TAG, "New preferIPv6Media is ${acc.preferIPv6Media}")
                     if (acc.preferIPv6Media)
-                        Api.ua_set_media_af(ua.uap, Api.AF_INET6)
+                        Api.account_set_mediaaf(acc.accp, Api.AF_INET6)
                     else
-                        Api.ua_set_media_af(ua.uap, Api.AF_UNSPEC)
+                        Api.account_set_mediaaf(acc.accp, Api.AF_UNSPEC)
                     save = true
                 }
 
