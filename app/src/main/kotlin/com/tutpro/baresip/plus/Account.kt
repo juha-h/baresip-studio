@@ -68,6 +68,8 @@ class Account(val accp: String) {
 
         val extra = Api.account_extra(accp)
         preferIPv6Media = Utils.paramValue(extra,"prefer_ipv6_media") == "yes"
+        if (!preferIPv6Media)
+            preferIPv6Media = Api.account_mediaaf(accp) == Api.AF_INET6
         callHistory = Utils.paramValue(extra,"call_history") == ""
 
     }
@@ -131,6 +133,8 @@ class Account(val accp: String) {
 
         if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
 
+        if (preferIPv6Media) res += ";mediaaf=ipv6"
+
         if (vmUri == "")
             res = "$res;mwi=no"
         else
@@ -145,9 +149,6 @@ class Account(val accp: String) {
 
         if (!callHistory)
             extra += ";call_history=no"
-
-        if (preferIPv6Media)
-            extra += ";prefer_ipv6_media=yes"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
