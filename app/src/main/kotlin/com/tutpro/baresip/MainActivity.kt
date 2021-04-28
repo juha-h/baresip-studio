@@ -67,8 +67,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var stopState: String
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
+
     private var downloadsInputStream: FileInputStream? = null
     private var downloadsOutputStream: FileOutputStream? = null
+    private var downloadsInputFile = "baresip.bs"
+    private var downloadsOutputFile = "baresip.bs"
 
     private lateinit var baresipService: Intent
 
@@ -1181,11 +1184,12 @@ class MainActivity : AppCompatActivity() {
             BACKUP_CODE -> {
                 if (resultCode == Activity.RESULT_OK)
                     data?.data?.also {
-                        Log.d(TAG, "******** $it")
                         downloadsOutputStream = applicationContext.contentResolver.openOutputStream(it)
                                 as FileOutputStream
-                        if (downloadsOutputStream != null)
+                        if (downloadsOutputStream != null) {
+                            downloadsOutputFile = Utils.fileNameOfUri(applicationContext, it)
                             askPassword(getString(R.string.encrypt_password))
+                        }
                     }
             }
 
@@ -1194,8 +1198,10 @@ class MainActivity : AppCompatActivity() {
                     data?.data?.also {
                         downloadsInputStream = applicationContext.contentResolver.openInputStream(it)
                                 as FileInputStream
-                        if (downloadsInputStream != null)
+                        if (downloadsInputStream != null) {
+                            downloadsInputFile = Utils.fileNameOfUri(applicationContext, it)
                             askPassword(getString(R.string.decrypt_password))
+                        }
                     }
             }
 
