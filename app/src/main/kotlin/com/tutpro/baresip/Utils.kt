@@ -11,7 +11,9 @@ import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
 import android.net.LinkAddress
 import android.net.LinkProperties
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -418,14 +420,14 @@ object Utils {
     }
 
     fun getFileContents(filePath: String): ByteArray? {
-        try {
-            return File(filePath).readBytes()
+        return try {
+            File(filePath).readBytes()
         } catch (e: FileNotFoundException) {
             Log.e("Baresip", "File '$filePath' not found: ${e.printStackTrace()}")
-            return null
+            null
         } catch (e: Exception) {
             Log.e("Baresip", "Failed to read file '$filePath': ${e.printStackTrace()}")
-            return null
+            null
         }
     }
 
@@ -438,6 +440,18 @@ object Utils {
             return false
         }
         return true
+    }
+
+    fun fileNameOfUri(ctx: Context, uri: Uri): String {
+        val cursor = ctx.contentResolver.query(uri, null, null, null, null)
+        var name = ""
+        if (cursor != null) {
+            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            name = cursor.getString(index)
+            cursor.close()
+        }
+        return name
     }
 
     fun saveBitmap(bitmap: Bitmap, file: File): Boolean {
@@ -504,29 +518,28 @@ object Utils {
         return plainData
     }
 
-
-    fun encryptToFile(filePath: String, content: ByteArray, password: String): Boolean {
+    fun encryptToStream(stream: FileOutputStream?, content: ByteArray, password: String): Boolean {
         val obj = encrypt(content, password.toCharArray())
         try {
-            ObjectOutputStream(FileOutputStream(File(filePath))).use {
+            ObjectOutputStream(stream).use {
                 it.writeObject(obj)
             }
         } catch (e: Exception) {
-            Log.e("Baresip", "Write failed: ${e.printStackTrace()}")
+            Log.w("Baresip", "encryptToStream failed: $e")
             return false
         }
         return true
     }
 
-    fun decryptFromFile(filePath: String, password: String): ByteArray? {
+    fun decryptFromStream(stream: FileInputStream?, password: String): ByteArray? {
         var plainData: ByteArray? = null
         try {
-            ObjectInputStream(FileInputStream(File(filePath))).use {
+            ObjectInputStream(stream).use {
                 val obj = it.readObject() as Crypto
                 plainData = decrypt(obj, password.toCharArray())
             }
         } catch (e: Exception) {
-            Log.e("Baresip", "Decrypt failed from file '$filePath'")
+            Log.w("Baresip", "decryptFromStream failed: $e")
         }
         return plainData
     }

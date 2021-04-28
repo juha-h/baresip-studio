@@ -45,7 +45,7 @@ object Api {
     external fun account_dtmfmode(acc: String): Int
     external fun account_set_dtmfmode(acc: String, mode: Int): Int
     external fun account_mediaaf(acc: String): Int
-    external fun account_set_mediaaf(acc: String, af: Int)
+    external fun account_set_mediaaf(acc: String, af: Int): Int
     external fun account_extra(acc: String): String
     external fun account_debug(acc: String)
 

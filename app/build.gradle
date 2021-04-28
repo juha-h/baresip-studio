@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode = 163
         versionName = '29.2.1'
         externalNativeBuild {
