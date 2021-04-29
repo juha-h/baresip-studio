@@ -13,6 +13,8 @@ import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
 import android.os.*
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
@@ -20,6 +22,7 @@ import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -28,9 +31,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -70,6 +76,11 @@ class MainActivity : AppCompatActivity() {
     private var speakerIcon: MenuItem? = null
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
+
+    private var downloadsInputStream: FileInputStream? = null
+    private var downloadsOutputStream: FileOutputStream? = null
+    private var downloadsInputFile = "baresip+.bs"
+    private var downloadsOutputFile = "baresip+.bs"
 
     private lateinit var baresipService: Intent
 
@@ -1257,15 +1268,23 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.backup -> {
-                if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                BACKUP_PERMISSION_REQUEST_CODE))
-                    askPassword(getString(R.string.encrypt_password))
+                if (Build.VERSION.SDK_INT >= 29) {
+                    pickupFileFromDownloads(BACKUP_CODE)
+                } else {
+                    if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    BACKUP_PERMISSION_REQUEST_CODE)) {
+                        val path = BaresipService.downloadsPath + "/baresip+.bs"
+                        downloadsOutputStream = FileOutputStream(File(path))
+                        askPassword(getString(R.string.encrypt_password))
+                    }
+                }
             }
 
             R.id.restore -> {
-                if (Utils.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE,
+                if (Build.VERSION.SDK_INT >= 29 ||
+                        Utils.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE,
                                 RESTORE_PERMISSION_REQUEST_CODE))
-                    askPassword(getString(R.string.decrypt_password))
+                    startRestore()
             }
 
             R.id.about -> {
@@ -1346,6 +1365,30 @@ class MainActivity : AppCompatActivity() {
                 updateIcons(Account.ofAor(activityAor)!!)
             }
 
+            BACKUP_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        downloadsOutputStream = applicationContext.contentResolver.openOutputStream(it)
+                                as FileOutputStream
+                        if (downloadsOutputStream != null) {
+                            downloadsOutputFile = Utils.fileNameOfUri(applicationContext, it)
+                            askPassword(getString(R.string.encrypt_password))
+                        }
+                    }
+            }
+
+            RESTORE_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        downloadsInputStream = applicationContext.contentResolver.openInputStream(it)
+                                as FileInputStream
+                        if (downloadsInputStream != null) {
+                            downloadsInputFile = Utils.fileNameOfUri(applicationContext, it)
+                            askPassword(getString(R.string.decrypt_password))
+                        }
+                    }
+            }
+
             ABOUT_CODE -> {
             }
 
@@ -1359,7 +1402,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
 
             RECORD_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Utils.alertView(this, getString(R.string.notice),
                             getString(R.string.no_calls), ::startBaresip)
                 else {
@@ -1376,19 +1419,28 @@ class MainActivity : AppCompatActivity() {
             }
 
             CAMERA_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.size > 0) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
+                if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Utils.alertView(this, getString(R.string.notice), getString(R.string.no_video_calls))
                 startBaresip()
             }
 
             BACKUP_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
                     askPassword(getString(R.string.encrypt_password))
 
             RESTORE_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.size > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                    askPassword(getString(R.string.decrypt_password))
+                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    startRestore()
+        }
+    }
 
+    private fun startRestore() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            pickupFileFromDownloads(RESTORE_CODE)
+        } else {
+            val path = BaresipService.downloadsPath + "/baresip+.bs"
+            downloadsInputStream = FileInputStream(File(path))
+            askPassword(getString(R.string.decrypt_password))
         }
     }
 
@@ -1451,6 +1503,29 @@ class MainActivity : AppCompatActivity() {
         // This needs to be done after dialog has been created and before it is shown
         alertDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         alertDialog.show()
+    }
+
+    @RequiresApi(29)
+    private fun pickupFileFromDownloads(activityCode: Int) {
+        val intent = when (activityCode) {
+            BACKUP_CODE -> {
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/octet-stream"
+                    putExtra(Intent.EXTRA_TITLE, "baresip+.bs")
+                    putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+                }
+            }
+            RESTORE_CODE -> {
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/octet-stream"
+                    putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+                }
+            }
+            else -> null
+        }
+        startActivityForResult(intent, activityCode)
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
@@ -1576,54 +1651,57 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        val bsFile = getString(R.string.app_name_plus) + ".bs"
-        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         if (!Utils.zip(files, zipFile)) {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.backup_failed), bsFile))
+                    String.format(getString(R.string.backup_failed),
+                            downloadsOutputFile))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
         if (content == null) {
             Log.w(TAG, "Failed to read zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.backup_failed), bsFile))
+                    String.format(getString(R.string.backup_failed),
+                            downloadsOutputFile))
             return
         }
-        if (!Utils.encryptToFile(backupFilePath, content, password)) {
+        if (!Utils.encryptToStream(downloadsOutputStream, content, password)) {
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.backup_failed), bsFile))
+                    String.format(getString(R.string.backup_failed),
+                            downloadsOutputFile))
             return
         }
         Utils.alertView(this, getString(R.string.info),
-                String.format(getString(R.string.backed_up), bsFile))
+                String.format(getString(R.string.backed_up),
+                        downloadsOutputFile))
         Utils.deleteFile(File(zipFilePath))
     }
 
     private fun restore(password: String) {
-        val bsFile = getString(R.string.app_name_plus) + ".bs"
-        val backupFilePath = BaresipService.downloadsPath + "/$bsFile"
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
-        val zipData = Utils.decryptFromFile(backupFilePath, password)
+        val zipData = Utils.decryptFromStream(downloadsInputStream, password)
         if (zipData == null) {
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed), bsFile))
+                    String.format(getString(R.string.restore_failed),
+                            downloadsInputFile))
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed), bsFile))
+                    String.format(getString(R.string.restore_failed),
+                            downloadsInputFile))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
             Log.w(TAG, "Failed to unzip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed), bsFile))
+                    String.format(getString(R.string.restore_failed),
+                            downloadsInputFile))
             return
         }
         Utils.deleteFile(File(zipFilePath))
@@ -2077,6 +2155,8 @@ class MainActivity : AppCompatActivity() {
         const val CONTACT_CODE = 7
         const val CHATS_CODE = 8
         const val CHAT_CODE = 9
+        const val BACKUP_CODE = 10
+        const val RESTORE_CODE = 11
 
         const val BACKUP_PERMISSION_REQUEST_CODE = 1
         const val RESTORE_PERMISSION_REQUEST_CODE = 2
