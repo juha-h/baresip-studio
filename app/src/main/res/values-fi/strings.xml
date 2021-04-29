@@ -286,10 +286,10 @@
     <string name="invalid_dns_servers">Virheelliset DNS-palvelimet</string>
     <string name="failed_to_set_dns_servers">DNS-palvelinten asetus epäonnistui</string>
     <string name="tls_certificate_file">TLS-sertifikaattitiedosto</string>
-    <string name="tls_certificate_file_help">Jos merkitty, tiedosto \'cert.pem\', joka sisältää
+    <string name="tls_certificate_file_help">Jos merkitty, tiedosto joka sisältää
         tämän baresip-sovelluksen julkisen ja yksityisen TLS-sertifikaatin, on joko jo ladattu
-        tai tullaan lataamaan Download-hakemistosta.  Turvallisuusyistä tuhoa tiedosto heti
-        lataamisen jälkeen.
+        tai tullaan lataamaan.  Android versioon 9 saakka tiedosto nimeltään \'cert.pem\'
+        ladataan Download-kansiosta. Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
     </string>
     <string name="verify_server">Tarkista palvelinten sertifikaatit</string>
     <string name="verify_server_error">Palvelinten sertifikaatteja ei voi tarkistaa ilman TLS
@@ -300,9 +300,10 @@
         ladattuna.
     </string>
     <string name="tls_ca_file">TLS CA-tiedosto</string>
-    <string name="tls_ca_file_help">Jos merkitty, tiedosto \'ca_certs.crt\', joka sisältää
+    <string name="tls_ca_file_help">Jos merkitty, tiedosto joka sisältää
         sertifikaattiauktoriteettien (CA) julkiset sertifikaatit, on joko jo ladattu tai tullaan
-        lataamaan Download-hakemistosta.
+        lataamaan. Android versioon 9 saakka tiedosto nimeltään \'ca_certs.crt\' ladataan
+        Download-kansiosta.
     </string>
     <string name="audio">Audio</string>
     <string name="audio_modules_title">Audio-modulit</string>
@@ -346,8 +347,8 @@
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
-    <string name="read_cert_error">Tiedoston \'cert.pem\' luku Download-kansiosta epäonnistui.</string>
-    <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' luku Download-kansiosta epäonnistui.</string>
+    <string name="read_cert_error">Tiedoston \'cert.pem\' luku epäonnistui.</string>
+    <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' epäonnistui.</string>
     <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset
         käyttöön. Käynnistä nyt?
     </string>
@@ -447,19 +448,19 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen?</string>
     <string name="unverify">Poista todennus</string>
-    <string name="backed_up">Sovelluksen tiedot talletettiin Download-kansion tiedostoon
-        \'%1$s\'.
+    <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
+        versioon 9 saakka tiedosto löytyy Download-kansiosta.
     </string>
-    <string name="backup_failed">Sovelluksen tietojen talletus Download-kansion tiedostoon
-        \'%1$s\' epäonnistui. Tarkista Asetukset → Sovellukset → baresip →
-        Käyttöluvat → Tallennustila.</string>
+    <string name="backup_failed">Sovelluksen tietojen talletus epäonnistui. Android versioon 9 saakka
+        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.
+    </string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt?
     </string>
-    <string name="restore_failed">Sovelluksen tietojen palauttaminen Download-kansiosta epäonnistui.
-        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila ja että tallennettu
-        tiedosto \'%1$s\' on kansiossa ja (jos on) että annoit oikean salasanan.
+    <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
+        annoit oikean salasanan.  Android versioon 9 saakka tarkista myös Asetukset → Sovellukset →
+        baresip → Käyttöluvat → Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.
     </string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
