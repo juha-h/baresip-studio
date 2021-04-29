@@ -264,9 +264,10 @@
     <string name="invalid_dns_servers">Invalid DNS Servers</string>
     <string name="failed_to_set_dns_servers">Failed to set DNS servers</string>
     <string name="tls_certificate_file">TLS Certificate File</string>
-    <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing
-        TLS certificate and private key of this baresip instance has been or will be loaded from
-        Download directory. For security reasons, delete the file after loading.</string>
+    <string name="tls_certificate_file_help">If checked, a file containing TLS certificate and
+        private key of this baresip instance has been or will be loaded. In Android versions 9 and
+        below, a file called \'cert.pem\' is loaded from Download folder. For security reasons,
+        delete the file after loading.</string>
     <string name="verify_server">Verify Server Certificates</string>
     <string name="verify_server_error">Server Certificates cannot be verified without
         TLS CA file.</string>
@@ -274,8 +275,9 @@
         Agent and SIP Proxy Servers when TLS transport is used.  If checked, also TLS CA File has
         to be loaded.</string>
     <string name="tls_ca_file">TLS CA File</string>
-    <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates
-        of Certificate Authorities has been or will be loaded from Download directory.</string>
+    <string name="tls_ca_file_help">If checked, a file containing TLS certificates
+        of needed Certificate Authorities has been or will be loaded. In Android versions 9 and
+        below, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
     <string name="audio">Audio</string>
     <string name="audio_modules_title">Audio Modules</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
@@ -309,8 +311,8 @@
         request and response trace to Logcat. Unchecked automatically at baresip start.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, settings are reset to factory default values.</string>
-    <string name="read_cert_error">Failed to read file \'cert.pem\' from Download directory.</string>
-    <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\' from Download directory.</string>
+    <string name="read_cert_error">Failed to read file \'cert.pem\'.</string>
+    <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\'.</string>
     <string name="config_restart">You need to restart baresip in order to activate the new
         settings. Restart now?
     </string>
@@ -409,17 +411,17 @@
         Do you want to unverify the peer?
     </string>
     <string name="unverify">Unverify</string>
-    <string name="backed_up">Application data backed up to Download folder file \'%1$s\'.</string>
-    <string name="backup_failed">Failed to back up application data to Download folder file
+    <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
+        versions 9 and below, the file is in Download folder.</string>
+    <string name="backup_failed">Failed to back up application data to file
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.</string>
     <string name="restart_request">Restart Request</string>
     <string name="restored">Application data restored. baresip needs to be restarted.
         Restart now?
     </string>
-    <string name="restore_failed">Failed to restore application data from Download folder. Check Apps →
-        baresip → Permissions → Storage and that backup file \'%1$s\' exists in the folder
-        and, if so, you gave correct Decrypt Password.
-    </string>
+    <string name="restore_failed">Failed to restore application data. Check that you gave correct
+        password. In Android versions 9 and below, also check Apps → baresip → Permissions → Storage
+        and that file \'%1$s\' exists in Download folder.</string>
     <string name="no_calls">You are not able to place or answer calls without Microphone permission.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to place or answer video calls.</string>
     <string name="no_cameras">You don\'t have any supported video cameras.</string>
