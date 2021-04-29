@@ -1205,6 +1205,30 @@ class MainActivity : AppCompatActivity() {
                     }
             }
 
+            BACKUP_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        downloadsOutputStream = applicationContext.contentResolver.openOutputStream(it)
+                                as FileOutputStream
+                        if (downloadsOutputStream != null) {
+                            downloadsOutputFile = Utils.fileNameOfUri(applicationContext, it)
+                            askPassword(getString(R.string.encrypt_password))
+                        }
+                    }
+            }
+
+            RESTORE_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        downloadsInputStream = applicationContext.contentResolver.openInputStream(it)
+                                as FileInputStream
+                        if (downloadsInputStream != null) {
+                            downloadsInputFile = Utils.fileNameOfUri(applicationContext, it)
+                            askPassword(getString(R.string.decrypt_password))
+                        }
+                    }
+            }
+
             ABOUT_CODE -> {
             }
 
@@ -1453,7 +1477,7 @@ class MainActivity : AppCompatActivity() {
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
-        val zipFile = getString(R.string.app_name_plus) + ".zip"
+        val zipFile = getString(R.string.app_name) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         if (!Utils.zip(files, zipFile)) {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
@@ -1483,7 +1507,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun restore(password: String) {
-        val zipFile = getString(R.string.app_name_plus) + ".zip"
+        val zipFile = getString(R.string.app_name) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         val zipData = Utils.decryptFromStream(downloadsInputStream, password)
         if (zipData == null) {
