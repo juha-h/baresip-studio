@@ -1,0 +1,3 @@
+- Upgraded target SDK version to API level 30
+- In Android versions 10 and above, let user choose the file in
+  backup, restore, TLS certificate related operations
