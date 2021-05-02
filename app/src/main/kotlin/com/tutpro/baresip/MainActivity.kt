@@ -1205,30 +1205,6 @@ class MainActivity : AppCompatActivity() {
                     }
             }
 
-            BACKUP_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        downloadsOutputStream = applicationContext.contentResolver.openOutputStream(it)
-                                as FileOutputStream
-                        if (downloadsOutputStream != null) {
-                            downloadsOutputFile = Utils.fileNameOfUri(applicationContext, it)
-                            askPassword(getString(R.string.encrypt_password))
-                        }
-                    }
-            }
-
-            RESTORE_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        downloadsInputStream = applicationContext.contentResolver.openInputStream(it)
-                                as FileInputStream
-                        if (downloadsInputStream != null) {
-                            downloadsInputFile = Utils.fileNameOfUri(applicationContext, it)
-                            askPassword(getString(R.string.decrypt_password))
-                        }
-                    }
-            }
-
             ABOUT_CODE -> {
             }
 
