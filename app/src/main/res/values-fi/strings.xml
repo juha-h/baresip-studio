@@ -10,7 +10,10 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-        <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Salli baresip sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
+            osiossa.</li>
+        <li>Tarkista, että baresip sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
+        kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
             <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
@@ -51,7 +54,10 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-        <li>Tarkista, että Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
+        <li>Salli baresip+ sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
+            osiossa.</li>
+        <li>Tarkista, että baresip+ sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
+        kosketus tarjoaa apua.</li>
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
             <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
