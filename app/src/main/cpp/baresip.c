@@ -201,7 +201,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 
     struct player *player = baresip_player();
 
-    LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
+    LOGD("ua (%s) event (%s) %s\n", account_aor(ua_account(ua)), uag_event_str(ev), prm);
 
     switch (ev) {
         case UA_EVENT_REGISTERING:
