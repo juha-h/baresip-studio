@@ -9,7 +9,7 @@
     <string name="tls_ca_file_help">Se marcado, o ficheiro \'ca_certs.crt\' contendo certificados TLS de Autoridades de Certificação foi ou será carregado no diretório Download.</string>
     <string name="debug_help">Fornece disponibilidade de mensagens de log no nível de depuração e informações no Logcat.</string>
     <string name="answer">Atender</string>
-    <string name="opus_packet_loss_help">Porcentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por predefinição 0, desativando a Opus Forward Error Correction (FEC).</string>
+    <string name="opus_packet_loss_help">Percentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por predefinição 0, a desactivar a Opus Forward Error Correction (FEC).</string>
     <string name="reject">Rejeitar</string>
     <string name="outbound_proxies_help">URI SIP de um ou dois proxies que precisam ser usados para enviar solicitações. Se dois forem informados, requisições de REGISTO serão enviados para ambos e as outras requisições serão enviadas para aquele que respondeu. Se nenhum proxy foi informado, requisições serão enviadas baseadas em DNS NAPTR/SRV/A pesquisa de registo da URI do host do destinatário. Se o host da URI SIP for um endereço IPv6, o endereço precisa ser escrito dentro de colchetes [].
 \nExemplos:
@@ -54,7 +54,7 @@
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
     <string name="disable_history">Desativar</string>
     <string name="long_message_question">Quer apagar a mensagem ou adicionar o ponto \'%1$s\' aos contatos\?</string>
-    <string name="voicemain_uri_help">URI SIP para checar mensagens de correio de voz. Se deixado em branco, as mensagens do correio de voz (Indicação de Mensagem em Espera) não serão assinadas.</string>
+    <string name="voicemain_uri_help">URI SIP para verificar mensagens de correio de voz. Se deixado em branco, as mensagens do correio de voz (Indicação de Mensagem em Espera) não serão assinadas.</string>
     <string name="register_help">Se selecionado, o registo é ativado e requisições de REGISTO serão enviadas em intervalos de 12 minutos.</string>
     <string name="video_codecs_help">Lista dos codecs de vídeo compatíveis em ordem de prioridade</string>
     <string name="rate">Taxa</string>
@@ -171,7 +171,7 @@
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="invalid_stun_server">Servidor URI STUN/TURN Inválido \'%1$s\'</string>
     <string name="invalid_authentication_username">Nome de Utilizador de Autenticação Inválido \'%1$s\'</string>
-    <string name="no_cameras">Não possui câmeras de vídeo compatíveis.</string>
+    <string name="no_cameras">Não possui câmaras de vídeo compatíveis.</string>
     <string name="calls_calls">chamadas</string>
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="enable_history">Ativar</string>
@@ -207,7 +207,7 @@
     <string name="delete_chats">Apagar</string>
     <string name="debug">Depuração</string>
     <string name="prefer_ipv6_media_help">Se selecionado, oferece usar protocolo de mídia IPv6 (se disponível) quando o protocolo de mídia do par não puder ser determinado automaticamente.</string>
-    <string name="invalid_opus_packet_loss">Porcentagem de Perda de Pacotes do Opus inválida</string>
+    <string name="invalid_opus_packet_loss">Percentagem de Perda de Pacotes do Opus inválida</string>
     <string name="dns_servers_help">Lista de endereço de servidores de DNS separados por vírgula. Endereços de servidores DNS são obtidos dinamicamente pelo sistema. Cada endereço DNS é na forma \'ip:porta\' ou \'ip\'. Se a porta é omitida, a predefinição será 53. Se o ip é um endereço IPv6 e também a porta é fornecida, o ip precisa ser escrito dentro de colchetes []. Por exemplo, escutar \'8.8.8.8:53,[2001:4860:4860::8888]:53\' aponta para endereços IPv4 e IPv6 dos servidores de DNS do Google.</string>
     <string name="notice">Aviso</string>
     <string name="about_title">Sobre o baresip</string>
