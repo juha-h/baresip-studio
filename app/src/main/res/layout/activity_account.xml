@@ -81,9 +81,9 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/AuthPass"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textPassword"
-                android:hint="@string/password"
                 android:maxLines="1">
             </androidx.appcompat.widget.AppCompatEditText>
         </com.google.android.material.textfield.TextInputLayout>
@@ -256,7 +256,8 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/StunPass"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textPassword"
                 android:hint="@string/password"
                 android:maxLines="1">
