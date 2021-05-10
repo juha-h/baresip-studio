@@ -1343,13 +1343,6 @@ class MainActivity : AppCompatActivity() {
         }
         val input = layout.findViewById(R.id.password) as EditText
         input.requestFocus()
-        val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
-        checkBox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked)
-                input.transformationMethod = HideReturnsTransformationMethod()
-            else
-                input.transformationMethod = PasswordTransformationMethod()
-        }
         val context = this
         val builder = AlertDialog.Builder(this, R.style.AlertDialog)
         with(builder) {
@@ -1399,13 +1392,6 @@ class MainActivity : AppCompatActivity() {
                 messageView.text = message
                 val input = layout.findViewById(R.id.password) as EditText
                 input.requestFocus()
-                val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
-                checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked)
-                        input.transformationMethod = HideReturnsTransformationMethod()
-                    else
-                        input.transformationMethod = PasswordTransformationMethod()
-                }
                 val context = this
                 val builder = AlertDialog.Builder(this, R.style.AlertDialog)
                 with(builder) {
