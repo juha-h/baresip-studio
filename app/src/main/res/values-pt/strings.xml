@@ -6,15 +6,16 @@
     <string name="help">Ajuda</string>
     <string name="verify_sas">Quer verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
     <string name="invalid_sip_uri">URI SIP \'%1$s\' inválida</string>
-    <string name="tls_ca_file_help">Se marcado, o ficheiro \'ca_certs.crt\' contendo certificados TLS de Autoridades de Certificação foi ou será carregado no diretório Download.</string>
-    <string name="debug_help">Fornece disponibilidade de mensagens de log no nível de depuração e informações no Logcat.</string>
+    <string name="tls_ca_file_help">Se marcado, um ficheiro contendo certificados TLS necessário para as Autoridades de Certificação foi ou será carregado. Na versão do Android 9 e anteriores, um ficheiro chamado \'ca_certs.crt\' será lido a partir da pasta Download.</string>
+    <string name="debug_help">Se selecionado, disponibiliza mensagens de depuração no registo log e informações para o Logcat.</string>
     <string name="answer">Atender</string>
     <string name="opus_packet_loss_help">Percentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por predefinição 0, a desactivar a Opus Forward Error Correction (FEC).</string>
     <string name="reject">Rejeitar</string>
     <string name="outbound_proxies_help">URI SIP de um ou dois proxies que precisam ser usados para enviar solicitações. Se dois forem informados, requisições de REGISTO serão enviados para ambos e as outras requisições serão enviadas para aquele que respondeu. Se nenhum proxy foi informado, requisições serão enviadas baseadas em DNS NAPTR/SRV/A pesquisa de registo da URI do host do destinatário. Se o host da URI SIP for um endereço IPv6, o endereço precisa ser escrito dentro de colchetes [].
 \nExemplos:
-\n • sip:foo.com:5060;transport=tls
-\n • sip:[2001:67c:223:777::10]:5060;transport=tcp</string>
+\n • sip:example.com:5061;transport=tls
+\n • sip:[2001:67c:223:777::10];transport=tcp
+\n • sip:192.168.43.50:443;transport=wss</string>
     <string name="tap_to_start">Toque para iniciar a aplicação</string>
     <string name="send_message">Enviar Mensagem</string>
     <string name="account_allocation_failure">Falha ao alocar nova conta.</string>
@@ -22,14 +23,14 @@
     <string name="deny">Recusar</string>
     <string name="delete_history_alert">Quer apagar o histórico de chamadas da conta \'%1$s\'\?</string>
     <string name="add_contact">Adicionar Contato</string>
-    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta]. Onde o scheme é \'stun\', \'stuns\', \'turn\', ou \'turns\'. O servidor STUN predefinido de fábrica é \'stun:stun.l.google.com:19302\', apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
+    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta]. Onde o scheme é \'stun\' ou \'turn\'. O Servidor predefinido de fábrica para o STUN e os protocolos ICE são \'stun:stun.l.google.com:19302\' apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
     <string name="start_failed">Baresip falhou ao iniciar. Isso pode ser devido a um valor inválido das Configurações. Verifique Endereço de Escuta, Ficheiro de Certificado TLS e Ficheiro CA TLS. Em seguida, reinicie o baresip.</string>
     <string name="call_already_active">Já tem uma chamada ativa.</string>
     <string name="calls_call">chamada</string>
-    <string name="accounts_help">Número de porta da conta e protocolo de transporte podem ser opcionalmente informados quando uma nova conta é criada: usuario@dominio[:porta][;transport=udp|tcp|tls]. Se a porta é fornecida e o protocolo de transporte não, o protocolo de transporte vai para a predefinição udp. Se a porta não é fornecida e o protocolo de transporte é, a porta vai para a predefinição 5060 ou 5061 (TLS). Se nenhum é fornecido e nenhum proxy de saída é especificado, registador da conta (se houver) é determinado exclusivamente com base em informações do DNS do domínio.</string>
+    <string name="accounts_help">Quando uma nova conta é criada, a informação do número da porta, da conta e o protocolo de transporte é opcional: &lt;utilizador&gt;@@&lt;domínio&gt;[:&lt;porta&gt;][;transport=udp|tcp|tls]. Caso a &lt;porta&gt; seja informada e o protocolo de transporte não, o padrão será udp. Caso a &lt;porta&gt; não seja informada e o protocolo de transporte seja, a &lt;porta&gt; padrão é 5060 ou 5061 (TLS). Caso nenhum dos dois ou nenhum proxy seja informado, o utilizador da conta (caso haja) é determinado exclusivamente com base nas informações do DNS do domínio.</string>
     <string name="stun_password">Palavra-passe STUN/TURN</string>
     <string name="reset_config">Redefinir os Padrões de Fábrica</string>
-    <string name="allow_video">Aceitar a chamada de vídeo com \'%1$s\'\?</string>
+    <string name="allow_video">Aceitar o envio e o recebimento de vídeo com \'%1$s\'\?</string>
     <string name="incoming_call_from_dots">Chamada recebida de …</string>
     <string name="add">Adicionar</string>
     <string name="alert">Alerta</string>
@@ -49,7 +50,7 @@
     <string name="sip_uri_of_proxy_server">URI SIP do Servidor Proxy</string>
     <string name="backup">Cópia de Segurança</string>
     <string name="audio_modules_title">Módulos de Áudio</string>
-    <string name="transfer">Solicitação da Transferência</string>
+    <string name="transfer">Transferir</string>
     <string name="status">Estado</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
     <string name="disable_history">Desativar</string>
@@ -61,18 +62,18 @@
     <string name="today">Hoje</string>
     <string name="delete_history">Apagar</string>
     <string name="dns_servers">Servidores DNS</string>
-    <string name="no_video_calls">Não tem a possibilidade de fazer ou responder chamadas de vídeo sem a permissão da câmera.</string>
+    <string name="no_video_calls">Conceda permissão à \"Câmera\" para realizar ou atender chamadas de vídeo.</string>
     <string name="failed_to_set_dns_servers">Falha ao definir servidores DNS</string>
     <string name="audio_codecs_help">Lista dos codecs de áudio compatíveis em ordem de prioridade</string>
     <string name="stun_password_help">Palavra-passe, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="long_chat_question">Quer apagar o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="incoming_call_from">Chamada de</string>
+    <string name="incoming_call_from">Recebendo chamada de</string>
     <string name="send">Enviar</string>
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
     <string name="video_call">Chamada de vídeo</string>
     <string name="default_account_help">Se marcado, esta conta é selecionada quando o baresip for iniciado.</string>
-    <string name="backup_failed">Falha ao fazer o backup dos dados da aplicação no ficheiro \'%1$s\' na pasta Download. Verifique Apps → baresip → Permissões → Armazenamento.</string>
+    <string name="backup_failed">Falha ao fazer o backup dos dados da aplicação no ficheiro \'%1$s\'. Verifique Aplicações → baresip → Permissões → Armazenamento.</string>
     <string name="hold">Reter</string>
     <string name="display_name_help">Nome (se houver) usado em From URI de solicitações de saída.</string>
     <string name="call_failed">A ligação falhou</string>
@@ -145,7 +146,7 @@
     <string name="message_failed">Falhou</string>
     <string name="call_closed">A chamada está terminada</string>
     <string name="invalid_opus_bitrate">Taxa de bits Opus inválida</string>
-    <string name="transfer_request">Solicitação de transferência de chamada para</string>
+    <string name="transfer_request">Pedido de Transferência</string>
     <string name="authentication_password">Palavra-passe de Autenticação</string>
     <string name="registering_failed">O registo de %1$s falhou.</string>
     <string name="contact">Contato</string>
@@ -159,10 +160,10 @@
 \n • SRTP-MAND significa que RTP/SAVP é oferecido em chamadas efetuadas e requerido em chamadas recebidas.
 \n • SRTP significa que RTP/AVP é oferecido em chamadas efetuadas e que RTP/SAVP ou RTP/SAVPF é usado se oferecido em chamadas recebidas.</string>
     <string name="new_messages">novas mensagens</string>
-    <string name="about_text">&lt;h1&gt;Biblioteca Baresip baseado em agente de utilizador SIP&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Dicas de Uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Verifique se os ajustes padrões atendem suas necessidades (clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;Então crie uma ou mais contas (novamente clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;O estado de uma conta é mostrado com um ponto colorido: verde (registo bem sucedido), amarelo (registo em progresso), vermelho (registo falhou), branco (registo não foi ativado).&lt;/li&gt; &lt;li&gt;Peers de chamada e mensagens podem ser adicionadas aos contatos com toque longo.&lt;/li&gt; &lt;li&gt;Toques longos também podem ser usados para remover chamadas, chats, mensagens e contatos.&lt;/li&gt; &lt;li&gt;Toque/toque longo em ícones de contato podem ser usados para adicionar/remover avatar.&lt;/li&gt; &lt;li&gt;Pode selecionar novamente a chamada anterior clicando no ícone de ligação quando Destino estiver vazio.&lt;/li&gt; &lt;li&gt;Se não puder ouvir a outra parte durante a ligação, tente aumentar o volume de Mídia do aparelho ou ajuste o Volume de Ligação Predefinido nos Ajustes.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Problemas Conhecidos&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Devido a limitações em bibliotecas subjacentes, baresip atualmente não suporta múltiplas interfaces de rede ativas simultaneamente.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Código Fonte&lt;/h2&gt; Código fonte disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também falhas podem ser reportadas.</string>
+    <string name="about_text">&lt;h1&gt;Biblioteca Baresip baseado em agente de utilizador SIP&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Dicas de Uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Nas configurações de notificação do Android, permita as notificações do baresip.&lt;/li&gt; &lt;ul&gt; &lt;li&gt;Verifique se os valores predefinidos nas Configurações atendem as suas necessidades (clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;Uma nova conta pode ser parcialmente configurada automaticamente. Consulte &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;Wiki&lt;/a&gt; para obter mais informações.&lt;/li&gt; &lt;li&gt;O estado de uma conta é mostrado com um ponto colorido: verde (registo bem sucedido), amarelo (registo em progresso), vermelho (registo falhou), branco (registo não foi ativado).&lt;/li&gt; &lt;li&gt;Toque nos três pontos para ir direto para a configuração da conta.&lt;/li&gt; &lt;li&gt;O gesto de passar o dedo para baixo no ecrã faz com que o ecrã de registo da conta seja exibida novamente.&lt;/li&gt; &lt;li&gt;Peers de chamada e mensagens podem ser adicionadas aos contatos com toque longo.&lt;/li&gt; &lt;li&gt;Toques longos também podem ser usados para remover chamadas, chats, mensagens e contatos.&lt;/li&gt; &lt;li&gt;Toque/toque longo em ícones de contato podem ser usados para adicionar/remover avatar.&lt;/li&gt; &lt;li&gt;Pode selecionar novamente a chamada anterior clicando no ícone de ligação quando Destino estiver vazio.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Problemas Conhecidos&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Devido a limitações em bibliotecas subjacentes, baresip atualmente não suporta múltiplas interfaces de rede ativas simultaneamente. A preferência da interface ativa da rede é VPN, Internet, outro.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Código Fonte&lt;/h2&gt; Código fonte disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também falhas podem ser reportadas. &lt;h2&gt;Licenças&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; exceto o seguinte&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codec e TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; G722 e codecs G726&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt; &lt;/ul&gt;</string>
     <string name="your_name">Seu Nome</string>
     <string name="video_size">Tamanho do Quadro do Vídeo</string>
-    <string name="restore_failed">Falha ao restaurar os dados da aplicação da pasta Download. Verifique Apps → baresip → Permissões → Armazenamento e se o ficheiro de backup \'%1$s\' existe na pasta e, se houver, se forneceu a Palavra-passe de Descriptografia correta.</string>
+    <string name="restore_failed">Falha ao restaurar os dados da aplicação. Verifique se inseriu a palavra-passe correta, Nas versões do Android 9 e anteriores, verifique também em Aplocação → baresip → Permissões → Armazenamento e se o ficheiro \'%1$s\' existe na pasta Descarregas.</string>
     <string name="restart">Reiniciar</string>
     <string name="authentication_username">Nome de Utilizador de Autenticação</string>
     <string name="messages">Mensagens</string>
@@ -179,12 +180,12 @@
     <string name="invalid_voicemail_uri">URI de Correio de Voz inválida \'%1$s\'</string>
     <string name="no_calls">Não pode fazer ou atender chamadas sem a permissão do Microfone.</string>
     <string name="invalid_contact_uri">URI SIP inválida</string>
-    <string name="read_ca_certs_error">Falha ao ler o ficheiro \'ca_certs.crt\' do diretório Download.</string>
+    <string name="read_ca_certs_error">Houve uma falha ao ler o ficheiro \'ca_certs.crt\'.</string>
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="listen_address_help">Endereço IP e porta no formato \'endereco:porta\' do qual o baresip escuta para solicitações SIP recebidas. Se o endereço IP é um endereço IPv6, deve ser escrito em colchetes []. Endereço IPv4 0.0.0.0 ou IPv6 [::] faz o baresip escutar todos endereços disponíveis. Se deixado em branco (ajuste predefinido), o baresip escuta na porta 5060 de todos endereços disponíveis.</string>
     <string name="reset_config_help">Se selecionado, ajustes serão redefinidos para os valores de predefinição de fábrica.</string>
     <string name="call_not_secure">Esta chamada NÃO é segura!</string>
-    <string name="read_cert_error">Falha ao ler o ficheiro \'cert.pem\' do diretório Download.</string>
+    <string name="read_cert_error">Houve uma falha ao ler o ficheiro \'cert.pem\'.</string>
     <string name="media_encryption">Criptografia de Mídia</string>
     <string name="callee">Destinatário</string>
     <string name="listen_address">Endereço de Escuta</string>
@@ -215,13 +216,35 @@
     <string name="one_old_message">uma mensagem antiga</string>
     <string name="configuration">Ajustes</string>
     <string name="answer_mode_help">Selecione como chamadas recebidas são respondidas.</string>
-    <string name="contacts_exceeded">Sua quantidade máxima de contatos %1%d foi excedido.</string>
+    <string name="contacts_exceeded">A sua quantidade máxima de %1$d contatos foi excedida.</string>
     <string name="video_size_help">Tamanho dos quadros de vídeo que foram transmitidos (largura x altura). A configuração de fábrica é 800x600.</string>
     <string name="voicemail_uri">URI do Correio de Voz</string>
-    <string name="backed_up">Dados da aplicação armazenados em backup no ficheiro \'%1$s\' na Download.</string>
+    <string name="backed_up">Os dados as aplicações foram armazenados num backup no ficheiro \'%1$s\'. Nas versões do Android 9 e anteriores, o ficheiro está na pasta Download.</string>
     <string name="quit">Sair</string>
     <string name="unverify">Desverificar</string>
-    <string name="tls_certificate_file_help">Se for marcado, o ficheiro \'cert.pem\' que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado no diretório Download. Por motivos de segurança, apague o ficheiro após o carregamento.</string>
+    <string name="tls_certificate_file_help">Se marcado, o ficheiro que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9 e anteriores, um ficheiro chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, exclua o ficheiro após o carregamento.</string>
     <string name="invalid_stun_username">Nome do utilizador inválido \'%1$s\'</string>
     <string name="calls_delete_question">Quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
+    <string name="transfer_failed">A transferência falhou</string>
+    <string name="transfer_destination">Destino da transferência</string>
+    <string name="call_transfer">Transferência de chamada</string>
+    <string name="allow_video_recv">Aceitar o recebimento de vídeo a partir do \'%1$s\'\?</string>
+    <string name="allow_video_send">Aceitar o envio de vídeo para \'%1$s\'\?</string>
+    <string name="android_contact_help">Se for marcado, este contato também estará disponível nos contatos do Android.</string>
+    <string name="sip_trace_help">Se selecionado em conjunto com Debug, fornece também o pedido SIP e o rastreamento da resposta ao Logcat. A seleção não é automática durante a inicialização do baresip.</string>
+    <string name="sip_trace">Rastreio SIP</string>
+    <string name="dark_theme_help">Impor o uso do tema escuro no ecrã</string>
+    <string name="dark_theme">Tema Escuro</string>
+    <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado. Se estiver marcado, o ficheiro TLS CA também deve ser carregado.</string>
+    <string name="verify_server_error">Os certificados do servidor não podem ser aferidos sem o ficheiro CA TLS.</string>
+    <string name="verify_server">Verifique os certificados do servidor</string>
+    <string name="transfer_request_to">Chamada de solicitação de transferência para</string>
+    <string name="missed_call_from">Ligação perdida de</string>
+    <string name="dtmf_info">Solicitações INFO SIP</string>
+    <string name="dtmf_inband">Eventos na Banda RTP</string>
+    <string name="dtmf_mode_help">Selecione como os tons DTMF 0–9, #, * e A-D serão enviados.</string>
+    <string name="dtmf_mode">Modo DTMF</string>
+    <string name="stun_server_uri">Servidor URI STUN/TURN</string>
+    <string name="about_text_plus">&lt;h1&gt;Agente de utilizador SIP baseado na biblioteca baresip com chamadas&lt;/h1&gt; de vídeo &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Versão %1$s&lt;/p&gt; Dicas de &lt;h2&gt;uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Nas configurações de notificação das aplicações do Android, permita as notificações do baresip+.&lt;/li&gt; &lt;li&gt;Verifique se os valores predefinidos nas Configurações do baresip+ atendem às suas necessidades (toque nos títulos dos itens para ver a ajuda).&lt;/li&gt; &lt;li&gt;Em Contas, crie uma ou mais contas (toque novamente nos títulos dos itens para receber ajuda).&lt;/li&gt; &lt;li&gt;Uma nova conta pode ser parcialmente configurada automaticamente. Consulte &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;Wiki&lt;/a&gt; para obter mais informações.&lt;/li&gt; &lt;li&gt;A condição geral do registo de uma conta é exibido com um ponto colorido: verde (registo bem sucedido, amarelo (o registo está em andamento), vermelho (falha no registo), branco (o registo ainda não foi ativado).&lt;/li&gt; &lt;li&gt;Toque nos três pontos para ir direto para a configuração da conta.&lt;/li&gt; &lt;li&gt;O gesto para baixo causa o recadastramento da conta que está atualmente sendo mostrada.&lt;/li&gt; &lt;li&gt;Os peers das chamadas e das mensagens podem ser adicionados aos contatos através de toques longos.&lt;/li&gt; &lt;li&gt;Os toques também podem ser utilizados para remover chamadas, chats, mensagens e os contatos.&lt;/li&gt; &lt;li&gt;O toque ou toque longo no ícone de contato pode ser usado para instalar/remover a imagem do avatar.&lt;/li&gt; &lt;li&gt;É possível selecionar novamente parte da chamada anterior tocando no ícone de chamada quando o \"Callee\" estiver vazio.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Problemas Conhecidos&lt;/h2&gt; &lt;ul&gt;&lt;li&gt; Devido às limitações nas bibliotecas subjacentes, as várias interfaces de rede concorrentes não são suportadas. A preferência da interface ativa da rede é VPN, Internet, outro.&lt;/li&gt; &lt;li&gt;Nas chamadas de vídeo, o aparelho precisa ser mantido no modo paisagem com o ecrã na horizontal.&lt;/li&gt; &lt;li&gt;O Selfview não é mostrado adequadamente quando a transmissão do vídeo está como sendonly.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;O Código Fonte&lt;/h2&gt; está disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também qualquer problema poderá ser relatado. &lt;h2&gt;Licenças&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; exceto as seguintes:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codec e segurança TLS&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; codecs G.722 e G.726 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; criptografia de mídia ZRTP&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv2&lt;/b&gt; codecs H.264 e H.265&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; codec G.729&lt;/li&gt; &lt;li&gt;&lt;b&gt;AOMedia&lt;/b&gt; AV1 codec&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="about_title_plus">Sobre o baresip+</string>
 </resources>
