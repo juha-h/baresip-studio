@@ -2,18 +2,20 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.tutpro.baresip.databinding.ActivityAccountBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
-import java.lang.ref.WeakReference
 import java.net.URL
 import java.util.*
 import kotlin.collections.ArrayList
@@ -56,6 +58,8 @@ class AccountActivity : AppCompatActivity() {
     private var save = false
     private var uaIndex= -1
 
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -89,15 +93,103 @@ class AccountActivity : AppCompatActivity() {
 
         Utils.addActivity("account,$aor")
 
-        if (intent.getBooleanExtra("new", false)) {
-            val url = "https://${Utils.uriHostPart(aor)}/baresip/account_config.xml"
-            GetAccountConfigAsyncTask(this).execute(url)
-        }
+        if (intent.getBooleanExtra("new", false))
+            initAccountFromConfig(this)
 
         title = aor.split(":")[1]
 
         initLayoutFromAccount(acc)
 
+    }
+
+    private fun initAccountFromConfig(ctx: AccountActivity) {
+        scope.launch(Dispatchers.IO) {
+            val url = "https://${Utils.uriHostPart(aor)}/baresip/account_config.xml"
+            val config = try {
+                URL(url).readText()
+            } catch (e: java.lang.Exception) {
+                Log.d("Baresip", "Network request failed")
+                null
+            }
+            if (config != null && !ctx.isFinishing) {
+                Log.d("Baresip", "Got account config $config")
+                val acc = Account(acc.accp)
+                val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
+                val parser: XmlPullParser = parserFactory.newPullParser()
+                parser.setInput(StringReader(config))
+                var tag: String?
+                var text = ""
+                var event = parser.eventType
+                val audioCodecs = ArrayList(Api.audio_codecs().split(","))
+                val videoCodecs = ArrayList(Api.video_codecs().split(","))
+                while (event != XmlPullParser.END_DOCUMENT) {
+                    tag = parser.name
+                    when (event) {
+                        XmlPullParser.TEXT ->
+                            text = parser.text
+                        XmlPullParser.START_TAG -> {
+                            if (tag == "audio-codecs")
+                                acc.audioCodec.clear()
+                            if (tag == "video-codecs")
+                                acc.videoCodec.clear()
+                        }
+                        XmlPullParser.END_TAG ->
+                            when (tag) {
+                                "outbound-proxy-1" ->
+                                    if (text.isNotEmpty())
+                                        acc.outbound.add(text)
+                                "outbound-proxy-2" ->
+                                    if (text.isNotEmpty())
+                                        acc.outbound.add(text)
+                                "register" ->
+                                    acc.regint = if (text == "yes") 3600 else 0
+                                "audio-codec" ->
+                                    if (text in audioCodecs)
+                                        acc.audioCodec.add(text)
+                                "video-codec" ->
+                                    if (text in videoCodecs)
+                                        acc.videoCodec.add(text)
+                                "media-encoding" -> {
+                                    val enc = text.toLowerCase(Locale.ROOT)
+                                    if (enc in mediaEncKeys && enc.isNotEmpty())
+                                        acc.mediaEnc = enc
+                                }
+                                "media-nat" -> {
+                                    val nat = text.toLowerCase(Locale.ROOT)
+                                    if (nat in mediaNatKeys && nat.isNotEmpty())
+                                        acc.mediaNat = nat
+                                }
+                                "stun-turn-server" ->
+                                    if (text.isNotEmpty())
+                                        acc.stunServer = text
+                                "prefer-ipv6-media" ->
+                                    acc.preferIPv6Media = text == "yes"
+                                "dtmf-mode" ->
+                                    if (text in arrayOf("rtp-event", "sip-info")) {
+                                        acc.dtmfMode = if (text == "rtp-event")
+                                            Api.DTMFMODE_RTP_EVENT
+                                        else
+                                            Api.DTMFMODE_SIP_INFO
+                                    }
+                                "answer-mode" ->
+                                    if (text in arrayOf("manual", "auto")) {
+                                        acc.answerMode = if (text == "manual")
+                                            Api.ANSWERMODE_MANUAL
+                                        else
+                                            Api.ANSWERMODE_AUTO
+                                    }
+                                "voicemail-uri" ->
+                                    if (text.isNotEmpty())
+                                        acc.vmUri = text
+                            }
+                    }
+                    event = parser.next()
+                }
+                runOnUiThread {
+                    initLayoutFromAccount(acc)
+                }
+            }
+        }
     }
 
     private fun initLayoutFromAccount(acc: Account) {
@@ -616,104 +708,6 @@ class AccountActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.default_account),
                         getString(R.string.default_account_help))
             }
-        }
-    }
-
-    private class GetAccountConfigAsyncTask(context: AccountActivity):
-            AsyncTask<String, String, String>() {
-
-        private val TAG = "Baresip"
-
-        private val activityReference: WeakReference<AccountActivity> = WeakReference(context)
-
-        override fun doInBackground(vararg url: String?): String? {
-            val result = try {
-                URL(url[0]).readText()
-            } catch (e: Exception) {
-                Log.e(TAG, "Could not get account config from ${url[0]}: $e")
-                null
-            }
-            Log.d(TAG, "Got account config $result")
-            return result
-        }
-
-        override fun onPostExecute(result: String?) {
-            val activity = activityReference.get()
-            if (activity == null || activity.isFinishing || result == null)
-                return
-            val acc = Account(activity.acc.accp)
-            val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
-            val parser: XmlPullParser = parserFactory.newPullParser()
-            parser.setInput(StringReader(result))
-            var tag: String?
-            var text = ""
-            var event = parser.eventType
-            val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-            val videoCodecs = ArrayList(Api.video_codecs().split(","))
-            while (event != XmlPullParser.END_DOCUMENT) {
-                tag = parser.name
-                when (event) {
-                    XmlPullParser.TEXT ->
-                        text = parser.text
-                    XmlPullParser.START_TAG -> {
-                        if (tag == "audio-codecs")
-                            acc.audioCodec.clear()
-                        if (tag == "video-codecs")
-                            acc.videoCodec.clear()
-                    }
-                    XmlPullParser.END_TAG ->
-                        when (tag) {
-                            "outbound-proxy-1" ->
-                                if (text.isNotEmpty())
-                                    acc.outbound.add(text)
-                            "outbound-proxy-2" ->
-                                if (text.isNotEmpty())
-                                    acc.outbound.add(text)
-                            "register" ->
-                                acc.regint = if (text == "yes") 3600 else 0
-                            "audio-codec" ->
-                                if (text in audioCodecs)
-                                    acc.audioCodec.add(text)
-                            "video-codec" ->
-                                if (text in videoCodecs)
-                                    acc.videoCodec.add(text)
-                            "media-encoding" -> {
-                                val enc = text.toLowerCase(Locale.ROOT)
-                                if (enc in activity.mediaEncKeys && enc.isNotEmpty())
-                                    acc.mediaEnc = enc
-                            }
-                            "media-nat" -> {
-                                val nat = text.toLowerCase(Locale.ROOT)
-                                if (nat in activity.mediaNatKeys && nat.isNotEmpty())
-                                    acc.mediaNat = nat
-                            }
-                            "stun-turn-server" ->
-                                if (text.isNotEmpty())
-                                    acc.stunServer = text
-                            "prefer-ipv6-media" ->
-                                acc.preferIPv6Media = text == "yes"
-                            "dtmf-mode" ->
-                                if (text in arrayOf("rtp-event", "sip-info")) {
-                                    acc.dtmfMode = if (text == "rtp-event")
-                                        Api.DTMFMODE_RTP_EVENT
-                                    else
-                                        Api.DTMFMODE_SIP_INFO
-                                }
-                            "answer-mode" ->
-                                if (text in arrayOf("manual", "auto")) {
-                                    acc.answerMode = if (text == "manual")
-                                        Api.ANSWERMODE_MANUAL
-                                    else
-                                        Api.ANSWERMODE_AUTO
-                                }
-                            "voicemail-uri" ->
-                                if (text.isNotEmpty())
-                                    acc.vmUri = text
-                    }
-                }
-                event = parser.next()
-            }
-            activity.initLayoutFromAccount(acc)
         }
     }
 
