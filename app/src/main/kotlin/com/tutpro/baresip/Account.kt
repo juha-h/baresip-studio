@@ -206,13 +206,10 @@ class Account(val accp: String) {
         fun checkAuthUser(au: String): Boolean {
             if (au == "") return true
             val ud = au.split("@")
-            val userIDRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}\$")
-            val telnoRegex = Regex("^[+]?[0-9]{1,16}\$")
-            if (ud.size == 1) {
-                return userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])
-            } else {
-                return (userIDRegex.matches(ud[0]) || telnoRegex.matches(ud[0])) &&
-                        Utils.checkDomain(ud[1])
+            return when (ud.size) {
+                1 -> Utils.checkUriUser(au)
+                2 -> Utils.checkUriUser(ud[0]) && Utils.checkDomain(ud[1])
+                else -> false
             }
         }
 
