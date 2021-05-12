@@ -22,8 +22,6 @@ import kotlin.collections.ArrayList
 
 class AccountActivity : AppCompatActivity() {
 
-    private val TAG = "Baresip"
-
     private lateinit var binding: ActivityAccountBinding
     private lateinit var acc: Account
     private lateinit var ua: UserAgent
@@ -108,11 +106,11 @@ class AccountActivity : AppCompatActivity() {
             val config = try {
                 URL(url).readText()
             } catch (e: java.lang.Exception) {
-                Log.d("Baresip", "Network request failed")
+                Log.d(TAG, "Network request failed")
                 null
             }
             if (config != null && !ctx.isFinishing) {
-                Log.d("Baresip", "Got account config $config")
+                Log.d(TAG, "Got account config '$config'")
                 val acc = Account(acc.accp)
                 val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
                 val parser: XmlPullParser = parserFactory.newPullParser()
@@ -398,7 +396,7 @@ class AccountActivity : AppCompatActivity() {
                     if (acc.authUser != "") {
                         if (!MainActivity.aorPasswords.containsKey(aor)) {
                             setAuthPass(acc, "")
-                            MainActivity.aorPasswords.put(aor, "")
+                            MainActivity.aorPasswords[aor] = ""
                         }
                     } else {
                         if (acc.authPass != "") {
@@ -412,12 +410,12 @@ class AccountActivity : AppCompatActivity() {
                 var uri: String
                 if (outbound1.text.toString().trim() != "") {
                     uri = outbound1.text.toString().trim().replace(" ", "")
-                    if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                    if (!uri.startsWith("sip:")) uri = "sip:$uri"
                     ob.add(uri)
                 }
                 if (outbound2.text.toString().trim() != "") {
                     uri = outbound2.text.toString().trim().replace(" ", "")
-                    if (!uri.startsWith("sip:")) uri = "sip:" + uri
+                    if (!uri.startsWith("sip:")) uri = "sip:$uri"
                     ob.add(uri)
                 }
                 if (ob != acc.outbound) {
@@ -734,4 +732,7 @@ class AccountActivity : AppCompatActivity() {
         return Utils.checkHostPortParams(uri.substring(4))
     }
 
+    companion object {
+        private const val TAG = "Baresip"
+    }
 }
