@@ -168,8 +168,10 @@ object Utils {
                 checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
     }
 
-    private fun checkUriUser(user: String): Boolean {
-        user.forEach { if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
+    fun checkUriUser(user: String): Boolean {
+        val escaped = """%(\d|A|B|C|D|E|F|a|b|c|d|e|f){2}""".toRegex()
+        escaped.replace(user, "").forEach {
+            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
         return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
     }
 
