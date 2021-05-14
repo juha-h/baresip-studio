@@ -34,8 +34,6 @@ import kotlin.math.roundToInt
 
 class BaresipService: Service() {
 
-    private val TAG = "Baresip Service"
-
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
     internal lateinit var rt: Ringtone
