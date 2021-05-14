@@ -162,7 +162,7 @@ class ContactActivity : AppCompatActivity() {
                     if (Utils.saveBitmap(rotatedBitmap, File(BaresipService.filesPath, "tmp.png")))
                         newAvatar = "image"
                 } catch (e: Exception) {
-                    Log.e("Baresip", "Could not read avatar image: $e")
+                    Log.e(TAG, "Could not read avatar image: $e")
                 }
             }
         }
@@ -421,7 +421,7 @@ class ContactActivity : AppCompatActivity() {
         try {
             ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e("Baresip", "Adding of contact ${contact.name} failed")
+            Log.e(TAG, "Adding of contact ${contact.name} failed")
             return false
         }
         return true
@@ -446,7 +446,7 @@ class ContactActivity : AppCompatActivity() {
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
+            Log.e(TAG, "Adding of SIP URI $sipUri failed")
         }
     }
 
@@ -458,7 +458,7 @@ class ContactActivity : AppCompatActivity() {
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e("Baresip", "Adding of SIP URI $sipUri failed")
+            Log.e(TAG, "Adding of SIP URI $sipUri failed")
             0
         }
     }
@@ -476,7 +476,7 @@ class ContactActivity : AppCompatActivity() {
             try {
                 contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
             } catch (e: Exception) {
-                Log.e("Baresip", "Adding of Android photo failed")
+                Log.e(TAG, "Adding of Android photo failed")
             }
         }
     }
@@ -493,7 +493,7 @@ class ContactActivity : AppCompatActivity() {
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e("Baresip", "updateAndroidPhoto failed")
+            Log.e(TAG, "updateAndroidPhoto failed")
             0
         }
     }
@@ -507,7 +507,7 @@ class ContactActivity : AppCompatActivity() {
             out.close()
             out.toByteArray()
         } catch (e: Exception) {
-            Log.w("Baresip", "Unable to serialize photo: $e")
+            Log.w(TAG, "Unable to serialize photo: $e")
             null
         }
     }
@@ -542,7 +542,7 @@ class ContactActivity : AppCompatActivity() {
                     CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> kind = "sip"
                     CommonDataKinds.Photo.CONTENT_ITEM_TYPE -> kind = "thumb"
                 }
-                Log.d("Baresip", "got $id, $name, $kind - $data")
+                Log.d(TAG, "got $id, $name, $kind - $data")
                 var info: MutableList<String>
                 if (contacts.containsKey(id)) {
                     info = contacts[id]!!

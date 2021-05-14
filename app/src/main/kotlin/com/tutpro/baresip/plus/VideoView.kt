@@ -47,18 +47,18 @@ class VideoView(val context: Context) {
     inner class SurfaceHolderCallback: SurfaceHolder.Callback {
 
         override fun surfaceCreated(holder: SurfaceHolder) {
-            Log.d("Baresip", "Surface created")
+            Log.d(TAG, "Surface created")
             afterCreate = true
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, w: Int, h: Int) {
-            Log.d("Baresip", "Surface changed")
+            Log.d(TAG, "Surface changed")
             set_surface(holder.surface)
             if (afterCreate) {
                 for (call in Call.calls())
                     if (call.hasVideo()) {
                         if (call.startVideoDisplay() != 0)
-                            Log.e("Baresip", "Failed to start video display")
+                            Log.e(TAG, "Failed to start video display")
                         break;
                     }
                 afterCreate = false
@@ -66,7 +66,7 @@ class VideoView(val context: Context) {
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.d("Baresip", "Surface destroyed")
+            Log.d(TAG, "Surface destroyed")
             for (call in Call.calls())
                 if (call.hasVideo())
                     call.stopVideoDisplay()

@@ -665,7 +665,7 @@ class BaresipService: Service() {
                     "call verified", "call secure" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w("Baresip", "Call $callp that is verified is not found")
+                            Log.w(TAG, "Call $callp that is verified is not found")
                             return
                         }
                         if (ev[0] == "call secure") {

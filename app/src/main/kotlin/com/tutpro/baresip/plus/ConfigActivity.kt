@@ -111,13 +111,11 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
-        Log.d("Baresip", "Old video_size $oldVideoSize")
         val videoSizeSpinner = findViewById(R.id.VideoSizeSpinner) as Spinner
         val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720",
             "1920x1080")
         sizes.removeIf{it == oldVideoSize}
         sizes.add(0, oldVideoSize)
-        Log.d("Baresip", "sizes = $sizes")
         val videoSizeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
                 sizes)
         videoSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -329,7 +327,7 @@ class ConfigActivity : AppCompatActivity() {
                 else
                     if (reload)
                         if (Api.reload_config() != 0)
-                            Log.e("Baresip", "Reload of config failed")
+                            Log.e(TAG, "Reload of config failed")
                 setResult(RESULT_OK, intent)
                 finish()
 

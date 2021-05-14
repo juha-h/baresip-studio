@@ -42,7 +42,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
         }
 
         fun save() {
-            Log.d("Baresip", "Saving history of ${BaresipService.callHistory.size} calls")
+            Log.d(TAG, "Saving history of ${BaresipService.callHistory.size} calls")
             val file = File(BaresipService.filesPath, "calls")
             try {
                 val fos = FileOutputStream(file)
@@ -51,7 +51,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
-                Log.e("Baresip", "OutputStream exception: " + e.toString())
+                Log.e(TAG, "OutputStream exception: " + e.toString())
                 e.printStackTrace()
             }
         }
@@ -66,15 +66,15 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
                     BaresipService.callHistory = ois.readObject() as ArrayList<CallHistory>
                     ois.close()
                     fis.close()
-                    Log.d("Baresip", "Restored history of ${BaresipService.callHistory.size} calls")
+                    Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls")
                 } catch (e: Exception) {
-                    Log.e("Baresip", "InputStream exception: - " + e.toString())
+                    Log.e(TAG, "InputStream exception: - " + e.toString())
                 }
         }
 
         fun print() {
             for (h in BaresipService.callHistory)
-                Log.d("Baresip", "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.connected}]")
+                Log.d(TAG, "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.connected}]")
         }
     }
 

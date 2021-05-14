@@ -113,29 +113,29 @@ class CodecsActivity : AppCompatActivity() {
                 if (media == "audio")
                     if (mc != acc.audioCodec) {
                         if (Api.account_set_audio_codecs(acc.accp, mcList) == 0) {
-                            Log.d("Baresip", "New audio codecs '$mcList'")
+                            Log.d(TAG, "New audio codecs '$mcList'")
                             acc.audioCodec = mc
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of audio codecs '$mcList' failed")
+                            Log.e(TAG, "Setting of audio codecs '$mcList' failed")
                         }
                     }
 
                 if (media == "video")
                     if (mc != acc.videoCodec) {
                         if (Api.account_set_video_codecs(acc.accp, mcList) == 0) {
-                            Log.d("Baresip", "New video codecs '$mcList'")
+                            Log.d(TAG, "New video codecs '$mcList'")
                             acc.videoCodec = mc
                             save = true
                         } else {
-                            Log.e("Baresip", "Setting of video codecs '$mcList' failed")
+                            Log.e(TAG, "Setting of video codecs '$mcList' failed")
                         }
                     }
 
                 if (save) {
                     AccountsActivity.saveAccounts()
                     if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e("Baresip", "Failed to update UA ${ua.uap} with AoR $aor")
+                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
                 }
 
                 if ((acc.regint > 0) && !((acc.authUser != "") && (acc.authPass == "")))

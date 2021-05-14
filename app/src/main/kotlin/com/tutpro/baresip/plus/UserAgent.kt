@@ -51,7 +51,7 @@ class UserAgent(val uap: String) {
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
             if (uap != "") return UserAgent(uap)
-            Log.e("Baresip", "Failed to allocate UserAgent for $uri")
+            Log.e(TAG, "Failed to allocate UserAgent for $uri")
             return null
         }
 
@@ -66,7 +66,7 @@ class UserAgent(val uap: String) {
             for (ua in BaresipService.uas) {
                 if (ua.account.regint > 0) {
                     if (Api.ua_register(ua.uap) != 0)
-                        Log.d("Baresip", "Failed to register ${ua.account.aor}")
+                        Log.d(TAG, "Failed to register ${ua.account.aor}")
                 }
             }
         }

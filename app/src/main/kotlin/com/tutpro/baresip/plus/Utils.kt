@@ -301,10 +301,10 @@ object Utils {
         var updated = false
         val ipV6Addr = findIpV6Address(linkAddresses)
         if (ipV6Addr != findIpV6Address(BaresipService.linkAddresses)) {
-            Log.d("Baresip", "Updating IPv6 address to '$ipV6Addr'")
+            Log.d(TAG, "Updating IPv6 address to '$ipV6Addr'")
             if (ipV6Addr != "") {
                 if (Api.net_set_address(ipV6Addr) != 0)
-                    Log.w("Baresip", "Failed to update net address '$ipV6Addr")
+                    Log.w(TAG, "Failed to update net address '$ipV6Addr")
             } else {
                 Api.net_unset_address(Api.AF_INET6)
             }
@@ -312,10 +312,10 @@ object Utils {
         }
         val ipV4Addr = findIpV4Address(linkAddresses)
         if (ipV4Addr != findIpV4Address(BaresipService.linkAddresses)) {
-            Log.d("Baresip", "Updating IPv4 address to '$ipV4Addr'")
+            Log.d(TAG, "Updating IPv4 address to '$ipV4Addr'")
             if (ipV4Addr != "") {
                 if (Api.net_set_address(ipV4Addr) != 0)
-                    Log.w("Baresip", "Failed to update net address '$ipV4Addr'")
+                    Log.w(TAG, "Failed to update net address '$ipV4Addr'")
             } else {
                 Api.net_unset_address(Api.AF_INET)
             }
@@ -334,7 +334,7 @@ object Utils {
         if (BaresipService.dynDns && (BaresipService.dnsServers != props.dnsServers)) {
             if (BaresipService.isServiceRunning)
                     if (Config.updateDnsServers(props.dnsServers) != 0)
-                        Log.w("Baresip", "Failed to update DNS servers '${props.dnsServers}'")
+                        Log.w(TAG, "Failed to update DNS servers '${props.dnsServers}'")
                     else
                         BaresipService.dnsServers = props.dnsServers
             else
@@ -369,9 +369,9 @@ object Utils {
                     val digit = text[0]
                     val call = Call.ofCallp(callp)
                     if (call == null) {
-                        Log.w("Baresip", "dtmfWatcher did not find call $callp")
+                        Log.w(TAG, "dtmfWatcher did not find call $callp")
                     } else {
-                        Log.d("Baresip", "Got DTMF digit '$digit'")
+                        Log.d(TAG, "Got DTMF digit '$digit'")
                         if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
                             call.sendDigit(digit)
                     }
@@ -415,7 +415,7 @@ object Utils {
             os.close()
             `is`.close()
         } catch (e: IOException) {
-            Log.e("Baresip", "Failed to copy asset '$asset' to file: $e")
+            Log.e(TAG, "Failed to copy asset '$asset' to file: $e")
         }
     }
 
@@ -424,7 +424,7 @@ object Utils {
             try {
                 file.delete()
             } catch (e: IOException) {
-                Log.e("Baresip", "Could not delete file ${file.absolutePath}")
+                Log.e(TAG, "Could not delete file ${file.absolutePath}")
             }
         }
     }
@@ -433,10 +433,10 @@ object Utils {
         return try {
             File(filePath).readBytes()
         } catch (e: FileNotFoundException) {
-            Log.e("Baresip", "File '$filePath' not found: ${e.printStackTrace()}")
+            Log.e(TAG, "File '$filePath' not found: ${e.printStackTrace()}")
             null
         } catch (e: Exception) {
-            Log.e("Baresip", "Failed to read file '$filePath': ${e.printStackTrace()}")
+            Log.e(TAG, "Failed to read file '$filePath': ${e.printStackTrace()}")
             null
         }
     }
@@ -446,7 +446,7 @@ object Utils {
             File(filePath).writeBytes(contents)
         }
         catch (e: IOException) {
-            Log.e("Baresip", "Failed to write file '$filePath': $e")
+            Log.e(TAG, "Failed to write file '$filePath': $e")
             return false
         }
         return true
@@ -472,9 +472,9 @@ object Utils {
             scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
-            Log.e("Baresip", "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
+            Log.d(TAG, "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
         } catch (e: Exception) {
-            Log.e("Baresip", "Failed to save bitmap to ${file.absolutePath}")
+            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}")
             return false
         }
         return true
@@ -505,7 +505,7 @@ object Utils {
             val cipherData = cipher.doFinal(content)
             obj = Crypto(salt, iterationCount, iv, cipherData)
         } catch (e: Exception) {
-            Log.e("Baresip", "Encrypt failed: ${e.printStackTrace()}")
+            Log.e(TAG, "Encrypt failed: ${e.printStackTrace()}")
         }
         return obj
 
@@ -523,7 +523,7 @@ object Utils {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             plainData = cipher.doFinal(obj.data)
         } catch (e: Exception) {
-            Log.e("Baresip", "Decrypt failed: ${e.printStackTrace()}")
+            Log.e(TAG, "Decrypt failed: ${e.printStackTrace()}")
         }
         return plainData
     }
@@ -535,7 +535,7 @@ object Utils {
                 it.writeObject(obj)
             }
         } catch (e: Exception) {
-            Log.w("Baresip", "encryptToStream failed: $e")
+            Log.w(TAG, "encryptToStream failed: $e")
             return false
         }
         return true
@@ -549,7 +549,7 @@ object Utils {
                 plainData = decrypt(obj, password.toCharArray())
             }
         } catch (e: Exception) {
-            Log.w("Baresip", "decryptFromStream failed: $e")
+            Log.w(TAG, "decryptFromStream failed: $e")
         }
         return plainData
     }
@@ -577,7 +577,7 @@ object Utils {
                 }
             }
         } catch (e: IOException) {
-            Log.e("Baresip", "Failed to zip file '$zipFilePath': $e")
+            Log.e(TAG, "Failed to zip file '$zipFilePath': $e")
             return false
         }
         return true
@@ -599,7 +599,7 @@ object Utils {
                 }
             }
         } catch (e: IOException) {
-            Log.e("Baresip", "Failed to unzip file '$zipFilePath': $e")
+            Log.e(TAG, "Failed to unzip file '$zipFilePath': $e")
             return false
         }
         (allFiles - zipFiles).iterator().forEach {
@@ -612,12 +612,12 @@ object Utils {
         val bundle: Bundle = intent.extras ?: return
         val keys = bundle.keySet()
         val it = keys.iterator()
-        Log.d("Baresip", "Dumping intent start")
+        Log.d(TAG, "Dumping intent start")
         while (it.hasNext()) {
             val key = it.next()
-            Log.d("Baresip", "[" + key + "=" + bundle.get(key) + "]")
+            Log.d(TAG, "[" + key + "=" + bundle.get(key) + "]")
         }
-        Log.d("Baresip", "Dumping intent finish")
+        Log.d(TAG, "Dumping intent finish")
     }
 
     fun randomColor(): Int {
@@ -645,7 +645,7 @@ object Utils {
                 }
             }
         } catch (e: CameraAccessException) {
-            Log.e("Baresip", "Could not get supportedCameras: ${e.printStackTrace()}")
+            Log.e(TAG, "Could not get supportedCameras: ${e.printStackTrace()}")
         }
         return cameras
     }

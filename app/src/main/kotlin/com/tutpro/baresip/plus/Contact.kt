@@ -55,18 +55,18 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                         id = idValue.toLong()
                     else
                         id = baseId + contactNo
-                    Log.d("Baresip", "Restoring contact $name, $uri, $color, $id, $androidContact")
+                    Log.d(TAG, "Restoring contact $name, $uri, $color, $id, $androidContact")
                     val contact = Contact(name, uri, color, id)
                     contact.androidContact = androidContact
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {
                             contact.avatarImage = BitmapFactory.decodeFile(avatarFilePath)
-                            Log.d("Baresip", "Set avatarImage")
+                            Log.d(TAG, "Set avatarImage")
                             if (contact.avatarImage == null)
-                                Log.d("Baresip", "Contact $id avatarImage is null")
+                                Log.d(TAG, "Contact $id avatarImage is null")
                         } catch (e: Exception) {
-                            Log.e("Baresip", "Could not read avatar image from '$id.img")
+                            Log.e(TAG, "Could not read avatar image from '$id.img")
                         }
                     }
                     BaresipService.contacts.add(contact)

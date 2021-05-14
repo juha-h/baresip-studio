@@ -52,7 +52,7 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
                     }
                 }
             } catch (e: Exception) {
-                Log.e("Baresip", "onFling exception $e")
+                Log.e(TAG, "onFling exception $e")
                 e.printStackTrace()
             }
 
