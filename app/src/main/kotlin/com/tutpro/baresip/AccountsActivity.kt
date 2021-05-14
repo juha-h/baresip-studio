@@ -40,13 +40,13 @@ class AccountsActivity : AppCompatActivity() {
         addAccountButton.setOnClickListener {
             val aor = newAorView.text.toString().trim()
             if (!Utils.checkAor("sip:$aor")) {
-                Log.d("Baresip", "Invalid Address of Record $aor")
+                Log.d(TAG, "Invalid Address of Record $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.invalid_aor), aor))
                 return@setOnClickListener
             }
             if (Account.ofAor("sip:$aor") != null) {
-                Log.d("Baresip", "Account $aor already exists")
+                Log.d(TAG, "Account $aor already exists")
                 Utils.alertView(this, getString(R.string.notice),
                         String.format(getString(R.string.account_exists), aor.split(":")[0]))
                 return@setOnClickListener
@@ -54,13 +54,13 @@ class AccountsActivity : AppCompatActivity() {
             val laddr = "sip:$aor"
             val ua = UserAgent.uaAlloc("<$laddr>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;mwi=no")
             if (ua == null) {
-                Log.e("Baresip", "Failed to allocate UA for $aor")
+                Log.e(TAG, "Failed to allocate UA for $aor")
                 Utils.alertView(this, getString(R.string.notice),
                         getString(R.string.account_allocation_failure))
                 return@setOnClickListener
             }
             // Api.account_debug(ua.account.accp)
-            Log.d("Baresip", "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
+            Log.d(TAG, "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
             newAorView.setText("")
             newAorView.hint = getString(R.string.user_domain)
             newAorView.clearFocus()
@@ -191,7 +191,7 @@ class AccountsActivity : AppCompatActivity() {
                 count++
             }
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
-            // Log.d("Baresip", "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun noAccounts(): Boolean {
@@ -207,7 +207,7 @@ class AccountsActivity : AppCompatActivity() {
                 if ((ap != "") && (acc.regint > 0))
                     Api.ua_register(ua.uap)
             } else {
-                Log.e("Baresip", "Setting of auth pass failed")
+                Log.e(TAG, "Setting of auth pass failed")
             }
         }
     }

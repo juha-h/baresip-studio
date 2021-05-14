@@ -53,7 +53,7 @@ class ChatActivity : AppCompatActivity() {
 
         val userAgent = UserAgent.ofAor(aor)
         if (userAgent == null) {
-            Log.w("Baresip", "MessageActivity did not find ua of $aor")
+            Log.w(TAG, "MessageActivity did not find ua of $aor")
             MainActivity.activityAor = aor
             returnResult(Activity.RESULT_CANCELED)
             return
@@ -181,7 +181,7 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onPause() {
         if (newMessage.text.toString() != "") {
-            Log.d("Baresip", "Saving newMessage ${newMessage.text} for $aor::$peerUri")
+            Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
             BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
         }
         MainActivity.activityAor = aor
@@ -193,7 +193,7 @@ class ChatActivity : AppCompatActivity() {
         super.onResume()
         val chatText = BaresipService.chatTexts["$aor::$peerUri"]
         if (chatText != null) {
-            Log.d("Baresip", "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
+            Log.d(TAG, "Restoring newMessage ${newMessage.text} for $aor::$peerUri")
             newMessage.setText(chatText)
             newMessage.requestFocus()
             BaresipService.chatTexts.remove("$aor::$peerUri")

@@ -44,9 +44,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 oos.writeObject(BaresipService.messages)
                 oos.close()
                 fos.close()
-                Log.d("Baresip", "Saved ${BaresipService.messages.size} messages")
+                Log.d(TAG, "Saved ${BaresipService.messages.size} messages")
             } catch (e: IOException) {
-                Log.e("Baresip", "OutputStream exception: " + e.toString())
+                Log.e(TAG, "OutputStream exception: " + e.toString())
                 e.printStackTrace()
             }
         }
@@ -61,9 +61,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     BaresipService.messages = ois.readObject() as ArrayList<Message>
                     ois.close()
                     fis.close()
-                    Log.d("Baresip", "Restored ${BaresipService.messages.size} messages")
+                    Log.d(TAG, "Restored ${BaresipService.messages.size} messages")
                 } catch (e: Exception) {
-                    Log.e("Baresip", "InputStream exception: - " + e.toString())
+                    Log.e(TAG, "InputStream exception: - " + e.toString())
                 }
             }
         }

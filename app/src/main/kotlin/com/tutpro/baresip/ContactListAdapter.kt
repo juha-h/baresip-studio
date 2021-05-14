@@ -87,7 +87,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                 i.putExtra("action", "message")
                             val ua = UserAgent.ofAor(aor)
                             if (ua == null) {
-                                Log.w("Baresip", "onClickListener did not find AoR $aor")
+                                Log.w(TAG, "onClickListener did not find AoR $aor")
                             } else {
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
@@ -123,7 +123,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                             try {
                                 avatarFile.delete()
                             } catch (e: IOException) {
-                                Log.e("Baresip", "Could not delete file '$id.img")
+                                Log.e(TAG, "Could not delete file '$id.img")
                             }
                         }
                         if (contact.androidContact &&

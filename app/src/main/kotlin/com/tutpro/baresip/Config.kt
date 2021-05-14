@@ -12,7 +12,7 @@ object Config {
 
     fun initialize() {
 
-        Log.d("Baresip", "Config is '$config'")
+        Log.d(TAG, "Config is '$config'")
 
         if (!config.contains(Regex("ausrc_format s16"))) {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
@@ -89,7 +89,7 @@ object Config {
 
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
-        Log.i("Baresip", "Initialized config to '$config'")
+        Log.i(TAG, "Initialized config to '$config'")
 
     }
 
@@ -136,12 +136,12 @@ object Config {
                 result = result + line + '\n'
         config = result
         Utils.putFileContents(configPath, config.toByteArray())
-        Log.d("Baresip", "New config '$result'")
+        Log.d(TAG, "Saved new config '$result'")
         // Api.reload_config()
     }
 
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
-        Log.i("Baresip", "Updating dnsServers with $dnsServers")
+        Log.i(TAG, "Updating dnsServers with $dnsServers")
         var servers = ""
         for (dnsServer in dnsServers) {
             var address = dnsServer.hostAddress.removePrefix("/")
