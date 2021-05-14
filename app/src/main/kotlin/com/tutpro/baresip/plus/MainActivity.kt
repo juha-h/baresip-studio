@@ -2130,8 +2130,6 @@ class MainActivity : AppCompatActivity() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 
-        private const val TAG = "Baresip"
-
         const val ACCOUNTS_CODE = 1
         const val CONTACTS_CODE = 2
         const val CONFIG_CODE = 3

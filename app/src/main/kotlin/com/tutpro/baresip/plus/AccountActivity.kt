@@ -741,7 +741,4 @@ class AccountActivity : AppCompatActivity() {
         return Utils.checkHostPortParams(uri.substring(4))
     }
 
-    companion object {
-        private const val TAG = "Baresip"
-    }
 }
