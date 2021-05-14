@@ -1158,9 +1158,10 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String, netInterface: String,
-                              dnsServers: String, netAf: Int, logLevel: Int)
-    external fun baresipStop(force: Boolean)
+    private external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String,
+                                      netInterface: String, dnsServers: String, netAf: Int,
+                                      logLevel: Int)
+    private external fun baresipStop(force: Boolean)
 
     companion object {
 
