@@ -14,12 +14,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
 import android.text.TextWatcher
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -1089,8 +1088,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                     BACKUP_PERMISSION_REQUEST_CODE)) {
-                        val path = BaresipService.downloadsPath + "/baresip.bs"
-                        downloadsOutputStream = FileOutputStream(File(path))
+                        val filePath = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS).path + "/baresip/bs"
+                        downloadsOutputStream = FileOutputStream(File(filePath))
                         askPassword(getString(R.string.encrypt_password))
                     }
                 }
