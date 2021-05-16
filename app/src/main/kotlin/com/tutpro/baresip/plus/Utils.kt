@@ -20,16 +20,18 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentResolverCompat.query
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import java.io.*
 import java.net.InetAddress
@@ -58,7 +60,7 @@ object Utils {
     fun removeLinesStartingWithString(lines: String, string: String): String {
         var result = ""
         for (line in lines.split("\n"))
-            if (!line.startsWith(string) && (line.length > 0)) result += line + "\n"
+            if (!line.startsWith(string) && (line.isNotEmpty())) result += line + "\n"
         return result
     }
 
@@ -450,6 +452,44 @@ object Utils {
             return false
         }
         return true
+    }
+
+    fun File.copyInputStreamToFile(inputStream: InputStream): Boolean {
+        try {
+            this.outputStream().use { fileOut ->
+                inputStream.copyTo(fileOut)
+            }
+            return true
+        }
+        catch (e: IOException) {
+            Log.e(TAG, "Failed to write file '${this.absolutePath}': $e")
+        }
+        return false
+    }
+
+    @RequiresApi(29)
+    fun selectInputFile(activity: Activity, activityCode: Int) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+        }
+        startActivityForResult(activity, intent, activityCode, null)
+    }
+
+    @RequiresApi(29)
+    fun selectOutputFile(title: String) {
+        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/octet-stream"
+            putExtra(Intent.EXTRA_TITLE, title)
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+        }
+    }
+
+    fun downloadsPath(fileName: String): String {
+        return Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS).path + "/$fileName"
     }
 
     fun fileNameOfUri(ctx: Context, uri: Uri): String {
