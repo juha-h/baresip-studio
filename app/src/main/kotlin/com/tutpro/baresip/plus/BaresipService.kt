@@ -65,7 +65,6 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip.plus")
 
         filesPath = filesDir.absolutePath
-        downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -1266,7 +1265,6 @@ class BaresipService: Service() {
         var dynDns = false
         var netInterface = ""
         var filesPath = ""
-        var downloadsPath = ""
         var logLevel = 2
         var sipTrace = false
         var callActionUri = ""
