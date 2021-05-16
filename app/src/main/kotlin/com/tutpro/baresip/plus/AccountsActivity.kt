@@ -185,10 +185,8 @@ class AccountsActivity : AppCompatActivity() {
 
         fun saveAccounts() {
             var accounts = ""
-            var count = 0
             for (a in Account.accounts()) {
                 accounts = accounts + a.print() + "\n"
-                count++
             }
             Utils.putFileContents(BaresipService.filesPath + "/accounts", accounts.toByteArray())
             // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
@@ -196,7 +194,7 @@ class AccountsActivity : AppCompatActivity() {
 
         fun noAccounts(): Boolean {
             val contents = Utils.getFileContents(BaresipService.filesPath + "/accounts")
-            return contents == null || contents.size == 0
+            return contents == null || contents.isEmpty()
         }
 
         fun setAuthPass(ua: UserAgent, ap: String) {
