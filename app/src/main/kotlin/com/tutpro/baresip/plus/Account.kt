@@ -74,12 +74,10 @@ class Account(val accp: String) {
 
     fun print() : String {
 
-        var res: String
-
-        if (displayName != "")
-            res = "\"${displayName}\" "
+        var res = if (displayName != "")
+            "\"${displayName}\" "
         else
-            res = ""
+            ""
 
         res = "$res<$luri>"
 
@@ -89,7 +87,7 @@ class Account(val accp: String) {
             res += ";auth_pass=\"${authPass}\""
 
         if (outbound.size > 0) {
-            res = res + ";outbound=\"${outbound[0]}\""
+            res += ";outbound=\"${outbound[0]}\""
             if (outbound.size > 1) res += ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
         }
@@ -131,10 +129,10 @@ class Account(val accp: String) {
 
         if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
 
-        if (vmUri == "")
-            res = "$res;mwi=no"
+        res = if (vmUri == "")
+            "$res;mwi=no"
         else
-            res = "$res;mwi=yes;vm_uri=\"$vmUri\""
+            "$res;mwi=yes;vm_uri=\"$vmUri\""
 
         if (answerMode == Api.ANSWERMODE_AUTO)
             res += ";answermode=auto"
@@ -156,29 +154,35 @@ class Account(val accp: String) {
     }
 
     fun vmMessages(cxt: Context) : String {
-        var new = ""
-        var old = ""
-        if (vmNew > 0)
+
+        val new = if (vmNew > 0) {
             if (vmNew == 1)
-                new = cxt.getString(R.string.one_new_message)
+                cxt.getString(R.string.one_new_message)
             else
-                new = "$vmNew ${cxt.getString(R.string.new_messages)}"
-        if (vmOld > 0)
+                "$vmNew ${cxt.getString(R.string.new_messages)}"
+        } else
+            ""
+
+        val old = if (vmOld > 0) {
             if (vmOld == 1)
-                old = cxt.getString(R.string.one_old_message)
+                cxt.getString(R.string.one_old_message)
             else
-                old = "$vmOld ${cxt.getString(R.string.old_messages)}"
+                    "$vmOld ${cxt.getString(R.string.old_messages)}"
+        } else
+            ""
+
         var msg = cxt.getString(R.string.you_have)
         if (new != "") {
             msg = "$msg $new"
             if (old != "") msg = "$msg ${cxt.getString(R.string.and)} $old"
         } else {
-            if (old != "")
-                msg = "$msg $old"
+            msg = if (old != "")
+                "$msg $old"
             else
-                msg = cxt.getString(R.string.no_messages)
+                cxt.getString(R.string.no_messages)
         }
-        return "$msg."
+
+         return "$msg."
     }
 
     fun host() : String {
@@ -188,7 +192,7 @@ class Account(val accp: String) {
     private fun removeAudioCodecsStartingWith(prefix: String) {
         val newCodecs = ArrayList<String>()
         for (acSpec in audioCodec)
-            if (!acSpec.toLowerCase(Locale.ROOT).startsWith(prefix)) newCodecs.add(acSpec)
+            if (!acSpec.lowercase(Locale.ROOT).startsWith(prefix)) newCodecs.add(acSpec)
         audioCodec = newCodecs
     }
 
