@@ -290,8 +290,8 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                val dnsServers = addMissingPorts(dnsServers.text.toString().trim()
-                    .toLowerCase(Locale.ROOT))
+                val dnsServers = addMissingPorts(
+                    dnsServers.text.toString().trim().lowercase(Locale.ROOT))
                 if (dnsServers != oldDnsServers) {
                     if (!checkDnsServers(dnsServers)) {
                         Utils.alertView(this, getString(R.string.notice),
