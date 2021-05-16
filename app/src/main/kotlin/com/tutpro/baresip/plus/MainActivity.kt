@@ -17,8 +17,6 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
 import android.text.TextWatcher
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -36,7 +34,6 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -1273,7 +1270,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                     BACKUP_PERMISSION_REQUEST_CODE)) {
-                        val path = BaresipService.downloadsPath + "/baresip+.bs"
+                        val path = Utils.downloadsPath("baresip+.bs")
                         downloadsOutputStream = FileOutputStream(File(path))
                         askPassword(getString(R.string.encrypt_password))
                     }
@@ -1438,7 +1435,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 29) {
             pickupFileFromDownloads(RESTORE_CODE)
         } else {
-            val path = BaresipService.downloadsPath + "/baresip+.bs"
+            val path = Utils.downloadsPath("baresip+.bs")
             downloadsInputStream = FileInputStream(File(path))
             askPassword(getString(R.string.decrypt_password))
         }
