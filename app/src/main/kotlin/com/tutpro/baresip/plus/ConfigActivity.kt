@@ -111,7 +111,7 @@ class ConfigActivity : AppCompatActivity() {
                     val filesPath = BaresipService.filesPath + "/cert.pem"
                     Utils.putFileContents(filesPath, content)
                     Config.removeVariable("sip_certificate")
-                    Config.addLine("sip_certificate $filesPath/cert.pem")
+                    Config.addLine("sip_certificate $filesPath")
                     save = true
                     restart = true
                 } else {
@@ -153,7 +153,7 @@ class ConfigActivity : AppCompatActivity() {
                     val filesPath = BaresipService.filesPath + "/ca_certs.crt"
                     Utils.putFileContents(filesPath, content)
                     Config.removeVariable("sip_cafile")
-                    Config.addLine("sip_cafile $filesPath/ca_certs.crt")
+                    Config.addLine("sip_cafile $filesPath")
                     save = true
                     restart = true
                 } else {
