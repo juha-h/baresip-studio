@@ -482,6 +482,7 @@ object Utils {
         }
     }
 
+    @Suppress("DEPRECATION")
     fun downloadsPath(fileName: String): String {
         return Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DOWNLOADS).path + "/$fileName"
@@ -517,7 +518,9 @@ object Utils {
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray):
         Serializable {
-        val serialVersionUID = -29238082928391L
+        companion object {
+            private const val serialVersionUID: Long = -29238082928391L
+        }
     }
 
     private fun encrypt(content: ByteArray, password: CharArray): Crypto? {
@@ -643,6 +646,7 @@ object Utils {
         return true
     }
 
+    @Suppress("UNUSED")
     fun dumpIntent(intent: Intent) {
         val bundle: Bundle = intent.extras ?: return
         val keys = bundle.keySet()

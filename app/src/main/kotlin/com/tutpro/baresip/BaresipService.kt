@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.*
 import android.app.PendingIntent.getActivity
@@ -37,24 +38,25 @@ class BaresipService: Service() {
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
     internal lateinit var rt: Ringtone
-    internal lateinit var nt: Ringtone
-    internal lateinit var nm: NotificationManager
-    internal lateinit var snb: NotificationCompat.Builder
-    internal lateinit var cm: ConnectivityManager
-    internal lateinit var pm: PowerManager
-    internal lateinit var tm: TelephonyManager
-    internal lateinit var partialWakeLock: PowerManager.WakeLock
-    internal lateinit var proximityWakeLock: PowerManager.WakeLock
-    internal lateinit var fl: WifiManager.WifiLock
-    internal lateinit var br: BroadcastReceiver
+    private lateinit var nt: Ringtone
+    private lateinit var nm: NotificationManager
+    private lateinit var snb: NotificationCompat.Builder
+    private lateinit var cm: ConnectivityManager
+    private lateinit var pm: PowerManager
+    private lateinit var tm: TelephonyManager
+    private lateinit var partialWakeLock: PowerManager.WakeLock
+    private lateinit var proximityWakeLock: PowerManager.WakeLock
+    private lateinit var fl: WifiManager.WifiLock
+    private lateinit var br: BroadcastReceiver
 
     internal var rtTimer: Timer? = null
-    internal var audioFocusRequest: AudioFocusRequest? = null
-    internal var audioFocusUsage = -1
-    internal var origVolumes = arrayOf(-1, -1, -1, -1)
-    internal val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    private var audioFocusRequest: AudioFocusRequest? = null
+    private var audioFocusUsage = -1
+    private var origVolumes = arrayOf(-1, -1, -1, -1)
+    private val btAdapter = BluetoothAdapter.getDefaultAdapter()
     internal var activeNetwork = ""
 
+    @SuppressLint("WakelockTimeout")
     override fun onCreate() {
 
         Log.d(TAG, "At onCreate")
@@ -116,9 +118,15 @@ class BaresipService: Service() {
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-        partialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "com.tutpro.baresip:partial_wakelog")
-        partialWakeLock.acquire()
+        // This is needed to keep service running also in Doze Mode
+        partialWakeLock = pm.run {
+            newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "com.tutpro.baresip:partial_wakelog"
+            ).apply {
+                acquire()
+            }
+        }
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip:proximity_wakelog")
@@ -257,10 +265,12 @@ class BaresipService: Service() {
                 val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
                 if ((ipV4Addr == "") && (ipV6Addr == ""))
                     Log.w(TAG, "Starting baresip without IP addresses")
-                Thread({
-                    baresipStart(filesPath, ipV4Addr, ipV6Addr, "",
-                            dnsServers, Api.AF_UNSPEC, logLevel)
-                }).start()
+
+                Thread {
+                    baresipStart(
+                        filesPath, ipV4Addr, ipV6Addr, "", dnsServers, Api.AF_UNSPEC, logLevel
+                    )
+                }.start()
 
                 isServiceRunning = true
 
@@ -279,7 +289,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
+                newIntent.putExtra("action", action.lowercase(Locale.ROOT))
                 newIntent.putExtra("callp", intent!!.getStringExtra("callp"))
                 startActivity(newIntent)
             }
@@ -288,7 +298,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
+                newIntent.putExtra("action", action.lowercase(Locale.ROOT))
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 startActivity(newIntent)
             }
@@ -319,7 +329,7 @@ class BaresipService: Service() {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
+                    newIntent.putExtra("action", action.lowercase(Locale.ROOT))
                     newIntent.putExtra("callp", intent.getStringExtra("callp"))
                     newIntent.putExtra("uri", intent.getStringExtra("uri"))
                     startActivity(newIntent)
@@ -341,7 +351,7 @@ class BaresipService: Service() {
                 val newIntent = Intent(this, MainActivity::class.java)
                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-                newIntent.putExtra("action", action.toLowerCase(Locale.ROOT))
+                newIntent.putExtra("action", action.lowercase(Locale.ROOT))
                 newIntent.putExtra("uap", intent!!.getStringExtra("uap"))
                 newIntent.putExtra("peer", intent.getStringExtra("peer"))
                 startActivity(newIntent)
@@ -565,6 +575,7 @@ class BaresipService: Service() {
                                     .setShowWhen(true)
                                     .setFullScreenIntent(pi, true)
                             if (VERSION.SDK_INT < 26) {
+                                @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .priority = Notification.PRIORITY_HIGH
@@ -656,6 +667,7 @@ class BaresipService: Service() {
                                     .setContentTitle(getString(R.string.transfer_request_to))
                                     .setContentText(target)
                             if (VERSION.SDK_INT < 26)
+                                @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).priority =
                                         Notification.PRIORITY_HIGH
@@ -725,6 +737,7 @@ class BaresipService: Service() {
                                     .setContentTitle(getString(R.string.missed_call_from))
                                     .setContentText(caller)
                             if (VERSION.SDK_INT < 26) {
+                                @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
                                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                                         .priority = Notification.PRIORITY_HIGH
@@ -792,6 +805,7 @@ class BaresipService: Service() {
                     .setContentTitle(getString(R.string.message_from) + " " + sender)
                     .setContentText(text)
             if (VERSION.SDK_INT < 26) {
+                @Suppress("DEPRECATION")
                 nb.setVibrate(LongArray(0))
                         .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .priority = Notification.PRIORITY_HIGH
@@ -830,6 +844,7 @@ class BaresipService: Service() {
     }
 
     @Keep
+    @Suppress("UNUSED")
     fun messageResponse(responseCode: Int, responseReason: String, time: String) {
         Log.d(TAG, "Message response '$responseCode $responseReason' at $time")
         val intent = Intent("message response")
@@ -843,10 +858,10 @@ class BaresipService: Service() {
     fun getPassword(aor: String): String {
         if (!isServiceRunning) return ""
         Log.d(TAG, "getPassword of $aor")
-        if (MainActivity.aorPasswords[aor] != null)
-            return MainActivity.aorPasswords[aor]!!
+        return if (MainActivity.aorPasswords[aor] != null)
+            MainActivity.aorPasswords[aor]!!
         else
-            return ""
+            ""
     }
 
     @Keep
@@ -958,6 +973,7 @@ class BaresipService: Service() {
                 audioFocusUsage = -1
             }
         } else {
+            @Suppress("DEPRECATION")
             if (am.requestAudioFocus(null, usage, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "Audio focus granted for usage $usage")
@@ -995,6 +1011,7 @@ class BaresipService: Service() {
             }
         } else {
             if (audioFocusUsage != -1) {
+                @Suppress("DEPRECATION")
                 if (am.abandonAudioFocus(null) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     Log.d(TAG, "Audio focus abandoned")
                     audioFocusUsage = -1
@@ -1058,6 +1075,7 @@ class BaresipService: Service() {
         }
     }
 
+    @SuppressLint("WakelockTimeout")
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
             if (!proximityWakeLock.isHeld) {
@@ -1135,6 +1153,7 @@ class BaresipService: Service() {
     private fun isNetworkActive(network: Network): Boolean {
         if (VERSION.SDK_INT >= 23)
             return network == cm.activeNetwork
+        @Suppress("DEPRECATION")
         if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
             return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
         return false
