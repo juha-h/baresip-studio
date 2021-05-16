@@ -353,6 +353,8 @@
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
+    <string name="reset_config_alert">Oletko varma, että haluat palauttaa oletusasetukset?</string>
+    <string name="reset">Palauta</string>
     <string name="read_cert_error">Tiedoston \'cert.pem\' luku epäonnistui.</string>
     <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' epäonnistui.</string>
     <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset

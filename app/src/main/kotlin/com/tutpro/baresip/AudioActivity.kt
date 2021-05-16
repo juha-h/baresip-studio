@@ -66,7 +66,7 @@ class AudioActivity : AppCompatActivity() {
             cb.layoutParams = cbParams
             cb.gravity = Gravity.END
             cb.isChecked = Config.variable("module $module.so").size > 0
-            oldAudioModules.put(module, cb.isChecked)
+            oldAudioModules[module] = cb.isChecked
             rl.addView(cb)
             audioModulesList.addView(rl)
         }

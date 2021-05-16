@@ -14,7 +14,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
@@ -1086,11 +1085,14 @@ class MainActivity : AppCompatActivity() {
                 if (Build.VERSION.SDK_INT >= 29) {
                     pickupFileFromDownloads(BACKUP_CODE)
                 } else {
-                    if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    BACKUP_PERMISSION_REQUEST_CODE)) {
-                        val filePath = Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_DOWNLOADS).path + "/baresip/bs"
-                        downloadsOutputStream = FileOutputStream(File(filePath))
+                    if (Utils.requestPermission(
+                            this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            BACKUP_PERMISSION_REQUEST_CODE
+                        )
+                    ) {
+                        val path = Utils.downloadsPath("baresip.bs")
+                        downloadsOutputStream = FileOutputStream(File(path))
                         askPassword(getString(R.string.encrypt_password))
                     }
                 }
@@ -1240,7 +1242,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 29) {
             pickupFileFromDownloads(RESTORE_CODE)
         } else {
-            val path = BaresipService.downloadsPath + "/baresip.bs"
+            val path = Utils.downloadsPath("baresip.bs")
             downloadsInputStream = FileInputStream(File(path))
             askPassword(getString(R.string.decrypt_password))
         }

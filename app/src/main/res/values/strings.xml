@@ -315,6 +315,9 @@
         request and response trace to Logcat. Unchecked automatically at baresip start.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, settings are reset to factory default values.</string>
+    <string name="reset_config_alert">Are you sure you want to reset settings to factory
+        default values?</string>
+    <string name="reset">Reset</string>
     <string name="read_cert_error">Failed to read file \'cert.pem\'.</string>
     <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\'.</string>
     <string name="config_restart">You need to restart baresip in order to activate the new
