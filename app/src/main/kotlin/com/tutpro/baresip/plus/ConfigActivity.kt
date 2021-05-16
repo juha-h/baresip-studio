@@ -1,22 +1,32 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
+import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
 import com.tutpro.baresip.plus.databinding.ActivityConfigBinding
+import java.io.File
+import java.io.FileInputStream
+import java.util.*
 
 class ConfigActivity : AppCompatActivity() {
 
     private val READ_CERT_PERMISSION_CODE = 1
     private val READ_CA_PERMISSION_CODE = 2
+
+    private val CERTIFICATE_CODE = 1
+    private val CA_CERTIFICATES_CODE = 2
 
     private lateinit var binding: ActivityConfigBinding
     private lateinit var autoStart: CheckBox
@@ -81,6 +91,39 @@ class ConfigActivity : AppCompatActivity() {
         oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
         certificateFile.isChecked = oldCertificateFile
 
+        certificateFile.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT < 29) {
+                    if (!Utils.requestPermission(this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            READ_CERT_PERMISSION_CODE)) {
+                        certificateFile.isChecked = false
+                        return@setOnCheckedChangeListener
+                    }
+                    val downloadsPath = Utils.downloadsPath("cert.pem")
+                    val content = Utils.getFileContents(downloadsPath)
+                    if (content == null) {
+                        Utils.alertView(this, getString(R.string.error),
+                            getString(R.string.read_cert_error))
+                        certificateFile.isChecked = false
+                        return@setOnCheckedChangeListener
+                    }
+                    val filesPath = BaresipService.filesPath + "/cert.pem"
+                    Utils.putFileContents(filesPath, content)
+                    Config.removeVariable("sip_certificate")
+                    Config.addLine("sip_certificate $filesPath/cert.pem")
+                    save = true
+                    restart = true
+                } else {
+                    Utils.selectInputFile(this, CERTIFICATE_CODE)
+                }
+            } else {
+                Config.removeVariable("sip_certificate")
+                save = true
+                restart = true
+            }
+        }
+
         verifyServer = binding.VerifyServer
         val vsCv = Config.variable("sip_verify_server")
         oldVerifyServer = if (vsCv.size == 0) "no" else vsCv[0]
@@ -89,6 +132,39 @@ class ConfigActivity : AppCompatActivity() {
         caFile = binding.CAFile
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
         caFile.isChecked = oldCAFile
+
+        caFile.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT < 29) {
+                    if (!Utils.requestPermission(this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            READ_CERT_PERMISSION_CODE)) {
+                        caFile.isChecked = false
+                        return@setOnCheckedChangeListener
+                    }
+                    val downloadsPath = Utils.downloadsPath("ca_certs.crt")
+                    val content = Utils.getFileContents(downloadsPath)
+                    if (content == null) {
+                        Utils.alertView(this, getString(R.string.error),
+                            getString(R.string.read_ca_certs_error))
+                        caFile.isChecked = false
+                        return@setOnCheckedChangeListener
+                    }
+                    val filesPath = BaresipService.filesPath + "/ca_certs.crt"
+                    Utils.putFileContents(filesPath, content)
+                    Config.removeVariable("sip_cafile")
+                    Config.addLine("sip_cafile $filesPath/ca_certs.crt")
+                    save = true
+                    restart = true
+                } else {
+                    Utils.selectInputFile(this, CA_CERTIFICATES_CODE)
+                }
+            } else {
+                Config.removeVariable("sip_cafile")
+                save = true
+                restart = true
+            }
+        }
 
         val callVolSpinner = binding.VolumeSpinner
         val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -111,7 +187,7 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
-        val videoSizeSpinner = findViewById(R.id.VideoSizeSpinner) as Spinner
+        val videoSizeSpinner = findViewById<Spinner>(R.id.VideoSizeSpinner)
         val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720",
             "1920x1080")
         sizes.removeIf{it == oldVideoSize}
@@ -135,10 +211,10 @@ class ConfigActivity : AppCompatActivity() {
 
         debug = binding.Debug
         val dbCv = Config.variable("log_level")
-        if (dbCv.size == 0)
-            oldLogLevel = "2"
+        oldLogLevel = if (dbCv.size == 0)
+            "2"
         else
-            oldLogLevel = dbCv[0]
+            dbCv[0]
         debug.isChecked =  oldLogLevel == "0"
 
         sipTrace = binding.SipTrace
@@ -146,6 +222,29 @@ class ConfigActivity : AppCompatActivity() {
 
         reset = binding.Reset
         reset.isChecked = false
+
+        reset.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.confirmation)
+                with (AlertDialog.Builder(this@ConfigActivity)) {
+                    setCustomTitle(titleView)
+                    setMessage(getString(R.string.reset_config_alert))
+                    setPositiveButton(getText(R.string.reset)) { dialog, _ ->
+                        Config.reset(this@ConfigActivity)
+                        save = false
+                        restart = true
+                        done()
+                        dialog.dismiss()
+                    }
+                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        reset.isChecked = false
+                        dialog.dismiss()
+                    }
+                    show()
+                }
+            }
+        }
 
     }
 
@@ -191,7 +290,8 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                val dnsServers = addMissingPorts(dnsServers.text.toString().trim().toLowerCase())
+                val dnsServers = addMissingPorts(dnsServers.text.toString().trim()
+                    .toLowerCase(Locale.ROOT))
                 if (dnsServers != oldDnsServers) {
                     if (!checkDnsServers(dnsServers)) {
                         Utils.alertView(this, getString(R.string.notice),
@@ -215,56 +315,6 @@ class ConfigActivity : AppCompatActivity() {
                     }
                     Api.net_debug()
                     save = true
-                }
-
-                if (certificateFile.isChecked != oldCertificateFile) {
-                    if (certificateFile.isChecked) {
-                        if (!Utils.requestPermission(this,
-                                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        READ_CERT_PERMISSION_CODE))
-                            return false
-                        val content = Utils.getFileContents(BaresipService.downloadsPath + "/cert.pem")
-                        if (content == null) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.read_cert_error))
-                            certificateFile.isChecked = false
-                            return false
-                        }
-                        Utils.putFileContents(BaresipService.filesPath + "/cert.pem", content)
-                        Config.removeVariable("sip_certificate")
-                        Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
-                    } else {
-                        Config.removeVariable("sip_certificate")
-                    }
-                    save = true
-                    restart = true
-                }
-
-                if (caFile.isChecked != oldCAFile) {
-                    if (caFile.isChecked) {
-                        if (!Utils.requestPermission(this,
-                                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        READ_CA_PERMISSION_CODE)) {
-                            caFile.isChecked = false
-                            return false
-                        }
-                        val content = Utils.getFileContents(BaresipService.downloadsPath +
-                                "/ca_certs.crt")
-                        if (content == null) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.read_ca_certs_error))
-                            caFile.isChecked = false
-                            return false
-                        }
-                        Utils.putFileContents(BaresipService.filesPath + "/ca_certs.crt",
-                                content)
-                        Config.removeVariable("sip_cafile")
-                        Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
-                    } else {
-                        Config.removeVariable("sip_cafile")
-                    }
-                    save = true
-                    restart = true
                 }
 
                 if (verifyServer.isChecked && !caFile.isChecked) {
@@ -312,25 +362,7 @@ class ConfigActivity : AppCompatActivity() {
                 BaresipService.sipTrace = sipTrace.isChecked
                 Api.uag_enable_sip_trace(sipTrace.isChecked)
 
-                if (reset.isChecked) {
-                    Config.reset(this)
-                    save = false
-                    restart = true
-                }
-
-                if (save) Config.save()
-
-                BaresipService.activities.remove("config")
-                val intent = Intent(this, MainActivity::class.java)
-                if (restart)
-                    intent.putExtra("restart", true)
-                else
-                    if (reload)
-                        if (Api.reload_config() != 0)
-                            Log.e(TAG, "Reload of config failed")
-                setResult(RESULT_OK, intent)
-                finish()
-
+                done()
             }
 
             android.R.id.home -> {
@@ -347,6 +379,77 @@ class ConfigActivity : AppCompatActivity() {
 
     }
 
+    private fun done() {
+
+        if (save) Config.save()
+        BaresipService.activities.remove("config")
+        val intent = Intent(this, MainActivity::class.java)
+        if (restart)
+            intent.putExtra("restart", true)
+        else
+            if (reload)
+                if (Api.reload_config() != 0)
+                    Log.e(TAG, "Reload of config failed")
+        setResult(RESULT_OK, intent)
+        finish()
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+
+            CERTIFICATE_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        try {
+                            val inputStream = applicationContext.contentResolver.openInputStream(it)
+                                    as FileInputStream
+                            File(BaresipService.filesPath + "/cert.pem")
+                                .copyInputStreamToFile(inputStream)
+                            inputStream.close()
+                            Config.removeVariable("sip_certificate")
+                            Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
+                            save = true
+                            restart = true
+                        } catch (e: Error) {
+                            Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.read_cert_error))
+                            certificateFile.isChecked = false
+                        }
+                    }
+                else
+                    certificateFile.isChecked = false
+            }
+
+            CA_CERTIFICATES_CODE -> {
+                if (resultCode == Activity.RESULT_OK)
+                    data?.data?.also {
+                        try {
+                            val inputStream = applicationContext.contentResolver.openInputStream(it)
+                                    as FileInputStream
+                            File(BaresipService.filesPath + "/ca_certs.crt")
+                                .copyInputStreamToFile(inputStream)
+                            inputStream.close()
+                            Config.removeVariable("sip_cafile")
+                            Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
+                            save = true
+                            restart = true
+                        } catch (e: Error) {
+                            Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.read_ca_certs_error))
+                            caFile.isChecked = false
+                        }
+                    }
+                else
+                    caFile.isChecked = false
+            }
+        }
+
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
                                             grantResults: IntArray) {
 
@@ -354,15 +457,15 @@ class ConfigActivity : AppCompatActivity() {
 
         when (requestCode) {
             READ_CERT_PERMISSION_CODE ->
-                if (grantResults.isNotEmpty() && (grantResults[0] ==
-                                PackageManager.PERMISSION_GRANTED))
-                    menu!!.performIdentifierAction(R.id.checkIcon, 0)
+                if (grantResults.isNotEmpty() &&
+                    (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                        menu!!.performIdentifierAction(R.id.checkIcon, 0)
                 else
                     certificateFile.isChecked = false
             READ_CA_PERMISSION_CODE ->
-                if ((grantResults.size > 0) && (grantResults[0] ==
-                                PackageManager.PERMISSION_GRANTED))
-                    menu!!.performIdentifierAction(R.id.checkIcon, 0)
+                if (grantResults.isNotEmpty() &&
+                    (grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                        menu!!.performIdentifierAction(R.id.checkIcon, 0)
                 else
                     caFile.isChecked = false
         }
@@ -436,7 +539,7 @@ class ConfigActivity : AppCompatActivity() {
     }
 
     private fun checkDnsServers(dnsServers: String): Boolean {
-        if (dnsServers.length == 0) return true
+        if (dnsServers.isEmpty()) return true
         for (server in dnsServers.split(","))
             if (!Utils.checkIpPort(server.trim())) return false
         return true
@@ -446,13 +549,13 @@ class ConfigActivity : AppCompatActivity() {
         if (addressList == "") return ""
         var result = ""
         for (addr in addressList.split(","))
-            if (Utils.checkIpPort(addr)) {
-                result = "$result,$addr"
+            result = if (Utils.checkIpPort(addr)) {
+                "$result,$addr"
             } else {
                 if (Utils.checkIpV4(addr))
-                    result = "$result,$addr:53"
+                    "$result,$addr:53"
                 else
-                    result = "$result,[$addr]:53"
+                    "$result,[$addr]:53"
             }
         return result.substring(1)
     }
