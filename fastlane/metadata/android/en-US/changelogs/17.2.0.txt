@@ -1,0 +1,6 @@
+- Added support for AMR codec Bandwidth Efficient Mode
+- Allow escaped characters in SIP URI user part and authentication username
+- Use coroutine instead of async task to fetch account config from network
+- In Android 10+ use picker to choose TLS Certificate and TLS CA Files
+- Ask confirmation to reset settings to factory defaults
+- New translations (Portuguese and Portuguese (Brazil))
