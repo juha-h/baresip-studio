@@ -545,6 +545,8 @@ class BaresipService: Service() {
                                     startRinging()
                                 }
                             } else {
+                                val mediaPlayer = MediaPlayer.create(this, R.raw.autoanswer)
+                                mediaPlayer.start()
                                 val newIntent = Intent(this, MainActivity::class.java)
                                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
