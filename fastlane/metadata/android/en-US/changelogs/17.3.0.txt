@@ -1,0 +1,2 @@
+- Play auto-answer sound when auto-answering
+- Removed unused audio files
