@@ -26,7 +26,7 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusPacketLoss = ""
     private var oldAec = false
     private var oldExtendedFilter = false
-    private val audioModules = listOf("opus", "amr", "ilbc", "g722", "g7221", "g726", "g729", "g711")
+    private val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
