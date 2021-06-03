@@ -132,7 +132,7 @@ static const char *ua_event_reg_str(enum ua_event ev)
 static const char *translate_errorcode(uint16_t scode)
 {
 	switch (scode) {
-        case 404: return "notfound.wav";
+        case 404: return NULL; /* ignore */
 	    case 486: return "busy.wav";
 	    case 487: return NULL; /* ignore */
 	    default:  return "error.wav";
