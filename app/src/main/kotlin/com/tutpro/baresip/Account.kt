@@ -116,7 +116,7 @@ class Account(val accp: String) {
             "$res;mwi=yes;vm_uri=\"$vmUri\""
 
         if (answerMode == Api.ANSWERMODE_AUTO)
-            res += ";answermode=auto;answerdelay=1000"
+            res += ";answermode=auto"
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
