@@ -148,12 +148,12 @@ class AccountActivity : AppCompatActivity() {
                                     if (text in videoCodecs)
                                         acc.videoCodec.add(text)
                                 "media-encoding" -> {
-                                    val enc = text.toLowerCase(Locale.ROOT)
+                                    val enc = text.lowercase(Locale.ROOT)
                                     if (enc in mediaEncKeys && enc.isNotEmpty())
                                         acc.mediaEnc = enc
                                 }
                                 "media-nat" -> {
-                                    val nat = text.toLowerCase(Locale.ROOT)
+                                    val nat = text.lowercase(Locale.ROOT)
                                     if (nat in mediaNatKeys && nat.isNotEmpty())
                                         acc.mediaNat = nat
                                 }

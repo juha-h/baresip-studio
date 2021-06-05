@@ -11,7 +11,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
 
     companion object {
 
-        const val CALL_HISTORY_SIZE = 100
+        private const val CALL_HISTORY_SIZE = 100
 
         fun add(history: CallHistory) {
             BaresipService.callHistory.add(history)
@@ -51,7 +51,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
-                Log.e(TAG, "OutputStream exception: " + e.toString())
+                Log.e(TAG, "OutputStream exception: $e")
                 e.printStackTrace()
             }
         }
@@ -68,7 +68,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
                     fis.close()
                     Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls")
                 } catch (e: Exception) {
-                    Log.e(TAG, "InputStream exception: - " + e.toString())
+                    Log.e(TAG, "InputStream exception: - $e")
                 }
         }
 
