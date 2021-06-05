@@ -5,12 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.plus.databinding.ActivityAccountsBinding
 
 import java.util.ArrayList
@@ -34,6 +33,17 @@ class AccountsActivity : AppCompatActivity() {
         generateAccounts()
         alAdapter = AccountListAdapter(this, accounts)
         listView.adapter = alAdapter
+
+        val accountRequest =
+           registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+               if (it.resultCode == RESULT_OK) {
+                   val aor = it.data!!.getStringExtra("aor")!!
+                    val ua = UserAgent.ofAor(aor)!!
+                    if (MainActivity.aorPasswords.containsKey(aor) &&
+                        MainActivity.aorPasswords[aor] == "")
+                        askPassword(ua)
+                }
+            }
 
         val addAccountButton = binding.addAccount
         val newAorView = binding.newAor
@@ -73,25 +83,7 @@ class AccountsActivity : AppCompatActivity() {
             b.putString("aor", ua.account.aor)
             b.putBoolean("new", true)
             i.putExtras(b)
-            startActivityForResult(i, MainActivity.ACCOUNT_CODE)
-        }
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            MainActivity.ACCOUNT_CODE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val aor = data!!.getStringExtra("aor")!!
-                    val ua = UserAgent.ofAor(aor)!!
-                    if (MainActivity.aorPasswords.containsKey(aor) &&
-                            MainActivity.aorPasswords[aor] == "")
-                        askPassword(ua)
-                }
-            }
+            accountRequest.launch(i)
         }
 
     }
@@ -106,13 +98,6 @@ class AccountsActivity : AppCompatActivity() {
         val message = getString(R.string.account) + " " + Utils.plainAor(ua.account.aor)
         messageView.text = message
         val input = layout.findViewById(R.id.password) as EditText
-        val checkBox = layout.findViewById(R.id.checkbox) as CheckBox
-        checkBox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked)
-                input.transformationMethod = HideReturnsTransformationMethod()
-            else
-                input.transformationMethod = PasswordTransformationMethod()
-        }
         with (AlertDialog.Builder(this)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
