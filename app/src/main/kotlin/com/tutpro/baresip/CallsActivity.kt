@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.databinding.ActivityCallsBinding
 
 import java.util.ArrayList
@@ -88,6 +89,13 @@ class CallsActivity : AppCompatActivity() {
             }
         }
 
+        val contactRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    clAdapter.notifyDataSetChanged()
+                }
+            }
+
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerUri
             val peerName = ContactsActivity.contactName(peerUri)
@@ -99,7 +107,7 @@ class CallsActivity : AppCompatActivity() {
                         b.putBoolean("new", true)
                         b.putString("uri", peerUri)
                         i.putExtras(b)
-                        startActivityForResult(i, MainActivity.CONTACT_CODE)
+                        contactRequest.launch(i)
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
@@ -110,11 +118,10 @@ class CallsActivity : AppCompatActivity() {
                     }
                 }
             }
-            val callText: String
-            if (uaHistory[pos].directions.size > 1)
-                callText = getString(R.string.calls_calls)
+            val callText: String = if (uaHistory[pos].directions.size > 1)
+                getString(R.string.calls_calls)
             else
-                callText = getString(R.string.calls_call)
+                getString(R.string.calls_call)
             val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
             if (peerName.startsWith("sip:"))
                 with (builder) {
@@ -138,14 +145,6 @@ class CallsActivity : AppCompatActivity() {
 
         ua.account.missedCalls = false
         invalidateOptionsMenu()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -231,26 +230,24 @@ class CallsActivity : AppCompatActivity() {
         for (i in BaresipService.callHistory.indices.reversed()) {
             val h = BaresipService.callHistory[i]
             if (h.aor == aor) {
-                var direction: Int
-                if (h.direction == "in")
+                val direction: Int = if (h.direction == "in")
                     if (h.connected)
-                        direction = R.drawable.arrow_down_green
+                        R.drawable.arrow_down_green
                     else
-                        direction = R.drawable.arrow_down_red
+                        R.drawable.arrow_down_red
                 else
                     if (h.connected)
-                        direction = R.drawable.arrow_up_green
+                        R.drawable.arrow_up_green
                     else
-                        direction = R.drawable.arrow_up_red
+                        R.drawable.arrow_up_red
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri)) {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
-                    val fmt: DateFormat
-                    if (isToday(h.time.timeInMillis))
-                        fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+                    val fmt: DateFormat = if (isToday(h.time.timeInMillis))
+                        DateFormat.getTimeInstance(DateFormat.SHORT)
                     else
-                        fmt = DateFormat.getDateInstance(DateFormat.SHORT)
+                        DateFormat.getDateInstance(DateFormat.SHORT)
                     val time = fmt.format(h.time.time)
                     uaHistory.add(CallRow(h.aor, h.peerUri, direction, time, i))
                 }
