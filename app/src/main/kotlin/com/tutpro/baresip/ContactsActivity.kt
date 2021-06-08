@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.databinding.ActivityContactsBinding
 
 class ContactsActivity : AppCompatActivity() {
@@ -29,6 +30,12 @@ class ContactsActivity : AppCompatActivity() {
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
+        val contactRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK)
+                    clAdapter.notifyDataSetChanged()
+            }
+
         val plusButton = binding.plusButton
         plusButton.setOnClickListener {
             if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
@@ -38,12 +45,12 @@ class ContactsActivity : AppCompatActivity() {
             } else {
                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                     lastClick = SystemClock.elapsedRealtime()
-                    val i = Intent(this, ContactActivity::class.java)
+                    val intent = Intent(this, ContactActivity::class.java)
                     val b = Bundle()
                     b.putBoolean("new", true)
                     b.putString("uri", "")
-                    i.putExtras(b)
-                    startActivityForResult(i, MainActivity.CONTACT_CODE)
+                    intent.putExtras(b)
+                    contactRequest.launch(intent)
                 }
             }
         }
@@ -55,14 +62,6 @@ class ContactsActivity : AppCompatActivity() {
         super.onResume()
 
         clAdapter.notifyDataSetChanged()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK) clAdapter.notifyDataSetChanged()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
