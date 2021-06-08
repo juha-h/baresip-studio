@@ -43,18 +43,16 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                     val uri = uriParams.substringAfter("<").substringBefore(">")
                     val params = uriParams.substringAfter(">;")
                     val colorValue = Utils.paramValue(params, "color" )
-                    val color: Int
-                    if (colorValue != "")
-                        color = colorValue.toInt()
+                    val color: Int = if (colorValue != "")
+                        colorValue.toInt()
                     else
-                        color = Utils.randomColor()
+                        Utils.randomColor()
                     val androidContact = Utils.paramValue(params, "android" ) == "true"
                     val idValue = Utils.paramValue(params, "id" )
-                    val id: Long
-                    if (idValue != "")
-                        id = idValue.toLong()
+                    val id: Long = if (idValue != "")
+                        idValue.toLong()
                     else
-                        id = baseId + contactNo
+                        baseId + contactNo
                     Log.d(TAG, "Restoring contact $name, $uri, $color, $id, $androidContact")
                     val contact = Contact(name, uri, color, id)
                     contact.androidContact = androidContact
