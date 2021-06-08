@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
@@ -24,9 +25,6 @@ class ConfigActivity : AppCompatActivity() {
 
     private val READ_CERT_PERMISSION_CODE = 1
     private val READ_CA_PERMISSION_CODE = 2
-
-    private val CERTIFICATE_CODE = 1
-    private val CA_CERTIFICATES_CODE = 2
 
     private lateinit var binding: ActivityConfigBinding
     private lateinit var autoStart: CheckBox
@@ -91,6 +89,33 @@ class ConfigActivity : AppCompatActivity() {
         oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
         certificateFile.isChecked = oldCertificateFile
 
+        val certificateRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    it.data?.data?.also { uri ->
+                        try {
+                            val inputStream = applicationContext.contentResolver.openInputStream(uri)
+                                    as FileInputStream
+                            File(BaresipService.filesPath + "/cert.pem")
+                                .copyInputStreamToFile(inputStream)
+                            inputStream.close()
+                            Config.removeVariable("sip_certificate")
+                            Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
+                            save = true
+                            restart = true
+                        } catch (e: Error) {
+                            Utils.alertView(
+                                this, getString(R.string.error),
+                                getString(R.string.read_cert_error)
+                            )
+                            certificateFile.isChecked = false
+                        }
+                    }
+                } else {
+                    certificateFile.isChecked = false
+                }
+            }
+
         certificateFile.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (Build.VERSION.SDK_INT < 29) {
@@ -115,7 +140,7 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                     restart = true
                 } else {
-                    Utils.selectInputFile(this, CERTIFICATE_CODE)
+                    Utils.selectInputFile(certificateRequest)
                 }
             } else {
                 Config.removeVariable("sip_certificate")
@@ -132,6 +157,30 @@ class ConfigActivity : AppCompatActivity() {
         caFile = binding.CAFile
         oldCAFile = Config.variable("sip_cafile").isNotEmpty()
         caFile.isChecked = oldCAFile
+
+        val certificatesRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == Activity.RESULT_OK)
+                    it.data?.data?.also { uri ->
+                        try {
+                            val inputStream = applicationContext.contentResolver.openInputStream(uri)
+                                    as FileInputStream
+                            File(BaresipService.filesPath + "/ca_certs.crt")
+                                .copyInputStreamToFile(inputStream)
+                            inputStream.close()
+                            Config.removeVariable("sip_cafile")
+                            Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
+                            save = true
+                            restart = true
+                        } catch (e: Error) {
+                            Utils.alertView(this, getString(R.string.error),
+                                getString(R.string.read_ca_certs_error))
+                            caFile.isChecked = false
+                        }
+                    }
+                else
+                    caFile.isChecked = false
+            }
 
         caFile.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -157,7 +206,7 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                     restart = true
                 } else {
-                    Utils.selectInputFile(this, CA_CERTIFICATES_CODE)
+                    Utils.selectInputFile(certificatesRequest)
                 }
             } else {
                 Config.removeVariable("sip_cafile")
@@ -392,61 +441,6 @@ class ConfigActivity : AppCompatActivity() {
                     Log.e(TAG, "Reload of config failed")
         setResult(RESULT_OK, intent)
         finish()
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-
-            CERTIFICATE_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        try {
-                            val inputStream = applicationContext.contentResolver.openInputStream(it)
-                                    as FileInputStream
-                            File(BaresipService.filesPath + "/cert.pem")
-                                .copyInputStreamToFile(inputStream)
-                            inputStream.close()
-                            Config.removeVariable("sip_certificate")
-                            Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
-                            save = true
-                            restart = true
-                        } catch (e: Error) {
-                            Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.read_cert_error))
-                            certificateFile.isChecked = false
-                        }
-                    }
-                else
-                    certificateFile.isChecked = false
-            }
-
-            CA_CERTIFICATES_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        try {
-                            val inputStream = applicationContext.contentResolver.openInputStream(it)
-                                    as FileInputStream
-                            File(BaresipService.filesPath + "/ca_certs.crt")
-                                .copyInputStreamToFile(inputStream)
-                            inputStream.close()
-                            Config.removeVariable("sip_cafile")
-                            Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
-                            save = true
-                            restart = true
-                        } catch (e: Error) {
-                            Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.read_ca_certs_error))
-                            caFile.isChecked = false
-                        }
-                    }
-                else
-                    caFile.isChecked = false
-            }
-        }
 
     }
 
