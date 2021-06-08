@@ -3,15 +3,14 @@ package com.tutpro.baresip.plus
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.tutpro.baresip.plus.databinding.ActivityChatsBinding
-
 import java.util.*
 
 class ChatsActivity: AppCompatActivity() {
@@ -23,6 +22,7 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
     internal lateinit var aor: String
+    private var scrollPosition = -1
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -56,6 +56,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
+            scrollPosition = pos
             val i = Intent(this, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
@@ -148,12 +149,25 @@ class ChatsActivity: AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        MainActivity.activityAor = aor
+        super.onPause()
+    }
+
     override fun onResume() {
         super.onResume()
         clAdapter.clear()
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, uaMessages)
         listView.adapter = clAdapter
+        if (uaMessages.count() > 0) {
+            if (scrollPosition >= 0) {
+                listView.setSelection(scrollPosition)
+                scrollPosition = -1
+            } else {
+                listView.setSelection(0)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -201,11 +215,6 @@ class ChatsActivity: AppCompatActivity() {
     override fun onBackPressed() {
         BaresipService.activities.remove("chats,$aor")
         returnResult()
-    }
-
-    override fun onPause() {
-        MainActivity.activityAor = aor
-        super.onPause()
     }
 
     private fun returnResult() {
