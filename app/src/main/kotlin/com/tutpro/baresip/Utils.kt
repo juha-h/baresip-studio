@@ -21,10 +21,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 
 import java.io.*
@@ -109,15 +109,15 @@ object Utils {
         var u = uri
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
-        if (u.contains("@")) {
+        return if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            return if (isE164Number(user) || (host == domain))
+            if (isE164Number(user) || (host == domain))
                 user
             else
                 "$user@$host"
         } else {
-            return u
+            u
         }
     }
 
@@ -188,11 +188,11 @@ object Utils {
     }
 
     fun checkIpPort(ipPort: String): Boolean {
-        if (ipPort.startsWith("["))
-            return checkIpv6InBrackets(ipPort.substringBeforeLast(":")) &&
+        return if (ipPort.startsWith("["))
+            checkIpv6InBrackets(ipPort.substringBeforeLast(":")) &&
                     checkPort(ipPort.substringAfterLast(":"))
         else
-            return checkIpV4(ipPort.substringBeforeLast(":")) &&
+            checkIpV4(ipPort.substringBeforeLast(":")) &&
                     checkPort(ipPort.substringAfterLast(":"))
     }
 
@@ -232,10 +232,10 @@ object Utils {
 
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
-        if (restParams.size == 1)
-            return checkHostPort(restParams[0])
+        return if (restParams.size == 1)
+            checkHostPort(restParams[0])
         else
-            return checkHostPort(restParams[0]) && checkParams(restParams[1])
+            checkHostPort(restParams[0]) && checkParams(restParams[1])
     }
 
     fun checkSipUri(uri: String): Boolean {
@@ -282,14 +282,14 @@ object Utils {
         var servers = ""
         for (dnsServer in list) {
             var address = dnsServer.hostAddress.removePrefix("/")
-            if (checkIpV4(address))
-                address = "${address}:53"
+            address = if (checkIpV4(address))
+                "${address}:53"
             else
-                address = "[${address}]:53"
-            if (servers == "")
-                servers = address
+                "[${address}]:53"
+            servers = if (servers == "")
+                address
             else
-                servers = "${servers},${address}"
+                "${servers},${address}"
         }
         return servers
     }
@@ -343,10 +343,10 @@ object Utils {
     fun implode(list: List<String>, sep: String): String {
         var res = ""
         for (s in list) {
-            if (res == "")
-                res = s
+            res = if (res == "")
+                s
             else
-                res = res + sep + s
+                res + sep + s
         }
         return res
     }
@@ -463,13 +463,13 @@ object Utils {
     }
 
     @RequiresApi(29)
-    fun selectInputFile(activity: Activity, activityCode: Int) {
+    fun selectInputFile(request: ActivityResultLauncher<Intent>) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
             putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
         }
-        startActivityForResult(activity, intent, activityCode, null)
+        request.launch(intent)
     }
 
     @RequiresApi(29)
