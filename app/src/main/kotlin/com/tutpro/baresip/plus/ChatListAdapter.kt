@@ -76,19 +76,17 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
-        val fmt: DateFormat
-        if (isToday(message.timeStamp))
-            fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+        val fmt: DateFormat = if (isToday(message.timeStamp))
+            DateFormat.getTimeInstance(DateFormat.SHORT)
         else
-            fmt = DateFormat.getDateInstance(DateFormat.SHORT)
+            DateFormat.getDateInstance(DateFormat.SHORT)
         viewHolder.infoView.text = fmt.format(cal.time)
         if (message.direction == R.drawable.arrow_up_red) {
-            val info: String
-            if (message.responseCode != 0)
-                info = "${viewHolder.infoView.text} - ${ctx.getString(R.string.message_failed)}: " +
-                    "${message.responseCode} ${message.responseReason}"
+            val info: String = if (message.responseCode != 0)
+                "${viewHolder.infoView.text} - ${ctx.getString(R.string.message_failed)}: " +
+                        "${message.responseCode} ${message.responseReason}"
             else
-                info = "${viewHolder.infoView.text} - ${ctx.getString(R.string.sending_failed)}"
+                "${viewHolder.infoView.text} - ${ctx.getString(R.string.sending_failed)}"
             viewHolder.infoView.text = info
             viewHolder.infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         }
