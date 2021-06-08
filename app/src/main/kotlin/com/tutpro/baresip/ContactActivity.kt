@@ -20,6 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.exifinterface.media.ExifInterface
@@ -28,8 +29,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 class ContactActivity : AppCompatActivity() {
-
-    private val READ_REQUEST_CODE = 42
 
     private lateinit var binding: ActivityContactBinding
     private lateinit var textAvatarView: TextView
@@ -101,13 +100,36 @@ class ContactActivity : AppCompatActivity() {
 
         oldAndroid = androidCheck.isChecked
 
+        val avatarRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    it.data?.data?.also { uri ->
+                        try {
+                            val inputStream = baseContext.contentResolver.openInputStream(uri)
+                            val avatarBitmap = BitmapFactory.decodeStream(inputStream)
+                            inputStream?.close()
+                            val scaledBitmap = Bitmap.createScaledBitmap(avatarBitmap, 192, 192, true)
+                            val exif = ExifInterface(baseContext.contentResolver.openInputStream(uri)!!)
+                            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                ExifInterface.ORIENTATION_NORMAL)
+                            val rotatedBitmap = rotateBitmap(scaledBitmap, orientation)
+                            showImageAvatar(rotatedBitmap)
+                            if (Utils.saveBitmap(rotatedBitmap, File(BaresipService.filesPath, "tmp.png")))
+                                newAvatar = "image"
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Could not read avatar image: $e")
+                        }
+                    }
+                }
+            }
+
         textAvatarView.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "image/*"
             }
-            startActivityForResult(intent, READ_REQUEST_CODE)
+            avatarRequest.launch(intent)
 
         }
 
@@ -126,7 +148,7 @@ class ContactActivity : AppCompatActivity() {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "image/*"
             }
-            startActivityForResult(intent, READ_REQUEST_CODE)
+            avatarRequest.launch(intent)
 
         }
 
@@ -140,32 +162,6 @@ class ContactActivity : AppCompatActivity() {
         }
 
         Utils.addActivity("contact,$newContact,$uOrI")
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, resultData)
-
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            resultData?.data?.also { uri ->
-                try {
-                    val inputStream = baseContext.contentResolver.openInputStream(uri)
-                    val avatarBitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream?.close()
-                    val scaledBitmap = Bitmap.createScaledBitmap(avatarBitmap, 192, 192, true)
-                    val exif = ExifInterface(baseContext.contentResolver.openInputStream(uri)!!)
-                    val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_NORMAL)
-                    val rotatedBitmap = rotateBitmap(scaledBitmap, orientation)
-                    showImageAvatar(rotatedBitmap)
-                    if (Utils.saveBitmap(rotatedBitmap, File(BaresipService.filesPath, "tmp.png")))
-                        newAvatar = "image"
-                } catch (e: Exception) {
-                    Log.e(TAG, "Could not read avatar image: $e")
-                }
-            }
-        }
 
     }
 
@@ -198,11 +194,10 @@ class ContactActivity : AppCompatActivity() {
                             String.format(getString(R.string.invalid_contact), newName))
                     return false
                 }
-                val alert: Boolean
-                if (newContact)
-                    alert = ContactsActivity.nameExists(newName, true)
+                val alert: Boolean = if (newContact)
+                    ContactsActivity.nameExists(newName, true)
                 else
-                    alert = (Contact.contacts()[index].name != newName) &&
+                    (Contact.contacts()[index].name != newName) &&
                             ContactsActivity.nameExists(newName, false)
                 if (alert) {
                     Utils.alertView(this, getString(R.string.notice),
@@ -211,11 +206,10 @@ class ContactActivity : AppCompatActivity() {
                 }
 
                 if (!newUri.startsWith("sip:")) {
-                    if (newUri.contains("@") || (BaresipService.uas.size != 1)) {
-                        newUri = "sip:$newUri"
-                    } else {
-                        newUri = "sip:$newUri@${Utils.aorDomain(BaresipService.uas[0].account.aor)}"
-                    }
+                    newUri = if (newUri.contains("@") || (BaresipService.uas.size != 1))
+                        "sip:$newUri"
+                    else
+                        "sip:$newUri@${Utils.aorDomain(BaresipService.uas[0].account.aor)}"
                 }
                 if (!Utils.checkSipUri(newUri)) {
                     Utils.alertView(this, getString(R.string.notice),
@@ -302,6 +296,7 @@ class ContactActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
                                             grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
 
@@ -522,6 +517,7 @@ class ContactActivity : AppCompatActivity() {
                     null)
         }
 
+        @Suppress("UNUSED")
         fun logAndroidSipContacts(ctx: Context): HashMap<Long, MutableList<String>> {
             val contacts = HashMap<Long, MutableList<String>>()
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
