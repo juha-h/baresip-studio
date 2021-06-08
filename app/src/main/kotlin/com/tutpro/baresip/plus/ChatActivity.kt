@@ -92,7 +92,7 @@ class ChatActivity : AppCompatActivity() {
                         b.putBoolean("new", true)
                         b.putString("uri", peerUri)
                         i.putExtras(b)
-                        startActivityForResult(i, MainActivity.CONTACT_CODE)
+                        startActivity(i)
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         Message.messages().remove(chatMessages[pos])
@@ -139,7 +139,7 @@ class ChatActivity : AppCompatActivity() {
         sendButton = binding.sendButton
         sendButton.setOnClickListener {
             val msgText = newMessage.text.toString()
-            if (msgText.length > 0) {
+            if (msgText.isNotEmpty()) {
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val time = System.currentTimeMillis()
                 val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
@@ -182,7 +182,7 @@ class ChatActivity : AppCompatActivity() {
     override fun onPause() {
         if (newMessage.text.toString() != "") {
             Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
-            BaresipService.chatTexts.put("$aor::$peerUri", newMessage.text.toString())
+            BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
         }
         MainActivity.activityAor = aor
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
