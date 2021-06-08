@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.plus.databinding.ActivityChatsBinding
 
 import java.util.*
@@ -16,9 +17,9 @@ import java.util.*
 class ChatsActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityChatsBinding
-    internal lateinit var uaMessages: ArrayList<Message>
+    private lateinit var uaMessages: ArrayList<Message>
     internal lateinit var listView: ListView
-    internal lateinit var clAdapter: ChatListAdapter
+    private lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     internal lateinit var plusButton: ImageButton
     internal lateinit var aor: String
@@ -44,13 +45,23 @@ class ChatsActivity: AppCompatActivity() {
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
+        val chatRequest =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    clAdapter.clear()
+                    uaMessages = uaMessages(aor)
+                    clAdapter = ChatListAdapter(this, uaMessages)
+                    listView.adapter = clAdapter
+                }
+            }
+
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
             val i = Intent(this, ChatActivity::class.java)
             val b = Bundle()
             b.putString("aor", aor)
             b.putString("peer", uaMessages[pos].peerUri)
             i.putExtras(b)
-            startActivityForResult(i, MainActivity.CHAT_CODE)
+            chatRequest.launch(i)
         }
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
@@ -62,7 +73,7 @@ class ChatsActivity: AppCompatActivity() {
                         b.putBoolean("new", true)
                         b.putString("uri", uaMessages[pos].peerUri)
                         i.putExtras(b)
-                        startActivityForResult(i, MainActivity.CONTACT_CODE)
+                        startActivity(i)
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         val peerUri = uaMessages[pos].peerUri
@@ -110,7 +121,7 @@ class ChatsActivity: AppCompatActivity() {
 
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
-            if (uriText.length > 0) {
+            if (uriText.isNotEmpty()) {
                 var uri = ContactsActivity.findContactURI(uriText)
                 if (!uri.startsWith("sip:")) {
                     uri = "sip:$uri"
@@ -130,7 +141,7 @@ class ChatsActivity: AppCompatActivity() {
                     b.putString("aor", aor)
                     b.putString("peer", uri)
                     i.putExtras(b)
-                    startActivityForResult(i, MainActivity.CHAT_CODE)
+                    chatRequest.launch(i)
                 }
             }
         }
@@ -185,18 +196,6 @@ class ChatsActivity: AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == MainActivity.CHAT_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                clAdapter.clear()
-                uaMessages = uaMessages(aor)
-                clAdapter = ChatListAdapter(this, uaMessages)
-                listView.adapter = clAdapter
-            }
-        }
     }
 
     override fun onBackPressed() {
