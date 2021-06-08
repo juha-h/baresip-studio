@@ -74,10 +74,10 @@ object Config {
             if (config.contains(Regex("dyn_dns[ ]+yes"))) {
                 removeVariable("dns_server")
                 for (dnsServer in BaresipService.dnsServers)
-                    if (Utils.checkIpV4(dnsServer.hostAddress))
-                        config = "${config}dns_server ${dnsServer.hostAddress}:53\n"
+                    config = if (Utils.checkIpV4(dnsServer.hostAddress))
+                        "${config}dns_server ${dnsServer.hostAddress}:53\n"
                     else
-                        config = "${config}dns_server [${dnsServer.hostAddress}]:53\n"
+                        "${config}dns_server [${dnsServer.hostAddress}]:53\n"
                 BaresipService.dynDns = true
             }
         }
@@ -132,7 +132,7 @@ object Config {
     fun save() {
         var result = ""
         for (line in config.split("\n"))
-            if (line.length > 0)
+            if (line.isNotEmpty())
                 result = result + line + '\n'
         config = result
         Utils.putFileContents(configPath, config.toByteArray())
@@ -145,14 +145,14 @@ object Config {
         var servers = ""
         for (dnsServer in dnsServers) {
             var address = dnsServer.hostAddress.removePrefix("/")
-            if (Utils.checkIpV4(address))
-                address = "${address}:53"
+            address = if (Utils.checkIpV4(address))
+                "${address}:53"
             else
-                address = "[${address}]:53"
-            if (servers == "")
-                servers = address
+                "[${address}]:53"
+            servers = if (servers == "")
+                address
             else
-                servers = "${servers},${address}"
+                "${servers},${address}"
         }
         return Api.net_use_nameserver(servers)
     }
