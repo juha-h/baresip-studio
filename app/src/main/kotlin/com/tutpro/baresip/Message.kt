@@ -25,7 +25,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
 
     companion object {
 
-        val MESSAGE_HISTORY_SIZE = 100
+        const val MESSAGE_HISTORY_SIZE = 100
 
         fun messages(): ArrayList<Message> {
             return BaresipService.messages
@@ -46,7 +46,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 fos.close()
                 Log.d(TAG, "Saved ${BaresipService.messages.size} messages")
             } catch (e: IOException) {
-                Log.e(TAG, "OutputStream exception: " + e.toString())
+                Log.e(TAG, "OutputStream exception: $e")
                 e.printStackTrace()
             }
         }
@@ -63,7 +63,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     fis.close()
                     Log.d(TAG, "Restored ${BaresipService.messages.size} messages")
                 } catch (e: Exception) {
-                    Log.e(TAG, "InputStream exception: - " + e.toString())
+                    Log.e(TAG, "InputStream exception: - $e")
                 }
             }
         }
