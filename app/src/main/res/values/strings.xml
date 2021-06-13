@@ -14,25 +14,25 @@
         <ul>
             <li>In Android\'s Apps and Notification Settings, allow baresip app\'s notifications.</li>
             <li>Check that default values in baresip\'s Settings meet your needs
-            (touch item titles for help).</li>
+                (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
             <li>A new account can be partially configured automatically. See
-            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
-            for more information.</li>
+                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
+                for more information.</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
-            succeeded, yellow (registration is in progress), red (registration failed), white (registration
-            has not been activated).</li>
+                succeeded, yellow (registration is in progress), red (registration failed), white (registration
+                has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Icon at the top of the main screen toggles speakerphone.</li>
             <li>Icons at the bottom of the main screen lead to voicemail (if Voicemail URI has been
-            configured for the account), contacts, messages, and call history, and allow toggling
-            between numeric and alphanumeric keyboard.</li>
+                configured for the account), contacts, messages, and call history, and allow toggling
+                between numeric and alphanumeric keyboard.</li>
+            <li>Previous call party can be reselect by touching the call icon when Callee is empty.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>You can reselect the previous call party by touching the call icon when Callee is empty.</li>
         </ul>
         <h2>Known Issues</h2>
         <ul>
@@ -62,20 +62,25 @@
         <ul>
             <li>In Android\'s Apps and Notification Settings, allow baresip+ app\'s notifications.</li>
             <li>Check that default values in baresip+\'s Settings meet your needs
-            (touch item titles for help).</li>
+                (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
             <li>A new account can be partially configured automatically. See
-            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
-            for more information.</li>
-            <li>Registration status of an account is shown with a colored dot:  green (registration
-            succeeded, yellow (registration is in progress), red (registration failed), white (registration
-            has not been activated).</li>
+                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
+                for more information.</li>
+            <li>Registration status of an account is shown with a colored dot: green (registration
+                succeeded, yellow (registration is in progress), red (registration failed), white (registration
+                has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Swipe left/right gesture toggles between the accounts.</li>
+            <li>Icon at the top of the main screen toggles speakerphone.</li>
+            <li>Icons at the bottom of the main screen lead to voicemail (if Voicemail URI has been
+                configured for the account), contacts, messages, and call history, and allow toggling
+                between numeric and alphanumeric keyboard.</li>
+            <li>Previous call party can be reselect by touching the call icon when Callee is empty.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
         </ul>
         <h2>Known Issues</h2>
         <ul>

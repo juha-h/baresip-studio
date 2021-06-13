@@ -10,29 +10,32 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-        <li>Salli baresip sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
-            osiossa.</li>
-        <li>Tarkista, että baresip sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
-        kosketus tarjoaa apua.</li>
-        <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-        <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
-            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
-            Wiki</a>-sivulta.</li>
-        <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
-            keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
-            (rekisteröintiä ei ole aktivoitu).</li>
-        <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
-        <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-        <li>Pyyhkäisyllä vasemmalle/oikealle voi vaihtaa näkyvissä olevaa tiliä.</li>
-        <li>Näytön yläosassa olevan ikonin kosketuksella voi kytkeä kaiuttimen päälle/pois.</li>
-        <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
-            on puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
-            näppäimistön tyylin vaihtamisen.</li>
-        <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
-        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
-        <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
-        <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
-        kun puhelun kohde on tyhjä.</li>
+            <li>Salli baresip sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
+                osiossa.</li>
+            <li>Tarkista, että baresip sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
+                kosketus tarjoaa apua.</li>
+            <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+            <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
+                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
+                Wiki</a>-sivulta.</li>
+            <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+                keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
+                (rekisteröintiä ei ole aktivoitu).</li>
+            <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+            <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
+            <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
+            <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
+            <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
+                puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
+                näppäimistön tyylin vaihtamisen.</li>
+            <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
+                kun puhelun kohde on tyhjä.</li>
+            <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
+            <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja
+                yhteystietoja.</li>
+            <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia
+                lyhyesti/pitkästi.</li>
+        </ul>
         <h2>Tunnetut ongelmat</h2>
         <ul>
             <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
@@ -59,26 +62,32 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-        <li>Salli baresip+ sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
-            osiossa.</li>
-        <li>Tarkista, että baresip+ sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
-        kosketus tarjoaa apua.</li>
-        <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-        <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
-            <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
-            Wiki</a>-sivulta</li>
-        <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
-            keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
-            (rekisteröintiä ei ole aktivoitu).</li>
-        <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
-        <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-        <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
-        <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
-        <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
-        <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
-        kun puhelun kohde on tyhjä.</li>
-        <li>Jos et puhelun aikana kuule, mitä toinen sanoo, kasvata median volyymia laitteessa
-        tai aseta Oletus äänen voimakkuus Konfiguraatiossa.</li>
+            <li>Salli baresip+ sovelluksen ilmoitukset Android-asetusten "Sovellukset ja ilmoitukset"
+                osiossa.</li>
+            <li>Tarkista, että baresip sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
+                kosketus tarjoaa apua.</li>
+            <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+            <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
+                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
+                Wiki</a>-sivulta.</li>
+            <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+                keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
+                (rekisteröintiä ei ole aktivoitu).</li>
+            <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+            <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
+            <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
+            <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
+            <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
+                puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
+                näppäimistön tyylin vaihtamisen.</li>
+            <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
+                kun puhelun kohde on tyhjä.</li>
+            <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
+            <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja
+                yhteystietoja.</li>
+            <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia
+                lyhyesti/pitkästi.</li>
+        </ul>
         <h2>Tunnetut ongelmat</h2>
         <ul>
             <li>Johtuen alla olevien kirjastojen rajoituksista useita,
