@@ -62,19 +62,18 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
         var info: String
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
-        val fmt: DateFormat
-        if (isToday(message.timeStamp))
-            fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+        val fmt: DateFormat = if (isToday(message.timeStamp))
+            DateFormat.getTimeInstance(DateFormat.SHORT)
         else
-            fmt = DateFormat.getDateInstance(DateFormat.SHORT)
+            DateFormat.getDateInstance(DateFormat.SHORT)
         info = fmt.format(cal.time)
         if (info.length < 6) info = "${ctx.getString(R.string.today)} $info"
         info = "$info - $peer"
         if (message.direction == R.drawable.arrow_up_red) {
-            if (message.responseCode != 0)
-                info = "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
+            info = if (message.responseCode != 0)
+                "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
             else
-                info = "$info - ${ctx.getString(R.string.sending_failed)}"
+                "$info - ${ctx.getString(R.string.sending_failed)}"
             viewHolder.infoView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         }
         viewHolder.infoView.text = info
