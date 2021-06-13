@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
-    private lateinit var accountRequest: ActivityResultLauncher<Intent>
+    lateinit var accountRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
     private lateinit var configRequest: ActivityResultLauncher<Intent>
     private lateinit var backupRequest: ActivityResultLauncher<Intent>
@@ -203,13 +203,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         accountRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                spinToAor(activityAor)
-                val ua = UserAgent.ofAor(activityAor)!!
-                updateIcons(ua.account)
-                if (it.resultCode == Activity.RESULT_OK)
-                    if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
-                        askPassword(getString(R.string.authentication_password), ua)
-            }
+            spinToAor(activityAor)
+            val ua = UserAgent.ofAor(activityAor)!!
+            updateIcons(ua.account)
+            if (it.resultCode == Activity.RESULT_OK)
+                if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
+                    askPassword(getString(R.string.authentication_password), ua)
+        }
 
         aorSpinner.setOnTouchListener { view, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -1176,7 +1176,7 @@ class MainActivity : AppCompatActivity() {
 
             R.id.backup -> {
                 if (Build.VERSION.SDK_INT >= 29) {
-                    pickupFileFromDownloads(BACKUP_CODE)
+                    pickupFileFromDownloads("backup")
                 } else {
                     if (Utils.requestPermission(
                             this,
@@ -1237,7 +1237,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startRestore() {
         if (Build.VERSION.SDK_INT >= 29) {
-            pickupFileFromDownloads(RESTORE_CODE)
+            pickupFileFromDownloads("restore")
         } else {
             val path = Utils.downloadsPath("baresip.bs")
             downloadsInputStream = FileInputStream(File(path))
@@ -1246,9 +1246,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(29)
-    private fun pickupFileFromDownloads(activityCode: Int) {
-        when (activityCode) {
-            BACKUP_CODE -> {
+    private fun pickupFileFromDownloads(action: String) {
+        when (action) {
+            "backup" -> {
                 backupRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
@@ -1256,7 +1256,7 @@ class MainActivity : AppCompatActivity() {
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
             }
-            RESTORE_CODE -> {
+            "restore" -> {
                 restoreRequest.launch(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
@@ -1845,16 +1845,6 @@ class MainActivity : AppCompatActivity() {
 
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
-
-        const val ACCOUNT_CODE = 6
-        const val CONTACT_CODE = 7
-        const val BACKUP_CODE = 10
-        const val RESTORE_CODE = 11
-
-        const val BACKUP_PERMISSION_REQUEST_CODE = 1
-        const val RESTORE_PERMISSION_REQUEST_CODE = 2
-        const val RECORD_PERMISSION_REQUEST_CODE = 3
-        const val CONTACTS_PERMISSION_REQUEST_CODE = 4
 
     }
 

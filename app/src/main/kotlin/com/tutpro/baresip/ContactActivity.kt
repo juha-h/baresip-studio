@@ -266,7 +266,7 @@ class ContactActivity : AppCompatActivity() {
                     if (contact.androidContact) {
                         Utils.requestPermission(this, Manifest.permission.READ_CONTACTS +
                                 "|" + Manifest.permission.WRITE_CONTACTS,
-                                MainActivity.CONTACTS_PERMISSION_REQUEST_CODE)
+                            CONTACTS_PERMISSION_REQUEST_CODE)
                         return false
                     }
                 }
@@ -300,7 +300,7 @@ class ContactActivity : AppCompatActivity() {
 
         when (requestCode) {
 
-            MainActivity.CONTACTS_PERMISSION_REQUEST_CODE ->
+            CONTACTS_PERMISSION_REQUEST_CODE ->
                 if (grantResults.isNotEmpty() && permissions.size == grantResults.size) {
                     for (res in grantResults)
                         if (res != PackageManager.PERMISSION_GRANTED)
