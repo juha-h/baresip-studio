@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 
 import java.io.File
 import java.io.IOException
@@ -158,7 +159,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                 b.putBoolean("new", false)
                 b.putInt("index", position)
                 i.putExtras(b)
-                (ctx as Activity).startActivityForResult(i, MainActivity.CONTACT_CODE)
+                startActivity(ctx, i, null)
             }
         }
 
