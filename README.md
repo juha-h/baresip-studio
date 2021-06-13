@@ -1,6 +1,6 @@
 This is a bare-bones Android Studio project implementing <a href="https://github.com/alfredh/baresip">baresip</a> based SIP User Agent.
 
-Currently the application supports voice calling and messaging, UDP, TCP, and TLS signaling transports, voicemail Message Waiting Indication, incoming call transfers (REFER), PCMU/PCMA, G.722, G.722.1, G.726, G.729, AMR, and Opus voice codecs, as well as ZRTP and (DTLS) SRTP media encapsulation.
+Currently the application supports voice calling and messaging, UDP, TCP, TLS, and WSS signaling transports, voicemail Message Waiting Indication, incoming call transfers (REFER), PCMU/PCMA, G.722, G.722.1, G.726, G.729, AMR, and Opus voice codecs, as well as ZRTP and (DTLS) SRTP media encapsulation.
 
 Motivated by need for a secure SIP user agent for Android that does not depend on third party push notification services.
 
