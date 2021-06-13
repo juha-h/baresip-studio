@@ -24,10 +24,15 @@
             has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Swipe left/right gesture toggles between the accounts.</li>
+            <li>Icon at the top of the main screen toggles speakerphone.</li>
+            <li>Icons at the bottom of the main screen lead to voicemail (if Voicemail URI has been
+            configured for the account), contacts, messages, and call history, and allow toggling
+            between numeric and alphanumeric keyboard.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
+            <li>You can reselect the previous call party by touching the call icon when Callee is empty.</li>
         </ul>
         <h2>Known Issues</h2>
         <ul>

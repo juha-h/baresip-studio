@@ -17,12 +17,17 @@
         <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
         <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
             <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
-            Wiki</a>-sivulta</li>
+            Wiki</a>-sivulta.</li>
         <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
             keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
             (rekisteröintiä ei ole aktivoitu).</li>
         <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
         <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
+        <li>Pyyhkäisyllä vasemmalle/oikealle voi vaihtaa näkyvissä olevaa tiliä.</li>
+        <li>Näytön yläosassa olevan ikonin kosketuksella voi kytkeä kaiuttimen päälle/pois.</li>
+        <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
+            on puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
+            näppäimistön tyylin vaihtamisen.</li>
         <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
         <li>Pitkillä kosketuksilla voi myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
         <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
