@@ -87,6 +87,8 @@ object Config {
             config = "${config}jitter_buffer_wish 6\n"
         }
 
+        removeLine("module ilbc.so")
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i(TAG, "Initialized config to '$config'")
