@@ -1,0 +1,4 @@
+- Improved About text
+- Restore chat list position when returning from chat
+- Fixed crash when asking for account's password
+- Don't try to load iLBC module
