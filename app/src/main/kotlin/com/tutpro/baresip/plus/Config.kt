@@ -72,6 +72,8 @@ object Config {
 
         removeLine("avcodec")
 
+        removeLine("module ilbc.so")
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i(TAG, "Initialized config to '$config'")
