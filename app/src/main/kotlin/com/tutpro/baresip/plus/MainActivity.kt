@@ -20,6 +20,8 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +36,7 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -73,6 +76,15 @@ class MainActivity : AppCompatActivity() {
     private var speakerIcon: MenuItem? = null
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
+
+    private lateinit var accountsRequest: ActivityResultLauncher<Intent>
+    private lateinit var accountRequest: ActivityResultLauncher<Intent>
+    private lateinit var chatRequests: ActivityResultLauncher<Intent>
+    private lateinit var configRequest: ActivityResultLauncher<Intent>
+    private lateinit var backupRequest: ActivityResultLauncher<Intent>
+    private lateinit var restoreRequest: ActivityResultLauncher<Intent>
+    private lateinit var contactsRequest: ActivityResultLauncher<Intent>
+    private lateinit var callsRequest: ActivityResultLauncher<Intent>
 
     private var downloadsInputStream: FileInputStream? = null
     private var downloadsOutputStream: FileOutputStream? = null
@@ -172,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                         baresipService.action = "Kill"
                         startService(baresipService)
                         finishAndRemoveTask()
-                        System.exit(0)
+                        exitProcess(0)
                     }
                 }
             }
@@ -198,6 +210,27 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Nothing selected")
             }
         }
+
+        accountsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            uaAdapter.notifyDataSetChanged()
+            spinToAor(activityAor)
+            if (aorSpinner.tag != "")
+                updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
+            if (BaresipService.isServiceRunning) {
+                baresipService.action = "UpdateNotification"
+                startService(baresipService)
+            }
+        }
+
+        accountRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                spinToAor(activityAor)
+                val ua = UserAgent.ofAor(activityAor)!!
+                updateIcons(ua.account)
+                if (it.resultCode == Activity.RESULT_OK)
+                    if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
+                        askPassword(getString(R.string.authentication_password), ua)
+            }
+
         aorSpinner.setOnTouchListener { view, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 if (aorSpinner.selectedItemPosition == -1) {
@@ -205,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                     val b = Bundle()
                     b.putString("aor", "")
                     i.putExtras(b)
-                    startActivityForResult(i, ACCOUNTS_CODE)
+                    accountsRequest.launch(i)
                     true
                 } else {
                     if ((event.x - view.left) < 100) {
@@ -213,7 +246,7 @@ class MainActivity : AppCompatActivity() {
                         val b = Bundle()
                         b.putString("aor", aorSpinner.tag.toString())
                         i.putExtras(b)
-                        startActivityForResult(i, ACCOUNT_CODE)
+                        accountRequest.launch(i)
                         true
                     } else {
                         UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri =
@@ -420,6 +453,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        contactsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
+                Contact.contacts().map { Contact -> Contact.name }))
+            }
+
         contactsButton.setOnClickListener {
             val i = Intent(this@MainActivity, ContactsActivity::class.java)
             val b = Bundle()
@@ -428,7 +466,12 @@ class MainActivity : AppCompatActivity() {
             else
                 b.putString("aor", "")
             i.putExtras(b)
-            startActivityForResult(i, CONTACTS_CODE)
+            contactsRequest.launch(i)
+        }
+
+        chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            spinToAor(activityAor)
+            updateIcons(Account.ofAor(activityAor)!!)
         }
 
         messagesButton.setOnClickListener {
@@ -438,8 +481,13 @@ class MainActivity : AppCompatActivity() {
                 b.putString("aor", aorSpinner.tag.toString())
                 b.putString("peer", resumeUri)
                 i.putExtras(b)
-                startActivityForResult(i, CHATS_CODE)
+                chatRequests.launch(i)
             }
+        }
+
+        callsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            spinToAor(activityAor)
+            callsButton.setImageResource(R.drawable.calls)
         }
 
         callsButton.setOnClickListener {
@@ -448,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", aorSpinner.tag.toString())
                 i.putExtras(b)
-                startActivityForResult(i, CALLS_CODE)
+                callsRequest.launch(i)
             }
         }
 
@@ -487,6 +535,54 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }, 250)
+        }
+
+        configRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if ((it.data != null) && it.data!!.hasExtra("restart")) {
+                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
+                titleView.text = getString(R.string.restart_request)
+                with(AlertDialog.Builder(this)) {
+                    setCustomTitle(titleView)
+                    setMessage(getString(R.string.config_restart))
+                    setPositiveButton(getText(R.string.restart)) { dialog, _ ->
+                        dialog.dismiss()
+                        quitRestart(true)
+                    }
+                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
+                }
+            }
+            val displayTheme = Preferences(applicationContext).displayTheme
+            if (displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+                AppCompatDelegate.setDefaultNightMode(displayTheme)
+                delegate.applyDayNight()
+            }
+        }
+
+        backupRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK)
+                it.data?.data?.also { uri ->
+                    downloadsOutputStream = applicationContext.contentResolver.openOutputStream(uri)
+                            as FileOutputStream
+                    if (downloadsOutputStream != null) {
+                        downloadsOutputFile = Utils.fileNameOfUri(applicationContext, uri)
+                        askPassword(getString(R.string.encrypt_password))
+                    }
+                }
+        }
+
+        restoreRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK)
+                it.data?.data?.also { uri ->
+                    downloadsInputStream = applicationContext.contentResolver.openInputStream(uri)
+                            as FileInputStream
+                    if (downloadsInputStream != null) {
+                        downloadsInputFile = Utils.fileNameOfUri(applicationContext, uri)
+                        askPassword(getString(R.string.decrypt_password))
+                    }
+                }
         }
 
         swipeRefresh.setOnTouchListener(object : OnSwipeTouchListener(this@MainActivity) {
@@ -725,7 +821,7 @@ class MainActivity : AppCompatActivity() {
                 resumeAction = "accounts"
             }
             "call" -> {
-                if (!Call.calls().isEmpty()) {
+                if (Call.calls().isNotEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return
@@ -924,7 +1020,7 @@ class MainActivity : AppCompatActivity() {
                 if (restart)
                     reStart()
                 else
-                    System.exit(0)
+                    exitProcess(0)
             }
             return
         }
@@ -1045,12 +1141,11 @@ class MainActivity : AppCompatActivity() {
                             setMessage(String.format(getString(R.string.verify_sas),
                                     ev[1], ev[2]))
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                                val security: Int
-                                if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                                val security: Int = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                                     Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
-                                    security = R.drawable.box_yellow
+                                    R.drawable.box_yellow
                                 } else {
-                                    security = R.drawable.box_green
+                                    R.drawable.box_green
                                 }
                                 call.security = security
                                 call.zid = ev[3]
@@ -1081,11 +1176,10 @@ class MainActivity : AppCompatActivity() {
                             Log.w(TAG, "Call $callp that is verified is not found")
                             return
                         }
-                        val tag: String
-                        if (call.security == R.drawable.box_yellow)
-                            tag = "yellow"
+                        val tag: String = if (call.security == R.drawable.box_yellow)
+                            "yellow"
                         else
-                            tag = "green"
+                            "green"
                         if (aor == aorSpinner.tag) {
                             securityButton.setImageResource(call.security)
                             securityButton.tag = tag
@@ -1174,7 +1268,7 @@ class MainActivity : AppCompatActivity() {
                         b.putString("peer", peer)
                         b.putBoolean("focus", ev[0] == "message reply")
                         i.putExtras(b)
-                        startActivityForResult(i, CHAT_CODE)
+                        chatRequests.launch(i)
                     }
                     "mwi notify" -> {
                         val lines = ev[1].split("\n")
@@ -1206,7 +1300,7 @@ class MainActivity : AppCompatActivity() {
         val intent = pm.getLaunchIntentForPackage(this.packageName)
         this.finishAffinity()
         this.startActivity(intent)
-        System.exit(0)
+        exitProcess(0)
     }
 
     override fun onBackPressed() {
@@ -1252,8 +1346,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.config -> {
-                i = Intent(this, ConfigActivity::class.java)
-                startActivityForResult(i, CONFIG_CODE)
+                configRequest.launch(Intent(this, ConfigActivity::class.java))
             }
 
             R.id.accounts -> {
@@ -1261,7 +1354,7 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", aorSpinner.tag.toString())
                 i.putExtras(b)
-                startActivityForResult(i, ACCOUNTS_CODE)
+                accountsRequest.launch(i)
             }
 
             R.id.backup -> {
@@ -1285,8 +1378,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.about -> {
-                i = Intent(this, AboutActivity::class.java)
-                startActivityForResult(i, ABOUT_CODE)
+                startActivity(Intent(this, AboutActivity::class.java))
             }
 
             R.id.restart, R.id.quit -> {
@@ -1294,102 +1386,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        Log.d(TAG, "onActivity result $requestCode $resultCode")
-
-        when (requestCode) {
-
-            ACCOUNTS_CODE -> {
-                uaAdapter.notifyDataSetChanged()
-                spinToAor(activityAor)
-                if (aorSpinner.tag != "")
-                    updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
-                if (BaresipService.isServiceRunning) {
-                    baresipService.action = "UpdateNotification"
-                    startService(baresipService)
-                }
-            }
-
-            ACCOUNT_CODE -> {
-                spinToAor(activityAor)
-                val ua = UserAgent.ofAor(activityAor)!!
-                updateIcons(ua.account)
-                if (resultCode == Activity.RESULT_OK)
-                    if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
-                        askPassword(getString(R.string.authentication_password), ua)
-            }
-
-            CONTACTS_CODE -> {
-                callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                        Contact.contacts().map { Contact -> Contact.name }))
-            }
-
-            CONFIG_CODE -> {
-                if ((data != null) && data.hasExtra("restart")) {
-                    val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
-                    titleView.text = getString(R.string.restart_request)
-                    with(AlertDialog.Builder(this)) {
-                        setCustomTitle(titleView)
-                        setMessage(getString(R.string.config_restart))
-                        setPositiveButton(getText(R.string.restart)) { dialog, _ ->
-                            dialog.dismiss()
-                            quitRestart(true)
-                        }
-                        setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        show()
-                    }
-                }
-                val displayTheme = Preferences(applicationContext).displayTheme
-                if (displayTheme != AppCompatDelegate.getDefaultNightMode()) {
-                    AppCompatDelegate.setDefaultNightMode(displayTheme)
-                    delegate.applyDayNight()
-                }
-            }
-
-            CALLS_CODE -> {
-                spinToAor(activityAor)
-                callsButton.setImageResource(R.drawable.calls)
-            }
-
-            CHATS_CODE, CHAT_CODE -> {
-                spinToAor(activityAor)
-                updateIcons(Account.ofAor(activityAor)!!)
-            }
-
-            BACKUP_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        downloadsOutputStream = applicationContext.contentResolver.openOutputStream(it)
-                                as FileOutputStream
-                        if (downloadsOutputStream != null) {
-                            downloadsOutputFile = Utils.fileNameOfUri(applicationContext, it)
-                            askPassword(getString(R.string.encrypt_password))
-                        }
-                    }
-            }
-
-            RESTORE_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    data?.data?.also {
-                        downloadsInputStream = applicationContext.contentResolver.openInputStream(it)
-                                as FileInputStream
-                        if (downloadsInputStream != null) {
-                            downloadsInputFile = Utils.fileNameOfUri(applicationContext, it)
-                            askPassword(getString(R.string.decrypt_password))
-                        }
-                    }
-            }
-
-            ABOUT_CODE -> {
-            }
-
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
@@ -1454,7 +1450,7 @@ class MainActivity : AppCompatActivity() {
                 if (reStart)
                     reStart()
                 else
-                    System.exit(0)
+                    exitProcess(0)
             }
         }
     }
@@ -1504,25 +1500,23 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(29)
     private fun pickupFileFromDownloads(activityCode: Int) {
-        val intent = when (activityCode) {
+        when (activityCode) {
             BACKUP_CODE -> {
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                backupRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
                     putExtra(Intent.EXTRA_TITLE, "baresip+.bs")
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
-                }
+                })
             }
             RESTORE_CODE -> {
-                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                restoreRequest.launch(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
-                }
+                })
             }
-            else -> null
         }
-        startActivityForResult(intent, activityCode)
     }
 
     private fun askPassword(title: String, ua: UserAgent? = null) {
@@ -1599,14 +1593,14 @@ class MainActivity : AppCompatActivity() {
                             Utils.alertView(context, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_authentication_password), password))
                         } else {
-                            aorPasswords.put(aor, password)
+                            aorPasswords[aor] = password
                         }
                         askPasswords(accounts)
                     }
                     setNegativeButton(android.R.string.cancel) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.cancel()
-                        aorPasswords.put(aor, "")
+                        aorPasswords[aor] = ""
                         askPasswords(accounts)
                     }
                     val dialog = builder.create()
@@ -1777,18 +1771,19 @@ class MainActivity : AppCompatActivity() {
             else -> Api.SDP_RECVONLY
         }
         val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, videoDir)
-        if (callp != "") {
+        return if (callp != "") {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             Call(callp, ua, uri, "out", status, Utils.dtmfWatcher(callp)).add()
             showCall(ua)
-            return true
+            true
         } else {
             Log.e(TAG, "ua_call_alloc ${ua.uap}/$uri failed")
-            return false
+            false
         }
     }
 
     // Currently transfer is implemented by first closing existing call and the making the new one
+    @Suppress("UNUSED")
     private fun transfer(ua: UserAgent, call: Call, uri: String) {
         val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
         if (newCallp != "") {
@@ -2015,8 +2010,7 @@ class MainActivity : AppCompatActivity() {
                     restoreActivities()
             }
             "config" -> {
-                val i = Intent(this, ConfigActivity::class.java)
-                startActivityForResult(i, CONFIG_CODE)
+                configRequest.launch(Intent(this, ConfigActivity::class.java))
             }
             "audio" -> {
                 val i = Intent(this, AudioActivity::class.java)
@@ -2027,14 +2021,14 @@ class MainActivity : AppCompatActivity() {
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 i.putExtras(b)
-                startActivityForResult(i, ACCOUNTS_CODE)
+                accountsRequest.launch(i)
             }
             "account" -> {
                 val i = Intent(this, AccountActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 i.putExtras(b)
-                startActivityForResult(i, ACCOUNT_CODE)
+                accountsRequest.launch(i)
             }
             "codecs" -> {
                 val i = Intent(this, CodecsActivity::class.java)
@@ -2045,15 +2039,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(i)
             }
             "about" -> {
-                val i = Intent(this, AboutActivity::class.java)
-                startActivityForResult(i, ABOUT_CODE)
+                startActivity(Intent(this, AboutActivity::class.java))
             }
             "contacts" -> {
                 val i = Intent(this, ContactsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 i.putExtras(b)
-                startActivityForResult(i, CONTACTS_CODE)
+                contactsRequest.launch(i)
 
             }
             "contact" -> {
@@ -2067,14 +2060,14 @@ class MainActivity : AppCompatActivity() {
                     b.putInt("index", activity[2].toInt())
                 }
                 i.putExtras(b)
-                startActivityForResult(i, CONTACT_CODE)
+                startActivity(i)
             }
             "chats" -> {
                 val i = Intent(this, ChatsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 i.putExtras(b)
-                startActivityForResult(i, CHATS_CODE)
+                chatRequests.launch(i)
             }
             "chat" -> {
                 val i = Intent(this, ChatActivity::class.java)
@@ -2083,14 +2076,14 @@ class MainActivity : AppCompatActivity() {
                 b.putString("peer", activity[2])
                 b.putBoolean("focus", activity[3] == "true")
                 i.putExtras(b)
-                startActivityForResult(i, CHAT_CODE)
+                chatRequests.launch(i)
             }
             "calls" -> {
                 val i = Intent(this, CallsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", activity[1])
                 i.putExtras(b)
-                startActivityForResult(i, CALLS_CODE)
+                callsRequest.launch(i)
             }
         }
         return
@@ -2127,15 +2120,8 @@ class MainActivity : AppCompatActivity() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 
-        const val ACCOUNTS_CODE = 1
-        const val CONTACTS_CODE = 2
-        const val CONFIG_CODE = 3
-        const val CALLS_CODE = 4
-        const val ABOUT_CODE = 5
         const val ACCOUNT_CODE = 6
         const val CONTACT_CODE = 7
-        const val CHATS_CODE = 8
-        const val CHAT_CODE = 9
         const val BACKUP_CODE = 10
         const val RESTORE_CODE = 11
 
