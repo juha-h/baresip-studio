@@ -23,9 +23,6 @@ import java.util.*
 
 class ConfigActivity : AppCompatActivity() {
 
-    private val READ_CERT_PERMISSION_CODE = 1
-    private val READ_CA_PERMISSION_CODE = 2
-
     private lateinit var binding: ActivityConfigBinding
     private lateinit var autoStart: CheckBox
     private lateinit var listenAddr: EditText

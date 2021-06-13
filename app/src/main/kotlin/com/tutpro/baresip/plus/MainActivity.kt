@@ -2119,7 +2119,7 @@ class MainActivity : AppCompatActivity() {
 
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
-        
+
     }
 
     init {
