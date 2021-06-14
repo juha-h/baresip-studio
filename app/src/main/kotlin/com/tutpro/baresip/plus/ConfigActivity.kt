@@ -414,8 +414,7 @@ class ConfigActivity : AppCompatActivity() {
             android.R.id.home -> {
 
                 BaresipService.activities.remove("config")
-                val intent = Intent(this, MainActivity::class.java)
-                setResult(Activity.RESULT_CANCELED, intent)
+                setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
                 finish()
 
             }
@@ -466,8 +465,7 @@ class ConfigActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         BaresipService.activities.remove("config")
-        val intent = Intent(this, MainActivity::class.java)
-        setResult(Activity.RESULT_CANCELED, intent)
+        setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
         finish()
         super.onBackPressed()
 
@@ -500,8 +498,7 @@ class ConfigActivity : AppCompatActivity() {
                         getString(R.string.tls_ca_file_help))
             }
             binding.AudioTitle -> {
-                val i = Intent(this, AudioActivity::class.java)
-                startActivity(i)
+                startActivity(Intent(this, AudioActivity::class.java))
             }
             binding.VolumeTitle -> {
                 Utils.alertView(this, getString(R.string.default_call_volume),

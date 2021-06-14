@@ -70,8 +70,7 @@ class ContactsActivity : AppCompatActivity() {
 
             android.R.id.home -> {
                 BaresipService.activities.remove("contacts,$aor")
-                val i = Intent()
-                setResult(Activity.RESULT_OK, i)
+                setResult(Activity.RESULT_OK, Intent())
                 finish()
             }
         }
@@ -83,8 +82,7 @@ class ContactsActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         BaresipService.activities.remove("contacts,$aor")
-        val i = Intent()
-        setResult(Activity.RESULT_OK, i)
+        setResult(Activity.RESULT_OK, Intent())
         finish()
         
     }

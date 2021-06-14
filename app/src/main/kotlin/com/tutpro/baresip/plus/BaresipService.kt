@@ -415,8 +415,7 @@ class BaresipService: Service() {
         if (am.isBluetoothScoOn) am.stopBluetoothSco()
         cleanService()
         if (isServiceRunning) {
-            val broadcastIntent = Intent("com.tutpro.baresip.plus.Restart")
-            sendBroadcast(broadcastIntent)
+            sendBroadcast(Intent("com.tutpro.baresip.plus.Restart"))
         }
     }
 

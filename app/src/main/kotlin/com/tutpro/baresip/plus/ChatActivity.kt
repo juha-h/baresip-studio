@@ -259,8 +259,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun returnResult(code: Int) {
-        val i = Intent()
-        setResult(code, i)
+        setResult(code, Intent())
         finish()
     }
 

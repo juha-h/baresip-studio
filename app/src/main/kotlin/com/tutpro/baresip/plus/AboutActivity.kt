@@ -33,8 +33,7 @@ class AboutActivity : AppCompatActivity() {
         when (item.itemId) {
             android.R.id.home -> {
                 BaresipService.activities.remove("about")
-                val i = Intent()
-                setResult(Activity.RESULT_CANCELED, i)
+                setResult(Activity.RESULT_CANCELED, Intent())
                 finish()
             }
         }

@@ -203,8 +203,7 @@ class CallsActivity : AppCompatActivity() {
     }
 
     private fun returnResult() {
-        val i = Intent()
-        setResult(Activity.RESULT_CANCELED, i)
+        setResult(Activity.RESULT_CANCELED, Intent())
         finish()
     }
 

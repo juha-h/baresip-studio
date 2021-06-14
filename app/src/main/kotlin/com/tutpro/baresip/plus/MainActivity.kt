@@ -428,13 +428,13 @@ class MainActivity : AppCompatActivity() {
                     val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                val callIntent = Intent(this, MainActivity::class.java)
-                                callIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                val i = Intent(this, MainActivity::class.java)
+                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                                         Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                callIntent.putExtra("action", "call")
-                                callIntent.putExtra("uap", ua.uap)
-                                callIntent.putExtra("peer", acc.vmUri)
-                                startActivity(callIntent)
+                                i.putExtra("action", "call")
+                                i.putExtra("uap", ua.uap)
+                                i.putExtra("peer", acc.vmUri)
+                                startActivity(i)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
                             }
@@ -1330,8 +1330,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val i: Intent
-
         when (item.itemId) {
 
             R.id.speakerIcon -> {
@@ -1350,7 +1348,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.accounts -> {
-                i = Intent(this, AccountsActivity::class.java)
+                val i = Intent(this, AccountsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aorSpinner.tag.toString())
                 i.putExtras(b)
@@ -2013,8 +2011,7 @@ class MainActivity : AppCompatActivity() {
                 configRequest.launch(Intent(this, ConfigActivity::class.java))
             }
             "audio" -> {
-                val i = Intent(this, AudioActivity::class.java)
-                startActivity(i)
+                startActivity(Intent(this, AudioActivity::class.java))
             }
             "accounts" -> {
                 val i = Intent(this, AccountsActivity::class.java)

@@ -147,8 +147,7 @@ class AccountsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         BaresipService.activities.remove("accounts,$aor")
-        val i = Intent()
-        setResult(Activity.RESULT_CANCELED, i)
+        setResult(Activity.RESULT_CANCELED, Intent())
         finish()
     }
 
