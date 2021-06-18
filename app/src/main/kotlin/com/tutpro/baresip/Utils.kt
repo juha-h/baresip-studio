@@ -217,9 +217,12 @@ object Utils {
         if (nameValue.size == 1)
             /* Todo: do proper check */
             return true
-        if (nameValue.size == 2)
+        if (nameValue.size == 2) {
             /* Todo: do proper check */
+            if ((nameValue[0] == "transport") &&
+                setOf("udp", "tcp", "tls", "wss").contains(nameValue[1].lowercase()))
             return true
+        }
         return false
     }
 
