@@ -482,7 +482,8 @@ class AccountActivity : AppCompatActivity() {
                     if (((mediaNat == "stun") || (mediaNat == "ice")) && (newStunServer == ""))
                         newStunServer = resources.getString(R.string.stun_server_default)
                     if (!Utils.checkStunUri(newStunServer) ||
-                            ((mediaNat == "turn") && !newStunServer.startsWith("turn:"))) {
+                            (mediaNat == "turn" &&
+                                    newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_stun_server), newStunServer))
                         return false

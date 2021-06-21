@@ -167,8 +167,8 @@
         for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
-    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti]\'
-        oleva URI, missä kaava on \'stun\' tai \'turn\'. Oletus STUN-palvelin
+    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][?transport=udp|tcp]\'
+        oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletus STUN-palvelin
         STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
         julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
     </string>
