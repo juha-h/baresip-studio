@@ -941,12 +941,21 @@ Java_com_tutpro_baresip_Api_account_1stun_1uri(JNIEnv *env, jobject thiz, jstrin
         const struct stun_uri *stun_uri = account_stun_uri(acc);
         if (stun_uri) {
             char uri_str[256];
-            if (stun_uri->port != 0)
-                sprintf(uri_str, "%s:%s:%d", stunuri_scheme_name(stun_uri->scheme),
-                        stun_uri->host, stun_uri->port);
-            else
-                sprintf(uri_str, "%s:%s", stunuri_scheme_name(stun_uri->scheme),
-                        stun_uri->host);
+            if (stun_uri->port != 0) {
+                if (stun_uri->proto == IPPROTO_TCP)
+                    sprintf(uri_str, "%s:%s:%d?transport=tcp",
+                            stunuri_scheme_name(stun_uri->scheme), stun_uri->host, stun_uri->port);
+                else
+                    sprintf(uri_str, "%s:%s:%d",
+                            stunuri_scheme_name(stun_uri->scheme), stun_uri->host, stun_uri->port);
+            } else {
+                if (stun_uri->proto == IPPROTO_TCP)
+                    sprintf(uri_str, "%s:%s?transport=tcp",
+                            stunuri_scheme_name(stun_uri->scheme), stun_uri->host);
+                else
+                    sprintf(uri_str, "%s:%s",
+                            stunuri_scheme_name(stun_uri->scheme), stun_uri->host);
+            }
             return (*env)->NewStringUTF(env, uri_str);
         }
     }

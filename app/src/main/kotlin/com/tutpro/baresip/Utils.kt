@@ -142,10 +142,17 @@ object Utils {
                         params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
     }
 
+    private fun checkTransport(transport: String, transports: Set<String>): Boolean {
+        return transport.split("=")[0] == "transport" &&
+                transport.split("=")[1].lowercase() in transports
+    }
+
     fun checkStunUri(uri: String): Boolean {
-        if (!uri.startsWith("stun:") && !uri.startsWith("turn:"))
+        if (uri.substringBefore(":").lowercase() !in setOf("stun", "stuns", "turn", "turns"))
             return false
-        return checkHostPort(uri.substringAfter(":"))
+        return checkHostPort(uri.substringAfter(":").substringBefore("?")) &&
+                (uri.indexOf("?") == -1 ||
+                checkTransport(uri.substringAfter("?"), setOf("udp", "tcp")))
     }
 
     fun isE164Number(no: String): Boolean {
@@ -213,12 +220,11 @@ object Utils {
     }
 
     private fun checkParam(param: String): Boolean {
+        /* Todo: do proper check */
         val nameValue = param.split("=")
         if (nameValue.size == 1)
-            /* Todo: do proper check */
             return true
         if (nameValue.size == 2) {
-            /* Todo: do proper check */
             if ((nameValue[0] == "transport") &&
                 setOf("udp", "tcp", "tls", "wss").contains(nameValue[1].lowercase()))
             return true
