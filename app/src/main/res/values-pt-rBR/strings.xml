@@ -172,7 +172,7 @@
 \n • SRTP significa que RTP/AVP é oferecido em chamadas efetuadas e que RTP/SAVP ou RTP/SAVPF é usado se oferecido em chamadas recebidas.</string>
     <string name="media_encryption">Criptografia de Mídia</string>
     <string name="invalid_stun_server">Servidor URI STUN/TURN Inválido \'%1$s\'</string>
-    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta]. Onde o scheme é \'stun\' ou \'turn\'. O Servidor predefinido de fábrica para o STUN e os protocolos ICE são \'stun:stun.l.google.com:19302\' apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
+    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta][\?transport=udp|tcp]. Onde o scheme é \'stun\', \'stuns\', \'turn\', ou \'turns\'. O Servidor predefinido de fábrica para o STUN e os protocolos ICE são \'stun:stun.l.google.com:19302\' apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
