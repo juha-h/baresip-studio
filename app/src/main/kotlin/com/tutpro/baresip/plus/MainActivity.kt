@@ -660,6 +660,13 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
+        if (am.mode == AudioManager.MODE_RINGTONE) {
+            volumeControlStream = AudioManager.STREAM_RING
+        } else {
+            am.mode = AudioManager.MODE_IN_COMMUNICATION
+            volumeControlStream = AudioManager.STREAM_VOICE_CALL
+        }
+
     } // OnCreate
 
     private fun addVideoLayoutViews() {
@@ -1049,7 +1056,7 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing", "call progress" -> {
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                     }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
@@ -1076,7 +1083,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call established" -> {
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (Call.ofCallp(params[1])!!.videoEnabled()) {
                             am.isSpeakerphoneOn = true
                             speakerButton.setImageResource(R.drawable.speaker_on_button)
@@ -1245,7 +1252,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param[0].isDigit())
@@ -1727,10 +1734,7 @@ class MainActivity : AppCompatActivity() {
                             String.format(getString(R.string.invalid_sip_uri), uri))
                 } else {
                     callUri.isFocusable = false
-                    if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                     if (!call(ua, uri, "outgoing", kind)) {
-                        am.mode = AudioManager.MODE_NORMAL
                         callButton.visibility = View.VISIBLE
                         callButton.isEnabled = true
                         callVideoButton.visibility = View.VISIBLE
@@ -1858,7 +1862,7 @@ class MainActivity : AppCompatActivity() {
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
             videoButton.visibility = View.INVISIBLE
-            volumeControlStream = AudioManager.STREAM_MUSIC
+            volumeControlStream = AudioManager.STREAM_VOICE_CALL
         } else {
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
@@ -1881,7 +1885,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
-                    volumeControlStream = AudioManager.STREAM_MUSIC
+                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
@@ -1971,7 +1975,7 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
-                    volumeControlStream = AudioManager.STREAM_MUSIC
+                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
             }
         }
