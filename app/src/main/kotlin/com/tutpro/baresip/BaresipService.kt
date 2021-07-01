@@ -621,8 +621,6 @@ class BaresipService: Service() {
                             call.hasHistory = true
                         }
                         stopRinging()
-                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                         setCallVolume()
                         if (!Utils.isVisible())
@@ -704,8 +702,6 @@ class BaresipService: Service() {
                         call.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
-                            if (am.mode != AudioManager.MODE_NORMAL)
-                                am.mode = AudioManager.MODE_NORMAL
                             am.isSpeakerphoneOn = false
                             if (am.isBluetoothScoOn) {
                                 Log.d(TAG, "Stopping Bluetooth SCO")
@@ -1049,12 +1045,13 @@ class BaresipService: Service() {
                 rtTimer = null
             }
             rt.stop()
+            am.mode = AudioManager.MODE_IN_COMMUNICATION
         }
     }
 
     private fun setCallVolume() {
         if ((callVolume != 0) && (origVolumes.contentEquals(arrayOf(-1, -1, -1, -1)))) {
-            for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_MUSIC)) {
+            for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_RING)) {
                 origVolumes[streamType] = am.getStreamVolume(streamType)
                 am.setStreamVolume(streamType,
                         (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
@@ -1066,7 +1063,7 @@ class BaresipService: Service() {
     }
 
     private fun resetCallVolume() {
-        for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_MUSIC)) {
+        for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_RING)) {
             if (origVolumes[streamType] != -1) {
                 am.setStreamVolume(streamType, origVolumes[streamType], 0)
                 Log.d(TAG, "Reset volume of stream type $streamType to " +

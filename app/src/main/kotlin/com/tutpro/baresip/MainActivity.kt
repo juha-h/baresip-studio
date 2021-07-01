@@ -311,10 +311,7 @@ class MainActivity : AppCompatActivity() {
                                 String.format(getString(R.string.invalid_sip_uri), uri))
                     } else {
                         callUri.isFocusable = false
-                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         if (!call(ua, uri)) {
-                            am.mode = AudioManager.MODE_NORMAL
                             callButton.visibility = View.VISIBLE
                             callButton.isEnabled = true
                             hangupButton.visibility = View.INVISIBLE
@@ -629,6 +626,13 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
+        if (am.mode == AudioManager.MODE_RINGTONE) {
+            volumeControlStream = AudioManager.STREAM_RING
+        } else {
+            am.mode = AudioManager.MODE_IN_COMMUNICATION
+            volumeControlStream = AudioManager.STREAM_VOICE_CALL
+        }
+
     } // OnCreate
 
     override fun onNewIntent(intent: Intent) {
@@ -917,7 +921,7 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG).show()
                     }
                     "call ringing", "call progress" -> {
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                     }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
@@ -944,7 +948,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call established" -> {
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
@@ -1068,7 +1072,7 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
-                        volumeControlStream = AudioManager.STREAM_MUSIC
+                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param[0].isDigit())
@@ -1606,7 +1610,7 @@ class MainActivity : AppCompatActivity() {
             dtmf.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
             infoButton.visibility = View.INVISIBLE
-            volumeControlStream = AudioManager.STREAM_MUSIC
+            volumeControlStream = AudioManager.STREAM_VOICE_CALL
         } else {
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
@@ -1627,7 +1631,7 @@ class MainActivity : AppCompatActivity() {
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.INVISIBLE
-                    volumeControlStream = AudioManager.STREAM_MUSIC
+                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
@@ -1696,7 +1700,7 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
-                    volumeControlStream = AudioManager.STREAM_MUSIC
+                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
             }
         }
