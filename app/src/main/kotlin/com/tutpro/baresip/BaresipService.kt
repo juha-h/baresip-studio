@@ -52,7 +52,7 @@ class BaresipService: Service() {
     internal var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
-    private var origVolumes = arrayOf(-1, -1, -1, -1)
+    private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
     internal var activeNetwork = ""
 
@@ -1050,26 +1050,22 @@ class BaresipService: Service() {
     }
 
     private fun setCallVolume() {
-        if ((callVolume != 0) && (origVolumes.contentEquals(arrayOf(-1, -1, -1, -1)))) {
-            for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_RING)) {
-                origVolumes[streamType] = am.getStreamVolume(streamType)
-                am.setStreamVolume(streamType,
-                        (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
-                        0)
-                Log.d(TAG, "Orig/new call volume of stream type $streamType is " +
-                        "${origVolumes[streamType]}/${am.getStreamVolume(streamType)}")
-            }
+        if (callVolume != 0 && origVolume == -1) {
+            val streamType = AudioManager.STREAM_VOICE_CALL
+            origVolume = am.getStreamVolume(streamType)
+            am.setStreamVolume(streamType,
+                (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
+                0)
+            Log.d(TAG, "Orig/new call volume is $origVolume/${am.getStreamVolume(streamType)}")
         }
     }
 
     private fun resetCallVolume() {
-        for (streamType in listOf(AudioManager.STREAM_VOICE_CALL, AudioManager.STREAM_RING)) {
-            if (origVolumes[streamType] != -1) {
-                am.setStreamVolume(streamType, origVolumes[streamType], 0)
-                Log.d(TAG, "Reset volume of stream type $streamType to " +
-                        "${am.getStreamVolume(streamType)}")
-                origVolumes[streamType] = -1
-            }
+        if (origVolume != -1) {
+            val streamType = AudioManager.STREAM_VOICE_CALL
+            am.setStreamVolume(streamType, origVolume, 0)
+            Log.d(TAG, "Reset volume to ${am.getStreamVolume(streamType)}")
+            origVolume = -1
         }
     }
 
