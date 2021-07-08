@@ -49,7 +49,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
             val b = Bundle()
             b.putString("aor", UserAgent.uas()[position].account.aor)
             i.putExtras(b)
-            (cxt as MainActivity).accountRequest.launch(i)
+            MainActivity.accountRequest!!.launch(i)
         }
 
         viewHolder.actionView.setOnClickListener {
