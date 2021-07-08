@@ -78,7 +78,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
-    lateinit var accountRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
     private lateinit var configRequest: ActivityResultLauncher<Intent>
     private lateinit var backupRequest: ActivityResultLauncher<Intent>
@@ -246,7 +245,7 @@ class MainActivity : AppCompatActivity() {
                         val b = Bundle()
                         b.putString("aor", aorSpinner.tag.toString())
                         i.putExtras(b)
-                        accountRequest.launch(i)
+                        accountRequest!!.launch(i)
                         true
                     } else {
                         UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri =
@@ -2114,6 +2113,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        var accountRequest: ActivityResultLauncher<Intent>? = null
 
         var visible = false
         var activityAor = ""
