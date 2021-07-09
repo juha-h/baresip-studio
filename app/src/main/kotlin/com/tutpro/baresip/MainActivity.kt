@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var hangupButton: ImageButton
     private lateinit var answerButton: ImageButton
     private lateinit var rejectButton: ImageButton
+    private lateinit var callControl: HorizontalScrollView
     private lateinit var holdButton: ImageButton
     private lateinit var micButton: ImageButton
     private lateinit var transferButton: ImageButton
@@ -124,6 +125,7 @@ class MainActivity : AppCompatActivity() {
         hangupButton = binding.hangupButton
         answerButton = binding.answerButton
         rejectButton = binding.rejectButton
+        callControl = binding.callControl
         holdButton = binding.holdButton
         micButton = binding.micButton
         transferButton = binding.transferButton
@@ -1604,6 +1606,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
+            swipeRefresh.isEnabled = true
             callTitle.text = getString(R.string.outgoing_call_to_dots)
             if (ua.account.resumeUri != "")
                 callUri.setText(ua.account.resumeUri)
@@ -1621,14 +1624,11 @@ class MainActivity : AppCompatActivity() {
             hangupButton.visibility = View.INVISIBLE
             answerButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
-            holdButton.visibility = View.INVISIBLE
-            micButton.visibility = View.INVISIBLE
-            transferButton.visibility = View.INVISIBLE
-            dtmf.visibility = View.INVISIBLE
+            callControl.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
-            infoButton.visibility = View.INVISIBLE
             volumeControlStream = AudioManager.STREAM_VOICE_CALL
         } else {
+            swipeRefresh.isEnabled = false
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
@@ -1643,12 +1643,8 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
-                    holdButton.visibility = View.INVISIBLE
-                    micButton.visibility = View.INVISIBLE
-                    transferButton.visibility = View.INVISIBLE
-                    dtmf.visibility = View.INVISIBLE
+                    callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.INVISIBLE
                     volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
                 "incoming" -> {
@@ -1663,12 +1659,8 @@ class MainActivity : AppCompatActivity() {
                     answerButton.isEnabled = true
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
-                    holdButton.visibility = View.INVISIBLE
-                    micButton.visibility = View.INVISIBLE
-                    transferButton.visibility = View.INVISIBLE
-                    dtmf.visibility = View.INVISIBLE
+                    callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.INVISIBLE
                     volumeControlStream = AudioManager.STREAM_RING
                 }
                 "connected" -> {
@@ -1698,15 +1690,15 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
+                    callControl.post(Runnable {
+                        callControl.scrollTo(holdButton.left, holdButton.top)
+                    })
+                    callControl.visibility = View.VISIBLE
                     if (call.onhold) {
                         holdButton.setImageResource(R.drawable.play)
                     } else {
                         holdButton.setImageResource(R.drawable.pause)
                     }
-                    holdButton.visibility = View.VISIBLE
-                    micButton.visibility = View.VISIBLE
-                    transferButton.visibility = View.VISIBLE
-                    dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
                     if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
@@ -1718,7 +1710,6 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
                     dialpadButton.tag = "on"
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
                     volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
