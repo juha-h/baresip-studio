@@ -1664,6 +1664,9 @@ class MainActivity : AppCompatActivity() {
                     volumeControlStream = AudioManager.STREAM_RING
                 }
                 "connected" -> {
+                    callControl.post {
+                        callControl.scrollTo(holdButton.left, holdButton.top)
+                    }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
                         callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.referTo),
@@ -1690,10 +1693,6 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.isEnabled = true
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
-                    callControl.post(Runnable {
-                        callControl.scrollTo(holdButton.left, holdButton.top)
-                    })
-                    callControl.visibility = View.VISIBLE
                     if (call.onhold) {
                         holdButton.setImageResource(R.drawable.play)
                     } else {
@@ -1711,6 +1710,7 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.tag = "on"
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
+                    callControl.visibility = View.VISIBLE
                     volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
             }
