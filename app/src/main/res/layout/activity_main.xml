@@ -160,32 +160,30 @@
                     </ImageButton>
 
                     <ImageButton
+                        android:id="@+id/micButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="0dp"
+                        android:src="@drawable/mic"
+                        android:background="@null"
+                        android:layout_marginStart="130dp"
+                        android:clickable="false"
+                        android:visibility="invisible"
+                        android:contentDescription="@string/mic" >
+                    </ImageButton>
+
+                    <ImageButton
                         android:id="@+id/transferButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="0dp"
                         android:src="@drawable/call_transfer"
                         android:background="@null"
-                        android:layout_marginStart="135dp"
+                        android:layout_marginStart="195dp"
                         android:clickable="false"
                         android:visibility="invisible"
                         android:contentDescription="@string/call_transfer" >
                     </ImageButton>
-
-                    <EditText
-                        android:id="@+id/dtmf"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/transferButton"
-                        android:layout_toStartOf="@+id/info"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:hint="@string/dtmf"
-                        android:importantForAutofill="no"
-                        android:inputType="phone"
-                        android:textSize="20sp"
-                        android:visibility="invisible">
-                    </EditText>
 
                     <ImageButton
                         android:id="@+id/info"
@@ -200,6 +198,27 @@
                         android:visibility="invisible"
                         android:contentDescription="@string/call_info" >
                     </ImageButton>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/dtmfRow"
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/callRow" >
+
+                    <EditText
+                        android:id="@+id/dtmf"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:hint="@string/dtmf"
+                        android:importantForAutofill="no"
+                        android:inputType="phone"
+                        android:textSize="20sp"
+                        android:visibility="invisible" >
+                    </EditText>
 
                 </RelativeLayout>
 

@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var answerButton: ImageButton
     private lateinit var rejectButton: ImageButton
     private lateinit var holdButton: ImageButton
+    private lateinit var micButton: ImageButton
     private lateinit var transferButton: ImageButton
     private lateinit var voicemailButton: ImageButton
     private lateinit var contactsButton: ImageButton
@@ -124,6 +125,7 @@ class MainActivity : AppCompatActivity() {
         answerButton = binding.answerButton
         rejectButton = binding.rejectButton
         holdButton = binding.holdButton
+        micButton = binding.micButton
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
@@ -377,6 +379,21 @@ class MainActivity : AppCompatActivity() {
                 call.hold()
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
+            }
+        }
+
+        micButton.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val aor = ua.account.aor
+            val call = Call.uaCalls(ua, "")[0]
+            if (call.isMuted()) {
+                Log.d(TAG, "AoR $aor un-muting call ${call.callp} with ${callUri.text}")
+                call.mute(false)
+                micButton.setImageResource(R.drawable.mic)
+            } else {
+                Log.d(TAG, "AoR $aor muting call ${call.callp} with ${callUri.text}")
+                call.mute(true)
+                micButton.setImageResource(R.drawable.mic_off)
             }
         }
 
@@ -1605,6 +1622,7 @@ class MainActivity : AppCompatActivity() {
             answerButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
             holdButton.visibility = View.INVISIBLE
+            micButton.visibility = View.INVISIBLE
             transferButton.visibility = View.INVISIBLE
             dtmf.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
@@ -1626,6 +1644,7 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     holdButton.visibility = View.INVISIBLE
+                    micButton.visibility = View.INVISIBLE
                     transferButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
@@ -1645,6 +1664,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     holdButton.visibility = View.INVISIBLE
+                    micButton.visibility = View.INVISIBLE
                     transferButton.visibility = View.INVISIBLE
                     dtmf.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
@@ -1684,6 +1704,7 @@ class MainActivity : AppCompatActivity() {
                         holdButton.setImageResource(R.drawable.pause)
                     }
                     holdButton.visibility = View.VISIBLE
+                    micButton.visibility = View.VISIBLE
                     transferButton.visibility = View.VISIBLE
                     dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true

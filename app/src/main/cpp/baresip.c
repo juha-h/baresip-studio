@@ -1406,6 +1406,22 @@ Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring jav
     return ret;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_Call_call_1ismuted(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    return audio_ismuted(call_audio(call));
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Call_call_1mute(JNIEnv *env, jobject thiz, jstring jCall, jboolean mute) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    audio_mute(call_audio(call), mute);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
         jstring jPeer) {

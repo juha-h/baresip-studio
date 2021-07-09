@@ -428,6 +428,7 @@
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
     <string name="hold">Aseta puhelu pitoon</string>
+    <string name="mic">Mikrofoni päälle/pois</string>
     <string name="call_transfer">Puhelun siirto</string>
     <string name="transfer_destination">Siirron kohde</string>
     <string name="transfer">Siirto</string>
