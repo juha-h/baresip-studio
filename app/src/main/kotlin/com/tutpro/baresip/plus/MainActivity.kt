@@ -53,7 +53,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var answerButton: ImageButton
     private lateinit var answerVideoButton: ImageButton
     private lateinit var rejectButton: ImageButton
+    private lateinit var callControl: HorizontalScrollView
     private lateinit var holdButton: ImageButton
+    private lateinit var micButton: ImageButton
     private lateinit var transferButton: ImageButton
     private lateinit var videoButton: ImageButton
     private lateinit var voicemailButton: ImageButton
@@ -138,7 +140,9 @@ class MainActivity : AppCompatActivity() {
         answerButton = binding.answerButton
         answerVideoButton = binding.answerVideoButton
         rejectButton = binding.rejectButton
+        callControl = binding.callControl
         holdButton = binding.holdButton
+        micButton = binding.micButton
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
@@ -387,6 +391,21 @@ class MainActivity : AppCompatActivity() {
                 call.hold()
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
+            }
+        }
+
+        micButton.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val aor = ua.account.aor
+            val call = Call.uaCalls(ua, "")[0]
+            if (call.isMuted()) {
+                Log.d(TAG, "AoR $aor un-muting call ${call.callp} with ${callUri.text}")
+                call.mute(false)
+                micButton.setImageResource(R.drawable.mic)
+            } else {
+                Log.d(TAG, "AoR $aor muting call ${call.callp} with ${callUri.text}")
+                call.mute(true)
+                micButton.setImageResource(R.drawable.mic_off)
             }
         }
 
@@ -1105,7 +1124,7 @@ class MainActivity : AppCompatActivity() {
                             Log.w(TAG, "Video request call $callp not found")
                             return
                         }
-                        if (!isFinishing() && !alerting) {
+                        if (!isFinishing && !alerting) {
                             val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                             titleView.text = getString(R.string.video_request)
                             with(AlertDialog.Builder(this)) {
@@ -1827,6 +1846,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCall(ua: UserAgent) {
         if (Call.uaCalls(ua, "").size == 0) {
+            swipeRefresh.isEnabled = true
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
@@ -1855,14 +1875,12 @@ class MainActivity : AppCompatActivity() {
             answerButton.visibility = View.INVISIBLE
             answerVideoButton.visibility = View.INVISIBLE
             rejectButton.visibility = View.INVISIBLE
-            holdButton.visibility = View.INVISIBLE
-            transferButton.visibility = View.INVISIBLE
-            dtmf.visibility = View.INVISIBLE
+            callControl.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
-            infoButton.visibility = View.INVISIBLE
             videoButton.visibility = View.INVISIBLE
             volumeControlStream = AudioManager.STREAM_VOICE_CALL
         } else {
+            swipeRefresh.isEnabled = false
             val call = Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
@@ -1879,11 +1897,8 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     answerVideoButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
-                    holdButton.visibility = View.INVISIBLE
-                    transferButton.visibility = View.INVISIBLE
-                    dtmf.visibility = View.INVISIBLE
+                    callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.INVISIBLE
                     volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
                 "incoming" -> {
@@ -1907,14 +1922,14 @@ class MainActivity : AppCompatActivity() {
                     }
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
-                    holdButton.visibility = View.INVISIBLE
-                    transferButton.visibility = View.INVISIBLE
-                    dtmf.visibility = View.INVISIBLE
+                    callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.INVISIBLE
                     volumeControlStream = AudioManager.STREAM_RING
                 }
                 "connected" -> {
+                    callControl.post {
+                        callControl.scrollTo(videoButton.left, videoButton.top)
+                    }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
                         callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.referTo),
@@ -1929,7 +1944,6 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    dtmf.visibility = View.VISIBLE
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
                     if (call.videoEnabled()) {
@@ -1966,14 +1980,11 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         holdButton.setImageResource(R.drawable.pause)
                     }
-                    holdButton.visibility = View.VISIBLE
-                    transferButton.visibility = View.VISIBLE
-                    callUri.inputType = InputType.TYPE_CLASS_PHONE
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
                     dialpadButton.tag = "on"
                     dialpadButton.isEnabled = false
-                    infoButton.visibility = View.VISIBLE
                     infoButton.isEnabled = true
+                    callControl.visibility = View.VISIBLE
                     volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
             }
