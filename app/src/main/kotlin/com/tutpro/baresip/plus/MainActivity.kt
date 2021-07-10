@@ -538,7 +538,7 @@ class MainActivity : AppCompatActivity() {
         videoButton.setOnClickListener {
             videoButton.isClickable = false
             videoButton.setImageResource(R.drawable.video_pending)
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 val call = Call.call("connected")
                 if (call != null) {
                     val dir = call.videoRequest
