@@ -37,7 +37,7 @@
     <string name="duration">Duração</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>
     <string name="call_info">Informações da Chamada</string>
-    <string name="hold">Reter</string>
+    <string name="hold">Chamada em espera/liberar</string>
     <string name="hangup">Desligar</string>
     <string name="callee">Destinatário</string>
     <string name="invalid_sip_uri">URI SIP \'%1$s\' inválida</string>
@@ -247,4 +247,7 @@
     <string name="dtmf_inband">Eventos na Banda RTP</string>
     <string name="dtmf_mode_help">Selecione como os tons DTMF 0–9, #, *, e A-D serão enviados.</string>
     <string name="dtmf_mode">Modo DTMF</string>
+    <string name="reset">Redefinir</string>
+    <string name="reset_config_alert">Tem certeza de que deseja redefinir as configurações para os valores predefinidos de fábrica\?</string>
+    <string name="mic">Microfone ligado/desligado</string>
 </resources>
