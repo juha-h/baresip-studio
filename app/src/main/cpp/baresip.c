@@ -1565,7 +1565,7 @@ Java_com_tutpro_baresip_plus_Call_call_1status(JNIEnv *env, jobject thiz, jstrin
 JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring jCall)
 {
-    int res;
+    bool res;
     re_thread_enter();
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
