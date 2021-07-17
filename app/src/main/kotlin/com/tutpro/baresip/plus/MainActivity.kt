@@ -796,7 +796,8 @@ class MainActivity : AppCompatActivity() {
         prm.bottomMargin = 15
         hb.layoutParams = prm
         hb.setOnClickListener {
-            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+            if (!BaresipService.cameraAvailable)
+                Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
             hangupButton.performClick()
         }
         videoLayout.addView(hb)
