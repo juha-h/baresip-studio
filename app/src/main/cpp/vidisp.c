@@ -271,7 +271,7 @@ static void setup_vertices(struct vidisp_st *st)
     st->vertices[i++] = 0;
     st->vertices[i++] = frame_width;
     st->vertices[i++] = frame_height;
-    st->vertices[i++] = 0;
+    st->vertices[i] = 0;
 }
 
 static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
@@ -335,7 +335,7 @@ static int opengles_render(struct vidisp_st *st)
     if (!st->texture_id) {
 
         struct vidrect ortho, vp;
-        int err = 0;
+        int err;
 
         err = texture_init(st);
         if (err) {
