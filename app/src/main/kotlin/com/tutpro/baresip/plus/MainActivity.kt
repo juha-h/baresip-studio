@@ -733,30 +733,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Camera Button
-        val cb = ImageButton(this)
-        cb.setImageResource(R.drawable.camera_front)
-        cb.setBackgroundResource(0)
-        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-        prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-        prm.marginStart = 15
-        prm.topMargin = 15
-        cb.layoutParams = prm
-        cb.setOnClickListener {
-            val call = Call.call("connected")
-            if (call != null) {
-                if (call.setVideoSource(!BaresipService.cameraFront) != 0)
-                    Log.w(TAG, "Failed to set video source")
-                else
-                    BaresipService.cameraFront = !BaresipService.cameraFront
-                if (BaresipService.cameraFront)
-                    cb.setImageResource(R.drawable.camera_front)
-                else
-                    cb.setImageResource(R.drawable.camera_rear)
+        if (BaresipService.cameraAvailable) {
+            val cb = ImageButton(this)
+            cb.setImageResource(R.drawable.camera_front)
+            cb.setBackgroundResource(0)
+            prm = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            )
+            prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            prm.marginStart = 15
+            prm.topMargin = 15
+            cb.layoutParams = prm
+            cb.setOnClickListener {
+                val call = Call.call("connected")
+                if (call != null) {
+                    if (call.setVideoSource(!BaresipService.cameraFront) != 0)
+                        Log.w(TAG, "Failed to set video source")
+                    else
+                        BaresipService.cameraFront = !BaresipService.cameraFront
+                    if (BaresipService.cameraFront)
+                        cb.setImageResource(R.drawable.camera_front)
+                    else
+                        cb.setImageResource(R.drawable.camera_rear)
+                }
             }
+            videoLayout.addView(cb)
         }
-        videoLayout.addView(cb)
 
         // Speaker Button
         speakerButton = ImageButton(this)
@@ -792,6 +796,7 @@ class MainActivity : AppCompatActivity() {
         prm.bottomMargin = 15
         hb.layoutParams = prm
         hb.setOnClickListener {
+            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
             hangupButton.performClick()
         }
         videoLayout.addView(hb)
