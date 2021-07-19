@@ -33,6 +33,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
+
 class BaresipService: Service() {
 
     internal lateinit var intent: Intent
@@ -67,6 +68,8 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        // Hack to avoid playback delay when outgoing call is established
+        am.mode = AudioManager.MODE_IN_COMMUNICATION
 
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_RINGTONE)
@@ -511,7 +514,8 @@ class BaresipService: Service() {
                         return
                     }
                     "call progress", "call ringing" -> {
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         return
                     }
@@ -602,6 +606,7 @@ class BaresipService: Service() {
                         }
                     }
                     "call answered" -> {
+                        stopRinging()
                         proximitySensing(true)
                         return
                     }
@@ -620,8 +625,8 @@ class BaresipService: Service() {
                             CallHistory.save()
                             call.hasHistory = true
                         }
-                        stopRinging()
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         if (!Utils.isVisible())
                             return
@@ -939,7 +944,7 @@ class BaresipService: Service() {
         return spannable
     }
 
-    private fun requestAudioFocus(usage: Int) {
+    private fun requestAudioFocus(usage: Int, type: Int) {
         if (audioFocusUsage != -1) {
             if (audioFocusUsage == usage)
                 return
@@ -952,6 +957,7 @@ class BaresipService: Service() {
                     .run {
                         setAudioAttributes(AudioAttributes.Builder().run {
                             setUsage(usage)
+                            setContentType(type)
                             build()
                         })
                 build()
@@ -1021,7 +1027,8 @@ class BaresipService: Service() {
 
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
-        requestAudioFocus(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+        requestAudioFocus(AudioAttributes.USAGE_NOTIFICATION_RINGTONE,
+            AudioAttributes.CONTENT_TYPE_MUSIC)
         if (VERSION.SDK_INT >= 28) {
             rt.isLooping = true
             rt.play()
@@ -1034,12 +1041,13 @@ class BaresipService: Service() {
                         rt.play()
                     }
                 }
-            }, 1000 * 1, 1000 * 1)
+            }, 1000, 1000)
         }
     }
 
     private fun stopRinging() {
         if (am.mode == AudioManager.MODE_RINGTONE) {
+            abandonAudioFocus()
             if ((VERSION.SDK_INT < 28) && (rtTimer != null)) {
                 rtTimer!!.cancel()
                 rtTimer = null

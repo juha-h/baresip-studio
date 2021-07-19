@@ -644,12 +644,10 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
-        if (am.mode == AudioManager.MODE_RINGTONE) {
+        if (am.mode == AudioManager.MODE_RINGTONE)
             volumeControlStream = AudioManager.STREAM_RING
-        } else {
-            am.mode = AudioManager.MODE_IN_COMMUNICATION
+        else
             volumeControlStream = AudioManager.STREAM_VOICE_CALL
-        }
 
     } // OnCreate
 
