@@ -1,0 +1,2 @@
+- New Spanish and Portuguese (Brazil) translations
+- Minor AudioManager related improvements
