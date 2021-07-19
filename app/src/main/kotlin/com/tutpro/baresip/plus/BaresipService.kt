@@ -35,7 +35,6 @@ import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
-
 class BaresipService: Service() {
 
     internal lateinit var intent: Intent
