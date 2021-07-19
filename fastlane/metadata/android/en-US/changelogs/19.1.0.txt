@@ -1,0 +1,3 @@
+- Avoid crash when call is closed from video layout
+- Don't show front/back camera button if camera is not available
+- Minor AudioManager related improvements
