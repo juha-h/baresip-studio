@@ -220,16 +220,24 @@ object Utils {
     }
 
     private fun checkParam(param: String): Boolean {
-        /* Todo: do proper check */
         val nameValue = param.split("=")
         if (nameValue.size == 1)
-            return true
+            return checkParamChars(nameValue[0])
         if (nameValue.size == 2) {
-            if ((nameValue[0] == "transport") &&
-                setOf("udp", "tcp", "tls", "wss").contains(nameValue[1].lowercase()))
-            return true
+            if (nameValue[0] == "transport")
+                return setOf("udp", "tcp", "tls", "wss").contains(nameValue[1].lowercase())
+            return checkParamChars(nameValue[1])
         }
         return false
+    }
+
+    private fun checkParamChars(s: String): Boolean {
+        // Does not currently allow escaped characters
+        val allowed = "[]/:&+$-_.!~*'()"
+        for (c in s)
+            if (!allowed.contains(c) && !c.isLetterOrDigit())
+                return false
+        return true
     }
 
     fun paramValue(params: String, name: String): String {
