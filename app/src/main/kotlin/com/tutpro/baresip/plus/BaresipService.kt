@@ -69,9 +69,6 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        // Hack to avoid playback delay when outgoing call is established
-        am.mode = AudioManager.MODE_IN_COMMUNICATION
-
         val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_RINGTONE)
         rt = RingtoneManager.getRingtone(applicationContext, rtUri)
@@ -534,6 +531,7 @@ class BaresipService: Service() {
                             return
                     }
                     "call progress", "call ringing" -> {
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
@@ -621,8 +619,20 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "local call offered", "local call answered" -> {
+                    "call outgoing" -> {
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
+                        setCallVolume()
+                        proximitySensing(true)
+                        return
+                    }
+                    "call answered" -> {
                         stopRinging()
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
+                        setCallVolume()
                         proximitySensing(true)
                         return
                     }
@@ -669,9 +679,6 @@ class BaresipService: Service() {
                             CallHistory.save()
                             call.hasHistory = true
                         }
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
-                        setCallVolume()
                         if (!Utils.isVisible())
                             return
                     }
@@ -752,12 +759,9 @@ class BaresipService: Service() {
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             am.isSpeakerphoneOn = false
-                            if (am.isBluetoothScoOn) {
-                                Log.d(TAG, "Stopping Bluetooth SCO")
-                                am.stopBluetoothSco()
-                            } else {
-                                abandonAudioFocus()
-                            }
+                            am.stopBluetoothSco()
+                            abandonAudioFocus()
+                            am.mode = AudioManager.MODE_NORMAL
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
@@ -1045,7 +1049,7 @@ class BaresipService: Service() {
                 Log.d(TAG, "Audio focus granted for usage $usage")
                 audioFocusUsage = usage
                 if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
-                    Log.d(TAG, "Starting Bluetooth Sco")
+                    Log.d(TAG, "Starting Bluetooth SCO")
                     am.startBluetoothSco()
                 }
             } else {
@@ -1131,7 +1135,6 @@ class BaresipService: Service() {
                 rtTimer = null
             }
             rt.stop()
-            am.mode = AudioManager.MODE_IN_COMMUNICATION
         }
     }
 
@@ -1231,6 +1234,7 @@ class BaresipService: Service() {
     }
 
     private fun cleanService() {
+        am.mode = AudioManager.MODE_NORMAL
         abandonAudioFocus()
         uas.clear()
         status.clear()
