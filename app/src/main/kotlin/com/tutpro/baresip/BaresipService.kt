@@ -711,12 +711,8 @@ class BaresipService: Service() {
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             am.isSpeakerphoneOn = false
-                            if (am.isBluetoothScoOn) {
-                                Log.d(TAG, "Stopping Bluetooth SCO")
-                                am.stopBluetoothSco()
-                            } else {
-                                abandonAudioFocus()
-                            }
+                            am.stopBluetoothSco()
+                            abandonAudioFocus()
                             am.mode = AudioManager.MODE_NORMAL
                             proximitySensing(false)
                         }

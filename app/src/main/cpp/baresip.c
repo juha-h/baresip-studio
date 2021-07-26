@@ -198,6 +198,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CALL_OUTGOING:
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call outgoing");
             break;
+        case UA_EVENT_CALL_ANSWERED:
+            len = re_snprintf(event_buf, sizeof event_buf, "call answered", prm);
+            break;
         case UA_EVENT_CALL_LOCAL_SDP:
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
