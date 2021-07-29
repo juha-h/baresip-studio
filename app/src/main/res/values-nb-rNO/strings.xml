@@ -32,7 +32,7 @@
     <string name="calls_calls">samtaler</string>
     <string name="calls_call">samtale</string>
     <string name="calls_call_message_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
-    <string name="calls_add_delete_question">Ønsker du å legge til \"%1$s\" til i kontaktlisten, eller slette \"%2$s\" fra anropsloggen\?</string>
+    <string name="calls_add_delete_question">Ønsker du å legge til «%1$s» i kontaktlisten, eller slette «%2$s» fra anropsloggen\?</string>
     <string name="disable_history">Skru av</string>
     <string name="enable_history">Skru på</string>
     <string name="chat">Sludremeldinger</string>
