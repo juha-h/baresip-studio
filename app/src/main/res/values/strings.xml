@@ -12,7 +12,9 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>In Android\'s Apps and Notification Settings, allow baresip app\'s notifications.</li>
+            <li>In Android\'s \`Apps & notifications\` settings, allow baresip app\'s notifications and
+                turn off battery optimization (if you want to reduce likelihood that Android kills
+                baresip).</li>
             <li>Check that default values in baresip\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
@@ -60,7 +62,9 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>In Android\'s Apps and Notification Settings, allow baresip+ app\'s notifications.</li>
+            <li>In Android\'s \`Apps & notifications\' settings, allow baresip+ app\'s notifications and
+                turn off battery optimization (if you want to reduce likelihood that Android kills
+                baresip+).</li>
             <li>Check that default values in baresip+\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
