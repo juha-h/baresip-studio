@@ -601,7 +601,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     stopped:
 
-    LOGD("tell main that baresip has stopped");
+    LOGD("sending stopped event");
     jstring javaError = (*env)->NewStringUTF(env, start_error);
     jmethodID stoppedId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "stopped",
             "(Ljava/lang/String;)V");
