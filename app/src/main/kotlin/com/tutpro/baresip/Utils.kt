@@ -311,52 +311,6 @@ object Utils {
         return servers
     }
 
-    private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
-        var updated = false
-        val ipV6Addr = findIpV6Address(linkAddresses)
-        if (ipV6Addr != findIpV6Address(BaresipService.linkAddresses)) {
-            Log.d(TAG, "Updating IPv6 address to '$ipV6Addr'")
-            if (ipV6Addr != "") {
-                if (Api.net_set_address(ipV6Addr) != 0)
-                    Log.w(TAG, "Failed to update net address '$ipV6Addr")
-            } else {
-                Api.net_unset_address(Api.AF_INET6)
-            }
-            updated = true
-        }
-        val ipV4Addr = findIpV4Address(linkAddresses)
-        if (ipV4Addr != findIpV4Address(BaresipService.linkAddresses)) {
-            Log.d(TAG, "Updating IPv4 address to '$ipV4Addr'")
-            if (ipV4Addr != "") {
-                if (Api.net_set_address(ipV4Addr) != 0)
-                    Log.w(TAG, "Failed to update net address '$ipV4Addr'")
-            } else {
-                Api.net_unset_address(Api.AF_INET)
-            }
-            updated = true
-        }
-        if (updated) {
-            BaresipService.linkAddresses = linkAddresses
-            Api.uag_reset_transp(register = true, reinvite = true)
-            Api.net_debug()
-        } else {
-            UserAgent.register()
-        }
-    }
-
-    fun updateLinkProperties(props: LinkProperties) {
-        if (BaresipService.dynDns && (BaresipService.dnsServers != props.dnsServers)) {
-            if (BaresipService.isServiceRunning)
-                    if (Config.updateDnsServers(props.dnsServers) != 0)
-                        Log.w(TAG, "Failed to update DNS servers '${props.dnsServers}'")
-                    else
-                        BaresipService.dnsServers = props.dnsServers
-            else
-                BaresipService.dnsServers = props.dnsServers
-        }
-        updateLinkAddresses(props.linkAddresses)
-    }
-
     fun implode(list: List<String>, sep: String): String {
         var res = ""
         for (s in list) {
