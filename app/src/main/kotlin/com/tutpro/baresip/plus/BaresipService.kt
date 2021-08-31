@@ -45,10 +45,11 @@ class BaresipService: Service() {
     private lateinit var snb: NotificationCompat.Builder
     private lateinit var cm: ConnectivityManager
     private lateinit var pm: PowerManager
+    private lateinit var wm: WifiManager
     private lateinit var tm: TelephonyManager
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
-    private lateinit var fl: WifiManager.WifiLock
+    private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var br: BroadcastReceiver
 
     internal var rtTimer: Timer? = null
@@ -117,6 +118,8 @@ class BaresipService: Service() {
 
         pm = getSystemService(Context.POWER_SERVICE) as PowerManager
 
+        wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         // This is needed to keep service running also in Doze Mode
@@ -131,6 +134,9 @@ class BaresipService: Service() {
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip.plus:proximity_wakelog")
+
+        wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
+        wifiLock.setReferenceCounted(false)
 
         br = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
@@ -228,9 +234,6 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
-                val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                fl = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
-
                 val assets = arrayOf("accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
                         "error.wav", "ringback.wav")
                 var file = File(filesPath)
@@ -1187,7 +1190,7 @@ class BaresipService: Service() {
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isConfigInitialized) {
-                    Utils.updateLinkProperties(props)
+                    updateLinkProperties(caps, props)
                 } else {
                     for (s in props.dnsServers)
                         Log.i(TAG, "DNS Server ${s.hostAddress}")
@@ -1206,7 +1209,7 @@ class BaresipService: Service() {
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isServiceRunning) {
-                    Utils.updateLinkProperties(props)
+                    updateLinkProperties(caps, props)
                 } else {
                     dnsServers = props.dnsServers
                     linkAddresses = props.linkAddresses
@@ -1223,13 +1226,66 @@ class BaresipService: Service() {
                         "$caps, props: $props")
                 activeNetwork = "$n"
                 if (isServiceRunning) {
-                    Utils.updateLinkProperties(props)
+                    updateLinkProperties(caps, props)
                 } else {
                     dnsServers = props.dnsServers
                     linkAddresses = props.linkAddresses
                 }
                 return
             }
+        }
+    }
+
+    private fun updateLinkProperties(caps: NetworkCapabilities, props: LinkProperties) {
+        if (dynDns && (dnsServers != props.dnsServers)) {
+            if (isServiceRunning)
+                if (Config.updateDnsServers(props.dnsServers) != 0)
+                    Log.w(TAG, "Failed to update DNS servers '${props.dnsServers}'")
+                else
+                    dnsServers = props.dnsServers
+            else
+                dnsServers = props.dnsServers
+        }
+        updateLinkAddresses(props.linkAddresses)
+        if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            Log.d(TAG, "Acquiring WiFi Lock")
+            wifiLock.acquire()
+        } else {
+            Log.d(TAG, "Releasing WiFi Lock")
+            wifiLock.release()
+        }
+    }
+
+    private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
+        var updated = false
+        val ipV6Addr = Utils.findIpV6Address(linkAddresses)
+        if (ipV6Addr != Utils.findIpV6Address(BaresipService.linkAddresses)) {
+            Log.d(TAG, "Updating IPv6 address to '$ipV6Addr'")
+            if (ipV6Addr != "") {
+                if (Api.net_set_address(ipV6Addr) != 0)
+                    Log.w(TAG, "Failed to update net address '$ipV6Addr")
+            } else {
+                Api.net_unset_address(Api.AF_INET6)
+            }
+            updated = true
+        }
+        val ipV4Addr = Utils.findIpV4Address(linkAddresses)
+        if (ipV4Addr != Utils.findIpV4Address(BaresipService.linkAddresses)) {
+            Log.d(TAG, "Updating IPv4 address to '$ipV4Addr'")
+            if (ipV4Addr != "") {
+                if (Api.net_set_address(ipV4Addr) != 0)
+                    Log.w(TAG, "Failed to update net address '$ipV4Addr'")
+            } else {
+                Api.net_unset_address(Api.AF_INET)
+            }
+            updated = true
+        }
+        if (updated) {
+            BaresipService.linkAddresses = linkAddresses
+            Api.uag_reset_transp(register = true, reinvite = true)
+            Api.net_debug()
+        } else {
+            UserAgent.register()
         }
     }
 
@@ -1246,8 +1302,8 @@ class BaresipService: Service() {
             partialWakeLock.release()
         if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
             proximityWakeLock.release()
-        if (this::fl.isInitialized && fl.isHeld)
-            fl.release()
+        if (this::wifiLock.isInitialized)
+            wifiLock.release()
         isServiceClean = true
     }
 
