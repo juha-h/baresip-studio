@@ -234,7 +234,7 @@ class BaresipService: Service() {
 
             "Start" -> {
                 val assets = arrayOf("accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
-                        "error.wav", "notfound.wav", "ring.wav", "ringback.wav")
+                        "error.wav", "ringback.wav")
                 var file = File(filesPath)
                 if (!file.exists()) {
                     Log.d(TAG, "Creating baresip directory")
