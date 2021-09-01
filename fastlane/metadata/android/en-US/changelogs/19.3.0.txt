@@ -1,0 +1,4 @@
+- Acquire WiFi lock while baresip is using WiFi network
+- Restored accidently removed ringback asset
+- Added About note regarding turning off battery optimizations
+- Swedish language translations
