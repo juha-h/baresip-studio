@@ -58,6 +58,7 @@ class BaresipService: Service() {
     private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
     internal var activeNetwork = ""
+    private var linkAddresses = listOf<LinkAddress>()
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -1256,10 +1257,10 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateLinkAddresses(linkAddresses: List<LinkAddress>) {
+    private fun updateLinkAddresses(linkAddrs: List<LinkAddress>) {
         var updated = false
-        val ipV6Addr = Utils.findIpV6Address(linkAddresses)
-        if (ipV6Addr != Utils.findIpV6Address(BaresipService.linkAddresses)) {
+        val ipV6Addr = Utils.findIpV6Address(linkAddrs)
+        if (ipV6Addr != Utils.findIpV6Address(linkAddresses)) {
             Log.d(TAG, "Updating IPv6 address to '$ipV6Addr'")
             if (ipV6Addr != "") {
                 if (Api.net_set_address(ipV6Addr) != 0)
@@ -1269,8 +1270,8 @@ class BaresipService: Service() {
             }
             updated = true
         }
-        val ipV4Addr = Utils.findIpV4Address(linkAddresses)
-        if (ipV4Addr != Utils.findIpV4Address(BaresipService.linkAddresses)) {
+        val ipV4Addr = Utils.findIpV4Address(linkAddrs)
+        if (ipV4Addr != Utils.findIpV4Address(linkAddresses)) {
             Log.d(TAG, "Updating IPv4 address to '$ipV4Addr'")
             if (ipV4Addr != "") {
                 if (Api.net_set_address(ipV4Addr) != 0)
@@ -1281,7 +1282,7 @@ class BaresipService: Service() {
             updated = true
         }
         if (updated) {
-            BaresipService.linkAddresses = linkAddresses
+            linkAddresses = linkAddrs
             Api.uag_reset_transp(register = true, reinvite = true)
             Api.net_debug()
         } else {
@@ -1357,7 +1358,6 @@ class BaresipService: Service() {
         val contacts = ArrayList<Contact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
-        var linkAddresses = listOf<LinkAddress>()
         var dnsServers = listOf<InetAddress>()
 
     }
