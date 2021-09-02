@@ -13,8 +13,8 @@
         <h2>Usage Hints</h2>
         <ul>
             <li>In Android\'s \`Apps & notifications\` settings, allow baresip app\'s notifications and
-                turn off battery optimization (if you want to reduce likelihood that Android kills
-                baresip).</li>
+                disable battery optimization (if you want to reduce likelihood that Android
+                restricts baresip\'s access to network or enters baresip to standby state).</li>
             <li>Check that default values in baresip\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
@@ -22,7 +22,7 @@
                 <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
                 for more information.</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
-                succeeded, yellow (registration is in progress), red (registration failed), white (registration
+                succeeded), yellow (registration is in progress), red (registration failed), white (registration
                 has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
@@ -72,7 +72,7 @@
                 <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">Wiki</a>
                 for more information.</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
-                succeeded, yellow (registration is in progress), red (registration failed), white (registration
+                succeeded), yellow (registration is in progress), red (registration failed), white (registration
                 has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
