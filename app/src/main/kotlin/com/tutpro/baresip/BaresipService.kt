@@ -50,12 +50,12 @@ class BaresipService: Service() {
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var br: BroadcastReceiver
 
-    internal var rtTimer: Timer? = null
+    private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
     private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
-    internal var activeNetwork: Network? = null
+    private var activeNetwork: Network? = null
     private var linkAddresses = listOf<LinkAddress>()
 
     @SuppressLint("WakelockTimeout")
