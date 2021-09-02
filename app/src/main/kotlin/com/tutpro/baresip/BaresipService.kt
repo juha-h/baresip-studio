@@ -880,6 +880,9 @@ class BaresipService: Service() {
         intent.putExtra("params", arrayListOf(callActionUri))
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         callActionUri = ""
+        if (VERSION.SDK_INT >= 23)
+            if (pm.isIgnoringBatteryOptimizations(applicationContext.packageName))
+                Log.d(TAG, "Battery optimizations are ignored")
     }
 
     @Keep
