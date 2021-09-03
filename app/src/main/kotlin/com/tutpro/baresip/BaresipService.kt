@@ -1134,15 +1134,22 @@ class BaresipService: Service() {
         if (selectedNetwork != null) {
             activeNetwork = selectedNetwork
             if (isServiceRunning) {
-                updateLinkProperties(caps!!, props!!)
+                updateLinkProperties(props!!)
             } else {
                 dnsServers = props!!.dnsServers
                 linkAddresses = props.linkAddresses
             }
+            if (caps!!.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                Log.d(TAG, "Acquiring WiFi Lock")
+                wifiLock.acquire()
+            } else {
+                Log.d(TAG, "Releasing WiFi Lock")
+                wifiLock.release()
+            }
         }
     }
 
-    private fun updateLinkProperties(caps: NetworkCapabilities, props: LinkProperties) {
+    private fun updateLinkProperties(props: LinkProperties) {
         if (dynDns && (dnsServers != props.dnsServers)) {
             if (isServiceRunning)
                 if (Config.updateDnsServers(props.dnsServers) != 0)
@@ -1153,13 +1160,6 @@ class BaresipService: Service() {
                 dnsServers = props.dnsServers
         }
         updateLinkAddresses(props.linkAddresses)
-        if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            Log.d(TAG, "Acquiring WiFi Lock")
-            wifiLock.acquire()
-        } else {
-            Log.d(TAG, "Releasing WiFi Lock")
-            wifiLock.release()
-        }
     }
 
     private fun updateLinkAddresses(linkAddrs: List<LinkAddress>) {
