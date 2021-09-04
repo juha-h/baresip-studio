@@ -83,6 +83,18 @@ class BaresipService: Service() {
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
 
+        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        // This is needed to keep service running also in Doze Mode
+        partialWakeLock = pm.run {
+            newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "com.tutpro.baresip:partial_wakelog"
+            ).apply {
+                acquire()
+            }
+        }
+
         cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val builder = NetworkRequest.Builder()
                 .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
@@ -117,21 +129,11 @@ class BaresipService: Service() {
                 }
         )
 
-        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
 
         wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-
-        // This is needed to keep service running also in Doze Mode
-        partialWakeLock = pm.run {
-            newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK,
-                "com.tutpro.baresip.plus:partial_wakelog"
-            ).apply {
-                acquire()
-            }
-        }
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip.plus:proximity_wakelog")
