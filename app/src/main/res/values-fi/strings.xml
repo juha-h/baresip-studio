@@ -12,7 +12,7 @@
         <ul>
             <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa salli baresip-sovelluksen
                 ilmoitukset ja ota akun optimointi pois päältä (jos haluat vähentää todennäköisyyttä,
-                että Android tappaa baresip-sovelluksen).</li>
+                että Android rajoittaa baresip-sovelluksen toimintaa ja pääsyä verkkoon).</li>
             <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
                 kosketus tarjoaa apua.</li>
             <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
@@ -65,7 +65,7 @@
         <ul>
             <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa salli baresip+-sovelluksen
                 ilmoitukset ja ota akun optimointi pois päältä (jos haluat vähentää todennäköisyyttä,
-                että Android tappaa baresip+-sovelluksen).</li>
+                että Android rajoittaa baresip+-sovelluksen toimintaa ja pääsyä verkkoon).</li>
             <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
                 kosketus tarjoaa apua.</li>
             <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
