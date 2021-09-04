@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
     private var resumeUap = ""
     private var resumeCall: Call? = null
     private var resumeAction = ""
+    private var firstRun = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -658,17 +659,15 @@ class MainActivity : AppCompatActivity() {
         else
             if (!BaresipService.isServiceRunning)
                 if (File(filesDir.absolutePath + "/accounts").exists()) {
-                    val accounts = String(Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
-                            Charsets.UTF_8).lines().toMutableList()
+                    val accounts = String(
+                        Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                        Charsets.UTF_8
+                    ).lines().toMutableList()
                     askPasswords(accounts)
                 } else {
                     // Baresip is started for the first time
-                    if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
-                        Utils.requestPermission(this, Manifest.permission.RECORD_AUDIO,
-                                RECORD_PERMISSION_REQUEST_CODE)
-                    else
-                        // Some old devices have granted Mic permission without a need to ask
-                        startBaresip()
+                    firstRun = true
+                    startBaresip()
                 }
 
         intent.removeExtra("action")
@@ -682,6 +681,16 @@ class MainActivity : AppCompatActivity() {
             volumeControlStream = AudioManager.STREAM_RING
         else
             volumeControlStream = AudioManager.STREAM_VOICE_CALL
+
+        window.decorView.post {
+            if (firstRun) {
+                if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
+                    Utils.requestPermission(
+                        this, Manifest.permission.RECORD_AUDIO, RECORD_PERMISSION_REQUEST_CODE
+                    )
+                firstRun = false
+            }
+        }
 
     } // OnCreate
 
@@ -1421,28 +1430,23 @@ class MainActivity : AppCompatActivity() {
 
         when (requestCode) {
 
-            RECORD_PERMISSION_REQUEST_CODE -> {
+            RECORD_PERMISSION_REQUEST_CODE ->
                 if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.no_calls), ::startBaresip)
+                            getString(R.string.no_calls))
                 else {
                     BaresipService.cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
                     if (BaresipService.cameraAvailable)
                         Utils.requestPermission(this, Manifest.permission.CAMERA,
                                 CAMERA_PERMISSION_REQUEST_CODE)
-                    else {
+                    else
                         Utils.alertView(this,
                                 getString(R.string.notice), getString(R.string.no_cameras))
-                        startBaresip()
-                    }
                 }
-            }
 
-            CAMERA_PERMISSION_REQUEST_CODE -> {
+            CAMERA_PERMISSION_REQUEST_CODE ->
                 if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
                     Utils.alertView(this, getString(R.string.notice), getString(R.string.no_video_calls))
-                startBaresip()
-            }
 
             BACKUP_PERMISSION_REQUEST_CODE ->
                 if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
