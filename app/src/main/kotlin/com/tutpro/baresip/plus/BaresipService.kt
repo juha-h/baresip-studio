@@ -57,7 +57,7 @@ class BaresipService: Service() {
     private var audioFocusUsage = -1
     private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
-    internal var activeNetwork = ""
+    internal var activeNetwork: Network? = null
     private var linkAddresses = listOf<LinkAddress>()
 
     @SuppressLint("WakelockTimeout")
@@ -111,14 +111,14 @@ class BaresipService: Service() {
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.i(TAG, "Network $network is lost")
-                        if (activeNetwork == "$network")
+                        if (activeNetwork == network)
                             updateNetwork()
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
                         Log.i(TAG, "Network $network link properties changed")
-                        if (activeNetwork == "$network")
+                        if (activeNetwork == network)
                             updateNetwork()
                     }
 
@@ -1187,62 +1187,52 @@ class BaresipService: Service() {
     }
 
     private fun updateNetwork() {
+
+        var selectedNetwork: Network? = null
+        var caps: NetworkCapabilities? = null
+        var props: LinkProperties? = null
+
         // Use VPN network if available
         for (n in cm.allNetworks) {
-            val caps = cm.getNetworkCapabilities(n) ?: continue
-            val props = cm.getLinkProperties(n) ?: continue
-            if ((n == cm.activeNetwork) && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-                Log.i(TAG, "Active VPN network $n is available with caps: " +
-                        "$caps, props: $props")
-                activeNetwork = "$n"
-                if (isConfigInitialized) {
-                    updateLinkProperties(caps, props)
-                } else {
-                    for (s in props.dnsServers)
-                        Log.i(TAG, "DNS Server ${s.hostAddress}")
-                    dnsServers = props.dnsServers
-                    linkAddresses = props.linkAddresses
-                }
-                return
+            caps = cm.getNetworkCapabilities(n) ?: continue
+            if (n == cm.activeNetwork && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                props = cm.getLinkProperties(n) ?: continue
+                Log.i(TAG, "Active VPN network $n is available with caps: $caps, props: $props")
+                selectedNetwork = n
+                break
             }
         }
-        // Otherwise, use active network with Internet access
+
+        // Otherwise, use currently active default data network
         for (n in cm.allNetworks) {
-            val caps = cm.getNetworkCapabilities(n) ?: continue
-            val props = cm.getLinkProperties(n) ?: continue
-            if ((n == cm.activeNetwork) && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                Log.i(TAG, "Active Internet network $n is available with caps: " +
-                        "$caps, props: $props")
-                activeNetwork = "$n"
-                if (isServiceRunning) {
-                    updateLinkProperties(caps, props)
-                } else {
-                    dnsServers = props.dnsServers
-                    linkAddresses = props.linkAddresses
-                }
-                return
-            }
-        }
-        // Otherwise, use an active network
-        for (n in cm.allNetworks) {
-            val caps = cm.getNetworkCapabilities(n) ?: continue
-            val props = cm.getLinkProperties(n) ?: continue
             if (n == cm.activeNetwork) {
-                Log.i(TAG, "Active network $n is available with caps: " +
-                        "$caps, props: $props")
-                activeNetwork = "$n"
-                if (isServiceRunning) {
-                    updateLinkProperties(caps, props)
-                } else {
-                    dnsServers = props.dnsServers
-                    linkAddresses = props.linkAddresses
-                }
-                return
+                caps = cm.getNetworkCapabilities(n) ?: continue
+                props = cm.getLinkProperties(n) ?: continue
+                Log.i(TAG, "Active network $n is available with caps: $caps, props: $props")
+                selectedNetwork = n
+                break
+            }
+        }
+
+        if (selectedNetwork != null) {
+            activeNetwork = selectedNetwork
+            if (isServiceRunning) {
+                updateLinkProperties(props!!)
+            } else {
+                dnsServers = props!!.dnsServers
+                linkAddresses = props.linkAddresses
+            }
+            if (caps!!.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                Log.d(TAG, "Acquiring WiFi Lock")
+                wifiLock.acquire()
+            } else {
+                Log.d(TAG, "Releasing WiFi Lock")
+                wifiLock.release()
             }
         }
     }
 
-    private fun updateLinkProperties(caps: NetworkCapabilities, props: LinkProperties) {
+    private fun updateLinkProperties(props: LinkProperties) {
         if (dynDns && (dnsServers != props.dnsServers)) {
             if (isServiceRunning)
                 if (Config.updateDnsServers(props.dnsServers) != 0)
@@ -1253,13 +1243,6 @@ class BaresipService: Service() {
                 dnsServers = props.dnsServers
         }
         updateLinkAddresses(props.linkAddresses)
-        if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            Log.d(TAG, "Acquiring WiFi Lock")
-            wifiLock.acquire()
-        } else {
-            Log.d(TAG, "Releasing WiFi Lock")
-            wifiLock.release()
-        }
     }
 
     private fun updateLinkAddresses(linkAddrs: List<LinkAddress>) {
