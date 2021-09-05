@@ -643,10 +643,10 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
-        if (am.mode == AudioManager.MODE_RINGTONE)
-            volumeControlStream = AudioManager.STREAM_RING
+        volumeControlStream = if (am.mode == AudioManager.MODE_RINGTONE)
+            AudioManager.STREAM_RING
         else
-            volumeControlStream = AudioManager.STREAM_VOICE_CALL
+            AudioManager.STREAM_VOICE_CALL
 
         window.decorView.post {
             if (firstRun) {
