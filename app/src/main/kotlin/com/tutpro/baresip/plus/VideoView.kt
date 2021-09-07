@@ -14,7 +14,7 @@ class VideoView(val context: Context) {
     external fun on_pause()
     external fun on_stop()
 
-    val surfaceHolderCallback: SurfaceHolderCallback?
+    private val surfaceHolderCallback: SurfaceHolderCallback?
     val surfaceView: View
     var afterCreate = false
 
@@ -59,7 +59,7 @@ class VideoView(val context: Context) {
                     if (call.hasVideo()) {
                         if (call.startVideoDisplay() != 0)
                             Log.e(TAG, "Failed to start video display")
-                        break;
+                        break
                     }
                 afterCreate = false
             }
