@@ -56,7 +56,7 @@ class AccountActivity : AppCompatActivity() {
     private var save = false
     private var uaIndex= -1
 
-    val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

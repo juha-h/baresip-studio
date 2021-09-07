@@ -6,7 +6,7 @@ object Api {
     const val AF_INET = 2
     const val AF_INET6 = 10
     const val VIDMODE_OFF = 0
-    const val VIDMODE_ON = 1
+    // const val VIDMODE_ON = 1
     const val ANSWERMODE_MANUAL = 0
     const val ANSWERMODE_AUTO = 2
     const val DTMFMODE_RTP_EVENT = 0
