@@ -15,38 +15,57 @@ import java.util.*
 class CallListAdapter(private val cxt: Context, private val rows: ArrayList<CallRow>) :
         ArrayAdapter<CallRow>(cxt, R.layout.call_row, rows) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+    private class ViewHolder(view: View?) {
+        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
+        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
+        val cardImageAvatarView = view?.findViewById(R.id.CardImageAvatar) as ImageView
+        val directionsView = view?.findViewById(R.id.directions) as LinearLayout
+        val etcView = view?.findViewById(R.id.etc) as TextView
+        val peerURIView = view?.findViewById(R.id.peer_uri) as TextView
+        val timeView = view?.findViewById(R.id.time) as TextView
+    }
+
+    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+
+        val viewHolder: ViewHolder
+        val rowView: View
+
+        if (view == null) {
+            rowView = layoutInflater.inflate(R.layout.call_row, parent, false)
+            viewHolder = ViewHolder(rowView)
+            rowView.tag = viewHolder
+        } else {
+            rowView = view
+            viewHolder = rowView.tag as ViewHolder
+        }
+
         val callRow = rows[position]
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val rowView = inflater.inflate(R.layout.call_row, parent, false)
-        val textAvatarView = rowView.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = rowView.findViewById(R.id.CardAvatar) as CardView
-        val cardImageAvatarView = rowView.findViewById(R.id.CardImageAvatar) as ImageView
         val contact = ContactsActivity.findContact(callRow.peerUri)
         if (contact != null) {
             val avatarImage = contact.avatarImage
             if (avatarImage != null) {
-                textAvatarView.visibility = View.GONE
-                cardAvatarView.visibility = View.VISIBLE
-                cardImageAvatarView.setImageBitmap(avatarImage)
+                viewHolder.textAvatarView.visibility = View.GONE
+                viewHolder.cardAvatarView.visibility = View.VISIBLE
+                viewHolder.cardImageAvatarView.setImageBitmap(avatarImage)
             } else {
-                textAvatarView.visibility = View.VISIBLE
-                cardAvatarView.visibility = View.GONE
-                textAvatarView.background.setTint(contact.color)
-                textAvatarView.text = "${contact.name[0]}"
+                viewHolder.textAvatarView.visibility = View.VISIBLE
+                viewHolder.cardAvatarView.visibility = View.GONE
+                viewHolder.textAvatarView.background.setTint(contact.color)
+                viewHolder.textAvatarView.text = "${contact.name[0]}"
             }
         } else {
-            textAvatarView.visibility = View.VISIBLE
-            cardAvatarView.visibility = View.GONE
-            textAvatarView.setBackgroundResource(R.drawable.person_image)
+            viewHolder.textAvatarView.visibility = View.VISIBLE
+            viewHolder.cardAvatarView.visibility = View.GONE
+            viewHolder.textAvatarView.setBackgroundResource(R.drawable.person_image)
         }
-        val directions = rowView.findViewById(R.id.directions) as LinearLayout
-        directions.removeAllViews()
+
+        viewHolder.directionsView.removeAllViews()
         var count = 1
         for (d in callRow.directions) {
             if (count > 3) {
-                val etc = rowView.findViewById(R.id.etc) as TextView
-                etc.text = "..."
+                viewHolder.etcView.text = "..."
                 break
             }
             val dirView = ImageView(cxt)
@@ -55,17 +74,18 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
             dirView.layoutParams = params
             dirView.setPadding(0, 5, 0, 0)
             dirView.setImageResource(d)
-            directions.addView(dirView)
+            viewHolder.directionsView.addView(dirView)
             count++
         }
-        val peerURIView = rowView.findViewById(R.id.peer_uri) as TextView
+
         val contactName = ContactsActivity.contactName(callRow.peerUri)
         if (contactName.startsWith("sip:"))
-            peerURIView.text = Utils.friendlyUri(contactName, Utils.aorDomain(callRow.aor))
+            viewHolder.peerURIView.text = Utils.friendlyUri(contactName, Utils.aorDomain(callRow.aor))
         else
-            peerURIView.text = contactName
-        val timeView = rowView.findViewById(R.id.time) as TextView
-        timeView.text = callRow.time
+            viewHolder.peerURIView.text = contactName
+
+        viewHolder.timeView.text = callRow.time
+
         return rowView
     }
 

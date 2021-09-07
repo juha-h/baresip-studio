@@ -15,7 +15,6 @@ import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.net.LinkAddress
-import android.net.LinkProperties
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -277,6 +276,7 @@ object Utils {
                 name.lines().size == 1 && !name.contains('"')
     }
 
+    @Suppress("unused")
     fun checkIfName(name: String): Boolean {
         if ((name.length < 2) || !name.first().isLetter()) return false
         for (c in name)
@@ -449,6 +449,7 @@ object Utils {
     }
 
     @RequiresApi(29)
+    @Suppress("unused")
     fun selectOutputFile(title: String) {
         Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -622,7 +623,7 @@ object Utils {
         return true
     }
 
-    @Suppress("UNUSED")
+    @Suppress("unused")
     fun dumpIntent(intent: Intent) {
         val bundle: Bundle = intent.extras ?: return
         val keys = bundle.keySet()

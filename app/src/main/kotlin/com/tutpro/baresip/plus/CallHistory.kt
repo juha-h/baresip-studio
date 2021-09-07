@@ -31,7 +31,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String,
             while (it.hasNext()) if (it.next().aor == aor) it.remove()
         }
 
-        fun aorHistorySize(aor: String): Int {
+        private fun aorHistorySize(aor: String): Int {
             return BaresipService.callHistory.filter { it.aor == aor }.count()
         }
 
