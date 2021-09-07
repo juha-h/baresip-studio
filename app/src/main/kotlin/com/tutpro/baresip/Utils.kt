@@ -10,7 +10,6 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
 import android.net.LinkAddress
-import android.net.LinkProperties
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -272,6 +271,7 @@ object Utils {
                 name.lines().size == 1 && !name.contains('"')
     }
 
+    @Suppress("unused")
     fun checkIfName(name: String): Boolean {
         if ((name.length < 2) || !name.first().isLetter()) return false
         for (c in name)
@@ -444,6 +444,7 @@ object Utils {
     }
 
     @RequiresApi(29)
+    @Suppress("unused")
     fun selectOutputFile(title: String) {
         Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -617,7 +618,7 @@ object Utils {
         return true
     }
 
-    @Suppress("UNUSED")
+    @Suppress("unused")
     fun dumpIntent(intent: Intent) {
         val bundle: Bundle = intent.extras ?: return
         val keys = bundle.keySet()
@@ -641,6 +642,7 @@ object Utils {
             BaresipService.activities.add(0, activity)
     }
 
+    @Suppress("unused")
     fun darkTheme(ctx: Context): Boolean {
         return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
                 Configuration.UI_MODE_NIGHT_YES
