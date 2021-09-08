@@ -1,0 +1,4 @@
+- Acquire WiFi lock when baresip is using WiFi network
+- Added note to About text regarding battery optimization
+- New Swedish and Portuguese (Brazil) translations
+- Various implementation improvements
