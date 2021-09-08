@@ -1,0 +1,2 @@
+- New Swedish and Portuguese (Brazil) translations
+- Various implementation improvements
