@@ -488,7 +488,7 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
         jstring jPath, jstring jIpV4Addr, jstring jIpV6Addr, jstring jNetInterface,
         jstring jDnsServers, jint jNetAf, jint javaLogLevel) {
 
-    LOGD("starting baresip\n");
+    LOGI("starting baresip\n");
 
     const char *net_interface = (*env)->GetStringUTFChars(env, jNetInterface, 0);
     const int net_af = jNetAf;
