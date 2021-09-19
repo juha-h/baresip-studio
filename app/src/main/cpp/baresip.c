@@ -10,7 +10,7 @@
 #include "logger.h"
 #include "vidisp.h"
 
-#define LOG_TAG "Baresip Lib"
+#define LOG_TAG "Baresip+ Lib"
 
 typedef struct baresip_context {
     JavaVM  *javaVM;
