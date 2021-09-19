@@ -14,6 +14,10 @@ object Config {
 
         Log.d(TAG, "Config is '$config'")
 
+        config = config.replace("module_tmp uuid.so", "module uuid.so")
+
+        config = config.replace("module_tmp account.so", "module_app account.so")
+
         if (BaresipService.cameraAvailable) {
             if (!config.contains("module avformat.so")) {
                 addModuleLine("module avformat.so")

@@ -46,8 +46,8 @@ module srtp.so
 module dtls_srtp.so
 module zrtp.so
 module opensles.so
-module_tmp uuid.so
-module_tmp account.so
+module uuid.so
+module_app account.so
 module_app contact.so
 module_app debug_cmd.so
 module_app mwi.so
