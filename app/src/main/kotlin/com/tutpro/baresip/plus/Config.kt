@@ -132,7 +132,6 @@ object Config {
     }
 
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
-        Log.i(TAG, "Updating dnsServers with $dnsServers")
         var servers = ""
         for (dnsServer in dnsServers) {
             var address = dnsServer.hostAddress.removePrefix("/")
