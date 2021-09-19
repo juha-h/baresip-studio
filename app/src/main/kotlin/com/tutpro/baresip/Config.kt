@@ -14,6 +14,10 @@ object Config {
 
         Log.d(TAG, "Config is '$config'")
 
+        config = config.replace("module_tmp uuid.so", "module uuid.so")
+
+        config = config.replace("module_tmp account.so", "module_app account.so")
+
         if (!config.contains(Regex("ausrc_format s16"))) {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
         }
