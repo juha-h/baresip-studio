@@ -29,6 +29,7 @@ import java.io.File
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
@@ -55,7 +56,7 @@ class BaresipService: Service() {
     private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
     private var activeNetwork: Network? = null
-    private var linkAddresses = listOf<LinkAddress>()
+    private var linkAddresses = mutableListOf<LinkAddress>()
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -119,14 +120,8 @@ class BaresipService: Service() {
                             updateNetwork()
                     }
 
-                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                        super.onCapabilitiesChanged(network, caps)
-                        Log.i(TAG, "Network $network capabilities changed: $caps")
-                    }
                 }
         )
-
-
 
         wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -234,6 +229,25 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
+
+                var ipAddrs = ""
+                for (n in cm.allNetworks) {
+                    val props = cm.getLinkProperties(n)
+                    if (props != null) {
+                        for (a in props.linkAddresses)
+                            linkAddresses.add(a)
+                        val addrs = Utils.hostAddresses(props.linkAddresses)
+                        if (addrs != "") {
+                            if (ipAddrs == "")
+                                ipAddrs = addrs
+                            else
+                                ipAddrs += ";$addrs"
+                        }
+                    }
+                }
+
+                updateDnsServers()
+
                 val assets = arrayOf("accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
                         "error.wav", "ringback.wav")
                 var file = File(filesPath)
@@ -264,15 +278,12 @@ class BaresipService: Service() {
                 CallHistory.restore()
                 Message.restore()
 
-                val ipV4Addr = Utils.findIpV4Address(linkAddresses)
-                val ipV6Addr = Utils.findIpV6Address(linkAddresses)
-                val dnsServers = Utils.findDnsServers(BaresipService.dnsServers)
-                if ((ipV4Addr == "") && (ipV6Addr == ""))
+                if (ipAddrs == "")
                     Log.w(TAG, "Starting baresip without IP addresses")
 
                 Thread {
                     baresipStart(
-                        filesPath, ipV4Addr, ipV6Addr, "", dnsServers, Api.AF_UNSPEC, logLevel
+                        filesPath, ipAddrs, "", Api.AF_UNSPEC, logLevel
                     )
                 }.start()
 
@@ -425,35 +436,11 @@ class BaresipService: Service() {
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
-                        if ((ev.size > 1) && (ev[1] == "Invalid argument")) {
-                            // Most likely this error is due to DNS lookup failure
+                        if (ev.size > 1 && ev[1] == "Invalid argument")
+                            // Likely due to DNS lookup failure
                             newEvent = "registering failed,DNS lookup failed"
-                            Api.net_dns_debug()
-                            if (dynDns)
-                                if (VERSION.SDK_INT >= 23) {
-                                    val activeNetwork = cm.activeNetwork
-                                    if (activeNetwork != null) {
-                                        val props = cm.getLinkProperties(activeNetwork)
-                                        if (props != null) {
-                                            val dnsServers = props.dnsServers
-                                            Log.d(TAG, "Updating DNS Servers = $dnsServers")
-                                            if (Config.updateDnsServers(dnsServers) != 0) {
-                                                Log.w(TAG, "Failed to update DNS servers '$dnsServers'")
-                                            } else {
-                                                Api.net_dns_debug()
-                                                if (!ua.registrationFailed) {
-                                                    ua.registrationFailed = true
-                                                    Api.ua_register(uap)
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        Log.d(TAG, "No active network!")
-                                    }
-                                }
-                        }
-                        if ((ev.size > 1) && (ev[1] == "Software caused connection abort")) {
-                            // Perhaps due to VPN connect/disconnect
+                        if (!ua.registrationFailed) {
+                            ua.registrationFailed = true
                             updateNetwork()
                         }
                         if (!Utils.isVisible())
@@ -1102,94 +1089,92 @@ class BaresipService: Service() {
     }
 
     private fun updateNetwork() {
-
-        var selectedNetwork: Network? = null
-        var caps: NetworkCapabilities? = null
-        var props: LinkProperties? = null
-
-        // Use VPN network if available
-        for (n in cm.allNetworks) {
-            caps = cm.getNetworkCapabilities(n) ?: continue
-            if (isNetworkActive(n) && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-                props = cm.getLinkProperties(n) ?: continue
-                Log.i(TAG, "Active VPN network $n is available with caps: $caps, props: $props")
-                selectedNetwork = n
-                break
+        /* for (n in cm.allNetworks)
+            Log.i(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
+                    "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}") */
+        activeNetwork = activeNetwork()
+        if (activeNetwork != null) {
+            val linkCaps = cm.getNetworkCapabilities(activeNetwork)
+            val linkProps = cm.getLinkProperties(activeNetwork)
+            Log.d(TAG, "Using active network $activeNetwork with caps: $linkCaps, props: $linkProps")
+            val lnAddrs = mutableListOf<LinkAddress>()
+            for (n in cm.allNetworks) {
+                val props = cm.getLinkProperties(n)
+                if (props != null)
+                    for (a in props.linkAddresses)
+                        lnAddrs.add(a)
             }
-        }
-
-        // Otherwise, use currently active default data network
-        for (n in cm.allNetworks) {
-            if (isNetworkActive(n)) {
-                caps = cm.getNetworkCapabilities(n) ?: continue
-                props = cm.getLinkProperties(n) ?: continue
-                Log.i(TAG, "Active network $n is available with caps: $caps, props: $props")
-                selectedNetwork = n
-                break
-            }
-        }
-
-        if (selectedNetwork != null) {
-            activeNetwork = selectedNetwork
-            if (isServiceRunning) {
-                updateLinkProperties(props!!)
+            var addrUpdate = false
+            for (a in lnAddrs)
+                if (!linkAddresses.contains(a)) {
+                    Api.net_add_address(a.address.hostAddress)
+                    addrUpdate = true
+                }
+            for (a in linkAddresses)
+                if (!lnAddrs.contains(a)) {
+                    Api.net_rm_address(a.address.hostAddress)
+                    addrUpdate = true
+                }
+            val dnsUpdate = updateDnsServers()
+            if (addrUpdate) {
+                linkAddresses = lnAddrs
+                Api.uag_reset_transp(register = true, reinvite = true)
             } else {
-                dnsServers = props!!.dnsServers
-                linkAddresses = props.linkAddresses
+                if (dnsUpdate)
+                    UserAgent.register()
             }
-            if (caps!!.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            if (linkCaps != null && linkCaps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                 Log.d(TAG, "Acquiring WiFi Lock")
                 wifiLock.acquire()
             } else {
                 Log.d(TAG, "Releasing WiFi Lock")
                 wifiLock.release()
             }
-        }
+        } else
+            Log.w(TAG, "No active network")
     }
 
-    private fun updateLinkProperties(props: LinkProperties) {
-        if (dynDns && (dnsServers != props.dnsServers)) {
-            if (isServiceRunning)
-                if (Config.updateDnsServers(props.dnsServers) != 0)
-                    Log.w(TAG, "Failed to update DNS servers '${props.dnsServers}'")
-                else
-                    dnsServers = props.dnsServers
-            else
-                dnsServers = props.dnsServers
+    private fun updateDnsServers(): Boolean {
+        if (isServiceRunning && !dynDns)
+            return false
+        val servers = mutableListOf<InetAddress>()
+        // Use DNS servers first from active network (if given)
+        for (n in cm.allNetworks)
+            if (isNetworkActive(n)) {
+                val linkProps = cm.getLinkProperties(n)
+                if (linkProps != null) {
+                    servers.addAll(linkProps.dnsServers)
+                    break
+                }
+            }
+        // Then add DNS servers from the other networks
+        for (n in cm.allNetworks) {
+            if (isNetworkActive(n)) continue
+            val linkProps = cm.getLinkProperties(n)
+            if (linkProps != null)
+                for (server in linkProps.dnsServers)
+                    if (!servers.contains(server)) servers.add(server)
         }
-        updateLinkAddresses(props.linkAddresses)
+        // Update if change
+        if (servers != dnsServers) {
+            if (isServiceRunning && Config.updateDnsServers(servers) != 0) {
+                Log.w(TAG, "Failed to update DNS servers '${servers}'")
+            } else {
+                // Log.d(TAG, "Updated DNS servers: '${servers}'")
+                dnsServers = servers
+                return true
+            }
+        }
+        return false
     }
 
-    private fun updateLinkAddresses(linkAddrs: List<LinkAddress>) {
-        var updated = false
-        val ipV6Addr = Utils.findIpV6Address(linkAddrs)
-        if (ipV6Addr != Utils.findIpV6Address(linkAddresses)) {
-            Log.d(TAG, "Updating IPv6 address to '$ipV6Addr'")
-            if (ipV6Addr != "") {
-                if (Api.net_set_address(ipV6Addr) != 0)
-                    Log.w(TAG, "Failed to update net address '$ipV6Addr")
-            } else {
-                Api.net_unset_address(Api.AF_INET6)
-            }
-            updated = true
-        }
-        val ipV4Addr = Utils.findIpV4Address(linkAddrs)
-        if (ipV4Addr != Utils.findIpV4Address(linkAddresses)) {
-            Log.d(TAG, "Updating IPv4 address to '$ipV4Addr'")
-            if (ipV4Addr != "") {
-                if (Api.net_set_address(ipV4Addr) != 0)
-                    Log.w(TAG, "Failed to update net address '$ipV4Addr'")
-            } else {
-                Api.net_unset_address(Api.AF_INET)
-            }
-            updated = true
-        }
-        if (updated) {
-            linkAddresses = linkAddrs
-            Api.uag_reset_transp(register = true, reinvite = true)
-            Api.net_debug()
-        } else {
-            UserAgent.register()
+    private fun activeNetwork(): Network? {
+        return if (VERSION.SDK_INT >= 23)
+            cm.activeNetwork
+        else {
+            for (n in cm.allNetworks)
+                if (isNetworkActive(n)) return n
+            return null
         }
     }
 
@@ -1220,9 +1205,8 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    private external fun baresipStart(path: String, ipV4Addr: String, ipV6Addr: String,
-                                      netInterface: String, dnsServers: String, netAf: Int,
-                                      logLevel: Int)
+    private external fun baresipStart(path: String, ipAddrs: String, netInterface: String,
+                                      netAf: Int, logLevel: Int)
     private external fun baresipStop(force: Boolean)
 
     companion object {

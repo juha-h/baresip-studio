@@ -9,8 +9,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
-import android.net.LinkAddress
-import android.net.Uri
+import android.net.*
 import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
@@ -27,7 +26,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 import java.io.*
-import java.net.InetAddress
 import java.security.SecureRandom
 import java.util.*
 import java.util.zip.ZipEntry
@@ -279,36 +277,15 @@ object Utils {
         return true
     }
 
-    fun findIpV6Address(list: List<LinkAddress>): String {
-        for (la in list)
+    fun hostAddresses(list: List<LinkAddress>?): String {
+        var result = ""
+        if (list != null) for (la in list)
             if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE)
-                if (checkIpV6(la.address.hostAddress))
-                    return la.address.hostAddress
-        return ""
-    }
-
-    fun findIpV4Address(list: List<LinkAddress>): String {
-        for (la in list)
-            if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE)
-                if (checkIpV4(la.address.hostAddress))
-                    return la.address.hostAddress
-        return ""
-    }
-
-    fun findDnsServers(list: List<InetAddress>): String {
-        var servers = ""
-        for (dnsServer in list) {
-            var address = dnsServer.hostAddress.removePrefix("/")
-            address = if (checkIpV4(address))
-                "${address}:53"
-            else
-                "[${address}]:53"
-            servers = if (servers == "")
-                address
-            else
-                "${servers},${address}"
-        }
-        return servers
+                if (result == "")
+                    result = la.address.hostAddress
+                else
+                    result += ";" + la.address.hostAddress
+        return result
     }
 
     fun implode(list: List<String>, sep: String): String {

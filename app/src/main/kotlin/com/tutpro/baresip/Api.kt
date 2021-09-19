@@ -3,7 +3,7 @@ package com.tutpro.baresip
 object Api {
 
     const val AF_UNSPEC = 0
-    const val AF_INET = 2
+    // const val AF_INET = 2
     const val AF_INET6 = 10
     const val VIDMODE_OFF = 0
     // const val VIDMODE_ON = 1
@@ -76,6 +76,8 @@ object Api {
 
     external fun net_use_nameserver(servers: String): Int
     external fun net_set_address(ip_addr: String): Int
+    external fun net_add_address(ip_addr: String): Int
+    external fun net_rm_address(ip_addr: String): Int
     external fun net_unset_address(af: Int)
     external fun net_debug()
     external fun net_dns_debug()

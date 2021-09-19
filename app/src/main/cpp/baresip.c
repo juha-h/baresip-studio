@@ -437,20 +437,21 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz, jstring javaIp);
+Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring javaIp);
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers);
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance,
-        jstring jPath, jstring jIpV4Addr, jstring jIpV6Addr, jstring jNetInterface,
-        jstring jDnsServers, jint jNetAf, jint javaLogLevel) {
+        jstring jPath, jstring jIpAddrs, jstring jNetInterface, jint jNetAf, jint jLogLevel) {
 
-    LOGD("starting baresip\n");
+    LOGI("starting baresip\n");
 
     const char *net_interface = (*env)->GetStringUTFChars(env, jNetInterface, 0);
     const int net_af = jNetAf;
+
+    const char *ip_addrs = (*env)->GetStringUTFChars(env, jIpAddrs, 0);
 
     char start_error[64] = "";
 
@@ -477,7 +478,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     conf_path_set(path);
 
-    log_level_set((enum log_level)javaLogLevel);
+    log_level_set((enum log_level)jLogLevel);
 
     err = conf_configure();
     if (err) {
@@ -502,9 +503,26 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    Java_com_tutpro_baresip_Api_net_1set_1address(env, instance, jIpV4Addr);
-    Java_com_tutpro_baresip_Api_net_1set_1address(env, instance, jIpV6Addr);
-    Java_com_tutpro_baresip_Api_net_1use_1nameserver(env, instance, jDnsServers);
+    if (strlen(ip_addrs) > 0) {
+        char* addr_list = (char*)malloc(strlen(ip_addrs));
+        struct sa temp_sa;
+        char buf[256];
+        net_flush_addresses(baresip_network());
+        strcpy(addr_list, ip_addrs);
+        char *ptr = strtok(addr_list, ";");
+        while (ptr != NULL) {
+            LOGI("adding address '%s'", ptr);
+            if (0 == sa_set_str(&temp_sa, ptr, 0)) {
+                sa_ntop(&temp_sa, buf, 256);
+                net_add_address(baresip_network(), &temp_sa);
+            } else {
+                LOGE("invalid ip address %s\n", ptr);
+                res = EAFNOSUPPORT;
+            }
+            ptr = strtok(NULL, ";");
+        }
+        free(addr_list);
+    }
 
     net_debug_log();
 
@@ -1674,6 +1692,50 @@ Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz, jstring
         res = EAFNOSUPPORT;
     }
     (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+    return res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring javaIp) {
+    const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
+    int res = 0;
+    struct sa temp_sa;
+    char buf[256];
+    LOGI("adding address '%s'\n", native_ip);
+    if (str_len(native_ip) == 0) {
+        (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+        return 0;
+    }
+    if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
+        sa_ntop(&temp_sa, buf, 256);
+        net_add_address(baresip_network(), &temp_sa);
+    } else {
+        LOGE("invalid ip address %s\n", native_ip);
+        res = EAFNOSUPPORT;
+    }
+    (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+    return res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring jIp) {
+    const char *native_ip = (*env)->GetStringUTFChars(env, jIp, 0);
+    int res = 0;
+    struct sa temp_sa;
+    char buf[256];
+    LOGD("removing address '%s'\n", native_ip);
+    if (str_len(native_ip) == 0) {
+        (*env)->ReleaseStringUTFChars(env, jIp, native_ip);
+        return 0;
+    }
+    if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
+        sa_ntop(&temp_sa, buf, 256);
+        net_rm_address(baresip_network(), &temp_sa);
+    } else {
+        LOGE("invalid ip address %s\n", native_ip);
+        res = EAFNOSUPPORT;
+    }
+    (*env)->ReleaseStringUTFChars(env, jIp, native_ip);
     return res;
 }
 
