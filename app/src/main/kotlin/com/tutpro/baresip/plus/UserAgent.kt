@@ -3,7 +3,6 @@ package com.tutpro.baresip.plus
 class UserAgent(val uap: String) {
 
     val account = Account(Api.ua_account(uap))
-    var registrationFailed = false
 
     fun add(status: Int) {
         BaresipService.uas.add(this)

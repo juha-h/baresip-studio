@@ -453,7 +453,6 @@ class BaresipService: Service() {
                             status[account_index] = R.drawable.dot_white
                         else
                             status[account_index] = R.drawable.dot_green
-                        ua.registrationFailed = false
                         updateStatusNotification()
                         if (!Utils.isVisible())
                             return
@@ -464,10 +463,6 @@ class BaresipService: Service() {
                         if (ev.size > 1 && ev[1] == "Invalid argument")
                         // Likely due to DNS lookup failure
                             newEvent = "registering failed,DNS lookup failed"
-                        if (!ua.registrationFailed) {
-                            ua.registrationFailed = true
-                            updateNetwork()
-                        }
                         if (!Utils.isVisible())
                             return
                     }
