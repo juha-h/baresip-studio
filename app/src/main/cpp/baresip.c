@@ -1674,28 +1674,6 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1set_1address(JNIEnv *env, jobject thiz, jstring javaIp) {
-    const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
-    int res = 0;
-    struct sa temp_sa;
-    char buf[256];
-    LOGD("setting address '%s'\n", native_ip);
-    if (str_len(native_ip) == 0) {
-        (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
-        return 0;
-    }
-    if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
-        sa_ntop(&temp_sa, buf, 256);
-        net_set_address(baresip_network(), &temp_sa);
-    } else {
-        LOGE("invalid ip address %s\n", native_ip);
-        res = EAFNOSUPPORT;
-    }
-    (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
-    return res;
-}
-
-JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring javaIp) {
     const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
     int res = 0;
@@ -1708,7 +1686,9 @@ Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring
     }
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
         sa_ntop(&temp_sa, buf, 256);
+        re_thread_enter();
         net_add_address(baresip_network(), &temp_sa);
+        re_thread_leave();
     } else {
         LOGE("invalid ip address %s\n", native_ip);
         res = EAFNOSUPPORT;
@@ -1730,7 +1710,9 @@ Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring 
     }
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
         sa_ntop(&temp_sa, buf, 256);
+        re_thread_enter();
         net_rm_address(baresip_network(), &temp_sa);
+        re_thread_leave();
     } else {
         LOGE("invalid ip address %s\n", native_ip);
         res = EAFNOSUPPORT;
@@ -1740,18 +1722,12 @@ Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring 
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_net_1unset_1address(JNIEnv *env, jobject thiz, jint javaAf) {
-    struct sa temp_sa;
-    LOGD("unsetting AF '%d' address\n", javaAf);
-    sa_init(&temp_sa, javaAf);
-    net_set_address(baresip_network(), &temp_sa);
-}
-
-JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg,
         jboolean reinvite) {
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
+    re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL
