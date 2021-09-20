@@ -338,7 +338,7 @@ class ConfigActivity : AppCompatActivity() {
                         Config.addLine("dyn_dns yes")
                         Config.updateDnsServers(BaresipService.dnsServers)
                     }
-                    Api.net_debug()
+                    // Api.net_dns_debug()
                     save = true
                 }
 
