@@ -1107,14 +1107,13 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        if (am.mode == AudioManager.MODE_RINGTONE) {
+        if (am.mode == AudioManager.MODE_RINGTONE)
             abandonAudioFocus()
-            if ((VERSION.SDK_INT < 28) && (rtTimer != null)) {
-                rtTimer!!.cancel()
-                rtTimer = null
-            }
-            rt.stop()
+        if ((VERSION.SDK_INT < 28) && (rtTimer != null)) {
+            rtTimer!!.cancel()
+            rtTimer = null
         }
+        rt.stop()
     }
 
     private fun setCallVolume() {
