@@ -1,0 +1,2 @@
+- Added limited support for multiple simultaneously active network interfaces
+- Show notification when baresip is started without network access
