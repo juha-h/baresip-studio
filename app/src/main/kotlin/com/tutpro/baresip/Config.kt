@@ -11,8 +11,6 @@ object Config {
 
     fun initialize() {
 
-        Log.d(TAG, "Config is '$config'")
-
         config = config.replace("module_tmp uuid.so", "module uuid.so")
 
         config = config.replace("module_tmp account.so", "module_app account.so")
