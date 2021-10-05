@@ -5,19 +5,9 @@
 #include <stdlib.h>
 #include <re.h>
 #include <baresip.h>
+#include "logger.h"
 
-#define LOGD(...) \
-    if (log_level_get() < LEVEL_INFO) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGI(...) \
-    if (log_level_get() < LEVEL_WARN) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGW(...) \
-    if (log_level_get() < LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
-#define LOGE(...) \
-    if (log_level_get() <= LEVEL_ERROR) ((void)__android_log_print(ANDROID_LOG_DEBUG, "Baresip Lib", __VA_ARGS__))
-
+#define LOG_TAG "Baresip Lib"
 
 typedef struct baresip_context {
     JavaVM  *javaVM;
@@ -202,6 +192,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call answered", prm);
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
+            if (strcmp(prm, "offer") == 0)
+                return;
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
         case UA_EVENT_CALL_RINGING:
@@ -436,22 +428,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_VERSION_1_6;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring javaIp);
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers);
-
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance,
-        jstring jPath, jstring jIpAddrs, jstring jNetInterface, jint jNetAf, jint jLogLevel) {
+Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring jPath,
+                                                    jstring jAddrs, jint jLogLevel) {
 
     LOGI("starting baresip\n");
-
-    const char *net_interface = (*env)->GetStringUTFChars(env, jNetInterface, 0);
-    const int net_af = jNetAf;
-
-    const char *ip_addrs = (*env)->GetStringUTFChars(env, jIpAddrs, 0);
 
     char start_error[64] = "";
 
@@ -468,6 +449,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
+    const char *addrs = (*env)->GetStringUTFChars(env, jAddrs, 0);
     struct le *le;
 
     runLoggingThread();
@@ -487,15 +469,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    if (strlen(net_interface) > 0) {
-        struct config *theconf = conf_config();
-        str_ncpy(theconf->net.ifname, net_interface,
-             sizeof(theconf->net.ifname));
-    }
-
-    if (net_af != AF_UNSPEC)
-        conf_config()->net.af = net_af;
-
     err = baresip_init(conf_config());
     if (err) {
         LOGW("baresip_init() failed (%d)\n", err);
@@ -503,20 +476,21 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    if (strlen(ip_addrs) > 0) {
-        char* addr_list = (char*)malloc(strlen(ip_addrs));
+    if (strlen(addrs) > 0) {
+        char* addr_list = (char*)malloc(strlen(addrs));
         struct sa temp_sa;
         char buf[256];
         net_flush_addresses(baresip_network());
-        strcpy(addr_list, ip_addrs);
+        strcpy(addr_list, addrs);
         char *ptr = strtok(addr_list, ";");
         while (ptr != NULL) {
-            LOGI("adding address '%s'", ptr);
             if (0 == sa_set_str(&temp_sa, ptr, 0)) {
                 sa_ntop(&temp_sa, buf, 256);
-                net_add_address(baresip_network(), &temp_sa);
+                ptr = strtok(NULL, ";");
+                net_add_address_ifname(baresip_network(), &temp_sa, ptr);
             } else {
                 LOGE("invalid ip address %s\n", ptr);
+                ptr = strtok(NULL, ";");
                 res = EAFNOSUPPORT;
             }
             ptr = strtok(NULL, ";");
@@ -524,7 +498,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         free(addr_list);
     }
 
-    net_debug_log();
+    // net_debug_log();
 
     play_set_path(baresip_player(), path);
 
@@ -572,7 +546,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         (*env)->DeleteLocalRef(env, javaUA);
     }
 
-    LOGI("allocating mqeue\n");
     err = mqueue_alloc(&mq, mqueue_handler, NULL);
     if (err) {
         LOGW("mqueue_alloc failed (%d)\n", err);
@@ -1674,26 +1647,25 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1add_1address(JNIEnv *env, jobject thiz, jstring javaIp) {
-    const char *native_ip = (*env)->GetStringUTFChars(env, javaIp, 0);
+Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(JNIEnv *env, jobject thiz, jstring jAddr,
+                                                     jstring jIfName) {
+    const char *addr = (*env)->GetStringUTFChars(env, jAddr, 0);
+    const char *name = (*env)->GetStringUTFChars(env, jIfName, 0);
     int res = 0;
     struct sa temp_sa;
     char buf[256];
-    LOGI("adding address '%s'\n", native_ip);
-    if (str_len(native_ip) == 0) {
-        (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
-        return 0;
-    }
-    if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
+    LOGD("adding address/ifname '%s/%s'\n", addr, name);
+    if (0 == sa_set_str(&temp_sa, addr, 0)) {
         sa_ntop(&temp_sa, buf, 256);
         re_thread_enter();
-        net_add_address(baresip_network(), &temp_sa);
+        res = net_add_address_ifname(baresip_network(), &temp_sa, name);
         re_thread_leave();
     } else {
-        LOGE("invalid ip address %s\n", native_ip);
+        LOGE("invalid ip address %s\n", addr);
         res = EAFNOSUPPORT;
     }
-    (*env)->ReleaseStringUTFChars(env, javaIp, native_ip);
+    (*env)->ReleaseStringUTFChars(env, jAddr, addr);
+    (*env)->ReleaseStringUTFChars(env, jIfName, name);
     return res;
 }
 
@@ -1711,7 +1683,7 @@ Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring 
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
         sa_ntop(&temp_sa, buf, 256);
         re_thread_enter();
-        net_rm_address(baresip_network(), &temp_sa);
+        res = net_rm_address(baresip_network(), &temp_sa);
         re_thread_leave();
     } else {
         LOGE("invalid ip address %s\n", native_ip);

@@ -495,4 +495,5 @@
     </string>
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>
+    <string name="no_network">Ei verkkoyhteyttä!</string>
 </resources>

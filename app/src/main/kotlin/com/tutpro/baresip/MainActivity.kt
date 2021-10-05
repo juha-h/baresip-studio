@@ -21,6 +21,8 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import android.content.Intent
+import android.content.BroadcastReceiver
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -330,8 +332,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val latest = CallHistory.aorLatestHistory(aor)
                     if (latest != null)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(latest.peerUri),
-                                Utils.aorDomain(ua.account.aor)))
+                        callUri.setText(
+                            Utils.friendlyUri(
+                                ContactsActivity.contactName(latest.peerUri),
+                                Utils.aorDomain(ua.account.aor)
+                            )
+                        )
                 }
             }
         }
@@ -707,8 +713,14 @@ class MainActivity : AppCompatActivity() {
             "accounts" -> {
                 resumeAction = "accounts"
             }
+            "no network" -> {
+                Utils.alertView(this, getString(R.string.notice),
+                    getString(R.string.no_network))
+                return
+            }
             "call" -> {
                 if (Call.calls().isNotEmpty()) {
+
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return

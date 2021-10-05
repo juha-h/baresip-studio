@@ -448,4 +448,5 @@
     <string name="no_video_calls">Grant \"Camera\" permission to place or answer video calls.</string>
     <string name="no_cameras">You don\'t have any supported video cameras.</string>
     <string name="show_password">Show Password</string>
+    <string name="no_network">No network connection!</string>
 </resources>
