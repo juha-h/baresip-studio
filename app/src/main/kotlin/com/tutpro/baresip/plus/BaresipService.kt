@@ -20,6 +20,8 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RemoteViews
+import android.content.Intent
+import android.content.BroadcastReceiver
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
@@ -50,15 +52,18 @@ class BaresipService: Service() {
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
-    private lateinit var br: BroadcastReceiver
+    private lateinit var bluetoothReceiver: BroadcastReceiver
+    private lateinit var hotSpotReceiver: BroadcastReceiver
 
     private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
     private var origVolume = -1
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
-    private var linkAddresses = mutableListOf<LinkAddress>()
+    private var hotSpotIsEnabled = false
+    private var hotSpotAddresses = mapOf<String, String>()
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -104,21 +109,35 @@ class BaresipService: Service() {
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        Log.i(TAG, "Network $network is available")
-                        updateNetwork()
+                        Log.d(TAG, "Network $network is available")
+                        // If API >= 26, this will be followed by onCapabilitiesChanged
+                        if (isServiceRunning && VERSION.SDK_INT < 26)
+                            updateNetwork()
+                    }
+
+                    override fun onLosing(network: Network, maxMsToLive: Int) {
+                        super.onLosing(network, maxMsToLive)
+                        Log.d(TAG, "Network $network is losing after $maxMsToLive ms")
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        Log.i(TAG, "Network $network is lost")
-                        if (activeNetwork == network)
+                        Log.d(TAG, "Network $network is lost")
+                        if (isServiceRunning)
+                            updateNetwork()
+                    }
+
+                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                        super.onCapabilitiesChanged(network, caps)
+                        Log.d(TAG, "Network $network capabilities changed: $caps")
+                        if (isServiceRunning)
                             updateNetwork()
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
-                        Log.i(TAG, "Network $network link properties changed")
-                        if (activeNetwork == network)
+                        Log.d(TAG, "Network $network link properties changed: $props")
+                        if (isServiceRunning)
                             updateNetwork()
                     }
 
@@ -126,6 +145,55 @@ class BaresipService: Service() {
         )
 
         wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        hotSpotIsEnabled = Utils.isHotSpotOn(wm)
+
+        hotSpotReceiver = object : BroadcastReceiver() {
+            override fun onReceive(contxt: Context, intent: Intent) {
+                val action = intent.action
+                if ("android.net.wifi.WIFI_AP_STATE_CHANGED" == action) {
+                    val state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0)
+                    if (WifiManager.WIFI_STATE_ENABLED == state % 10) {
+                        if (hotSpotIsEnabled) {
+                            Log.d(TAG, "HotSpot is still enabled")
+                        } else {
+                            Log.d(TAG, "HotSpot is enabled")
+                            hotSpotIsEnabled = true
+                            Timer().schedule(1000) {
+                                hotSpotAddresses = Utils.hotSpotAddresses()
+                                Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
+                                if (hotSpotAddresses.isNotEmpty()) {
+                                    for ((k, v) in hotSpotAddresses)
+                                        if (Api.net_add_address_ifname(k, v) != 0)
+                                            Log.e(TAG, "Failed to add $v address $k")
+                                    Timer().schedule(2000) {
+                                        Api.uag_reset_transp(register = true, reinvite = false)
+                                    }
+                                } else {
+                                    Log.w(TAG, "Could not get hotspot addresses")
+                                }
+                            }
+                        }
+                    } else {
+                        if (!hotSpotIsEnabled) {
+                            Log.d(TAG, "HotSpot is still disabled")
+                        } else {
+                            Log.d(TAG, "HotSpot is disabled")
+                            hotSpotIsEnabled = false
+                            if (hotSpotAddresses.isNotEmpty()) {
+                                for ((k, _) in hotSpotAddresses)
+                                    if (Api.net_rm_address(k) != 0)
+                                        Log.e(TAG, "Failed to remove address $k")
+                                hotSpotAddresses = mapOf()
+                                Api.uag_reset_transp(register = true, reinvite = false)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.registerReceiver(hotSpotReceiver,
+            IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
@@ -135,7 +203,7 @@ class BaresipService: Service() {
         wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
         wifiLock.setReferenceCounted(false)
 
-        br = object : BroadcastReceiver() {
+        bluetoothReceiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 when (intent.action) {
                     BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
@@ -208,7 +276,7 @@ class BaresipService: Service() {
             filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
             filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
             filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
-            this.registerReceiver(br, filter)
+            this.registerReceiver(bluetoothReceiver, filter)
         }
 
         super.onCreate()
@@ -232,26 +300,12 @@ class BaresipService: Service() {
 
             "Start" -> {
 
-                var ipAddrs = ""
-                for (n in cm.allNetworks) {
-                    val props = cm.getLinkProperties(n)
-                    if (props != null) {
-                        for (a in props.linkAddresses)
-                            linkAddresses.add(a)
-                        val addrs = Utils.hostAddresses(props.linkAddresses)
-                        if (addrs != "") {
-                            if (ipAddrs == "")
-                                ipAddrs = addrs
-                            else
-                                ipAddrs += ";$addrs"
-                        }
-                    }
-                }
-
                 updateDnsServers()
 
-                val assets = arrayOf("accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
-                        "error.wav", "ringback.wav")
+                val assets = arrayOf(
+                    "accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
+                    "error.wav", "ringback.wav"
+                )
                 var file = File(filesPath)
                 if (!file.exists()) {
                     Log.d(TAG, "Creating baresip directory")
@@ -282,13 +336,15 @@ class BaresipService: Service() {
                 CallHistory.restore()
                 Message.restore()
 
-                if (ipAddrs == "")
-                    Log.w(TAG, "Starting baresip without IP addresses")
+                linkAddresses = linkAddresses()
+                var addrs = ""
+                for (la in linkAddresses)
+                    addrs = "$addrs;${la.key};${la.value}"
+
+                Log.d(TAG, "Link addresses: $addrs")
 
                 Thread {
-                    baresipStart(
-                        filesPath, ipAddrs, "", Api.AF_UNSPEC, logLevel
-                    )
+                    baresipStart(filesPath, addrs.removePrefix(";"), logLevel)
                 }.start()
 
                 isServiceRunning = true
@@ -297,11 +353,22 @@ class BaresipService: Service() {
 
                 if (AccountsActivity.noAccounts()) {
                     val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                            Intent.FLAG_ACTIVITY_NEW_TASK
+                    newIntent.flags =
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                Intent.FLAG_ACTIVITY_NEW_TASK
                     newIntent.putExtra("action", "accounts")
                     startActivity(newIntent)
                 }
+
+                if (linkAddresses.isEmpty()) {
+                    val newIntent = Intent(this, MainActivity::class.java)
+                    newIntent.flags =
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                    newIntent.putExtra("action", "no network")
+                    startActivity(newIntent)
+                }
+
             }
 
             "Call Reject" -> {
@@ -337,8 +404,10 @@ class BaresipService: Service() {
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
-                    ChatsActivity.saveUaMessage(ua.account.aor,
-                            intent.getStringExtra("time")!!.toLong())
+                    ChatsActivity.saveUaMessage(
+                        ua.account.aor,
+                        intent.getStringExtra("time")!!.toLong()
+                    )
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -348,8 +417,10 @@ class BaresipService: Service() {
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
-                    ChatsActivity.deleteUaMessage(ua.account.aor,
-                            intent.getStringExtra("time")!!.toLong())
+                    ChatsActivity.deleteUaMessage(
+                        ua.account.aor,
+                        intent.getStringExtra("time")!!.toLong()
+                    )
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -380,7 +451,8 @@ class BaresipService: Service() {
     override fun onDestroy() {
         Log.d(TAG, "At Baresip Service onDestroy")
         super.onDestroy()
-        this.unregisterReceiver(br)
+        this.unregisterReceiver(bluetoothReceiver)
+        this.unregisterReceiver(hotSpotReceiver)
         if (am.isBluetoothScoOn) am.stopBluetoothSco()
         cleanService()
         if (isServiceRunning) {
@@ -840,6 +912,7 @@ class BaresipService: Service() {
     @Keep
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
+        Api.net_debug()
         val intent = Intent("service event")
         intent.putExtra("event", "started")
         intent.putExtra("params", arrayListOf(callActionUri))
@@ -1128,56 +1201,87 @@ class BaresipService: Service() {
     }
 
     private fun updateNetwork() {
+
+        if (!isServiceRunning)
+            return
+
         /* for (n in cm.allNetworks)
-            Log.i(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
+            Log.d(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
                     "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}") */
-        activeNetwork = cm.activeNetwork
+
+        updateDnsServers()
+
+        val lnAddrs = linkAddresses()
+
+        Log.d(TAG, "Old/new link addresses $linkAddresses/$lnAddrs")
+
+        var added = 0
+        for (a in lnAddrs)
+            if (!linkAddresses.containsKey(a.key)) {
+                if (Api.net_add_address_ifname(a.key, a.value) != 0)
+                    Log.e(TAG, "Failed to add address: $a")
+                else
+                    added++
+            }
+        var removed = 0
+        for (a in linkAddresses)
+            if (!lnAddrs.containsKey(a.key)) {
+                if (Api.net_rm_address(a.key) != 0)
+                    Log.e(TAG, "Failed to remove address: $a")
+                else
+                    removed++
+            }
+
+        val active = cm.activeNetwork
+        Log.d(TAG, "Added/Removed/Active = $added/$removed/$active")
+
+        if (added > 0 || removed > 0 || active != activeNetwork) {
+            linkAddresses = lnAddrs
+            activeNetwork = active
+            Api.uag_reset_transp(register = true, reinvite = true)
+        }
+
+        Api.net_debug()
+
         if (activeNetwork != null) {
-            val linkCaps = cm.getNetworkCapabilities(activeNetwork)
-            val linkProps = cm.getLinkProperties(activeNetwork)
-            Log.d(TAG, "Using active network $activeNetwork with caps: $linkCaps, props: $linkProps")
-            val lnAddrs = mutableListOf<LinkAddress>()
-            for (n in cm.allNetworks) {
-                val props = cm.getLinkProperties(n)
-                if (props != null)
-                    for (a in props.linkAddresses)
-                        lnAddrs.add(a)
-            }
-            var addrUpdate = false
-            for (a in lnAddrs)
-                if (!linkAddresses.contains(a)) {
-                    Api.net_add_address(a.address.hostAddress)
-                    addrUpdate = true
-                }
-            for (a in linkAddresses)
-                if (!lnAddrs.contains(a)) {
-                    Api.net_rm_address(a.address.hostAddress)
-                    addrUpdate = true
-                }
-            val dnsUpdate = updateDnsServers()
-            if (addrUpdate) {
-                linkAddresses = lnAddrs
-                Api.uag_reset_transp(register = true, reinvite = true)
-            } else {
-                if (dnsUpdate)
-                    UserAgent.register()
-            }
-            if (linkCaps != null && linkCaps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            val caps = cm.getNetworkCapabilities(activeNetwork)
+            if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                 Log.d(TAG, "Acquiring WiFi Lock")
                 wifiLock.acquire()
-            } else {
-                Log.d(TAG, "Releasing WiFi Lock")
-                wifiLock.release()
+                return
             }
-        } else
-            Log.w(TAG, "No active network")
+        }
+        Log.d(TAG, "Releasing WiFi Lock")
+        wifiLock.release()
     }
 
-    private fun updateDnsServers(): Boolean {
+    private fun linkAddresses(): MutableMap<String, String> {
+        val lnAddrs = mutableMapOf<String, String>()
+        for (n in cm.allNetworks) {
+            val caps = cm.getNetworkCapabilities(n) ?: continue
+            if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND) ||
+                VERSION.SDK_INT < 28) {
+                val props = cm.getLinkProperties(n) ?: continue
+                for (la in props.linkAddresses)
+                    if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
+                        props.interfaceName != null)
+                        lnAddrs[la.address.hostAddress] = props.interfaceName!!
+            }
+        }
+        if (hotSpotIsEnabled) {
+            hotSpotAddresses = Utils.hotSpotAddresses()
+            Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
+            for ((k, v) in hotSpotAddresses)
+                lnAddrs[k] = v
+        }
+        return lnAddrs
+    }
+
+    private fun updateDnsServers() {
         if (isServiceRunning && !dynDns)
-            return false
+            return
         val servers = mutableListOf<InetAddress>()
-        // Use DNS servers first from active network (if given)
+        // Use DNS servers first from active network (if available)
         for (n in cm.allNetworks)
             if (n == cm.activeNetwork) {
                 val linkProps = cm.getLinkProperties(n)
@@ -1201,10 +1305,8 @@ class BaresipService: Service() {
             } else {
                 // Log.d(TAG, "Updated DNS servers: '${servers}'")
                 dnsServers = servers
-                return true
             }
         }
-        return false
     }
 
     private fun cleanService() {
@@ -1225,9 +1327,7 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    private external fun baresipStart(path: String, ipAddrs: String, netInterface: String,
-                                      netAf: Int, logLevel: Int)
-
+    private external fun baresipStart(path: String, addrs: String, logLevel: Int)
     private external fun baresipStop(force: Boolean)
 
     companion object {

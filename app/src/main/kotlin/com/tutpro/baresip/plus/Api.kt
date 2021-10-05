@@ -81,8 +81,7 @@ object Api {
     external fun log_level_set(level: Int)
 
     external fun net_use_nameserver(servers: String): Int
-    external fun net_set_address(ip_addr: String): Int
-    external fun net_add_address(ip_addr: String): Int
+    external fun net_add_address_ifname(ip_addr: String, if_name: String): Int
     external fun net_rm_address(ip_addr: String): Int
     external fun net_unset_address(af: Int)
     external fun net_debug()

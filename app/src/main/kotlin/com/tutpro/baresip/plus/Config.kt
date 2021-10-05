@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
-
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 

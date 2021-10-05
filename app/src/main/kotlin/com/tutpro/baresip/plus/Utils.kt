@@ -15,6 +15,7 @@ import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.net.*
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -32,9 +33,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.*
+import java.lang.reflect.Method
 import java.security.SecureRandom
 import java.util.*
 import java.util.zip.*
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -111,10 +116,14 @@ object Utils {
         var u = uri
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
+        u = u.replace(":5060", "")
+        u = u.replace(";transport=udp", "", true)
+        if (u.split(":").size == 3 || uriParams(u).isNotEmpty())
+            return u
         return if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (isE164Number(user) || (host == domain))
+            if (isE164Number(user) || host == domain)
                 user
             else
                 "$user@$host"
@@ -282,17 +291,6 @@ object Utils {
         return true
     }
 
-    fun hostAddresses(list: List<LinkAddress>?): String {
-        var result = ""
-        if (list != null) for (la in list)
-            if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE)
-                if (result == "")
-                    result = la.address.hostAddress
-                else
-                    result += ";" + la.address.hostAddress
-        return result
-    }
-
     fun implode(list: List<String>, sep: String): String {
         var res = ""
         for (s in list) {
@@ -308,6 +306,39 @@ object Utils {
         val appProcessInfo = ActivityManager.RunningAppProcessInfo()
         ActivityManager.getMyMemoryState(appProcessInfo)
         return appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+    }
+
+    fun isHotSpotOn(wm: WifiManager): Boolean {
+        try {
+            val method: Method = wm.javaClass.getDeclaredMethod("isWifiApEnabled")
+            method.isAccessible = true
+            return method.invoke(wm) as Boolean
+        } catch (ignored: Throwable) {
+        }
+        return false
+    }
+
+    fun hotSpotAddresses(): Map<String, String> {
+        val result = mutableMapOf<String, String>()
+        try {
+            val interfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val iface: NetworkInterface = interfaces.nextElement()
+                val ifName = iface.name
+                if (ifName.startsWith("ap") || ifName.startsWith("wlan")) {
+                    val addresses: Enumeration<InetAddress> = iface.inetAddresses
+                    while (addresses.hasMoreElements()) {
+                        val inetAddress: InetAddress = addresses.nextElement()
+                        if (!inetAddress.isLoopbackAddress && !inetAddress.isLinkLocalAddress)
+                            result[inetAddress.hostAddress] = ifName
+                    }
+                    if (result.isNotEmpty()) return result
+                }
+            }
+        } catch (ex: SocketException) {
+            Log.e(TAG, ex.toString())
+        }
+        return result
     }
 
     fun dtmfWatcher(callp: String): TextWatcher {
