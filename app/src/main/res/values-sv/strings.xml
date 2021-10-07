@@ -250,4 +250,5 @@
     <string name="backup_failed">Kunde inte säkerhetskopiera programdata till filen \'%1$s\'. Kontrollera Appar → baresip → Behörigheter → Lagring.</string>
     <string name="backed_up">Programdata har säkerhetskopierats till filen \'%1$s\'. I Android 9 och tidigare versioner återfinns filen i katalogen Nedladdningar.</string>
     <string name="callee">Motpart</string>
+    <string name="no_network">Inget nätverk tillgängligt!</string>
 </resources>
