@@ -1214,8 +1214,8 @@ class BaresipService: Service() {
         val lnAddrs = mutableMapOf<String, String>()
         for (n in cm.allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
-            if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND) ||
-                VERSION.SDK_INT < 28) {
+            if (VERSION.SDK_INT < 28 ||
+                caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
                     val props = cm.getLinkProperties(n) ?: continue
                     for (la in props.linkAddresses)
                         if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
