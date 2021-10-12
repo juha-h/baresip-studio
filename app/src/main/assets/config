@@ -36,7 +36,7 @@ module vp9.so
 module vp8.so
 module avcodec.so
 module avformat.so
-module webrtc_aec.so
+module webrtc_aecm.so
 module selfview.so
 module snapshot.so
 module stun.so

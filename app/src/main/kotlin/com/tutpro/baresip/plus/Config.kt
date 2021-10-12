@@ -15,6 +15,8 @@ object Config {
 
         config = config.replace("module_tmp account.so", "module_app account.so")
 
+        config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
+
         if (BaresipService.cameraAvailable) {
             if (!config.contains("module avformat.so")) {
                 addModuleLine("module avformat.so")
@@ -72,8 +74,6 @@ object Config {
         }
 
         removeLine("avcodec")
-
-        removeLine("module ilbc.so")
 
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
