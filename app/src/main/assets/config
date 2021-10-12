@@ -27,7 +27,7 @@ module g7221.so
 module g726.so
 module g729.so
 module g711.so
-module webrtc_aec.so
+module webrtc_aecm.so
 module opensles.so
 module stun.so
 module turn.so

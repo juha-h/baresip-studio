@@ -15,6 +15,8 @@ object Config {
 
         config = config.replace("module_tmp account.so", "module_app account.so")
 
+        config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
+
         if (!config.contains(Regex("ausrc_format s16"))) {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aec.so\n"
         }
