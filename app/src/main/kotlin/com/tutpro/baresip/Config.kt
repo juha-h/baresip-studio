@@ -61,10 +61,6 @@ object Config {
             BaresipService.logLevel = ll
         }
 
-        if (config.contains("net_interface")) {
-           BaresipService.netInterface = variable("net_interface")[0]
-        }
-
         if (!config.contains("call_volume")) {
             config = "${config}call_volume 0\n"
         } else {
@@ -89,8 +85,6 @@ object Config {
             config = "${config}jitter_buffer_type adaptive\n"
             config = "${config}jitter_buffer_wish 6\n"
         }
-
-        removeLine("module ilbc.so")
 
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true

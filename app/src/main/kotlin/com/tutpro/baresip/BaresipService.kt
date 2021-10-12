@@ -1332,7 +1332,6 @@ class BaresipService: Service() {
         var isServiceClean = false
         var callVolume = 0
         var dynDns = false
-        var netInterface = ""
         var filesPath = ""
         var logLevel = 2
         var sipTrace = false
