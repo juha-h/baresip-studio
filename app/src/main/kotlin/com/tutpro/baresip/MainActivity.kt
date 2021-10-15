@@ -796,6 +796,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "Main onResume with action '$resumeAction'")
+        nm.cancelAll()
         visible = true
         when (resumeAction) {
             "call show" ->
