@@ -794,20 +794,30 @@ class BaresipService: Service() {
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             nb.setSmallIcon(R.drawable.ic_stat)
-                                    .setColor(ContextCompat.getColor(this,
-                                            R.color.colorBaresip))
-                                    .setContentIntent(pi)
-                                    .setCategory(Notification.CATEGORY_CALL)
-                                    .setAutoCancel(true)
-                                    .setContentTitle(getString(R.string.missed_call_from))
+                                .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                                .setContentIntent(pi)
+                                .setCategory(Notification.CATEGORY_CALL)
+                                .setAutoCancel(true)
+                            var missedCalls = 0
+                            for (notification in nm.activeNotifications)
+                                if (notification.id == CALL_MISSED_NOTIFICATION_ID)
+                                    missedCalls++
+                            if (missedCalls == 0) {
+                                nb.setContentTitle(getString(R.string.missed_call_from))
                                     .setContentText(caller)
+                            } else {
+                                nb.setContentTitle(getString(R.string.missed_calls))
+                                    .setContentText(
+                                        String.format(getString(R.string.missed_calls_count),
+                                            missedCalls + 1))
+                            }
                             if (VERSION.SDK_INT < 26) {
                                 @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .priority = Notification.PRIORITY_HIGH
+                                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                    .priority = Notification.PRIORITY_HIGH
                             }
-                            nm.notify(CALL_NOTIFICATION_ID, nb.build())
+                            nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
                             return
                         }
                     }
@@ -1330,26 +1340,6 @@ class BaresipService: Service() {
     private external fun baresipStop(force: Boolean)
 
     companion object {
-
-        const val STATUS_NOTIFICATION_ID = 101
-        const val CALL_NOTIFICATION_ID = 102
-        const val TRANSFER_NOTIFICATION_ID = 103
-        const val MESSAGE_NOTIFICATION_ID = 104
-
-        const val STATUS_REQ_CODE = 1
-        const val CALL_REQ_CODE = 2
-        const val ANSWER_REQ_CODE = 3
-        const val REJECT_REQ_CODE = 4
-        const val TRANSFER_REQ_CODE = 5
-        const val ACCEPT_REQ_CODE = 6
-        const val DENY_REQ_CODE = 7
-        const val MESSAGE_REQ_CODE = 8
-        const val REPLY_REQ_CODE = 9
-        const val SAVE_REQ_CODE = 10
-        const val DELETE_REQ_CODE = 11
-
-        const val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.plus.default"
-        const val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
         var isServiceRunning = false
         var isConfigInitialized = false
