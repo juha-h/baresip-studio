@@ -220,6 +220,8 @@
     <string name="reject">Reject</string>
     <string name="incoming_call_from">Incoming call from</string>
     <string name="missed_call_from">Missed call from</string>
+    <string name="missed_calls">Missed calls</string>
+    <string name="missed_calls_count">%1$d missed calls</string>
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="message_from">Message from</string>
     <!-- Boot Completed Receiver -->

@@ -242,6 +242,8 @@
     <string name="reject">Hylkää</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
     <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
+    <string name="missed_calls">Vastaamattomia puheluita</string>
+    <string name="missed_calls_count">%1$d vastaamatonta puhelua</string>
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
     <!-- Boot Completed Receiver -->
