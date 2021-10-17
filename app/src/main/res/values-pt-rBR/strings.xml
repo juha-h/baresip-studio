@@ -251,4 +251,6 @@
     <string name="reset_config_alert">Tem certeza de que deseja redefinir as configurações para os valores predefinidos de fábrica\?</string>
     <string name="mic">Microfone ligado/desligado</string>
     <string name="no_network">Nenhuma conexão de rede!</string>
+    <string name="missed_calls_count">%1$d chamadas perdidas</string>
+    <string name="missed_calls">Chamadas perdidas</string>
 </resources>
