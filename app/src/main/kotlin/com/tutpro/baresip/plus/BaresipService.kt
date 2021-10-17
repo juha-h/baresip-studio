@@ -599,22 +599,23 @@ class BaresipService: Service() {
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val caller = Utils.friendlyUri(ContactsActivity.contactName(peerUri),
                                     Utils.aorDomain(aor))
-                            nb.setSmallIcon(R.drawable.ic_stat)
-                                    .setColor(ContextCompat.getColor(this,
-                                            R.color.colorBaresip))
-                                    .setContentIntent(pi)
-                                    .setCategory(Notification.CATEGORY_CALL)
-                                    .setAutoCancel(true)
-                                    .setOngoing(true)
-                                    .setContentTitle(getString(R.string.incoming_call_from))
-                                    .setContentText(caller)
-                                    .setShowWhen(true)
-                                    .setFullScreenIntent(pi, true)
-                            if (VERSION.SDK_INT < 26)
+                            nb.setSmallIcon(R.drawable.ic_stat_call)
+                                .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                                .setContentIntent(pi)
+                                .setCategory(Notification.CATEGORY_CALL)
+                                .setAutoCancel(true)
+                                .setOngoing(true)
+                                .setContentTitle(getString(R.string.incoming_call_from))
+                                .setContentText(caller)
+                                .setWhen(System.currentTimeMillis())
+                                .setShowWhen(true)
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                .setFullScreenIntent(pi, true)
+                            if (VERSION.SDK_INT < 26) {
                                 @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .priority = Notification.PRIORITY_HIGH
+                                    .priority = Notification.PRIORITY_HIGH
+                            }
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                             answerIntent.putExtra("action", "call answer")
                                 .putExtra("callp", callp)
@@ -625,9 +626,9 @@ class BaresipService: Service() {
                             rejectIntent.putExtra("callp", callp)
                             val rpi = PendingIntent.getService(this, REJECT_REQ_CODE, rejectIntent,
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat,
+                            nb.addAction(R.drawable.ic_stat_call,
                                 getActionText(R.string.answer, R.color.colorGreen), api)
-                            nb.addAction(R.drawable.ic_stat,
+                            nb.addAction(R.drawable.ic_stat_call_end,
                                 getActionText(R.string.reject, R.color.colorRed), rpi)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
@@ -728,7 +729,7 @@ class BaresipService: Service() {
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
                                     Utils.aorDomain(aor))
-                            nb.setSmallIcon(R.drawable.ic_stat)
+                            nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
                                     .setDefaults(Notification.DEFAULT_SOUND)
@@ -753,8 +754,8 @@ class BaresipService: Service() {
                             denyIntent.putExtra("callp", callp)
                             val dpi = PendingIntent.getService(this, DENY_REQ_CODE, denyIntent,
                                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.accept), api)
-                            nb.addAction(R.drawable.ic_stat, getString(R.string.deny), dpi)
+                            nb.addAction(R.drawable.ic_stat_call, getString(R.string.accept), api)
+                            nb.addAction(R.drawable.ic_stat_call_end, getString(R.string.deny), dpi)
                             nm.notify(TRANSFER_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -793,7 +794,7 @@ class BaresipService: Service() {
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            nb.setSmallIcon(R.drawable.ic_stat)
+                            nb.setSmallIcon(R.drawable.ic_stat_phone_missed)
                                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                 .setContentIntent(pi)
                                 .setCategory(Notification.CATEGORY_CALL)
@@ -873,7 +874,7 @@ class BaresipService: Service() {
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
             val sender = Utils.friendlyUri(ContactsActivity.contactName(peer),
                     Utils.aorDomain(ua.account.aor))
-            nb.setSmallIcon(R.drawable.ic_stat)
+            nb.setSmallIcon(R.drawable.ic_stat_message)
                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                     .setContentIntent(pi)
                     .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
@@ -904,9 +905,9 @@ class BaresipService: Service() {
                     .putExtra("time", timeStamp)
             val dpi = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            nb.addAction(R.drawable.ic_stat, "Reply", rpi)
-            nb.addAction(R.drawable.ic_stat, "Save", spi)
-            nb.addAction(R.drawable.ic_stat, "Delete", dpi)
+            nb.addAction(R.drawable.ic_stat_reply, "Reply", rpi)
+            nb.addAction(R.drawable.ic_stat_save, "Save", spi)
+            nb.addAction(R.drawable.ic_stat_delete, "Delete", dpi)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
         } else {
