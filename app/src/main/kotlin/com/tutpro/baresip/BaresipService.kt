@@ -1006,7 +1006,10 @@ class BaresipService: Service() {
         else
             contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
         snb.setContent(contentView)
-        nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+        // Don't know why, but without the delay the notification is not always updated
+        Timer().schedule(250) {
+            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+        }
     }
 
     private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
