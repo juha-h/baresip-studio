@@ -251,4 +251,6 @@
     <string name="backed_up">Programdata har säkerhetskopierats till filen \'%1$s\'. I Android 9 och tidigare versioner återfinns filen i katalogen Nedladdningar.</string>
     <string name="callee">Motpart</string>
     <string name="no_network">Inget nätverk tillgängligt!</string>
+    <string name="missed_calls">Missade samtal</string>
+    <string name="missed_calls_count">%1$d missade samtal</string>
 </resources>
