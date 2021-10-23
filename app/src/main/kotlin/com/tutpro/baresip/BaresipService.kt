@@ -56,7 +56,7 @@ class BaresipService: Service() {
     private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
-    private var origVolume = -1
+    private var origVolume = mutableMapOf<Int, Int>()
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
@@ -1134,23 +1134,26 @@ class BaresipService: Service() {
     }
 
     private fun setCallVolume() {
-        if (callVolume != 0 && origVolume == -1) {
-            val streamType = AudioManager.STREAM_VOICE_CALL
-            origVolume = am.getStreamVolume(streamType)
-            am.setStreamVolume(streamType,
-                (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
-                0)
-            Log.d(TAG, "Orig/new call volume is $origVolume/${am.getStreamVolume(streamType)}")
+        if (callVolume != 0 && origVolume.isEmpty()) {
+            for (streamType in listOf(AudioManager.STREAM_MUSIC, AudioManager.STREAM_VOICE_CALL)) {
+                origVolume[streamType] = am.getStreamVolume(streamType)
+                am.setStreamVolume(
+                    streamType,
+                    (callVolume * 0.1 * am.getStreamMaxVolume(streamType)).roundToInt(),
+                    0
+                )
+                Log.d(TAG, "Orig/new $streamType volume is " +
+                        "${origVolume[streamType]}/${am.getStreamVolume(streamType)}")
+            }
         }
     }
 
     private fun resetCallVolume() {
-        if (origVolume != -1) {
-            val streamType = AudioManager.STREAM_VOICE_CALL
-            am.setStreamVolume(streamType, origVolume, 0)
-            Log.d(TAG, "Reset volume to ${am.getStreamVolume(streamType)}")
-            origVolume = -1
+        for ((streamType, streamVolume) in origVolume) {
+            am.setStreamVolume(streamType, streamVolume, 0)
+            Log.d(TAG, "Reset $streamType volume to ${am.getStreamVolume(streamType)}")
         }
+        origVolume.clear()
     }
 
     @SuppressLint("WakelockTimeout")
