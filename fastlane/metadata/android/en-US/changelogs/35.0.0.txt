@@ -1,0 +1,6 @@
+- Use WebRTC Acoustic Echo Cancellation Mobile Mode filter
+- Show in notification the number missed calls if more than one
+- When Default Call Volume setting is set, set both media and call volume
+- Cancel notifications when main activity is resumed
+- Fixed stop ringing in older Android versions
+- New Swedish and Portuguese (Brazil) translations
