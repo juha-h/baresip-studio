@@ -83,12 +83,8 @@ class AudioActivity : AppCompatActivity() {
 
         aec = binding.Aec
         val aecCv = Config.variable("module")
-        oldAec = aecCv.contains("webrtc_aec.so")
+        oldAec = aecCv.contains("webrtc_aecm.so")
         aec.isChecked = oldAec
-
-        extendedFilter = binding.ExtendedFilter
-        oldExtendedFilter = Config.variable("webrtc_aec_extended_filter")[0] == "yes"
-        extendedFilter.isChecked = oldExtendedFilter
 
     }
 
@@ -163,28 +159,18 @@ class AudioActivity : AppCompatActivity() {
                 }
 
                 if (aec.isChecked != oldAec) {
-                    Config.removeLine("module webrtc_aec.so")
+                    Config.removeLine("module webrtc_aecm.so")
                     if (aec.isChecked) {
-                        Config.addModuleLine("module webrtc_aec.so")
-                        if (Api.module_load("webrtc_aec.so") != 0) {
+                        Config.addModuleLine("module webrtc_aecm.so")
+                        if (Api.module_load("webrtc_aecm.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.failed_to_load_module))
                             aec.isChecked = false
                             return false
                         }
                     } else {
-                        Api.module_unload("webrtc_aec.so")
+                        Api.module_unload("webrtc_aecm.so")
                     }
-                    save = true
-                }
-
-                if (extendedFilter.isChecked != oldExtendedFilter) {
-                    Config.removeVariable("webrtc_aec_extended_filter")
-                    if (extendedFilter.isChecked)
-                        Config.addLine("webrtc_aec_extended_filter yes")
-                    else
-                        Config.addLine("webrtc_aec_extended_filter no")
-                    reload = true
                     save = true
                 }
 
@@ -231,10 +217,6 @@ class AudioActivity : AppCompatActivity() {
             binding.AecTitle -> {
                 Utils.alertView(this, getString(R.string.aec),
                         getString(R.string.aec_help))
-            }
-            binding.ExtendedFilterTitle -> {
-                Utils.alertView(this, getString(R.string.aec_extended_filter),
-                        getString(R.string.aec_extended_filter_help))
             }
         }
     }
