@@ -123,32 +123,6 @@
             </CheckBox>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp" >
-            <TextView
-                android:id="@+id/ExtendedFilterTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/ExtendedFilter"
-                android:textSize="18sp"
-                android:onClick="onClick"
-                android:text="@string/aec_extended_filter" >
-            </TextView>
-            <CheckBox
-                android:id="@+id/ExtendedFilter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:checked="true" >
-            </CheckBox>
-        </RelativeLayout>
-
     </LinearLayout>
 
 </ScrollView>
