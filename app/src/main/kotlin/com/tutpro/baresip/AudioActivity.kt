@@ -17,7 +17,6 @@ class AudioActivity : AppCompatActivity() {
     private lateinit var opusBitRate: EditText
     private lateinit var opusPacketLoss: EditText
     private lateinit var aec: CheckBox
-    private lateinit var extendedFilter: CheckBox
 
     private var save = false
     private var reload = false
@@ -25,7 +24,6 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
     private var oldAec = false
-    private var oldExtendedFilter = false
     private val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
 
     override fun onCreate(savedInstanceState: Bundle?) {
