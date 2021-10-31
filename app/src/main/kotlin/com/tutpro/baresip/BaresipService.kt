@@ -34,6 +34,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
+import android.media.MediaPlayer
 
 class BaresipService: Service() {
 
@@ -62,6 +63,7 @@ class BaresipService: Service() {
     private var activeNetwork: Network? = null
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
+    private var mediaPlayer: MediaPlayer? = null
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -300,10 +302,7 @@ class BaresipService: Service() {
 
                 updateDnsServers()
 
-                val assets = arrayOf(
-                    "accounts", "config", "contacts", "busy.wav", "callwaiting.wav",
-                    "error.wav", "ringback.wav"
-                )
+                val assets = arrayOf("accounts", "config", "contacts")
                 var file = File(filesPath)
                 if (!file.exists()) {
                     Log.d(TAG, "Creating baresip directory")
@@ -524,6 +523,11 @@ class BaresipService: Service() {
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
+                        if (mediaPlayer == null ) {
+                            mediaPlayer = MediaPlayer.create(this, R.raw.ringback)
+                            mediaPlayer!!.isLooping = true
+                            mediaPlayer!!.start()
+                        }
                         return
                     }
                     "call incoming" -> {
@@ -534,6 +538,7 @@ class BaresipService: Service() {
                                         Manifest.permission.RECORD_AUDIO)) {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
+                            playNTimes(R.raw.callwaiting, 1)
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in", false))
                                 CallHistory.save()
@@ -634,6 +639,7 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopRinging()
+                        stopMediaPlayer()
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -739,6 +745,13 @@ class BaresipService: Service() {
                         }
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
+                        stopMediaPlayer()
+                        when (ev[2]) {
+                            "busy" ->
+                                playNTimes(R.raw.busy, 1)
+                            "error" ->
+                                playNTimes(R.raw.error, 1)
+                        }
                         call.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
@@ -1131,6 +1144,23 @@ class BaresipService: Service() {
             rtTimer = null
         }
         rt.stop()
+    }
+
+    private fun playNTimes(raw: Int, count: Int) {
+        if (mediaPlayer == null ) {
+            mediaPlayer = MediaPlayer.create(this, raw)
+            mediaPlayer!!.setOnCompletionListener {
+                stopMediaPlayer()
+                if (count > 1) playNTimes(raw, count - 1)
+            }
+            mediaPlayer!!.start()
+        }
+    }
+
+    private fun stopMediaPlayer() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     private fun setCallVolume() {

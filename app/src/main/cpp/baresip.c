@@ -18,8 +18,6 @@ typedef struct baresip_context {
 
 BaresipContext g_ctx;
 
-struct play *play = NULL;
-
 static int vprintf_null(const char *p, size_t size, void *arg) {
     (void)p;
     (void)size;
@@ -122,10 +120,10 @@ static const char *ua_event_reg_str(enum ua_event ev)
 static const char *translate_errorcode(uint16_t scode)
 {
 	switch (scode) {
-        case 404: return NULL; /* ignore */
-	    case 486: return "busy.wav";
-	    case 487: return NULL; /* ignore */
-	    default:  return "error.wav";
+        case 404: return ""; /* ignore */
+	    case 486: return "busy";
+	    case 487: return ""; /* ignore */
+	    default:  return "error";
 	}
 }
 
@@ -158,12 +156,11 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 {
     (void)arg;
     const char *event;
+    const char *tone;
     char event_buf[256];
     char ua_buf[32];
     char call_buf[32];
     int len;
-
-    struct player *player = baresip_player();
 
     LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
@@ -179,10 +176,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            //if (list_count(ua_calls(ua)) > 1) {
-            //    play = mem_deref(play);
-            //    (void)play_file(&play, player, "callwaiting.wav", 3, NULL, NULL);
-            //}
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
             break;
         case UA_EVENT_CALL_OUTGOING:
@@ -197,15 +190,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
         case UA_EVENT_CALL_RINGING:
-            play = mem_deref(play);
-            (void)play_file(&play, player, "ringback.wav", -1, NULL, NULL);
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
             break;
         case UA_EVENT_CALL_ESTABLISHED:
-            play = mem_deref(play);
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
             break;
         case UA_EVENT_CALL_MENC:
@@ -225,15 +215,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "refer failed,%s", prm);
             break;
         case UA_EVENT_CALL_CLOSED:
-            play = mem_deref(play);
-            if (call_scode(call)) {
-			    const char *tone;
-			    tone = translate_errorcode(call_scode(call));
-			    if (tone) {
-				    (void)play_file(&play, player, tone, 1, NULL, NULL);
-			    }
-		    }
-            len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s", prm);
+            tone = call_scode(call) ? translate_errorcode(call_scode(call)) : "";
+            len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s,%s", prm, tone);
             break;
         case UA_EVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
@@ -500,8 +483,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     // net_debug_log();
 
-    play_set_path(baresip_player(), path);
-
     err = ua_init("baresip v" BARESIP_VERSION " (" ARCH "/" OS ")",
                   true, true, true);
     if (err) {
@@ -571,7 +552,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         LOGI("main loop exit\n");
     }
 
-    play = mem_deref(play);
     mq = mem_deref(mq);
 
     LOGD("closing ...");
@@ -1299,7 +1279,6 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
     LOGD("answering call %s/%s\n", native_ua, native_call);
     struct ua *ua = (struct ua *) strtoul(native_ua, NULL, 10);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    play = mem_deref(play);
     re_thread_enter();
     ua_answer(ua, call, (enum vidmode)javaVidMode);
     re_thread_leave();
