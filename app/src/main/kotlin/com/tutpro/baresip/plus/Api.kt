@@ -68,7 +68,7 @@ object Api {
     external fun ua_connect_dir(uap: String, peer_uri: String, vmode: Int, adir: Int, vdir: Int): String
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
     external fun ua_call_alloc(uap: String, xcallp: String, video: Int): String
-    external fun ua_call_answer(uap: String, callp: String)
+    external fun ua_answer(uap: String, callp: String)
     external fun ua_debug(uap: String)
 
     external fun call_peeruri(callp: String): String

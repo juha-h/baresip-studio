@@ -1348,7 +1348,7 @@ Java_com_tutpro_baresip_plus_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstr
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1call_1answer(JNIEnv *env, jobject thiz, jstring jUA, jstring jCall) {
+Java_com_tutpro_baresip_plus_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring jUA, jstring jCall) {
     const char *native_ua = (*env)->GetStringUTFChars(env, jUA, 0);
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     LOGD("answering call %s/%s\n", native_ua, native_call);

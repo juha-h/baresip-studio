@@ -353,7 +353,7 @@ class MainActivity : AppCompatActivity() {
             rejectButton.isEnabled = false
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
             call.disableVideoStream(true)
-            Api.ua_call_answer(ua.uap, call.callp)
+            Api.ua_answer(ua.uap, call.callp)
         }
 
         answerVideoButton.setOnClickListener {
@@ -366,7 +366,7 @@ class MainActivity : AppCompatActivity() {
             rejectButton.isEnabled = false
             val videoDir = if (BaresipService.cameraAvailable) Api.SDP_SENDRECV else Api.SDP_RECVONLY
             call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-            Api.ua_call_answer(ua.uap, call.callp)
+            Api.ua_answer(ua.uap, call.callp)
         }
 
         rejectButton.setOnClickListener {
