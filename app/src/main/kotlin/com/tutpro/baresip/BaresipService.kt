@@ -1336,6 +1336,8 @@ class BaresipService: Service() {
     private fun cleanService() {
         am.mode = AudioManager.MODE_NORMAL
         abandonAudioFocus()
+        stopRinging()
+        stopMediaPlayer()
         uas.clear()
         status.clear()
         callHistory.clear()
