@@ -543,6 +543,15 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
+                    "call outgoing" -> {
+                        stopMediaPlayer()
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
+                        setCallVolume()
+                        proximitySensing(true)
+                        return
+                    }
                     "call ringing" -> {
                         playRingBack()
                         return
@@ -552,6 +561,7 @@ class BaresipService: Service() {
                             stopMediaPlayer()
                         else
                             playRingBack()
+                        return
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -635,19 +645,11 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "call outgoing" -> {
-                        stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
-                        setCallVolume()
-                        proximitySensing(true)
-                        return
-                    }
                     "call answered" -> {
                         stopRinging()
                         stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                           am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
