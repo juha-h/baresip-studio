@@ -545,6 +545,7 @@ class BaresipService: Service() {
                                 CallHistory.save()
                                 ua.account.missedCalls = true
                             }
+                            playUnInterrupted(R.raw.callwaiting, 1)
                             if (!Utils.isVisible())
                                 return
                             newEvent = "call rejected"
@@ -748,9 +749,9 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         when (ev[2]) {
                             "busy" ->
-                                playNTimes(R.raw.busy, 1)
+                                playMedia(R.raw.busy, 1)
                             "error" ->
-                                playNTimes(R.raw.error, 1)
+                                playMedia(R.raw.error, 1)
                         }
                         call.remove()
                         if (Call.calls().size == 0) {
@@ -1154,15 +1155,25 @@ class BaresipService: Service() {
         }
     }
 
-    private fun playNTimes(raw: Int, count: Int) {
+    private fun playMedia(raw: Int, count: Int) {
         if (mediaPlayer == null ) {
             mediaPlayer = MediaPlayer.create(this, raw)
             mediaPlayer?.setOnCompletionListener {
                 stopMediaPlayer()
-                if (count > 1) playNTimes(raw, count - 1)
+                if (count > 1) playMedia(raw, count - 1)
             }
             mediaPlayer?.start()
         }
+    }
+
+    private fun playUnInterrupted(raw: Int, count: Int) {
+        val player = MediaPlayer.create(this, raw)
+        player.setOnCompletionListener {
+            it.stop()
+            it.release()
+            if (count > 1) playUnInterrupted(raw, count - 1)
+        }
+        player.start()
     }
 
     private fun stopMediaPlayer() {
