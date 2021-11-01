@@ -543,17 +543,19 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
-                    "call progress", "call ringing" -> {
+                    "call ringing" -> {
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
-                        if (mediaPlayer == null ) {
-                            mediaPlayer = MediaPlayer.create(this, R.raw.ringback)
-                            mediaPlayer!!.isLooping = true
-                            mediaPlayer!!.start()
-                        }
+                        playRingBack()
                         return
+                    }
+                    "call progress" -> {
+                        if (ev[1] != "0")
+                            stopMediaPlayer()
+                        else
+                            playRingBack()
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -563,7 +565,6 @@ class BaresipService: Service() {
                                         Manifest.permission.RECORD_AUDIO)) {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
-                            playNTimes(R.raw.callwaiting, 1)
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in", false))
                                 CallHistory.save()
@@ -582,8 +583,6 @@ class BaresipService: Service() {
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                     startRinging()
                             } else {
-                                val mediaPlayer = MediaPlayer.create(this, R.raw.autoanswer)
-                                mediaPlayer.start()
                                 val newIntent = Intent(this, MainActivity::class.java)
                                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
@@ -640,6 +639,7 @@ class BaresipService: Service() {
                         }
                     }
                     "call outgoing" -> {
+                        stopMediaPlayer()
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -1187,14 +1187,22 @@ class BaresipService: Service() {
         rt.stop()
     }
 
+    private fun playRingBack() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(this, R.raw.ringback)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        }
+    }
+
     private fun playNTimes(raw: Int, count: Int) {
         if (mediaPlayer == null ) {
             mediaPlayer = MediaPlayer.create(this, raw)
-            mediaPlayer!!.setOnCompletionListener {
+            mediaPlayer?.setOnCompletionListener {
                 stopMediaPlayer()
                 if (count > 1) playNTimes(raw, count - 1)
             }
-            mediaPlayer!!.start()
+            mediaPlayer?.start()
         }
     }
 

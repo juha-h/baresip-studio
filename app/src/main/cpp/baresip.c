@@ -193,6 +193,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     char event_buf[256];
     char ua_buf[32];
     char call_buf[32];
+    enum sdp_dir ardir;
     int len, ldir, rdir;
     struct sdp_media *media;
     int remote_has_video;
@@ -243,7 +244,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress");
+            ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress,%d", ardir);
             break;
         case UA_EVENT_CALL_ESTABLISHED:
             len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
