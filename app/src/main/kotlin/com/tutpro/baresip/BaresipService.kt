@@ -518,9 +518,17 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
+                    "call outgoing" -> {
+                        stopMediaPlayer()
+                        am.mode = AudioManager.MODE_IN_CALL
+                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                            AudioAttributes.CONTENT_TYPE_SPEECH)
+                        setCallVolume()
+                        proximitySensing(true)
+                        return
+                    }
                     "call ringing" -> {
                         playRingBack()
-                        return
                     }
                     "call progress" -> {
                         if (ev[1] != "0")
@@ -625,19 +633,11 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "call outgoing" -> {
-                        stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
-                        setCallVolume()
-                        proximitySensing(true)
-                        return
-                    }
                     "call answered" -> {
                         stopRinging()
                         stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (am.mode != AudioManager.MODE_IN_CALL)
+                            am.mode = AudioManager.MODE_IN_CALL
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
