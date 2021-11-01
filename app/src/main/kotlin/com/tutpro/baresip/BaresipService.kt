@@ -520,7 +520,7 @@ class BaresipService: Service() {
                     }
                     "call outgoing" -> {
                         stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_CALL
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
@@ -529,12 +529,14 @@ class BaresipService: Service() {
                     }
                     "call ringing" -> {
                         playRingBack()
+                        return
                     }
                     "call progress" -> {
                         if (ev[1] != "0")
                             stopMediaPlayer()
                         else
                             playRingBack()
+                        return
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
@@ -636,8 +638,8 @@ class BaresipService: Service() {
                     "call answered" -> {
                         stopRinging()
                         stopMediaPlayer()
-                        if (am.mode != AudioManager.MODE_IN_CALL)
-                            am.mode = AudioManager.MODE_IN_CALL
+                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                           am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()

@@ -649,11 +649,6 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
-        volumeControlStream = if (am.mode == AudioManager.MODE_RINGTONE)
-            AudioManager.STREAM_RING
-        else
-            AudioManager.STREAM_VOICE_CALL
-
         window.decorView.post {
             if (firstRun) {
                 if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
@@ -867,10 +862,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val stream = if (am.mode == AudioManager.MODE_RINGTONE)
+            AudioManager.STREAM_RING
+        else
+            AudioManager.STREAM_MUSIC
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
-                Log.d(TAG, "Adjusting volume $keyCode of stream $volumeControlStream")
-                am.adjustStreamVolume(volumeControlStream,
+                Log.d(TAG, "Adjusting volume $keyCode of stream $stream")
+                am.adjustStreamVolume(stream,
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
                             AudioManager.ADJUST_LOWER else
                             AudioManager.ADJUST_RAISE,
@@ -958,9 +957,6 @@ class MainActivity : AppCompatActivity() {
                                         ": ${ev[1]}",
                                 Toast.LENGTH_LONG).show()
                     }
-                    "call ringing", "call progress" -> {
-                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
-                    }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
                             callsButton.setImageResource(R.drawable.calls_missed)
@@ -986,7 +982,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call established" -> {
-                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         if (aor == aorSpinner.tag) {
                             dtmf.setText("")
                             dtmf.hint = getString(R.string.dtmf)
@@ -1110,7 +1105,6 @@ class MainActivity : AppCompatActivity() {
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
                         if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
-                        volumeControlStream = AudioManager.STREAM_VOICE_CALL
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param[0].isDigit())
@@ -1643,7 +1637,6 @@ class MainActivity : AppCompatActivity() {
             rejectButton.visibility = View.INVISIBLE
             callControl.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
-            volumeControlStream = AudioManager.STREAM_VOICE_CALL
         } else {
             swipeRefresh.isEnabled = false
             val call = Call.uaCalls(ua, "")[0]
@@ -1662,7 +1655,6 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.INVISIBLE
                     callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
@@ -1678,7 +1670,6 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.isEnabled = true
                     callControl.visibility = View.INVISIBLE
                     dialpadButton.isEnabled = false
-                    volumeControlStream = AudioManager.STREAM_RING
                 }
                 "connected" -> {
                     callControl.post {
@@ -1728,7 +1719,6 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
                     callControl.visibility = View.VISIBLE
-                    volumeControlStream = AudioManager.STREAM_VOICE_CALL
                 }
             }
         }
