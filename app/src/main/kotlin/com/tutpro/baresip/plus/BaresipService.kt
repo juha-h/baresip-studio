@@ -544,10 +544,6 @@ class BaresipService: Service() {
                             return
                     }
                     "call ringing" -> {
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
-                        setCallVolume()
                         playRingBack()
                         return
                     }
