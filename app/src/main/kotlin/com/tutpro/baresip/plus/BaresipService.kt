@@ -545,7 +545,8 @@ class BaresipService: Service() {
                     }
                     "call outgoing" -> {
                         stopMediaPlayer()
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
@@ -787,7 +788,6 @@ class BaresipService: Service() {
                             am.isSpeakerphoneOn = false
                             am.stopBluetoothSco()
                             abandonAudioFocus()
-                            am.mode = AudioManager.MODE_NORMAL
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
