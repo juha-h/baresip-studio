@@ -1,0 +1,5 @@
+- When aec is enabled/disabled, load/unload webrtc_aecm module
+- Use BaresipService to play all sounds
+- Proper handling of session progress response
+- During call, volume keys now control media volume
+- Use communication audio mode when not in ringing audio mode
