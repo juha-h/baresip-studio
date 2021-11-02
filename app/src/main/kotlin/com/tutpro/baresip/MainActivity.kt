@@ -792,6 +792,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "Main onResume with action '$resumeAction'")
         nm.cancelAll()
+        // Keep the app in communication mode in order to avoid audio delay when the mode changes
+        if (am.mode != AudioManager.MODE_RINGTONE && am.mode != AudioManager.MODE_IN_COMMUNICATION)
+            am.mode = AudioManager.MODE_IN_COMMUNICATION
         visible = true
         when (resumeAction) {
             "call show" ->
