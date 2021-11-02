@@ -48,7 +48,6 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
-webrtc_aec_extended_filter yes
 ice_turn no
 ice_nomination regular
 zrtp_hash yes
