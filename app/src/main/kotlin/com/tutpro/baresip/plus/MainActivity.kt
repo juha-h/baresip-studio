@@ -1757,7 +1757,7 @@ class MainActivity : AppCompatActivity() {
         val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
-            val uriText = callUri.text.toString().trim()
+            val uriText = callUri.text.toString().filterNot { it.isWhitespace() }
             if (uriText.isNotEmpty()) {
                 val uri = Utils.uriComplete(ContactsActivity.findContactURI(uriText),
                         Utils.aorDomain(aor))
