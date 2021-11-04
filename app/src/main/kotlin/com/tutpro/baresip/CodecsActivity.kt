@@ -86,6 +86,15 @@ class CodecsActivity : AppCompatActivity() {
             }
         }
 
+        binding.CodecsTitle.setOnClickListener {
+            if (media == "audio")
+                Utils.alertView(this, getString(R.string.audio_codecs),
+                    getString(R.string.audio_codecs_help))
+            else
+                Utils.alertView(this, getString(R.string.video_codecs),
+                    getString(R.string.video_codecs_help))
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -166,19 +175,6 @@ class CodecsActivity : AppCompatActivity() {
     override fun onPause() {
         MainActivity.activityAor = aor
         super.onPause()
-    }
-
-    fun onClick(v: View) {
-        when (v) {
-            binding.CodecsTitle -> {
-                if (media == "audio")
-                    Utils.alertView(this, getString(R.string.audio_codecs),
-                            getString(R.string.audio_codecs_help))
-                else
-                    Utils.alertView(this, getString(R.string.video_codecs),
-                            getString(R.string.video_codecs_help))
-            }
-        }
     }
 
 }

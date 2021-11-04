@@ -28,7 +28,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/AutoStart"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/start_automatically" >
             </TextView>
             <CheckBox
@@ -46,7 +45,6 @@
             android:id="@+id/ListenAddressTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
             android:text="@string/listen_address"
             android:textSize="18sp" >
         </TextView>
@@ -66,7 +64,6 @@
             android:id="@+id/DnsServersTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
             android:text="@string/dns_servers"
             android:textSize="18sp">
         </TextView>
@@ -94,7 +91,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/CertificateFile"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/tls_certificate_file" >
             </TextView>
             <CheckBox
@@ -121,7 +117,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/VerifyServer"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/verify_server" >
             </TextView>
             <CheckBox
@@ -148,7 +143,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/CAFile"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/tls_ca_file" >
             </TextView>
             <CheckBox
@@ -169,7 +163,6 @@
             android:layout_marginBottom="16dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:onClick="onClick"
             android:text="@string/audio" >
         </TextView>
 
@@ -186,7 +179,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/VolumeSpinner"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/default_call_volume" >
             </TextView>
             <Spinner
@@ -212,7 +204,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/DarkTheme"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/dark_theme" >
             </TextView>
             <CheckBox
@@ -239,7 +230,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Debug"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/debug" >
             </TextView>
             <CheckBox
@@ -266,7 +256,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/SipTrace"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/sip_trace" >
             </TextView>
             <CheckBox
@@ -293,7 +282,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Reset"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/reset_config" >
             </TextView>
             <CheckBox

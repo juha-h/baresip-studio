@@ -31,7 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/display_name" >
         </TextView>
 
@@ -50,7 +49,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/authentication_username" >
         </TextView>
 
@@ -69,7 +67,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/authentication_password" >
         </TextView>
 
@@ -93,7 +90,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/outbound_proxies" >
         </TextView>
 
@@ -128,7 +124,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/Register"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/register" >
             </TextView>
             <CheckBox
@@ -148,7 +143,6 @@
             android:paddingTop="10dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:onClick="onClick"
             android:text="@string/audio_codecs" >
         </TextView>
 
@@ -158,7 +152,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/media_encryption" >
         </TextView>
 
@@ -175,7 +168,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/media_nat" >
         </TextView>
 
@@ -192,7 +184,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/stun_server" >
         </TextView>
 
@@ -213,7 +204,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/stun_username" >
         </TextView>
 
@@ -233,7 +223,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/stun_password" >
         </TextView>
 
@@ -265,7 +254,6 @@
                 android:layout_toStartOf="@id/PreferIPv6Media"
                 android:paddingTop="10dp"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/prefer_ipv6_media" >
             </TextView>
             <CheckBox
@@ -284,7 +272,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/dtmf_mode" >
         </TextView>
 
@@ -301,7 +288,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/answer_mode" >
         </TextView>
 
@@ -318,7 +304,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:textSize="18sp"
-            android:onClick="onClick"
             android:text="@string/voicemail_uri" >
         </TextView>
 
@@ -344,7 +329,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/Default"
                 android:textSize="18sp"
-                android:onClick="onClick"
                 android:text="@string/default_account" >
             </TextView>
             <CheckBox

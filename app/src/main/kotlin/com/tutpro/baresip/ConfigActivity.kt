@@ -271,6 +271,8 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
+        bindTitles()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -442,54 +444,52 @@ class ConfigActivity : AppCompatActivity() {
 
     }
 
-    fun onClick(v: View) {
-        when (v) {
-            binding.AutoStartTitle -> {
-                Utils.alertView(this, getString(R.string.start_automatically),
-                        getString(R.string.start_automatically_help))
-            }
-            binding.ListenAddressTitle -> {
-                Utils.alertView(this, getString(R.string.listen_address),
-                        getString(R.string.listen_address_help))
-            }
-            binding.DnsServersTitle  -> {
-                Utils.alertView(this, getString(R.string.dns_servers),
-                        getString(R.string.dns_servers_help))
-            }
-            binding.CertificateFileTitle  -> {
-                Utils.alertView(this, getString(R.string.tls_certificate_file),
-                        getString(R.string.tls_certificate_file_help))
-            }
-            binding.VerifyServerTitle  -> {
-                Utils.alertView(this, getString(R.string.verify_server),
-                        getString(R.string.verify_server_help))
-            }
-            binding.CAFileTitle -> {
-                Utils.alertView(this, getString(R.string.tls_ca_file),
-                        getString(R.string.tls_ca_file_help))
-            }
-            binding.AudioTitle  -> {
-                startActivity(Intent(this, AudioActivity::class.java))
-            }
-            binding.VolumeTitle -> {
-                Utils.alertView(this, getString(R.string.default_call_volume),
-                        getString(R.string.default_call_volume_help))
-            }
-            binding.DarkThemeTitle -> {
-                Utils.alertView(this, getString(R.string.dark_theme),
-                        getString(R.string.dark_theme_help))
-            }
-            binding.DebugTitle -> {
-                Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
-            }
-            binding.SipTraceTitle -> {
-                Utils.alertView(this, getString(R.string.sip_trace),
-                        getString(R.string.sip_trace_help))
-            }
-            binding.ResetTitle -> {
-                Utils.alertView(this, getString(R.string.reset_config),
-                        getString(R.string.reset_config_help))
-            }
+    fun bindTitles() {
+        binding.AutoStartTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.start_automatically),
+                    getString(R.string.start_automatically_help))
+        }
+        binding.ListenAddressTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.listen_address),
+                    getString(R.string.listen_address_help))
+        }
+        binding.DnsServersTitle .setOnClickListener {
+            Utils.alertView(this, getString(R.string.dns_servers),
+                    getString(R.string.dns_servers_help))
+        }
+        binding.CertificateFileTitle .setOnClickListener {
+            Utils.alertView(this, getString(R.string.tls_certificate_file),
+                    getString(R.string.tls_certificate_file_help))
+        }
+        binding.VerifyServerTitle .setOnClickListener {
+            Utils.alertView(this, getString(R.string.verify_server),
+                    getString(R.string.verify_server_help))
+        }
+        binding.CAFileTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.tls_ca_file),
+                    getString(R.string.tls_ca_file_help))
+        }
+        binding.AudioTitle .setOnClickListener {
+            startActivity(Intent(this, AudioActivity::class.java))
+        }
+        binding.VolumeTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.default_call_volume),
+                    getString(R.string.default_call_volume_help))
+        }
+        binding.DarkThemeTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.dark_theme),
+                    getString(R.string.dark_theme_help))
+        }
+        binding.DebugTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
+        }
+        binding.SipTraceTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.sip_trace),
+                    getString(R.string.sip_trace_help))
+        }
+        binding.ResetTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.reset_config),
+                    getString(R.string.reset_config_help))
         }
     }
 

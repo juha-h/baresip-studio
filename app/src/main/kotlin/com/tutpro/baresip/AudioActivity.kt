@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -83,6 +82,8 @@ class AudioActivity : AppCompatActivity() {
         val aecCv = Config.variable("module")
         oldAec = aecCv.contains("webrtc_aecm.so")
         aec.isChecked = oldAec
+
+        bindTitles()
 
     }
 
@@ -198,24 +199,22 @@ class AudioActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    fun onClick(v: View) {
-        when (v) {
-            binding.AudioModulesTitle -> {
-                Utils.alertView(this, getString(R.string.audio_modules_title),
-                        getString(R.string.audio_modules_help))
-            }
-            binding.OpusBitRateTitle -> {
-                Utils.alertView(this, getString(R.string.opus_bit_rate),
-                        getString(R.string.opus_bit_rate_help))
-            }
-            binding.OpusPacketLossTitle -> {
-                Utils.alertView(this, getString(R.string.opus_packet_loss),
-                        getString(R.string.opus_packet_loss_help))
-            }
-            binding.AecTitle -> {
-                Utils.alertView(this, getString(R.string.aec),
-                        getString(R.string.aec_help))
-            }
+    private fun bindTitles() {
+        binding.AudioModulesTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.audio_modules_title),
+                    getString(R.string.audio_modules_help))
+        }
+        binding.OpusBitRateTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.opus_bit_rate),
+                    getString(R.string.opus_bit_rate_help))
+        }
+        binding.OpusPacketLossTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.opus_packet_loss),
+                    getString(R.string.opus_packet_loss_help))
+        }
+        binding.AecTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.aec),
+                    getString(R.string.aec_help))
         }
     }
 
