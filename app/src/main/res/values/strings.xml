@@ -348,6 +348,7 @@
     <string name="invalid_contact_uri">Invalid SIP URI</string>
     <string name="android" translatable="false">Android</string>
     <string name="android_contact_help">If checked, this contact is available also in Android contacts.</string>
+    <string name="avatar_image">Profile image</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>

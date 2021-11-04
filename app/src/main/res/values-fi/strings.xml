@@ -387,6 +387,7 @@
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="android_contact_help">Jos merkitty, tämä yhteystieto näkyy myös Androidin
         yhteystiedoissa.</string>
+    <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää
