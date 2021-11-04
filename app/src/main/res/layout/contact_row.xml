@@ -31,7 +31,8 @@
             android:layout_height="36dp"
             android:layout_width="36dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop" >
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/avatar_image">
         </ImageView>
 
     </androidx.cardview.widget.CardView>

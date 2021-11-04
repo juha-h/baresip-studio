@@ -27,7 +27,8 @@
         android:layout_marginStart="6dp"
         android:icon="@android:drawable/ic_menu_delete"
         android:background="@null"
-        android:scaleType="centerCrop" >
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/delete">
     </ImageButton>
 
 </RelativeLayout>
