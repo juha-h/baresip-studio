@@ -98,6 +98,8 @@ class AccountActivity : AppCompatActivity() {
 
         initLayoutFromAccount(acc)
 
+        bindTitles()
+
     }
 
     private fun initAccountFromConfig(ctx: AccountActivity) {
@@ -638,84 +640,102 @@ class AccountActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    fun onClick(v: View) {
-        when (v) {
-            binding.DisplayNameTitle -> {
-                Utils.alertView(this, getString(R.string.display_name),
-                        getString(R.string.display_name_help))
-            }
-            binding.AuthUserTitle -> {
-                Utils.alertView(this, getString(R.string.authentication_username),
-                        getString(R.string.authentication_username_help))
-            }
-            binding.AuthPassTitle -> {
-                Utils.alertView(this, getString(R.string.authentication_password),
-                        getString(R.string.authentication_password_help))
-            }
-            binding.OutboundProxyTitle -> {
-                Utils.alertView(this, getString(R.string.outbound_proxies),
-                        getString(R.string.outbound_proxies_help))
-            }
-            binding.RegTitle -> {
-                Utils.alertView(this, getString(R.string.register),
-                        getString(R.string.register_help))
-            }
-            binding.AudioCodecsTitle -> {
-                val i = Intent(this, CodecsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", aor)
-                b.putString("media", "audio")
-                i.putExtras(b)
-                startActivity(i)
-            }
-            binding.VideoCodecsTitle -> {
-                val i = Intent(this, CodecsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", aor)
-                b.putString("media", "video")
-                i.putExtras(b)
-                startActivity(i)
-            }
-            binding.MediaNatTitle -> {
-                Utils.alertView(this, getString(R.string.media_nat),
-                        getString(R.string.media_nat_help))
-            }
-            binding.StunServerTitle -> {
-                Utils.alertView(this, getString(R.string.stun_server),
-                        getString(R.string.stun_server_help))
-            }
-            binding.StunUserTitle -> {
-                Utils.alertView(this, getString(R.string.stun_username),
-                        getString(R.string.stun_username_help))
-            }
-            binding.StunPassTitle -> {
-                Utils.alertView(this, getString(R.string.stun_password),
-                        getString(R.string.stun_password_help))
-            }
-            binding.MediaEncTitle -> {
-                Utils.alertView(this, getString(R.string.media_encryption),
-                        getString(R.string.media_encryption_help))
-            }
-            binding.PreferIPv6MediaTitle -> {
-                Utils.alertView(this, getString(R.string.prefer_ipv6_media),
-                        getString(R.string.prefer_ipv6_media_help))
-            }
-            binding.DtmfModeTitle -> {
-                Utils.alertView(this, getString(R.string.dtmf_mode),
-                        getString(R.string.dtmf_mode_help))
-            }
-            binding.AnswerModeTitle -> {
-                Utils.alertView(this, getString(R.string.answer_mode),
-                        getString(R.string.answer_mode_help))
-            }
-            binding.VoicemailUriTitle -> {
-                Utils.alertView(this, getString(R.string.voicemail_uri),
-                        getString(R.string.voicemain_uri_help))
-            }
-            binding.DefaultTitle -> {
-                Utils.alertView(this, getString(R.string.default_account),
-                        getString(R.string.default_account_help))
-            }
+    private fun bindTitles() {
+        binding.DisplayNameTitle.setOnClickListener{
+            Utils.alertView(this, getString(R.string.display_name),
+                getString(R.string.display_name_help))
+        }
+        binding.AuthUserTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.authentication_username),
+                getString(R.string.authentication_username_help)
+            )
+        }
+        binding.AuthPassTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.authentication_password),
+                getString(R.string.authentication_password_help)
+            )
+        }
+        binding.OutboundProxyTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.outbound_proxies),
+                getString(R.string.outbound_proxies_help)
+            )
+        }
+        binding.RegTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.register),
+                getString(R.string.register_help)
+            )
+        }
+        binding.AudioCodecsTitle.setOnClickListener {
+            val i = Intent(this, CodecsActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", aor)
+            b.putString("media", "audio")
+            i.putExtras(b)
+            startActivity(i)
+        }
+        binding.MediaNatTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.media_nat),
+                getString(R.string.media_nat_help)
+            )
+        }
+        binding.StunServerTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.stun_server),
+                getString(R.string.stun_server_help)
+            )
+        }
+        binding.StunUserTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.stun_username),
+                getString(R.string.stun_username_help)
+            )
+        }
+        binding.StunPassTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.stun_password),
+                getString(R.string.stun_password_help)
+            )
+        }
+        binding.MediaEncTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.media_encryption),
+                getString(R.string.media_encryption_help)
+            )
+        }
+        binding.PreferIPv6Media.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.prefer_ipv6_media),
+                getString(R.string.prefer_ipv6_media_help)
+            )
+        }
+        binding.DtmfModeTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.dtmf_mode),
+                getString(R.string.dtmf_mode_help)
+            )
+        }
+        binding.AnswerModeTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.answer_mode),
+                getString(R.string.answer_mode_help)
+            )
+        }
+        binding.VoicemailUriTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.voicemail_uri),
+                getString(R.string.voicemain_uri_help)
+            )
+        }
+        binding.DefaultTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.default_account),
+                getString(R.string.default_account_help)
+            )
         }
     }
 

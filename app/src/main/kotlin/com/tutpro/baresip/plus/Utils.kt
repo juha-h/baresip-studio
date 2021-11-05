@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.ContentValues
@@ -32,6 +31,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import java.io.*
 import java.lang.reflect.Method
 import java.security.SecureRandom
@@ -303,9 +304,7 @@ object Utils {
     }
 
     fun isVisible(): Boolean {
-        val appProcessInfo = ActivityManager.RunningAppProcessInfo()
-        ActivityManager.getMyMemoryState(appProcessInfo)
-        return appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+        return ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
     }
 
     fun isHotSpotOn(wm: WifiManager): Boolean {

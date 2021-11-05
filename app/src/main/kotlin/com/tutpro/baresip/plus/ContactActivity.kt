@@ -161,6 +161,11 @@ class ContactActivity : AppCompatActivity() {
 
         }
 
+        binding.AndroidTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.android),
+                getString(R.string.android_contact_help))
+        }
+
         Utils.addActivity("contact,$newContact,$uOrI")
 
     }
@@ -317,13 +322,6 @@ class ContactActivity : AppCompatActivity() {
         finish()
         super.onBackPressed()
 
-    }
-
-    fun onClick(v: View) {
-        when (v) {
-            binding.AndroidTitle ->
-                Utils.alertView(this, getString(R.string.android), getString(R.string.android_contact_help))
-        }
     }
 
     private fun showTextAvatar(name: String, color: Int) {
