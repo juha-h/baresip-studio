@@ -795,7 +795,7 @@ class MainActivity : AppCompatActivity() {
         // Keep the app in communication mode in order to avoid audio delay when the mode changes
         if (am.mode != AudioManager.MODE_RINGTONE && am.mode != AudioManager.MODE_IN_COMMUNICATION)
             am.mode = AudioManager.MODE_IN_COMMUNICATION
-        visible = true
+        BaresipService.isMainVisible = true
         when (resumeAction) {
             "call show" ->
                 handleServiceEvent("call incoming",
@@ -849,7 +849,9 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
-        visible = false
+        if (Call.calls().size == 0)
+            am.mode = AudioManager.MODE_NORMAL
+        BaresipService.isMainVisible = false
         saveCallUri()
         super.onPause()
     }
@@ -971,7 +973,7 @@ class MainActivity : AppCompatActivity() {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
-                        if (visible) {
+                        if (BaresipService.isMainVisible) {
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
                             showCall(ua)
@@ -1862,10 +1864,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
 
         var accountRequest: ActivityResultLauncher<Intent>? = null
-
-        var visible = false
         var activityAor = ""
-
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 

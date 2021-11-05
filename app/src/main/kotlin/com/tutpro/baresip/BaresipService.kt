@@ -745,6 +745,10 @@ class BaresipService: Service() {
                         }
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
+                        if (isMainVisible)
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        else
+                            am.mode = AudioManager.MODE_NORMAL
                         stopMediaPlayer()
                         when (ev[2]) {
                             "busy" ->
@@ -1385,6 +1389,7 @@ class BaresipService: Service() {
         var logLevel = 2
         var sipTrace = false
         var callActionUri = ""
+        var isMainVisible = false
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()
