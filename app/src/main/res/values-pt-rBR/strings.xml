@@ -253,4 +253,5 @@
     <string name="no_network">Nenhuma conexão de rede!</string>
     <string name="missed_calls_count">%1$d chamadas perdidas</string>
     <string name="missed_calls">Chamadas perdidas</string>
+    <string name="avatar_image">Imagem do perfil</string>
 </resources>
