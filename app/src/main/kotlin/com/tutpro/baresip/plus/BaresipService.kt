@@ -547,7 +547,7 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         proximitySensing(true)
@@ -651,7 +651,7 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                            am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioAttributes.USAGE_VOICE_COMMUNICATION,
+                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
                             AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         proximitySensing(true)
@@ -1088,7 +1088,7 @@ class BaresipService: Service() {
         }
         if ((VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
             @TargetApi(26)
-            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                     .run {
                         setAudioAttributes(AudioAttributes.Builder().run {
                             setUsage(usage)
@@ -1112,7 +1112,7 @@ class BaresipService: Service() {
             }
         } else {
             @Suppress("DEPRECATION")
-            if (am.requestAudioFocus(null, usage, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE) ==
+            if (am.requestAudioFocus(null, usage, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "Audio focus granted for usage $usage")
                 audioFocusUsage = usage
@@ -1162,8 +1162,7 @@ class BaresipService: Service() {
 
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
-        requestAudioFocus(AudioAttributes.USAGE_NOTIFICATION_RINGTONE,
-            AudioAttributes.CONTENT_TYPE_MUSIC)
+        requestAudioFocus(AudioManager.STREAM_RING, AudioAttributes.CONTENT_TYPE_MUSIC)
         if (VERSION.SDK_INT >= 28) {
             rt.isLooping = true
             rt.play()
