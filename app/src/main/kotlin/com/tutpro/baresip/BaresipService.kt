@@ -366,6 +366,21 @@ class BaresipService: Service() {
 
             }
 
+            "Call Answer" -> {
+                val uap = intent!!.getStringExtra("uap")!!
+                val callp = intent.getStringExtra("callp")!!
+                val vidMode = intent.getIntExtra("video", Api.VIDMODE_OFF)
+                stopRinging()
+                stopMediaPlayer()
+                if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
+                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+                requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
+                    AudioAttributes.CONTENT_TYPE_SPEECH)
+                setCallVolume()
+                proximitySensing(true)
+                Api.ua_answer(uap, callp, vidMode)
+            }
+
             "Call Reject" -> {
                 val callp = intent!!.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
@@ -636,17 +651,6 @@ class BaresipService: Service() {
                             return
                         }
                     }
-                    "call answered" -> {
-                        stopRinging()
-                        stopMediaPlayer()
-                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                           am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
-                        setCallVolume()
-                        proximitySensing(true)
-                        return
-                    }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.ofCallp(callp)
@@ -745,10 +749,6 @@ class BaresipService: Service() {
                         }
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
-                        if (isMainVisible)
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        else
-                            am.mode = AudioManager.MODE_NORMAL
                         stopMediaPlayer()
                         when (ev[2]) {
                             "busy" ->
@@ -762,6 +762,7 @@ class BaresipService: Service() {
                             am.isSpeakerphoneOn = false
                             am.stopBluetoothSco()
                             abandonAudioFocus()
+                            am.mode = AudioManager.MODE_NORMAL
                             proximitySensing(false)
                         }
                         if (ua.account.callHistory && !call.hasHistory) {
@@ -1120,8 +1121,8 @@ class BaresipService: Service() {
     }
 
     private fun startRinging() {
-        am.mode = AudioManager.MODE_RINGTONE
         requestAudioFocus(AudioManager.STREAM_RING, AudioAttributes.CONTENT_TYPE_MUSIC)
+        am.mode = AudioManager.MODE_RINGTONE
         if (VERSION.SDK_INT >= 28) {
             rt.isLooping = true
             rt.play()
