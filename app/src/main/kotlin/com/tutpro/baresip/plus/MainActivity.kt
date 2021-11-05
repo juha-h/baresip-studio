@@ -353,7 +353,11 @@ class MainActivity : AppCompatActivity() {
             rejectButton.isEnabled = false
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
             call.disableVideoStream(true)
-            Api.ua_answer(ua.uap, call.callp)
+            val intent = Intent(this@MainActivity, BaresipService::class.java)
+            intent.action = "Call Answer"
+            intent.putExtra("uap", ua.uap)
+            intent.putExtra("callp", call.callp)
+            startService(intent)
         }
 
         answerVideoButton.setOnClickListener {
@@ -934,9 +938,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "Main onResume with action '$resumeAction'")
         nm.cancelAll()
-        // Keep the app in communication mode in order to avoid audio delay when the mode changes
-        if (am.mode != AudioManager.MODE_RINGTONE && am.mode != AudioManager.MODE_IN_COMMUNICATION)
-            am.mode = AudioManager.MODE_IN_COMMUNICATION
         BaresipService.isMainVisible = true
         when (resumeAction) {
             "call show" ->
@@ -991,8 +992,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
-        if (Call.calls().size == 0)
-            am.mode = AudioManager.MODE_NORMAL
         BaresipService.isMainVisible = false
         saveCallUri()
         super.onPause()
