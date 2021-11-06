@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.*
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothHeadset
 import android.content.*
 import android.media.*
@@ -13,7 +14,6 @@ import android.net.wifi.WifiManager
 import android.os.*
 import android.os.Build.VERSION
 import android.provider.Settings
-import android.telephony.TelephonyManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -35,6 +35,7 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import android.media.MediaPlayer
+import android.telecom.TelecomManager
 
 class BaresipService: Service() {
 
@@ -47,7 +48,8 @@ class BaresipService: Service() {
     private lateinit var cm: ConnectivityManager
     private lateinit var pm: PowerManager
     private lateinit var wm: WifiManager
-    private lateinit var tm: TelephonyManager
+    private lateinit var tm: TelecomManager
+    private lateinit var btm: BluetoothManager
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
@@ -58,7 +60,7 @@ class BaresipService: Service() {
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
     private var origVolume = mutableMapOf<Int, Int>()
-    private val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    private var btAdapter: BluetoothAdapter? = null
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
     private var hotSpotIsEnabled = false
@@ -195,7 +197,10 @@ class BaresipService: Service() {
         this.registerReceiver(hotSpotReceiver,
             IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
 
-        tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        tm = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+
+        btm = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        btAdapter = btm.adapter
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip:proximity_wakelog")
@@ -556,10 +561,10 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
-                        if ((Call.calls().size > 0) ||
-                                (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
-                                !Utils.checkPermission(applicationContext,
-                                        Manifest.permission.RECORD_AUDIO)) {
+                        if (Call.calls().size > 0 ||
+                            (Utils.checkPermission(this, Manifest.permission.READ_PHONE_STATE) &&
+                                tm.isInCall) ||
+                            !Utils.checkPermission(applicationContext, Manifest.permission.RECORD_AUDIO)) {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             if (ua.account.callHistory) {
@@ -1090,8 +1095,8 @@ class BaresipService: Service() {
     }
 
     private fun isBluetoothHeadsetConnected(): Boolean {
-        return (btAdapter != null) && btAdapter.isEnabled &&
-                (btAdapter.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
+        return (btAdapter != null) && btAdapter!!.isEnabled &&
+                (btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
                         BluetoothHeadset.STATE_CONNECTED)
     }
 
