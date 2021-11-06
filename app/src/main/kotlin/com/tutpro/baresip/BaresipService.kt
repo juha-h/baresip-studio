@@ -63,6 +63,7 @@ class BaresipService: Service() {
     private var btAdapter: BluetoothAdapter? = null
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
+    private var allNetworks = mutableSetOf<Network>()
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
@@ -103,6 +104,13 @@ class BaresipService: Service() {
         }
 
         cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (VERSION.SDK_INT < 31)
+            @Suppress("DEPRECATION")
+            allNetworks = cm.allNetworks.toMutableSet()
+        else
+            if (cm.activeNetwork != null)
+                allNetworks.add(cm.activeNetwork!!)
+
         val builder = NetworkRequest.Builder()
             .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         cm.registerNetworkCallback(
@@ -112,6 +120,8 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(TAG, "Network $network is available")
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
                         // If API >= 26, this will be followed by onCapabilitiesChanged
                         if (isServiceRunning && VERSION.SDK_INT < 26)
                             updateNetwork()
@@ -125,6 +135,8 @@ class BaresipService: Service() {
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(TAG, "Network $network is lost")
+                        if (network in allNetworks)
+                            allNetworks.remove(network)
                         if (isServiceRunning)
                             updateNetwork()
                     }
@@ -1240,9 +1252,9 @@ class BaresipService: Service() {
         if (!isServiceRunning)
             return
 
-        /* for (n in cm.allNetworks)
+        for (n in allNetworks)
             Log.d(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
-                    "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}") */
+                    "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}")
 
         updateDnsServers()
 
@@ -1292,15 +1304,15 @@ class BaresipService: Service() {
 
     private fun linkAddresses(): MutableMap<String, String> {
         val lnAddrs = mutableMapOf<String, String>()
-        for (n in cm.allNetworks) {
+        for (n in allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             if (VERSION.SDK_INT < 28 ||
                 caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
                     val props = cm.getLinkProperties(n) ?: continue
                     for (la in props.linkAddresses)
                         if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
-                            props.interfaceName != null)
-                                lnAddrs[la.address.hostAddress] = props.interfaceName!!
+                            props.interfaceName != null && la.address.hostAddress != null)
+                                lnAddrs[la.address.hostAddress!!] = props.interfaceName!!
             }
         }
         if (hotSpotIsEnabled) {
@@ -1317,7 +1329,7 @@ class BaresipService: Service() {
             return
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
-        for (n in cm.allNetworks)
+        for (n in allNetworks)
             if (isNetworkActive(n)) {
                 val linkProps = cm.getLinkProperties(n)
                 if (linkProps != null) {
@@ -1326,7 +1338,7 @@ class BaresipService: Service() {
                 }
             }
         // Then add DNS servers from the other networks
-        for (n in cm.allNetworks) {
+        for (n in allNetworks) {
             if (isNetworkActive(n)) continue
             val linkProps = cm.getLinkProperties(n)
             if (linkProps != null)
@@ -1348,7 +1360,7 @@ class BaresipService: Service() {
         return if (VERSION.SDK_INT >= 23)
             cm.activeNetwork
         else {
-            for (n in cm.allNetworks)
+            for (n in allNetworks)
                 if (isNetworkActive(n)) return n
             return null
         }
