@@ -1758,10 +1758,12 @@ class MainActivity : AppCompatActivity() {
         val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
-            val uriText = callUri.text.toString().filterNot { it.isWhitespace() }
+            val uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val uri = Utils.uriComplete(ContactsActivity.findContactURI(uriText),
-                        Utils.aorDomain(aor))
+                val uri = Utils.uriComplete(
+                    ContactsActivity.findContactURI(uriText).filterNot { it.isWhitespace() },
+                    Utils.aorDomain(aor)
+                )
                 if (!Utils.checkSipUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_sip_uri), uri))

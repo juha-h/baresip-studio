@@ -692,6 +692,10 @@ class BaresipService: Service() {
                         }
                         newEvent = "call update"
                     }
+                    "call answered" -> {
+                        stopMediaPlayer()
+                        return
+                    }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.ofCallp(callp)
