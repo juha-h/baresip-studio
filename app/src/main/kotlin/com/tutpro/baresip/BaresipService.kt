@@ -120,11 +120,12 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(TAG, "Network $network is available")
-                        if (network !in allNetworks)
-                            allNetworks.add(network)
                         // If API >= 26, this will be followed by onCapabilitiesChanged
-                        if (isServiceRunning && VERSION.SDK_INT < 26)
+                        if (isServiceRunning && VERSION.SDK_INT < 26) {
+                            if (network !in allNetworks)
+                                allNetworks.add(network)
                             updateNetwork()
+                        }
                     }
 
                     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -135,24 +136,31 @@ class BaresipService: Service() {
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(TAG, "Network $network is lost")
-                        if (network in allNetworks)
-                            allNetworks.remove(network)
-                        if (isServiceRunning)
+                        if (isServiceRunning) {
+                            if (network in allNetworks)
+                                allNetworks.remove(network)
                             updateNetwork()
+                        }
                     }
 
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                         super.onCapabilitiesChanged(network, caps)
                         Log.d(TAG, "Network $network capabilities changed: $caps")
-                        if (isServiceRunning)
+                        if (isServiceRunning) {
+                            if (network !in allNetworks)
+                                allNetworks.add(network)
                             updateNetwork()
+                        }
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
                         Log.d(TAG, "Network $network link properties changed: $props")
-                        if (isServiceRunning)
+                        if (isServiceRunning) {
+                            if (network !in allNetworks)
+                                allNetworks.add(network)
                             updateNetwork()
+                        }
                     }
 
                 }
@@ -1249,12 +1257,9 @@ class BaresipService: Service() {
 
     private fun updateNetwork() {
 
-        if (!isServiceRunning)
-            return
-
-        for (n in allNetworks)
+        /* for (n in allNetworks)
             Log.d(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
-                    "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}")
+                    "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}") */
 
         updateDnsServers()
 
@@ -1329,14 +1334,12 @@ class BaresipService: Service() {
             return
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
-        for (n in allNetworks)
-            if (isNetworkActive(n)) {
-                val linkProps = cm.getLinkProperties(n)
-                if (linkProps != null) {
-                    servers.addAll(linkProps.dnsServers)
-                    break
-                }
-            }
+        val activeNetwork = activeNetwork()
+        if (activeNetwork != null) {
+            val linkProps = cm.getLinkProperties(activeNetwork)
+            if (linkProps != null)
+                servers.addAll(linkProps.dnsServers)
+        }
         // Then add DNS servers from the other networks
         for (n in allNetworks) {
             if (isNetworkActive(n)) continue
