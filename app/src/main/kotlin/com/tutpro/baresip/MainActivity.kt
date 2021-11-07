@@ -1378,8 +1378,7 @@ class MainActivity : AppCompatActivity() {
         val input = layout.findViewById(R.id.password) as EditText
         input.requestFocus()
         val context = this
-        val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-        with(builder) {
+        with (AlertDialog.Builder(this, R.style.AlertDialog)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1403,7 +1402,7 @@ class MainActivity : AppCompatActivity() {
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
                 dialog.cancel()
             }
-            val dialog = builder.create()
+            val dialog = this.create()
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             dialog.show()
         }
@@ -1427,8 +1426,7 @@ class MainActivity : AppCompatActivity() {
                 val input = layout.findViewById(R.id.password) as EditText
                 input.requestFocus()
                 val context = this
-                val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-                with(builder) {
+                with (AlertDialog.Builder(this, R.style.AlertDialog)) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1448,7 +1446,7 @@ class MainActivity : AppCompatActivity() {
                         aorPasswords[aor] = ""
                         askPasswords(accounts)
                     }
-                    val dialog = builder.create()
+                    val dialog = this.create()
                     dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     dialog.show()
                 }

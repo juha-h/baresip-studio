@@ -20,7 +20,7 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var listView: ListView
     private lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
-    internal lateinit var plusButton: ImageButton
+    private lateinit var plusButton: ImageButton
     internal lateinit var aor: String
     private var scrollPosition = -1
 

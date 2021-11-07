@@ -444,7 +444,7 @@ class ConfigActivity : AppCompatActivity() {
 
     }
 
-    fun bindTitles() {
+    private fun bindTitles() {
         binding.AutoStartTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.start_automatically),
                     getString(R.string.start_automatically_help))
