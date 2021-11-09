@@ -104,13 +104,6 @@ class BaresipService: Service() {
         }
 
         cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (VERSION.SDK_INT < 31)
-            @Suppress("DEPRECATION")
-            allNetworks = cm.allNetworks.toMutableSet()
-        else
-            if (cm.activeNetwork != null)
-                allNetworks.add(cm.activeNetwork!!)
-
         val builder = NetworkRequest.Builder()
             .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         cm.registerNetworkCallback(
@@ -120,12 +113,11 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(TAG, "Network $network is available")
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
                         // If API >= 26, this will be followed by onCapabilitiesChanged
-                        if (isServiceRunning && VERSION.SDK_INT < 26) {
-                            if (network !in allNetworks)
-                                allNetworks.add(network)
+                        if (isServiceRunning && VERSION.SDK_INT < 26)
                             updateNetwork()
-                        }
                     }
 
                     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -136,31 +128,28 @@ class BaresipService: Service() {
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(TAG, "Network $network is lost")
-                        if (isServiceRunning) {
-                            if (network in allNetworks)
-                                allNetworks.remove(network)
+                        if (network in allNetworks)
+                            allNetworks.remove(network)
+                        if (isServiceRunning)
                             updateNetwork()
-                        }
                     }
 
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                         super.onCapabilitiesChanged(network, caps)
                         Log.d(TAG, "Network $network capabilities changed: $caps")
-                        if (isServiceRunning) {
-                            if (network !in allNetworks)
-                                allNetworks.add(network)
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
+                        if (isServiceRunning)
                             updateNetwork()
-                        }
                     }
 
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
                         Log.d(TAG, "Network $network link properties changed: $props")
-                        if (isServiceRunning) {
-                            if (network !in allNetworks)
-                                allNetworks.add(network)
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
+                        if (isServiceRunning)
                             updateNetwork()
-                        }
                     }
 
                 }
@@ -324,6 +313,11 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
+
+                if (VERSION.SDK_INT < 31) {
+                    @Suppress("DEPRECATION")
+                    allNetworks = cm.allNetworks.toMutableSet()
+                }
 
                 updateDnsServers()
 
