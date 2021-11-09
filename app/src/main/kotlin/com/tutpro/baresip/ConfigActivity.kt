@@ -12,10 +12,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
+import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityConfigBinding
 import java.io.File
 import java.io.FileInputStream
@@ -24,6 +29,7 @@ import java.util.*
 class ConfigActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityConfigBinding
+    private lateinit var layout: ScrollView
     private lateinit var autoStart: CheckBox
     private lateinit var listenAddr: EditText
     private lateinit var dnsServers: EditText
@@ -34,6 +40,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
@@ -54,6 +61,7 @@ class ConfigActivity : AppCompatActivity() {
 
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        layout = binding.ConfigView
 
         Utils.addActivity("config")
 
@@ -88,8 +96,9 @@ class ConfigActivity : AppCompatActivity() {
                 if (it.resultCode == RESULT_OK) {
                     it.data?.data?.also { uri ->
                         try {
-                            val inputStream = applicationContext.contentResolver.openInputStream(uri)
-                                    as FileInputStream
+                            val inputStream =
+                                applicationContext.contentResolver.openInputStream(uri)
+                                        as FileInputStream
                             File(BaresipService.filesPath + "/cert.pem")
                                 .copyInputStreamToFile(inputStream)
                             inputStream.close()
@@ -113,26 +122,45 @@ class ConfigActivity : AppCompatActivity() {
         certificateFile.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (Build.VERSION.SDK_INT < 29) {
-                    if (!Utils.requestPermission(this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            READ_CERT_PERMISSION_CODE)) {
-                        certificateFile.isChecked = false
-                        return@setOnCheckedChangeListener
+                    certificateFile.isChecked = false
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        Log.d(TAG, "Read External Storage permission granted")
+                        val downloadsPath = Utils.downloadsPath("cert.pem")
+                        val content = Utils.getFileContents(downloadsPath)
+                        if (content == null) {
+                            Utils.alertView(
+                                this, getString(R.string.error),
+                                getString(R.string.read_cert_error)
+                            )
+                            return@setOnCheckedChangeListener
+                        }
+                        val filesPath = BaresipService.filesPath + "/cert.pem"
+                        Utils.putFileContents(filesPath, content)
+                        Config.removeVariable("sip_certificate")
+                        Config.addLine("sip_certificate $filesPath")
+                        certificateFile.isChecked = true
+                        save = true
+                        restart = true
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                    ) {
+                        layout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_restore),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        }
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
-                    val downloadsPath = Utils.downloadsPath("cert.pem")
-                    val content = Utils.getFileContents(downloadsPath)
-                    if (content == null) {
-                        Utils.alertView(this, getString(R.string.error),
-                            getString(R.string.read_cert_error))
-                        certificateFile.isChecked = false
-                        return@setOnCheckedChangeListener
-                    }
-                    val filesPath = BaresipService.filesPath + "/cert.pem"
-                    Utils.putFileContents(filesPath, content)
-                    Config.removeVariable("sip_certificate")
-                    Config.addLine("sip_certificate $filesPath")
-                    save = true
-                    restart = true
                 } else {
                     Utils.selectInputFile(certificateRequest)
                 }
@@ -157,8 +185,9 @@ class ConfigActivity : AppCompatActivity() {
                 if (it.resultCode == Activity.RESULT_OK)
                     it.data?.data?.also { uri ->
                         try {
-                            val inputStream = applicationContext.contentResolver.openInputStream(uri)
-                                    as FileInputStream
+                            val inputStream =
+                                applicationContext.contentResolver.openInputStream(uri)
+                                        as FileInputStream
                             File(BaresipService.filesPath + "/ca_certs.crt")
                                 .copyInputStreamToFile(inputStream)
                             inputStream.close()
@@ -167,8 +196,10 @@ class ConfigActivity : AppCompatActivity() {
                             save = true
                             restart = true
                         } catch (e: Error) {
-                            Utils.alertView(this, getString(R.string.error),
-                                getString(R.string.read_ca_certs_error))
+                            Utils.alertView(
+                                this, getString(R.string.error),
+                                getString(R.string.read_ca_certs_error)
+                            )
                             caFile.isChecked = false
                         }
                     }
@@ -179,26 +210,45 @@ class ConfigActivity : AppCompatActivity() {
         caFile.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (Build.VERSION.SDK_INT < 29) {
-                    if (!Utils.requestPermission(this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            READ_CERT_PERMISSION_CODE)) {
-                        caFile.isChecked = false
-                        return@setOnCheckedChangeListener
+                    caFile.isChecked = false
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        Log.d(TAG, "Read External Storage permission granted")
+                        val downloadsPath = Utils.downloadsPath("ca_certs.crt")
+                        val content = Utils.getFileContents(downloadsPath)
+                        if (content == null) {
+                            Utils.alertView(
+                                this, getString(R.string.error),
+                                getString(R.string.read_ca_certs_error)
+                            )
+                            return@setOnCheckedChangeListener
+                        }
+                        val filesPath = BaresipService.filesPath + "/ca_certs.crt"
+                        Utils.putFileContents(filesPath, content)
+                        Config.removeVariable("sip_cafile")
+                        Config.addLine("sip_cafile $filesPath")
+                        caFile.isChecked = true
+                        save = true
+                        restart = true
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                    ) {
+                        layout.showSnackBar(
+                        binding.root,
+                        getString(R.string.no_restore),
+                        Snackbar.LENGTH_INDEFINITE,
+                        getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        }
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
-                    val downloadsPath = Utils.downloadsPath("ca_certs.crt")
-                    val content = Utils.getFileContents(downloadsPath)
-                    if (content == null) {
-                        Utils.alertView(this, getString(R.string.error),
-                            getString(R.string.read_ca_certs_error))
-                        caFile.isChecked = false
-                        return@setOnCheckedChangeListener
-                    }
-                    val filesPath = BaresipService.filesPath + "/ca_certs.crt"
-                    Utils.putFileContents(filesPath, content)
-                    Config.removeVariable("sip_cafile")
-                    Config.addLine("sip_cafile $filesPath")
-                    save = true
-                    restart = true
                 } else {
                     Utils.selectInputFile(certificatesRequest)
                 }
@@ -218,14 +268,22 @@ class ConfigActivity : AppCompatActivity() {
         volVals.removeAt(curVal)
         volKeys.add(0, curKey)
         volVals.add(0, curVal)
-        val callVolAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
-                volKeys)
+        val callVolAdapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_item,
+            volKeys
+        )
         callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         callVolSpinner.adapter = callVolAdapter
         callVolSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
@@ -240,7 +298,7 @@ class ConfigActivity : AppCompatActivity() {
             "2"
         else
             dbCv[0]
-        debug.isChecked =  oldLogLevel == "0"
+        debug.isChecked = oldLogLevel == "0"
 
         sipTrace = binding.SipTrace
         sipTrace.isChecked = BaresipService.sipTrace
@@ -252,7 +310,7 @@ class ConfigActivity : AppCompatActivity() {
             if (isChecked) {
                 val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                 titleView.text = getString(R.string.confirmation)
-                with (AlertDialog.Builder(this@ConfigActivity)) {
+                with(AlertDialog.Builder(this@ConfigActivity)) {
                     setCustomTitle(titleView)
                     setMessage(getString(R.string.reset_config_alert))
                     setPositiveButton(getText(R.string.reset)) { dialog, _ ->
@@ -273,6 +331,12 @@ class ConfigActivity : AppCompatActivity() {
 
         bindTitles()
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -410,28 +474,6 @@ class ConfigActivity : AppCompatActivity() {
             intent.putExtra("restart", true)
         setResult(RESULT_OK, intent)
         finish()
-
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                            grantResults: IntArray) {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-            READ_CERT_PERMISSION_CODE ->
-                if (grantResults.isNotEmpty() &&
-                    (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                        menu!!.performIdentifierAction(R.id.checkIcon, 0)
-                else
-                    certificateFile.isChecked = false
-            READ_CA_PERMISSION_CODE ->
-                if (grantResults.isNotEmpty() &&
-                    (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                        menu!!.performIdentifierAction(R.id.checkIcon, 0)
-                else
-                    caFile.isChecked = false
-        }
 
     }
 

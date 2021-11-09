@@ -29,8 +29,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
+import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileInputStream
@@ -72,6 +76,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var stopState: String
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
@@ -304,44 +310,10 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            callUri.setAdapter(null)
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            if (Call.calls().isEmpty()) {
-                val uriText = callUri.text.toString().trim()
-                if (uriText.isNotEmpty()) {
-                    val uri = Utils.uriComplete(
-                        ContactsActivity.findContactURI(uriText).filterNot { it.isWhitespace() },
-                        Utils.aorDomain(aor)
-                    )
-                    if (!Utils.checkSipUri(uri)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_uri), uri))
-                    } else {
-                        callUri.isFocusable = false
-                        if (!call(ua, uri)) {
-                            callButton.visibility = View.VISIBLE
-                            callButton.isEnabled = true
-                            hangupButton.visibility = View.INVISIBLE
-                            hangupButton.isEnabled = false
-                        } else {
-                            callButton.visibility = View.INVISIBLE
-                            callButton.isEnabled = false
-                            hangupButton.visibility = View.VISIBLE
-                            hangupButton.isEnabled = true
-                        }
-                    }
-                } else {
-                    val latest = CallHistory.aorLatestHistory(aor)
-                    if (latest != null)
-                        callUri.setText(
-                            Utils.friendlyUri(
-                                ContactsActivity.contactName(latest.peerUri),
-                                Utils.aorDomain(ua.account.aor)
-                            )
-                        )
-                }
-            }
+            val permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE)
+            if (Build.VERSION.SDK_INT >= 23)
+                if (!Utils.checkPermissions(this, permissions))
+                    requestPermissions(permissions, CALL_PERMISSION_REQUEST_CODE)
         }
 
         hangupButton.setOnClickListener {
@@ -656,17 +628,182 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
-        window.decorView.post {
-            if (firstRun) {
-                if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
-                    Utils.requestPermission(
-                        this, Manifest.permission.RECORD_AUDIO, RECORD_PERMISSION_REQUEST_CODE
-                    )
-                firstRun = false
+    } // OnCreate
+
+    override fun onStart() {
+        Log.i(TAG, "Main onStart")
+        super.onStart()
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                    permissions ->
+                permissions.entries.forEach {
+                    if (it.value)
+                        Log.i(TAG, "Permission ${it.key} granted")
+                    else
+                        Log.i(TAG, "Permission ${it.key} denied")
+                }
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "Main onResume with action '$resumeAction'")
+        nm.cancelAll()
+        BaresipService.isMainVisible = true
+        when (resumeAction) {
+            "call show" ->
+                handleServiceEvent("call incoming",
+                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "call answer" -> {
+                answerButton.performClick()
+                showCall(resumeCall!!.ua)
+            }
+            "call missed" -> {
+                callsButton.performClick()
+            }
+            "call reject" ->
+                rejectButton.performClick()
+            "call" -> {
+                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
+                callButton.performClick()
+            }
+            "transfer show", "transfer accept" ->
+                handleServiceEvent("$resumeAction,$resumeUri",
+                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "message", "message show", "message reply" ->
+                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
+            else -> {
+                val incomingCall = Call.call("incoming")
+                if (incomingCall != null) {
+                    spinToAor(incomingCall.ua.account.aor)
+                } else {
+                    restoreActivities()
+                    if (UserAgent.uas().size > 0) {
+                        if (aorSpinner.selectedItemPosition == -1) {
+                            if (Call.calls().size > 0)
+                                spinToAor(Call.calls()[0].ua.account.aor)
+                            else {
+                                aorSpinner.setSelection(0)
+                                aorSpinner.tag = UserAgent.uas()[0].account.aor
+                            }
+                        }
+                    }
+                }
+                uaAdapter.notifyDataSetChanged()
+                if (UserAgent.uas().size > 0) {
+                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                    showCall(ua)
+                    updateIcons(ua.account)
+                }
             }
         }
+        resumeAction = ""
+    }
 
-    } // OnCreate
+    override fun onPause() {
+        Log.d(TAG, "Main onPause")
+        Utils.addActivity("main")
+        BaresipService.isMainVisible = false
+        saveCallUri()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "Main onStop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "Main onDestroy")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        BaresipService.activities.clear()
+        super.onDestroy()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grandResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
+        var allowed = true
+        when (requestCode) {
+            CALL_PERMISSION_REQUEST_CODE -> {
+                for (res in grandResults)
+                    allowed = allowed && res == PackageManager.PERMISSION_GRANTED
+                if (allowed) {
+                    callUri.setAdapter(null)
+                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                    val aor = ua.account.aor
+                    if (Call.calls().isEmpty()) {
+                        val uriText = callUri.text.toString().trim()
+                        if (uriText.isNotEmpty()) {
+                            val uri = Utils.uriComplete(
+                                ContactsActivity.findContactURI(uriText)
+                                    .filterNot { it.isWhitespace() },
+                                Utils.aorDomain(aor)
+                            )
+                            if (!Utils.checkSipUri(uri)) {
+                                Utils.alertView(
+                                    this, getString(R.string.notice),
+                                    String.format(getString(R.string.invalid_sip_uri), uri)
+                                )
+                            } else {
+                                callUri.isFocusable = false
+                                if (!call(ua, uri)) {
+                                    callButton.visibility = View.VISIBLE
+                                    callButton.isEnabled = true
+                                    hangupButton.visibility = View.INVISIBLE
+                                    hangupButton.isEnabled = false
+                                } else {
+                                    callButton.visibility = View.INVISIBLE
+                                    callButton.isEnabled = false
+                                    hangupButton.visibility = View.VISIBLE
+                                    hangupButton.isEnabled = true
+                                }
+                            }
+                        } else {
+                            val latest = CallHistory.aorLatestHistory(aor)
+                            if (latest != null)
+                                callUri.setText(
+                                    Utils.friendlyUri(
+                                        ContactsActivity.contactName(latest.peerUri),
+                                        Utils.aorDomain(ua.account.aor)
+                                    )
+                                )
+                        }
+                    }
+                } else {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.RECORD_AUDIO
+                        )
+                    ) {
+                        layout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_android_contacts),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionsLauncher.launch(permissions)
+                        }
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_PHONE_STATE
+                        )
+                    ) {
+                        layout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_android_contacts),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionsLauncher.launch(permissions)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
@@ -790,84 +927,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        Log.d(TAG, "Main onStart")
-        super.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "Main onResume with action '$resumeAction'")
-        nm.cancelAll()
-        BaresipService.isMainVisible = true
-        when (resumeAction) {
-            "call show" ->
-                handleServiceEvent("call incoming",
-                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "call answer" -> {
-                answerButton.performClick()
-                showCall(resumeCall!!.ua)
-            }
-            "call missed" -> {
-                callsButton.performClick()
-            }
-            "call reject" ->
-                rejectButton.performClick()
-            "call" -> {
-                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
-                callButton.performClick()
-            }
-            "transfer show", "transfer accept" ->
-                handleServiceEvent("$resumeAction,$resumeUri",
-                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "message", "message show", "message reply" ->
-                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
-            else -> {
-                val incomingCall = Call.call("incoming")
-                if (incomingCall != null) {
-                    spinToAor(incomingCall.ua.account.aor)
-                } else {
-                    restoreActivities()
-                    if (UserAgent.uas().size > 0) {
-                        if (aorSpinner.selectedItemPosition == -1) {
-                            if (Call.calls().size > 0)
-                                spinToAor(Call.calls()[0].ua.account.aor)
-                            else {
-                                aorSpinner.setSelection(0)
-                                aorSpinner.tag = UserAgent.uas()[0].account.aor
-                            }
-                        }
-                    }
-                }
-                uaAdapter.notifyDataSetChanged()
-                if (UserAgent.uas().size > 0) {
-                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-                    showCall(ua)
-                    updateIcons(ua.account)
-                }
-            }
-        }
-        resumeAction = ""
-    }
-
-    override fun onPause() {
-        Log.d(TAG, "Main onPause")
-        Utils.addActivity("main")
-        BaresipService.isMainVisible = false
-        saveCallUri()
-        super.onPause()
-    }
-
-    override fun onStop() {
-        Log.d(TAG, "Main onStop")
-        super.onStop()
-    }
-
-    override fun recreate() {
-        Log.d(TAG, "Main onCreate")
-        super.recreate()
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         val stream = if (am.mode == AudioManager.MODE_RINGTONE)
             AudioManager.STREAM_RING
@@ -971,10 +1030,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val callp = params[1]
-                        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
-                            Api.ua_hangup(uap, callp, 486, "Busy Here")
-                            return
-                        }
                         if (BaresipService.isMainVisible) {
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
@@ -1173,13 +1228,6 @@ class MainActivity : AppCompatActivity() {
         moveTaskToBack(true)
     }
 
-    override fun onDestroy() {
-        Log.d(TAG, "Main onDestroy")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
-        BaresipService.activities.clear()
-        super.onDestroy()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
@@ -1219,24 +1267,59 @@ class MainActivity : AppCompatActivity() {
                 if (Build.VERSION.SDK_INT >= 29) {
                     pickupFileFromDownloads("backup")
                 } else {
-                    if (Utils.requestPermission(
+                    if (ContextCompat.checkSelfPermission(
                             this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            BACKUP_PERMISSION_REQUEST_CODE
-                        )
-                    ) {
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "Write External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
                         downloadsOutputStream = FileOutputStream(File(path))
                         askPassword(getString(R.string.encrypt_password))
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        layout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_backup),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        }
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     }
+
                 }
             }
 
             R.id.restore -> {
-                if (Build.VERSION.SDK_INT >= 29 ||
-                        Utils.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE,
-                                RESTORE_PERMISSION_REQUEST_CODE))
-                    startRestore()
+                if (Build.VERSION.SDK_INT >= 29) {
+                    pickupFileFromDownloads("restore")
+                } else {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "Read External Storage permission granted")
+                        val path = Utils.downloadsPath("baresip.bs")
+                        downloadsInputStream = FileInputStream(File(path))
+                        askPassword(getString(R.string.decrypt_password))
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        layout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_restore),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        }
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                }
             }
 
             R.id.about -> {
@@ -1248,38 +1331,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                            grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-
-            RECORD_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.no_calls))
-
-            BACKUP_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                    askPassword(getString(R.string.encrypt_password))
-
-            RESTORE_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                    startRestore()
-
-        }
-    }
-
-    private fun startRestore() {
-        if (Build.VERSION.SDK_INT >= 29) {
-            pickupFileFromDownloads("restore")
-        } else {
-            val path = Utils.downloadsPath("baresip.bs")
-            downloadsInputStream = FileInputStream(File(path))
-            askPassword(getString(R.string.decrypt_password))
-        }
     }
 
     @RequiresApi(29)
@@ -1559,11 +1610,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String): Boolean {
-        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
-            Toast.makeText(applicationContext, getString(R.string.no_calls),
-                    Toast.LENGTH_LONG).show()
-            return false
-        }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
         val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)

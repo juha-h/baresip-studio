@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.content.Intent
 import android.content.BroadcastReceiver
+import android.content.pm.PackageManager
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
@@ -36,6 +37,7 @@ import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import android.media.MediaPlayer
 import android.telecom.TelecomManager
+import androidx.core.app.ActivityCompat
 
 class BaresipService: Service() {
 
@@ -576,20 +578,23 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
                         if (Call.calls().size > 0 ||
-                            (Utils.checkPermission(this, Manifest.permission.READ_PHONE_STATE) &&
-                                tm.isInCall) ||
-                            !Utils.checkPermission(applicationContext, Manifest.permission.RECORD_AUDIO)) {
-                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
-                            Api.ua_hangup(uap, callp, 486, "Busy Here")
-                            if (ua.account.callHistory) {
-                                CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                                CallHistory.save()
-                                ua.account.missedCalls = true
-                            }
-                            playUnInterrupted(R.raw.callwaiting, 1)
-                            if (!Utils.isVisible())
-                                return
-                            newEvent = "call rejected"
+                            !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)) ||
+                            ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.READ_PHONE_STATE
+                                ) != PackageManager.PERMISSION_GRANTED ||
+                            tm.isInCall) {
+                                Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                                Api.ua_hangup(uap, callp, 486, "Busy Here")
+                                if (ua.account.callHistory) {
+                                    CallHistory.add(CallHistory(aor, peerUri, "in", false))
+                                    CallHistory.save()
+                                    ua.account.missedCalls = true
+                                }
+                                playUnInterrupted(R.raw.callwaiting, 1)
+                                if (!Utils.isVisible())
+                                    return
+                                newEvent = "call rejected"
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming",

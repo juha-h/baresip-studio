@@ -41,6 +41,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        tools:remove="android:appComponentFactory"
         tools:targetApi="q">
         <activity
             android:name=".MainActivity"

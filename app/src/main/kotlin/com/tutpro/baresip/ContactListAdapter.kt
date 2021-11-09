@@ -128,7 +128,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                             }
                         }
                         if (contact.androidContact &&
-                                Utils.checkPermission(ctx, Manifest.permission.WRITE_CONTACTS))
+                                Utils.checkPermissions(ctx, arrayOf(Manifest.permission.WRITE_CONTACTS)))
                             ContactActivity.deleteAndroidContact(ctx, contact)
                         Contact.contacts().removeAt(position)
                         Contact.save()
