@@ -578,12 +578,7 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
                         if (Call.calls().size > 0 ||
-                            !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)) ||
-                            ActivityCompat.checkSelfPermission(
-                                    this,
-                                    Manifest.permission.READ_PHONE_STATE
-                                ) != PackageManager.PERMISSION_GRANTED ||
-                            tm.isInCall) {
+                            !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
                                 Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                                 Api.ua_hangup(uap, callp, 486, "Busy Here")
                                 if (ua.account.callHistory) {
