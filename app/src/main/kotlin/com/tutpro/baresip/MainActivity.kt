@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity() {
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
@@ -637,16 +636,6 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        requestPermissionsLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-                    permissions ->
-                permissions.entries.forEach {
-                    if (it.value)
-                        Log.i(TAG, "Permission ${it.key} granted")
-                    else
-                        Log.i(TAG, "Permission ${it.key} denied")
-                }
-            }
     }
 
     override fun onResume() {

@@ -21,7 +21,6 @@ import android.view.View
 import android.widget.RemoteViews
 import android.content.Intent
 import android.content.BroadcastReceiver
-import android.content.pm.PackageManager
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
@@ -37,7 +36,6 @@ import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import android.media.MediaPlayer
 import android.telecom.TelecomManager
-import androidx.core.app.ActivityCompat
 
 class BaresipService: Service() {
 
