@@ -359,7 +359,7 @@ object Utils {
     fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
         for (p in permissions) {
             if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Permission $p is not granted")
+                Log.d(TAG, "Permission $p is denied")
                 return false
             } else {
                 Log.d(TAG, "Permission $p is granted")

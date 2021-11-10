@@ -123,43 +123,45 @@ class ConfigActivity : AppCompatActivity() {
             if (isChecked) {
                 if (Build.VERSION.SDK_INT < 29) {
                     certificateFile.isChecked = false
-                    if (ContextCompat.checkSelfPermission(
+                    when {
+                        ContextCompat.checkSelfPermission(
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        Log.d(TAG, "Read External Storage permission granted")
-                        val downloadsPath = Utils.downloadsPath("cert.pem")
-                        val content = Utils.getFileContents(downloadsPath)
-                        if (content == null) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                getString(R.string.read_cert_error)
-                            )
-                            return@setOnCheckedChangeListener
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                            Log.d(TAG, "Read External Storage permission granted")
+                            val downloadsPath = Utils.downloadsPath("cert.pem")
+                            val content = Utils.getFileContents(downloadsPath)
+                            if (content == null) {
+                                Utils.alertView(
+                                    this, getString(R.string.error),
+                                    getString(R.string.read_cert_error)
+                                )
+                                return@setOnCheckedChangeListener
+                            }
+                            val filesPath = BaresipService.filesPath + "/cert.pem"
+                            Utils.putFileContents(filesPath, content)
+                            Config.removeVariable("sip_certificate")
+                            Config.addLine("sip_certificate $filesPath")
+                            certificateFile.isChecked = true
+                            save = true
+                            restart = true
                         }
-                        val filesPath = BaresipService.filesPath + "/cert.pem"
-                        Utils.putFileContents(filesPath, content)
-                        Config.removeVariable("sip_certificate")
-                        Config.addLine("sip_certificate $filesPath")
-                        certificateFile.isChecked = true
-                        save = true
-                        restart = true
-                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                        ActivityCompat.shouldShowRequestPermissionRationale(
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
-                        )
-                    ) {
-                        layout.showSnackBar(
-                            binding.root,
-                            getString(R.string.no_restore),
-                            Snackbar.LENGTH_INDEFINITE,
-                            getString(R.string.ok)
-                        ) {
+                        ) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_restore),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
+                        }
+                        else -> {
                             requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }
-                    } else {
-                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 } else {
                     Utils.selectInputFile(certificateRequest)
@@ -211,43 +213,45 @@ class ConfigActivity : AppCompatActivity() {
             if (isChecked) {
                 if (Build.VERSION.SDK_INT < 29) {
                     caFile.isChecked = false
-                    if (ContextCompat.checkSelfPermission(
+                    when {
+                        ContextCompat.checkSelfPermission(
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        Log.d(TAG, "Read External Storage permission granted")
-                        val downloadsPath = Utils.downloadsPath("ca_certs.crt")
-                        val content = Utils.getFileContents(downloadsPath)
-                        if (content == null) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                getString(R.string.read_ca_certs_error)
-                            )
-                            return@setOnCheckedChangeListener
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                            Log.d(TAG, "Read External Storage permission granted")
+                            val downloadsPath = Utils.downloadsPath("ca_certs.crt")
+                            val content = Utils.getFileContents(downloadsPath)
+                            if (content == null) {
+                                Utils.alertView(
+                                    this, getString(R.string.error),
+                                    getString(R.string.read_ca_certs_error)
+                                )
+                                return@setOnCheckedChangeListener
+                            }
+                            val filesPath = BaresipService.filesPath + "/ca_certs.crt"
+                            Utils.putFileContents(filesPath, content)
+                            Config.removeVariable("sip_cafile")
+                            Config.addLine("sip_cafile $filesPath")
+                            caFile.isChecked = true
+                            save = true
+                            restart = true
                         }
-                        val filesPath = BaresipService.filesPath + "/ca_certs.crt"
-                        Utils.putFileContents(filesPath, content)
-                        Config.removeVariable("sip_cafile")
-                        Config.addLine("sip_cafile $filesPath")
-                        caFile.isChecked = true
-                        save = true
-                        restart = true
-                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                        )
-                    ) {
-                        layout.showSnackBar(
-                        binding.root,
-                        getString(R.string.no_restore),
-                        Snackbar.LENGTH_INDEFINITE,
-                        getString(R.string.ok)
-                        ) {
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_restore),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
+                        }
+                        else -> {
                             requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }
-                    } else {
-                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 } else {
                     Utils.selectInputFile(certificatesRequest)

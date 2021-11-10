@@ -207,39 +207,40 @@ class ContactActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grandResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grandResults)
-        var allowed = true
         when (requestCode) {
-            CONTACT_PERMISSION_REQUEST_CODE ->
+            CONTACT_PERMISSION_REQUEST_CODE -> {
+                var allowed = true
                 for (res in grandResults)
                     allowed = allowed && res == PackageManager.PERMISSION_GRANTED
-        }
-        if (!allowed) {
-            androidCheck.isChecked = oldAndroid
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.READ_CONTACTS
-                ))
-            {
-                layout.showSnackBar(
-                    binding.root,
-                    getString(R.string.no_android_contacts),
-                    Snackbar.LENGTH_INDEFINITE,
-                    getString(R.string.ok)
-                ) {
-                    requestPermissionsLauncher.launch(permissions)
-                }
-            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.WRITE_CONTACTS
-                ))
-            {
-                layout.showSnackBar(
-                    binding.root,
-                    getString(R.string.no_android_contacts),
-                    Snackbar.LENGTH_INDEFINITE,
-                    getString(R.string.ok)
-                ) {
-                    requestPermissionsLauncher.launch(permissions)
+                if (!allowed) {
+                    androidCheck.isChecked = oldAndroid
+                    when {
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.READ_CONTACTS) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_android_contacts),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.WRITE_CONTACTS) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_android_contacts),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        else -> {
+                            requestPermissionsLauncher.launch(permissions)
+                        }
+                    }
                 }
             }
         }

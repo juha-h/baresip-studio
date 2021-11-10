@@ -310,10 +310,12 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            val permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE)
-            if (Build.VERSION.SDK_INT >= 23)
-                if (!Utils.checkPermissions(this, permissions))
-                    requestPermissions(permissions, CALL_PERMISSION_REQUEST_CODE)
+            val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
+            if (Build.VERSION.SDK_INT < 23 || Utils.checkPermissions(this, permissions))
+                makeCall()
+            else
+                ActivityCompat.requestPermissions(this, permissions,
+                    CALL_PERMISSION_REQUEST_CODE)
         }
 
         hangupButton.setOnClickListener {
@@ -720,89 +722,6 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
         super.onDestroy()
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grandResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
-        var allowed = true
-        when (requestCode) {
-            CALL_PERMISSION_REQUEST_CODE -> {
-                for (res in grandResults)
-                    allowed = allowed && res == PackageManager.PERMISSION_GRANTED
-                if (allowed) {
-                    callUri.setAdapter(null)
-                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-                    val aor = ua.account.aor
-                    if (Call.calls().isEmpty()) {
-                        val uriText = callUri.text.toString().trim()
-                        if (uriText.isNotEmpty()) {
-                            val uri = Utils.uriComplete(
-                                ContactsActivity.findContactURI(uriText)
-                                    .filterNot { it.isWhitespace() },
-                                Utils.aorDomain(aor)
-                            )
-                            if (!Utils.checkSipUri(uri)) {
-                                Utils.alertView(
-                                    this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_sip_uri), uri)
-                                )
-                            } else {
-                                callUri.isFocusable = false
-                                if (!call(ua, uri)) {
-                                    callButton.visibility = View.VISIBLE
-                                    callButton.isEnabled = true
-                                    hangupButton.visibility = View.INVISIBLE
-                                    hangupButton.isEnabled = false
-                                } else {
-                                    callButton.visibility = View.INVISIBLE
-                                    callButton.isEnabled = false
-                                    hangupButton.visibility = View.VISIBLE
-                                    hangupButton.isEnabled = true
-                                }
-                            }
-                        } else {
-                            val latest = CallHistory.aorLatestHistory(aor)
-                            if (latest != null)
-                                callUri.setText(
-                                    Utils.friendlyUri(
-                                        ContactsActivity.contactName(latest.peerUri),
-                                        Utils.aorDomain(ua.account.aor)
-                                    )
-                                )
-                        }
-                    }
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.RECORD_AUDIO
-                        )
-                    ) {
-                        layout.showSnackBar(
-                            binding.root,
-                            getString(R.string.no_android_contacts),
-                            Snackbar.LENGTH_INDEFINITE,
-                            getString(R.string.ok)
-                        ) {
-                            requestPermissionsLauncher.launch(permissions)
-                        }
-                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.READ_PHONE_STATE
-                        )
-                    ) {
-                        layout.showSnackBar(
-                            binding.root,
-                            getString(R.string.no_android_contacts),
-                            Snackbar.LENGTH_INDEFINITE,
-                            getString(R.string.ok)
-                        ) {
-                            requestPermissionsLauncher.launch(permissions)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -1264,20 +1183,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.backup -> {
-                if (Build.VERSION.SDK_INT >= 29) {
-                    pickupFileFromDownloads("backup")
-                } else {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED) {
+                when {
+                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("backup")
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Write External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
                         downloadsOutputStream = FileOutputStream(File(path))
                         askPassword(getString(R.string.encrypt_password))
-                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    }
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
                         layout.showSnackBar(
                             binding.root,
                             getString(R.string.no_backup),
@@ -1286,28 +1205,28 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         }
-                    } else {
+                    }
+                    else -> {
                         requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     }
-
                 }
             }
 
             R.id.restore -> {
-                if (Build.VERSION.SDK_INT >= 29) {
-                    pickupFileFromDownloads("restore")
-                } else {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED) {
+                when {
+                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("restore")
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Read External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
                         downloadsInputStream = FileInputStream(File(path))
                         askPassword(getString(R.string.decrypt_password))
-                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    }
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                         layout.showSnackBar(
                             binding.root,
                             getString(R.string.no_restore),
@@ -1316,7 +1235,8 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }
-                    } else {
+                    }
+                    else -> {
                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 }
@@ -1331,6 +1251,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            CALL_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    makeCall()
+                } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.RECORD_AUDIO)) {
+                    layout.showSnackBar(
+                        binding.root,
+                        getString(R.string.no_calls),
+                        Snackbar.LENGTH_INDEFINITE,
+                        getString(R.string.ok)
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }
+                } else  {
+                    requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+        }
     }
 
     @RequiresApi(29)
@@ -1662,6 +1607,50 @@ class MainActivity : AppCompatActivity() {
             }
             R.drawable.box_green -> {
                 button.tag = "green"
+            }
+        }
+    }
+
+    private fun makeCall() {
+        callUri.setAdapter(null)
+        val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+        val aor = ua.account.aor
+        if (Call.calls().isEmpty()) {
+            val uriText = callUri.text.toString().trim()
+            if (uriText.isNotEmpty()) {
+                val uri = Utils.uriComplete(
+                    ContactsActivity.findContactURI(uriText)
+                        .filterNot { it.isWhitespace() },
+                    Utils.aorDomain(aor)
+                )
+                if (!Utils.checkSipUri(uri)) {
+                    Utils.alertView(
+                        this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_sip_uri), uri)
+                    )
+                } else {
+                    callUri.isFocusable = false
+                    if (!call(ua, uri)) {
+                        callButton.visibility = View.VISIBLE
+                        callButton.isEnabled = true
+                        hangupButton.visibility = View.INVISIBLE
+                        hangupButton.isEnabled = false
+                    } else {
+                        callButton.visibility = View.INVISIBLE
+                        callButton.isEnabled = false
+                        hangupButton.visibility = View.VISIBLE
+                        hangupButton.isEnabled = true
+                    }
+                }
+            } else {
+                val latest = CallHistory.aorLatestHistory(aor)
+                if (latest != null)
+                    callUri.setText(
+                        Utils.friendlyUri(
+                            ContactsActivity.contactName(latest.peerUri),
+                            Utils.aorDomain(ua.account.aor)
+                        )
+                    )
             }
         }
     }
