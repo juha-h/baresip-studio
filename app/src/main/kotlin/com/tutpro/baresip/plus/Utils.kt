@@ -1,7 +1,5 @@
 package com.tutpro.baresip.plus
 
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -27,17 +25,20 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.google.android.material.snackbar.Snackbar
 import java.io.*
 import java.lang.reflect.Method
 import java.security.SecureRandom
 import java.util.*
-import java.util.zip.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -328,8 +329,9 @@ object Utils {
                     val addresses: Enumeration<InetAddress> = iface.inetAddresses
                     while (addresses.hasMoreElements()) {
                         val inetAddress: InetAddress = addresses.nextElement()
-                        if (!inetAddress.isLoopbackAddress && !inetAddress.isLinkLocalAddress)
-                            result[inetAddress.hostAddress] = ifName
+                        if (inetAddress.hostAddress != null && !inetAddress.isLoopbackAddress &&
+                            !inetAddress.isLinkLocalAddress)
+                            result[inetAddress.hostAddress!!] = ifName
                     }
                     if (result.isNotEmpty()) return result
                 }
@@ -364,22 +366,33 @@ object Utils {
         }
     }
 
-    fun checkPermission(ctx: Context, permissions: String) : Boolean {
-        for (p in permissions.split("|")) {
-            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED)
+    fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
+        for (p in permissions) {
+            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permission $p is denied")
                 return false
+            } else {
+                Log.d(TAG, "Permission $p is granted")
+            }
         }
         return true
     }
 
-    fun requestPermission(ctx: Context, permissions: String, requestCode: Int) : Boolean {
-        val pArray = permissions.split("|").toTypedArray()
-        for (p in pArray)
-            if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(ctx as Activity, pArray, requestCode)
-                return false
-            }
-        return true
+    fun View.showSnackBar(
+        view: View,
+        msg: String,
+        length: Int,
+        actionMessage: CharSequence?,
+        action: (View) -> Unit
+    ) {
+        val snackBar = Snackbar.make(view, msg, length)
+        if (actionMessage != null) {
+            snackBar.setAction(actionMessage) {
+                action(this)
+            }.show()
+        } else {
+            snackBar.show()
+        }
     }
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {

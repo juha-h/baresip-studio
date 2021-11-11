@@ -10,9 +10,7 @@ import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
-import android.media.MediaActionSound
 import android.net.Uri
-import android.os.*
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
@@ -22,15 +20,20 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import android.content.Intent
 import android.content.BroadcastReceiver
+import android.media.MediaActionSound
+import android.os.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
+import com.tutpro.baresip.plus.Utils.showSnackBar
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileInputStream
@@ -38,6 +41,7 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -80,6 +84,8 @@ class MainActivity : AppCompatActivity() {
     private var speakerIcon: MenuItem? = null
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
@@ -322,13 +328,31 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            makeCall("voice")
+            val permissions =
+                if (BaresipService.cameraAvailable)
+                    arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
+                else
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
+            if (Utils.checkPermissions(this, permissions))
+                makeCall("voice")
+            else
+                ActivityCompat.requestPermissions(this, permissions,
+                    CALL_PERMISSION_REQUEST_CODE)
         }
 
         callVideoButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            makeCall("video")
+            val permissions =
+                if (BaresipService.cameraAvailable)
+                    arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
+                else
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
+            if (Utils.checkPermissions(this, permissions))
+                makeCall("video")
+            else
+                ActivityCompat.requestPermissions(this, permissions,
+                    VIDEO_CALL_PERMISSION_REQUEST_CODE)
         }
 
         hangupButton.setOnClickListener {
@@ -683,17 +707,91 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
-        window.decorView.post {
-            if (firstRun) {
-                if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO))
-                    Utils.requestPermission(
-                        this, Manifest.permission.RECORD_AUDIO, RECORD_PERMISSION_REQUEST_CODE
-                    )
-                firstRun = false
+    } // OnCreate
+
+    override fun onStart() {
+        Log.i(TAG, "Main onStart")
+        super.onStart()
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "Main onResume with action '$resumeAction'")
+        nm.cancelAll()
+        BaresipService.isMainVisible = true
+        when (resumeAction) {
+            "call show" ->
+                handleServiceEvent("call incoming",
+                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "call answer" -> {
+                answerButton.performClick()
+                showCall(resumeCall!!.ua)
+            }
+            "call missed" -> {
+                callsButton.performClick()
+            }
+            "call reject" ->
+                rejectButton.performClick()
+            "call" -> {
+                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
+                callButton.performClick()
+            }
+            "transfer show", "transfer accept" ->
+                handleServiceEvent("$resumeAction,$resumeUri",
+                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "message", "message show", "message reply" ->
+                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
+            else -> {
+                val incomingCall = Call.call("incoming")
+                if (incomingCall != null) {
+                    spinToAor(incomingCall.ua.account.aor)
+                } else {
+                    restoreActivities()
+                    if (UserAgent.uas().size > 0) {
+                        if (aorSpinner.selectedItemPosition == -1) {
+                            if (Call.calls().size > 0)
+                                spinToAor(Call.calls()[0].ua.account.aor)
+                            else {
+                                aorSpinner.setSelection(0)
+                                aorSpinner.tag = UserAgent.uas()[0].account.aor
+                            }
+                        }
+                    }
+                }
+                uaAdapter.notifyDataSetChanged()
+                if (UserAgent.uas().size > 0) {
+                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                    showCall(ua)
+                    updateIcons(ua.account)
+                }
             }
         }
+        resumeAction = ""
+    }
 
-    } // OnCreate
+    override fun onPause() {
+        Log.d(TAG, "Main onPause")
+        Utils.addActivity("main")
+        BaresipService.isMainVisible = false
+        saveCallUri()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "Main onStop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "Main onDestroy")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        BaresipService.activities.clear()
+        super.onDestroy()
+    }
 
     private fun addVideoLayoutViews() {
 
@@ -718,7 +816,7 @@ class MainActivity : AppCompatActivity() {
 
         // Snapshot Button
         if ((Build.VERSION.SDK_INT >= 29) ||
-                Utils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Utils.checkPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
             val sb = ImageButton(this)
             sb.setImageResource(R.drawable.snapshot)
             sb.setBackgroundResource(0)
@@ -934,74 +1032,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "Main onResume with action '$resumeAction'")
-        nm.cancelAll()
-        BaresipService.isMainVisible = true
-        when (resumeAction) {
-            "call show" ->
-                handleServiceEvent("call incoming",
-                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "call answer" -> {
-                answerButton.performClick()
-                showCall(resumeCall!!.ua)
-            }
-            "call missed" -> {
-                callsButton.performClick()
-            }
-            "call reject" ->
-                rejectButton.performClick()
-            "call" -> {
-                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
-                callButton.performClick()
-            }
-            "transfer show", "transfer accept" ->
-                handleServiceEvent("$resumeAction,$resumeUri",
-                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
-            "message", "message show", "message reply" ->
-                handleServiceEvent(resumeAction, arrayListOf(resumeUap, resumeUri))
-            else -> {
-                val incomingCall = Call.call("incoming")
-                if (incomingCall != null) {
-                    spinToAor(incomingCall.ua.account.aor)
-                } else {
-                    restoreActivities()
-                    if (UserAgent.uas().size > 0) {
-                        if (aorSpinner.selectedItemPosition == -1) {
-                            if (Call.calls().size > 0)
-                                spinToAor(Call.calls()[0].ua.account.aor)
-                            else {
-                                aorSpinner.setSelection(0)
-                                aorSpinner.tag = UserAgent.uas()[0].account.aor
-                            }
-                        }
-                    }
-                }
-                uaAdapter.notifyDataSetChanged()
-                if (UserAgent.uas().size > 0) {
-                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-                    showCall(ua)
-                    updateIcons(ua.account)
-                }
-            }
-        }
-        resumeAction = ""
-    }
-
-    override fun onPause() {
-        Log.d(TAG, "Main onPause")
-        Utils.addActivity("main")
-        BaresipService.isMainVisible = false
-        saveCallUri()
-        super.onPause()
-    }
-
-    override fun recreate() {
-        Log.d(TAG, "Main onCreate")
-        super.recreate()
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         val stream = if (am.mode == AudioManager.MODE_RINGTONE)
             AudioManager.STREAM_RING
@@ -1105,7 +1135,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call incoming" -> {
                         val callp = params[1]
-                        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
+                        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             return
                         }
@@ -1352,13 +1382,6 @@ class MainActivity : AppCompatActivity() {
         moveTaskToBack(true)
     }
 
-    override fun onDestroy() {
-        Log.d(TAG, "Main onDestroy")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
-        BaresipService.activities.clear()
-        super.onDestroy()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         menuInflater.inflate(R.menu.speaker_icon, menu)
@@ -1401,23 +1424,63 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.backup -> {
-                if (Build.VERSION.SDK_INT >= 29) {
-                    pickupFileFromDownloads("backup")
-                } else {
-                    if (Utils.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    BACKUP_PERMISSION_REQUEST_CODE)) {
-                        val path = Utils.downloadsPath("baresip+.bs")
+                when {
+                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("backup")
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED -> {
+                        Log.d(TAG, "Write External Storage permission granted")
+                        val path = Utils.downloadsPath("baresip.bs")
                         downloadsOutputStream = FileOutputStream(File(path))
                         askPassword(getString(R.string.encrypt_password))
+                    }
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
+                        defaultLayout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_backup),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        }
+                    }
+                    else -> {
+                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     }
                 }
             }
 
             R.id.restore -> {
-                if (Build.VERSION.SDK_INT >= 29 ||
-                        Utils.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE,
-                                RESTORE_PERMISSION_REQUEST_CODE))
-                    startRestore()
+                when {
+                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("restore")
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED -> {
+                        Log.d(TAG, "Read External Storage permission granted")
+                        val path = Utils.downloadsPath("baresip.bs")
+                        downloadsInputStream = FileInputStream(File(path))
+                        askPassword(getString(R.string.decrypt_password))
+                    }
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                        defaultLayout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_restore),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        }
+                    }
+                    else -> {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                }
             }
 
             R.id.about -> {
@@ -1428,50 +1491,71 @@ class MainActivity : AppCompatActivity() {
                 quitRestart(item.itemId == R.id.restart)
             }
         }
+
         return true
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
                                             grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         when (requestCode) {
-
-            RECORD_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
-                    Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.no_calls))
-                else {
-                    BaresipService.cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
-                    if (BaresipService.cameraAvailable)
-                        Utils.requestPermission(this, Manifest.permission.CAMERA,
-                                CAMERA_PERMISSION_REQUEST_CODE)
+            CALL_PERMISSION_REQUEST_CODE, VIDEO_CALL_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.size == 1) {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        makeCall("voice")
+                        return
+                    }
+                    val perm = Manifest.permission.RECORD_AUDIO
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, perm))
+                        defaultLayout.showSnackBar(
+                            binding.root,
+                            getString(R.string.no_calls),
+                            Snackbar.LENGTH_INDEFINITE,
+                            getString(R.string.ok)
+                        ) {
+                            requestPermissionLauncher.launch(perm)
+                        }
                     else
-                        Utils.alertView(this,
-                                getString(R.string.notice), getString(R.string.no_cameras))
+                        requestPermissionLauncher.launch(perm)
+                } else {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                            grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                        if (requestCode == CALL_PERMISSION_REQUEST_CODE)
+                            makeCall("voice")
+                        else
+                            makeCall("video")
+                        return
+                    }
+                    val perms = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
+                    when {
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.RECORD_AUDIO) -> {
+                            defaultLayout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_calls),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(perms)
+                            }
+                        }
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.CAMERA) -> {
+                            defaultLayout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_video_calls),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(perms)
+                            }
+                        }
+                        else -> {
+                            requestPermissionsLauncher.launch(perms)
+                        }
+                    }
                 }
-
-            CAMERA_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] != PackageManager.PERMISSION_GRANTED))
-                    Utils.alertView(this, getString(R.string.notice), getString(R.string.no_video_calls))
-
-            BACKUP_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                    askPassword(getString(R.string.encrypt_password))
-
-            RESTORE_PERMISSION_REQUEST_CODE ->
-                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                    startRestore()
-        }
-    }
-
-    private fun startRestore() {
-        if (Build.VERSION.SDK_INT >= 29) {
-            pickupFileFromDownloads("restore")
-        } else {
-            val path = Utils.downloadsPath("baresip+.bs")
-            downloadsInputStream = FileInputStream(File(path))
-            askPassword(getString(R.string.decrypt_password))
+            }
         }
     }
 
@@ -1571,8 +1655,7 @@ class MainActivity : AppCompatActivity() {
         val input = layout.findViewById(R.id.password) as EditText
         input.requestFocus()
         val context = this
-        val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-        with(builder) {
+        with(AlertDialog.Builder(this, R.style.AlertDialog)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1596,7 +1679,7 @@ class MainActivity : AppCompatActivity() {
                 imm.hideSoftInputFromWindow(input.windowToken, 0)
                 dialog.cancel()
             }
-            val dialog = builder.create()
+            val dialog = this.create()
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             dialog.show()
         }
@@ -1620,8 +1703,7 @@ class MainActivity : AppCompatActivity() {
                 val input = layout.findViewById(R.id.password) as EditText
                 input.requestFocus()
                 val context = this
-                val builder = AlertDialog.Builder(this, R.style.AlertDialog)
-                with(builder) {
+                with(AlertDialog.Builder(this, R.style.AlertDialog)) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
@@ -1641,7 +1723,7 @@ class MainActivity : AppCompatActivity() {
                         aorPasswords[aor] = ""
                         askPasswords(accounts)
                     }
-                    val dialog = builder.create()
+                    val dialog = this.create()
                     dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     dialog.show()
                 }
@@ -1799,7 +1881,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String, kind: String): Boolean {
-        if (!Utils.checkPermission(this, Manifest.permission.RECORD_AUDIO)) {
+        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
             Toast.makeText(applicationContext, getString(R.string.no_calls),
                     Toast.LENGTH_LONG).show()
             return false

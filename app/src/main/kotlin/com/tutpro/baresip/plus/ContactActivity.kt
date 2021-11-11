@@ -20,10 +20,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
 import androidx.exifinterface.media.ExifInterface
+import com.google.android.material.snackbar.Snackbar
+import com.tutpro.baresip.plus.Utils.showSnackBar
 import com.tutpro.baresip.plus.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -31,6 +35,7 @@ import java.io.File
 class ContactActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactBinding
+    private lateinit var layout: LinearLayout
     private lateinit var textAvatarView: TextView
     private lateinit var cardAvatarView: CardView
     private lateinit var cardImageAvatarView: ImageView
@@ -38,6 +43,7 @@ class ContactActivity : AppCompatActivity() {
     private lateinit var uriView: EditText
     private lateinit var androidCheck: CheckBox
     private lateinit var menu: Menu
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private var newContact = false
     private var newAvatar = ""
@@ -48,11 +54,15 @@ class ContactActivity : AppCompatActivity() {
     private var id: Long = 0
     private var oldAndroid = false
 
+    private val permissions =
+        arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         binding = ActivityContactBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        layout = binding.ContactView
 
         textAvatarView = binding.TextAvatar
         cardAvatarView = binding.CardAvatar
@@ -166,8 +176,19 @@ class ContactActivity : AppCompatActivity() {
                 getString(R.string.android_contact_help))
         }
 
+        androidCheck.setOnClickListener{
+            if (!Utils.checkPermissions(this, permissions))
+                requestPermissions(permissions, CONTACT_PERMISSION_REQUEST_CODE)
+        }
+
         Utils.addActivity("contact,$newContact,$uOrI")
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
     }
 
     override fun onCreateOptionsMenu(optionsMenu: Menu): Boolean {
@@ -179,6 +200,46 @@ class ContactActivity : AppCompatActivity() {
         menu = optionsMenu
         return true
 
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grandResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
+        when (requestCode) {
+            CONTACT_PERMISSION_REQUEST_CODE -> {
+                if (grandResults[0] != PackageManager.PERMISSION_GRANTED ||
+                        grandResults[1] != PackageManager.PERMISSION_GRANTED) {
+                    androidCheck.isChecked = oldAndroid
+                    when {
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.READ_CONTACTS) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_android_contacts),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.WRITE_CONTACTS) -> {
+                            layout.showSnackBar(
+                                binding.root,
+                                getString(R.string.no_android_contacts),
+                                Snackbar.LENGTH_INDEFINITE,
+                                getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        else -> {
+                            requestPermissionsLauncher.launch(permissions)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -260,20 +321,13 @@ class ContactActivity : AppCompatActivity() {
 
                 Contact.contacts().sortBy { Contact -> Contact.name }
 
-                if (Utils.checkPermission(this, Manifest.permission.READ_CONTACTS +
-                                "|" + Manifest.permission.WRITE_CONTACTS)) {
+                if (Utils.checkPermissions(this, permissions)) {
                     if (contact.androidContact)
                         addOrUpdateAndroidContact(this, contact)
-                    else
-                        if (oldAndroid)
-                            deleteAndroidContact(this, contact)
+                    else if (oldAndroid)
+                        deleteAndroidContact(this, contact)
                 } else {
-                    if (contact.androidContact) {
-                        Utils.requestPermission(this, Manifest.permission.READ_CONTACTS +
-                                "|" + Manifest.permission.WRITE_CONTACTS,
-                            CONTACTS_PERMISSION_REQUEST_CODE)
-                        return false
-                    }
+                    contact.androidContact = oldAndroid
                 }
 
                 Contact.save()
@@ -295,23 +349,6 @@ class ContactActivity : AppCompatActivity() {
         }
 
         return true
-
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                            grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-
-            CONTACTS_PERMISSION_REQUEST_CODE ->
-                if (grantResults.isNotEmpty() && permissions.size == grantResults.size) {
-                    for (res in grantResults)
-                        if (res != PackageManager.PERMISSION_GRANTED)
-                            return
-                    menu.performIdentifierAction(R.id.checkIcon, 0)
-                }
-        }
 
     }
 

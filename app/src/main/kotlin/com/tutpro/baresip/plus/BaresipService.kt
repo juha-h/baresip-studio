@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.*
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothHeadset
 import android.content.*
 import android.graphics.BitmapFactory
@@ -14,7 +15,6 @@ import android.net.wifi.WifiManager
 import android.os.*
 import android.os.Build.VERSION
 import android.provider.Settings
-import android.telephony.TelephonyManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -37,6 +37,7 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import android.media.MediaPlayer
+import android.telecom.TelecomManager
 
 class BaresipService: Service() {
 
@@ -49,7 +50,8 @@ class BaresipService: Service() {
     private lateinit var cm: ConnectivityManager
     private lateinit var pm: PowerManager
     private lateinit var wm: WifiManager
-    private lateinit var tm: TelephonyManager
+    private lateinit var tm: TelecomManager
+    private lateinit var btm: BluetoothManager
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
@@ -60,9 +62,10 @@ class BaresipService: Service() {
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusUsage = -1
     private var origVolume = mutableMapOf<Int, Int>()
-    private val btAdapter = BluetoothAdapter.getDefaultAdapter()
+    private var btAdapter: BluetoothAdapter? = null
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
+    private var allNetworks = mutableSetOf<Network>()
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
@@ -112,6 +115,8 @@ class BaresipService: Service() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         Log.d(TAG, "Network $network is available")
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
                         // If API >= 26, this will be followed by onCapabilitiesChanged
                         if (isServiceRunning && VERSION.SDK_INT < 26)
                             updateNetwork()
@@ -125,6 +130,8 @@ class BaresipService: Service() {
                     override fun onLost(network: Network) {
                         super.onLost(network)
                         Log.d(TAG, "Network $network is lost")
+                        if (network in allNetworks)
+                            allNetworks.remove(network)
                         if (isServiceRunning)
                             updateNetwork()
                     }
@@ -132,6 +139,8 @@ class BaresipService: Service() {
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                         super.onCapabilitiesChanged(network, caps)
                         Log.d(TAG, "Network $network capabilities changed: $caps")
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
                         if (isServiceRunning)
                             updateNetwork()
                     }
@@ -139,6 +148,8 @@ class BaresipService: Service() {
                     override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                         super.onLinkPropertiesChanged(network, props)
                         Log.d(TAG, "Network $network link properties changed: $props")
+                        if (network !in allNetworks)
+                            allNetworks.add(network)
                         if (isServiceRunning)
                             updateNetwork()
                     }
@@ -197,7 +208,10 @@ class BaresipService: Service() {
         this.registerReceiver(hotSpotReceiver,
             IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
 
-        tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        tm = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+
+        btm = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        btAdapter = btm.adapter
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip.plus:proximity_wakelog")
@@ -301,6 +315,11 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
+
+                if (VERSION.SDK_INT < 31) {
+                    @Suppress("DEPRECATION")
+                    allNetworks = cm.allNetworks.toMutableSet()
+                }
 
                 updateDnsServers()
 
@@ -580,21 +599,19 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = Api.call_peeruri(callp)
-                        if ((Call.calls().size > 0) ||
-                                (tm.callState != TelephonyManager.CALL_STATE_IDLE) ||
-                                !Utils.checkPermission(applicationContext,
-                                        Manifest.permission.RECORD_AUDIO)) {
-                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
-                            Api.ua_hangup(uap, callp, 486, "Busy Here")
-                            if (ua.account.callHistory) {
-                                CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                                CallHistory.save()
-                                ua.account.missedCalls = true
-                            }
-                            playUnInterrupted(R.raw.callwaiting, 1)
-                            if (!Utils.isVisible())
-                                return
-                            newEvent = "call rejected"
+                        if (Call.calls().size > 0 ||
+                            !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
+                                Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                                Api.ua_hangup(uap, callp, 486, "Busy Here")
+                                if (ua.account.callHistory) {
+                                    CallHistory.add(CallHistory(aor, peerUri, "in", false))
+                                    CallHistory.save()
+                                    ua.account.missedCalls = true
+                                }
+                                playUnInterrupted(R.raw.callwaiting, 1)
+                                if (!Utils.isVisible())
+                                    return
+                                newEvent = "call rejected"
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             val call = Call(callp, ua, peerUri, "in", "incoming",
@@ -659,10 +676,6 @@ class BaresipService: Service() {
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
-                    }
-                    "call answered" -> {
-                        stopMediaPlayer()
-                        return
                     }
                     "remote call answered" -> {
                         val call = Call.ofCallp(callp)
@@ -1134,8 +1147,8 @@ class BaresipService: Service() {
     }
 
     private fun isBluetoothHeadsetConnected(): Boolean {
-        return (btAdapter != null) && btAdapter.isEnabled &&
-                (btAdapter.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
+        return (btAdapter != null) && btAdapter!!.isEnabled &&
+                (btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
                         BluetoothHeadset.STATE_CONNECTED)
     }
 
@@ -1276,10 +1289,7 @@ class BaresipService: Service() {
 
     private fun updateNetwork() {
 
-        if (!isServiceRunning)
-            return
-
-        /* for (n in cm.allNetworks)
+        /* for (n in allNetworks)
             Log.d(TAG, "NETWORK $n with caps ${cm.getNetworkCapabilities(n)} and props " +
                     "${cm.getLinkProperties(n)} is active ${isNetworkActive(n)}") */
 
@@ -1331,15 +1341,15 @@ class BaresipService: Service() {
 
     private fun linkAddresses(): MutableMap<String, String> {
         val lnAddrs = mutableMapOf<String, String>()
-        for (n in cm.allNetworks) {
+        for (n in allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND) ||
                 VERSION.SDK_INT < 28) {
                 val props = cm.getLinkProperties(n) ?: continue
                 for (la in props.linkAddresses)
                     if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
-                        props.interfaceName != null)
-                        lnAddrs[la.address.hostAddress] = props.interfaceName!!
+                        props.interfaceName != null && la.address.hostAddress != null)
+                        lnAddrs[la.address.hostAddress!!] = props.interfaceName!!
             }
         }
         if (hotSpotIsEnabled) {
@@ -1356,16 +1366,13 @@ class BaresipService: Service() {
             return
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
-        for (n in cm.allNetworks)
-            if (n == cm.activeNetwork) {
-                val linkProps = cm.getLinkProperties(n)
-                if (linkProps != null) {
-                    servers.addAll(linkProps.dnsServers)
-                    break
-                }
-            }
+        if (cm.activeNetwork != null) {
+            val linkProps = cm.getLinkProperties(cm.activeNetwork)
+            if (linkProps != null)
+                servers.addAll(linkProps.dnsServers)
+        }
         // Then add DNS servers from the other networks
-        for (n in cm.allNetworks) {
+        for (n in allNetworks) {
             if (n == cm.activeNetwork) continue
             val linkProps = cm.getLinkProperties(n)
             if (linkProps != null)

@@ -31,6 +31,7 @@
 
         <ImageView
             android:id="@+id/CardImageAvatar"
+            android:contentDescription="@string/avatar_image"
             android:layout_height="36dp"
             android:layout_width="36dp"
             android:adjustViewBounds="true"
