@@ -242,30 +242,6 @@
             </androidx.appcompat.widget.AppCompatEditText>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-            <TextView
-                android:id="@+id/PreferIPv6MediaTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/PreferIPv6Media"
-                android:paddingTop="10dp"
-                android:textSize="18sp"
-                android:text="@string/prefer_ipv6_media" >
-            </TextView>
-            <CheckBox
-                android:id="@+id/PreferIPv6Media"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="end"
-                android:checked="false" >
-            </CheckBox>
-        </RelativeLayout>
-
         <TextView
             android:id="@+id/DtmfModeTitle"
             android:layout_width="wrap_content"
