@@ -40,7 +40,6 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var mediaNatSpinner: Spinner
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
-    private lateinit var ipV6MediaCheck: CheckBox
     private var dtmfMode = Api.DTMFMODE_RTP_EVENT
     private lateinit var dtmfModeSpinner: Spinner
     private var answerMode = Api.ANSWERMODE_MANUAL
@@ -78,7 +77,6 @@ class AccountActivity : AppCompatActivity() {
         stunUser = binding.StunUser
         stunPass = binding.StunPass
         mediaEncSpinner = binding.mediaEncSpinner
-        ipV6MediaCheck = binding.PreferIPv6Media
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         vmUri = binding.voicemailUri
@@ -162,8 +160,6 @@ class AccountActivity : AppCompatActivity() {
                                 "stun-turn-server" ->
                                     if (text.isNotEmpty())
                                         acc.stunServer = text
-                                "prefer-ipv6-media" ->
-                                    acc.preferIPv6Media = text == "yes"
                                 "dtmf-mode" ->
                                     if (text in arrayOf("rtp-event", "sip-info")) {
                                         acc.dtmfMode = if (text == "rtp-event")
@@ -275,8 +271,6 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
-
-        ipV6MediaCheck.isChecked = acc.preferIPv6Media
 
         dtmfMode = acc.dtmfMode
         val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO)
@@ -545,16 +539,6 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
-                if (ipV6MediaCheck.isChecked != acc.preferIPv6Media) {
-                    acc.preferIPv6Media = ipV6MediaCheck.isChecked
-                    Log.d(TAG, "New preferIPv6Media is ${acc.preferIPv6Media}")
-                    if (acc.preferIPv6Media)
-                        Api.account_set_mediaaf(acc.accp, Api.AF_INET6)
-                    else
-                        Api.account_set_mediaaf(acc.accp, Api.AF_UNSPEC)
-                    save = true
-                }
-
                 if (dtmfMode != acc.dtmfMode) {
                     if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
                         acc.dtmfMode = Api.account_dtmfmode(acc.accp)
@@ -705,12 +689,6 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.media_encryption),
                 getString(R.string.media_encryption_help)
-            )
-        }
-        binding.PreferIPv6Media.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.prefer_ipv6_media),
-                getString(R.string.prefer_ipv6_media_help)
             )
         }
         binding.DtmfModeTitle.setOnClickListener {

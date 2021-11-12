@@ -1162,15 +1162,6 @@ Java_com_tutpro_baresip_plus_Api_account_1set_1dtmfmode(JNIEnv *env, jobject thi
     return account_set_dtmfmode(acc, mode);
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_account_1set_1mediaaf(JNIEnv *env, jobject thiz,
-                                                       jstring jAccount, jint jAf) {
-    const char *native_account = (*env)->GetStringUTFChars(env, jAccount, 0);
-    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
-    LOGD("setting account mediaaf to '%s'\n", net_af2name(jAf));
-    account_set_mediaaf(acc, jAf);
-}
-
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_plus_Api_account_1extra(JNIEnv *env, jobject thiz, jstring javaAcc)
 {

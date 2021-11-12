@@ -56,7 +56,7 @@ object Config {
             if (config.contains(Regex("dyn_dns[ ]+yes"))) {
                 removeVariable("dns_server")
                 for (dnsServer in BaresipService.dnsServers)
-                    config = if (Utils.checkIpV4(dnsServer.hostAddress))
+                    config = if (Utils.checkIpV4(dnsServer.hostAddress!!))
                         "${config}dns_server ${dnsServer.hostAddress}:53\n"
                     else
                         "${config}dns_server [${dnsServer.hostAddress}]:53\n"
@@ -127,7 +127,7 @@ object Config {
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
         var servers = ""
         for (dnsServer in dnsServers) {
-            var address = dnsServer.hostAddress.removePrefix("/")
+            var address = dnsServer.hostAddress!!.removePrefix("/")
             address = if (Utils.checkIpV4(address))
                 "${address}:53"
             else

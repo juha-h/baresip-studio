@@ -497,8 +497,6 @@ class BaresipService: Service() {
         val ua = UserAgent(uap)
         Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
         uas.add(ua)
-        if (ua.account.preferIPv6Media)
-            Api.account_set_mediaaf(ua.account.accp, Api.AF_INET6)
         if (Api.ua_isregistered(uap)) {
             Log.d(TAG, "Ua ${ua.account.aor} is registered")
             status.add(R.drawable.dot_green)

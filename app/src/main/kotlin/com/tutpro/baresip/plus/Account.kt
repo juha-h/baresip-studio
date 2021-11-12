@@ -20,7 +20,6 @@ class Account(val accp: String) {
     var videoCodec = ArrayList<String>()
     var regint = Api.account_regint(accp)
     var mediaEnc = Api.account_mediaenc(accp)
-    var preferIPv6Media = false
     var dtmfMode = Api.account_dtmfmode(accp)
     var answerMode = Api.account_answermode(accp)
     var vmUri = Api.account_vm_uri(accp)
@@ -66,9 +65,7 @@ class Account(val accp: String) {
             }
         }
 
-        val extra = Api.account_extra(accp)
-        preferIPv6Media = Utils.paramValue(extra,"prefer_ipv6_media") == "yes"
-        callHistory = Utils.paramValue(extra,"call_history") == ""
+        callHistory = Utils.paramValue(Api.account_extra(accp),"call_history") == ""
 
     }
 
@@ -143,9 +140,6 @@ class Account(val accp: String) {
 
         if (!callHistory)
             extra += ";call_history=no"
-
-        if (preferIPv6Media)
-            extra += ";prefer_ipv6_media=yes"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
