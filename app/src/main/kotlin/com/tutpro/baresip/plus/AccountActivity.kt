@@ -661,6 +661,14 @@ class AccountActivity : AppCompatActivity() {
             i.putExtras(b)
             startActivity(i)
         }
+        binding.VideoCodecsTitle.setOnClickListener {
+            val i = Intent(this, CodecsActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", aor)
+            b.putString("media", "video")
+            i.putExtras(b)
+            startActivity(i)
+        }
         binding.MediaNatTitle.setOnClickListener {
             Utils.alertView(
                 this, getString(R.string.media_nat),
