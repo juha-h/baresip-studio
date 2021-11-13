@@ -1,0 +1,6 @@
+- Migrated baresip to API level 31 (Android 12)
+- Improved available network detection
+- Improved permission requests
+- Removed account's Prefer IPv6 Media setting
+- Fixed crash in account's Video Codecs setting
+- New Portuguese (Brazil) translations
