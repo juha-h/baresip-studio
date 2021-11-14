@@ -138,6 +138,7 @@ object Config {
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
         var servers = ""
         for (dnsServer in dnsServers) {
+            if (dnsServer.hostAddress == null) continue
             var address = dnsServer.hostAddress!!.removePrefix("/")
             address = if (Utils.checkIpV4(address))
                 "${address}:53"
