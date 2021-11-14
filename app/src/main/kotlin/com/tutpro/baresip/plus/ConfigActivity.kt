@@ -77,19 +77,15 @@ class ConfigActivity : AppCompatActivity() {
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-            batteryOptimizations = binding.BatteryOptimizations
-            batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
-            batteryOptimizations.setOnCheckedChangeListener { _, _ ->
-                try {
-                    startActivity(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
-                } catch (e: ActivityNotFoundException) {
-                        Log.e(TAG, "ActivityNotFound exception: $e")
-                }
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        batteryOptimizations = binding.BatteryOptimizations
+        batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
+        batteryOptimizations.setOnCheckedChangeListener { _, _ ->
+            try {
+                startActivity(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
+            } catch (e: ActivityNotFoundException) {
+                    Log.e(TAG, "ActivityNotFound exception: $e")
             }
-        } else {
-            binding.Battery.visibility = View.GONE
         }
 
         listenAddr = binding.ListenAddress
