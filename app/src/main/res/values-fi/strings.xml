@@ -10,9 +10,8 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa salli baresip-sovelluksen
-                ilmoitukset ja ota akun optimointi pois päältä (jos haluat vähentää todennäköisyyttä,
-                että Android rajoittaa baresip-sovelluksen toimintaa ja pääsyä verkkoon).</li>
+            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip-sovellus ja
+                salli Ilmoitukset.</li>
             <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
                 kosketus tarjoaa apua.</li>
             <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
@@ -63,9 +62,8 @@
         <p>Versio %1$s</p>
         <h2>Käyttövihjeitä</h2>
         <ul>
-            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa salli baresip+-sovelluksen
-                ilmoitukset ja ota akun optimointi pois päältä (jos haluat vähentää todennäköisyyttä,
-                että Android rajoittaa baresip+-sovelluksen toimintaa ja pääsyä verkkoon).</li>
+            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip+-sovellus ja
+                salli Ilmoitukset.</li>
             <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
                 kosketus tarjoaa apua.</li>
             <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
@@ -290,6 +288,10 @@
     <string name="start_automatically">Käynnistä automaattisesti</string>
     <string name="start_automatically_help">Jos merkitty, baresip
     käynnistyy automaattisesti, kun laite käynnistyy.</string>
+    <string name="battery_optimizations">Akun käytön optiomointi</string>
+    <string name="battery_optimizations_help">Ota akun käytön optimointi pois päältä (suositeltu),
+        jos haluat vähentää todennäköisyyttä, että Android rajoittaa baresip-sovelluksen toimintaa
+        ja pääsyä verkkoon.</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
     \'osoite:portti\', missä baresip kuuntelee sisään tulevia

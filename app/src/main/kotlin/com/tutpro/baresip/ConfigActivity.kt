@@ -2,11 +2,14 @@ package com.tutpro.baresip
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.PowerManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -31,6 +34,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var binding: ActivityConfigBinding
     private lateinit var layout: ScrollView
     private lateinit var autoStart: CheckBox
+    private lateinit var batteryOptimizations: CheckBox
     private lateinit var listenAddr: EditText
     private lateinit var dnsServers: EditText
     private lateinit var certificateFile: CheckBox
@@ -69,6 +73,21 @@ class ConfigActivity : AppCompatActivity() {
         val asCv = Config.variable("auto_start")
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            batteryOptimizations = binding.BatteryOptimizations
+            batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
+            batteryOptimizations.setOnCheckedChangeListener { _, _ ->
+                try {
+                    startActivity(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
+                } catch (e: ActivityNotFoundException) {
+                        Log.e(TAG, "ActivityNotFound exception: $e")
+                }
+            }
+        } else {
+            binding.Battery.visibility = View.GONE
+        }
 
         listenAddr = binding.ListenAddress
         val laCv = Config.variable("sip_listen")
@@ -494,6 +513,10 @@ class ConfigActivity : AppCompatActivity() {
         binding.AutoStartTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.start_automatically),
                     getString(R.string.start_automatically_help))
+        }
+        binding.BatteryOptimizationsTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.battery_optimizations),
+                getString(R.string.battery_optimizations_help))
         }
         binding.ListenAddressTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.listen_address),
