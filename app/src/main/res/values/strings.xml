@@ -12,9 +12,7 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>In Android\'s \`Apps & notifications\` settings, allow baresip app\'s notifications and
-                disable battery optimization (if you want to reduce likelihood that Android
-                restricts baresip\'s access to network or enters baresip to standby state).</li>
+            <li>In Android\'s \`Apps & notifications\` settings, select baresip app and allow Notifications.</li>
             <li>Check that default values in baresip\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
@@ -62,9 +60,7 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>In Android\'s \`Apps & notifications\` settings, allow baresip+ app\'s notifications and
-                disable battery optimization (if you want to reduce likelihood that Android
-                restricts baresip+\'s access to network or enters baresip+ to standby state).</li>
+            <li>In Android\'s \`Apps & notifications\` settings, select baresip+ app and allow Notifications.</li>
             <li>Check that default values in baresip+\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
@@ -265,6 +261,10 @@
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
     <string name="start_automatically_help">If checked, baresip starts automatically after device (re)start.</string>
+    <string name="battery_optimizations">Battery Optimizations</string>
+    <string name="battery_optimizations_help">Disable battery optimizations (recommended) if you want
+        to reduce likelihood that Android restricts baresip\'s access to network or enters baresip
+        to standby state.</string>
     <string name="listen_address">Listen Address</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside
