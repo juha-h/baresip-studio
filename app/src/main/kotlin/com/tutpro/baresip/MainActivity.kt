@@ -311,7 +311,7 @@ class MainActivity : AppCompatActivity() {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
             val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
-            if (Build.VERSION.SDK_INT < 23 || Utils.checkPermissions(this, permissions))
+            if (Utils.checkPermissions(this, permissions))
                 makeCall()
             else
                 ActivityCompat.requestPermissions(this, permissions,
