@@ -324,7 +324,7 @@ class BaresipService: Service() {
                 val assets = arrayOf("accounts", "config", "contacts")
                 var file = File(filesPath)
                 if (!file.exists()) {
-                    Log.d(TAG, "Creating baresip directory")
+                    Log.i(TAG, "Creating baresip directory")
                     try {
                         File(filesPath).mkdirs()
                     } catch (e: Error) {
@@ -334,10 +334,10 @@ class BaresipService: Service() {
                 for (a in assets) {
                     file = File("${filesPath}/$a")
                     if (!file.exists()) {
-                        Log.d(TAG, "Copying asset '$a'")
+                        Log.i(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {
-                        Log.d(TAG, "Asset '$a' already copied")
+                        Log.i(TAG, "Asset '$a' already copied")
                     }
                     if (a == "config")
                         Config.initialize()
@@ -355,7 +355,7 @@ class BaresipService: Service() {
                 for (la in linkAddresses)
                     addrs = "$addrs;${la.key};${la.value}"
 
-                Log.d(TAG, "Link addresses: $addrs")
+                Log.i(TAG, "Link addresses: $addrs")
 
                 Thread {
                     baresipStart(filesPath, addrs.removePrefix(";"), logLevel)
