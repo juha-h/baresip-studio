@@ -146,80 +146,65 @@
                         android:contentDescription="@string/reject" >
                     </ImageButton>
 
-                    <HorizontalScrollView
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="70dp"
+                        android:orientation="horizontal"
                         android:visibility="invisible"
                         android:id="@+id/callControl" >
 
-                        <RelativeLayout
+                        <ImageButton
+                            android:id="@+id/holdButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal" >
+                            android:padding="0dp"
+                            android:src="@drawable/pause"
+                            android:background="@null"
+                            android:clickable="false"
+                            android:contentDescription="@string/hold" >
+                        </ImageButton>
 
-                            <ImageButton
-                                android:id="@+id/holdButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="0dp"
-                                android:src="@drawable/pause"
-                                android:background="@null"
-                                android:clickable="false"
-                                android:contentDescription="@string/hold" >
-                            </ImageButton>
+                        <ImageButton
+                            android:id="@+id/transferButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:src="@drawable/call_transfer"
+                            android:background="@null"
+                            android:layout_marginStart="60dp"
+                            android:clickable="false"
+                            android:contentDescription="@string/call_transfer" >
+                        </ImageButton>
 
-                            <ImageButton
-                                android:id="@+id/micButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="0dp"
-                                android:src="@drawable/mic"
-                                android:background="@null"
-                                android:layout_marginStart="60dp"
-                                android:clickable="false"
-                                android:contentDescription="@string/mic" >
-                            </ImageButton>
+                        <EditText
+                            android:id="@+id/dtmf"
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="120dp"
+                            android:singleLine="true"
+                            android:scrollHorizontally="true"
+                            android:hint="@string/dtmf"
+                            android:importantForAutofill="no"
+                            android:inputType="phone"
+                            android:textSize="20sp" >
+                        </EditText>
 
-                            <ImageButton
-                                android:id="@+id/transferButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="0dp"
-                                android:src="@drawable/call_transfer"
-                                android:background="@null"
-                                android:layout_marginStart="120dp"
-                                android:clickable="false"
-                                android:contentDescription="@string/call_transfer" >
-                            </ImageButton>
+                        <ImageButton
+                            android:id="@+id/info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:src="@drawable/info"
+                            android:layout_marginTop="6dp"
+                            android:background="@null"
+                            android:clickable="false"
+                            android:contentDescription="@string/call_info" >
+                        </ImageButton>
 
-                            <EditText
-                                android:id="@+id/dtmf"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="180dp"
-                                android:hint="@string/dtmf"
-                                android:importantForAutofill="no"
-                                android:inputType="phone"
-                                android:textSize="20sp" >
-                            </EditText>
-
-                            <ImageButton
-                                android:id="@+id/info"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="0dp"
-                                android:layout_marginStart="250dp"
-                                android:src="@drawable/info"
-                                android:layout_marginTop="6dp"
-                                android:background="@null"
-                                android:clickable="false"
-                                android:contentDescription="@string/call_info" >
-                            </ImageButton>
-
-                        </RelativeLayout>
-
-                    </HorizontalScrollView>
+                    </RelativeLayout>
 
                 </RelativeLayout>
 

@@ -53,9 +53,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var hangupButton: ImageButton
     private lateinit var answerButton: ImageButton
     private lateinit var rejectButton: ImageButton
-    private lateinit var callControl: HorizontalScrollView
+    private lateinit var callControl: RelativeLayout
     private lateinit var holdButton: ImageButton
-    private lateinit var micButton: ImageButton
     private lateinit var transferButton: ImageButton
     private lateinit var voicemailButton: ImageButton
     private lateinit var contactsButton: ImageButton
@@ -74,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceEventReceiver: BroadcastReceiver
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
+    private var micIcon: MenuItem? = null
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
@@ -107,6 +107,8 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         val intentAction = intent.getStringExtra("action")
@@ -135,7 +137,6 @@ class MainActivity : AppCompatActivity() {
         rejectButton = binding.rejectButton
         callControl = binding.callControl
         holdButton = binding.holdButton
-        micButton = binding.micButton
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
@@ -368,21 +369,6 @@ class MainActivity : AppCompatActivity() {
                 call.hold()
                 call.onhold = true
                 holdButton.setImageResource(R.drawable.play)
-            }
-        }
-
-        micButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            val call = Call.uaCalls(ua, "")[0]
-            if (call.isMuted()) {
-                Log.d(TAG, "AoR $aor un-muting call ${call.callp} with ${callUri.text}")
-                call.mute(false)
-                micButton.setImageResource(R.drawable.mic)
-            } else {
-                Log.d(TAG, "AoR $aor muting call ${call.callp} with ${callUri.text}")
-                call.mute(true)
-                micButton.setImageResource(R.drawable.mic_off)
             }
         }
 
@@ -1137,19 +1123,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
         menuInflater.inflate(R.menu.main_menu, menu)
+
+        menuInflater.inflate(R.menu.mic_icon, menu)
+        micIcon = menu.findItem(R.id.micIcon)
+        if (BaresipService.isMicMuted)
+            micIcon!!.setIcon(R.drawable.mic_off)
+        else
+            micIcon!!.setIcon(R.drawable.mic_on)
+
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
         if (am.isSpeakerphoneOn)
             speakerIcon!!.setIcon(R.drawable.speaker_on)
         else
             speakerIcon!!.setIcon(R.drawable.speaker_off)
+
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.micIcon -> {
+                BaresipService.isMicMuted = !BaresipService.isMicMuted
+                if (BaresipService.isMicMuted) {
+                    item.setIcon(R.drawable.mic_off)
+                    Api.calls_mute(true)
+                } else {
+                    item.setIcon(R.drawable.mic_on)
+                    Api.calls_mute(false)
+                }
+            }
 
             R.id.speakerIcon -> {
                 am.isSpeakerphoneOn = !am.isSpeakerphoneOn

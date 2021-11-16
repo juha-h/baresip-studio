@@ -881,19 +881,6 @@ Java_com_tutpro_baresip_Api_account_1set_1medianat(JNIEnv *env, jobject thiz,
     return res;
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1sipnat(JNIEnv *env, jobject thiz, jstring javaAcc)
-{
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    if (acc) {
-        const char *sipnat = account_sipnat(acc);
-        if (sipnat) return (*env)->NewStringUTF(env, sipnat);
-    }
-    return (*env)->NewStringUTF(env, "");
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_account_1set_1sipnat(JNIEnv *env, jobject thiz,
                                                        jstring javaAcc, jstring javaSipNat) {
@@ -1269,6 +1256,22 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute) {
+    struct le *ua_le;
+    struct le *call_le;
+    LOGD("muting calls %d\n", mute);
+    re_thread_enter();
+    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
+        const struct ua *ua = ua_le->data;
+        for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
+            const struct call *call = call_le->data;
+            audio_mute(call_audio(call), mute);
+        }
+    }
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL

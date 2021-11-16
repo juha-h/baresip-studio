@@ -32,14 +32,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_hold(callp)
     }
 
-    fun isMuted(): Boolean {
-        return call_ismuted(callp)
-    }
-
-    fun mute(mute: Boolean) {
-        call_mute(callp, mute)
-    }
-
     fun unhold(): Int {
         return call_unhold(callp)
     }

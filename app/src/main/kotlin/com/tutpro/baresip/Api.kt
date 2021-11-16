@@ -2,9 +2,6 @@ package com.tutpro.baresip
 
 object Api {
 
-    const val AF_UNSPEC = 0
-    // const val AF_INET = 2
-    const val AF_INET6 = 10
     const val VIDMODE_OFF = 0
     // const val VIDMODE_ON = 1
     const val ANSWERMODE_MANUAL = 0
@@ -63,6 +60,7 @@ object Api {
     external fun ua_answer(uap: String, callp: String, video: Int)
     external fun ua_debug(uap: String)
 
+    external fun calls_mute(mute: Boolean)
     external fun call_peeruri(callp: String): String
 
     external fun message_send(uap: String, peer_uri: String, message: String, time: String): Int
