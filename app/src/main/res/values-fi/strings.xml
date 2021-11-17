@@ -36,12 +36,6 @@
             <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia
                 lyhyesti/pitkästi.</li>
         </ul>
-        <h2>Tunnetut ongelmat</h2>
-        <ul>
-            <li>Johtuen alla olevien kirjastojen rajoituksista, baresip ei tällä hetkellä tue useita,
-            samanaikaisesti aktiivisia verkkoliittymiä. Aktiivisia verkkoliittymiä suositaan
-            järjestyksessä VPN, Internet, muu.</li>
-        </ul>
         <h2>Lähdekoodi</h2>
         Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
         missä voi myös raportoida virheistä.
@@ -90,9 +84,6 @@
         </ul>
         <h2>Tunnetut ongelmat</h2>
         <ul>
-            <li>Johtuen alla olevien kirjastojen rajoituksista useita,
-            samanaikaisesti aktiivisia verkkoliittymiä ei voi käyttää. Aktiivisia verkkoliittymiä
-            suositaan järjestyksessä VPN, Internet, muu.</li>
             <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
             kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
             <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
