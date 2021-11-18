@@ -394,7 +394,11 @@ class MainActivity : AppCompatActivity() {
             rejectButton.isEnabled = false
             val videoDir = if (BaresipService.cameraAvailable) Api.SDP_SENDRECV else Api.SDP_RECVONLY
             call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-            Api.ua_answer(ua.uap, call.callp)
+            val intent = Intent(this@MainActivity, BaresipService::class.java)
+            intent.action = "Call Answer"
+            intent.putExtra("uap", ua.uap)
+            intent.putExtra("callp", call.callp)
+            startService(intent)
         }
 
         rejectButton.setOnClickListener {
