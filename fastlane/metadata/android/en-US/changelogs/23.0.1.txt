@@ -1,0 +1,1 @@
+- Stop ringing when answering to video call
