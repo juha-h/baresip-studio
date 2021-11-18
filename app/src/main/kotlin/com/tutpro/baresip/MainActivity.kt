@@ -310,12 +310,10 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition == -1)
                 return@setOnClickListener
-            val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
-            if (Utils.checkPermissions(this, permissions))
+            if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
                 makeCall()
             else
-                ActivityCompat.requestPermissions(this, permissions,
-                    CALL_PERMISSION_REQUEST_CODE)
+                Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
         }
 
         hangupButton.setOnClickListener {
@@ -620,8 +618,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         Log.i(TAG, "Main onStart")
         super.onStart()
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+                MIC_PERMISSION_REQUEST_CODE)
     }
 
     override fun onResume() {
@@ -1254,9 +1253,9 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            CALL_PERMISSION_REQUEST_CODE -> {
+            MIC_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    makeCall()
+                    Log.d(TAG, "Record audio permission granted")
                 } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.RECORD_AUDIO)) {
                     layout.showSnackBar(

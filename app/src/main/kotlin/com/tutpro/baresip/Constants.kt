@@ -5,7 +5,7 @@ const val TAG = "Baresip"
 const val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
 const val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
 
-const val CALL_PERMISSION_REQUEST_CODE = 1
+const val MIC_PERMISSION_REQUEST_CODE = 1
 const val CONTACT_PERMISSION_REQUEST_CODE = 2
 
 const val STATUS_NOTIFICATION_ID = 101
