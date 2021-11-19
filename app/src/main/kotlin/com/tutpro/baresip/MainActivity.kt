@@ -619,7 +619,7 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "Main onStart")
         super.onStart()
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
                 MIC_PERMISSION_REQUEST_CODE)
     }
 
