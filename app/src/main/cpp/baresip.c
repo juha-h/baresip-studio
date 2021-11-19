@@ -1355,6 +1355,22 @@ Java_com_tutpro_baresip_plus_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring j
 }
 
 JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_plus_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute) {
+    struct le *ua_le;
+    struct le *call_le;
+    LOGD("muting calls %d\n", mute);
+    re_thread_enter();
+    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
+        const struct ua *ua = ua_le->data;
+        for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
+            const struct call *call = call_le->data;
+            audio_mute(call_audio(call), mute);
+        }
+    }
+    re_thread_leave();
+}
+
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
