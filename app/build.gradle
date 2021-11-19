@@ -7,7 +7,7 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode = 184
+        versionCode = 185
         versionName = '36.1.0'
         externalNativeBuild {
             cmake {
