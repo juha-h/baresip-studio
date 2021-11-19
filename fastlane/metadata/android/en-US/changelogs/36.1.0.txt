@@ -1,0 +1,4 @@
+- Moved call mute button from call control to action bar
+- Added Battery Optimizations setting
+- Ask record audio permission when baresip is started
+- New Portuguese (Brazil), French, and Swedish translations
