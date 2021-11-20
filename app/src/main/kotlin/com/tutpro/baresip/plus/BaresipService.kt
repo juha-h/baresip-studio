@@ -219,6 +219,8 @@ class BaresipService: Service() {
         wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
         wifiLock.setReferenceCounted(false)
 
+        cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
+
         bluetoothReceiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 when (intent.action) {
@@ -342,7 +344,6 @@ class BaresipService: Service() {
                         Log.d(TAG, "Asset '$a' already copied")
                     }
                     if (a == "config") {
-                        cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
                         Config.initialize()
                     }
                 }
