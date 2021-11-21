@@ -1183,10 +1183,12 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     LOGD("hanging up call %s/%s\n", native_ua, native_call);
+    re_thread_enter();
     if (strlen(native_reason) == 0)
         ua_hangup(ua, call, native_code, NULL);
     else
         ua_hangup(ua, call, native_code, native_reason);
+    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
@@ -1383,7 +1385,9 @@ Java_com_tutpro_baresip_Call_call_1mute(JNIEnv *env, jobject thiz, jstring jCall
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    re_thread_enter();
     audio_mute(call_audio(call), mute);
+    re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL
