@@ -1,5 +1,6 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -376,6 +377,12 @@ object Utils {
             }
         }
         return true
+    }
+
+    fun isCameraAvailable(ctx: Context): Boolean {
+        return BaresipService.supportedCameras &&
+                ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
     }
 
     fun View.showSnackBar(

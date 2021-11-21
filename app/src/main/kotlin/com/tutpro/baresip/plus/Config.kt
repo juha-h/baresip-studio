@@ -9,7 +9,7 @@ object Config {
     private val configPath = BaresipService.filesPath + "/config"
     private var config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
 
-    fun initialize() {
+    fun initialize(ctx: Context) {
 
         config = config.replace("module_tmp uuid.so", "module uuid.so")
 
@@ -17,7 +17,7 @@ object Config {
 
         config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
 
-        if (BaresipService.cameraAvailable) {
+        if (Utils.supportedCameras(ctx).isNotEmpty()) {
             if (!config.contains("module avformat.so")) {
                 addModuleLine("module avformat.so")
                 addModuleLine("module selfview.so")

@@ -219,8 +219,6 @@ class BaresipService: Service() {
         wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
         wifiLock.setReferenceCounted(false)
 
-        cameraAvailable = Utils.supportedCameras(applicationContext).isNotEmpty()
-
         bluetoothReceiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 when (intent.action) {
@@ -344,7 +342,7 @@ class BaresipService: Service() {
                         Log.d(TAG, "Asset '$a' already copied")
                     }
                     if (a == "config") {
-                        Config.initialize()
+                        Config.initialize(this)
                     }
                 }
 
@@ -369,15 +367,6 @@ class BaresipService: Service() {
                 isServiceRunning = true
 
                 showStatusNotification()
-
-                if (AccountsActivity.noAccounts()) {
-                    val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags =
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "accounts")
-                    startActivity(newIntent)
-                }
 
                 if (linkAddresses.isEmpty()) {
                     val newIntent = Intent(this, MainActivity::class.java)
@@ -693,7 +682,10 @@ class BaresipService: Service() {
                         val callHasVideo = ev[1] == "1"
                         val remoteHasVideo = ev[2] == "1"
                         val ldir = ev[3].toInt()
-                        val rdir = if (cameraAvailable) ev[4].toInt() else ev[4].toInt() and Api.SDP_RECVONLY
+                        val rdir = if (Utils.isCameraAvailable(this))
+                            ev[4].toInt()
+                        else
+                            ev[4].toInt() and Api.SDP_RECVONLY
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                                 (!callHasVideo && remoteHasVideo &&
                                         (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
@@ -1418,7 +1410,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var isServiceClean = false
-        var cameraAvailable = false
+        var supportedCameras = false
         var cameraFront = true
         var callVolume = 0
         var dynDns = false
