@@ -1,0 +1,1 @@
+- Added microphone mute button to video layout
