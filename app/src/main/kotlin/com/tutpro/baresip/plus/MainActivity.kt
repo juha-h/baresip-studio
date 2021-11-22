@@ -163,6 +163,8 @@ class MainActivity : AppCompatActivity() {
         dialpadButton = binding.dialpadButton
         swipeRefresh = binding.swipeRefresh
 
+        BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
+
         addVideoLayoutViews()
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -703,7 +705,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         Log.i(TAG, "Main onStart")
         super.onStart()
-        BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
             requestCallPermission(Manifest.permission.RECORD_AUDIO)
         else
@@ -862,6 +863,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             videoLayout.addView(cb)
+        } else {
+
         }
 
         // Speaker Button
@@ -885,6 +888,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
         videoLayout.addView(speakerButton)
+
+        // Mic Button
+        val mb = ImageButton(this)
+        mb.setBackgroundResource(0)
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        prm.addRule(RelativeLayout.CENTER_VERTICAL)
+        prm.marginEnd = 15
+        mb.layoutParams = prm
+        if (BaresipService.isMicMuted)
+            mb.setImageResource(R.drawable.mic_off_button)
+        else
+            mb.setImageResource(R.drawable.mic_on_button)
+        mb.setOnClickListener {
+            BaresipService.isMicMuted = !BaresipService.isMicMuted
+            if (BaresipService.isMicMuted) {
+                mb.setImageResource(R.drawable.mic_off_button)
+                Api.calls_mute(true)
+            } else {
+                mb.setImageResource(R.drawable.mic_on_button)
+                Api.calls_mute(false)
+            }
+        }
+        videoLayout.addView(mb)
 
         // Hangup Button
         val hb = ImageButton(this)
