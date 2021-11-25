@@ -213,13 +213,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
+            len = re_snprintf(event_buf, sizeof event_buf, "call incoming");
             break;
         case UA_EVENT_CALL_OUTGOING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call outgoing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");
             break;
         case UA_EVENT_CALL_ANSWERED:
-            len = re_snprintf(event_buf, sizeof event_buf, "call answered", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "call answered");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
             if (strcmp(prm, "offer") == 0)
@@ -241,14 +241,14 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 	                call_has_video(call), remote_has_video, ldir, rdir);
             break;
         case UA_EVENT_CALL_RINGING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress,%d", ardir);
+            len = re_snprintf(event_buf, sizeof event_buf, "call progress,%d", ardir);
             break;
         case UA_EVENT_CALL_ESTABLISHED:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
+            len = re_snprintf(event_buf, sizeof event_buf, "call established");
             break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '0')
@@ -258,7 +258,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             else if (prm[0] == '2')
                 len = re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm+2);
             else
-                len = re_snprintf(event_buf, sizeof event_buf, "%s", "unknown menc event");
+                len = re_snprintf(event_buf, sizeof event_buf, "unknown menc event");
             break;
         case UA_EVENT_CALL_TRANSFER:
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
@@ -646,7 +646,9 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
     LOGD("ua_stop_all upon baresipStop");
+    re_thread_enter();
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
+    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1357,6 +1359,13 @@ Java_com_tutpro_baresip_plus_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring j
 }
 
 JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_plus_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    ua_debug_log(ua);
+}
+
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute) {
     struct le *ua_le;
     struct le *call_le;
@@ -1372,29 +1381,12 @@ Java_com_tutpro_baresip_plus_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean
     re_thread_leave();
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    ua_debug_log(ua);
-}
-
 JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1ismuted(JNIEnv *env, jobject thiz, jstring jCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     return audio_ismuted(call_audio(call));
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1mute(JNIEnv *env, jobject thiz, jstring jCall, jboolean mute) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    re_thread_enter();
-    audio_mute(call_audio(call), mute);
-    re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL
@@ -1669,7 +1661,9 @@ Java_com_tutpro_baresip_plus_Api_message_1send(JNIEnv *env, jobject thiz, jstrin
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Api_reload_1config(JNIEnv *env, jobject thiz) {
     int err;
+    re_thread_enter();
     err = conf_configure();
+    re_thread_leave();
     if (err) {
         LOGE("failed to reload config %d\n", err);
     } else {
@@ -1682,7 +1676,9 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
+    re_thread_enter();
     int res = cmd_process_long(baresip_commands(), native_cmd, strlen(native_cmd), &pf_null, NULL);
+    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCmd, native_cmd);
     return res;
 }
