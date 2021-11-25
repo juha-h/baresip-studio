@@ -1,0 +1,1 @@
+- Prevented swipe related crash
