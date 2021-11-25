@@ -1098,9 +1098,7 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring javaUri
     const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
-    re_thread_enter();
     int res = ua_alloc(&ua, uri);
-    re_thread_leave();
     char ua_buf[32];
     ua_buf[0] = '\0';
     if (res == 0) {
@@ -1120,9 +1118,7 @@ Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jstring java
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     LOGD("registering UA '%s'\n", native_ua);
-    re_thread_enter();
     return ua_register(ua);
-    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL
@@ -1131,9 +1127,7 @@ Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jstring ja
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    re_thread_enter();
     ua_unregister(ua);
-    re_thread_enter();
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1150,12 +1144,9 @@ Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jstri
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    int res;
     LOGD("updating account of ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    re_thread_enter();
-    res = ua_update_account(ua);
-    re_thread_leave();
+    return ua_update_account(ua);
 }
 
 JNIEXPORT void JNICALL
@@ -1165,9 +1156,7 @@ Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaU
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("destroying ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    re_thread_enter();
     (void)ua_destroy(ua);
-    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1623,9 +1612,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
         }
         count++;
     }
-    re_thread_enter();
     res = net_use_nameserver(baresip_network(), nsv, count);
-    re_thread_leave();
     return res;
 }
 
@@ -1704,9 +1691,7 @@ Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz) {
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule) {
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
-    re_thread_enter();
     int result = module_load(".", native_module);
-    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
     return result;
 }
@@ -1714,9 +1699,7 @@ Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring java
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring javaModule) {
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
-    re_thread_enter();
     module_unload(native_module);
-    re_thread_leave();
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
