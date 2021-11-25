@@ -65,7 +65,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
     private external fun call_hold(callp: String): Int
     private external fun call_unhold(callp: String): Int
     private external fun call_ismuted(callp: String): Boolean
-    private external fun call_mute(callp: String, mute: Boolean)
     private external fun call_transfer(callp: String, peer_uri: String): Int
     private external fun call_send_digit(callp: String, digit: Char): Int
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)

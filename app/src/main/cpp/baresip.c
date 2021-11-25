@@ -177,13 +177,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call incoming");
+            len = re_snprintf(event_buf, sizeof event_buf, "call incoming");
             break;
         case UA_EVENT_CALL_OUTGOING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call outgoing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");
             break;
         case UA_EVENT_CALL_ANSWERED:
-            len = re_snprintf(event_buf, sizeof event_buf, "call answered", prm);
+            len = re_snprintf(event_buf, sizeof event_buf, "call answered");
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
             if (strcmp(prm, "offer") == 0)
@@ -191,14 +191,14 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
         case UA_EVENT_CALL_RINGING:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call ringing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call ringing");
             break;
         case UA_EVENT_CALL_PROGRESS:
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call progress,%d", ardir);
+            len = re_snprintf(event_buf, sizeof event_buf, "call progress,%d", ardir);
             break;
         case UA_EVENT_CALL_ESTABLISHED:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", "call established");
+            len = re_snprintf(event_buf, sizeof event_buf, "call established");
             break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '0')
@@ -208,7 +208,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             else if (prm[0] == '2')
                 len = re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm+2);
             else
-                len = re_snprintf(event_buf, sizeof event_buf, "%s", "unknown menc event");
+                len = re_snprintf(event_buf, sizeof event_buf, "unknown menc event");
             break;
         case UA_EVENT_CALL_TRANSFER:
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
@@ -586,7 +586,10 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
     LOGD("ua_stop_all upon baresipStop");
+
+    re_thread_enter();
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
+    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1095,7 +1098,9 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring javaUri
     const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
+    re_thread_enter();
     int res = ua_alloc(&ua, uri);
+    re_thread_leave();
     char ua_buf[32];
     ua_buf[0] = '\0';
     if (res == 0) {
@@ -1115,7 +1120,9 @@ Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jstring java
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     LOGD("registering UA '%s'\n", native_ua);
+    re_thread_enter();
     return ua_register(ua);
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL
@@ -1124,7 +1131,9 @@ Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jstring ja
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    re_thread_enter();
     ua_unregister(ua);
+    re_thread_enter();
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1141,9 +1150,12 @@ Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jstri
 {
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    int res;
     LOGD("updating account of ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    return ua_update_account(ua);
+    re_thread_enter();
+    res = ua_update_account(ua);
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL
@@ -1153,7 +1165,9 @@ Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaU
     struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
     LOGD("destroying ua %s\n", native_ua);
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
+    re_thread_enter();
     (void)ua_destroy(ua);
+    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1380,16 +1394,6 @@ Java_com_tutpro_baresip_Call_call_1ismuted(JNIEnv *env, jobject thiz, jstring jC
     return audio_ismuted(call_audio(call));
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1mute(JNIEnv *env, jobject thiz, jstring jCall, jboolean mute) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    re_thread_enter();
-    audio_mute(call_audio(call), mute);
-    re_thread_leave();
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
         jstring jPeer) {
@@ -1500,7 +1504,9 @@ Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring jav
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz) {
     int err;
+    re_thread_enter();
     err = conf_configure();
+    re_thread_leave();
     if (err) {
         LOGE("failed to reload config %d\n", err);
     } else {
@@ -1513,7 +1519,9 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
+    re_thread_enter();
     int res = cmd_process_long(baresip_commands(), native_cmd, strlen(native_cmd), &pf_null, NULL);
+    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCmd, native_cmd);
     return res;
 }
@@ -1587,6 +1595,7 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
     struct sa nsv[NET_MAX_NS];
     uint32_t count = 0;
     char *comma;
+    int res;
     int err;
     LOGD("setting dns servers '%s'\n", native_servers);
     if (str_len(native_servers) > 255) {
@@ -1614,7 +1623,10 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
         }
         count++;
     }
-    return net_use_nameserver(baresip_network(), nsv, count);
+    re_thread_enter();
+    res = net_use_nameserver(baresip_network(), nsv, count);
+    re_thread_leave();
+    return res;
 }
 
 JNIEXPORT jint JNICALL
@@ -1692,7 +1704,9 @@ Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz) {
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule) {
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
+    re_thread_enter();
     int result = module_load(".", native_module);
+    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
     return result;
 }
@@ -1700,7 +1714,9 @@ Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring java
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring javaModule) {
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
+    re_thread_enter();
     module_unload(native_module);
+    re_thread_leave();
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
