@@ -1264,6 +1264,13 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA
 }
 
 JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
+    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
+    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
+    ua_debug_log(ua);
+}
+
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute) {
     struct le *ua_le;
     struct le *call_le;
@@ -1277,13 +1284,6 @@ Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute
         }
     }
     re_thread_leave();
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    ua_debug_log(ua);
 }
 
 JNIEXPORT jint JNICALL
@@ -1327,18 +1327,6 @@ Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jstri
     re_thread_enter();
     struct audio *a = call_audio(call);
     if (!audio_started(a)) audio_start(a);
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-}
-
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1stop_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("stopping audio of call %s\n", native_call);
-    re_thread_enter();
-    struct audio *a = call_audio(call);
-    if (audio_started(a)) audio_stop(a);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
 }
