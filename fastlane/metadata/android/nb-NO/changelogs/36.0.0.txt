@@ -1,0 +1,5 @@
+- Flyttet til API-nivå 31 (Android 12)
+- Forbedret oppdagelse av tilgjengelig nettverk
+- Forbedrede tilgangsforespørsler
+- Fjernet kontoens «Foretrekk IPv6-media»-innstilling
+- Ny Portugisisk (Brasil)-oversettelse
