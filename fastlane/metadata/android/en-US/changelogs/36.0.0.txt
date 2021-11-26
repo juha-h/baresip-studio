@@ -2,4 +2,4 @@
 - Improved available network detection
 - Improved permission requests
 - Removed account's Prefer IPv6 Media setting
-- New Portuguese (Brazil) translations
+- New Portuguese (Brazil) translation
