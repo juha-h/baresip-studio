@@ -863,8 +863,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             videoLayout.addView(cb)
-        } else {
-
         }
 
         // Speaker Button
@@ -1432,13 +1430,15 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.micIcon -> {
-                BaresipService.isMicMuted = !BaresipService.isMicMuted
-                if (BaresipService.isMicMuted) {
-                    item.setIcon(R.drawable.mic_off)
-                    Api.calls_mute(true)
-                } else {
-                    item.setIcon(R.drawable.mic_on)
-                    Api.calls_mute(false)
+                if (Call.call("connected") != null) {
+                    BaresipService.isMicMuted = !BaresipService.isMicMuted
+                    if (BaresipService.isMicMuted) {
+                        item.setIcon(R.drawable.mic_off)
+                        Api.calls_mute(true)
+                    } else {
+                        item.setIcon(R.drawable.mic_on)
+                        Api.calls_mute(false)
+                    }
                 }
             }
 
@@ -2009,6 +2009,10 @@ class MainActivity : AppCompatActivity() {
             callControl.visibility = View.INVISIBLE
             dialpadButton.isEnabled = true
             videoButton.visibility = View.INVISIBLE
+            if (BaresipService.isMicMuted) {
+                BaresipService.isMicMuted = false
+                micIcon!!.setIcon(R.drawable.mic_on)
+            }
         } else {
             swipeRefresh.isEnabled = false
             val call = Call.uaCalls(ua, "")[0]
