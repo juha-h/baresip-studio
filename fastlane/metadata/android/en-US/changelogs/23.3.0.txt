@@ -1,0 +1,3 @@
+- Removed AV1 video codec until it starts to work again
+- Currently mic icon is active only when a call is connected
+- New Swedish translations
