@@ -1,0 +1,2 @@
+- Currently mic icon is active only when a call is connected
+- New Swedish translations
