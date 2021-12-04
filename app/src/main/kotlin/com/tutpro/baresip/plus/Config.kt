@@ -27,8 +27,8 @@ object Config {
             removeLine("module selfview.so")
         }
 
-        if (!config.contains("module av1.so"))
-            addModuleLine("module av1.so")
+        if (config.contains("module av1.so"))
+            removeLine("module av1.so")
 
         if (!config.contains("module snapshot.so"))
             addModuleLine("module snapshot.so")
