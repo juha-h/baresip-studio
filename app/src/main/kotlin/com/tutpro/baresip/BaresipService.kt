@@ -761,16 +761,11 @@ class BaresipService: Service() {
                     }
                     "transfer failed" -> {
                         Log.d(TAG, "AoR $aor call $callp transfer failed: ${ev[1]}")
-                        // stopMediaPlayer()
                         val call = Call.ofCallp(callp)
-                        if (call == null) {
+                        if (call == null)
                             Log.w(TAG, "Call $callp with failed transfer is not found")
-                        } else {
+                        else
                             call.referTo = ""
-                            //Timer().schedule(500) {
-                            //    call.resume()
-                            //}
-                        }
                         if (!Utils.isVisible()) return
                     }
                     "call closed" -> {

@@ -26,11 +26,6 @@ object Config {
                     "module_app mwi.so")
         }
 
-        if (!config.contains("module presence.so")) {
-            config = config.replace("module_app mwi.so",
-                   "module_app mwi.so\nmodule_app presence.so")
-        }
-
         if (!config.contains("opus_application")) {
             config = "${config}opus_application voip\n"
         }

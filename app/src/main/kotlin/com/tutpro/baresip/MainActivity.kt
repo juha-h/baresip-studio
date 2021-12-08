@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         transferButton.setOnClickListener {
-            callTransfer(UserAgent.uas()[aorSpinner.selectedItemPosition])
+            makeTransfer(UserAgent.uas()[aorSpinner.selectedItemPosition])
         }
 
         infoButton.setOnClickListener {
@@ -1315,7 +1315,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callTransfer(ua: UserAgent) {
+    private fun makeTransfer(ua: UserAgent) {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content),
                         false)
@@ -1334,12 +1334,15 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 val uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    val uri = Utils.uriComplete(ContactsActivity.findContactURI(uriText),
-                            Utils.aorDomain(ua.account.aor))
-                    if (!Utils.checkSipUri(uri))
+                    val uri = Utils.uriComplete(
+                            ContactsActivity.findContactURI(uriText)
+                                    .filterNot { it.isWhitespace() },
+                            Utils.aorDomain(ua.account.aor)
+                    )
+                    if (!Utils.checkSipUri(uri)) {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_uri), uri))
-                    else {
+                    } else {
                         if (Call.uaCalls(ua, "").size > 0) {
                             Call.uaCalls(ua, "")[0].transfer(uri)
                             showCall(ua)
