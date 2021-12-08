@@ -40,6 +40,7 @@ module_app account.so
 module_app contact.so
 module_app debug_cmd.so
 module_app mwi.so
+module_app presence.so
 evdev_device /dev/input/event0
 opus_bitrate 28000
 opus_samplerate 16000

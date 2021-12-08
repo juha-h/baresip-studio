@@ -359,7 +359,7 @@ class MainActivity : AppCompatActivity() {
             val call = Call.uaCalls(ua, "")[0]
             if (call.onhold) {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
-                call.unhold()
+                call.resume()
                 call.onhold = false
                 holdButton.setImageResource(R.drawable.pause)
             } else {
@@ -1043,10 +1043,11 @@ class MainActivity : AppCompatActivity() {
                         call(ua, ev[1])
                         showCall(ua)
                     }
-                    "refer failed" -> {
+                    "transfer failed" -> {
                         Toast.makeText(applicationContext,
                                 "${getString(R.string.transfer_failed)}: ${ev[1].trim()}",
                                 Toast.LENGTH_LONG).show()
+                        showCall(ua)
                     }
                     "call closed" -> {
                         if (aor == aorSpinner.tag) {
@@ -1340,7 +1341,7 @@ class MainActivity : AppCompatActivity() {
                                 String.format(getString(R.string.invalid_sip_uri), uri))
                     else {
                         if (Call.uaCalls(ua, "").size > 0) {
-                            Call.uaCalls(ua, "")[0].refer(uri)
+                            Call.uaCalls(ua, "")[0].transfer(uri)
                             showCall(ua)
                         }
                     }

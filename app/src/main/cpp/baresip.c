@@ -214,7 +214,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
             break;
         case UA_EVENT_CALL_TRANSFER_FAILED:
-            len = re_snprintf(event_buf, sizeof event_buf, "refer failed,%s", prm);
+            call_hold(call, false);
+            len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
             break;
         case UA_EVENT_CALL_CLOSED:
             tone = call_scode(call) ? translate_errorcode(call_scode(call)) : "";
@@ -1236,13 +1237,13 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
     xcall = (struct call *)strtoul(native_xcall, NULL, 10);
     re_thread_enter();
     err = ua_call_alloc(&call, ua, (enum vidmode)javaVidMode, NULL, xcall, call_localuri(xcall), true);
+    re_thread_leave();
     if (err) {
         LOGW("call allocation for ua %s failed with error %d\n", native_ua, err);
         call_buf[0] = '\0';
     } else {
         sprintf(call_buf, "%lu", (unsigned long)call);
     }
-    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
     (*env)->ReleaseStringUTFChars(env, javaXCall, native_xcall);
     return (*env)->NewStringUTF(env, call_buf);
@@ -1332,35 +1333,24 @@ Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jstring jCall, jboolean hold) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    int ret;
-    LOGD("holding call %s\n", native_call);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    re_thread_enter();
-    // struct audio *au = call_audio(call);
-    // audio_set_hold(au, true);
-    // audio_set_source(au, NULL, NULL);
-    ret = call_hold(call, true);
-    re_thread_leave();
-    return ret;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1unhold(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    int ret;
-    LOGD("unholding call %s\n", native_call);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    re_thread_enter();
-    // struct audio *au = call_audio(call);
-    // audio_set_hold(au, false);
-    // audio_set_source(au, "opensles", "nil");
-    ret = call_hold(call, false);
-    re_thread_leave();
-    return ret;
+    int err;
+    if (hold) {
+        LOGD("holding call %s\n", native_call);
+        re_thread_enter();
+        err = call_hold(call, true);
+        re_thread_leave();
+    } else {
+        LOGD("resuming call %s\n", native_call);
+        re_thread_enter();
+        err = call_hold(call, false);
+        re_thread_leave();
+    }
+    if (err) LOGW("call_hold error: %d\n", err);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    return err;
 }
 
 JNIEXPORT jboolean JNICALL
