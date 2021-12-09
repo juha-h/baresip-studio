@@ -565,6 +565,9 @@ class BaresipService: Service() {
                             return
                     }
                     "call outgoing" -> {
+                        val call = Call.ofCallp(callp) ?: return
+                        if (call.status == "transferring")
+                            break
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -781,6 +784,16 @@ class BaresipService: Service() {
                             return
                         }
                     }
+                    "transfer failed" -> {
+                        Log.d(TAG, "AoR $aor call $callp transfer failed: ${ev[1]}")
+                        stopMediaPlayer()
+                        val call = Call.ofCallp(callp)
+                        if (call == null)
+                            Log.w(TAG, "Call $callp with failed transfer is not found")
+                        else
+                            call.referTo = ""
+                        if (!Utils.isVisible()) return
+                    }
                     "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         val call = Call.ofCallp(callp)
@@ -849,17 +862,6 @@ class BaresipService: Service() {
                             nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
                             return
                         }
-                    }
-                    "refer failed" -> {
-                        Log.d(TAG, "AoR $aor hanging up call $callp with ${ev[1]}")
-                        Api.ua_hangup(uap, callp, 0, "")
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp with failed refer is not found")
-                        } else {
-                            call.referTo = ""
-                        }
-                        if (!Utils.isVisible()) return
                     }
                 }
             }

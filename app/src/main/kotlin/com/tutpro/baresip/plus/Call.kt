@@ -29,10 +29,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_connect(callp, uri)
     }
 
-    fun startAudio() {
-        call_start_audio(callp)
-    }
-
     fun startVideoDisplay(): Int {
         return call_start_video_display(callp)
     }
@@ -46,14 +42,17 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
     }
 
     fun hold(): Int {
-        return call_hold(callp)
+        return call_hold(callp, true)
     }
 
-    fun unhold(): Int {
-        return call_unhold(callp)
+    fun resume(): Int {
+        return call_hold(callp, false)
     }
 
-    fun refer(uri: String): Int {
+    fun transfer(uri: String): Int {
+        val err = call_hold(callp, true)
+        if (err != 0)
+            return err
         referTo = uri
         return call_transfer(callp, uri)
     }
@@ -95,13 +94,11 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
     }
 
     private external fun call_connect(callp: String, peer_uri: String): Int
-    private external fun call_hold(callp: String): Int
-    private external fun call_unhold(callp: String): Int
+    private external fun call_hold(callp: String, hold: Boolean): Int
     private external fun call_ismuted(callp: String): Boolean
     private external fun call_transfer(callp: String, peer_uri: String): Int
     private external fun call_send_digit(callp: String, digit: Char): Int
     private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
-    private external fun call_start_audio(callp: String)
     private external fun call_start_video_display(callp: String): Int
     private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
