@@ -921,12 +921,12 @@ class MainActivity : AppCompatActivity() {
                             callsButton.setImageResource(R.drawable.calls_missed)
                         }
                     }
-                    "call incoming" -> {
+                    "call incoming", "call outgoing" -> {
                         val callp = params[1]
                         if (BaresipService.isMainVisible) {
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
-                            showCall(ua)
+                            showCall(ua, Call.ofCallp(callp))
                         } else {
                             Log.d(TAG, "Reordering to front")
                             val i = Intent(applicationContext, MainActivity::class.java)
@@ -1018,9 +1018,7 @@ class MainActivity : AppCompatActivity() {
                                     target))
                             setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                                 if (call in Call.calls())
-                                    Api.ua_hangup(uap, callp, 0, "")
-                                call(ua, ev[1])
-                                showCall(ua)
+                                    acceptTransfer(ua, call, ev[1])
                                 dialog.dismiss()
                             }
                             setNegativeButton(getString(R.string.no)) { dialog, _ ->
@@ -1570,25 +1568,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Currently transfer is implemented by first closing existing call and the making the new one
-    @Suppress("UNUSED")
-    private fun transfer(ua: UserAgent, call: Call, uri: String) {
+    private fun acceptTransfer(ua: UserAgent, call: Call, uri: String) {
         val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
         if (newCallp != "") {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))
             newCall.add()
-            Api.ua_hangup(ua.uap, call.callp, 0, "")
-            // Api.call_stop_audio(call.callp)
             val err = newCall.connect(uri)
             if (err == 0) {
-                newCall.startAudio()
                 if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 showCall(ua)
             } else {
-                call.startAudio()
                 Log.w(TAG, "call_connect $newCallp failed with error $err")
                 call.notifySipfrag(500, "Call Error")
             }
@@ -1656,7 +1648,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCall(ua: UserAgent) {
+    private fun showCall(ua: UserAgent, showCall: Call? = null) {
         if (Call.uaCalls(ua, "").size == 0) {
             swipeRefresh.isEnabled = true
             callTitle.text = getString(R.string.outgoing_call_to_dots)
@@ -1684,11 +1676,11 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             swipeRefresh.isEnabled = false
-            val call = Call.uaCalls(ua, "")[0]
+            val call = showCall ?: Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
-                "outgoing" -> {
+                "outgoing", "transferring" -> {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))

@@ -551,6 +551,9 @@ class BaresipService: Service() {
                             return
                     }
                     "call outgoing" -> {
+                        val call = Call.ofCallp(callp) ?: return
+                        if (call.status == "transferring")
+                            break
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -761,6 +764,7 @@ class BaresipService: Service() {
                     }
                     "transfer failed" -> {
                         Log.d(TAG, "AoR $aor call $callp transfer failed: ${ev[1]}")
+                        stopMediaPlayer()
                         val call = Call.ofCallp(callp)
                         if (call == null)
                             Log.w(TAG, "Call $callp with failed transfer is not found")
