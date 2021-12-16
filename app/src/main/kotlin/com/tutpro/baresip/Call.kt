@@ -7,6 +7,7 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
+    var held = false
     var security = 0
     var zid = ""
     var hasHistory = false
@@ -24,11 +25,11 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_connect(callp, uri)
     }
 
-    fun startAudio() {
-        call_start_audio(callp)
+    fun hold(): Int {
+        return call_hold(callp, true)
     }
 
-    fun hold(): Int {
+    fun isOnHold(): Int {
         return call_hold(callp, true)
     }
 

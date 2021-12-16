@@ -426,6 +426,7 @@
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
         Do you want to unverify the peer?
     </string>
+    <string name="call_on_hold_by_peer">Call is on hold by peer</string>
     <string name="unverify">Unverify</string>
     <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
         versions 9 and below, the file is in Download folder.</string>

@@ -691,6 +691,17 @@ class BaresipService: Service() {
                         if (!Utils.isVisible())
                             return
                     }
+                    "call update" -> {
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w("Baresip", "Call $callp that is updated is not found")
+                            return
+                        }
+                        when (ev[1]) {
+                            "0", "1" -> call.held = true
+                            "2", "3" -> call.held = false
+                        }
+                    }
                     "call verified", "call secure" -> {
                         val call = Call.ofCallp(callp)
                         if (call == null) {

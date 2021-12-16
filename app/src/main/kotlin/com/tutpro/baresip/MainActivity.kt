@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dtmf: EditText
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
+    private lateinit var onHoldNotice: TextView
     private lateinit var uaAdapter: UaSpinnerAdapter
     private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
@@ -140,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
+        onHoldNotice = binding.onHoldNotice
         voicemailButton = binding.voicemailButton
         contactsButton = binding.contactsButton
         messagesButton = binding.messagesButton
@@ -943,6 +945,9 @@ class MainActivity : AppCompatActivity() {
                             showCall(ua)
                         }
                     }
+                    "call update" -> {
+                        showCall(ua)
+                    }
                     "call verify" -> {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
@@ -1674,6 +1679,7 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.isMicMuted = false
                 micIcon!!.setIcon(R.drawable.mic_on)
             }
+            onHoldNotice.visibility = View.GONE
         } else {
             swipeRefresh.isEnabled = false
             val call = showCall ?: Call.uaCalls(ua, "")[0]
@@ -1691,6 +1697,7 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "incoming" -> {
@@ -1706,6 +1713,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "connected" -> {
@@ -1756,6 +1764,13 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
                     callControl.visibility = View.VISIBLE
+                    if (call.held) {
+                        imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                        onHoldNotice.text = getString(R.string.call_on_hold_by_peer)
+                        onHoldNotice.visibility = View.VISIBLE
+                    } else {
+                        onHoldNotice.visibility = View.GONE
+                    }
                 }
             }
         }
