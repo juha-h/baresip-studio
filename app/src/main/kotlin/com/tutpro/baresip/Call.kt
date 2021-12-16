@@ -24,10 +24,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_connect(callp, uri)
     }
 
-    fun startAudio() {
-        call_start_audio(callp)
-    }
-
     fun hold(): Int {
         return call_hold(callp, true)
     }

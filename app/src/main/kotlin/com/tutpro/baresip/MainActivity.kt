@@ -1058,7 +1058,8 @@ class MainActivity : AppCompatActivity() {
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
-                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_off)
                         val param = ev[1].trim()
                         if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
                             if (param[0].isDigit())
@@ -1556,12 +1557,19 @@ class MainActivity : AppCompatActivity() {
     private fun call(ua: UserAgent, uri: String): Boolean {
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val callp = Api.ua_connect(ua.uap, uri, Api.VIDMODE_OFF)
+        val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_OFF)
         return if (callp != "") {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-            Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp)).add()
-            showCall(ua)
-            true
+            val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
+            call.add()
+            val err = call.connect(uri)
+            if (err == 0) {
+                showCall(ua)
+                true
+            } else {
+                Log.w(TAG, "call_connect $callp failed with error $err")
+                false
+            }
         } else {
             Log.w(TAG, "ua_connect ${ua.uap}/$uri failed")
             false

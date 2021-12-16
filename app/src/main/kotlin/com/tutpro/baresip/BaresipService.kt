@@ -551,7 +551,11 @@ class BaresipService: Service() {
                             return
                     }
                     "call outgoing" -> {
-                        val call = Call.ofCallp(callp) ?: return
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w(TAG, "Call $callp that is outgoing is not found")
+                            return
+                        }
                         if (call.status == "transferring")
                             break
                         stopMediaPlayer()

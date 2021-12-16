@@ -54,7 +54,6 @@ object Api {
     external fun ua_register(ua: String): Int
     external fun ua_isregistered(ua: String): Boolean
     external fun ua_unregister(ua: String)
-    external fun ua_connect(uap: String, peer_uri: String, video: Int): String
     external fun ua_hangup(uap: String, callp: String, code: Int, reason: String)
     external fun ua_call_alloc(uap: String, xcallp: String, video: Int): String
     external fun ua_answer(uap: String, callp: String, video: Int)

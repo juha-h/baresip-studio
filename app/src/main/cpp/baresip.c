@@ -1199,34 +1199,9 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1connect(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaURI, jint javaVidMode) {
-    struct call *call;
-    struct ua *ua;
-    int err;
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_uri = (*env)->GetStringUTFChars(env, javaURI, 0);
-    char call_buf[32];
-    LOGD("connecting ua %s to %s %s video\n", native_ua, native_uri,
-            javaVidMode == 0 ? "without" : "with");
-    ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    re_thread_enter();
-    err = ua_connect(ua, &call, NULL, native_uri, (enum vidmode)javaVidMode);
-    re_thread_leave();
-    if (err) {
-        LOGW("connecting to %s failed with error %d\n", native_uri, err);
-        call_buf[0] = '\0';
-    } else {
-        sprintf(call_buf, "%lu", (unsigned long)call);
-    }
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaURI, native_uri);
-    return (*env)->NewStringUTF(env, call_buf);
-}
-
-JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
         jstring javaXCall, jint javaVidMode) {
-    struct call *xcall, *call = NULL;
+    struct call *xcall = NULL, *call = NULL;
     struct ua *ua;
     int err;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
@@ -1234,7 +1209,8 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring j
     char call_buf[32];
     LOGD("allocating new call for ua %s xcall %s\n", native_ua, native_xcall);
     ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    xcall = (struct call *)strtoul(native_xcall, NULL, 10);
+    if (strlen(native_xcall) > 0)
+        xcall = (struct call *)strtoul(native_xcall, NULL, 10);
     re_thread_enter();
     err = ua_call_alloc(&call, ua, (enum vidmode)javaVidMode, NULL, xcall, call_localuri(xcall), true);
     re_thread_leave();
