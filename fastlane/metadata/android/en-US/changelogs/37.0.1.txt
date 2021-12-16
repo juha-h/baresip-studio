@@ -1,0 +1,1 @@
+Fixed outgoing call audio settings
