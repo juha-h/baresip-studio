@@ -7,8 +7,6 @@
 #include <baresip.h>
 #include "logger.h"
 
-#define LOG_TAG "Baresip Lib"
-
 typedef struct baresip_context {
     JavaVM  *javaVM;
     JNIEnv  *env;

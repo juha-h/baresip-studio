@@ -4,6 +4,8 @@
 #ifndef BARESIP_LOGGER_H
 #define BARESIP_LOGGER_H
 
+#define LOG_TAG "Baresip Lib"
+
 #define LOGD(...) \
     if (log_level_get() < LEVEL_INFO) \
         ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
