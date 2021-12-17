@@ -1917,12 +1917,25 @@ class MainActivity : AppCompatActivity() {
             Utils.isCameraAvailable(this) -> Api.SDP_SENDRECV
             else -> Api.SDP_RECVONLY
         }
-        val callp = Api.ua_connect_dir(ua.uap, uri, Api.VIDMODE_ON, Api.SDP_SENDRECV, videoDir)
+        val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
         return if (callp != "") {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
-            Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp)).add()
-            showCall(ua)
-            true
+            val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
+            call.add()
+            var err = call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
+            if (err == 0) {
+                err = call.connect(uri)
+                if (err == 0) {
+                    showCall(ua)
+                    true
+                } else {
+                    Log.w(TAG, "Call $callp call_connect failed with error $err")
+                    false
+                }
+            } else {
+                Log.w(TAG, "Call $callp callSetMediaDirection failed with error $err")
+                false
+            }
         } else {
             Log.e(TAG, "ua_call_alloc ${ua.uap}/$uri failed")
             false

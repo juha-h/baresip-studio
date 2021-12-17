@@ -1290,35 +1290,7 @@ Java_com_tutpro_baresip_plus_Api_ua_1hangup(JNIEnv *env, jobject thiz, jstring j
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1connect_1dir(JNIEnv *env, jobject thiz, jstring jUA,
-        jstring jURI, jint vmode, jint adir, jint vdir) {
-    int err;
-    const char *native_ua = (*env)->GetStringUTFChars(env, jUA, 0);
-    const char *native_uri = (*env)->GetStringUTFChars(env, jURI, 0);
-    char call_buf[32];
-    re_thread_enter();
-    struct call *call;
-    struct ua *ua;
-    LOGD("connecting ua %s to %s with vmode %u, adir: %u, vdir: %u\n", native_ua, native_uri,
-         vmode, adir, vdir);
-    ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    err = ua_connect_dir(ua, &call, NULL, native_uri, (enum vidmode)vmode,
-            (enum sdp_dir)adir, (enum sdp_dir)vdir);
-    if (err) {
-        LOGW("connecting to %s failed with error %d\n", native_uri, err);
-        call_buf[0] = '\0';
-    } else {
-        sprintf(call_buf, "%lu", (unsigned long)call);
-    }
-    re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, jUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, jURI, native_uri);
-    return (*env)->NewStringUTF(env, call_buf);
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
-        jstring javaXCall, jint javaVidMode) {
+Java_com_tutpro_baresip_plus_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA, jstring javaXCall, jint javaVidMode) {
     int err;
     const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
     const char *native_xcall = (*env)->GetStringUTFChars(env, javaXCall, 0);
