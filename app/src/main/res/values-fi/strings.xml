@@ -356,6 +356,9 @@
         Tehdasasetus on 800x600.</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
+    <string name="rtp_stats">RTP tilastot</string>
+    <string name="rtp_stats_help">Jos merkitty ja lokiviestit on merkitty, Logcat-viestit sisältävät
+        myös päättyneen puhelun RTP-tilastot.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
     <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit
         sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen

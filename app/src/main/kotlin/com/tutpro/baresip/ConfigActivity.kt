@@ -42,6 +42,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var caFile: CheckBox
     private lateinit var darkTheme: CheckBox
     private lateinit var debug: CheckBox
+    private lateinit var rtpStats: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
@@ -53,6 +54,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldVerifyServer = ""
     private var oldCAFile = false
     private var oldLogLevel = ""
+    private var oldRtpStats = ""
     private var callVolume = BaresipService.callVolume
     private var oldDisplayTheme = -1
     private var save = false
@@ -323,6 +325,10 @@ class ConfigActivity : AppCompatActivity() {
             dbCv[0]
         debug.isChecked = oldLogLevel == "0"
 
+        rtpStats = binding.RtpStats
+        oldRtpStats = Config.variable("rtp_stats")[0]
+        rtpStats.isChecked = oldRtpStats == "yes"
+
         sipTrace = binding.SipTrace
         sipTrace.isChecked = BaresipService.sipTrace
 
@@ -467,6 +473,13 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
+                val newRtpStats = if (rtpStats.isChecked) "yes" else "no"
+                if (newRtpStats != oldRtpStats) {
+                    Config.replaceVariable("rtp_stats", newRtpStats)
+                    save = true
+                    restart = true
+                }
+
                 BaresipService.sipTrace = sipTrace.isChecked
                 Api.uag_enable_sip_trace(sipTrace.isChecked)
 
@@ -551,6 +564,9 @@ class ConfigActivity : AppCompatActivity() {
         }
         binding.DebugTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
+        }
+        binding.RtpStatsTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.rtp_stats), getString(R.string.rtp_stats_help))
         }
         binding.SipTraceTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.sip_trace),
