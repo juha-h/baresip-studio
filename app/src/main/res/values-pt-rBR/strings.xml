@@ -259,4 +259,5 @@
     <string name="no_backup">Você não pode criar backups sem a permissão de \"Armazenamento\".</string>
     <string name="battery_optimizations">Otimizações da bateria</string>
     <string name="battery_optimizations_help">Desative as otimizações da bateria (recomendado) caso queira reduzir a probabilidade do Android restringir o acesso do baresip à rede ou coloque o baresip no modo de espera.</string>
+    <string name="rtp_stats">Estatísticas RTP</string>
 </resources>
