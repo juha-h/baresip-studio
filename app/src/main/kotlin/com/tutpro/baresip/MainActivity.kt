@@ -363,12 +363,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
                 call.onhold = false
-                holdButton.setImageResource(R.drawable.pause)
+                holdButton.setImageResource(R.drawable.resume)
             } else {
                 Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
                 call.onhold = true
-                holdButton.setImageResource(R.drawable.play)
+                holdButton.setImageResource(R.drawable.hold)
             }
         }
 
@@ -1747,9 +1747,9 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     if (call.onhold) {
-                        holdButton.setImageResource(R.drawable.play)
+                        holdButton.setImageResource(R.drawable.resume)
                     } else {
-                        holdButton.setImageResource(R.drawable.pause)
+                        holdButton.setImageResource(R.drawable.hold)
                     }
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
