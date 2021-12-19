@@ -11,9 +11,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
@@ -23,6 +20,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import android.content.Intent
 import android.content.BroadcastReceiver
+import android.os.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -40,6 +38,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URLDecoder
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -363,12 +363,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
                 call.onhold = false
-                holdButton.setImageResource(R.drawable.resume)
+                holdButton.setImageResource(R.drawable.hold)
             } else {
                 Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
                 call.onhold = true
-                holdButton.setImageResource(R.drawable.hold)
+                holdButton.setImageResource(R.drawable.resume)
             }
         }
 
@@ -1774,8 +1774,9 @@ class MainActivity : AppCompatActivity() {
                     callControl.visibility = View.VISIBLE
                     if (call.held) {
                         imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
-                        onHoldNotice.text = getString(R.string.call_on_hold_by_peer)
-                        onHoldNotice.visibility = View.VISIBLE
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            onHoldNotice.visibility = View.VISIBLE
+                        }, 250)
                     } else {
                         onHoldNotice.visibility = View.GONE
                     }

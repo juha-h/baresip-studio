@@ -390,6 +390,7 @@
     <string name="allow_video_send">Accept sending of video to \'%1$s\'?</string>
     <string name="allow_video_recv">Accept receiving video from \'%1$s\'?</string>
     <string name="hold">Call Hold/Unhold</string>
+    <string name="call_is_on_hold">Call is on hold</string>
     <string name="mic">Microphone On/Off</string>
     <string name="call_transfer">Call Transfer</string>
     <string name="transfer_destination">Transfer destination</string>
@@ -429,7 +430,6 @@
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
         Do you want to unverify the peer?
     </string>
-    <string name="call_on_hold_by_peer">Call is on hold by peer</string>
     <string name="unverify">Unverify</string>
     <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
         versions 9 and below, the file is in Download folder.</string>
