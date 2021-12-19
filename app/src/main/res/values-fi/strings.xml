@@ -441,7 +441,7 @@
     <string name="average_rate">Keskinopeus: %1$s (Kbit/s)</string>
     <string name="packets">Paketit</string>
     <string name="lost">Hukkunu</string>
-    <string name="jitter">Vaihtelur</string>
+    <string name="jitter">Vaihtelu: %1$s (ms)</string>
     <string name="voicemail">Puheposti</string>
     <string name="voicemail_messages">Puhepostiviestit</string>
     <string name="you_have">Sinulla on</string>

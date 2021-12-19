@@ -402,7 +402,7 @@
     <string name="average_rate">Average Rate: %1$s (Kbits/s)</string>
     <string name="packets">Packets</string>
     <string name="lost">Lost</string>
-    <string name="jitter">Jitter</string>
+    <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="voicemail">Voicemail</string>
     <string name="voicemail_messages">Voicemail Messages</string>
     <string name="you_have">You have</string>

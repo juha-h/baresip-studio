@@ -1430,7 +1430,7 @@ Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jstring jCal
         const double rx_rate = 1.0 * stream_metric_get_rx_bitrate(s) / 1000.0;
         const double tx_avg_rate = 1.0 * stream_metric_get_tx_avg_bitrate(s) / 1000.0;
         const double rx_avg_rate = 1.0 * stream_metric_get_rx_avg_bitrate(s) / 1000.0;
-        len = re_snprintf(&(stats_buf[0]), 256, "%.1f/%.1f,%.1f/%.1f,%u/%u,%d/%d,%.1f/%.1f\n",
+        len = re_snprintf(&(stats_buf[0]), 256, "%.1f/%.1f,%.1f/%.1f,%u/%u,%d/%d,%.1f/%.1f",
                           tx_rate, rx_rate,
                           tx_avg_rate, rx_avg_rate,
                           stats->tx.sent, stats->rx.sent,
