@@ -29,10 +29,6 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_hold(callp, true)
     }
 
-    fun isOnHold(): Int {
-        return call_hold(callp, true)
-    }
-
     fun resume(): Int {
         return call_hold(callp, false)
     }
