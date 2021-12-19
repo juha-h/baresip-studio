@@ -317,9 +317,6 @@
         Factory default is 800x600.</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
-    <string name="rtp_stats">RTP Statistics</string>
-    <string name="rtp_stats_help">If checked and if Debug is checked, Logcat messages include also
-        RTP statistics of calls when calls are closed.</string>
     <string name="sip_trace">SIP Trace</string>
     <string name="sip_trace_help">If checked and if Debug is checked, Logcat messages include also SIP
         request and response trace. Unchecked automatically at baresip start.</string>
