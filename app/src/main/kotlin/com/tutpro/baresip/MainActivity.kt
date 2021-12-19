@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dtmf: EditText
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
+    private lateinit var onHoldNotice: TextView
     private lateinit var uaAdapter: UaSpinnerAdapter
     private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
@@ -140,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
+        onHoldNotice = binding.onHoldNotice
         voicemailButton = binding.voicemailButton
         contactsButton = binding.contactsButton
         messagesButton = binding.messagesButton
@@ -361,12 +363,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
                 call.onhold = false
-                holdButton.setImageResource(R.drawable.pause)
+                holdButton.setImageResource(R.drawable.resume)
             } else {
                 Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
                 call.onhold = true
-                holdButton.setImageResource(R.drawable.play)
+                holdButton.setImageResource(R.drawable.hold)
             }
         }
 
@@ -942,6 +944,9 @@ class MainActivity : AppCompatActivity() {
                             dtmf.hint = getString(R.string.dtmf)
                             showCall(ua)
                         }
+                    }
+                    "call update" -> {
+                        showCall(ua)
                     }
                     "call verify" -> {
                         val callp = params[1]
@@ -1682,6 +1687,7 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.isMicMuted = false
                 micIcon!!.setIcon(R.drawable.mic_on)
             }
+            onHoldNotice.visibility = View.GONE
         } else {
             swipeRefresh.isEnabled = false
             val call = showCall ?: Call.uaCalls(ua, "")[0]
@@ -1699,6 +1705,7 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "incoming" -> {
@@ -1714,6 +1721,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "connected" -> {
@@ -1747,9 +1755,9 @@ class MainActivity : AppCompatActivity() {
                     answerButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     if (call.onhold) {
-                        holdButton.setImageResource(R.drawable.play)
+                        holdButton.setImageResource(R.drawable.resume)
                     } else {
-                        holdButton.setImageResource(R.drawable.pause)
+                        holdButton.setImageResource(R.drawable.hold)
                     }
                     dtmf.isEnabled = true
                     dtmf.requestFocus()
@@ -1764,6 +1772,13 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
                     callControl.visibility = View.VISIBLE
+                    if (call.held) {
+                        imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                        onHoldNotice.text = getString(R.string.call_on_hold_by_peer)
+                        onHoldNotice.visibility = View.VISIBLE
+                    } else {
+                        onHoldNotice.visibility = View.GONE
+                    }
                 }
             }
         }

@@ -198,6 +198,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CALL_ESTABLISHED:
             len = re_snprintf(event_buf, sizeof event_buf, "call established");
             break;
+        case UA_EVENT_CALL_REMOTE_SDP:
+            if (strcmp(prm, "offer") != 0)
+                return;
+            ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
+            len = re_snprintf(event_buf, sizeof event_buf, "call update,%d", ardir);
+            break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '0')
                 len = re_snprintf(event_buf, sizeof event_buf, "call secure");

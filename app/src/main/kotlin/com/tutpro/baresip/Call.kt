@@ -7,6 +7,7 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
+    var held = false
     var security = 0
     var zid = ""
     var hasHistory = false
