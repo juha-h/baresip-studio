@@ -18,7 +18,7 @@ rtcp_mux no
 jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
 jitter_buffer_wish 6
-rtp_stats no
+rtp_stats yes
 dyn_dns yes
 module opus.so
 module amr.so
