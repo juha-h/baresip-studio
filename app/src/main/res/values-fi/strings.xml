@@ -435,6 +435,7 @@
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
     <string name="hold">Aseta puhelu pitoon</string>
+    <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="mic">Mikrofoni päälle/pois</string>
     <string name="call_transfer">Puhelun siirto</string>
     <string name="transfer_destination">Siirron kohde</string>
@@ -443,9 +444,13 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
     <string name="call_info_not_available">Ei saatavilla</string>
-    <string name="duration">Kesto</string>
+    <string name="duration">Kesto: %1$s (sek)</string>
     <string name="codecs">Koodekit</string>
-    <string name="rate">Nopeus</string>
+    <string name="rate">Nykyinen nopeus: %1$s (Kbit/s)</string>
+    <string name="average_rate">Keskinopeus: %1$s (Kbit/s)</string>
+    <string name="packets">Paketit</string>
+    <string name="lost">Hukkunu</string>
+    <string name="jitter">Vaihtelu: %1$s (ms)</string>
     <string name="voicemail">Puheposti</string>
     <string name="voicemail_messages">Puhepostiviestit</string>
     <string name="you_have">Sinulla on</string>

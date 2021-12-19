@@ -10,8 +10,6 @@
 #include "logger.h"
 #include "vidisp.h"
 
-#define LOG_TAG "Baresip+ Lib"
-
 typedef struct baresip_context {
     JavaVM  *javaVM;
     JNIEnv  *env;
@@ -237,8 +235,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             sdp_media_debug_log(media);
             //stream_debug_log(video_strm(call_video(call)));
             //call_video_debug_log(call);
-	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d", prm,
-	                call_has_video(call), remote_has_video, ldir, rdir);
+            ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
+	        len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d,%d", prm,
+	                call_has_video(call), remote_has_video, ldir, rdir, ardir);
             break;
         case UA_EVENT_CALL_RINGING:
             len = re_snprintf(event_buf, sizeof event_buf, "call ringing");
@@ -1476,18 +1475,47 @@ Java_com_tutpro_baresip_plus_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz,
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_Call_call_1status(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1duration(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
     struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    char status_buf[256];
-    int len = re_snprintf(&(status_buf[0]), 255, "%H", call_status, call);
-    if (len == -1) {
-        LOGE("failed to get status of call %s\n", native_call);
-        status_buf[0] = '\0';
+    int duration = call_duration(call);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    return duration;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1stats(JNIEnv *env, jobject thiz, jstring jCall, jstring jStream) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+    const char *native_stream = (*env)->GetStringUTFChars(env, jStream, 0);
+    const struct stream *s;
+    if (strcmp(native_stream, "audio") == 0)
+        s = audio_strm(call_audio(call));
+    else
+        s = video_strm(call_video(call));
+    const struct rtcp_stats *stats = stream_rtcp_stats(s);
+    char stats_buf[256];
+    int len;
+    if (stats) {
+        const double tx_rate = 1.0 * stream_metric_get_tx_bitrate(s) / 1000.0;
+        const double rx_rate = 1.0 * stream_metric_get_rx_bitrate(s) / 1000.0;
+        const double tx_avg_rate = 1.0 * stream_metric_get_tx_avg_bitrate(s) / 1000.0;
+        const double rx_avg_rate = 1.0 * stream_metric_get_rx_avg_bitrate(s) / 1000.0;
+        len = re_snprintf(&(stats_buf[0]), 256, "%.1f/%.1f,%.1f/%.1f,%u/%u,%d/%d,%.1f/%.1f",
+                          tx_rate, rx_rate,
+                          tx_avg_rate, rx_avg_rate,
+                          stats->tx.sent, stats->rx.sent,
+                          stats->tx.lost, stats->rx.lost,
+                          1.0 * stats->tx.jit / 1000, 1.0 * stats->rx.jit / 1000);
+        if (len == -1) {
+            LOGE("failed to get stats of call %s %s stream\n", native_call, native_stream);
+            stats_buf[0] = '\0';
+        }
     }
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return (*env)->NewStringUTF(env, status_buf);
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    (*env)->ReleaseStringUTFChars(env, jStream, native_stream);
+    return (*env)->NewStringUTF(env, stats_buf);
 }
 
 JNIEXPORT jboolean JNICALL

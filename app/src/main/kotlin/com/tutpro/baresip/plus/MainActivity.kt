@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dtmf: EditText
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
+    private lateinit var onHoldNotice: TextView
     private lateinit var uaAdapter: UaSpinnerAdapter
     private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
@@ -155,6 +156,7 @@ class MainActivity : AppCompatActivity() {
         transferButton = binding.transferButton
         dtmf = binding.dtmf
         infoButton = binding.info
+        onHoldNotice = binding.onHoldNotice
         voicemailButton = binding.voicemailButton
         videoButton = binding.videoButton
         contactsButton = binding.contactsButton
@@ -424,12 +426,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
                 call.onhold = false
-                holdButton.setImageResource(R.drawable.pause)
+                holdButton.setImageResource(R.drawable.hold)
             } else {
                 Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
                 call.onhold = true
-                holdButton.setImageResource(R.drawable.play)
+                holdButton.setImageResource(R.drawable.resume)
             }
         }
 
@@ -441,20 +443,23 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val calls = Call.uaCalls(ua, "")
             if (calls.size > 0) {
-                val status = calls[0].status()
-                val codecs = calls[0].audioCodecs()
-                if (status.contains('[') && status.contains(']') &&
-                        status.contains('=') && codecs.contains(',')) {
-                    val duration = status.split("[")[1].split("]")[0]
-                    val audio = status.split(' ')[1].split('=')[1]
-                    // val video = status.split(' ')[2]
+                val call = calls[0]
+                val stats = call.stats("audio")
+                if (stats != "") {
+                    val parts = stats.split(",")
+                    val codecs = call.audioCodecs()
+                    val duration = call.duration()
                     val txCodec = codecs.split(',')[0].split("/")
                     val rxCodec = codecs.split(',')[1].split("/")
                     Utils.alertView(this, getString(R.string.call_info),
-                            "${getString(R.string.duration)}: $duration\n" +
+                            "${String.format(getString(R.string.duration), duration)}\n" +
                                     "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "${getString(R.string.rate)}: $audio (bit/s)")
+                                    "${String.format(getString(R.string.rate), parts[0])}\n" +
+                                    "${String.format(getString(R.string.average_rate), parts[1])}\n" +
+                                    "${String.format(getString(R.string.jitter), parts[4])}\n" +
+                                    "${getString(R.string.packets)}: ${parts[2]}\n" +
+                                    "${getString(R.string.lost)}: ${parts[3]}")
                 } else {
                     Utils.alertView(this, getString(R.string.call_info),
                             getString(R.string.call_info_not_available))
@@ -2016,6 +2021,7 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.isMicMuted = false
                 micIcon!!.setIcon(R.drawable.mic_on)
             }
+            onHoldNotice.visibility = View.GONE
         } else {
             swipeRefresh.isEnabled = false
             val call = showCall ?: Call.uaCalls(ua, "")[0]
@@ -2035,6 +2041,7 @@ class MainActivity : AppCompatActivity() {
                     answerVideoButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "incoming" -> {
@@ -2059,6 +2066,7 @@ class MainActivity : AppCompatActivity() {
                     rejectButton.visibility = View.VISIBLE
                     rejectButton.isEnabled = true
                     callControl.visibility = View.INVISIBLE
+                    onHoldNotice.visibility = View.GONE
                     dialpadButton.isEnabled = false
                 }
                 "connected" -> {
@@ -2111,15 +2119,23 @@ class MainActivity : AppCompatActivity() {
                     answerVideoButton.visibility = View.INVISIBLE
                     rejectButton.visibility = View.INVISIBLE
                     if (call.onhold) {
-                        holdButton.setImageResource(R.drawable.play)
+                        holdButton.setImageResource(R.drawable.resume)
                     } else {
-                        holdButton.setImageResource(R.drawable.pause)
+                        holdButton.setImageResource(R.drawable.hold)
                     }
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
                     dialpadButton.tag = "on"
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
                     callControl.visibility = View.VISIBLE
+                    if (call.held) {
+                        imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            onHoldNotice.visibility = View.VISIBLE
+                        }, 250)
+                    } else {
+                        onHoldNotice.visibility = View.GONE
+                    }
                 }
             }
         }

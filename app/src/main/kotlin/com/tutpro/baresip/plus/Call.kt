@@ -7,6 +7,7 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
+    var held = false
     var security = 0
     var zid = ""
     var hasHistory = false
@@ -85,8 +86,13 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_set_media_direction(callp, adir, vdir)
     }
 
-    fun status(): String {
-        return call_status(callp)
+    fun duration(): Int {
+        return call_duration(callp)
+    }
+
+
+    fun stats(stream: String): String {
+        return call_stats(callp, stream)
     }
 
     fun audioCodecs(): String {
@@ -102,7 +108,8 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
     private external fun call_start_video_display(callp: String): Int
     private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
-    private external fun call_status(callp: String): String
+    private external fun call_duration(callp: String): Int
+    private external fun call_stats(callp: String, stream: String): String
     private external fun call_has_video(callp: String): Boolean
     private external fun call_set_video_source(callp: String, front: Boolean): Int
     private external fun call_set_video_direction(callp: String, dir: Int)

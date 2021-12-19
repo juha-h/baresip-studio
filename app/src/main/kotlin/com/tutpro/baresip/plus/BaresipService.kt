@@ -693,6 +693,10 @@ class BaresipService: Service() {
                             ev[4].toInt()
                         else
                             ev[4].toInt() and Api.SDP_RECVONLY
+                        when (ev[5]) {
+                            "0", "1" -> call.held = true
+                            "2", "3" -> call.held = false
+                        }
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                                 (!callHasVideo && remoteHasVideo &&
                                         (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
@@ -724,6 +728,17 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible())
                             return
+                    }
+                    "call update" -> {
+                        val call = Call.ofCallp(callp)
+                        if (call == null) {
+                            Log.w("Baresip", "Call $callp that is updated is not found")
+                            return
+                        }
+                        when (ev[1]) {
+                            "0", "1" -> call.held = true
+                            "2", "3" -> call.held = false
+                        }
                     }
                     "call verified", "call secure" -> {
                         val call = Call.ofCallp(callp)

@@ -327,8 +327,8 @@
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
     <string name="sip_trace">SIP Trace</string>
-    <string name="sip_trace_help">If checked and if Debug is checked, provides also SIP
-        request and response trace to Logcat. Unchecked automatically at baresip start.</string>
+    <string name="sip_trace_help">If checked and if Debug is checked, Logcat messages include also SIP
+        request and response trace. Unchecked automatically at baresip start.</string>
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, settings are reset to factory default values.</string>
     <string name="reset_config_alert">Are you sure you want to reset settings to factory
@@ -396,6 +396,7 @@
     <string name="allow_video_send">Accept sending of video to \'%1$s\'?</string>
     <string name="allow_video_recv">Accept receiving video from \'%1$s\'?</string>
     <string name="hold">Call Hold/Unhold</string>
+    <string name="call_is_on_hold">Call is on hold</string>
     <string name="mic">Microphone On/Off</string>
     <string name="call_transfer">Call Transfer</string>
     <string name="transfer_destination">Transfer destination</string>
@@ -404,9 +405,13 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
     <string name="call_info_not_available">No info available</string>
-    <string name="duration">Duration</string>
+    <string name="duration">Duration: %1$s (secs)</string>
     <string name="codecs">Codecs</string>
-    <string name="rate">Rate</string>
+    <string name="rate">Current Rate: %1$s (Kbits/s)</string>
+    <string name="average_rate">Average Rate: %1$s (Kbits/s)</string>
+    <string name="packets">Packets</string>
+    <string name="lost">Lost</string>
+    <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="voicemail">Voicemail</string>
     <string name="voicemail_messages">Voicemail Messages</string>
     <string name="you_have">You have</string>

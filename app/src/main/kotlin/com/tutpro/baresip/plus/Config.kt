@@ -17,6 +17,9 @@ object Config {
 
         config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
 
+        if (config.contains("rtp_stats no"))
+            replaceVariable("rtp_stats", "yes")
+
         if (Utils.supportedCameras(ctx).isNotEmpty()) {
             if (!config.contains("module avformat.so")) {
                 addModuleLine("module avformat.so")
