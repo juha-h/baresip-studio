@@ -1763,13 +1763,6 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         holdButton.setImageResource(R.drawable.hold)
                     }
-                    dtmf.isEnabled = true
-                    dtmf.requestFocus()
-                    if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
-                        imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
-                    if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
-                    dtmfWatcher = call.dtmfWatcher
-                    dtmf.addTextChangedListener(dtmfWatcher)
                     callUri.inputType = InputType.TYPE_CLASS_PHONE
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
                     dialpadButton.tag = "on"
@@ -1778,11 +1771,19 @@ class MainActivity : AppCompatActivity() {
                     callControl.visibility = View.VISIBLE
                     if (call.held) {
                         imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                        dtmf.isEnabled = false
                         Handler(Looper.getMainLooper()).postDelayed({
                             onHoldNotice.visibility = View.VISIBLE
                         }, 250)
                     } else {
+                        dtmf.isEnabled = true
+                        dtmf.requestFocus()
                         onHoldNotice.visibility = View.GONE
+                        if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
+                            imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
+                        if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
+                        dtmfWatcher = call.dtmfWatcher
+                        dtmf.addTextChangedListener(dtmfWatcher)
                     }
                 }
             }
