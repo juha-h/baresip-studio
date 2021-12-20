@@ -580,6 +580,8 @@ class MainActivity : AppCompatActivity() {
                         else
                             call.setVideoDirection(Api.SDP_RECVONLY)
                     }
+                    am.isSpeakerphoneOn = true
+                    speakerButton.setImageResource(R.drawable.speaker_on_button)
                 }
             }, 250)
         }
@@ -813,6 +815,8 @@ class MainActivity : AppCompatActivity() {
         vb.layoutParams = prm
         vb.setOnClickListener {
             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+            am.isSpeakerphoneOn = false
+            if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
         videoLayout.addView(vb)
 
@@ -2070,6 +2074,13 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                 }
                 "connected" -> {
+                    if (call.videoEnabled()) {
+                        defaultLayout.visibility = View.INVISIBLE
+                        videoLayout.visibility = View.VISIBLE
+                        return
+                    }
+                    defaultLayout.visibility = View.VISIBLE
+                    videoLayout.visibility = View.INVISIBLE
                     callControl.post {
                         callControl.scrollTo(videoButton.left, videoButton.top)
                     }
@@ -2087,23 +2098,9 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    dtmf.isEnabled = true
-                    dtmf.requestFocus()
-                    if (call.videoEnabled()) {
-                        defaultLayout.visibility = View.INVISIBLE
-                        videoLayout.visibility = View.VISIBLE
-                    } else {
-                        defaultLayout.visibility = View.VISIBLE
-                        videoLayout.visibility = View.INVISIBLE
-                        videoButton.setImageResource(R.drawable.video_on)
-                        videoButton.visibility = View.VISIBLE
-                        videoButton.isClickable = true
-                        if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
-                            imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
-                        if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
-                        dtmfWatcher = call.dtmfWatcher
-                        dtmf.addTextChangedListener(dtmfWatcher)
-                    }
+                    videoButton.setImageResource(R.drawable.video_on)
+                    videoButton.visibility = View.VISIBLE
+                    videoButton.isClickable = true
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
@@ -2130,11 +2127,19 @@ class MainActivity : AppCompatActivity() {
                     callControl.visibility = View.VISIBLE
                     if (call.held) {
                         imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
+                        dtmf.isEnabled = false
                         Handler(Looper.getMainLooper()).postDelayed({
                             onHoldNotice.visibility = View.VISIBLE
                         }, 250)
                     } else {
+                        dtmf.isEnabled = true
+                        dtmf.requestFocus()
                         onHoldNotice.visibility = View.GONE
+                        if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
+                            imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
+                        if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
+                        dtmfWatcher = call.dtmfWatcher
+                        dtmf.addTextChangedListener(dtmfWatcher)
                     }
                 }
             }
