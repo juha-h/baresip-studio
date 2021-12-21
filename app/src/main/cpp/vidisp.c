@@ -8,8 +8,6 @@
 #include "logger.h"
 #include "vidisp.h"
 
-#define LOG_TAG "Baresip vidisp"
-
 const char *egl_error(EGLint const err) {
     switch (err) {
         case EGL_FALSE:
