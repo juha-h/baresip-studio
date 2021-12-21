@@ -1696,7 +1696,6 @@ class MainActivity : AppCompatActivity() {
             swipeRefresh.isEnabled = false
             val call = showCall ?: Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
-            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
                 "outgoing", "transferring" -> {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)

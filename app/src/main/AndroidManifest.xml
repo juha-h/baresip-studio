@@ -45,6 +45,7 @@
             android:name=".MainActivity"
             android:theme="@style/AppTheme.Main"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
