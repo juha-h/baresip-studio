@@ -582,6 +582,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     am.isSpeakerphoneOn = true
                     speakerButton.setImageResource(R.drawable.speaker_on_button)
+                    imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                 }
             }, 250)
         }
@@ -2030,7 +2031,6 @@ class MainActivity : AppCompatActivity() {
             swipeRefresh.isEnabled = false
             val call = showCall ?: Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
-            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             when (call.status) {
                 "outgoing", "transferring" -> {
                     callTitle.text = getString(R.string.outgoing_call_to_dots)
@@ -2075,12 +2075,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 "connected" -> {
                     if (call.videoEnabled()) {
-                        defaultLayout.visibility = View.INVISIBLE
-                        videoLayout.visibility = View.VISIBLE
+                        if (defaultLayout.visibility == View.VISIBLE) {
+                            defaultLayout.visibility = View.INVISIBLE
+                            videoLayout.visibility = View.VISIBLE
+                        }
                         return
                     }
-                    defaultLayout.visibility = View.VISIBLE
-                    videoLayout.visibility = View.INVISIBLE
+                    if (defaultLayout.visibility == View.INVISIBLE) {
+                        videoLayout.visibility = View.INVISIBLE
+                        defaultLayout.visibility = View.VISIBLE
+                    }
                     callControl.post {
                         callControl.scrollTo(videoButton.left, videoButton.top)
                     }
