@@ -1,0 +1,5 @@
+- Added average bit rate, jitter, packet count, and packet lost count data to call info
+- Use accent color pause icon to indicate that user has put the call on hold
+- Inform user when the other party has put the call on hold
+- Minor soft input related improvements
+- New Portuguese (Brazil) translations
