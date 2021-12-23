@@ -1,0 +1,2 @@
+- Better protection of baresip app when device is locked with secure keyguard
+- New Portuguese (Brazil) translations
