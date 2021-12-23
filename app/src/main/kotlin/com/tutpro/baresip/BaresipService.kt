@@ -50,11 +50,13 @@ class BaresipService: Service() {
     private lateinit var wm: WifiManager
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
+    private lateinit var kgm: KeyguardManager
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
+    private lateinit var screenReceiver: BroadcastReceiver
 
     private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -205,6 +207,30 @@ class BaresipService: Service() {
 
         this.registerReceiver(hotSpotReceiver,
             IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
+
+        kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+
+        screenReceiver = object : BroadcastReceiver() {
+            override fun onReceive(contxt: Context, intent: Intent) {
+                when (intent.action) {
+                    Intent.ACTION_SCREEN_ON ->
+                        if (kgm.isKeyguardLocked) {
+                            Log.d(TAG, "Screen on LOCKED")
+                            if (Utils.isVisible()) {
+                                val i = Intent("screen event")
+                                i.putExtra("event", Intent.ACTION_SCREEN_ON)
+                                LocalBroadcastManager.getInstance(this@BaresipService)
+                                        .sendBroadcast(i)
+                            }
+                        } else {
+                            Log.d(TAG, "Screen on UNLOCKED")
+                        }
+                }
+
+            }
+        }
+
+        this.registerReceiver(screenReceiver, IntentFilter(Intent.ACTION_SCREEN_ON))
 
         tm = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
 
@@ -482,6 +508,7 @@ class BaresipService: Service() {
         super.onDestroy()
         this.unregisterReceiver(bluetoothReceiver)
         this.unregisterReceiver(hotSpotReceiver)
+        this.unregisterReceiver(screenReceiver)
         if (am.isBluetoothScoOn) am.stopBluetoothSco()
         cleanService()
         if (isServiceRunning) {
