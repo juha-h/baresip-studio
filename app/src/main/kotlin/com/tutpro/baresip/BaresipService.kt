@@ -226,7 +226,6 @@ class BaresipService: Service() {
                             Log.d(TAG, "Screen on UNLOCKED")
                         }
                 }
-
             }
         }
 
