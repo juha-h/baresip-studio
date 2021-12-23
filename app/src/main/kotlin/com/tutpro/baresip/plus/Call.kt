@@ -142,5 +142,12 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
             return null
         }
 
+        fun isIncoming(): Boolean {
+            for (call in BaresipService.calls)
+                if (call.status == "incoming")
+                    return true
+            return false
+        }
+
     }
 }

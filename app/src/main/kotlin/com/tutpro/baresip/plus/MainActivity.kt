@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
+import android.content.IntentFilter
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var serviceEventReceiver: BroadcastReceiver
+    private lateinit var screenEventReceiver: BroadcastReceiver
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
     private var micIcon: MenuItem? = null
@@ -129,6 +131,7 @@ class MainActivity : AppCompatActivity() {
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+
         dismissKeyguard()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
@@ -136,6 +139,7 @@ class MainActivity : AppCompatActivity() {
             window.setBackgroundDrawableResource(R.color.colorDark)
 
         setContentView(binding.root)
+
         setSupportActionBar(binding.toolbar)
 
         defaultLayout = binding.defaultLayout
@@ -181,6 +185,16 @@ class MainActivity : AppCompatActivity() {
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
                 IntentFilter("service event"))
+
+        screenEventReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val event = intent.getStringExtra("event")!!
+                if (event == Intent.ACTION_SCREEN_ON && !Call.isIncoming())
+                    dismissKeyguard()
+            }
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(screenEventReceiver,
+                IntentFilter("screen event"))
 
         stopState = "initial"
         quitTimer = object : CountDownTimer(5000, 1000) {
@@ -281,14 +295,10 @@ class MainActivity : AppCompatActivity() {
         callUri.threshold = 2
         callUri.setOnFocusChangeListener { view, b ->
             if (b) {
-                if (Build.VERSION.SDK_INT >= 27)
-                    kgm.requestDismissKeyguard(this, null)
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
             }
         }
         callUri.setOnClickListener { view ->
-            if (Build.VERSION.SDK_INT >= 27)
-                kgm.requestDismissKeyguard(this, null)
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
 
@@ -731,7 +741,7 @@ class MainActivity : AppCompatActivity() {
         when (resumeAction) {
             "call show" ->
                 handleServiceEvent("call incoming",
-                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
             "call answer" -> {
                 answerButton.performClick()
                 showCall(resumeCall!!.ua)
@@ -1359,6 +1369,8 @@ class MainActivity : AppCompatActivity() {
                                         Toast.LENGTH_LONG).show()
                         }
                         restoreActivities()
+                        if (kgm.isDeviceLocked && kgm.isKeyguardSecure)
+                            dismissKeyguard()
                     }
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
@@ -2271,6 +2283,7 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun dismissKeyguard() {
+        Log.d(TAG, "Dismissing keyguard")
         if (Build.VERSION.SDK_INT >= 27) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
