@@ -33,8 +33,8 @@
     <string name="you_have">Você tem</string>
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
     <string name="voicemail">Correio de Voz</string>
-    <string name="rate">Taxa</string>
-    <string name="duration">Duração</string>
+    <string name="rate">Taxa atual: %1$s (Kbits/s)</string>
+    <string name="duration">Duração: %1$s (segs)</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>
     <string name="call_info">Informações da Chamada</string>
     <string name="hold">Chamada em espera/liberar</string>
@@ -261,4 +261,9 @@
     <string name="battery_optimizations_help">Desative as otimizações da bateria (recomendado) caso queira reduzir a probabilidade do Android restringir o acesso do baresip à rede ou coloque o baresip no modo de espera.</string>
     <string name="rtp_stats">Estatísticas RTP</string>
     <string name="rtp_stats_help">Se estiver selecionado em conjunto com Debug, as mensagens do Logcat também incluirão as estatísticas RTP das chamadas quando elas forem encerradas.</string>
+    <string name="lost">Perda</string>
+    <string name="average_rate">Taxa média: %1$s (Kbits/s)</string>
+    <string name="packets">Pacotes</string>
+    <string name="call_is_on_hold">Chamada em espera</string>
+    <string name="jitter">Variação: %1$s (ms)</string>
 </resources>
