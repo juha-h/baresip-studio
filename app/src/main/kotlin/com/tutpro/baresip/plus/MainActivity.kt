@@ -887,6 +887,7 @@ class MainActivity : AppCompatActivity() {
 
         // Speaker Button
         speakerButton = ImageButton(this)
+        speakerButton.id = View.generateViewId()
         speakerButton.setBackgroundResource(0)
         prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -913,8 +914,9 @@ class MainActivity : AppCompatActivity() {
         prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT)
         prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-        prm.addRule(RelativeLayout.CENTER_VERTICAL)
+        prm.addRule(RelativeLayout.BELOW, speakerButton.id)
         prm.marginEnd = 15
+        prm.topMargin= 24
         mb.layoutParams = prm
         if (BaresipService.isMicMuted)
             mb.setImageResource(R.drawable.mic_off_button)
@@ -934,6 +936,7 @@ class MainActivity : AppCompatActivity() {
 
         // Hangup Button
         val hb = ImageButton(this)
+        hb.id = View.generateViewId()
         hb.setImageResource(R.drawable.hangup)
         hb.setBackgroundResource(0)
         prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -949,6 +952,46 @@ class MainActivity : AppCompatActivity() {
             hangupButton.performClick()
         }
         videoLayout.addView(hb)
+
+        // Info Button
+        val ib = ImageButton(this)
+        ib.setImageResource(R.drawable.video_info)
+        ib.setBackgroundResource(0)
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        prm.addRule(RelativeLayout.ABOVE, hb.id)
+        prm.marginEnd = 15
+        prm.bottomMargin= 24
+        ib.layoutParams = prm
+        ib.setOnClickListener {
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val calls = Call.uaCalls(ua, "")
+            if (calls.size > 0) {
+                val call = calls[0]
+                val stats = call.stats("video")
+                if (stats != "") {
+                    val parts = stats.split(",")
+                    val codecs = call.videoCodecs().split(',')
+                    val duration = call.duration()
+                    val txCodec = codecs[0]
+                    val rxCodec = codecs[1]
+                    Utils.alertView(this, getString(R.string.call_info),
+                            "${String.format(getString(R.string.duration), duration)}\n" +
+                                    "${getString(R.string.codecs)}: $txCodec/$rxCodec\n" +
+                                    "${String.format(getString(R.string.rate), parts[0])}\n" +
+                                    "${String.format(getString(R.string.average_rate), parts[1])}\n" +
+                                    "${String.format(getString(R.string.jitter), parts[4])}\n" +
+                                    "${getString(R.string.packets)}: ${parts[2]}\n" +
+                                    "${getString(R.string.lost)}: ${parts[3]}")
+                } else {
+                    Utils.alertView(this, getString(R.string.call_info),
+                            getString(R.string.call_info_not_available))
+                }
+            }
+        }
+        videoLayout.addView(ib)
+
 
     }
 

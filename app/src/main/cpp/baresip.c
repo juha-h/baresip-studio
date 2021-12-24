@@ -1475,6 +1475,26 @@ Java_com_tutpro_baresip_plus_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz,
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_plus_Call_call_1video_1codecs(JNIEnv *env, jobject thiz, jstring jCall) {
+    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+    const struct vidcodec *tx = video_codec(call_video(call), true);
+    const struct vidcodec *rx = video_codec(call_video(call), false);
+    char codec_buf[256];
+    char *start = &(codec_buf[0]);
+    unsigned int left = sizeof codec_buf;
+    int len = -1;
+    if (tx && rx)
+        len = re_snprintf(start, left, "%s,%s", tx->name, rx->name);
+    if (len == -1) {
+        LOGE("failed to get video codecs of call %s\n", native_call);
+        codec_buf[0] = '\0';
+    }
+    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+    return (*env)->NewStringUTF(env, codec_buf);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Call_call_1duration(JNIEnv *env, jobject thiz, jstring jCall) {
     const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);

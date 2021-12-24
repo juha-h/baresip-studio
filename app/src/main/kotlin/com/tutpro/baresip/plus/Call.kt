@@ -99,6 +99,10 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         return call_audio_codecs(callp)
     }
 
+    fun videoCodecs(): String {
+        return call_video_codecs(callp)
+    }
+
     private external fun call_connect(callp: String, peer_uri: String): Int
     private external fun call_hold(callp: String, hold: Boolean): Int
     private external fun call_ismuted(callp: String): Boolean
@@ -108,6 +112,7 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
     private external fun call_start_video_display(callp: String): Int
     private external fun call_stop_video_display(callp: String)
     private external fun call_audio_codecs(callp: String): String
+    private external fun call_video_codecs(callp: String): String
     private external fun call_duration(callp: String): Int
     private external fun call_stats(callp: String, stream: String): String
     private external fun call_has_video(callp: String): Boolean
