@@ -259,8 +259,6 @@
     <string name="no_backup">Você não pode criar backups sem a permissão de \"Armazenamento\".</string>
     <string name="battery_optimizations">Otimizações da bateria</string>
     <string name="battery_optimizations_help">Desative as otimizações da bateria (recomendado) caso queira reduzir a probabilidade do Android restringir o acesso do baresip à rede ou coloque o baresip no modo de espera.</string>
-    <string name="rtp_stats">Estatísticas RTP</string>
-    <string name="rtp_stats_help">Se estiver selecionado em conjunto com Debug, as mensagens do Logcat também incluirão as estatísticas RTP das chamadas quando elas forem encerradas.</string>
     <string name="lost">Perda</string>
     <string name="average_rate">Taxa média: %1$s (Kbits/s)</string>
     <string name="packets">Pacotes</string>
