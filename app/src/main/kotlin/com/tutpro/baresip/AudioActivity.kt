@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,6 +20,7 @@ class AudioActivity : AppCompatActivity() {
 
     private var save = false
     private var reload = false
+    private var callVolume = BaresipService.callVolume
     private var oldAudioModules = mutableMapOf<String, Boolean>()
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
@@ -33,6 +35,35 @@ class AudioActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Utils.addActivity("audio")
+
+        val callVolSpinner = binding.VolumeSpinner
+        val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        val volVals = arrayListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        val curVal = callVolume
+        val curKey = volKeys[curVal]
+        volKeys.removeAt(curVal)
+        volVals.removeAt(curVal)
+        volKeys.add(0, curKey)
+        volVals.add(0, curVal)
+        val callVolAdapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_item,
+            volKeys
+        )
+        callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        callVolSpinner.adapter = callVolAdapter
+        callVolSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long
+            ) {
+                callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
 
         val audioModulesList = binding.AudioModulesList
         var id = 1000
@@ -104,6 +135,12 @@ class AudioActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.checkIcon -> {
+
+                if (BaresipService.callVolume != callVolume) {
+                    BaresipService.callVolume = callVolume
+                    Config.replaceVariable("call_volume", callVolume.toString())
+                    save = true
+                }
 
                 var id = 1001
                 for (module in audioModules) {
@@ -200,6 +237,10 @@ class AudioActivity : AppCompatActivity() {
     }
 
     private fun bindTitles() {
+        binding.VolumeTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.default_call_volume),
+                    getString(R.string.default_call_volume_help))
+        }
         binding.AudioModulesTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.audio_modules_title),
                     getString(R.string.audio_modules_help))

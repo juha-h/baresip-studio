@@ -53,7 +53,6 @@ class ConfigActivity : AppCompatActivity() {
     private var oldVerifyServer = ""
     private var oldCAFile = false
     private var oldLogLevel = ""
-    private var callVolume = BaresipService.callVolume
     private var oldDisplayTheme = -1
     private var save = false
     private var restart = false
@@ -282,35 +281,6 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
-        val callVolSpinner = binding.VolumeSpinner
-        val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-        val volVals = arrayListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        val curVal = callVolume
-        val curKey = volKeys[curVal]
-        volKeys.removeAt(curVal)
-        volVals.removeAt(curVal)
-        volKeys.add(0, curKey)
-        volVals.add(0, curVal)
-        val callVolAdapter = ArrayAdapter(
-            this, android.R.layout.simple_spinner_item,
-            volKeys
-        )
-        callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        callVolSpinner.adapter = callVolAdapter
-        callVolSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
         darkTheme = binding.DarkTheme
         oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
@@ -445,12 +415,6 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                if (BaresipService.callVolume != callVolume) {
-                    BaresipService.callVolume = callVolume
-                    Config.replaceVariable("call_volume", callVolume.toString())
-                    save = true
-                }
-
                 val newDisplayTheme = if (darkTheme.isChecked)
                     AppCompatDelegate.MODE_NIGHT_YES
                 else
@@ -540,10 +504,6 @@ class ConfigActivity : AppCompatActivity() {
         }
         binding.AudioTitle .setOnClickListener {
             startActivity(Intent(this, AudioActivity::class.java))
-        }
-        binding.VolumeTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.default_call_volume),
-                    getString(R.string.default_call_volume_help))
         }
         binding.DarkThemeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.dark_theme),
