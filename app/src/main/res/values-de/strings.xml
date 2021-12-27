@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="about_title">Über baresip</string>
+    <string name="about_title_plus">Über baresip+</string>
+    <string name="account">Konto</string>
+    <string name="display_name">Anzeigename</string>
+    <string name="your_name">Ihr Name</string>
+</resources>
