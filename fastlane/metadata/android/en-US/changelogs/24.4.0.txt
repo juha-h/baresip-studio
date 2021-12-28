@@ -1,0 +1,3 @@
+- Added info button to video layout
+- Moved Default Call Volume setting under Audio settings
+- New language (German)
