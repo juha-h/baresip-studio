@@ -1,0 +1,2 @@
+- Moved Default Call Volume setting under Audio settings
+- New language (German)
