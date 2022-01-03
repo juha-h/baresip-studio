@@ -14,10 +14,14 @@ android {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
                 arguments "-DANDROID_STL=c++_shared"
+                version '3.18.1'
             }
         }
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+        lintOptions {
+            checkDependencies true
         }
     }
     splits {
