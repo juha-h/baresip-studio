@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion = 31
+    ndkVersion = '23.1.7779620'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
@@ -12,10 +13,14 @@ android {
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H'
+		version '3.18.1'
             }
         }
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+	lintOptions {
+            checkDependencies true
         }
     }
     splits {
