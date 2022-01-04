@@ -80,6 +80,7 @@
             android:id="@+id/ListenAddress"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
             android:layout_marginBottom="12dp"
             android:textSize="18sp"
             android:hint="@string/_0_0_0_0_5060"
@@ -99,6 +100,7 @@
             android:id="@+id/DnsServers"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
             android:layout_marginBottom="12dp"
             android:textSize="18sp"
             android:inputType="textUri"
@@ -183,16 +185,6 @@
             </CheckBox>
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/AudioTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="@string/audio" >
-        </TextView>
-
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -218,6 +210,26 @@
                 android:checked="false" >
             </CheckBox>
         </RelativeLayout>
+
+        <TextView
+            android:id="@+id/AudioSettingsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="@string/audio_settings" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/AndroidSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/android_settings"
+            android:textStyle="bold"
+            android:textSize="18sp">
+        </TextView>
 
         <RelativeLayout
             android:layout_width="wrap_content"
