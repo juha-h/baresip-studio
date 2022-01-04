@@ -290,6 +290,7 @@
         of needed Certificate Authorities has been or will be loaded. In Android versions 9 and
         below, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
     <string name="audio">Audio</string>
+    <string name="audio_settings">Audio Settings</string>
     <string name="audio_modules_title">Audio Modules</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.</string>
@@ -315,6 +316,7 @@
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height).
         Factory default is 800x600.</string>
+    <string name="android_settings">Android Settings</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
     <string name="sip_trace">SIP Trace</string>

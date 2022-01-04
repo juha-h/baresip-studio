@@ -332,6 +332,7 @@
         Download-kansiosta.
     </string>
     <string name="audio">Audio</string>
+    <string name="audio_settings">Audio-asetukset</string>
     <string name="audio_modules_title">Audio-modulit</string>
     <string name="audio_modules_help">Merkittyjen modulien tarjoamat audio-koodekit ovat tilien
         käytettävissä.
@@ -363,6 +364,7 @@
     <string name="video_size">Videon kehyskoko</string>
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus).
         Tehdasasetus on 800x600.</string>
+    <string name="android_settings">Android-asetukset</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>

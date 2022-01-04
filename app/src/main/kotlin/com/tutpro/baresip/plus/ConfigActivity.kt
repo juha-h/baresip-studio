@@ -8,8 +8,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -527,8 +529,15 @@ class ConfigActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.tls_ca_file),
                     getString(R.string.tls_ca_file_help))
         }
-        binding.AudioTitle.setOnClickListener {
+        binding.AudioSettingsTitle.setOnClickListener {
             startActivity(Intent(this, AudioActivity::class.java))
+        }
+        binding.AndroidSettings.setOnClickListener {
+            val i = Intent()
+            i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            i.data = Uri.parse("package:${applicationContext.packageName}")
+            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+            startActivity(i)
         }
         binding.VideoSizeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.video_size),

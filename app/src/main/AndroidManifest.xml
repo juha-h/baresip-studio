@@ -105,7 +105,7 @@
         <activity
             android:name=".AudioActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/audio"
+            android:label="@string/audio_settings"
             android:parentActivityName=".ConfigActivity" >
         </activity>
         <activity
