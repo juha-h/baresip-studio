@@ -76,11 +76,16 @@ class ConfigActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= 23) {
             val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val androidSettingsRequest = registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+            ) {
+                batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
+            }
             batteryOptimizations = binding.BatteryOptimizations
             batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
             batteryOptimizations.setOnCheckedChangeListener { _, _ ->
                 try {
-                    startActivity(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
+                    androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
                 } catch (e: ActivityNotFoundException) {
                         Log.e(TAG, "ActivityNotFound exception: $e")
                 }

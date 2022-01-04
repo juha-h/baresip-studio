@@ -279,7 +279,7 @@
     <string name="start_automatically">Käynnistä automaattisesti</string>
     <string name="start_automatically_help">Jos merkitty, baresip
     käynnistyy automaattisesti, kun laite käynnistyy.</string>
-    <string name="battery_optimizations">Akun käytön optiomointi</string>
+    <string name="battery_optimizations">Akun käytön optimointi</string>
     <string name="battery_optimizations_help">Ota akun käytön optimointi pois päältä (suositeltu),
         jos haluat vähentää todennäköisyyttä, että Android rajoittaa baresip-sovelluksen toimintaa
         ja pääsyä verkkoon.</string>
