@@ -47,7 +47,6 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private lateinit var pm: PowerManager
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
@@ -79,14 +78,19 @@ class ConfigActivity : AppCompatActivity() {
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
 
-        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val androidSettingsRequest = registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+        ) {
+            batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
+        }
         batteryOptimizations = binding.BatteryOptimizations
         batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
         batteryOptimizations.setOnCheckedChangeListener { _, _ ->
             try {
                 androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
             } catch (e: ActivityNotFoundException) {
-                    Log.e(TAG, "ActivityNotFound exception: $e")
+                Log.e(TAG, "ActivityNotFound exception: $e")
             }
         }
 
@@ -474,12 +478,6 @@ class ConfigActivity : AppCompatActivity() {
 
         return true
 
-    }
-
-    private val androidSettingsRequest = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-    ) { _ ->
-        batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
     }
 
     private fun done() {
