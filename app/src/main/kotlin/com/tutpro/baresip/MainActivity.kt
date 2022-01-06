@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         screenEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val event = intent.getStringExtra("event")!!
-                if (event == Intent.ACTION_SCREEN_ON && !Call.isIncoming())
+                if (event == Intent.ACTION_SCREEN_ON && !Call.isStatus("incoming"))
                     dismissKeyguard()
             }
         }
