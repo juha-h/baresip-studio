@@ -264,4 +264,6 @@
     <string name="packets">Pacotes</string>
     <string name="call_is_on_hold">Chamada em espera</string>
     <string name="jitter">Variação: %1$s (ms)</string>
+    <string name="android_settings">Configurações do Android</string>
+    <string name="audio_settings">Configurações do áudio</string>
 </resources>
