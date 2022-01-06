@@ -123,8 +123,6 @@ class MainActivity : AppCompatActivity() {
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        dismissKeyguard()
-
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(binding.root)
@@ -627,14 +625,15 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
+        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
+                MIC_PERMISSION_REQUEST_CODE)
+
     } // OnCreate
 
     override fun onStart() {
-        Log.i(TAG, "Main onStart")
+        Log.d(TAG, "Main onStart")
         super.onStart()
-        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
-                MIC_PERMISSION_REQUEST_CODE)
     }
 
     override fun onResume() {
