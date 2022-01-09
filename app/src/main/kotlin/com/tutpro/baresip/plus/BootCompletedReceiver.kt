@@ -27,7 +27,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
 
         if ((asCv.size > 0) && (asCv[0] == "yes")) {
 
-            Log.i(TAG, "Start baresip upon boot completed")
+            Log.i(TAG, "Start baresip+ upon boot completed")
 
             val i = Intent(context, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -47,7 +47,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
                         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT)
                 with(NotificationCompat.Builder(context, "default")) {
                     setSmallIcon(R.drawable.ic_stat)
-                    setContentTitle(context.getString(R.string.app_name))
+                    setContentTitle(context.getString(R.string.app_name_plus))
                     setContentText(context.getString(R.string.tap_to_start))
                     setContentIntent(pi)
                     setAutoCancel(true)
