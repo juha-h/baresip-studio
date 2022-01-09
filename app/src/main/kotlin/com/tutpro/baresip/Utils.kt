@@ -633,7 +633,7 @@ object Utils {
             Log.e(TAG, "Failed to unzip file '$zipFilePath': $e")
             return false
         }
-        (allFiles - zipFiles).iterator().forEach {
+        (allFiles - zipFiles.toSet()).iterator().forEach {
             deleteFile(File(BaresipService.filesPath, it))
         }
         return true
