@@ -74,6 +74,7 @@ class BaresipService: Service() {
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
+        super.onCreate()
 
         Log.d(TAG, "At onCreate")
 
@@ -232,7 +233,9 @@ class BaresipService: Service() {
             }
         }
 
-        this.registerReceiver(screenReceiver, IntentFilter(Intent.ACTION_SCREEN_ON))
+        this.registerReceiver(screenReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
 
         tm = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
 
@@ -320,8 +323,6 @@ class BaresipService: Service() {
             filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
             this.registerReceiver(bluetoothReceiver, filter)
         }
-
-        super.onCreate()
 
     }
 
@@ -497,8 +498,8 @@ class BaresipService: Service() {
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "At Baresip Service onDestroy")
         super.onDestroy()
+        Log.d(TAG, "At Baresip Service onDestroy")
         this.unregisterReceiver(bluetoothReceiver)
         this.unregisterReceiver(hotSpotReceiver)
         this.unregisterReceiver(screenReceiver)
@@ -654,9 +655,15 @@ class BaresipService: Service() {
                             }
                         }
                         if (!Utils.isVisible()) {
-                            val intent = Intent(applicationContext, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                            val intent = if (isMainAlive)
+                                Intent(applicationContext, ProxyActivity::class.java)
+                            else
+                                Intent(applicationContext, MainActivity::class.java)
+                            intent.flags = if (isMainAlive)
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                            else
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "call show")
                                 .putExtra("callp", callp)
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
@@ -665,17 +672,18 @@ class BaresipService: Service() {
                             val caller = Utils.friendlyUri(ContactsActivity.contactName(peerUri),
                                     Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
-                                .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
-                                .setContentIntent(pi)
-                                .setCategory(Notification.CATEGORY_CALL)
-                                .setAutoCancel(true)
-                                .setOngoing(true)
-                                .setContentTitle(getString(R.string.incoming_call_from))
-                                .setContentText(caller)
-                                .setWhen(System.currentTimeMillis())
-                                .setShowWhen(true)
-                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                .setFullScreenIntent(pi, true)
+                                    .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                                    .setContentIntent(pi)
+                                    .setCategory(Notification.CATEGORY_CALL)
+                                    .setAutoCancel(false)
+                                    .setOngoing(true)
+                                    .setContentTitle(getString(R.string.incoming_call_from))
+                                    .setContentText(caller)
+                                    .setWhen(System.currentTimeMillis())
+                                    .setShowWhen(true)
+                                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                    .setFullScreenIntent(pi, true)
                             if (VERSION.SDK_INT < 26) {
                                 @Suppress("DEPRECATION")
                                 nb.setVibrate(LongArray(0))
@@ -1467,6 +1475,7 @@ class BaresipService: Service() {
         var sipTrace = false
         var callActionUri = ""
         var isMainVisible = false
+        var isMainAlive = false
         var isMicMuted = false
 
         val uas = ArrayList<UserAgent>()

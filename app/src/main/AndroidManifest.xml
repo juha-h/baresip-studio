@@ -67,6 +67,12 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ProxyActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:noHistory="true" >
+        </activity>
+        <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts"
