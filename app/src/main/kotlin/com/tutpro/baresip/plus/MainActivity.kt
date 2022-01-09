@@ -132,8 +132,6 @@ class MainActivity : AppCompatActivity() {
 
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        dismissKeyguard()
-
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
         if (Utils.darkTheme())
             window.setBackgroundDrawableResource(R.color.colorDark)
@@ -189,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         screenEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val event = intent.getStringExtra("event")!!
-                if (event == Intent.ACTION_SCREEN_ON && !Call.isIncoming())
+                if (event == Intent.ACTION_SCREEN_ON && !Call.isStatus("incoming"))
                     dismissKeyguard()
             }
         }
@@ -718,10 +716,13 @@ class MainActivity : AppCompatActivity() {
             delegate.applyDayNight()
         }
 
+        requestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
     } // OnCreate
 
     override fun onStart() {
-        Log.i(TAG, "Main onStart")
+        Log.d(TAG, "Main onStart")
         super.onStart()
         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
             requestCallPermission(Manifest.permission.RECORD_AUDIO)
@@ -729,8 +730,6 @@ class MainActivity : AppCompatActivity() {
             if (BaresipService.supportedCameras)
                 if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.CAMERA)))
                     requestCallPermission(Manifest.permission.CAMERA)
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
     }
 
     override fun onResume() {
