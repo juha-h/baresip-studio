@@ -121,11 +121,14 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
-        kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(binding.root)
+
+        // Must be done after view has been created
+        Utils.setShowWhenLocked(this, true)
+        Utils.setTurnScreenOn(this, true)
+        Utils.requestDismissKeyguard(this)
 
         setSupportActionBar(binding.toolbar)
 
@@ -154,6 +157,7 @@ class MainActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
+        kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
         serviceEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -161,16 +165,20 @@ class MainActivity : AppCompatActivity() {
                         intent.getStringArrayListExtra("params")!!)
             }
         }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
                 IntentFilter("service event"))
 
         screenEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val event = intent.getStringExtra("event")!!
-                if (event == Intent.ACTION_SCREEN_ON && !Call.isStatus("incoming"))
-                    dismissKeyguard()
+                if (event == Intent.ACTION_SCREEN_ON && Call.calls().size == 0) {
+                    Log.d(TAG, "setShowWhenLocked == falsed")
+                    Utils.setShowWhenLocked(this@MainActivity, false)
+                }
             }
         }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(screenEventReceiver,
                 IntentFilter("screen event"))
 
@@ -603,7 +611,7 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.hasExtra("action"))
             // MainActivity was not visible when call, message, or transfer request came in
-            handleIntent(intent)
+            handleIntent(intent, intent.getStringExtra("action"))
         else
             if (!BaresipService.isServiceRunning)
                 if (File(filesDir.absolutePath + "/accounts").exists()) {
@@ -629,11 +637,13 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
                 MIC_PERMISSION_REQUEST_CODE)
 
+        BaresipService.isMainAlive = true
+
     } // OnCreate
 
     override fun onStart() {
-        Log.d(TAG, "Main onStart")
         super.onStart()
+        Log.d(TAG, "Main onStart")
     }
 
     override fun onResume() {
@@ -642,9 +652,10 @@ class MainActivity : AppCompatActivity() {
         nm.cancelAll()
         BaresipService.isMainVisible = true
         when (resumeAction) {
-            "call show" ->
-                handleServiceEvent("call incoming",
-                        arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            "call show" -> {
+                handleServiceEvent ("call incoming",
+                    arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
+            }
             "call answer" -> {
                 answerButton.performClick()
                 showCall(resumeCall!!.ua)
@@ -692,32 +703,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        super.onPause()
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
         BaresipService.isMainVisible = false
         saveCallUri()
-        super.onPause()
     }
 
     override fun onStop() {
-        Log.d(TAG, "Main onStop")
         super.onStop()
+        Log.d(TAG, "Main onStop")
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "Main onDestroy")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
-        BaresipService.activities.clear()
         super.onDestroy()
+        Log.d(TAG, "Main onDestroy")
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(screenEventReceiver)
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+
+        BaresipService.activities.clear()
+        BaresipService.isMainAlive = false
+
     }
 
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
+
         resumeAction = ""
         resumeUri = ""
-        Log.d(TAG, "onNewIntent ${intent.action} ${intent.data}")
         if (intent.action == ACTION_CALL) {
+            Log.d(TAG, "onNewIntent $ACTION_CALL ${intent.data}")
             if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty()) {
                 return
             }
@@ -746,13 +763,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else {
-            if (intent.getStringExtra("action") != null)
-                handleIntent(intent)
+            val action = intent.getStringExtra("action")
+            Log.d(TAG, "onNewIntent action `$action'")
+            if (action != null)
+                handleIntent(intent, action)
         }
     }
 
-    private fun handleIntent(intent: Intent) {
-        val action = intent.getStringExtra("action")
+    private fun handleIntent(intent: Intent, action: String?) {
         Log.d(TAG, "Handling intent '$action'")
         when (action) {
             "accounts" -> {
@@ -765,7 +783,6 @@ class MainActivity : AppCompatActivity() {
             }
             "call" -> {
                 if (Call.calls().isNotEmpty()) {
-
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return
@@ -1088,9 +1105,8 @@ class MainActivity : AppCompatActivity() {
                                         Toast.LENGTH_LONG).show()
                         }
                         restoreActivities()
-                        if (Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked && kgm.isKeyguardSecure) {
-                            dismissKeyguard()
-                        }
+                        if (Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked)
+                            moveTaskToBack(true)
                     }
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
@@ -1915,20 +1931,6 @@ class MainActivity : AppCompatActivity() {
                 ua.account.resumeUri = callUri.text.toString()
             else
                 ua.account.resumeUri = ""
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun dismissKeyguard() {
-        Log.d(TAG, "Dismissing keyguard")
-        if (Build.VERSION.SDK_INT >= 27) {
-            setShowWhenLocked(true)
-            setTurnScreenOn(true)
-            kgm.requestDismissKeyguard(this, null)
-        } else {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
     }
 

@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import android.app.Activity
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,6 +20,7 @@ import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
@@ -658,6 +661,37 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
+    }
+
+    @Suppress("DEPRECATION")
+    fun setShowWhenLocked(activity: Activity, show: Boolean) {
+        when {
+            Build.VERSION.SDK_INT >= 27 -> activity.setShowWhenLocked(show)
+            show -> activity.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+            else -> activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+        }
+    }
+
+    fun setTurnScreenOn(activity: Activity, turn: Boolean) {
+        if (Build.VERSION.SDK_INT >= 27) {
+            activity.setTurnScreenOn(turn)
+        } else
+            @Suppress("DEPRECATION")
+            if (turn) {
+                activity.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+            } else {
+                activity.window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+            }
+    }
+
+    @Suppress("DEPRECATION")
+    fun requestDismissKeyguard(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            val keyguardManager = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            keyguardManager.requestDismissKeyguard(activity, null)
+        } else {
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+        }
     }
 
     @Suppress("unused")
