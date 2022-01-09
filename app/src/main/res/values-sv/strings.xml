@@ -144,10 +144,10 @@
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
     <string name="call_already_active">Du har redan ett pågående samtal.</string>
     <string name="dialpad">Knappsats</string>
-    <string name="rate">Hastighet</string>
+    <string name="rate">Nuvarande hastighet: %1$s (Kbits/s)</string>
     <string name="call_info_not_available">Ingen information tillgänglig</string>
     <string name="call_info">Samtalsinformation</string>
-    <string name="duration">Längd</string>
+    <string name="duration">Längd: %1$s (sekunder)</string>
     <string name="hold">Parkera/återuppta samtal</string>
     <string name="allow_video_recv">Acceptera att ta emot video från \'%1$s\'\?</string>
     <string name="allow_video_send">Acceptera att skicka video till \'%1$s\'\?</string>
@@ -259,4 +259,10 @@
     <string name="no_restore">Du kan inte återställa en backup utan behörigheten \"Lagring\".</string>
     <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
     <string name="no_android_contacts">Du kan inte lägga till eller ta bort Android-kontakter utan behörigheten \"Kontakter\".</string>
+    <string name="android_settings">Android inställningar</string>
+    <string name="audio_settings">Ljud inställningar</string>
+    <string name="jitter">Jitter: %1$s (ms)</string>
+    <string name="call_is_on_hold">Samtalet är parkerat</string>
+    <string name="average_rate">Medelhastighet: %1$s (Kbits/s)</string>
+    <string name="packets">Paket</string>
 </resources>
