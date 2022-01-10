@@ -128,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         // Must be done after view has been created
         Utils.setShowWhenLocked(this, true)
         Utils.setTurnScreenOn(this, true)
-        Utils.requestDismissKeyguard(this)
 
         setSupportActionBar(binding.toolbar)
 
@@ -173,7 +172,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
                 val event = intent.getStringExtra("event")!!
                 if (event == Intent.ACTION_SCREEN_ON && Call.calls().size == 0) {
-                    Log.d(TAG, "setShowWhenLocked == falsed")
+                    Log.d(TAG, "setShowWhenLocked == false")
                     Utils.setShowWhenLocked(this@MainActivity, false)
                 }
             }
@@ -1105,7 +1104,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         restoreActivities()
                         if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
-                                (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked() && kgm.isKeyguardSecure()))
+                                (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
                             Utils.setShowWhenLocked(this, false)
                     }
                     "message", "message show", "message reply" -> {
