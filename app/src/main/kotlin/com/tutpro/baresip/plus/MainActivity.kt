@@ -1010,13 +1010,15 @@ class MainActivity : AppCompatActivity() {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
 
+        Utils.setShowWhenLocked(this, true)
+        Utils.setTurnScreenOn(this, true)
+
         resumeAction = ""
         resumeUri = ""
         if (intent.action == ACTION_CALL) {
             Log.d(TAG, "onNewIntent $ACTION_CALL ${intent.data}")
-            if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty()) {
+            if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty())
                 return
-            }
             val uri: Uri? = intent.data
             if (uri != null) {
                 val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
@@ -1425,7 +1427,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         restoreActivities()
                         if (kgm.isDeviceLocked)
-                            moveTaskToBack(true)
+                            Utils.setShowWhenLocked(this, false)
                     }
                     "message", "message show", "message reply" -> {
                         val peer = params[1]

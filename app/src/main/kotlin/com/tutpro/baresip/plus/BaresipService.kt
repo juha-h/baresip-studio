@@ -655,15 +655,9 @@ class BaresipService: Service() {
                             }
                         }
                         if (!Utils.isVisible()) {
-                            val intent = if (isMainAlive)
-                                Intent(applicationContext, ProxyActivity::class.java)
-                            else
-                                Intent(applicationContext, MainActivity::class.java)
-                            intent.flags = if (isMainAlive)
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                            else
-                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                            val intent = Intent(applicationContext, MainActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                    Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "call show")
                                 .putExtra("callp", callp)
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
