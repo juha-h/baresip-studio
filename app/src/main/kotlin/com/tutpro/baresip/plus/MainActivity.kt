@@ -727,8 +727,6 @@ class MainActivity : AppCompatActivity() {
         requestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
-        BaresipService.isMainAlive = true
-
     } // OnCreate
 
     override fun onStart() {
@@ -817,7 +815,6 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(screenEventReceiver)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
-        BaresipService.isMainAlive = false
     }
 
     private fun addVideoLayoutViews() {

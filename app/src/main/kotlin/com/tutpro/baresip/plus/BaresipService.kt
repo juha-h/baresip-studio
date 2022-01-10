@@ -1469,7 +1469,6 @@ class BaresipService: Service() {
         var sipTrace = false
         var callActionUri = ""
         var isMainVisible = false
-        var isMainAlive = false
         var isMicMuted = false
 
         val uas = ArrayList<UserAgent>()
