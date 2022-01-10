@@ -637,8 +637,6 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
                 MIC_PERMISSION_REQUEST_CODE)
 
-        BaresipService.isMainAlive = true
-
     } // OnCreate
 
     override fun onStart() {
@@ -723,8 +721,6 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
 
         BaresipService.activities.clear()
-        BaresipService.isMainAlive = false
-
     }
 
     override fun onNewIntent(intent: Intent) {
