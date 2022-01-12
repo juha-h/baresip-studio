@@ -687,8 +687,8 @@ object Utils {
     @Suppress("DEPRECATION")
     fun requestDismissKeyguard(activity: Activity) {
         if (Build.VERSION.SDK_INT >= 26) {
-            val keyguardManager = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(activity, null)
+            val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            kgm.requestDismissKeyguard(activity, null)
         } else {
             activity.window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
