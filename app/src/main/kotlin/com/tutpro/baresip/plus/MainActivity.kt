@@ -700,10 +700,6 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-        if (intent.hasExtra("action"))
-            // MainActivity was not visible when call, message, or transfer request came in
-            handleIntent(intent, intent.getStringExtra("action"))
-        else
             if (!BaresipService.isServiceRunning)
                 if (File(filesDir.absolutePath + "/accounts").exists()) {
                     val accounts = String(
@@ -716,8 +712,6 @@ class MainActivity : AppCompatActivity() {
                     firstRun = true
                     startBaresip()
                 }
-
-        intent.removeExtra("action")
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
@@ -732,12 +726,21 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "Main onStart")
+
         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
             requestCallPermission(Manifest.permission.RECORD_AUDIO)
         else
             if (BaresipService.supportedCameras)
                 if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.CAMERA)))
                     requestCallPermission(Manifest.permission.CAMERA)
+
+        val action = intent.getStringExtra("action")
+        if (action != null) {
+            // MainActivity was not visible when call, message, or transfer request came in
+            intent.removeExtra("action")
+            handleIntent(intent, action)
+        }
+
     }
 
     override fun onResume() {
@@ -1043,8 +1046,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             val action = intent.getStringExtra("action")
             Log.d(TAG, "onNewIntent action `$action'")
-            if (action != null)
+            if (action != null) {
+                intent.removeExtra("action")
                 handleIntent(intent, action)
+            }
         }
     }
 
