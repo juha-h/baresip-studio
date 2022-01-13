@@ -5,7 +5,6 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.Color
@@ -692,12 +691,6 @@ object Utils {
         } else {
             activity.window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
-    }
-
-    @Suppress("unused")
-    fun darkTheme(ctx: Context): Boolean {
-        return ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
-                Configuration.UI_MODE_NIGHT_YES
     }
 
 }

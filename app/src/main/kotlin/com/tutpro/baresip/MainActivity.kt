@@ -114,9 +114,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        val intentAction = intent.getStringExtra("action")
-
-        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
+        val extraAction = intent.getStringExtra("action")
+        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$extraAction")
 
         if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
@@ -128,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         // Must be done after view has been created
         Utils.setShowWhenLocked(this, true)
         Utils.setTurnScreenOn(this, true)
+        Utils.requestDismissKeyguard(this)
 
         setSupportActionBar(binding.toolbar)
 
@@ -608,39 +608,43 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-        if (intent.hasExtra("action"))
-            // MainActivity was not visible when call, message, or transfer request came in
-            handleIntent(intent, intent.getStringExtra("action"))
-        else
-            if (!BaresipService.isServiceRunning)
-                if (File(filesDir.absolutePath + "/accounts").exists()) {
-                    val accounts = String(
-                        Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
-                        Charsets.UTF_8
-                    ).lines().toMutableList()
-                    askPasswords(accounts)
-                } else {
-                    // Baresip is started for the first time
-                    firstRun = true
-                    startBaresip()
-                }
-
-        intent.removeExtra("action")
+        if (!BaresipService.isServiceRunning)
+            if (File(filesDir.absolutePath + "/accounts").exists()) {
+                val accounts = String(
+                    Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                    Charsets.UTF_8
+                ).lines().toMutableList()
+                askPasswords(accounts)
+            } else {
+                // Baresip is started for the first time
+                firstRun = true
+                startBaresip()
+            }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
             delegate.applyDayNight()
         }
 
-        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
-                MIC_PERMISSION_REQUEST_CODE)
+        requestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     } // OnCreate
 
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "Main onStart")
+
+        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
+                    MIC_PERMISSION_REQUEST_CODE)
+
+        val action = intent.getStringExtra("action")
+        if (action != null) {
+            // MainActivity was not visible when call, message, or transfer request came in
+            intent.removeExtra("action")
+            handleIntent(intent, action)
+        }
     }
 
     override fun onResume() {
@@ -715,10 +719,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Main onDestroy")
-
         LocalBroadcastManager.getInstance(this).unregisterReceiver(screenEventReceiver)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
-
         BaresipService.activities.clear()
     }
 
@@ -763,8 +765,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             val action = intent.getStringExtra("action")
             Log.d(TAG, "onNewIntent action `$action'")
-            if (action != null)
+            if (action != null) {
+                intent.removeExtra("action")
                 handleIntent(intent, action)
+            }
         }
     }
 
@@ -1284,26 +1288,25 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                            grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         when (requestCode) {
             MIC_PERMISSION_REQUEST_CODE -> {
-                if ((grantResults.isNotEmpty()) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Log.d(TAG, "Record audio permission granted")
-                } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.RECORD_AUDIO)) {
-                    layout.showSnackBar(
-                        binding.root,
-                        getString(R.string.no_calls),
-                        Snackbar.LENGTH_INDEFINITE,
-                        getString(R.string.ok)
-                    ) {
-                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                if (grantResults.isNotEmpty()) {
+                    if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                        Manifest.permission.RECORD_AUDIO))
+                            layout.showSnackBar(
+                                    binding.root,
+                                    getString(R.string.no_calls),
+                                    Snackbar.LENGTH_INDEFINITE,
+                                    getString(R.string.ok)
+                            ) {
+                                ActivityCompat.requestPermissions(this,
+                                        arrayOf(Manifest.permission.RECORD_AUDIO),
+                                MIC_PERMISSION_REQUEST_CODE)
+                            }
                     }
-                } else  {
-                    requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 }
             }
         }
