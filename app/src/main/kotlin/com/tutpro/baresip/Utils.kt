@@ -663,10 +663,6 @@ object Utils {
             BaresipService.activities.add(0, activity)
     }
 
-    fun darkTheme(): Boolean {
-        return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
-    }
-
     @Suppress("DEPRECATION")
     fun setShowWhenLocked(activity: Activity, show: Boolean) {
         when {
