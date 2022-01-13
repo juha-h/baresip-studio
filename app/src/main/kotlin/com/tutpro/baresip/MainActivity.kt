@@ -121,6 +121,8 @@ class MainActivity : AppCompatActivity() {
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
+        if (Utils.darkTheme())
+            window.setBackgroundDrawableResource(R.color.colorDark)
 
         setContentView(binding.root)
 

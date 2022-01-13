@@ -24,6 +24,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -660,6 +661,10 @@ object Utils {
     fun addActivity(activity: String) {
         if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
+    }
+
+    fun darkTheme(): Boolean {
+        return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
     }
 
     @Suppress("DEPRECATION")
