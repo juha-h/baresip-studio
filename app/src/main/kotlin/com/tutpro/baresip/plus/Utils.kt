@@ -31,7 +31,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -84,8 +83,6 @@ object Utils {
             }
             val dialog = this.create()
             dialog.show()
-            if (darkTheme())
-                dialog.window!!.setBackgroundDrawableResource(R.color.colorDark)
         }
     }
 
@@ -725,10 +722,6 @@ object Utils {
             Log.e(TAG, "Could not get supportedCameras: ${e.printStackTrace()}")
         }
         return cameras
-    }
-
-    fun darkTheme(): Boolean {
-        return AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
     }
 
     @Suppress("DEPRECATION")

@@ -130,8 +130,6 @@ class MainActivity : AppCompatActivity() {
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
-        if (Utils.darkTheme())
-            window.setBackgroundDrawableResource(R.color.colorDark)
 
         setContentView(binding.root)
 
@@ -2064,12 +2062,6 @@ class MainActivity : AppCompatActivity() {
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
-            if (Utils.darkTheme()) {
-                val color = ContextCompat.getColor(this, R.color.colorGrayLight)
-                callTitle.setTextColor(color)
-                callUri.setTextColor(color)
-                callUri.setHintTextColor(ContextCompat.getColor(this, R.color.colorGray))
-            }
             if (ua.account.resumeUri != "")
                 callUri.setText(ua.account.resumeUri)
             else
