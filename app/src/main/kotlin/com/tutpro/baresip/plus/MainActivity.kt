@@ -123,9 +123,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        val intentAction = intent.getStringExtra("action")
-
-        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$intentAction")
+        val extraAction = intent.getStringExtra("action")
+        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$extraAction")
 
         if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
@@ -700,18 +699,18 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-            if (!BaresipService.isServiceRunning)
-                if (File(filesDir.absolutePath + "/accounts").exists()) {
-                    val accounts = String(
-                        Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
-                        Charsets.UTF_8
-                    ).lines().toMutableList()
-                    askPasswords(accounts)
-                } else {
-                    // Baresip is started for the first time
-                    firstRun = true
-                    startBaresip()
-                }
+        if (!BaresipService.isServiceRunning)
+            if (File(filesDir.absolutePath + "/accounts").exists()) {
+                val accounts = String(
+                    Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                    Charsets.UTF_8
+                ).lines().toMutableList()
+                askPasswords(accounts)
+            } else {
+                // Baresip is started for the first time
+                firstRun = true
+                startBaresip()
+            }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
