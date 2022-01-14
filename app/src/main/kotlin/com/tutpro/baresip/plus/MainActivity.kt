@@ -188,11 +188,7 @@ class MainActivity : AppCompatActivity() {
 
         screenEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val event = intent.getStringExtra("event")!!
-                if (event == Intent.ACTION_SCREEN_ON && Call.calls().size == 0) {
-                    Log.d(TAG, "setShowWhenLocked == falsed")
-                    Utils.setShowWhenLocked(this@MainActivity, false)
-                }
+                Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
             }
         }
 

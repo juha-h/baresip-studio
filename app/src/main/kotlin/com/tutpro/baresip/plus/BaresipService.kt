@@ -215,19 +215,11 @@ class BaresipService: Service() {
 
         screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(contxt: Context, intent: Intent) {
-                when (intent.action) {
-                    Intent.ACTION_SCREEN_ON ->
-                        if (kgm.isKeyguardLocked) {
-                            Log.d(TAG, "Screen on LOCKED")
-                            if (Utils.isVisible()) {
-                                val i = Intent("screen event")
-                                i.putExtra("event", Intent.ACTION_SCREEN_ON)
-                                LocalBroadcastManager.getInstance(this@BaresipService)
-                                        .sendBroadcast(i)
-                            }
-                        } else {
-                            Log.d(TAG, "Screen on UNLOCKED")
-                        }
+                if (kgm.isKeyguardLocked) {
+                    Log.d(TAG, "Screen on when locked")
+                    val i = Intent("screen event")
+                    i.putExtra("event", Intent.ACTION_SCREEN_ON)
+                    LocalBroadcastManager.getInstance(this@BaresipService).sendBroadcast(i)
                 }
 
             }
