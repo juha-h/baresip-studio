@@ -240,19 +240,18 @@ class CallsActivity : AppCompatActivity() {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
-                    var time: String
-                    if (isToday(h.stopTime.timeInMillis)) {
+                    val time = if (isToday(h.stopTime.timeInMillis)) {
                         val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
-                        time = getString(R.string.today) + "\n" + fmt.format(h.stopTime.time)
+                        getString(R.string.today) + "\n" + fmt.format(h.stopTime.time)
                     } else {
                         val month = h.stopTime.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
                         val day = h.stopTime.get(Calendar.DAY_OF_MONTH)
                         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
                         if (h.stopTime.get(Calendar.YEAR) == currentYear) {
                             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
-                            time = "$month $day" + "\n" + fmt.format(h.stopTime.time)
+                            "$month $day" + "\n" + fmt.format(h.stopTime.time)
                         } else {
-                            time = "$month $day" + "\n" + h.stopTime.get(Calendar.YEAR)
+                            "$month $day" + "\n" + h.stopTime.get(Calendar.YEAR)
                         }
                     }
                     uaHistory.add(CallRow(h.aor, h.peerUri, direction, time, i))
