@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
-class CallRow(val aor: String, val peerUri: String, direction: Int, val time: String,
-              index: Int) {
+class CallRow(val aor: String, val peerUri: String, val direction: Int, val stopTime: String, val index: Int) {
 
     val directions = ArrayList<Int>()
     val indexes = ArrayList<Int>()
@@ -10,4 +9,5 @@ class CallRow(val aor: String, val peerUri: String, direction: Int, val time: St
         directions.add(direction)
         indexes.add(index)
     }
+
 }
