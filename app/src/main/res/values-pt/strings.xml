@@ -264,4 +264,6 @@
     <string name="no_network">Nenhuma conexão de rede!</string>
     <string name="average_rate">Taxa média: %1$s (Kbits/s)</string>
     <string name="no_backup">Não pode criar backups sem a permissão de \"Armazenamento\".</string>
+    <string name="audio_settings">Configurações de áudio</string>
+    <string name="android_settings">Configurações do Android</string>
 </resources>
