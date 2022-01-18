@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restoreRequest: ActivityResultLauncher<Intent>
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
+    private lateinit var callDetailsRequest: ActivityResultLauncher<Intent>
 
     private var downloadsInputStream: FileInputStream? = null
     private var downloadsOutputStream: FileOutputStream? = null
@@ -1917,6 +1918,15 @@ class MainActivity : AppCompatActivity() {
                 val i = Intent(this, CallsActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", activity[1])
+                i.putExtras(b)
+                callsRequest.launch(i)
+            }
+            "call_details" -> {
+                val i = Intent(this, CallDetailsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                b.putString("peer", activity[2])
+                b.putInt("position", activity[3].toInt())
                 i.putExtras(b)
                 callsRequest.launch(i)
             }

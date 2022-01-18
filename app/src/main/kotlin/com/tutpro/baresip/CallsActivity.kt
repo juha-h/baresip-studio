@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import android.text.format.DateUtils.isToday
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,7 +15,6 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.databinding.ActivityCallsBinding
 
-import java.text.DateFormat
 import java.util.*
 
 class CallsActivity : AppCompatActivity() {
@@ -46,7 +44,7 @@ class CallsActivity : AppCompatActivity() {
 
         val listView = binding.calls
         aorGenerateHistory(aor)
-        clAdapter = CallListAdapter(this, uaHistory)
+        clAdapter = CallListAdapter(this, aor, uaHistory)
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
@@ -117,7 +115,7 @@ class CallsActivity : AppCompatActivity() {
                     }
                 }
             }
-            val callText: String = if (uaHistory[pos].directions.size > 1)
+            val callText: String = if (uaHistory[pos].details.size > 1)
                 getString(R.string.calls_calls)
             else
                 getString(R.string.calls_call)
@@ -236,33 +234,19 @@ class CallsActivity : AppCompatActivity() {
                         R.drawable.arrow_up_green
                     else
                         R.drawable.arrow_up_red
-                if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri)) {
-                    uaHistory.last().directions.add(direction)
-                    uaHistory.last().indexes.add(i)
-                } else {
-                    val time = if (isToday(h.stopTime.timeInMillis)) {
-                        val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
-                        getString(R.string.today) + "\n" + fmt.format(h.stopTime.time)
-                    } else {
-                        val month = h.stopTime.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-                        val day = h.stopTime.get(Calendar.DAY_OF_MONTH)
-                        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-                        if (h.stopTime.get(Calendar.YEAR) == currentYear) {
-                            val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
-                            "$month $day" + "\n" + fmt.format(h.stopTime.time)
-                        } else {
-                            "$month $day" + "\n" + h.stopTime.get(Calendar.YEAR)
-                        }
-                    }
-                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, time, i))
-                }
+                if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
+                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime, h.stopTime))
+                else
+                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime))
             }
         }
     }
 
     private fun removeUaHistoryAt(i: Int) {
-        for (index in uaHistory[i].indexes)
-            BaresipService.callHistory.removeAt(index)
+        for (details in uaHistory[i].details)
+            BaresipService.callHistory.removeAll {
+                it.startTime == details.startTime && it.stopTime == details.stopTime
+            }
         uaHistory.removeAt(i)
     }
 

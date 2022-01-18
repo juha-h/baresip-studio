@@ -110,6 +110,12 @@
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
+            android:name=".CallDetailsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/call_details"
+            android:parentActivityName=".CallsActivity" >
+        </activity>
+        <activity
             android:name=".ChatsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chats"
