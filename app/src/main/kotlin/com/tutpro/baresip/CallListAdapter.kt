@@ -11,8 +11,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.graphics.Bitmap
-import android.graphics.Canvas
 
 import java.util.*
 
@@ -57,7 +55,7 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
                     viewHolder.textAvatarView.text = "${contact.name[0]}"
                 else
                     viewHolder.textAvatarView.text = ""
-                viewHolder.imageAvatarView.setImageBitmap(getBitmapFromView(viewHolder.textAvatarView))
+                viewHolder.imageAvatarView.setImageBitmap(Utils.bitmapFromView(viewHolder.textAvatarView))
             }
         } else {
             val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
@@ -80,6 +78,8 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
             viewHolder.directionsView.addView(dirView)
             count++
         }
+        if (count <= 3)
+            viewHolder.etcView.text = ""
 
         val contactName = ContactsActivity.contactName(callRow.peerUri)
         if (contactName.startsWith("sip:"))
@@ -100,14 +100,6 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         }
 
         return rowView
-    }
-
-    private fun getBitmapFromView(view: View): Bitmap? {
-        val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
-        view.draw(canvas)
-        return bitmap
     }
 
 }

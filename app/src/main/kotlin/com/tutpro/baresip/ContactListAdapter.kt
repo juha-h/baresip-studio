@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AlertDialog
-import androidx.cardview.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +30,6 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
 
     private class ViewHolder(view: View?) {
         val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
         val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
         val nameView = view?.findViewById(R.id.contactName) as TextView
         val actionView = view?.findViewById(R.id.edit) as ImageButton
@@ -55,19 +53,14 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
 
         val avatarImage = contact.avatarImage
         if (avatarImage != null) {
-            viewHolder.textAvatarView.visibility = View.GONE
-            viewHolder.cardAvatarView.visibility = View.VISIBLE
-            viewHolder.imageAvatarView.visibility = View.VISIBLE
             viewHolder.imageAvatarView.setImageBitmap(avatarImage)
         } else {
-            viewHolder.textAvatarView.visibility = View.VISIBLE
-            viewHolder.cardAvatarView.visibility = View.GONE
-            viewHolder.imageAvatarView.visibility = View.GONE
             viewHolder.textAvatarView.background.setTint(contact.color)
             if (contact.name.isNotEmpty())
                 viewHolder.textAvatarView.text = "${contact.name[0]}"
             else
                 viewHolder.textAvatarView.text = ""
+            viewHolder.imageAvatarView.setImageBitmap(Utils.bitmapFromView(viewHolder.textAvatarView))
         }
 
         viewHolder.nameView.text = contact.name

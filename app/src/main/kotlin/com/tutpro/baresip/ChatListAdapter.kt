@@ -1,9 +1,9 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import androidx.core.content.ContextCompat
-import androidx.cardview.widget.CardView
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
@@ -20,8 +20,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
 
     private class ViewHolder(view: View?) {
         val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
-        val cardImageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
+        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
         val layoutView = view?.findViewById(R.id.chat) as LinearLayout
         val peerView = view?.findViewById(R.id.peer) as TextView
         val infoView = view?.findViewById(R.id.info) as TextView
@@ -50,20 +49,19 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
             peer = contact.name
             val avatarImage = contact.avatarImage
             if (avatarImage != null) {
-                viewHolder.textAvatarView.visibility = View.GONE
-                viewHolder.cardAvatarView.visibility = View.VISIBLE
-                viewHolder.cardImageAvatarView.setImageBitmap(avatarImage)
+                viewHolder.imageAvatarView.setImageBitmap(avatarImage)
             } else {
-                viewHolder.textAvatarView.visibility = View.VISIBLE
-                viewHolder.cardAvatarView.visibility = View.GONE
                 viewHolder.textAvatarView.background.setTint(contact.color)
-                viewHolder.textAvatarView.text = "${peer[0]}"
+                if (peer.isNotEmpty())
+                    viewHolder.textAvatarView.text = "${peer[0]}"
+                else
+                    viewHolder.textAvatarView.text = ""
+                viewHolder.imageAvatarView.setImageBitmap(Utils.bitmapFromView(viewHolder.textAvatarView))
             }
         } else {
             peer = Utils.friendlyUri(message.peerUri, message.aor)
-            viewHolder.textAvatarView.visibility = View.VISIBLE
-            viewHolder.cardAvatarView.visibility = View.GONE
-            viewHolder.textAvatarView.setBackgroundResource(R.drawable.person_image)
+            val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
+            viewHolder.imageAvatarView.setImageBitmap(bitmap)
         }
 
         if ((message.direction == R.drawable.arrow_down_green) ||
