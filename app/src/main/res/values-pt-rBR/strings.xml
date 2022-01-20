@@ -266,4 +266,9 @@
     <string name="jitter">Variação: %1$s (ms)</string>
     <string name="android_settings">Configurações do Android</string>
     <string name="audio_settings">Configurações do áudio</string>
+    <string name="calls_duration">Duração</string>
+    <string name="peer">Par</string>
+    <string name="call_details">Detalhes da chamada</string>
+    <string name="direction">Direção</string>
+    <string name="time">Hora</string>
 </resources>
