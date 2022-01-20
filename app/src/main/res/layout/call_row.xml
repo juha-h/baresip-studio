@@ -14,7 +14,8 @@
         android:textSize="24sp"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
-        android:gravity="center" >
+        android:gravity="center"
+        android:visibility="gone" >
     </TextView>
 
     <androidx.cardview.widget.CardView

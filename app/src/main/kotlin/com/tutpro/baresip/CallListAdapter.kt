@@ -2,8 +2,8 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import androidx.cardview.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.graphics.Bitmap
+import android.graphics.Canvas
 
 import java.util.*
 
@@ -21,7 +23,6 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
 
     private class ViewHolder(view: View?) {
         val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
         val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
         val directionsView = view?.findViewById(R.id.directions) as LinearLayout
         val etcView = view?.findViewById(R.id.etc) as TextView
@@ -49,22 +50,18 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         if (contact != null) {
             val avatarImage = contact.avatarImage
             if (avatarImage != null) {
-                viewHolder.textAvatarView.visibility = View.GONE
-                viewHolder.cardAvatarView.visibility = View.VISIBLE
                 viewHolder.imageAvatarView.setImageBitmap(avatarImage)
             } else {
-                viewHolder.textAvatarView.visibility = View.VISIBLE
-                viewHolder.cardAvatarView.visibility = View.GONE
                 viewHolder.textAvatarView.background.setTint(contact.color)
                 if (contact.name.isNotEmpty())
                     viewHolder.textAvatarView.text = "${contact.name[0]}"
                 else
                     viewHolder.textAvatarView.text = ""
+                viewHolder.imageAvatarView.setImageBitmap(getBitmapFromView(viewHolder.textAvatarView))
             }
         } else {
-            viewHolder.textAvatarView.visibility = View.VISIBLE
-            viewHolder.cardAvatarView.visibility = View.GONE
-            viewHolder.textAvatarView.setBackgroundResource(R.drawable.person_image)
+            val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
+            viewHolder.imageAvatarView.setImageBitmap(bitmap)
         }
 
         viewHolder.directionsView.removeAllViews()
@@ -103,6 +100,14 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         }
 
         return rowView
+    }
+
+    private fun getBitmapFromView(view: View): Bitmap? {
+        val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
+        view.draw(canvas)
+        return bitmap
     }
 
 }
