@@ -14,7 +14,8 @@
         android:textSize="24sp"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
-        android:gravity="center" >
+        android:gravity="center"
+        android:visibility="gone" >
     </TextView>
 
     <androidx.cardview.widget.CardView
@@ -57,7 +58,7 @@
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingStart="0dp"
-        android:paddingEnd="5dp"
+        android:paddingEnd="6dp"
         android:textSize="12sp"
         android:lines="2"
         android:maxLines="2"

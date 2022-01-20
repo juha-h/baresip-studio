@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
@@ -774,4 +775,12 @@ object Utils {
         }
     }
 
+    fun bitmapFromView(view: View): Bitmap? {
+        val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
+        view.draw(canvas)
+        return bitmap
+    }
+    
 }
