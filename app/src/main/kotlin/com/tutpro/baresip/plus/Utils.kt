@@ -24,6 +24,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateUtils
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
@@ -45,6 +46,7 @@ import java.util.zip.ZipOutputStream
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
+import java.text.DateFormat
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -754,4 +756,22 @@ object Utils {
             stream.close()
         }
     }
+
+    fun relativeTime(ctx: Context, time: GregorianCalendar): String {
+        return if (DateUtils.isToday(time.timeInMillis)) {
+            val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+            ctx.getString(R.string.today) + "\n" + fmt.format(time.time)
+        } else {
+            val month = time.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+            val day = time.get(Calendar.DAY_OF_MONTH)
+            val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+            if (time.get(Calendar.YEAR) == currentYear) {
+                val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+                "$month $day" + "\n" + fmt.format(time.time)
+            } else {
+                "$month $day" + "\n" + time.get(Calendar.YEAR)
+            }
+        }
+    }
+
 }

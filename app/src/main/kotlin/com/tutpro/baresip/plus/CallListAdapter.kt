@@ -1,6 +1,8 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import androidx.cardview.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,15 +14,15 @@ import android.widget.TextView
 
 import java.util.*
 
-class CallListAdapter(private val cxt: Context, private val rows: ArrayList<CallRow>) :
-        ArrayAdapter<CallRow>(cxt, R.layout.call_row, rows) {
+class CallListAdapter(private val ctx: Context, private val aor: String, private val rows: ArrayList<CallRow>) :
+        ArrayAdapter<CallRow>(ctx, R.layout.call_row, rows) {
 
-    private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
         val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
         val cardAvatarView = view?.findViewById(R.id.CardAvatar) as CardView
-        val cardImageAvatarView = view?.findViewById(R.id.CardImageAvatar) as ImageView
+        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
         val directionsView = view?.findViewById(R.id.directions) as LinearLayout
         val etcView = view?.findViewById(R.id.etc) as TextView
         val peerURIView = view?.findViewById(R.id.peer_uri) as TextView
@@ -42,18 +44,22 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
         }
 
         val callRow = rows[position]
+
         val contact = ContactsActivity.findContact(callRow.peerUri)
         if (contact != null) {
             val avatarImage = contact.avatarImage
             if (avatarImage != null) {
                 viewHolder.textAvatarView.visibility = View.GONE
                 viewHolder.cardAvatarView.visibility = View.VISIBLE
-                viewHolder.cardImageAvatarView.setImageBitmap(avatarImage)
+                viewHolder.imageAvatarView.setImageBitmap(avatarImage)
             } else {
                 viewHolder.textAvatarView.visibility = View.VISIBLE
                 viewHolder.cardAvatarView.visibility = View.GONE
                 viewHolder.textAvatarView.background.setTint(contact.color)
-                viewHolder.textAvatarView.text = "${contact.name[0]}"
+                if (contact.name.isNotEmpty())
+                    viewHolder.textAvatarView.text = "${contact.name[0]}"
+                else
+                    viewHolder.textAvatarView.text = ""
             }
         } else {
             viewHolder.textAvatarView.visibility = View.VISIBLE
@@ -63,17 +69,17 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
 
         viewHolder.directionsView.removeAllViews()
         var count = 1
-        for (d in callRow.directions) {
+        for (d in callRow.details) {
             if (count > 3) {
                 viewHolder.etcView.text = "..."
                 break
             }
-            val dirView = ImageView(cxt)
+            val dirView = ImageView(ctx)
             val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT)
             dirView.layoutParams = params
             dirView.setPadding(0, 5, 0, 0)
-            dirView.setImageResource(d)
+            dirView.setImageResource(d.direction)
             viewHolder.directionsView.addView(dirView)
             count++
         }
@@ -84,7 +90,17 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
         else
             viewHolder.peerURIView.text = contactName
 
-        viewHolder.timeView.text = callRow.stopTime
+        viewHolder.timeView.text = Utils.relativeTime(ctx, callRow.stopTime)
+
+        viewHolder.timeView.setOnClickListener {
+            val i = Intent(ctx, CallDetailsActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", aor)
+            b.putString("peer", viewHolder.peerURIView.text!!.toString())
+            b.putInt("position", position)
+            i.putExtras(b)
+            ctx.startActivity(i)
+        }
 
         return rowView
     }

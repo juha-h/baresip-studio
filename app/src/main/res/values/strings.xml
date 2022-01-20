@@ -215,9 +215,14 @@
     <string name="tap_to_start">Tap to start application</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
+    <string name="call_details">Call Details</string>
     <string name="call">Call</string>
     <string name="calls_calls">calls</string>
     <string name="calls_call">call</string>
+    <string name="peer">Peer</string>
+    <string name="direction">Direction</string>
+    <string name="time">Time</string>
+    <string name="calls_duration">Duration</string>
     <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'?</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history?

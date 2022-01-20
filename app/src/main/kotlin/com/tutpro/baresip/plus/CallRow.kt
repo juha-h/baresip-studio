@@ -1,13 +1,17 @@
 package com.tutpro.baresip.plus
 
-class CallRow(val aor: String, val peerUri: String, val direction: Int, val stopTime: String, val index: Int) {
+import java.util.*
+import kotlin.collections.ArrayList
 
-    val directions = ArrayList<Int>()
-    val indexes = ArrayList<Int>()
+class CallRow(val aor: String, val peerUri: String, val direction: Int,
+              startTime: GregorianCalendar?, val stopTime: GregorianCalendar) {
+
+    class Details(val direction: Int, val startTime: GregorianCalendar?, val stopTime: GregorianCalendar)
+
+    val details = ArrayList<Details>()
 
     init {
-        directions.add(direction)
-        indexes.add(index)
+        details.add(Details(direction, startTime, stopTime))
     }
 
 }
