@@ -243,7 +243,7 @@
     <string name="calls_calls">puhelut</string>
     <string name="calls_call">puhelun</string>
     <string name="direction">Suunta</string>
-    <string name="peer">Pääri</string>
+    <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
     <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
