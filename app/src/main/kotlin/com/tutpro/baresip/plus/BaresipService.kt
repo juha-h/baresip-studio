@@ -369,7 +369,20 @@ class BaresipService: Service() {
                     File(filesDir, "history").renameTo(File(filesDir, "calls"))
 
                 Contact.restore()
-                CallHistory.restore()
+                val history = CallHistory.get()
+                if (history.isEmpty()) {
+                    NewCallHistory.restore()
+                } else {
+                    for (old in history) {
+                        val new = NewCallHistory(old.aor, old.peerUri, old.direction)
+                        new.stopTime = old.time
+                        if (old.connected)
+                            new.startTime = GregorianCalendar(0, 0, 0)
+                        callHistory.add(new)
+                    }
+                    NewCallHistory.save()
+                }
+
                 Message.restore()
 
                 linkAddresses = linkAddresses()
@@ -421,11 +434,8 @@ class BaresipService: Service() {
                     val peerUri = call.peerUri
                     val aor = call.ua.account.aor
                     Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
+                    call.rejected = true
                     Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
-                    if (call.ua.account.callHistory) {
-                        CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                        CallHistory.save()
-                    }
                 }
             }
 
@@ -618,11 +628,6 @@ class BaresipService: Service() {
                             !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
                                 Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                                 Api.ua_hangup(uap, callp, 486, "Busy Here")
-                                if (ua.account.callHistory) {
-                                    CallHistory.add(CallHistory(aor, peerUri, "in", false))
-                                    CallHistory.save()
-                                    ua.account.missedCalls = true
-                                }
                                 playUnInterrupted(R.raw.callwaiting, 1)
                                 if (!Utils.isVisible())
                                     return
@@ -739,14 +744,11 @@ class BaresipService: Service() {
                             Log.w(TAG, "Call $callp that is established is not found")
                             return
                         }
+                        Log.d(TAG, "AoR $aor call $callp established")
                         call.status = "connected"
                         call.onhold = false
-                        Log.d(TAG, "AoR $aor call $callp established")
-                        if (ua.account.callHistory) {
-                            CallHistory.add(CallHistory(aor, call.peerUri, call.dir, true))
-                            CallHistory.save()
-                            call.hasHistory = true
-                        }
+                        if (ua.account.callHistory)
+                            call.startTime = GregorianCalendar()
                         if (!Utils.isVisible())
                             return
                     }
@@ -859,12 +861,16 @@ class BaresipService: Service() {
                             am.mode = AudioManager.MODE_NORMAL
                             proximitySensing(false)
                         }
-                        if (ua.account.callHistory && !call.hasHistory) {
-                            CallHistory.add(CallHistory(aor, call.peerUri, call.dir, false))
-                            CallHistory.save()
-                            if (call.dir == "in") ua.account.missedCalls = true
+                        val missed = call.startTime == null && call.dir == "in" && !call.rejected
+                        if (ua.account.callHistory) {
+                            val history = NewCallHistory(aor, call.peerUri, call.dir)
+                            history.startTime = call.startTime
+                            history.stopTime = GregorianCalendar()
+                            NewCallHistory.add(history)
+                            NewCallHistory.save()
+                            ua.account.missedCalls = ua.account.missedCalls || missed
                         }
-                        if (!Utils.isVisible() && !call.hasHistory && call.dir == "in") {
+                        if (!Utils.isVisible() && missed) {
                             val caller = Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                                     Utils.aorDomain(aor))
                             val intent = Intent(applicationContext, MainActivity::class.java)
@@ -1466,7 +1472,7 @@ class BaresipService: Service() {
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()
         val calls = ArrayList<Call>()
-        var callHistory = ArrayList<CallHistory>()
+        var callHistory = ArrayList<NewCallHistory>()
         var messages = ArrayList<Message>()
         val contacts = ArrayList<Contact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()

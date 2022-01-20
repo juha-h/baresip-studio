@@ -419,11 +419,13 @@ class MainActivity : AppCompatActivity() {
         rejectButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = Call.uaCalls(ua, "in")[0].callp
+            val call = Call.uaCalls(ua, "in")[0]
+            val callp = call.callp
             Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
+            call.rejected = true
             Api.ua_hangup(ua.uap, callp, 486, "Rejected")
         }
 
@@ -1966,7 +1968,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                val latest = CallHistory.aorLatestHistory(aor)
+                val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
                     callUri.setText(
                         Utils.friendlyUri(

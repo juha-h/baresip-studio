@@ -84,7 +84,7 @@ class CallListAdapter(private val cxt: Context, private val rows: ArrayList<Call
         else
             viewHolder.peerURIView.text = contactName
 
-        viewHolder.timeView.text = callRow.time
+        viewHolder.timeView.text = callRow.stopTime
 
         return rowView
     }

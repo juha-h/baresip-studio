@@ -1,16 +1,17 @@
 package com.tutpro.baresip.plus
 
 import android.text.TextWatcher
-import java.util.ArrayList
+import java.util.*
 
 class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: String,
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
     var held = false
+    var rejected = false
     var security = 0
     var zid = ""
-    var hasHistory = false
+    var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""
     var videoRequest = 0
 

@@ -16,8 +16,8 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import com.tutpro.baresip.plus.databinding.ActivityCallsBinding
 
-import java.util.ArrayList
 import java.text.DateFormat
+import java.util.*
 
 class CallsActivity : AppCompatActivity() {
 
@@ -25,7 +25,6 @@ class CallsActivity : AppCompatActivity() {
     private lateinit var account: Account
     private lateinit var clAdapter: CallListAdapter
 
-    private var uaHistory = ArrayList<CallRow>()
     private var aor = ""
     private var lastClick: Long = 0
 
@@ -111,7 +110,7 @@ class CallsActivity : AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        CallHistory.save()
+                        NewCallHistory.save()
                         clAdapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -162,8 +161,8 @@ class CallsActivity : AppCompatActivity() {
                     setMessage(String.format(getString(R.string.delete_history_alert),
                             aor.substringAfter(":")))
                     setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        CallHistory.clear(aor)
-                        CallHistory.save()
+                        NewCallHistory.clear(aor)
+                        NewCallHistory.save()
                         aorGenerateHistory(aor)
                         clAdapter.notifyDataSetChanged()
                         dialog.dismiss()
@@ -218,10 +217,8 @@ class CallsActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.calls_menu, menu)
         return true
-
     }
 
     private fun aorGenerateHistory(aor: String) {
@@ -230,12 +227,12 @@ class CallsActivity : AppCompatActivity() {
             val h = BaresipService.callHistory[i]
             if (h.aor == aor) {
                 val direction: Int = if (h.direction == "in")
-                    if (h.connected)
+                    if (h.startTime != null)
                         R.drawable.arrow_down_green
                     else
                         R.drawable.arrow_down_red
                 else
-                    if (h.connected)
+                    if (h.startTime != null)
                         R.drawable.arrow_up_green
                     else
                         R.drawable.arrow_up_red
@@ -243,11 +240,20 @@ class CallsActivity : AppCompatActivity() {
                     uaHistory.last().directions.add(direction)
                     uaHistory.last().indexes.add(i)
                 } else {
-                    val fmt: DateFormat = if (isToday(h.time.timeInMillis))
-                        DateFormat.getTimeInstance(DateFormat.SHORT)
-                    else
-                        DateFormat.getDateInstance(DateFormat.SHORT)
-                    val time = fmt.format(h.time.time)
+                    val time = if (isToday(h.stopTime.timeInMillis)) {
+                        val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+                        getString(R.string.today) + "\n" + fmt.format(h.stopTime.time)
+                    } else {
+                        val month = h.stopTime.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                        val day = h.stopTime.get(Calendar.DAY_OF_MONTH)
+                        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+                        if (h.stopTime.get(Calendar.YEAR) == currentYear) {
+                            val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+                            "$month $day" + "\n" + fmt.format(h.stopTime.time)
+                        } else {
+                            "$month $day" + "\n" + h.stopTime.get(Calendar.YEAR)
+                        }
+                    }
                     uaHistory.add(CallRow(h.aor, h.peerUri, direction, time, i))
                 }
             }
@@ -258,6 +264,10 @@ class CallsActivity : AppCompatActivity() {
         for (index in uaHistory[i].indexes)
             BaresipService.callHistory.removeAt(index)
         uaHistory.removeAt(i)
+    }
+
+    companion object {
+        var uaHistory = ArrayList<CallRow>()
     }
 
 }
