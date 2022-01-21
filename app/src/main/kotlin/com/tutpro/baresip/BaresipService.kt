@@ -704,7 +704,10 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
-                        call!!.status = "answered"
+                        if (call!!.status == "incoming")
+                            call.status = "answered"
+                        else
+                            return
                     }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
