@@ -420,9 +420,10 @@
     <string name="about">Tietoja</string>
     <string name="restart">Käynnistä uudelleen</string>
     <string name="quit">Lopeta</string>
-    <string name="outgoing_call_to_dots">Lähtevä puhelu …</string>
-    <string name="incoming_call_from_dots">Tuleva puhelu …</string>
-    <string name="transferring_call_to_dots">Siirtopuhelu …</string>
+    <string name="outgoing_call_to_dots">Puhelu ulos …</string>
+    <string name="incoming_call_from_dots">Puhelu sisään …</string>
+    <string name="answering_call_from_dots">Vastattu puhelu …</string>
+    <string name="transferring_call_to_dots">Puhelun siirto …</string>
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>

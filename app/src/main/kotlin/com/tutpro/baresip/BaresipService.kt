@@ -538,12 +538,21 @@ class BaresipService: Service() {
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
     fun uaEvent(event: String, uap: String, callp: String) {
+
         if (!isServiceRunning) return
+
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
-            Log.w(TAG, "uaEvent did not find ua $uap")
+            Log.w(TAG, "uaEvent $event did not find ua $uap")
             return
         }
+
+        val call = Call.ofCallp(callp)
+        if (call == null && callp != "0" && event != "call incoming") {
+            Log.w(TAG, "uaEvent $event did not find call $callp")
+            return
+        }
+
         Log.d(TAG, "got uaEvent $event/${ua.account.aor}/$callp")
 
         val aor = ua.account.aor
@@ -580,12 +589,7 @@ class BaresipService: Service() {
                             return
                     }
                     "call outgoing" -> {
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp that is outgoing is not found")
-                            return
-                        }
-                        if (call.status == "transferring")
+                        if (call!!.status == "transferring")
                             break
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
@@ -700,17 +704,12 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
-                        return
+                        call!!.status = "answered"
                     }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp that is established is not found")
-                            return
-                        }
                         Log.d(TAG, "AoR $aor call $callp established")
-                        call.status = "connected"
+                        call!!.status = "connected"
                         call.onhold = false
                         if (ua.account.callHistory)
                             call.startTime = GregorianCalendar()
@@ -718,37 +717,22 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w("Baresip", "Call $callp that is updated is not found")
-                            return
-                        }
                         when (ev[1]) {
-                            "0", "1" -> call.held = true
-                            "2", "3" -> call.held = false
+                            "0", "1" -> call!!.held = true
+                            "2", "3" -> call!!.held = false
                         }
                     }
                     "call verified", "call secure" -> {
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w("Baresip", "Call $callp that is verified is not found")
-                            return
-                        }
                         if (ev[0] == "call secure") {
-                            call.security = R.drawable.box_yellow
+                            call!!.security = R.drawable.box_yellow
                         } else {
-                            call.security = R.drawable.box_green
+                            call!!.security = R.drawable.box_green
                             call.zid = ev[1]
                         }
                         if (!Utils.isVisible())
                             return
                     }
                     "call transfer" -> {
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp to be transferred is not found")
-                            return
-                        }
                         if (!Utils.isVisible()) {
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
@@ -802,20 +786,11 @@ class BaresipService: Service() {
                     "transfer failed" -> {
                         Log.d(TAG, "AoR $aor call $callp transfer failed: ${ev[1]}")
                         stopMediaPlayer()
-                        val call = Call.ofCallp(callp)
-                        if (call == null)
-                            Log.w(TAG, "Call $callp with failed transfer is not found")
-                        else
-                            call.referTo = ""
+                        call!!.referTo = ""
                         if (!Utils.isVisible()) return
                     }
                     "call closed" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.d(TAG, "AoR $aor call $callp that is closed is not found")
-                            return
-                        }
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
                         stopMediaPlayer()
@@ -825,7 +800,7 @@ class BaresipService: Service() {
                             "error" ->
                                 playMedia(R.raw.error, 1)
                         }
-                        call.remove()
+                        call!!.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             am.isSpeakerphoneOn = false

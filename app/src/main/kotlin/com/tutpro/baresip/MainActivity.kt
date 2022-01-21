@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restoreRequest: ActivityResultLauncher<Intent>
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
-    private lateinit var callDetailsRequest: ActivityResultLauncher<Intent>
 
     private var downloadsInputStream: FileInputStream? = null
     private var downloadsOutputStream: FileOutputStream? = null
@@ -333,9 +332,12 @@ class MainActivity : AppCompatActivity() {
             val aor = ua.account.aor
             val uaCalls = Call.uaCalls(ua, "")
             if (uaCalls.size > 0) {
-                val callp = uaCalls[uaCalls.size - 1].callp
+                val call = uaCalls[uaCalls.size - 1]
+                val callp = call.callp
                 Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.text}")
                 hangupButton.isEnabled = false
+                if (call.status == "answered")
+                    call.rejected = true
                 Api.ua_hangup(ua.uap, callp, 0, "")
             }
         }
@@ -966,6 +968,9 @@ class MainActivity : AppCompatActivity() {
                             i.putExtra("callp", callp)
                             startActivity(i)
                         }
+                    }
+                    "call answered" -> {
+                        showCall(ua)
                     }
                     "call established" -> {
                         if (aor == aorSpinner.tag) {
@@ -1724,8 +1729,11 @@ class MainActivity : AppCompatActivity() {
             val call = showCall ?: Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             when (call.status) {
-                "outgoing", "transferring" -> {
-                    callTitle.text = getString(R.string.outgoing_call_to_dots)
+                "outgoing", "transferring", "answered" -> {
+                    callTitle.text = if (call.status == "answered")
+                        getString(R.string.answering_call_from_dots)
+                    else
+                        getString(R.string.outgoing_call_to_dots)
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE

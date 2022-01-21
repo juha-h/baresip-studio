@@ -382,8 +382,9 @@
     <string name="about">About</string>
     <string name="restart">Restart</string>
     <string name="quit">Quit</string>
-    <string name="outgoing_call_to_dots">Outgoing call to …</string>
-    <string name="incoming_call_from_dots">Incoming call from …</string>
+    <string name="outgoing_call_to_dots">Call to …</string>
+    <string name="incoming_call_from_dots">Call from …</string>
+    <string name="answering_call_from_dots">Answering call from …</string>
     <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="callee">Callee</string>
