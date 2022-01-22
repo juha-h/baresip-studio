@@ -541,23 +541,25 @@ class BaresipService: Service() {
 
         if (!isServiceRunning) return
 
+        val ev = event.split(",")
         val ua = UserAgent.ofUap(uap)
+        val aor = ua?.account?.aor
+
+        Log.d(TAG, "got uaEvent $event/$aor/$callp")
+
         if (ua == null) {
             Log.w(TAG, "uaEvent $event did not find ua $uap")
             return
         }
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != "0" && event != "call incoming") {
+        if (call == null && callp != "0" && ev[0] != "call incoming") {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
 
-        Log.d(TAG, "got uaEvent $event/${ua.account.aor}/$callp")
-
-        val aor = ua.account.aor
         var newEvent: String? = null
-        val ev = event.split(",")
+
         for (account_index in uas.indices) {
             if (uas[account_index].account.aor == aor) {
                 when (ev[0]) {
