@@ -1,0 +1,6 @@
+- Improved display of call history time value in call history list
+- Added call details activity that can be accessed by touching time in
+call history list
+- Fixed showing of avatars in contact, call, and chat lists
+- Allow cancelling of answered call that waits to be established
+- New Portuguese, Portuguese Brazil, Swedish, and Norwegian translations
