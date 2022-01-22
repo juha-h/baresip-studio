@@ -1730,10 +1730,7 @@ class MainActivity : AppCompatActivity() {
             callUri.isFocusable = false
             when (call.status) {
                 "outgoing", "transferring", "answered" -> {
-                    callTitle.text = if (call.status == "answered")
-                        getString(R.string.answering_call_from_dots)
-                    else
-                        getString(R.string.outgoing_call_to_dots)
+                    callTitle.text = getString(R.string.outgoing_call_to_dots)
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
