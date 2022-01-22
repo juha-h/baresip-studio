@@ -260,7 +260,7 @@
     <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
     <string name="no_android_contacts">Du kan inte lägga till eller ta bort Android-kontakter utan behörigheten \"Kontakter\".</string>
     <string name="android_settings">Android inställningar</string>
-    <string name="audio_settings">Ljud inställningar</string>
+    <string name="audio_settings">Ljud-inställningar</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="call_is_on_hold">Samtalet är parkerat</string>
     <string name="average_rate">Medelhastighet: %1$s (Kbits/s)</string>

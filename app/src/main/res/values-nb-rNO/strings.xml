@@ -230,4 +230,7 @@
     <string name="video_size">Videorammestørrelse</string>
     <string name="dark_theme">Mørk drakt</string>
     <string name="missed_call_from">Tapt anrop fra</string>
+    <string name="time">Tid</string>
+    <string name="calls_duration">Varighet</string>
+    <string name="audio_settings">Lydinnstillinger</string>
 </resources>
