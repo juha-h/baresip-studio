@@ -169,13 +169,17 @@ class MainActivity : AppCompatActivity() {
                 IntentFilter("service event"))
 
         screenEventReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+            override fun onReceive(contxt: Context, intent: Intent) {
+                if (kgm.isKeyguardLocked) {
+                    Log.d(TAG, "Screen on when locked")
+                    Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+                }
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(screenEventReceiver,
-                IntentFilter("screen event"))
+        this.registerReceiver(screenEventReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
 
         stopState = "initial"
         quitTimer = object : CountDownTimer(5000, 1000) {
@@ -720,7 +724,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Main onDestroy")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(screenEventReceiver)
+        this.unregisterReceiver(screenEventReceiver)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
         BaresipService.activities.clear()
     }
