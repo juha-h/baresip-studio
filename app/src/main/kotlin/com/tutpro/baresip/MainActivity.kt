@@ -939,15 +939,8 @@ class MainActivity : AppCompatActivity() {
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "registered", "unregistering" -> {
+                    "registered", "unregistering", "registering failed" -> {
                         uaAdapter.notifyDataSetChanged()
-                    }
-                    "registering failed" -> {
-                        uaAdapter.notifyDataSetChanged()
-                        Toast.makeText(applicationContext,
-                                String.format(getString(R.string.registering_failed), aor) +
-                                        ": ${ev[1]}",
-                                Toast.LENGTH_LONG).show()
                     }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {

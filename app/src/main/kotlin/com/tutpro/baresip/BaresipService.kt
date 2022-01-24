@@ -36,6 +36,8 @@ import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import android.media.MediaPlayer
 import android.telecom.TelecomManager
+import android.widget.Toast
+import android.os.Looper
 
 class BaresipService: Service() {
 
@@ -572,22 +574,29 @@ class BaresipService: Service() {
                         else
                             status[account_index] = R.drawable.dot_green
                         updateStatusNotification()
-                        if (!Utils.isVisible())
+                        if (!isMainVisible)
                             return
                     }
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
-                        if (ev.size > 1 && ev[1] == "Invalid argument")
-                            // Likely due to DNS lookup failure
-                            newEvent = "registering failed,DNS lookup failed"
-                        if (!Utils.isVisible())
+                        if (Utils.isVisible()) {
+                            val reason = if (ev.size > 1) {
+                                if (ev[1] == "Invalid argument") // Likely due to DNS lookup failure
+                                    ": DNS lookup failed"
+                                else
+                                    ": ${ev[1]}"
+                            } else
+                                ""
+                            toast(String.format(getString(R.string.registering_failed), aor) + reason)
+                        }
+                        if (!isMainVisible)
                             return
                     }
                     "unregistering" -> {
                         status[account_index] = R.drawable.dot_white
                         updateStatusNotification()
-                        if (!Utils.isVisible())
+                        if (!isMainVisible)
                             return
                     }
                     "call outgoing" -> {
@@ -1068,6 +1077,12 @@ class BaresipService: Service() {
         // Don't know why, but without the delay the notification is not always updated
         Timer().schedule(250) {
             nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+        }
+    }
+
+    private fun toast(message: String) {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(this@BaresipService.applicationContext, message, Toast.LENGTH_LONG).show()
         }
     }
 
