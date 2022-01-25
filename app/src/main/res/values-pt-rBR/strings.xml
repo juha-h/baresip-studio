@@ -42,8 +42,8 @@
     <string name="callee">Destinatário</string>
     <string name="invalid_sip_uri">URI SIP \'%1$s\' inválida</string>
     <string name="transferring_call_to_dots">Transferindo chamada para …</string>
-    <string name="incoming_call_from_dots">Chamada recebida de …</string>
-    <string name="outgoing_call_to_dots">Chamada efetuada para …</string>
+    <string name="incoming_call_from_dots">Chamada de …</string>
+    <string name="outgoing_call_to_dots">Chamando …</string>
     <string name="quit">Sair</string>
     <string name="restart">Reiniciar</string>
     <string name="about">Sobre</string>
