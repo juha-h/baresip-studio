@@ -960,11 +960,25 @@ class BaresipService: Service() {
     @Suppress("UNUSED")
     fun messageResponse(responseCode: Int, responseReason: String, time: String) {
         Log.d(TAG, "Message response '$responseCode $responseReason' at $time")
-        val intent = Intent("message response")
-        intent.putExtra("response code", responseCode)
-        intent.putExtra("response reason", responseReason)
-        intent.putExtra("time", time)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        val timeStamp = time.toLong()
+        for (m in messages.reversed())
+            if (m.timeStamp == timeStamp) {
+                if (responseCode < 300) {
+                    m.direction = R.drawable.arrow_up_green
+                } else {
+                    m.direction = R.drawable.arrow_up_red
+                    m.responseCode = responseCode
+                    m.responseReason = responseReason
+                }
+                break
+            }
+        if (Utils.isVisible()) {
+            val intent = Intent("message response")
+            intent.putExtra("response code", responseCode)
+            intent.putExtra("response reason", responseReason)
+            intent.putExtra("time", time)
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        }
     }
 
     @Keep

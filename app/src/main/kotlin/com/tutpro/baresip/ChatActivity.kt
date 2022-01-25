@@ -161,9 +161,7 @@ class ChatActivity : AppCompatActivity() {
 
         messageResponseReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                handleMessageResponse(intent.getIntExtra("response code", 0),
-                        intent.getStringExtra("response reason")!!,
-                        intent.getStringExtra("time")!!)
+                mlAdapter.notifyDataSetChanged()
             }
         }
 
@@ -272,22 +270,6 @@ class ChatActivity : AppCompatActivity() {
         for (m in Message.messages())
             if ((m.aor == aor) && (m.peerUri == peerUri)) res.add(m)
         return res
-    }
-
-    private fun handleMessageResponse(responseCode: Int, responseReason: String, time: String) {
-        val timeStamp = time.toLong()
-        for (m in chatMessages.reversed())
-            if (m.timeStamp == timeStamp) {
-                if (responseCode < 300) {
-                    m.direction = R.drawable.arrow_up_green
-                } else {
-                    m.direction = R.drawable.arrow_up_red
-                    m.responseCode = responseCode
-                    m.responseReason = responseReason
-                }
-                mlAdapter.notifyDataSetChanged()
-                return
-            }
     }
 
 }
