@@ -179,16 +179,6 @@ class ChatActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onPause() {
-        if (newMessage.text.toString() != "") {
-            Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
-            BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
-        }
-        MainActivity.activityAor = aor
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
-        super.onPause()
-    }
-
     override fun onResume() {
         super.onResume()
         val chatText = BaresipService.chatTexts["$aor::$peerUri"]
@@ -202,6 +192,20 @@ class ChatActivity : AppCompatActivity() {
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (newMessage.text.toString() != "") {
+            Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
+            BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
+        }
+        MainActivity.activityAor = aor
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
