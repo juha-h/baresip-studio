@@ -947,9 +947,8 @@ class BaresipService: Service() {
             nb.addAction(R.drawable.ic_stat_delete, "Delete", deletePendingIntent)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
-        } else {
-            nt.play()
         }
+        nt.play()
         val intent = Intent("service event")
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("event", "message show")
