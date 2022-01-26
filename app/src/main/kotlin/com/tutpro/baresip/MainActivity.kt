@@ -31,6 +31,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
@@ -223,6 +224,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Nothing selected")
             }
         }
+
+        val registrationObserver = Observer<Long> { uaAdapter.notifyDataSetChanged() }
+        BaresipService.registrationUpdate.observe(this, registrationObserver)
 
         accountsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             uaAdapter.notifyDataSetChanged()
@@ -943,9 +947,6 @@ class MainActivity : AppCompatActivity() {
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "registered", "unregistering", "registering failed" -> {
-                        uaAdapter.notifyDataSetChanged()
-                    }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
                             callsButton.setImageResource(R.drawable.calls_missed)

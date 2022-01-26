@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -13,6 +12,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.lifecycle.Observer
 import com.tutpro.baresip.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
@@ -27,7 +27,6 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var aor: String
     private lateinit var peerUri: String
     private lateinit var ua: UserAgent
-    private lateinit var messageResponseReceiver: BroadcastReceiver
 
     private var focus = false
     private var lastCall: Long = 0
@@ -75,8 +74,13 @@ class ChatActivity : AppCompatActivity() {
         headerView.text = headerText
 
         listView = binding.messages
+
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
+
+        val messagesObserver = Observer<Long> { mlAdapter.notifyDataSetChanged() }
+        BaresipService.messageUpdate.observe(this, messagesObserver)
+
         listView.adapter = mlAdapter
         listView.isLongClickable = true
         val footerView = View(applicationContext)
@@ -159,15 +163,6 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
-        messageResponseReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                mlAdapter.notifyDataSetChanged()
-            }
-        }
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,
-                IntentFilter("message response"))
-
         ua.account.unreadMessages = false
 
     }
@@ -199,11 +194,6 @@ class ChatActivity : AppCompatActivity() {
             BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
         }
         MainActivity.activityAor = aor
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

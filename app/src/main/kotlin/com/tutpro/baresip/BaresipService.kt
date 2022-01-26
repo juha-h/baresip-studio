@@ -38,6 +38,7 @@ import android.media.MediaPlayer
 import android.telecom.TelecomManager
 import android.widget.Toast
 import android.os.Looper
+import androidx.lifecycle.MutableLiveData
 
 class BaresipService: Service() {
 
@@ -554,12 +555,13 @@ class BaresipService: Service() {
                         else
                             status[account_index] = R.drawable.dot_green
                         updateStatusNotification()
-                        if (!isMainVisible)
-                            return
+                        registrationUpdate.postValue(System.currentTimeMillis())
+                        return
                     }
                     "registering failed" -> {
                         status[account_index] = R.drawable.dot_red
                         updateStatusNotification()
+                        registrationUpdate.postValue(System.currentTimeMillis())
                         if (Utils.isVisible()) {
                             val reason = if (ev.size > 1) {
                                 if (ev[1] == "Invalid argument") // Likely due to DNS lookup failure
@@ -570,14 +572,13 @@ class BaresipService: Service() {
                                 ""
                             toast(String.format(getString(R.string.registering_failed), aor) + reason)
                         }
-                        if (!isMainVisible)
-                            return
+                        return
                     }
                     "unregistering" -> {
                         status[account_index] = R.drawable.dot_white
                         updateStatusNotification()
-                        if (!isMainVisible)
-                            return
+                        registrationUpdate.postValue(System.currentTimeMillis())
+                        return
                     }
                     "call outgoing" -> {
                         if (call!!.status == "transferring")
@@ -970,15 +971,12 @@ class BaresipService: Service() {
                     m.responseCode = responseCode
                     m.responseReason = responseReason
                 }
+                messageUpdate.postValue(System.currentTimeMillis())
                 break
+            } else {
+                if (m.timeStamp < timeStamp - 60000)
+                    break
             }
-        if (Utils.isVisible()) {
-            val intent = Intent("message response")
-            intent.putExtra("response code", responseCode)
-            intent.putExtra("response reason", responseReason)
-            intent.putExtra("time", time)
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-        }
     }
 
     @Keep
@@ -1442,6 +1440,8 @@ class BaresipService: Service() {
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<NewCallHistory>()
         var messages = ArrayList<Message>()
+        val messageUpdate = MutableLiveData<Long>()
+        val registrationUpdate = MutableLiveData<Long>()
         val contacts = ArrayList<Contact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
@@ -1450,10 +1450,15 @@ class BaresipService: Service() {
     }
 
     init {
+
+        messageUpdate.postValue(System.currentTimeMillis())
+        registrationUpdate.postValue(System.currentTimeMillis())
+
         if (!libraryLoaded) {
             Log.d(TAG, "Loading baresip library")
             System.loadLibrary("baresip")
             libraryLoaded = true
         }
+
     }
 }
