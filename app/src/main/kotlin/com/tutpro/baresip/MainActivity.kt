@@ -29,7 +29,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +38,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URLDecoder
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 import android.content.IntentFilter
@@ -73,8 +71,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
-    private lateinit var serviceEventReceiver: BroadcastReceiver
     private lateinit var screenEventReceiver: BroadcastReceiver
+    private lateinit var serviceEventObserver: Observer<Event<ServiceEvent>>
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
     private var micIcon: MenuItem? = null
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         val extraAction = intent.getStringExtra("action")
-        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$extraAction")
+        Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
 
         if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
             BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
@@ -159,15 +157,15 @@ class MainActivity : AppCompatActivity() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        serviceEventReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                handleServiceEvent(intent.getStringExtra("event")!!,
-                        intent.getStringArrayListExtra("params")!!)
+        serviceEventObserver = Observer<Event<ServiceEvent>> {
+            val serviceEvent = it.getContentIfNotHandled()
+            if (serviceEvent != null) {
+                Log.d(TAG, "Observed event ${serviceEvent.event}")
+                handleServiceEvent(serviceEvent.event, serviceEvent.params)
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
-                IntentFilter("service event"))
+        BaresipService.serviceEvent.observeForever(serviceEventObserver)
 
         screenEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(contxt: Context, intent: Intent) {
@@ -729,7 +727,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d(TAG, "Main onDestroy")
         this.unregisterReceiver(screenEventReceiver)
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        BaresipService.serviceEvent.removeObserver(serviceEventObserver)
         BaresipService.activities.clear()
     }
 
@@ -960,8 +958,9 @@ class MainActivity : AppCompatActivity() {
                             showCall(ua, Call.ofCallp(callp))
                         } else {
                             Log.d(TAG, "Reordering to front")
+                            BaresipService.activities.clear()
                             val i = Intent(applicationContext, MainActivity::class.java)
-                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                             i.putExtra("action", "call show")
                             i.putExtra("callp", callp)
                             startActivity(i)
@@ -1040,11 +1039,17 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call transfer", "transfer show" -> {
                         val callp = params[1]
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp to be transferred is not found")
+                        if (!BaresipService.isMainVisible) {
+                            Log.d(TAG, "Reordering to front")
+                            BaresipService.activities.clear()
+                            val i = Intent(applicationContext, MainActivity::class.java)
+                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            i.putExtra("action", event)
+                            i.putExtra("callp", callp)
+                            startActivity(i)
                             return
                         }
+                        val call = Call.ofCallp(callp)!!
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer_request)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
@@ -1069,19 +1074,12 @@ class MainActivity : AppCompatActivity() {
                     "transfer accept" -> {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp to be transferred is not found")
-                            return
-                        }
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
                         call(ua, ev[1])
                         showCall(ua)
                     }
                     "transfer failed" -> {
-                        Toast.makeText(applicationContext,
-                                "${getString(R.string.transfer_failed)}: ${ev[1].trim()}",
-                                Toast.LENGTH_LONG).show()
                         showCall(ua)
                     }
                     "call closed" -> {
@@ -1097,18 +1095,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (speakerIcon != null)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
-                        val param = ev[1].trim()
-                        if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
-                            if (param[0].isDigit())
-                                Toast.makeText(applicationContext,
-                                        "${getString(R.string.call_failed)}: $param",
-                                        Toast.LENGTH_LONG).show()
-                            else
-                                Toast.makeText(applicationContext,
-                                        "${getString(R.string.call_closed)}: $param",
-                                        Toast.LENGTH_LONG).show()
-                        }
-                        restoreActivities()
                         if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
                                 (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
                             Utils.setShowWhenLocked(this, false)
