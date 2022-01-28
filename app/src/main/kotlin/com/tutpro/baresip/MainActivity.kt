@@ -116,9 +116,6 @@ class MainActivity : AppCompatActivity() {
         val extraAction = intent.getStringExtra("action")
         Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
 
-        if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
-            BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
-
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
         setContentView(binding.root)
@@ -615,6 +612,13 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
+        if (intent?.action == ACTION_CALL) {
+            if (BaresipService.isServiceRunning)
+                callAction(intent)
+            else
+                BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+        }
+
         if (!BaresipService.isServiceRunning)
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -743,38 +747,43 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.action == ACTION_CALL) {
             Log.d(TAG, "onNewIntent $ACTION_CALL ${intent.data}")
-            if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty())
-                return
-            val uri: Uri? = intent.data
-            if (uri != null) {
-                val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
-                when (uri.scheme) {
-                    "sip" -> {
-                        var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
-                        if (ua == null)
-                            ua = BaresipService.uas[0]
-                        spinToAor(ua.account.aor)
-                        resumeAction = "call"
-                        ua.account.resumeUri = uriStr
-                    }
-                    "tel" -> {
-                        val acc = BaresipService.uas[0].account
-                        spinToAor(acc.aor)
-                        resumeAction = "call"
-                        acc.resumeUri = uriStr.replace("tel", "sip") + "@" + acc.aor
-                    }
-                    else -> {
-                        Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
-                        return
-                    }
-                }
-            }
+            callAction(intent)
         } else {
             val action = intent.getStringExtra("action")
             Log.d(TAG, "onNewIntent action `$action'")
             if (action != null) {
                 intent.removeExtra("action")
                 handleIntent(intent, action)
+            }
+        }
+    }
+
+    private fun callAction(intent: Intent) {
+        if (Call.calls().isNotEmpty() || BaresipService.uas.size == 0)
+            return
+        val uri: Uri? = intent.data
+        if (uri != null) {
+            val uriStr = URLDecoder.decode(uri.toString(), "UTF-8").replace(" ", "")
+            when (uri.scheme) {
+                "sip" -> {
+                    var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
+                    if (ua == null)
+                        ua = BaresipService.uas[0]
+                    spinToAor(ua.account.aor)
+                    resumeAction = "call"
+                    ua.account.resumeUri = uriStr
+                }
+                "tel" -> {
+                    val acc = BaresipService.uas[0].account
+                    spinToAor(acc.aor)
+                    resumeAction = "call"
+                    acc.resumeUri = uriStr.replace("tel", "sip") + "@" +
+                            Utils.uriHostPart(acc.aor)
+                }
+                else -> {
+                    Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
+                    return
+                }
             }
         }
     }
