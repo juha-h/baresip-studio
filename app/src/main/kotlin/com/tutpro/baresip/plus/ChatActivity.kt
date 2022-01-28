@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -13,6 +12,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.lifecycle.Observer
 import com.tutpro.baresip.plus.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
@@ -27,7 +27,6 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var aor: String
     private lateinit var peerUri: String
     private lateinit var ua: UserAgent
-    private lateinit var messageResponseReceiver: BroadcastReceiver
 
     private var focus = false
     private var lastCall: Long = 0
@@ -75,8 +74,13 @@ class ChatActivity : AppCompatActivity() {
         headerView.text = headerText
 
         listView = binding.messages
+
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
+
+        val messagesObserver = Observer<Long> { mlAdapter.notifyDataSetChanged() }
+        BaresipService.messageUpdate.observe(this, messagesObserver)
+
         listView.adapter = mlAdapter
         listView.isLongClickable = true
         val footerView = View(applicationContext)
@@ -159,17 +163,6 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
-        messageResponseReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                handleMessageResponse(intent.getIntExtra("response code", 0),
-                        intent.getStringExtra("response reason")!!,
-                        intent.getStringExtra("time")!!)
-            }
-        }
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageResponseReceiver,
-                IntentFilter("message response"))
-
         ua.account.unreadMessages = false
 
     }
@@ -177,16 +170,6 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.call_icon, menu)
         return true
-    }
-
-    override fun onPause() {
-        if (newMessage.text.toString() != "") {
-            Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
-            BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
-        }
-        MainActivity.activityAor = aor
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageResponseReceiver)
-        super.onPause()
     }
 
     override fun onResume() {
@@ -202,6 +185,15 @@ class ChatActivity : AppCompatActivity() {
         chatMessages = uaPeerMessages(aor, peerUri)
         mlAdapter = MessageListAdapter(this, chatMessages)
         listView.adapter = mlAdapter
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (newMessage.text.toString() != "") {
+            Log.d(TAG, "Saving newMessage ${newMessage.text} for $aor::$peerUri")
+            BaresipService.chatTexts["$aor::$peerUri"] = newMessage.text.toString()
+        }
+        MainActivity.activityAor = aor
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -268,22 +260,6 @@ class ChatActivity : AppCompatActivity() {
         for (m in Message.messages())
             if ((m.aor == aor) && (m.peerUri == peerUri)) res.add(m)
         return res
-    }
-
-    private fun handleMessageResponse(responseCode: Int, responseReason: String, time: String) {
-        val timeStamp = time.toLong()
-        for (m in chatMessages.reversed())
-            if (m.timeStamp == timeStamp) {
-                if (responseCode < 300) {
-                    m.direction = R.drawable.arrow_up_green
-                } else {
-                    m.direction = R.drawable.arrow_up_red
-                    m.responseCode = responseCode
-                    m.responseReason = responseReason
-                }
-                mlAdapter.notifyDataSetChanged()
-                return
-            }
     }
 
 }

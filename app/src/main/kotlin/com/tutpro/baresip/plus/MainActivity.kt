@@ -30,8 +30,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.plus.Utils.showSnackBar
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
@@ -40,10 +40,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 import android.content.IntentFilter
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,8 +79,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
-    private lateinit var serviceEventReceiver: BroadcastReceiver
     private lateinit var screenEventReceiver: BroadcastReceiver
+    private lateinit var serviceEventObserver: Observer<Event<ServiceEvent>>
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
     private var micIcon: MenuItem? = null
@@ -124,10 +124,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         val extraAction = intent.getStringExtra("action")
-        Log.d(TAG, "MainActivity onCreate ${intent.action}/${intent.data}/$extraAction")
-
-        if (intent?.action == ACTION_CALL && !BaresipService.isServiceRunning)
-            BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+        Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
@@ -176,24 +173,28 @@ class MainActivity : AppCompatActivity() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        serviceEventReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                handleServiceEvent(intent.getStringExtra("event")!!,
-                        intent.getStringArrayListExtra("params")!!)
+        serviceEventObserver = Observer<Event<ServiceEvent>> {
+            val serviceEvent = it.getContentIfNotHandled()
+            if (serviceEvent != null) {
+                Log.d(TAG, "Observed event ${serviceEvent.event}")
+                handleServiceEvent(serviceEvent.event, serviceEvent.params)
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
-                IntentFilter("service event"))
+        BaresipService.serviceEvent.observeForever(serviceEventObserver)
 
         screenEventReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+            override fun onReceive(contxt: Context, intent: Intent) {
+                if (kgm.isKeyguardLocked) {
+                    Log.d(TAG, "Screen on when locked")
+                    Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+                }
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(screenEventReceiver,
-                IntentFilter("screen event"))
+        this.registerReceiver(screenEventReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
 
         stopState = "initial"
         quitTimer = object : CountDownTimer(5000, 1000) {
@@ -239,6 +240,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Nothing selected")
             }
         }
+
+        val registrationObserver = Observer<Long> { uaAdapter.notifyDataSetChanged() }
+        BaresipService.registrationUpdate.observe(this, registrationObserver)
 
         accountsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             uaAdapter.notifyDataSetChanged()
@@ -698,6 +702,13 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
+        if (intent?.action == ACTION_CALL) {
+            if (BaresipService.isServiceRunning)
+                callAction(intent)
+            else
+                BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+        }
+
         if (!BaresipService.isServiceRunning)
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -764,7 +775,7 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
-            "transfer show", "transfer accept" ->
+            "call transfer", "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                     arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
             "message", "message show", "message reply" ->
@@ -813,8 +824,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Main onDestroy")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(screenEventReceiver)
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver)
+        this.unregisterReceiver(screenEventReceiver)
+        BaresipService.serviceEvent.removeObserver(serviceEventObserver)
         BaresipService.activities.clear()
     }
 
@@ -1015,32 +1026,7 @@ class MainActivity : AppCompatActivity() {
         resumeUri = ""
         if (intent.action == ACTION_CALL) {
             Log.d(TAG, "onNewIntent $ACTION_CALL ${intent.data}")
-            if (Call.calls().isNotEmpty() || UserAgent.uas().isEmpty())
-                return
-            val uri: Uri? = intent.data
-            if (uri != null) {
-                val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
-                when (uri.scheme) {
-                    "sip" -> {
-                        var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
-                        if (ua == null)
-                            ua = BaresipService.uas[0]
-                        spinToAor(ua.account.aor)
-                        resumeAction = "call"
-                        ua.account.resumeUri = uriStr
-                    }
-                    "tel" -> {
-                        val acc = BaresipService.uas[0].account
-                        spinToAor(acc.aor)
-                        resumeAction = "call"
-                        acc.resumeUri = uriStr.replace("tel", "sip") + "@" + acc.aor
-                    }
-                    else -> {
-                        Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
-                        return
-                    }
-                }
-            }
+            callAction(intent)
         } else {
             val action = intent.getStringExtra("action")
             Log.d(TAG, "onNewIntent action `$action'")
@@ -1051,9 +1037,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleIntent(intent: Intent, action: String?) {
+    private fun callAction(intent: Intent) {
+        if (Call.calls().isNotEmpty() || BaresipService.uas.size == 0)
+            return
+        val uri: Uri? = intent.data
+        if (uri != null) {
+            val uriStr = URLDecoder.decode(uri.toString(), "UTF-8").replace(" ", "")
+            when (uri.scheme) {
+                "sip" -> {
+                    var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
+                    if (ua == null)
+                        ua = BaresipService.uas[0]
+                    spinToAor(ua.account.aor)
+                    resumeAction = "call"
+                    ua.account.resumeUri = uriStr
+                }
+                "tel" -> {
+                    val acc = BaresipService.uas[0].account
+                    spinToAor(acc.aor)
+                    resumeAction = "call"
+                    acc.resumeUri = uriStr.replace("tel", "sip") + "@" +
+                            Utils.uriHostPart(acc.aor)
+                }
+                else -> {
+                    Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
+                    return
+                }
+            }
+        }
+    }
+
+    private fun handleIntent(intent: Intent, action: String) {
         Log.d(TAG, "Handling intent '$action'")
-        when (action) {
+        val ev = action.split(",")
+        when (ev[0]) {
             "accounts" -> {
                 resumeAction = "accounts"
             }
@@ -1096,14 +1113,14 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w(TAG, "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
             }
-            "transfer show", "transfer accept" -> {
+            "call transfer", "transfer show", "transfer accept" -> {
                 val callp = intent.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null) {
@@ -1111,9 +1128,12 @@ class MainActivity : AppCompatActivity() {
                     moveTaskToBack(true)
                     return
                 }
-                resumeAction = action
+                resumeAction = ev[0]
                 resumeCall = call
-                resumeUri = intent.getStringExtra("uri")!!
+                resumeUri = if (ev[0] == "call transfer")
+                    ev[1]
+                else
+                    intent.getStringExtra("uri")!!
             }
             "message", "message show", "message reply" -> {
                 val uap = intent.getStringExtra("uap")!!
@@ -1217,16 +1237,6 @@ class MainActivity : AppCompatActivity() {
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "registered", "unregistering" -> {
-                        uaAdapter.notifyDataSetChanged()
-                    }
-                    "registering failed" -> {
-                        uaAdapter.notifyDataSetChanged()
-                        Toast.makeText(applicationContext,
-                                String.format(getString(R.string.registering_failed), aor) +
-                                        ": ${ev[1]}",
-                                Toast.LENGTH_LONG).show()
-                    }
                     "call rejected" -> {
                         if (aor == aorSpinner.tag) {
                             callsButton.setImageResource(R.drawable.calls_missed)
@@ -1240,8 +1250,9 @@ class MainActivity : AppCompatActivity() {
                             showCall(ua, Call.ofCallp(callp))
                         } else {
                             Log.d(TAG, "Reordering to front")
+                            BaresipService.activities.clear()
                             val i = Intent(applicationContext, MainActivity::class.java)
-                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                             i.putExtra("action", "call show")
                             i.putExtra("callp", callp)
                             startActivity(i)
@@ -1361,11 +1372,17 @@ class MainActivity : AppCompatActivity() {
                     }
                     "call transfer", "transfer show" -> {
                         val callp = params[1]
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp to be transferred is not found")
+                        if (!BaresipService.isMainVisible) {
+                            Log.d(TAG, "Reordering to front")
+                            BaresipService.activities.clear()
+                            val i = Intent(applicationContext, MainActivity::class.java)
+                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            i.putExtra("action", event)
+                            i.putExtra("callp", callp)
+                            startActivity(i)
                             return
                         }
+                        val call = Call.ofCallp(callp)!!
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer_request)
                         val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
@@ -1389,19 +1406,12 @@ class MainActivity : AppCompatActivity() {
                     "transfer accept" -> {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            Log.w(TAG, "Call $callp to be transferred is not found")
-                            return
-                        }
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
                         call(ua, ev[1], "voice")
                         showCall(ua)
                     }
                     "transfer failed" -> {
-                        Toast.makeText(applicationContext,
-                                "${getString(R.string.transfer_failed)}: ${ev[1].trim()}",
-                                Toast.LENGTH_LONG).show()
                         showCall(ua)
                     }
                     "call closed" -> {
@@ -1415,27 +1425,16 @@ class MainActivity : AppCompatActivity() {
                             if (acc.missedCalls)
                                 callsButton.setImageResource(R.drawable.calls_missed)
                         }
-                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_off)
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        val param = ev[1].trim()
-                        if ((param != "") && (Call.uaCalls(ua, "").size == 0)) {
-                            if (param[0].isDigit())
-                                Toast.makeText(applicationContext,
-                                        "${getString(R.string.call_failed)}: $param",
-                                        Toast.LENGTH_LONG).show()
-                            else
-                                Toast.makeText(applicationContext,
-                                        "${getString(R.string.call_closed)}: $param",
-                                        Toast.LENGTH_LONG).show()
-                        }
-                        restoreActivities()
                         if (kgm.isDeviceLocked)
                             Utils.setShowWhenLocked(this, false)
                     }
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
                         val i = Intent(applicationContext, ChatActivity::class.java)
-                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         val b = Bundle()
                         b.putString("aor", aor)
                         b.putString("peer", peer)
@@ -2354,14 +2353,6 @@ class MainActivity : AppCompatActivity() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
 
-    }
-
-    init {
-        if (!BaresipService.libraryLoaded) {
-            Log.d(TAG, "Loading baresip library")
-            System.loadLibrary("baresip")
-            BaresipService.libraryLoaded = true
-        }
     }
 
 }
