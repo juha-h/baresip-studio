@@ -365,14 +365,14 @@ class BaresipService: Service() {
                 Message.restore()
 
                 linkAddresses = linkAddresses()
-                var addrs = ""
+                var addresses = ""
                 for (la in linkAddresses)
-                    addrs = "$addrs;${la.key};${la.value}"
+                    addresses = "$addresses;${la.key};${la.value}"
 
-                Log.i(TAG, "Link addresses: $addrs")
+                Log.i(TAG, "Link addresses: $addresses")
 
                 Thread {
-                    baresipStart(filesPath, addrs.removePrefix(";"), logLevel)
+                    baresipStart(filesPath, addresses.removePrefix(";"), logLevel)
                 }.start()
 
                 isServiceRunning = true
@@ -1292,12 +1292,12 @@ class BaresipService: Service() {
 
         updateDnsServers()
 
-        val lnAddrs = linkAddresses()
+        val addresses = linkAddresses()
 
-        Log.d(TAG, "Old/new link addresses $linkAddresses/$lnAddrs")
+        Log.d(TAG, "Old/new link addresses $linkAddresses/$addresses")
 
         var added = 0
-        for (a in lnAddrs)
+        for (a in addresses)
             if (!linkAddresses.containsKey(a.key)) {
                 if (Api.net_add_address_ifname(a.key, a.value) != 0)
                     Log.e(TAG, "Failed to add address: $a")
@@ -1306,7 +1306,7 @@ class BaresipService: Service() {
             }
         var removed = 0
         for (a in linkAddresses)
-            if (!lnAddrs.containsKey(a.key)) {
+            if (!addresses.containsKey(a.key)) {
                 if (Api.net_rm_address(a.key) != 0)
                     Log.e(TAG, "Failed to remove address: $a")
                 else
@@ -1317,7 +1317,7 @@ class BaresipService: Service() {
         Log.d(TAG, "Added/Removed/Active = $added/$removed/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
-            linkAddresses = lnAddrs
+            linkAddresses = addresses
             activeNetwork = active
             Api.uag_reset_transp(register = true, reinvite = true)
         }
@@ -1337,7 +1337,7 @@ class BaresipService: Service() {
     }
 
     private fun linkAddresses(): MutableMap<String, String> {
-        val lnAddrs = mutableMapOf<String, String>()
+        val addresses = mutableMapOf<String, String>()
         for (n in allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
             if (VERSION.SDK_INT < 28 ||
@@ -1346,16 +1346,16 @@ class BaresipService: Service() {
                     for (la in props.linkAddresses)
                         if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
                             props.interfaceName != null && la.address.hostAddress != null)
-                                lnAddrs[la.address.hostAddress!!] = props.interfaceName!!
+                                addresses[la.address.hostAddress!!] = props.interfaceName!!
             }
         }
         if (hotSpotIsEnabled) {
             hotSpotAddresses = Utils.hotSpotAddresses()
             Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
             for ((k, v) in hotSpotAddresses)
-                lnAddrs[k] = v
+                addresses[k] = v
         }
-        return lnAddrs
+        return addresses
     }
 
     private fun updateDnsServers() {
@@ -1427,7 +1427,7 @@ class BaresipService: Service() {
         isServiceClean = true
     }
 
-    private external fun baresipStart(path: String, addrs: String, logLevel: Int)
+    private external fun baresipStart(path: String, addresses: String, logLevel: Int)
     private external fun baresipStop(force: Boolean)
 
     companion object {
