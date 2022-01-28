@@ -677,7 +677,7 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
-            "transfer show", "transfer accept" ->
+            "call transfer", "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                     arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
             "message", "message show", "message reply" ->
@@ -779,9 +779,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleIntent(intent: Intent, action: String?) {
+    private fun handleIntent(intent: Intent, action: String) {
         Log.d(TAG, "Handling intent '$action'")
-        when (action) {
+        val ev = action.split(",")
+        when (ev[0]) {
             "accounts" -> {
                 resumeAction = "accounts"
             }
@@ -824,14 +825,14 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getStringExtra("uap")!!
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w(TAG, "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 resumeAction = action
             }
-            "transfer show", "transfer accept" -> {
+            "call transfer", "transfer show", "transfer accept" -> {
                 val callp = intent.getStringExtra("callp")!!
                 val call = Call.ofCallp(callp)
                 if (call == null) {
@@ -839,9 +840,12 @@ class MainActivity : AppCompatActivity() {
                     moveTaskToBack(true)
                     return
                 }
-                resumeAction = action
+                resumeAction = ev[0]
                 resumeCall = call
-                resumeUri = intent.getStringExtra("uri")!!
+                resumeUri = if (ev[0] == "call transfer")
+                    ev[1]
+                else
+                    intent.getStringExtra("uri")!!
             }
             "message", "message show", "message reply" -> {
                 val uap = intent.getStringExtra("uap")!!
@@ -1102,7 +1106,7 @@ class MainActivity : AppCompatActivity() {
                     "message", "message show", "message reply" -> {
                         val peer = params[1]
                         val i = Intent(applicationContext, ChatActivity::class.java)
-                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         val b = Bundle()
                         b.putString("aor", aor)
                         b.putString("peer", peer)
