@@ -176,6 +176,7 @@ class AccountsActivity : AppCompatActivity() {
             // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
+        @Suppress("unused")
         fun noAccounts(): Boolean {
             val contents = Utils.getFileContents(BaresipService.filesPath + "/accounts")
             return contents == null || contents.isEmpty()
