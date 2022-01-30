@@ -48,7 +48,6 @@ class CodecsActivity : AppCompatActivity() {
             title.text = getString(R.string.video_codecs)
             codecs = ArrayList(Api.video_codecs().split(",").distinct())
             accCodecs = acc.videoCodec
-            Log.d(TAG, "******** video codecs $codecs, accCodecs $accCodecs api ${Api.video_codecs()}")
         }
 
         newCodecs.addAll(accCodecs)
