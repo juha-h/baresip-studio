@@ -69,7 +69,7 @@ class AccountsActivity : AppCompatActivity() {
                         getString(R.string.account_allocation_failure))
                 return@setOnClickListener
             }
-            // Api.account_debug(ua.account.accp)
+            Api.account_debug(ua.account.accp)
             Log.d(TAG, "Allocated UA ${ua.uap} for ${Api.account_luri(ua.account.accp)}")
             newAorView.setText("")
             newAorView.hint = getString(R.string.user_domain)

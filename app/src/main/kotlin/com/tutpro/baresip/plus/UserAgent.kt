@@ -49,9 +49,12 @@ class UserAgent(val uap: String) {
 
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
-            if (uap != "") return UserAgent(uap)
-            Log.e(TAG, "Failed to allocate UserAgent for $uri")
-            return null
+            return if (uap == "") {
+                Log.e(TAG, "Failed to allocate UserAgent for $uri")
+                null
+            } else {
+                UserAgent(uap)
+            }
         }
 
         fun findAorIndex(aor: String): Int? {

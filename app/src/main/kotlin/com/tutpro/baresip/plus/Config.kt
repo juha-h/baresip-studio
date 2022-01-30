@@ -30,8 +30,11 @@ object Config {
             removeLine("module selfview.so")
         }
 
-        if (config.contains("module av1.so"))
-            removeLine("module av1.so")
+        if (!config.contains("module av1.so")) {
+            removeLine("module avcodec.so")
+            addModuleLine("module avcodec.so")
+            addModuleLine("module av1.so")
+        }
 
         if (!config.contains("module snapshot.so"))
             addModuleLine("module snapshot.so")

@@ -54,16 +54,12 @@ class Account(val accp: String) {
             }
         }
 
-        i = 0
-        while (true) {
-            val ac = Api.account_video_codec(accp, i)
-            if (ac != "") {
-                videoCodec.add(ac)
-                i++
-            } else {
-                break
-            }
-        }
+        val videoCodecsList = ArrayList(Api.video_codecs().split(",")).distinct()
+        val videoCodecsString = Utils.implode(videoCodecsList, ",")
+        if (Api.account_set_video_codecs(accp, videoCodecsString) != 0)
+            Log.e(TAG, "Setting of video codecs '$videoCodecsString' failed")
+        else
+            videoCodec = videoCodecsList as ArrayList
 
         callHistory = Utils.paramValue(Api.account_extra(accp),"call_history") == ""
 
