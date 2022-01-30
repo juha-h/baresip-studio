@@ -31,10 +31,10 @@ module g7221.so
 module g726.so
 module g729.so
 module g711.so
-module av1.so
 module vp9.so
 module vp8.so
 module avcodec.so
+module av1.so
 module avformat.so
 module webrtc_aecm.so
 module selfview.so
