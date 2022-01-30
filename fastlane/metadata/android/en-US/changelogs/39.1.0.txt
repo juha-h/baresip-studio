@@ -1,0 +1,6 @@
+- Improved and fixed handling of message and call transfer events
+- Toast registration failure it to any current activity
+- Automatically capitalize message sentences
+- Replaced deprecated local broadcasts with LiveData events
+- Fixed some bugs related to handling of external call actions
+- New Portuguese (Brazil) translations
