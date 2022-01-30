@@ -704,13 +704,15 @@ class BaresipService: Service() {
                             "0", "1" -> call!!.held = true
                             "2", "3" -> call!!.held = false
                         }
+                        if (!isMainVisible || call!!.status != "connected")
+                            return
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                                 (!callHasVideo && remoteHasVideo &&
                                         (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
                             serviceEvent.postValue(Event(ServiceEvent("call video request",
                                     arrayListOf(uap, callp, "$rdir"), System.currentTimeMillis())))
                         }
-                        newEvent = "call update"
+                        return
                     }
                     "call answered" -> {
                         stopMediaPlayer()
