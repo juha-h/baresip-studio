@@ -36,7 +36,7 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@id/sendButton"
         android:textSize="18sp"
-        android:inputType="textMultiLine|textShortMessage"
+        android:inputType="textMultiLine|textShortMessage|textCapSentences"
         android:scrollHorizontally="false"
         android:autofillHints="text"
         android:hint="@string/new_message" >
