@@ -182,8 +182,8 @@ class ContactActivity : AppCompatActivity() {
                     requestPermissions(permissions, CONTACT_PERMISSION_REQUEST_CODE)
         }
 
-        Log.d(TAG, "********** Android sip contacts ${logAndroidContacts(this, "sip")}")
-        Log.d(TAG, "********** Android tel contacts ${logAndroidContacts(this, "tel")}")
+        // Log.d(TAG, "Android sip contacts ${logAndroidContacts(this, "sip")}")
+        // Log.d(TAG, "Android tel contacts ${logAndroidContacts(this, "tel")}")
 
         Utils.addActivity("contact,$newContact,$uOrI")
 
@@ -434,10 +434,14 @@ class ContactActivity : AppCompatActivity() {
                 .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
                 .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name)
                 .build())
+        val mimeType = if (contact.uri.startsWith("sip:"))
+            CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+        else
+            CommonDataKinds.Phone.CONTENT_ITEM_TYPE
         ops.add(ContentProviderOperation
                 .newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(Data.RAW_CONTACT_ID, 0)
-                .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
+                .withValue(Data.MIMETYPE, mimeType)
                 .withValue(Data.DATA1, contact.uri.substringAfter(":"))
                 .build())
         if (contact.avatarImage != null) {
@@ -461,37 +465,45 @@ class ContactActivity : AppCompatActivity() {
     }
 
     private fun updateAndroidContact(rawContactId: Long, contact: Contact) {
-        if (updateAndroidSipUri(rawContactId, contact.uri) == 0)
-            addAndroidSipUri(rawContactId, contact.uri)
+        if (updateAndroidUri(rawContactId, contact.uri) == 0)
+            addAndroidUri(rawContactId, contact.uri)
         if (updateAndroidPhoto(rawContactId, contact.avatarImage) == 0)
             if (contact.avatarImage != null)
                 addAndroidPhoto(rawContactId, contact.avatarImage!!)
     }
 
-    private fun addAndroidSipUri(rawContactId: Long, sipUri: String) {
+    private fun addAndroidUri(rawContactId: Long, uri: String) {
+        val mimeType = if (uri.startsWith("sip:"))
+            CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+        else
+            CommonDataKinds.Phone.CONTENT_ITEM_TYPE
         val ops = ArrayList<ContentProviderOperation>()
         ops.add(ContentProviderOperation
                 .newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValue(Data.RAW_CONTACT_ID, rawContactId)
-                .withValue(Data.MIMETYPE, CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
-                .withValue(Data.DATA1, sipUri.substringAfter(":"))
+                .withValue(Data.MIMETYPE, mimeType)
+                .withValue(Data.DATA1, uri.substringAfter(":"))
                 .build())
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e(TAG, "Adding of SIP URI $sipUri failed")
+            Log.e(TAG, "Adding of SIP URI $uri failed")
         }
     }
 
-    private fun updateAndroidSipUri(rawContactId: Long, sipUri: String): Int {
+    private fun updateAndroidUri(rawContactId: Long, uri: String): Int {
+        val mimeType = if (uri.startsWith("sip:"))
+            CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+        else
+            CommonDataKinds.Phone.CONTENT_ITEM_TYPE
         val contentValues = ContentValues()
-        contentValues.put(ContactsContract.Data.DATA1, sipUri)
+        contentValues.put(ContactsContract.Data.DATA1, uri)
         val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
-                "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE}'"
+                "${ContactsContract.Data.MIMETYPE}='$mimeType'"
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e(TAG, "Adding of SIP URI $sipUri failed")
+            Log.e(TAG, "Adding of SIP URI $uri failed")
             0
         }
     }
