@@ -33,6 +33,7 @@ import com.tutpro.baresip.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+
 class ContactActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactBinding
@@ -83,12 +84,10 @@ class ContactActivity : AppCompatActivity() {
             nameView.hint = getString(R.string.contact_name)
             nameView.setSelection(nameView.text.length)
             val uri = intent.getStringExtra("uri")!!
-            if (uri == "") {
+            if (uri == "")
                 uriView.setText("")
-                uriView.hint = getString(R.string.sip_uri)
-            } else {
+            else
                 uriView.setText(uri)
-            }
             uOrI = uri
             androidCheck.isChecked = false
         } else {
@@ -183,6 +182,9 @@ class ContactActivity : AppCompatActivity() {
                     requestPermissions(permissions, CONTACT_PERMISSION_REQUEST_CODE)
         }
 
+        Log.d(TAG, "********** Android sip contacts ${logAndroidContacts(this, "sip")}")
+        Log.d(TAG, "********** Android tel contacts ${logAndroidContacts(this, "tel")}")
+
         Utils.addActivity("contact,$newContact,$uOrI")
 
     }
@@ -255,7 +257,7 @@ class ContactActivity : AppCompatActivity() {
             R.id.checkIcon -> {
 
                 var newName = nameView.text.toString().trim()
-                var newUri = uriView.text.toString().trim()
+                var newUri = uriView.text.toString().filterNot{setOf('-', ' ').contains(it)}
 
                 if (newName == "") newName = newUri
 
@@ -275,15 +277,14 @@ class ContactActivity : AppCompatActivity() {
                     return false
                 }
 
-                if (!newUri.startsWith("sip:")) {
-                    newUri = if (newUri.contains("@") || (BaresipService.uas.size != 1))
-                        "sip:$newUri"
+                if (!newUri.startsWith("sip:") && !newUri.startsWith("tel:"))
+                    newUri = if (Utils.isTelNumber(newUri))
+                        "tel:$newUri"
                     else
-                        "sip:$newUri@${Utils.aorDomain(BaresipService.uas[0].account.aor)}"
-                }
-                if (!Utils.checkSipUri(newUri)) {
+                        "sip:$newUri"
+                if (!Utils.checkUri(newUri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_contact_uri), newUri))
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), newUri))
                     return false
                 }
 
@@ -555,13 +556,16 @@ class ContactActivity : AppCompatActivity() {
         }
 
         @Suppress("UNUSED")
-        fun logAndroidSipContacts(ctx: Context): HashMap<Long, MutableList<String>> {
+        fun logAndroidContacts(ctx: Context, type: String): HashMap<Long, MutableList<String>> {
+            val mimeType = if (type == "sip")
+                CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+            else
+                CommonDataKinds.Phone.CONTENT_ITEM_TYPE
             val contacts = HashMap<Long, MutableList<String>>()
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                     ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                     ContactsContract.Data.PHOTO_THUMBNAIL_URI)
-            val selection = ContactsContract.Data.MIMETYPE + "='" +
-                    CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "'"
+            val selection = ContactsContract.Data.MIMETYPE + "='" + mimeType + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
             while (cur != null && cur.moveToNext()) {
@@ -574,6 +578,7 @@ class ContactActivity : AppCompatActivity() {
                 when (mime) {
                     CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> kind = "sip"
                     CommonDataKinds.Photo.CONTENT_ITEM_TYPE -> kind = "thumb"
+                    CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> kind = "tel"
                 }
                 Log.d(TAG, "got $id, $name, $kind - $data")
                 var info: MutableList<String>

@@ -89,19 +89,18 @@ class ContactsActivity : AppCompatActivity() {
 
     companion object {
 
-        fun findContactURI(name: String): String {
+        fun findContactUri(name: String): String? {
             for (c in Contact.contacts())
-                if (c.name == name)
+                if (c.name.equals(name, ignoreCase = true))
                     return c.uri.removePrefix("<")
                             .replaceAfter(">", "")
                             .replace(">", "")
-            return name
+            return null
         }
 
         fun findContact(uri: String): Contact? {
             for (c in Contact.contacts())
-                if ((Utils.uriUserPart(c.uri) == Utils.uriUserPart(uri)) &&
-                        (Utils.uriHostPart(c.uri) == Utils.uriHostPart(uri)))
+                if (Utils.uriMatch(c.uri, uri))
                     return c
             return null
         }
@@ -112,17 +111,14 @@ class ContactsActivity : AppCompatActivity() {
             return false
         }
 
+        // Return contact name of uri or uri itself if contact with uri is not found
         fun contactName(uri: String): String {
-            val uriUser = Utils.uriUserPart(uri)
-            val uriHost = Utils.uriHostPart(uri)
-            for (c in Contact.contacts()) {
-                val contactUser = Utils.uriUserPart(c.uri)
-                if ((contactUser == uriUser) &&
-                        (Utils.isE164Number(contactUser) ||
-                                (Utils.uriHostPart(c.uri) == uriHost)))
-                    return c.name
-            }
-            return uri
+            val userPart = Utils.uriUserPart(uri)
+            return if (Utils.isTelNumber(userPart))
+                findContact("tel:$userPart")?.name ?: uri
+            else
+                findContact(uri)?.name ?: uri
         }
+
     }
 }

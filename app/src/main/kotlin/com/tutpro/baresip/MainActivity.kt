@@ -774,11 +774,19 @@ class MainActivity : AppCompatActivity() {
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
-                    val acc = BaresipService.uas[0].account
-                    spinToAor(acc.aor)
+                    var account: Account? = null
+                    for (a in Account.accounts())
+                        if (a.telProvider != "") {
+                            account = a
+                            break
+                        }
+                    if (account == null) {
+                        Log.w(TAG, "No telephony providers for '$uriStr'")
+                        return
+                    }
+                    spinToAor(account.aor)
                     resumeAction = "call"
-                    acc.resumeUri = uriStr.replace("tel", "sip") + "@" +
-                            Utils.uriHostPart(acc.aor)
+                    account.resumeUri = uriStr
                 }
                 else -> {
                     Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
@@ -1369,16 +1377,24 @@ class MainActivity : AppCompatActivity() {
             setPositiveButton(R.string.transfer) { dialog, _ ->
                 imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.dismiss()
-                val uriText = transferUri.text.toString().trim()
+                var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    val uri = Utils.uriComplete(
-                            ContactsActivity.findContactURI(uriText)
-                                    .filterNot { it.isWhitespace() },
-                            Utils.aorDomain(ua.account.aor)
-                    )
-                    if (!Utils.checkSipUri(uri)) {
+                    uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                    if (Utils.isTelNumber(uriText))
+                        uriText = "tel:$uriText"
+                    val uri = if (Utils.isTelUri(uriText)) {
+                        if (ua.account.telProvider == "") {
+                            Utils.alertView(this@MainActivity, getString(R.string.notice),
+                                    String.format(getString(R.string.no_telephony_provider)))
+                            return@setPositiveButton
+                        }
+                        Utils.telToSip(uriText, ua.account)
+                    } else {
+                        Utils.uriComplete(uriText, Utils.aorDomain(ua.account.aor))
+                    }
+                    if (!Utils.checkUri(uri)) {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_uri), uri))
+                                String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                     } else {
                         if (Call.uaCalls(ua, "").size > 0) {
                             Call.uaCalls(ua, "")[0].transfer(uri)
@@ -1655,17 +1671,24 @@ class MainActivity : AppCompatActivity() {
         val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
-            val uriText = callUri.text.toString().trim()
+            var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val uri = Utils.uriComplete(
-                    ContactsActivity.findContactURI(uriText)
-                        .filterNot { it.isWhitespace() },
-                    Utils.aorDomain(aor)
-                )
-                if (!Utils.checkSipUri(uri)) {
-                    Utils.alertView(
-                        this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_sip_uri), uri)
+                uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                if (Utils.isTelNumber(uriText))
+                    uriText = "tel:$uriText"
+                val uri = if (Utils.isTelUri(uriText)) {
+                    if (ua.account.telProvider == "") {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.no_telephony_provider)))
+                        return
+                    }
+                    Utils.telToSip(uriText, ua.account)
+                } else {
+                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
+                }
+                if (!Utils.checkUri(uri)) {
+                    Utils.alertView(this, getString(R.string.notice),
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
                     )
                 } else {
                     callUri.isFocusable = false
