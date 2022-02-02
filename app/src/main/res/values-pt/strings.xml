@@ -31,7 +31,7 @@
     <string name="stun_password">Palavra-passe STUN/TURN</string>
     <string name="reset_config">Redefinir os Padrões de Fábrica</string>
     <string name="allow_video">Aceitar o envio e o recebimento de vídeo com \'%1$s\'\?</string>
-    <string name="incoming_call_from_dots">Chamada recebida de …</string>
+    <string name="incoming_call_from_dots">Chamada de …</string>
     <string name="add">Adicionar</string>
     <string name="alert">Alerta</string>
     <string name="prefer_ipv6_media">Preferir Mídia IPv6</string>
@@ -117,7 +117,7 @@
     <string name="you">Você</string>
     <string name="codecs">Codecs</string>
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
-    <string name="outgoing_call_to_dots">Chamada efetuada para …</string>
+    <string name="outgoing_call_to_dots">Ligar a …</string>
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="you_have">Tem</string>
     <string name="no_messages">Não tem mensagens</string>
@@ -266,4 +266,9 @@
     <string name="no_backup">Não pode criar backups sem a permissão de \"Armazenamento\".</string>
     <string name="audio_settings">Configurações de áudio</string>
     <string name="android_settings">Configurações do Android</string>
+    <string name="peer">Par</string>
+    <string name="direction">Direção</string>
+    <string name="call_details">Detalhes da chamada</string>
+    <string name="time">Hora</string>
+    <string name="calls_duration">Duração</string>
 </resources>
