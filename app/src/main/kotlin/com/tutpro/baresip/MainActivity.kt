@@ -763,17 +763,23 @@ class MainActivity : AppCompatActivity() {
             return
         val uri: Uri? = intent.data
         if (uri != null) {
-            val uriStr = URLDecoder.decode(uri.toString(), "UTF-8").replace(" ", "")
             when (uri.scheme) {
                 "sip" -> {
+                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
-                    if (ua == null)
+                    if (ua == null && BaresipService.uas.size > 0)
                         ua = BaresipService.uas[0]
+                    if (ua == null) {
+                        Log.w(TAG, "No accounts for '$uriStr'")
+                        return
+                    }
                     spinToAor(ua.account.aor)
                     resumeAction = "call"
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
+                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                            .filterNot{setOf('-', ' ').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
