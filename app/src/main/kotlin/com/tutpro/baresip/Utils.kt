@@ -291,7 +291,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return Regex("^[+][1-9][0-9- ]{0,14}\$").matches(no)
+        return Regex("^([+][1-9])?[0-9- ]{0,15}\$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {

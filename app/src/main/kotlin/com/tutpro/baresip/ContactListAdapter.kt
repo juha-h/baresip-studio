@@ -76,23 +76,9 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                 i.putExtra("action", "call")
                             else
                                 i.putExtra("action", "message")
-                            var ua = UserAgent.ofAor(aor)
+                            val ua = UserAgent.ofAor(aor)
                             if (ua == null) {
                                 Log.w(TAG, "onClickListener did not find AoR $aor")
-                            } else {
-                                if (Utils.isTelUri(contact.uri) && ua.account.telProvider == "") {
-                                    var newUa: UserAgent? = null
-                                    for (a in Account.accounts())
-                                        if (a.telProvider != "") {
-                                            newUa = UserAgent.ofAor(a.aor)
-                                            break
-                                        }
-                                    ua = newUa
-                                }
-                            }
-                            if (ua == null) {
-                                Toast.makeText(ctx, ctx.getString(R.string.no_telephony_providers),
-                                        Toast.LENGTH_LONG).show()
                             } else {
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)

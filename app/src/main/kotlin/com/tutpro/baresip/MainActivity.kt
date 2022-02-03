@@ -1388,16 +1388,10 @@ class MainActivity : AppCompatActivity() {
                     uriText = ContactsActivity.findContactUri(uriText) ?: uriText
                     if (Utils.isTelNumber(uriText))
                         uriText = "tel:$uriText"
-                    val uri = if (Utils.isTelUri(uriText)) {
-                        if (ua.account.telProvider == "") {
-                            Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                    String.format(getString(R.string.no_telephony_provider)))
-                            return@setPositiveButton
-                        }
+                    val uri = if (Utils.isTelUri(uriText))
                         Utils.telToSip(uriText, ua.account)
-                    } else {
+                    else
                         Utils.uriComplete(uriText, Utils.aorDomain(ua.account.aor))
-                    }
                     if (!Utils.checkUri(uri)) {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
@@ -1684,8 +1678,22 @@ class MainActivity : AppCompatActivity() {
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
                     if (ua.account.telProvider == "") {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.no_telephony_provider)))
+                        val telAccounts = Account.telProviderAccounts()
+                        if (telAccounts.isEmpty()) {
+                            Utils.alertView(this, getString(R.string.notice),
+                                    String.format(getString(R.string.no_telephony_providers)))
+                        } else {
+                            val builder = AlertDialog.Builder(this)
+                            with(builder) {
+                                setTitle("Choose a Telephony Provider account")
+                                setItems(telAccounts) { _, which ->
+                                    spinToAor("sip:${telAccounts[which]}")
+                                    makeCall()
+                                }
+                                setPositiveButton("Cancel") { _: DialogInterface, _: Int -> }
+                                show()
+                            }
+                        }
                         return
                     }
                     Utils.telToSip(uriText, ua.account)
@@ -1715,8 +1723,7 @@ class MainActivity : AppCompatActivity() {
                 if (latest != null)
                     callUri.setText(
                         Utils.friendlyUri(
-                            ContactsActivity.contactName(latest.peerUri),
-                            Utils.aorDomain(ua.account.aor)
+                            ContactsActivity.contactName(latest.peerUri), Utils.aorDomain(aor)
                         )
                     )
             }
