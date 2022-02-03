@@ -105,6 +105,15 @@ object Utils {
             ""
     }
 
+    fun uriMatch(firstUri: String, secondUri: String): Boolean {
+        if (firstUri.startsWith("tel:"))
+            return firstUri == secondUri
+        if (firstUri.startsWith("sip:"))
+            return uriUserPart(firstUri) == uriUserPart(secondUri) &&
+                    uriHostPart(firstUri) == uriHostPart(secondUri)
+        return false
+    }
+
     private fun uriParams(uri: String): List<String> {
         val params = uri.split(";")
         return if (params.size == 1) listOf() else params.subList(1, params.size)
@@ -121,7 +130,7 @@ object Utils {
         return if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (isE164Number(user) || host == domain)
+            if (isTelNumber(user) || host == domain)
                 user
             else
                 "$user@$host"
@@ -162,10 +171,6 @@ object Utils {
         return checkHostPort(uri.substringAfter(":").substringBefore("?")) &&
                 (uri.indexOf("?") == -1 ||
                 checkTransport(uri.substringAfter("?"), setOf("udp", "tcp")))
-    }
-
-    fun isE164Number(no: String): Boolean {
-        return Regex("^[+][1-9][0-9]{0,14}\$").matches(no)
     }
 
     fun checkIpV4(ip: String): Boolean {
@@ -256,6 +261,12 @@ object Utils {
         return ""
     }
 
+    fun paramExists(params: String, name: String): Boolean {
+        for (param in params.split(";"))
+            if (param.substringBefore("=") == name) return true
+        return false
+    }
+
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
         return if (restParams.size == 1)
@@ -264,16 +275,40 @@ object Utils {
             checkHostPort(restParams[0]) && checkParams(restParams[1])
     }
 
-    fun checkSipUri(uri: String): Boolean {
-        if (!uri.startsWith("sip:")) return false
-        val userRest = uri.substring(4).split("@")
-        return when (userRest.size) {
-            1 ->
-                checkHostPortParams(userRest[0])
-            2 ->
-                checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
-            else -> false
+    private fun checkSipUri(uri: String): Boolean {
+        return if (uri.startsWith("sip:")) {
+            val userRest = uri.substring(4).split("@")
+            when (userRest.size) {
+                1 ->
+                    checkHostPortParams(userRest[0])
+                2 ->
+                    checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
+                else -> false
+            }
+        } else {
+            false
         }
+    }
+
+    fun isTelNumber(no: String): Boolean {
+        return Regex("^([+][1-9])?[0-9- ]{0,15}\$").matches(no)
+    }
+
+    fun isTelUri(uri: String): Boolean {
+        return uri.startsWith("tel:") && isTelNumber(uri.substring(4))
+    }
+
+    fun checkUri(uri: String): Boolean {
+        return checkSipUri(uri) || isTelUri(uri)
+    }
+
+    fun telToSip(telUri: String, account: Account): String {
+        val hostPart = if (account.telProvider != "")
+            account.telProvider
+        else
+            aorDomain(account.aor)
+        return "sip:" + telUri.substring(4).filterNot{setOf('-', ' ').contains(it)} +
+                "@" + hostPart + ";user=phone"
     }
 
     fun checkName(name: String): Boolean {

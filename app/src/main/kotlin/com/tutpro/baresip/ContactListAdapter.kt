@@ -11,10 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat.startActivity
 
 import java.io.File
@@ -85,7 +82,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                             } else {
                                 BaresipService.activities.clear()
                                 i.putExtra("uap", ua.uap)
-                                i.putExtra("peer", Contact.contacts()[position].uri)
+                                i.putExtra("peer", contact.uri)
                                 (ctx as Activity).startActivity(i)
                             }
                         }

@@ -3,6 +3,8 @@ package com.tutpro.baresip
 import android.content.Context
 import java.util.*
 import kotlin.collections.ArrayList
+import java.net.URLEncoder
+import java.net.URLDecoder
 
 class Account(val accp: String) {
 
@@ -28,6 +30,7 @@ class Account(val accp: String) {
     var missedCalls = false
     var unreadMessages = false
     var callHistory = true
+    var telProvider = Utils.aorDomain(aor)
     var resumeUri = ""
 
     init {
@@ -56,6 +59,10 @@ class Account(val accp: String) {
 
         val extra = Api.account_extra(accp)
         callHistory = Utils.paramValue(extra,"call_history") == ""
+        telProvider = if (Utils.paramExists(extra, "tel_provider"))
+            URLDecoder.decode(Utils.paramValue(extra,"tel_provider"), "UTF-8")
+        else
+            Utils.aorDomain(aor)
 
     }
 
@@ -118,6 +125,8 @@ class Account(val accp: String) {
 
         if (!callHistory)
             extra += ";call_history=no"
+
+        extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
@@ -187,6 +196,14 @@ class Account(val accp: String) {
                 res.add(ua.account)
             }
             return res
+        }
+
+        fun telProviderAccounts(): Array<String> {
+            val res = ArrayList<String>()
+            for (account in accounts())
+                if (account.telProvider != "")
+                    res.add(account.aor.substring(4))
+            return res.toTypedArray()
         }
 
         fun ofAor(aor: String): Account? {

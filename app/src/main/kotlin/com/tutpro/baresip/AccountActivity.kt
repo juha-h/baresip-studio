@@ -2,10 +2,13 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.tutpro.baresip.databinding.ActivityAccountBinding
@@ -33,6 +36,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var outbound1: EditText
     private lateinit var outbound2: EditText
     private lateinit var mediaNat: String
+    private lateinit var stun: LinearLayout
     private lateinit var stunServer: EditText
     private lateinit var stunUser: EditText
     private lateinit var stunPass: EditText
@@ -45,6 +49,7 @@ class AccountActivity : AppCompatActivity() {
     private var answerMode = Api.ANSWERMODE_MANUAL
     private lateinit var answerModeSpinner: Spinner
     private lateinit var vmUri: EditText
+    private lateinit var telProvider: EditText
     private lateinit var defaultCheck: CheckBox
 
     private val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
@@ -73,6 +78,7 @@ class AccountActivity : AppCompatActivity() {
         outbound2 = binding.Outbound2
         regCheck = binding.Register
         mediaNatSpinner = binding.mediaNatSpinner
+        stun = binding.Stun
         stunServer = binding.StunServer
         stunUser = binding.StunUser
         stunPass = binding.StunPass
@@ -80,6 +86,7 @@ class AccountActivity : AppCompatActivity() {
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         vmUri = binding.voicemailUri
+        telProvider = binding.telephonyProvider
         defaultCheck = binding.Default
 
         aor = intent.getStringExtra("aor")!!
@@ -230,27 +237,21 @@ class AccountActivity : AppCompatActivity() {
                     stunServer.setText(resources.getString(R.string.stun_server_default))
                 else if ((mediaNat == "ice") && (stunServer.text.toString() == ""))
                     stunServer.setText(resources.getString(R.string.stun_server_default))
-                else if (mediaNat == "") {
+                if (mediaNat == "") {
+                    stun.visibility = GONE
                     stunServer.setText("")
                     stunUser.setText("")
                     stunPass.setText("")
-                }
-                stunServer.isEnabled = mediaNat != ""
-                stunUser.isEnabled = mediaNat != ""
-                stunPass.isEnabled = mediaNat != ""
+                } else
+                    stun.visibility = VISIBLE
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
 
         stunServer.setText(acc.stunServer)
-        stunServer.isEnabled = mediaNat != ""
-
         stunUser.setText(acc.stunUser)
-        stunUser.isEnabled = mediaNat != ""
-
         stunPass.setText(acc.stunPass)
-        stunPass.isEnabled = mediaNat != ""
 
         mediaEnc = acc.mediaEnc
         keyIx = mediaEncKeys.indexOf(mediaEnc)
@@ -312,6 +313,8 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        telProvider.setText(acc.telProvider)
 
         vmUri.setText(acc.vmUri)
 
@@ -563,9 +566,9 @@ class AccountActivity : AppCompatActivity() {
                     if (tVmUri != "") {
                         if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
                         if (!tVmUri.contains("@")) tVmUri = "$tVmUri@${acc.host()}"
-                        if (!Utils.checkSipUri(tVmUri)) {
+                        if (!Utils.checkUri(tVmUri)) {
                             Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_voicemail_uri), tVmUri))
+                                    String.format(getString(R.string.invalid_sip_or_tel_uri), tVmUri))
                             return false
                         }
                         Api.account_set_mwi(acc.accp, "yes")
@@ -573,6 +576,17 @@ class AccountActivity : AppCompatActivity() {
                         Api.account_set_mwi(acc.accp, "no")
                     }
                     acc.vmUri = tVmUri
+                    save = true
+                }
+
+                val hostPart = telProvider.text.toString().trim()
+                if (hostPart != acc.telProvider) {
+                    if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_sip_uri_hostpart), hostPart))
+                        return false
+                    }
+                    acc.telProvider = hostPart
                     save = true
                 }
 
@@ -706,6 +720,12 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.voicemail_uri),
                 getString(R.string.voicemain_uri_help)
+            )
+        }
+        binding.TelephonyProviderTitle.setOnClickListener {
+            Utils.alertView(
+                    this, getString(R.string.telephony_provider),
+                    getString(R.string.telephony_provider_help)
             )
         }
         binding.DefaultTitle.setOnClickListener {
