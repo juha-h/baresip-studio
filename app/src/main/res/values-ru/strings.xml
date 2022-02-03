@@ -232,4 +232,29 @@
     <string name="about_text_plus">&lt;h1&gt;Библиотека Baresip на основе пользовательского агента SIP с видео звонками&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Версия %1$s&lt;/p&gt; &lt;h2&gt;Подсказки по использованию&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Убедитесь, что значения параметров по умолчанию соответствуют вашим потребностям (для получения справки коснитесь заголовков пунктов).&lt;/li&gt; &lt;li&gt;Затем создайте одну или несколько учетных записей (снова коснитесь заголовков элементов для получения справки).&lt;/li&gt; &lt;li&gt;Статус регистрации учетной записи отображается цветной точкой: зеленый (регистрация успешна, желтый (регистрация в процессе), красный (регистрация не удалась), белый (регистрация не активирована).&lt;/li&gt; &lt;li&gt;Жест смахивания вниз вызывает перерегистрацию текущей учетной записи.&lt;/li&gt;&lt;li&gt;Собеседников звонков и сообщений можно добавлять в контакты долгими касаниями.&lt;/li&gt; &lt;li&gt;Длинные касания также можно использовать для удаления вызовов, чатов, сообщений и контактов.&lt;/li&gt; &lt;li&gt;Касание / долгое касание значка контакта можно использовать для установки/удаления аватара изображения.&lt;/li&gt; &lt;li&gt;Вы можете повторно выбрать предыдущего абонента, коснувшись значка вызова, когда вызываемый абонент пуст.&lt;/li&gt; &lt;li&gt;Если вы не слышите собеседника во время разговора, попробуйте увеличить громкость мультимедиа на устройстве или установите громкость вызова по умолчанию в настройках.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Известные проблемы&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Из-за ограничений в базовых библиотеках baresip в настоящее время не поддерживает несколько одновременно активных сетевых интерфейсов.&lt;/li&gt;&lt; li&gt;В видео звонках устройство необходимо держать в ландшафтном режиме, повернутом на 90 градусов влево относительно портретной ориентации.&lt;/li&gt;&lt;/ul&gt; &lt;h2&gt;Исходный код&lt;/h2&gt; Исходный код доступен на &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, где также можно сообщить о проблемах.</string>
     <string name="about_title_plus">О baresip+</string>
     <string name="stun_server_uri">URI-адрес сервера STUN/TURN</string>
+    <string name="dark_theme">Темная тема</string>
+    <string name="verify_server_error">Сертификаты сервера не могут быть проверены без файла TLS CA.</string>
+    <string name="verify_server">Проверка сертификатов сервера</string>
+    <string name="peer">Peer</string>
+    <string name="direction">Направление</string>
+    <string name="calls_duration">Продолжительность</string>
+    <string name="battery_optimizations">Оптимизация работы батареи</string>
+    <string name="android_settings">Настройки Android</string>
+    <string name="dtmf_mode">Режим DTMF</string>
+    <string name="dtmf_mode_help">Выбирает способ отправки сигналов DTMF 0-9, #, * и A-D.</string>
+    <string name="dtmf_inband">Внутриполосные события RTP</string>
+    <string name="dtmf_info">Запросы SIP INFO</string>
+    <string name="missed_calls">Пропущенные вызовы</string>
+    <string name="missed_calls_count">%1$d пропущенных вызовов</string>
+    <string name="reset">Сброс</string>
+    <string name="sip_trace">Трассировка SIP</string>
+    <string name="missed_call_from">Пропущенный вызов от</string>
+    <string name="call_details">Детали вызовов</string>
+    <string name="time">Время</string>
+    <string name="verify_server_help">Если флажок установлен - baresip проверяет сертификаты TLS User Agent\'а SIP и прокси-серверов SIP при использовании транспорта TLS. Если флажок установлен, также должен быть загружен файл TLS CA.</string>
+    <string name="dark_theme_help">Принудительное отображение темной темы</string>
+    <string name="reset_config_alert">Вы уверены, что хотите сбросить настройки до значений по умолчанию\?</string>
+    <string name="sip_trace_help">Если флажок установлен и если установлен флажок Отладка, сообщения Logcat также включают трассировку запросов и ответов SIP. Автоматически снимается при запуске baresip.</string>
+    <string name="battery_optimizations_help">Отключите оптимизацию работы батареи (рекомендуется), если вы хотите снизить вероятность того, что Android ограничит доступ baresip к сети или переведет baresip в режим ожидания.</string>
+    <string name="audio_settings">Аудионастройки</string>
 </resources>
