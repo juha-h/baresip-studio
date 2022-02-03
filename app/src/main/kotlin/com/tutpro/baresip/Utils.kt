@@ -121,11 +121,13 @@ object Utils {
 
     fun friendlyUri(uri: String, domain: String): String {
         var u = uri
+        val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
         u = u.replace(":5060", "")
         u = u.replace(";transport=udp", "", true)
-        if (u.split(":").size == 3 || uriParams(u).isNotEmpty())
+        if (u.split(":").size == 3 ||
+                (params.isNotEmpty() && !params.contains("user=phone")))
             return u
         return if (u.contains("@")) {
             val user = uriUserPart(u)
