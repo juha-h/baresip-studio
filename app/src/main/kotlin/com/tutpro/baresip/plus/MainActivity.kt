@@ -1978,7 +1978,7 @@ class MainActivity : AppCompatActivity() {
                                 setTitle(getString(R.string.choose_telephony_provider_account))
                                 setItems(telAccounts) { _, which ->
                                     spinToAor("sip:${telAccounts[which]}")
-                                    makeCall()
+                                    makeCall(kind)
                                 }
                                 setPositiveButton("Cancel") { _: DialogInterface, _: Int -> }
                                 show()
@@ -1990,9 +1990,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Utils.uriComplete(uriText, Utils.aorDomain(aor))
                 }
-                if (!Utils.checkSipUri(uri)) {
+                if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_sip_uri), uri))
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     callUri.isFocusable = false
                     if (!call(ua, uri, kind)) {
