@@ -1681,11 +1681,11 @@ class MainActivity : AppCompatActivity() {
                         val telAccounts = Account.telProviderAccounts()
                         if (telAccounts.isEmpty()) {
                             Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.no_telephony_providers)))
+                                    getString(R.string.no_telephony_providers))
                         } else {
                             val builder = AlertDialog.Builder(this)
                             with(builder) {
-                                setTitle("Choose a Telephony Provider account")
+                                setTitle(getString(R.string.choose_telephony_provider_account))
                                 setItems(telAccounts) { _, which ->
                                     spinToAor("sip:${telAccounts[which]}")
                                     makeCall()
