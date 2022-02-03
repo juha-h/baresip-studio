@@ -213,6 +213,13 @@
         mahdollista puhepostiviesteistä (Message Waiting Indications) ei tilata.
     </string>
     <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
+    <string name="telephony_provider">Puhelinpalvelun tarjoaja</string>
+    <string name="telephony_provider_help">SIP URI:n domain-osa, jota käytetään soitettaessa
+        puhelinnumeroihin. Tehdasasetus on tilin domain-osa.  Jos tyhjä, niin tätä tiliä ei
+        voi käyttää soitettaessa puhelinnumeroihin.
+    </string>
+    <string name="telephony_provider_hint">SIP URI:n domain osa</string>
+    <string name="invalid_sip_uri_hostpart">Virheellinen SIP URI:n domain-osa \'%1$s\'</string>
     <string name="default_account">Oletustili</string>
     <string name="default_account_help">Jos merkitty, niin tämä tili on
         valittuna, kun baresip käynnistetään.
@@ -281,7 +288,7 @@
     <string name="today">Tänään</string>
     <string name="you">Sinä</string>
     <string name="new_chat_peer">Uusi viestin kohde</string>
-    <string name="invalid_chat_peer_uri">Virheellinen SIP URI</string>
+    <string name="invalid_chat_peer_uri">Virheellinen viestikumppanin URI</string>
     <string name="long_chat_question">Haluatko poistaa viestiketjun tai
     luoda uuden yhteystiedon \'%1$s\'?</string>
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'?</string>
@@ -390,6 +397,8 @@
     <string name="contact">Yhteystieto</string>
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
+    <string name="sip_or_tel_uri">SIP tai tel URI</string>
+    <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
@@ -423,6 +432,7 @@
     <string name="error">Virhe</string>
     <string name="help">Apua</string>
     <string name="confirmation">Vahvistus</string>
+    <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>
@@ -433,6 +443,8 @@
     <string name="incoming_call_from_dots">Puhelu sisään …</string>
     <string name="transferring_call_to_dots">Puhelun siirto …</string>
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
+    <string name="no_telephony_providers">Millekään tilille ei ole konfiguroitu puhelinpalvelun
+        tarjoajaa</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
     <string name="video_call">Videopuhelu</string>
