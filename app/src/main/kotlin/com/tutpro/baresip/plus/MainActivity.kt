@@ -1042,22 +1042,36 @@ class MainActivity : AppCompatActivity() {
             return
         val uri: Uri? = intent.data
         if (uri != null) {
-            val uriStr = URLDecoder.decode(uri.toString(), "UTF-8").replace(" ", "")
             when (uri.scheme) {
                 "sip" -> {
+                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
-                    if (ua == null)
+                    if (ua == null && BaresipService.uas.size > 0)
                         ua = BaresipService.uas[0]
+                    if (ua == null) {
+                        Log.w(TAG, "No accounts for '$uriStr'")
+                        return
+                    }
                     spinToAor(ua.account.aor)
                     resumeAction = "call"
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
-                    val acc = BaresipService.uas[0].account
-                    spinToAor(acc.aor)
+                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                            .filterNot{setOf('-', ' ').contains(it)}
+                    var account: Account? = null
+                    for (a in Account.accounts())
+                        if (a.telProvider != "") {
+                            account = a
+                            break
+                        }
+                    if (account == null) {
+                        Log.w(TAG, "No telephony providers for '$uriStr'")
+                        return
+                    }
+                    spinToAor(account.aor)
                     resumeAction = "call"
-                    acc.resumeUri = uriStr.replace("tel", "sip") + "@" +
-                            Utils.uriHostPart(acc.aor)
+                    account.resumeUri = uriStr
                 }
                 else -> {
                     Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
@@ -1697,16 +1711,18 @@ class MainActivity : AppCompatActivity() {
             setPositiveButton(R.string.transfer) { dialog, _ ->
                 imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
                 dialog.dismiss()
-                val uriText = transferUri.text.toString().trim()
+                var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    val uri = Utils.uriComplete(
-                            ContactsActivity.findContactURI(uriText)
-                                    .filterNot { it.isWhitespace() },
-                            Utils.aorDomain(ua.account.aor)
-                    )
-                    if (!Utils.checkSipUri(uri)) {
+                    uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                    if (Utils.isTelNumber(uriText))
+                        uriText = "tel:$uriText"
+                    val uri = if (Utils.isTelUri(uriText))
+                        Utils.telToSip(uriText, ua.account)
+                    else
+                        Utils.uriComplete(uriText, Utils.aorDomain(ua.account.aor))
+                    if (!Utils.checkUri(uri)) {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_uri), uri))
+                                String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                     } else {
                         if (Call.uaCalls(ua, "").size > 0) {
                             Call.uaCalls(ua, "")[0].transfer(uri)
@@ -1945,12 +1961,35 @@ class MainActivity : AppCompatActivity() {
         val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
-            val uriText = callUri.text.toString().trim()
+            var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val uri = Utils.uriComplete(
-                    ContactsActivity.findContactURI(uriText).filterNot { it.isWhitespace() },
-                    Utils.aorDomain(aor)
-                )
+                uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                if (Utils.isTelNumber(uriText))
+                    uriText = "tel:$uriText"
+                val uri = if (Utils.isTelUri(uriText)) {
+                    if (ua.account.telProvider == "") {
+                        val telAccounts = Account.telProviderAccounts()
+                        if (telAccounts.isEmpty()) {
+                            Utils.alertView(this, getString(R.string.notice),
+                                    getString(R.string.no_telephony_providers))
+                        } else {
+                            val builder = AlertDialog.Builder(this)
+                            with(builder) {
+                                setTitle(getString(R.string.choose_telephony_provider_account))
+                                setItems(telAccounts) { _, which ->
+                                    spinToAor("sip:${telAccounts[which]}")
+                                    makeCall()
+                                }
+                                setPositiveButton("Cancel") { _: DialogInterface, _: Int -> }
+                                show()
+                            }
+                        }
+                        return
+                    }
+                    Utils.telToSip(uriText, ua.account)
+                } else {
+                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
+                }
                 if (!Utils.checkSipUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_sip_uri), uri))
@@ -1977,8 +2016,7 @@ class MainActivity : AppCompatActivity() {
                 if (latest != null)
                     callUri.setText(
                         Utils.friendlyUri(
-                            ContactsActivity.contactName(latest.peerUri),
-                            Utils.aorDomain(ua.account.aor)
+                                ContactsActivity.contactName(latest.peerUri), Utils.aorDomain(aor)
                         )
                     )
             }

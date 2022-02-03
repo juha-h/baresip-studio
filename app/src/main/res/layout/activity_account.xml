@@ -189,69 +189,77 @@
             android:paddingTop="8dp" >
         </Spinner>
 
-        <TextView
-            android:id="@+id/StunServerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:textSize="18sp"
-            android:text="@string/stun_server" >
-        </TextView>
-
-        <EditText
-            android:id="@+id/StunServer"
-            android:layout_height="wrap_content"
+        <LinearLayout
+            android:id="@+id/Stun"
             android:layout_width="fill_parent"
-            android:textSize="18sp"
-            android:scrollHorizontally="true"
-            android:importantForAutofill="no"
-            android:hint="@string/stun_server_uri"
-            android:inputType="textEmailAddress" >
-        </EditText>
+            android:orientation="vertical"
+            android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/StunUserTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:textSize="18sp"
-            android:text="@string/stun_username" >
-        </TextView>
+            <TextView
+                android:id="@+id/StunServerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:textSize="18sp"
+                android:text="@string/stun_server" >
+            </TextView>
 
-        <EditText
-            android:id="@+id/StunUser"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:hint="@string/user_id"
-            android:textSize="18sp"
-            android:inputType="textEmailAddress"
-            android:autofillHints="username" >
-        </EditText>
+            <EditText
+                android:id="@+id/StunServer"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:textSize="18sp"
+                android:scrollHorizontally="true"
+                android:importantForAutofill="no"
+                android:hint="@string/stun_server_uri"
+                android:inputType="textEmailAddress" >
+            </EditText>
 
-        <TextView
-            android:id="@+id/StunPassTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:textSize="18sp"
-            android:text="@string/stun_password" >
-        </TextView>
+            <TextView
+                android:id="@+id/StunUserTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:textSize="18sp"
+                android:text="@string/stun_username" >
+            </TextView>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hintEnabled="false"
-            app:endIconMode="password_toggle">
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/StunPass"
+            <EditText
+                android:id="@+id/StunUser"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:hint="@string/user_id"
+                android:textSize="18sp"
+                android:inputType="textEmailAddress"
+                android:autofillHints="username" >
+            </EditText>
+
+            <TextView
+                android:id="@+id/StunPassTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:textSize="18sp"
+                android:text="@string/stun_password" >
+            </TextView>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="flagNoExtractUi"
-                android:inputType="textPassword"
-                android:hint="@string/password"
-                android:maxLines="1">
-            </androidx.appcompat.widget.AppCompatEditText>
-        </com.google.android.material.textfield.TextInputLayout>
+                app:hintEnabled="false"
+                app:endIconMode="password_toggle">
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/StunPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="flagNoExtractUi"
+                    android:inputType="textPassword"
+                    android:hint="@string/password"
+                    android:maxLines="1">
+                </androidx.appcompat.widget.AppCompatEditText>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/DtmfModeTitle"
@@ -298,6 +306,25 @@
             android:id="@+id/voicemailUri"
             android:layout_height="wrap_content"
             android:hint="@string/sip_uri"
+            android:textSize="18sp"
+            android:inputType="textUri"
+            android:importantForAutofill="no"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
+            android:id="@+id/TelephonyProviderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:text="@string/telephony_provider" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/telephonyProvider"
+            android:layout_height="wrap_content"
+            android:hint="@string/telephony_provider_hint"
             android:textSize="18sp"
             android:inputType="textUri"
             android:importantForAutofill="no"

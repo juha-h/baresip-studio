@@ -182,6 +182,13 @@
         messages (Message Waiting Indications) are not subscribed to.
     </string>
     <string name="invalid_voicemail_uri">Invalid Voicemail URI \'%1$s\'</string>
+    <string name="telephony_provider">Telephony Provider</string>
+    <string name="telephony_provider_help">SIP URI host part used in calls to telephone numbers.
+        Factory default is account\'s domain. If not given, this account cannot be used to call
+        telephone numbers.
+    </string>
+    <string name="telephony_provider_hint">SIP URI host part</string>
+    <string name="invalid_sip_uri_hostpart">Invalid SIP URI host part \'%1$s\'</string>
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
@@ -247,7 +254,7 @@
     <string name="today">Today</string>
     <string name="you">You</string>
     <string name="new_chat_peer">New Chat Peer</string>
-    <string name="invalid_chat_peer_uri">Invalid SIP URI</string>
+    <string name="invalid_chat_peer_uri">Invalid chat peer URI</string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
@@ -341,6 +348,8 @@
     <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>
     <string name="contact_name">Name</string>
+    <string name="sip_or_tel_uri">SIP or tel URI</string>
+    <string name="user_domain_or_number">user@domain or telephone number</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
@@ -353,6 +362,7 @@
     <string name="send_message">Send Message</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
     <string name="contacts_exceeded">Your maximum number of contacts %1$d has been exceeded.</string>
+    <string name="no_telephony_providers">Telephony Provider has not been configured for any account.</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -376,6 +386,7 @@
     <string name="confirmation">Confirmation</string>
     <string name="dots" translatable="false">…</string>
     <string name="bullet_item" translatable="false">\u2022 %1$s</string>
+    <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -386,6 +397,7 @@
     <string name="incoming_call_from_dots">Call from …</string>
     <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
+    <string name="choose_telephony_provider_account">Choose Telephony Provider account.</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>

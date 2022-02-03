@@ -123,17 +123,14 @@ class ChatsActivity: AppCompatActivity() {
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                var uri = ContactsActivity.findContactURI(uriText)
-                if (!uri.startsWith("sip:")) {
-                    uri = "sip:$uri"
-                    if (!uri.contains("@")) {
-                        val host = aor.substring(aor.indexOf("@") + 1)
-                        uri = "$uri@$host"
-                    }
-                }
-                if (!Utils.checkSipUri(uri)) {
+                val contactUri = ContactsActivity.findContactUri(uriText)
+                val uri = if (contactUri == null)
+                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
+                else
+                    uriText
+                if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.invalid_chat_peer_uri))
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     peerUri.text.clear()
                     peerUri.isCursorVisible = false
