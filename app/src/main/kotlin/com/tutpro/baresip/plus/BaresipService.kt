@@ -71,6 +71,7 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
+    private var previousEvent: Long = 0
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -881,8 +882,22 @@ class BaresipService: Service() {
                 }
             }
         }
-        serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                System.currentTimeMillis())))
+        // In order to avoid observer missing events, post them at least 50ms apart
+        val currentTime = System.currentTimeMillis()
+        if (previousEvent + 50 > currentTime) {
+            val delay = previousEvent + 50 - currentTime
+            previousEvent = currentTime + delay
+            Timer().schedule(delay) {
+                Log.d(TAG, "Posting service event ${newEvent ?: event} with $delay ms delay")
+                serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
+                        currentTime)))
+            }
+        } else {
+            previousEvent = currentTime
+            Log.d(TAG, "Posting service event ${newEvent ?: event}")
+            serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
+                        currentTime)))
+            }
     }
 
     @Keep
