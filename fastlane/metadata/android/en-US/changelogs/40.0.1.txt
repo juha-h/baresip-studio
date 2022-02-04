@@ -1,0 +1,5 @@
+- Added Telephony Provider account configuration item
+- Added support for tel URI as Callee value and Contact URI
+- Prompt user for Telephony Provider account if needed to make the call
+- Show account's STUN configuration items only if needed
+- Improved handling of CALL action from other applications
