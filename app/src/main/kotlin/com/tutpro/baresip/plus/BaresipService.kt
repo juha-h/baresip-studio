@@ -71,6 +71,7 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
+    private val serviceEvents = mutableListOf<Event<ServiceEvent>>()
     private var previousEvent: Long = 0
 
     @SuppressLint("WakelockTimeout")
@@ -882,22 +883,23 @@ class BaresipService: Service() {
                 }
             }
         }
+
         // In order to avoid observer missing events, post them at least 50ms apart
         val currentTime = System.currentTimeMillis()
+        val e = Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), currentTime))
         if (previousEvent + 50 > currentTime) {
             val delay = previousEvent + 50 - currentTime
             previousEvent = currentTime + delay
+            serviceEvents.add(e)
             Timer().schedule(delay) {
-                Log.d(TAG, "Posting service event ${newEvent ?: event} with $delay ms delay")
-                serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                        currentTime)))
+                if (serviceEvents.isNotEmpty())
+                    serviceEvent.postValue(serviceEvents.removeFirst())
             }
         } else {
             previousEvent = currentTime
-            Log.d(TAG, "Posting service event ${newEvent ?: event}")
-            serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                        currentTime)))
-            }
+            serviceEvent.postValue(e)
+        }
+
     }
 
     @Keep
@@ -1474,6 +1476,7 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
 
         var serviceEvent = MutableLiveData<Event<ServiceEvent>>()
+
     }
 
     init {
