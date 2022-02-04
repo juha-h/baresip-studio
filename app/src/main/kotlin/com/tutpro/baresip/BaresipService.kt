@@ -69,6 +69,8 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
+    private val serviceEvents = mutableListOf<Event<ServiceEvent>>()
+    private var previousEvent: Long = 0
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -880,8 +882,23 @@ class BaresipService: Service() {
                 }
             }
         }
-        serviceEvent.postValue(Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                System.currentTimeMillis())))
+
+        // In order to avoid observer missing events, post them at least 50ms apart
+        val currentTime = System.currentTimeMillis()
+        val e = Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), currentTime))
+        if (previousEvent + 50 > currentTime) {
+            val delay = previousEvent + 50 - currentTime
+            previousEvent = currentTime + delay
+            serviceEvents.add(e)
+            Timer().schedule(delay) {
+                if (serviceEvents.isNotEmpty())
+                    serviceEvent.postValue(serviceEvents.removeFirst())
+            }
+        } else {
+            previousEvent = currentTime
+            serviceEvent.postValue(e)
+        }
+
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -1456,8 +1473,8 @@ class BaresipService: Service() {
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var dnsServers = listOf<InetAddress>()
-
         var serviceEvent = MutableLiveData<Event<ServiceEvent>>()
+
     }
 
     init {
