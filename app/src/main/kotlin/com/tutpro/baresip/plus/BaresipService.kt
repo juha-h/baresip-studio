@@ -71,8 +71,6 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
-    private val serviceEvents = mutableListOf<Event<ServiceEvent>>()
-    private var previousEvent: Long = 0
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -710,10 +708,9 @@ class BaresipService: Service() {
                             return
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                                 (!callHasVideo && remoteHasVideo &&
-                                        (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
-                            serviceEvent.postValue(Event(ServiceEvent("call video request",
-                                    arrayListOf(uap, callp, "$rdir"), System.currentTimeMillis())))
-                        }
+                                        (rdir != Api.SDP_INACTIVE) && (ldir != rdir)))
+                            postServiceEvent(ServiceEvent("call video request",
+                                    arrayListOf(uap, callp, "$rdir"), System.nanoTime()))
                         return
                     }
                     "call answered" -> {
@@ -884,22 +881,18 @@ class BaresipService: Service() {
             }
         }
 
-        // In order to avoid observer missing events, post them at least 50ms apart
-        val currentTime = System.currentTimeMillis()
-        val e = Event(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), currentTime))
-        if (previousEvent + 50 > currentTime) {
-            val delay = previousEvent + 50 - currentTime
-            previousEvent = currentTime + delay
-            serviceEvents.add(e)
-            Timer().schedule(delay) {
-                if (serviceEvents.isNotEmpty())
-                    serviceEvent.postValue(serviceEvents.removeFirst())
-            }
-        } else {
-            previousEvent = currentTime
-            serviceEvent.postValue(e)
-        }
+        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), System.nanoTime()))
 
+    }
+
+    private fun postServiceEvent(event: ServiceEvent) {
+        serviceEvents.add(event)
+        if (serviceEvents.size == 1) {
+            Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+            serviceEvent.postValue(Event(event.timeStamp))
+        } else {
+            Log.d(TAG, "Added service event ${event.event}")
+        }
     }
 
     @Keep
@@ -971,16 +964,14 @@ class BaresipService: Service() {
             return
         }
         nt.play()
-        serviceEvent.postValue(Event(ServiceEvent("message show", arrayListOf(uap, peer),
-                timeStamp)))
+        postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peer), System.nanoTime()))
     }
 
     @Keep
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
         Api.net_debug()
-        serviceEvent.postValue(Event(ServiceEvent("started", arrayListOf(callActionUri),
-                System.currentTimeMillis())))
+        postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
         Log.d(TAG, "Battery optimizations are ignored: " +
                     "${pm.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
@@ -1057,8 +1048,7 @@ class BaresipService: Service() {
     fun stopped(error: String) {
         Log.d(TAG, "Received 'stopped' from baresip with param '$error'")
         isServiceRunning = false
-        serviceEvent.postValue(Event(ServiceEvent("stopped", arrayListOf(error),
-                System.currentTimeMillis())))
+        postServiceEvent(ServiceEvent("stopped", arrayListOf(error), System.nanoTime()))
         stopForeground(true)
         stopSelf()
     }
@@ -1474,8 +1464,8 @@ class BaresipService: Service() {
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var dnsServers = listOf<InetAddress>()
-
-        var serviceEvent = MutableLiveData<Event<ServiceEvent>>()
+        val serviceEvent = MutableLiveData<Event<Long>>()
+        val serviceEvents = mutableListOf<ServiceEvent>()
 
     }
 
