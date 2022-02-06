@@ -2,7 +2,6 @@ package com.tutpro.baresip.plus
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.*
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -27,6 +26,9 @@ import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.media.AudioAttributesCompat
+import androidx.media.AudioFocusRequestCompat
+import androidx.media.AudioManagerCompat
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -61,8 +63,7 @@ class BaresipService: Service() {
     private lateinit var hotSpotReceiver: BroadcastReceiver
 
     private var rtTimer: Timer? = null
-    private var audioFocusRequest: AudioFocusRequest? = null
-    private var audioFocusUsage = -1
+    private var audioFocusRequest: AudioFocusRequestCompat? = null
     private var origVolume = mutableMapOf<Int, Int>()
     private var btAdapter: BluetoothAdapter? = null
     private var linkAddresses = mutableMapOf<String, String>()
@@ -231,14 +232,13 @@ class BaresipService: Service() {
                         when (state) {
                             BluetoothHeadset.STATE_CONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset is connected")
-                                if (isAudioFocused()) {
+                                if (audioFocusRequest != null)
                                     // Without delay, SCO_AUDIO_STATE_CONNECTING ->
                                     // SCO_AUDIO_STATE_DISCONNECTED
                                     Timer("Sco", false).schedule(1000) {
                                         Log.d(TAG, "Starting Bluetooth SCO")
                                         am.startBluetoothSco()
                                     }
-                                }
                             }
                             BluetoothHeadset.STATE_DISCONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset is disconnected")
@@ -279,7 +279,6 @@ class BaresipService: Service() {
                             }
                             AudioManager.SCO_AUDIO_STATE_DISCONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset SCO is disconnected")
-                                abandonAudioFocus()
                             }
                             AudioManager.SCO_AUDIO_STATE_ERROR -> {
                                 Log.d(TAG, "Bluetooth headset SCO state ERROR")
@@ -400,8 +399,7 @@ class BaresipService: Service() {
                 stopMediaPlayer()
                 if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                     am.mode = AudioManager.MODE_IN_COMMUNICATION
-                requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
-                    AudioAttributes.CONTENT_TYPE_SPEECH)
+                requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
                 setCallVolume()
                 proximitySensing(true)
                 Api.ua_answer(uap, callp)
@@ -597,8 +595,7 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        requestAudioFocus(AudioManager.STREAM_VOICE_CALL,
-                            AudioAttributes.CONTENT_TYPE_SPEECH)
+                        requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         proximitySensing(true)
                         return
@@ -805,12 +802,12 @@ class BaresipService: Service() {
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
                         stopMediaPlayer()
-                        when (ev[2]) {
+                        /* when (ev[2]) {
                             "busy" ->
                                 playMedia(R.raw.busy, 1)
                             "error" ->
                                 playMedia(R.raw.error, 1)
-                        }
+                        } */
                         call!!.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
@@ -1119,52 +1116,6 @@ class BaresipService: Service() {
         return spannable
     }
 
-    private fun requestAudioFocus(usage: Int, type: Int) {
-        if (audioFocusUsage != -1) {
-            if (audioFocusUsage == usage)
-                return
-            else
-                abandonAudioFocus()
-        }
-        if ((VERSION.SDK_INT >= 26) && (audioFocusRequest == null)) {
-            @TargetApi(26)
-            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                    .run {
-                        setAudioAttributes(AudioAttributes.Builder().run {
-                            setUsage(usage)
-                            setContentType(type)
-                            build()
-                        })
-                        build()
-                    }
-            @TargetApi(26)
-            if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(TAG, "Audio focus granted for usage $usage")
-                audioFocusUsage = usage
-                if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
-                    Log.d(TAG, "Starting Bluetooth SCO")
-                    am.startBluetoothSco()
-                }
-            } else {
-                Log.d(TAG, "Audio focus denied")
-                audioFocusRequest = null
-                audioFocusUsage = -1
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            if (am.requestAudioFocus(null, usage, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(TAG, "Audio focus granted for usage $usage")
-                audioFocusUsage = usage
-                if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn)
-                    am.startBluetoothSco()
-            } else {
-                Log.d(TAG, "Audio focus denied")
-                audioFocusUsage = -1
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun isBluetoothHeadsetConnected(): Boolean {
         return if (VERSION.SDK_INT < 31)
@@ -1175,37 +1126,39 @@ class BaresipService: Service() {
             true
     }
 
-    private fun isAudioFocused(): Boolean {
-        return audioFocusUsage != -1
+    private fun requestAudioFocus(type: Int) {
+        if (audioFocusRequest != null && audioFocusRequest!!.audioAttributesCompat.contentType == type)
+            return
+        val attributes = AudioAttributesCompat.Builder()
+                .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
+                .setContentType(type)
+                .build()
+        audioFocusRequest = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT)
+                .setAudioAttributes(attributes)
+                .setOnAudioFocusChangeListener { }
+                .build()
+        if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.d(TAG, "Audio focus granted")
+            if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
+                Log.d(TAG, "Starting Bluetooth SCO")
+                am.startBluetoothSco()
+            }
+        } else {
+            Log.d(TAG, "Audio focus denied")
+            audioFocusRequest = null
+        }
     }
 
     private fun abandonAudioFocus() {
-        if (VERSION.SDK_INT >= 26) {
-            if (audioFocusRequest != null) {
-                if (am.abandonAudioFocusRequest(audioFocusRequest!!) ==
-                        AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Log.d(TAG, "Audio focus abandoned")
-                    audioFocusRequest = null
-                    audioFocusUsage = -1
-                } else {
-                    Log.d(TAG, "Failed to abandon audio focus")
-                }
-            }
-        } else {
-            if (audioFocusUsage != -1) {
-                @Suppress("DEPRECATION")
-                if (am.abandonAudioFocus(null) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Log.d(TAG, "Audio focus abandoned")
-                    audioFocusUsage = -1
-                } else {
-                    Log.d(TAG, "Failed to abandon audio focus")
-                }
-            }
+        if (audioFocusRequest != null) {
+            AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!)
+            audioFocusRequest = null
+            Log.d(TAG, "Audio focus abandoned")
         }
     }
 
     private fun startRinging() {
-        requestAudioFocus(AudioManager.STREAM_RING, AudioAttributes.CONTENT_TYPE_MUSIC)
+        requestAudioFocus(AudioAttributes.CONTENT_TYPE_MUSIC)
         am.mode = AudioManager.MODE_RINGTONE
         if (VERSION.SDK_INT >= 28) {
             rt.isLooping = true
@@ -1241,6 +1194,7 @@ class BaresipService: Service() {
         }
     }
 
+    @Suppress("UNUSED")
     private fun playMedia(raw: Int, count: Int) {
         if (mediaPlayer == null ) {
             mediaPlayer = MediaPlayer.create(this, raw)
