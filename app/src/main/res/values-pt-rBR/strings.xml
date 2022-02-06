@@ -114,7 +114,7 @@
     <string name="delete_chats">Excluir</string>
     <string name="short_chat_question">Você quer excluir o chat com \'%1$s\'\?</string>
     <string name="long_chat_question">Você quer excluir o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
-    <string name="invalid_chat_peer_uri">URI SIP inválido</string>
+    <string name="invalid_chat_peer_uri">Par do chat URI é inválido</string>
     <string name="new_chat_peer">Novo Par de Chat</string>
     <string name="you">Você</string>
     <string name="today">Hoje</string>
@@ -271,4 +271,13 @@
     <string name="call_details">Detalhes da chamada</string>
     <string name="direction">Direção</string>
     <string name="time">Hora</string>
+    <string name="telephony_provider">Operadora de telefonia</string>
+    <string name="telephony_provider_hint">Parte do host SIP URI</string>
+    <string name="invalid_sip_uri_hostpart">Parte inválida do host SIP URI \'%1$s\'</string>
+    <string name="sip_or_tel_uri">SIP ou tel. URI</string>
+    <string name="user_domain_or_number">usuário@domínio ou o número de telefone</string>
+    <string name="choose_telephony_provider_account">Escolha a conta da operadora de telefonia</string>
+    <string name="telephony_provider_help">SIP URI host é parcialmente usado nas chamadas para números de telefone. O padrão de fábrica é domínio da conta. Caso não seja informada, essa conta não pode ser usada para ligar para os números de telefone.</string>
+    <string name="invalid_sip_or_tel_uri">SIP ou tel. URI inválido \'%1$s\'</string>
+    <string name="no_telephony_providers">A operadora de telefonia não foi configurada para nenhuma conta.</string>
 </resources>
