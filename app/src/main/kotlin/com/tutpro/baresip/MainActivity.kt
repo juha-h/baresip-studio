@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var screenEventReceiver: BroadcastReceiver
-    private lateinit var serviceEventObserver: Observer<Event<ServiceEvent>>
+    private lateinit var serviceEventObserver: Observer<Event<Long>>
     private lateinit var quitTimer: CountDownTimer
     private lateinit var stopState: String
     private var micIcon: MenuItem? = null
@@ -154,11 +154,12 @@ class MainActivity : AppCompatActivity() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        serviceEventObserver = Observer<Event<ServiceEvent>> {
-            val serviceEvent = it.getContentIfNotHandled()
-            if (serviceEvent != null) {
-                Log.d(TAG, "Observed event ${serviceEvent.event}")
-                handleServiceEvent(serviceEvent.event, serviceEvent.params)
+        serviceEventObserver = Observer<Event<Long>> {
+            val event = it.getContentIfNotHandled()
+            Log.d(TAG, "Observed event $event")
+            if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
+                val first = BaresipService.serviceEvents.first()
+                handleServiceEvent(first.event, first.params)
             }
         }
 
@@ -732,6 +733,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Main onDestroy")
         this.unregisterReceiver(screenEventReceiver)
         BaresipService.serviceEvent.removeObserver(serviceEventObserver)
+        BaresipService.serviceEvents.clear()
         BaresipService.activities.clear()
     }
 
@@ -906,10 +908,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleServiceEvent(event: String, params: ArrayList<String>) {
+
+        fun handleNextEvent(logMessage: String? = null) {
+            if (logMessage != null)
+                Log.w(TAG, logMessage)
+            if (BaresipService.serviceEvents.isNotEmpty()) {
+                BaresipService.serviceEvents.removeFirst()
+                if (BaresipService.serviceEvents.isNotEmpty()) {
+                    val e = BaresipService.serviceEvents.first()
+                    handleServiceEvent(e.event, e.params)
+                }
+            }
+        }
+
         if (taskId == -1) {
-            Log.d(TAG, "Omit service event '$event' for task -1")
+            handleNextEvent("Omit service event '$event' for task -1")
             return
         }
+
         if (event == "started") {
             val callActionUri = params[0]
             Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
@@ -920,7 +936,7 @@ class MainActivity : AppCompatActivity() {
                     if (BaresipService.uas.size > 0) {
                         ua = BaresipService.uas[0]
                     } else {
-                        Log.w(TAG, "No UAs to make the call to '$callActionUri'")
+                        handleNextEvent("No UAs to make the call to '$callActionUri'")
                         return
                     }
                 spinToAor(ua.account.aor)
@@ -933,8 +949,10 @@ class MainActivity : AppCompatActivity() {
                     aorSpinner.tag = UserAgent.uas()[0].account.aor
                 }
             }
+            handleNextEvent()
             return
         }
+
         if (event == "stopped") {
             Log.d(TAG, "Handling service event 'stopped' with param '${params[0]}'")
             if (params[0] != "") {
@@ -962,13 +980,15 @@ class MainActivity : AppCompatActivity() {
         val uap = params[0]
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
-            Log.w(TAG, "handleServiceEvent '$event' did not find ua $uap")
+            handleNextEvent("handleServiceEvent '$event' did not find ua $uap")
             return
         }
+
         val ev = event.split(",")
         Log.d(TAG, "Handling service event '${ev[0]}' for $uap")
         val acc = ua.account
         val aor = ua.account.aor
+
         for (account_index in UserAgent.uas().indices) {
             if (UserAgent.uas()[account_index].account.aor == aor) {
                 when (ev[0]) {
@@ -986,11 +1006,13 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             Log.d(TAG, "Reordering to front")
                             BaresipService.activities.clear()
+                            BaresipService.serviceEvents.clear()
                             val i = Intent(applicationContext, MainActivity::class.java)
                             i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                             i.putExtra("action", "call show")
                             i.putExtra("callp", callp)
                             startActivity(i)
+                            return
                         }
                     }
                     "call answered" -> {
@@ -1010,7 +1032,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(TAG, "Call $callp to be verified is not found")
+                            handleNextEvent("Call $callp to be verified is not found")
                             return
                         }
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
@@ -1052,7 +1074,7 @@ class MainActivity : AppCompatActivity() {
                         val callp = params[1]
                         val call = Call.ofCallp(callp)
                         if (call == null) {
-                            Log.w(TAG, "Call $callp that is verified is not found")
+                            handleNextEvent("Call $callp that is verified is not found")
                             return
                         }
                         val tag: String = if (call.security == R.drawable.box_yellow)
@@ -1069,6 +1091,7 @@ class MainActivity : AppCompatActivity() {
                         if (!BaresipService.isMainVisible) {
                             Log.d(TAG, "Reordering to front")
                             BaresipService.activities.clear()
+                            BaresipService.serviceEvents.clear()
                             val i = Intent(applicationContext, MainActivity::class.java)
                             i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                             i.putExtra("action", event)
@@ -1127,12 +1150,11 @@ class MainActivity : AppCompatActivity() {
                             Utils.setShowWhenLocked(this, false)
                     }
                     "message", "message show", "message reply" -> {
-                        val peer = params[1]
                         val i = Intent(applicationContext, ChatActivity::class.java)
                         i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         val b = Bundle()
                         b.putString("aor", aor)
-                        b.putString("peer", peer)
+                        b.putString("peer", params[1])
                         b.putBoolean("focus", ev[0] == "message reply")
                         i.putExtras(b)
                         chatRequests.launch(i)
@@ -1159,6 +1181,9 @@ class MainActivity : AppCompatActivity() {
                 break
             }
         }
+
+        handleNextEvent()
+
     }
 
     private fun reStart() {
@@ -1836,16 +1861,15 @@ class MainActivity : AppCompatActivity() {
                     dialpadButton.isEnabled = false
                     infoButton.isEnabled = true
                     callControl.visibility = View.VISIBLE
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        onHoldNotice.visibility = if (call.held) View.VISIBLE else View.GONE
+                    }, 100)
                     if (call.held) {
                         imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                         dtmf.isEnabled = false
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            onHoldNotice.visibility = View.VISIBLE
-                        }, 250)
                     } else {
                         dtmf.isEnabled = true
                         dtmf.requestFocus()
-                        onHoldNotice.visibility = View.GONE
                         if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
                             imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
                         if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
