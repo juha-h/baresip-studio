@@ -141,6 +141,8 @@
         <service
             android:name=".BaresipService"
             android:permission="android.permission.FOREGROUND_SERVICE"
+            android:foregroundServiceType="microphone|camera|phoneCall"
+            android:stopWithTask="false"
             android:enabled="true" >
         </service>
 
