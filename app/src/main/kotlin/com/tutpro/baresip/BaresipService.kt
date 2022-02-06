@@ -4,27 +4,34 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.*
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothHeadset
-import android.content.*
+import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.*
 import android.net.*
 import android.net.wifi.WifiManager
-import android.os.*
 import android.os.Build.VERSION
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.PowerManager
 import android.provider.Settings
+import android.telecom.TelecomManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RemoteViews
-import android.content.Intent
-import android.content.BroadcastReceiver
+import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
@@ -32,14 +39,8 @@ import java.io.File
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
-import android.media.MediaPlayer
-import android.telecom.TelecomManager
-import android.widget.Toast
-import android.os.Looper
-import androidx.lifecycle.MutableLiveData
 
 class BaresipService: Service() {
 
