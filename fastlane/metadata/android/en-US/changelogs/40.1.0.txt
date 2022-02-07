@@ -1,0 +1,4 @@
+- Do not play busy or error sound when call is closed
+- Improved reliability of Bluetooth usage
+- Better handling of events from baresip core
+- New Portuguese (Brazil) translations
