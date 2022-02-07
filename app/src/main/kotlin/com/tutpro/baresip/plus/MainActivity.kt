@@ -10,18 +10,17 @@ import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
+import android.media.MediaActionSound
 import android.net.Uri
+import android.os.*
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import android.content.Intent
-import android.content.BroadcastReceiver
-import android.media.MediaActionSound
-import android.os.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -30,8 +29,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.plus.Utils.showSnackBar
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
@@ -40,10 +39,8 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
-import kotlin.collections.ArrayList
-import kotlin.system.exitProcess
-import android.content.IntentFilter
 import java.util.*
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -73,6 +70,7 @@ class MainActivity : AppCompatActivity() {
     private var dtmfWatcher: TextWatcher? = null
     private lateinit var infoButton: ImageButton
     private lateinit var onHoldNotice: TextView
+    private lateinit var videoOnHoldNotice: TextView
     private lateinit var uaAdapter: UaSpinnerAdapter
     private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
@@ -1014,6 +1012,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         videoLayout.addView(ib)
+
+        // OnHold Notice
+        videoOnHoldNotice = TextView(this)
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
+        prm.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+        videoOnHoldNotice.layoutParams = prm
+        videoOnHoldNotice.text = getString(R.string.call_is_on_hold)
+        videoOnHoldNotice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        videoOnHoldNotice.setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+        videoOnHoldNotice.visibility = View.GONE
+        videoLayout.addView(videoOnHoldNotice)
 
     }
 
@@ -2210,6 +2221,7 @@ class MainActivity : AppCompatActivity() {
                             defaultLayout.visibility = View.INVISIBLE
                             videoLayout.visibility = View.VISIBLE
                         }
+                        videoOnHoldNotice.visibility = if (call.held) View.VISIBLE else View.GONE
                         return
                     }
                     if (defaultLayout.visibility == View.INVISIBLE) {
