@@ -225,8 +225,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
         case UA_EVENT_CALL_REMOTE_SDP:
-            if (call_state(call) != CALL_STATE_ESTABLISHED)
-                return;
             media = stream_sdpmedia(video_strm(call_video(call)));
             remote_has_video = sdp_media_rport(media) != 0 &&
                     list_head(sdp_media_format_lst(media, false)) != NULL;

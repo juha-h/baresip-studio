@@ -706,10 +706,12 @@ class BaresipService: Service() {
                             return
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                                 (!callHasVideo && remoteHasVideo &&
-                                        (rdir != Api.SDP_INACTIVE) && (ldir != rdir)))
+                                        (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
                             postServiceEvent(ServiceEvent("call video request",
                                     arrayListOf(uap, callp, "$rdir"), System.nanoTime()))
-                        return
+                            return
+                        }
+                        newEvent = "call update"
                     }
                     "call answered" -> {
                         stopMediaPlayer()
