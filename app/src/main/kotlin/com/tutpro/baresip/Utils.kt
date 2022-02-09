@@ -548,15 +548,19 @@ object Utils {
         return true
     }
 
-    class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray):
-        Serializable {
+    class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
             private const val serialVersionUID: Long = -29238082928391L
         }
     }
 
-    private fun encrypt(content: ByteArray, password: CharArray): Crypto? {
-        var obj: Crypto? = null
+    private fun encrypt(content: ByteArray, password: CharArray): ByteArray? {
+        fun intToByteArray(int: Int): ByteArray {
+            val bytes = ByteArray(2)
+            bytes[0] = (int shr 0).toByte()
+            bytes[1] = (int shr 8).toByte()
+            return bytes
+        }
         try {
             val sr = SecureRandom()
             val salt = ByteArray(128)
@@ -573,15 +577,42 @@ object Utils {
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
             val cipherData = cipher.doFinal(content)
-            obj = Crypto(salt, iterationCount, iv, cipherData)
+            val res = ByteArray(128 + 2 + 16 + cipherData.size)
+            salt.copyInto(res, 0)
+            intToByteArray(iterationCount).copyInto(res, salt.size)
+            iv.copyInto(res, salt.size + 2)
+            cipherData.copyInto(res, salt.size + 2 + iv.size)
+            return res
         } catch (e: Exception) {
             Log.e(TAG, "Encrypt failed: ${e.printStackTrace()}")
         }
-        return obj
-
+        return null
     }
 
-    private fun decrypt(obj: Crypto, password: CharArray): ByteArray? {
+    private fun decrypt(content: ByteArray, password: CharArray): ByteArray? {
+        fun byteArrayToInt(bytes: ByteArray) : Int {
+            return (bytes[1].toInt() and 0xff shl 8) or (bytes[0].toInt() and 0xff)
+        }
+        try {
+            val salt = content.copyOfRange(0, 128)
+            val iterationCount = byteArrayToInt(content.copyOfRange(128, 130))
+            val iv = content.copyOfRange(130, 146)
+            val data = content.copyOfRange(146, content.size)
+            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 128)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
+            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            val ivSpec = IvParameterSpec(iv)
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+            return cipher.doFinal(data)
+        } catch (e: Exception) {
+            Log.e(TAG, "Decrypt failed: ${e.printStackTrace()}")
+        }
+        return null
+    }
+
+    private fun decryptOld(obj: Crypto, password: CharArray): ByteArray? {
         var plainData: ByteArray? = null
         try {
             val pbKeySpec = PBEKeySpec(password, obj.salt, obj.iter, 128)
@@ -613,13 +644,24 @@ object Utils {
 
     fun decryptFromStream(stream: FileInputStream?, password: String): ByteArray? {
         var plainData: ByteArray? = null
+        if (stream == null)
+            return null
         try {
             ObjectInputStream(stream).use {
-                val obj = it.readObject() as Crypto
-                plainData = decrypt(obj, password.toCharArray())
+                val content = it.readObject() as ByteArray
+                plainData = decrypt(content, password.toCharArray())
             }
         } catch (e: Exception) {
-            Log.w(TAG, "decryptFromStream failed: $e")
+            Log.w(TAG, "decryptFromStream as ByteArray failed: $e")
+            try {
+                stream.close()
+                ObjectInputStream(stream).use {
+                    val obj = it.readObject() as Crypto
+                    plainData = decryptOld(obj, password.toCharArray())
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "decryptFromStream as Crypto failed: $e")
+            }
         }
         return plainData
     }
