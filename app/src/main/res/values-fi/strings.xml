@@ -503,8 +503,9 @@
         uudelleen. Käynnistä uudelleen nyt?
     </string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
-        annoit oikean salasanan.  Android versioon 9 saakka tarkista myös Asetukset → Sovellukset →
-        baresip → Käyttöluvat → Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.
+        annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
+        Android versioon 9 saakka tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
+        Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.
     </string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
         ilman Mikrofoni-käyttöoikeutta.
