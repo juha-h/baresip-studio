@@ -717,6 +717,10 @@ object Utils {
         try {
             ZipFile(zipFilePath).use { zip ->
                 zip.entries().asSequence().forEach { entry ->
+                    if (!entry.name.contains("/com.tutpro.baresip.plus/")) {
+                        Log.e(TAG, "Backup file is not from baresip+ application")
+                        return false
+                    }
                     zipFiles.add(entry.name.substringAfterLast("/"))
                     zip.getInputStream(entry).use { input ->
                         File(entry.name).outputStream().use { output ->
