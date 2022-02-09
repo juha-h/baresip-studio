@@ -460,8 +460,10 @@
         Restart now?
     </string>
     <string name="restore_failed">Failed to restore application data. Check that you gave correct
-        password. In Android versions 9 and below, also check Apps → baresip → Permissions → Storage
-        and that file \'%1$s\' exists in Download folder.</string>
+        password and that the backup file is from this application. In Android versions 9 and below,
+        also check Apps → baresip → Permissions → Storage and that file \'%1$s\' exists
+        in Download folder.
+    </string>
     <string name="no_calls">You are not able to make or answer calls without \"Microphone\"
         permission.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>

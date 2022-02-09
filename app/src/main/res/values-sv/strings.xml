@@ -16,7 +16,7 @@
     <string name="start_automatically">Starta automatiskt</string>
     <string name="configuration">Inställningar</string>
     <string name="delete_chats">Ta bort</string>
-    <string name="invalid_chat_peer_uri">Ogiltig SIP-URI</string>
+    <string name="invalid_chat_peer_uri">Ogiltig chat-motpart-URI</string>
     <string name="you">Du</string>
     <string name="today">Idag</string>
     <string name="add_contact">Lägg till kontakt</string>
@@ -77,8 +77,8 @@
     <string name="about">Om</string>
     <string name="restart">Starta om</string>
     <string name="quit">Avsluta</string>
-    <string name="outgoing_call_to_dots">Utgående samtal till …</string>
-    <string name="incoming_call_from_dots">Inkommande samtal från …</string>
+    <string name="outgoing_call_to_dots">Ring till …</string>
+    <string name="incoming_call_from_dots">Samtal från …</string>
     <string name="transferring_call_to_dots">Kopplar samtal till …</string>
     <string name="invalid_sip_uri">Ogiltig SIP-URI \'%1$s\'</string>
     <string name="hangup">Lägg på</string>
@@ -144,7 +144,7 @@
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
     <string name="call_already_active">Du har redan ett pågående samtal.</string>
     <string name="dialpad">Knappsats</string>
-    <string name="rate">Nuvarande hastighet: %1$s (Kbits/s)</string>
+    <string name="rate">Nuvarande hastighet: %1$s (kbits/s)</string>
     <string name="call_info_not_available">Ingen information tillgänglig</string>
     <string name="call_info">Samtalsinformation</string>
     <string name="duration">Längd: %1$s (sekunder)</string>
@@ -224,7 +224,7 @@
     <string name="accept">Acceptera</string>
     <string name="aec_extended_filter">Utökat filter vid ekoutsläckning</string>
     <string name="android_contact_help">Kryssa i för att inkludera kontakten även i dina Android-kontakter.</string>
-    <string name="sip_trace_help">Kryssa i för att skicka SIP-meddelanden till Logcat när Felsökning är aktiverat. Funktionen inaktiveras automatiskt när baresip startar.</string>
+    <string name="sip_trace_help">Kryssa i för att inkludera SIP-meddelanden i Logcat-meddelanden när Felsökning är aktiverat. Funktionen inaktiveras automatiskt när baresip startar.</string>
     <string name="debug_help">Kryssa i för att skicka felsöknings- och info-meddelanden till Logcat.</string>
     <string name="aec_extended_filter_help">Kryssa i för att använda ett utökat filter vid ekoutsläckning.</string>
     <string name="aec_help">Kryssa i för att aktivera ekoutsläckning för samtalsljud.</string>
@@ -259,10 +259,25 @@
     <string name="no_restore">Du kan inte återställa en backup utan behörigheten \"Lagring\".</string>
     <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
     <string name="no_android_contacts">Du kan inte lägga till eller ta bort Android-kontakter utan behörigheten \"Kontakter\".</string>
-    <string name="android_settings">Android inställningar</string>
-    <string name="audio_settings">Ljud-inställningar</string>
+    <string name="android_settings">Androidinställningar</string>
+    <string name="audio_settings">Ljudinställningar</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="call_is_on_hold">Samtalet är parkerat</string>
-    <string name="average_rate">Medelhastighet: %1$s (Kbits/s)</string>
+    <string name="average_rate">Medelhastighet: %1$s (kbits/s)</string>
     <string name="packets">Paket</string>
+    <string name="call_details">Samtalsdetaljer</string>
+    <string name="time">Tid</string>
+    <string name="telephony_provider_help">Värdnamn att använda i SIP-URI:er vid samtal till telefonnummer. Förvalt är att använda kontots domän. Om fältet lämnas tomt kan inte detta konto användas för att ringa telefonnummer.</string>
+    <string name="peer">Motpart</string>
+    <string name="telephony_provider">Telefonileverantör</string>
+    <string name="invalid_sip_uri_hostpart">Ogiltigt värdnamn i SIP-URI \'%1$s\'</string>
+    <string name="telephony_provider_hint">SIP-URI:s värdnamn</string>
+    <string name="direction">Riktning</string>
+    <string name="calls_duration">Längd</string>
+    <string name="sip_or_tel_uri">SIP- eller tel-URI</string>
+    <string name="user_domain_or_number">användare@domän eller telefonnummer</string>
+    <string name="lost">Tappade</string>
+    <string name="no_telephony_providers">Telefonileverantör har inte konfigurerats för något konto.</string>
+    <string name="invalid_sip_or_tel_uri">Ogiltig SIP- eller tel-URI \'%1$s\'</string>
+    <string name="choose_telephony_provider_account">Välj telefonileverantör-konto</string>
 </resources>
