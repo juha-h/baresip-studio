@@ -629,38 +629,41 @@ object Utils {
         return plainData
     }
 
-    fun encryptToStream(stream: FileOutputStream?, content: ByteArray, password: String): Boolean {
+    fun encryptToUri(ctx: Context, uri: Uri, content: ByteArray, password: String): Boolean {
         val obj = encrypt(content, password.toCharArray())
+        val stream = ctx.contentResolver.openOutputStream(uri) as FileOutputStream
         try {
             ObjectOutputStream(stream).use {
                 it.writeObject(obj)
             }
         } catch (e: Exception) {
-            Log.w(TAG, "encryptToStream failed: $e")
+            Log.w(TAG, "encryptToUri failed: $e")
             return false
         }
         return true
     }
 
-    fun decryptFromStream(stream: FileInputStream?, password: String): ByteArray? {
+    fun decryptFromUri(ctx: Context, uri: Uri, password: String): ByteArray? {
         var plainData: ByteArray? = null
-        if (stream == null)
-            return null
+        var stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
         try {
             ObjectInputStream(stream).use {
                 val content = it.readObject() as ByteArray
                 plainData = decrypt(content, password.toCharArray())
             }
+            stream.close()
         } catch (e: Exception) {
-            Log.w(TAG, "decryptFromStream as ByteArray failed: $e")
+            Log.w(TAG, "decryptFromUri as ByteArray failed: $e")
+            stream.close()
             try {
-                stream.close()
+                stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
                 ObjectInputStream(stream).use {
                     val obj = it.readObject() as Crypto
                     plainData = decryptOld(obj, password.toCharArray())
                 }
+                stream.close()
             } catch (e: Exception) {
-                Log.w(TAG, "decryptFromStream as Crypto failed: $e")
+                Log.w(TAG, "decryptFromUri as Crypto failed: $e")
             }
         }
         return plainData
