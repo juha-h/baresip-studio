@@ -184,6 +184,8 @@ class AccountActivity : AppCompatActivity() {
                                 "voicemail-uri" ->
                                     if (text.isNotEmpty())
                                         acc.vmUri = text
+                                "tel-provider" ->
+                                    acc.telProvider = text
                             }
                     }
                     event = parser.next()

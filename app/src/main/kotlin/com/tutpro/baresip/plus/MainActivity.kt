@@ -29,14 +29,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.plus.Utils.showSnackBar
 import com.tutpro.baresip.plus.databinding.ActivityMainBinding
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -95,10 +94,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
 
-    private var downloadsInputStream: FileInputStream? = null
-    private var downloadsOutputStream: FileOutputStream? = null
-    private var downloadsInputFile = "baresip+.bs"
-    private var downloadsOutputFile = "baresip+.bs"
+    private var downloadsInputUri: Uri? = null
+    private var downloadsOutputUri: Uri? = null
 
     private lateinit var baresipService: Intent
 
@@ -631,24 +628,18 @@ class MainActivity : AppCompatActivity() {
         backupRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK)
                 it.data?.data?.also { uri ->
-                    downloadsOutputStream = applicationContext.contentResolver.openOutputStream(uri)
-                            as FileOutputStream
-                    if (downloadsOutputStream != null) {
-                        downloadsOutputFile = Utils.fileNameOfUri(applicationContext, uri)
+                    downloadsOutputUri = uri
+                    if (downloadsOutputUri != null)
                         askPassword(getString(R.string.encrypt_password))
-                    }
                 }
         }
 
         restoreRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK)
                 it.data?.data?.also { uri ->
-                    downloadsInputStream = applicationContext.contentResolver.openInputStream(uri)
-                            as FileInputStream
-                    if (downloadsInputStream != null) {
-                        downloadsInputFile = Utils.fileNameOfUri(applicationContext, uri)
+                    downloadsInputUri = uri
+                    if (downloadsInputUri != null)
                         askPassword(getString(R.string.decrypt_password))
-                    }
                 }
         }
 
@@ -1599,7 +1590,7 @@ class MainActivity : AppCompatActivity() {
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Write External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
-                        downloadsOutputStream = FileOutputStream(File(path))
+                        downloadsOutputUri = File(path).toUri()
                         askPassword(getString(R.string.encrypt_password))
                     }
                     ActivityCompat.shouldShowRequestPermissionRationale(
@@ -1622,14 +1613,15 @@ class MainActivity : AppCompatActivity() {
 
             R.id.restore -> {
                 when {
-                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("restore")
+                    Build.VERSION.SDK_INT >= 29 ->
+                        pickupFileFromDownloads("restore")
                     ContextCompat.checkSelfPermission(
                         this,
                         Manifest.permission.READ_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Read External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
-                        downloadsInputStream = FileInputStream(File(path))
+                        downloadsInputUri = File(path).toUri()
                         askPassword(getString(R.string.decrypt_password))
                     }
                     ActivityCompat.shouldShowRequestPermissionRationale(
@@ -1912,7 +1904,7 @@ class MainActivity : AppCompatActivity() {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.backup_failed),
-                            downloadsOutputFile))
+                            Utils.fileNameOfUri(applicationContext, downloadsOutputUri!!)))
             return
         }
         val content = Utils.getFileContents(zipFilePath)
@@ -1920,43 +1912,43 @@ class MainActivity : AppCompatActivity() {
             Log.w(TAG, "Failed to read zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.backup_failed),
-                            downloadsOutputFile))
+                            Utils.fileNameOfUri(applicationContext, downloadsOutputUri!!)))
             return
         }
-        if (!Utils.encryptToStream(downloadsOutputStream, content, password)) {
+        if (!Utils.encryptToUri(applicationContext, downloadsOutputUri!!, content, password)) {
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.backup_failed),
-                            downloadsOutputFile))
+                            Utils.fileNameOfUri(applicationContext, downloadsOutputUri!!)))
             return
         }
         Utils.alertView(this, getString(R.string.info),
                 String.format(getString(R.string.backed_up),
-                        downloadsOutputFile))
+                        Utils.fileNameOfUri(applicationContext, downloadsOutputUri!!)))
         Utils.deleteFile(File(zipFilePath))
     }
 
     private fun restore(password: String) {
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
-        val zipData = Utils.decryptFromStream(downloadsInputStream, password)
+        val zipData = Utils.decryptFromUri(applicationContext, downloadsInputUri!!, password)
         if (zipData == null) {
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.restore_failed),
-                            downloadsInputFile))
+                            Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.restore_failed),
-                            downloadsInputFile))
+                    Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
             return
         }
         if (!Utils.unZip(zipFilePath)) {
             Log.w(TAG, "Failed to unzip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
                     String.format(getString(R.string.restore_failed),
-                            downloadsInputFile))
+                            Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
             return
         }
         Utils.deleteFile(File(zipFilePath))
