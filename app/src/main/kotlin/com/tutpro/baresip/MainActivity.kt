@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var layout: RelativeLayout
     private lateinit var callTitle: TextView
+    private lateinit var callTimer: Chronometer
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
     private lateinit var callButton: ImageButton
@@ -127,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         layout = binding.mainActivityLayout
         aorSpinner = binding.aorSpinner
         callTitle = binding.callTitle
+        callTimer = binding.callTimer
         callUri = binding.callUri
         securityButton = binding.securityButton
         callButton = binding.callButton
@@ -711,6 +713,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
         BaresipService.isMainVisible = false
+        callTimer.stop()
         saveCallUri()
     }
 
@@ -1136,6 +1139,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (speakerIcon != null)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
+                        callTimer.stop()
                         if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
                                 (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
                             Utils.setShowWhenLocked(this, false)
@@ -1751,6 +1755,7 @@ class MainActivity : AppCompatActivity() {
         if (Call.uaCalls(ua, "").size == 0) {
             swipeRefresh.isEnabled = true
             callTitle.text = getString(R.string.outgoing_call_to_dots)
+            callTimer.visibility = View.INVISIBLE
             if (ua.account.resumeUri != "")
                 callUri.setText(ua.account.resumeUri)
             else
@@ -1784,6 +1789,7 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.incoming_call_from_dots)
                     else
                         getString(R.string.outgoing_call_to_dots)
+                    callTimer.visibility = View.INVISIBLE
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
@@ -1798,6 +1804,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
+                    callTimer.visibility = View.INVISIBLE
                     callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
@@ -1830,6 +1837,10 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
+                    callTimer.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
+                    callTimer.stop()
+                    callTimer.start()
+                    callTimer.visibility = View.VISIBLE
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
