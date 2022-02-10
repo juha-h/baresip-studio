@@ -6,7 +6,7 @@
     <string name="backup">Cópia de Segurança</string>
     <string name="show_password">Mostrar Senha</string>
     <string name="no_calls">Você não pode fazer ou atender chamadas sem a permissão do \"Microfone\".</string>
-    <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta, Nas versões do Android 9 e anteriores, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
+    <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Nas versões do Android 9 e anteriores, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
     <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
     <string name="backup_failed">Falha ao fazer o backup dos dados do aplicativo no arquivo \'%1$s\'. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
     <string name="backed_up">Os dados do aplicativo foram armazenados em um backup no arquivo \'%1$s\'. Nas versões do Android 9 e anteriores, o arquivo está na pasta Download.</string>
