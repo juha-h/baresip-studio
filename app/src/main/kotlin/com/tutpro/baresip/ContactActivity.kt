@@ -567,49 +567,6 @@ class ContactActivity : AppCompatActivity() {
                     null)
         }
 
-        @Suppress("UNUSED")
-        fun logAndroidContacts(ctx: Context, type: String): HashMap<Long, MutableList<String>> {
-            val mimeType = if (type == "sip")
-                CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
-            else
-                CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-            val contacts = HashMap<Long, MutableList<String>>()
-            val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
-                    ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
-                    ContactsContract.Data.PHOTO_THUMBNAIL_URI)
-            val selection = ContactsContract.Data.MIMETYPE + "='" + mimeType + "'"
-            val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
-                    selection, null, null)
-            while (cur != null && cur.moveToNext()) {
-                val id = cur.getLong(0)
-                val name = cur.getString(1)  // display name
-                val mime = cur.getString(2)  // type of data
-                val data = cur.getString(3)  // info
-                val thumb = cur.getString(4) // thumbnail
-                var kind = "unknown"
-                when (mime) {
-                    CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> kind = "sip"
-                    CommonDataKinds.Photo.CONTENT_ITEM_TYPE -> kind = "thumb"
-                    CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> kind = "tel"
-                }
-                Log.d(TAG, "got $id, $name, $kind - $data")
-                var info: MutableList<String>
-                if (contacts.containsKey(id)) {
-                    info = contacts[id]!!
-                } else {
-                    info = mutableListOf()
-                    info.add("name = $name")
-                    info.add("thumb = $thumb")
-                    contacts[id] = info
-                }
-                info.add("$kind = $data")
-            }
-            cur?.close()
-            return contacts
-        }
-
     }
 
 }
-
-

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +58,11 @@ class ContactsActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.swap_contacts_icon, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onResume() {
 
         super.onResume()
@@ -67,6 +73,17 @@ class ContactsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.swapContactsIcon -> {
+                if (SystemClock.elapsedRealtime() - lastClick > 1000) {
+                    lastClick = SystemClock.elapsedRealtime()
+                    val intent = Intent(this, AndroidContactsActivity::class.java)
+                    intent.putExtra("aor", aor)
+                    startActivity(intent)
+                    finish()
+                    return true
+                }
+            }
 
             android.R.id.home -> {
                 BaresipService.activities.remove("contacts,$aor")
