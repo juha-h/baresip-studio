@@ -77,6 +77,7 @@ class ContactsActivity : AppCompatActivity() {
             R.id.swapContactsIcon -> {
                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                     lastClick = SystemClock.elapsedRealtime()
+                    BaresipService.activities.remove("contacts,$aor")
                     val intent = Intent(this, AndroidContactsActivity::class.java)
                     intent.putExtra("aor", aor)
                     startActivity(intent)

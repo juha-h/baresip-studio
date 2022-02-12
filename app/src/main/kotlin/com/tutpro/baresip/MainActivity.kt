@@ -1966,6 +1966,21 @@ class MainActivity : AppCompatActivity() {
                 i.putExtras(b)
                 startActivity(i)
             }
+            "android contacts" -> {
+                val i = Intent(this, AndroidContactsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                i.putExtras(b)
+                startActivity(i)
+            }
+            "android contact" -> {
+                val i = Intent(this, AndroidContactActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                b.putInt("index", activity[2].toInt())
+                i.putExtras(b)
+                startActivity(i)
+            }
             "chats" -> {
                 val i = Intent(this, ChatsActivity::class.java)
                 val b = Bundle()

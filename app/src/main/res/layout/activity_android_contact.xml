@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ContactView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="24dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/TextAvatar"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="centerInside"
+        android:background="@drawable/circle"
+        android:textSize="72sp"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:gravity="center" >
+    </TextView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/CardAvatar"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="center_horizontal"
+        android:elevation="12dp"
+        app:cardCornerRadius="48dp" >
+
+        <ImageView
+            android:id="@+id/ImageAvatar"
+            android:contentDescription="@string/avatar_image"
+            android:layout_height="96dp"
+            android:layout_width="96dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" >
+        </ImageView>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/Name"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:textColor="@color/colorStrong"
+        android:textSize="24sp"
+        tools:ignore="LabelFor">
+    </TextView>
+
+    <ListView
+        android:id="@+id/uris"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:divider="#00000000"
+        android:dividerHeight="0dp" >
+    </ListView>
+
+</LinearLayout>
+
