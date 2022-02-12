@@ -1,23 +1,17 @@
 package com.tutpro.baresip
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
-import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
-
-import java.io.File
-import java.io.IOException
-import java.util.*
 
 class AndroidContactListAdapter(private val ctx: Context,
                                 private val rows: ArrayList<AndroidContact>,

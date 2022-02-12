@@ -1408,6 +1408,7 @@ class BaresipService: Service() {
         var callActionUri = ""
         var isMainVisible = false
         var isMicMuted = false
+        var preferAndroidContacts = false
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()

@@ -85,6 +85,8 @@ object Config {
             config = "${config}jitter_buffer_wish 6\n"
         }
 
+        BaresipService.preferAndroidContacts = config.contains("prefer_android_contacts yes")
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i(TAG, "Initialized config to '$config'")

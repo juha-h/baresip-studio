@@ -106,7 +106,7 @@
             android:name=".AndroidContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
-            android:parentActivityName=".ContactsActivity" >
+            android:parentActivityName=".AndroidContactsActivity" >
         </activity>
         <activity
             android:name=".ConfigActivity"

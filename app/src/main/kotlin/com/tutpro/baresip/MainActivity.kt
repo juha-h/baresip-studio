@@ -460,14 +460,23 @@ class MainActivity : AppCompatActivity() {
             }
 
         contactsButton.setOnClickListener {
-            val i = Intent(this@MainActivity, ContactsActivity::class.java)
-            val b = Bundle()
-            if (aorSpinner.selectedItemPosition >= 0)
-                b.putString("aor", aorSpinner.tag.toString())
-            else
-                b.putString("aor", "")
-            i.putExtras(b)
-            contactsRequest.launch(i)
+            if (BaresipService.preferAndroidContacts) {
+                val i = Intent(this@MainActivity, AndroidContactsActivity::class.java)
+                if (aorSpinner.selectedItemPosition >= 0)
+                    i.putExtra("aor", aorSpinner.tag.toString())
+                else
+                    i.putExtra("aor", "")
+                startActivity(i)
+            } else {
+                val i = Intent(this@MainActivity, ContactsActivity::class.java)
+                val b = Bundle()
+                if (aorSpinner.selectedItemPosition >= 0)
+                    b.putString("aor", aorSpinner.tag.toString())
+                else
+                    b.putString("aor", "")
+                i.putExtras(b)
+                contactsRequest.launch(i)
+            }
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

@@ -237,6 +237,32 @@
             android:layout_marginBottom="12dp"
             android:orientation="horizontal" >
             <TextView
+                android:id="@+id/AndroidContactsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/AndroidContacts"
+                android:textSize="18sp"
+                android:text="@string/show_android_contacts" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/AndroidContacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal" >
+            <TextView
                 android:id="@+id/DebugTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
