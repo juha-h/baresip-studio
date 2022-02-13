@@ -55,8 +55,6 @@ class AndroidContactsActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= 23 && !Utils.checkPermissions(this, permissions))
             requestPermissions(permissions, CONTACT_PERMISSION_REQUEST_CODE)
-        else
-            fetchAndroidContacts(this)
 
         clAdapter = AndroidContactListAdapter(this, BaresipService.androidContacts, aor)
         listView.adapter = clAdapter
