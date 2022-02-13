@@ -6,6 +6,6 @@
         android:id="@+id/swapIcon"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/ic_test_swap" />
+        android:icon="@drawable/ic_action_swap" />
 
 </menu>
