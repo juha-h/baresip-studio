@@ -50,7 +50,7 @@ class CallsActivity : AppCompatActivity() {
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerUri
-            var peerName = ContactsActivity.contactName(peerUri)
+            var peerName = Utils.contactName(peerUri)
             if (peerName.startsWith("sip:"))
                 peerName = Utils.friendlyUri(peerName, Utils.aorDomain(aor))
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
@@ -95,7 +95,7 @@ class CallsActivity : AppCompatActivity() {
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerUri
-            val peerName = ContactsActivity.contactName(peerUri)
+            val peerName = Utils.contactName(peerUri)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEGATIVE -> {

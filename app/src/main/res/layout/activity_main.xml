@@ -52,7 +52,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/aorSpinner"
-                    android:layout_marginTop="31dp"
+                    android:layout_marginTop="12dp"
                     android:orientation="horizontal" >
 
                     <TextView

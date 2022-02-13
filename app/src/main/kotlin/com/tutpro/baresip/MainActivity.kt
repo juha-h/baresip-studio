@@ -1105,8 +1105,7 @@ class MainActivity : AppCompatActivity() {
                         val call = Call.ofCallp(callp)!!
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer_request)
-                        val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
-                                Utils.aorDomain(aor))
+                        val target = Utils.friendlyUri(Utils.contactName(ev[1]), Utils.aorDomain(aor))
                         with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_request_query),
@@ -1752,8 +1751,7 @@ class MainActivity : AppCompatActivity() {
                 val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
                     callUri.setText(
-                        Utils.friendlyUri(
-                            ContactsActivity.contactName(latest.peerUri), Utils.aorDomain(aor)
+                        Utils.friendlyUri(Utils.contactName(latest.peerUri), Utils.aorDomain(aor)
                         )
                     )
             }
@@ -1799,7 +1797,7 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
@@ -1814,7 +1812,7 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
@@ -1834,7 +1832,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.referTo),
+                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.referTo),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = false
                     } else {
@@ -1842,7 +1840,7 @@ class MainActivity : AppCompatActivity() {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }

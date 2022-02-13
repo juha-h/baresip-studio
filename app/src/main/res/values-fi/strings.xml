@@ -520,7 +520,7 @@
         Tallennustila-käyttöoikeutta.</string>
     <string name="no_restore">Et voi palauttaa sovelluksen tietoja ilman
         Tallennustila-käyttöoikeutta.</string>
-    <string name="no_android_contacts">Et voi lisätä tai poistaa Android-yhteystietoja ilman
+    <string name="no_android_contacts">Et voi käsitellä Androidin yhteystietoja ilman
         Kontaktit-käyttöoikeutta.</string>
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>

@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
-import androidx.core.net.toUri
 
 class AndroidContactListAdapter(private val ctx: Context,
                                 private val rows: ArrayList<AndroidContact>,
@@ -45,7 +44,7 @@ class AndroidContactListAdapter(private val ctx: Context,
 
         val thumbNailUri = contact.thumbnailUri
         if (thumbNailUri != null) {
-            viewHolder.imageAvatarView.setImageURI(thumbNailUri.toUri())
+            viewHolder.imageAvatarView.setImageURI(thumbNailUri)
         } else {
             contact.color = Utils.randomColor()
             viewHolder.textAvatarView.background.setTint(contact.color)

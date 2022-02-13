@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.net.*
@@ -22,6 +23,7 @@ import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
@@ -107,7 +109,7 @@ object Utils {
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
         if (firstUri.startsWith("tel:"))
-            return firstUri == secondUri
+            return firstUri == secondUri || firstUri.substringAfter(":") == uriUserPart(secondUri)
         if (firstUri.startsWith("sip:"))
             return uriUserPart(firstUri) == uriUserPart(secondUri) &&
                     uriHostPart(firstUri) == uriHostPart(secondUri)
@@ -316,6 +318,49 @@ object Utils {
     fun checkName(name: String): Boolean {
         return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
                 name.lines().size == 1 && !name.contains('"')
+    }
+
+    fun contactName(uri: String) : String {
+        val name = ContactsActivity.contactName(uri)
+        return if (name != uri)
+            name
+        else
+            AndroidContactsActivity.contactName(uri)
+    }
+
+    fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
+        val contact = ContactsActivity.findContact(uri)
+        if (contact != null) {
+            val avatarImage = contact.avatarImage
+            if (avatarImage != null) {
+                imageView.setImageBitmap(avatarImage)
+            } else {
+                textView.background.setTint(contact.color)
+                if (contact.name.isNotEmpty())
+                    textView.text = "${contact.name[0]}"
+                else
+                    textView.text = ""
+                imageView.setImageBitmap(bitmapFromView(textView))
+            }
+        } else {
+            val androidContact = AndroidContactsActivity.findContact(uri)
+            if (androidContact != null) {
+                val thumbnailUri = androidContact.thumbnailUri
+                if (thumbnailUri != null) {
+                    imageView.setImageURI(thumbnailUri)
+                } else {
+                    textView.background.setTint(androidContact.color)
+                    if (androidContact.name.isNotEmpty())
+                        textView.text = "${androidContact.name[0]}"
+                    else
+                        textView.text = ""
+                    imageView.setImageBitmap(bitmapFromView(textView))
+                }
+            } else {
+                val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
+                imageView.setImageBitmap(bitmap)
+            }
+        }
     }
 
     @Suppress("unused")

@@ -33,7 +33,6 @@ import com.tutpro.baresip.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-
 class ContactActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactBinding

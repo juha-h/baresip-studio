@@ -475,7 +475,7 @@
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>
     <string name="no_restore">You are not able restore backup without \"Storage\" permission.</string>
-    <string name="no_android_contacts">You are not able add or remove Android contacts without
+    <string name="no_android_contacts">You are not able to access Android contacts without
         \"Contacts\" permission.</string>
     <string name="no_cameras">You don\'t have any supported video cameras.</string>
     <string name="show_password">Show Password</string>

@@ -296,6 +296,7 @@ class BaresipService: Service() {
             this.registerReceiver(bluetoothReceiver, filter)
         }
 
+        AndroidContactsActivity.fetchAndroidContacts(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -648,8 +649,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val caller = Utils.friendlyUri(ContactsActivity.contactName(peerUri),
-                                    Utils.aorDomain(aor))
+                            val caller = Utils.friendlyUri(Utils.contactName(peerUri), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -743,8 +743,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
                                     intent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
-                                    Utils.aorDomain(aor))
+                            val target = Utils.friendlyUri(Utils.contactName(ev[1]), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                 .setContentIntent(pi)
@@ -820,8 +819,7 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible()) {
                             if (missed) {
-                                val caller = Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
-                                        Utils.aorDomain(aor))
+                                val caller = Utils.friendlyUri(Utils.contactName(call.peerUri), Utils.aorDomain(aor))
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -927,8 +925,7 @@ class BaresipService: Service() {
                 PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(ContactsActivity.contactName(peer),
-                    Utils.aorDomain(ua.account.aor))
+            val sender = Utils.friendlyUri(Utils.contactName(peer), Utils.aorDomain(ua.account.aor))
             nb.setSmallIcon(R.drawable.ic_stat_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                 .setContentIntent(pi)
@@ -1111,8 +1108,12 @@ class BaresipService: Service() {
     }
 
     private fun requestAudioFocus(type: Int) {
-        if (audioFocusRequest != null && audioFocusRequest!!.audioAttributesCompat.contentType == type)
-            return
+        if (audioFocusRequest != null) {
+            if (audioFocusRequest!!.audioAttributesCompat.contentType == type)
+                return
+            else
+                abandonAudioFocus()
+        }
         val attributes = AudioAttributesCompat.Builder()
                 .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
                 .setContentType(type)
@@ -1418,6 +1419,7 @@ class BaresipService: Service() {
         val messageUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
         val contacts = ArrayList<Contact>()
+        val androidContacts = ArrayList<AndroidContact>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var dnsServers = listOf<InetAddress>()

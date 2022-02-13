@@ -45,7 +45,7 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
         val peer: String = if (down) {
             lp.setMargins(0, 10, 75, 10)
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
-            val contactName = ContactsActivity.contactName(message.peerUri)
+            val contactName = Utils.contactName(message.peerUri)
             if (contactName.startsWith("sip:") &&
                     (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
                 Utils.uriUserPart(message.peerUri)

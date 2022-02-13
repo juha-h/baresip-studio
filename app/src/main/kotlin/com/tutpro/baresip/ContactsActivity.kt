@@ -74,7 +74,7 @@ class ContactsActivity : AppCompatActivity() {
 
         when (item.itemId) {
 
-            R.id.swapContactsIcon -> {
+            R.id.swapIcon -> {
                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                     lastClick = SystemClock.elapsedRealtime()
                     BaresipService.activities.remove("contacts,$aor")
@@ -117,9 +117,10 @@ class ContactsActivity : AppCompatActivity() {
         }
 
         fun findContact(uri: String): Contact? {
-            for (c in Contact.contacts())
+            for (c in Contact.contacts()) {
                 if (Utils.uriMatch(c.uri, uri))
                     return c
+            }
             return null
         }
 

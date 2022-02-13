@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/swapContactsIcon"
+        android:id="@+id/swapIcon"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/swap_contacts" />
+        android:icon="@drawable/ic_test_swap" />
 
 </menu>
