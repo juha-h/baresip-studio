@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.database.ContentObserver
 import android.graphics.BitmapFactory
 import android.media.*
 import android.net.*
@@ -19,6 +20,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.telecom.TelecomManager
 import android.text.Spannable
@@ -62,6 +64,7 @@ class BaresipService: Service() {
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
+    private lateinit var contentObserver: ContentObserver
 
     private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequestCompat? = null
@@ -298,7 +301,21 @@ class BaresipService: Service() {
             this.registerReceiver(bluetoothReceiver, filter)
         }
 
-        AndroidContactsActivity.fetchAndroidContacts(this)
+        val contentObserver: ContentObserver = object : ContentObserver(null) {
+            override fun onChange(self: Boolean) {
+                Log.d(TAG, "Contacts change")
+                AndroidContactsActivity.fetchAndroidContacts(this@BaresipService.applicationContext)
+            }
+        }
+
+        try {
+            AndroidContactsActivity.fetchAndroidContacts(this)
+            contentResolver.registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, contentObserver)
+        } catch(e: SecurityException) {
+            Log.i(TAG, "No Contacts permission")
+        }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -1388,6 +1405,9 @@ class BaresipService: Service() {
             proximityWakeLock.release()
         if (this::wifiLock.isInitialized)
             wifiLock.release()
+        if (this::contentObserver.isInitialized)
+            contentResolver.unregisterContentObserver(contentObserver)
+
         isServiceClean = true
     }
 
