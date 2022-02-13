@@ -2,7 +2,6 @@ package com.tutpro.baresip.plus
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-
-import java.util.*
 
 class CallListAdapter(private val ctx: Context, private val aor: String, private val rows: ArrayList<CallRow>) :
         ArrayAdapter<CallRow>(ctx, R.layout.call_row, rows) {
@@ -44,23 +41,7 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
 
         val callRow = rows[position]
 
-        val contact = ContactsActivity.findContact(callRow.peerUri)
-        if (contact != null) {
-            val avatarImage = contact.avatarImage
-            if (avatarImage != null) {
-                viewHolder.imageAvatarView.setImageBitmap(avatarImage)
-            } else {
-                viewHolder.textAvatarView.background.setTint(contact.color)
-                if (contact.name.isNotEmpty())
-                    viewHolder.textAvatarView.text = "${contact.name[0]}"
-                else
-                    viewHolder.textAvatarView.text = ""
-                viewHolder.imageAvatarView.setImageBitmap(Utils.bitmapFromView(viewHolder.textAvatarView))
-            }
-        } else {
-            val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
-            viewHolder.imageAvatarView.setImageBitmap(bitmap)
-        }
+        Utils.setAvatar(ctx, viewHolder.imageAvatarView, viewHolder.textAvatarView, callRow.peerUri)
 
         viewHolder.directionsView.removeAllViews()
         var count = 1
@@ -81,7 +62,7 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         if (count <= 3)
             viewHolder.etcView.text = ""
 
-        val contactName = ContactsActivity.contactName(callRow.peerUri)
+        val contactName = Utils.contactName(callRow.peerUri)
         if (contactName.startsWith("sip:"))
             viewHolder.peerURIView.text = Utils.friendlyUri(contactName, Utils.aorDomain(callRow.aor))
         else

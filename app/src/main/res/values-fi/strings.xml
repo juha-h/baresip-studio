@@ -367,6 +367,9 @@
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus).
         Tehdasasetus on 800x600.</string>
     <string name="android_settings">Android-asetukset</string>
+    <string name="show_android_contacts">Näytä Androidin yhteystiedot</string>
+    <string name="show_android_contacts_help">Jos valittu, niin Yhteystiedot-ikoni näyttää
+        Androidin yhteystiedot.</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
@@ -517,7 +520,7 @@
         Tallennustila-käyttöoikeutta.</string>
     <string name="no_restore">Et voi palauttaa sovelluksen tietoja ilman
         Tallennustila-käyttöoikeutta.</string>
-    <string name="no_android_contacts">Et voi lisätä tai poistaa Android-yhteystietoja ilman
+    <string name="no_android_contacts">Et voi käsitellä Androidin yhteystietoja ilman
         Kontaktit-käyttöoikeutta.</string>
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>

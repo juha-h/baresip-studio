@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.tutpro.baresip.plus">
+    package="com.tutpro.baresip.plus" >
 
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -13,8 +13,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" android:maxSdkVersion="28"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
@@ -39,8 +41,8 @@
 
     <application
         android:allowBackup="false"
-        android:installLocation="internalOnly"
         android:icon="@mipmap/ic_launcher"
+        android:installLocation="internalOnly"
         android:label="@string/app_name_plus"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
@@ -48,11 +50,11 @@
         tools:remove="android:appComponentFactory" >
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.Main"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustResize"
             android:exported="true"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.Main"
+            android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -86,15 +88,28 @@
         <activity
             android:name=".ContactsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/contacts"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".MainActivity" >
+            android:label="@string/baresip_contacts"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name=".ContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
             android:parentActivityName=".ContactsActivity" >
+        </activity>
+        <activity
+            android:name=".AndroidContactsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/android_contacts"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name=".AndroidContactActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/contact"
+            android:parentActivityName=".AndroidContactsActivity" >
         </activity>
         <activity
             android:name=".ConfigActivity"
@@ -135,7 +150,7 @@
             android:name=".AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title_plus"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
         </activity>
 
         <service
@@ -156,7 +171,6 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

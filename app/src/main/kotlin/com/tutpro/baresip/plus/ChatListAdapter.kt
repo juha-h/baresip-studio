@@ -1,17 +1,18 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Typeface
-import androidx.core.content.ContextCompat
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-
-import java.util.*
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import java.text.DateFormat
+import java.util.*
 
 class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
@@ -43,26 +44,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
 
         val message = rows[position]
 
-        val contact = ContactsActivity.findContact(message.peerUri)
-        val peer: String
-        if (contact != null) {
-            peer = contact.name
-            val avatarImage = contact.avatarImage
-            if (avatarImage != null) {
-                viewHolder.imageAvatarView.setImageBitmap(avatarImage)
-            } else {
-                viewHolder.textAvatarView.background.setTint(contact.color)
-                if (peer.isNotEmpty())
-                    viewHolder.textAvatarView.text = "${peer[0]}"
-                else
-                    viewHolder.textAvatarView.text = ""
-                viewHolder.imageAvatarView.setImageBitmap(Utils.bitmapFromView(viewHolder.textAvatarView))
-            }
-        } else {
-            peer = Utils.friendlyUri(message.peerUri, message.aor)
-            val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
-            viewHolder.imageAvatarView.setImageBitmap(bitmap)
-        }
+        Utils.setAvatar(ctx, viewHolder.imageAvatarView, viewHolder.textAvatarView, message.peerUri)
 
         if ((message.direction == R.drawable.arrow_down_green) ||
                 (message.direction == R.drawable.arrow_down_red))
@@ -70,7 +52,11 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
 
-        viewHolder.peerView.text = peer
+        val peerName = Utils.contactName(message.peerUri)
+        viewHolder.peerView.text = if (peerName !=message.peerUri )
+            peerName
+        else
+            Utils.friendlyUri(message.peerUri, message.aor)
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp

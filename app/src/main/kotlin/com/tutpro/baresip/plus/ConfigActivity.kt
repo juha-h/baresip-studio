@@ -8,10 +8,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
-import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -43,6 +41,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var verifyServer: CheckBox
     private lateinit var caFile: CheckBox
     private lateinit var darkTheme: CheckBox
+    private lateinit var androidContacts: CheckBox
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
@@ -56,6 +55,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldCAFile = false
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
+    private var oldAndroidContacts = ""
     private var videoSize = ""
     private var oldVideoSize = Config.variable("video_size")[0]
     private var save = false
@@ -309,6 +309,11 @@ class ConfigActivity : AppCompatActivity() {
         oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
+        androidContacts = binding.AndroidContacts
+        val acCv = Config.variable("prefer_android_contacts")
+        oldAndroidContacts = if (acCv.size == 0) "no" else acCv[0]
+        androidContacts.isChecked =  oldAndroidContacts == "yes"
+
         debug = binding.Debug
         val dbCv = Config.variable("log_level")
         oldLogLevel = if (dbCv.size == 0)
@@ -452,6 +457,16 @@ class ConfigActivity : AppCompatActivity() {
                 if (oldDisplayTheme != newDisplayTheme)
                     Preferences(applicationContext).displayTheme = newDisplayTheme
 
+                val androidContactsString = if (androidContacts.isChecked)
+                    "yes"
+                else
+                    "no"
+                if (oldAndroidContacts != androidContactsString) {
+                    Config.replaceVariable("prefer_android_contacts", androidContactsString)
+                    BaresipService.preferAndroidContacts = androidContacts.isChecked
+                    save = true
+                }
+
                 var logLevelString = "2"
                 if (debug.isChecked) logLevelString = "0"
                 if (oldLogLevel != logLevelString) {
@@ -537,13 +552,6 @@ class ConfigActivity : AppCompatActivity() {
         binding.AudioSettingsTitle.setOnClickListener {
             startActivity(Intent(this, AudioActivity::class.java))
         }
-        binding.AndroidSettings.setOnClickListener {
-            val i = Intent()
-            i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            i.data = Uri.parse("package:${applicationContext.packageName}")
-            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-            startActivity(i)
-        }
         binding.VideoSizeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.video_size),
                     getString(R.string.video_size_help))
@@ -551,6 +559,10 @@ class ConfigActivity : AppCompatActivity() {
         binding.DarkThemeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.dark_theme),
                     getString(R.string.dark_theme_help))
+        }
+        binding.AndroidContactsTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.show_android_contacts),
+                    getString(R.string.show_android_contacts_help))
         }
         binding.DebugTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))

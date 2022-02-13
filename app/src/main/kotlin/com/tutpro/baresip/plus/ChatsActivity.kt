@@ -95,7 +95,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
-            val peer = ContactsActivity.contactName(uaMessages[pos].peerUri)
+            val peer = Utils.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
                 with (builder) {
                     setMessage(String.format(getString(R.string.long_chat_question),

@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var videoLayout: RelativeLayout
     private lateinit var videoView: VideoView
     private lateinit var callTitle: TextView
+    private lateinit var callTimer: Chronometer
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
     private lateinit var callButton: ImageButton
@@ -137,6 +138,7 @@ class MainActivity : AppCompatActivity() {
         videoView = VideoView(applicationContext)
         aorSpinner = binding.aorSpinner
         callTitle = binding.callTitle
+        callTimer = binding.callTimer
         callUri = binding.callUri
         securityButton = binding.securityButton
         callButton = binding.callButton
@@ -520,14 +522,23 @@ class MainActivity : AppCompatActivity() {
             }
 
         contactsButton.setOnClickListener {
-            val i = Intent(this@MainActivity, ContactsActivity::class.java)
-            val b = Bundle()
-            if (aorSpinner.selectedItemPosition >= 0)
-                b.putString("aor", aorSpinner.tag.toString())
-            else
-                b.putString("aor", "")
-            i.putExtras(b)
-            contactsRequest.launch(i)
+            if (BaresipService.preferAndroidContacts) {
+                val i = Intent(this@MainActivity, AndroidContactsActivity::class.java)
+                if (aorSpinner.selectedItemPosition >= 0)
+                    i.putExtra("aor", aorSpinner.tag.toString())
+                else
+                    i.putExtra("aor", "")
+                startActivity(i)
+            } else {
+                val i = Intent(this@MainActivity, ContactsActivity::class.java)
+                val b = Bundle()
+                if (aorSpinner.selectedItemPosition >= 0)
+                    b.putString("aor", aorSpinner.tag.toString())
+                else
+                    b.putString("aor", "")
+                i.putExtras(b)
+                contactsRequest.launch(i)
+            }
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -803,6 +814,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
         BaresipService.isMainVisible = false
+        callTimer.stop()
         saveCallUri()
     }
 
@@ -1424,8 +1436,7 @@ class MainActivity : AppCompatActivity() {
                         val call = Call.ofCallp(callp)!!
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer_request)
-                        val target = Utils.friendlyUri(ContactsActivity.contactName(ev[1]),
-                                Utils.aorDomain(aor))
+                        val target = Utils.friendlyUri(Utils.contactName(ev[1]), Utils.aorDomain(aor))
                         with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_request_query),
@@ -1467,6 +1478,7 @@ class MainActivity : AppCompatActivity() {
                         if (speakerIcon != null)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
+                        callTimer.stop()
                         if (kgm.isDeviceLocked)
                             Utils.setShowWhenLocked(this, false)
                     }
@@ -2042,11 +2054,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
-                    callUri.setText(
-                        Utils.friendlyUri(
-                                ContactsActivity.contactName(latest.peerUri), Utils.aorDomain(aor)
-                        )
-                    )
+                    callUri.setText(Utils.friendlyUri(Utils.contactName(latest.peerUri), Utils.aorDomain(aor)))
             }
         }
     }
@@ -2131,6 +2139,7 @@ class MainActivity : AppCompatActivity() {
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
             callTitle.text = getString(R.string.outgoing_call_to_dots)
+            callTimer.visibility = View.INVISIBLE
             if (ua.account.resumeUri != "")
                 callUri.setText(ua.account.resumeUri)
             else
@@ -2168,7 +2177,8 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.incoming_call_from_dots)
                     else
                         getString(R.string.outgoing_call_to_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                    callTimer.visibility = View.INVISIBLE
+                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
@@ -2184,7 +2194,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
-                    callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                    callTimer.visibility = View.INVISIBLE
+                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
@@ -2225,7 +2236,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.referTo),
+                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.referTo),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = false
                     } else {
@@ -2233,10 +2244,14 @@ class MainActivity : AppCompatActivity() {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(ContactsActivity.contactName(call.peerUri),
+                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
+                    callTimer.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
+                    callTimer.stop()
+                    callTimer.start()
+                    callTimer.visibility = View.VISIBLE
                     videoButton.setImageResource(R.drawable.video_on)
                     videoButton.visibility = View.VISIBLE
                     videoButton.isClickable = true
@@ -2363,6 +2378,21 @@ class MainActivity : AppCompatActivity() {
                     b.putBoolean("new", false)
                     b.putInt("index", activity[2].toInt())
                 }
+                i.putExtras(b)
+                startActivity(i)
+            }
+            "android contacts" -> {
+                val i = Intent(this, AndroidContactsActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                i.putExtras(b)
+                startActivity(i)
+            }
+            "android contact" -> {
+                val i = Intent(this, AndroidContactActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", activity[1])
+                b.putInt("index", activity[2].toInt())
                 i.putExtras(b)
                 startActivity(i)
             }
