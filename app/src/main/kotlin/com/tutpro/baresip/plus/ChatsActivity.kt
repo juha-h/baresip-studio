@@ -123,7 +123,7 @@ class ChatsActivity: AppCompatActivity() {
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val contactUri = ContactsActivity.findContactUri(uriText)
+                val contactUri = Utils.contactUri(uriText)
                 val uri = if (contactUri == null)
                     Utils.uriComplete(uriText, Utils.aorDomain(aor))
                 else
