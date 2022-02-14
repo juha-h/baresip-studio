@@ -1,0 +1,5 @@
+- Added call timer chronometer to "Call to .../Call from ..." row
+- Added possibility to use Android contacts
+- Added "Show Android Contacts" setting to choose if Android contacts are shown when contacts button is touched
+- Check that restore file has been created by baresip app
+- New Swedish and Portuguese (Brazil) translations
