@@ -207,6 +207,21 @@ class AndroidContactsActivity : AppCompatActivity() {
                 findContact(uri)?.name ?: uri
         }
 
+        // Return first sip (preferred) or tel uri of contact name or
+        // null if contact is not found or if it has no uris
+        fun contactUri(name: String): String? {
+            for (c in BaresipService.androidContacts)
+                if (c.name == name) {
+                    if (c.uris.isNotEmpty()) {
+                        for (u in c.uris)
+                            if (u.startsWith("sip:"))
+                                return u
+                        return c.uris.first()
+                    }
+                }
+            return null
+        }
+
     }
 
 }

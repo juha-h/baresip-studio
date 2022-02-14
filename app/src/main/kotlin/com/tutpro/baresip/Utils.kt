@@ -321,11 +321,11 @@ object Utils {
     }
 
     fun contactName(uri: String) : String {
-        val name = ContactsActivity.contactName(uri)
-        return if (name != uri)
-            name
-        else
-            AndroidContactsActivity.contactName(uri)
+        return ContactsActivity.contactName(uri) ?: AndroidContactsActivity.contactName(uri)
+    }
+
+    fun contactUri(name: String) : String? {
+        return ContactsActivity.contactUri(name) ?: AndroidContactsActivity.contactUri(name)
     }
 
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {

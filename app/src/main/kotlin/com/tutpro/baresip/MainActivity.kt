@@ -1414,7 +1414,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                    uriText = Utils.contactUri(uriText) ?: uriText
                     if (Utils.isTelNumber(uriText))
                         uriText = "tel:$uriText"
                     val uri = if (Utils.isTelUri(uriText))
@@ -1702,7 +1702,7 @@ class MainActivity : AppCompatActivity() {
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                uriText = ContactsActivity.findContactUri(uriText) ?: uriText
+                uriText = Utils.contactUri(uriText) ?: uriText
                 if (Utils.isTelNumber(uriText))
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
