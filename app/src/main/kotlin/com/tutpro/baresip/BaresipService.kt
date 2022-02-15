@@ -1440,6 +1440,7 @@ class BaresipService: Service() {
         val registrationUpdate = MutableLiveData<Long>()
         val contacts = ArrayList<Contact>()
         val androidContacts = ArrayList<AndroidContact>()
+        val contactNames = mutableListOf<String>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var dnsServers = listOf<InetAddress>()

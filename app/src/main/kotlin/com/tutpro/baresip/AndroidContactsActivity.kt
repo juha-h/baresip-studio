@@ -187,6 +187,7 @@ class AndroidContactsActivity : AppCompatActivity() {
             for ((_, value) in contacts)
                 if (value.name != "")
                     BaresipService.androidContacts.add(value)
+            Utils.reloadContactNames()
             return
         }
 

@@ -70,6 +70,7 @@ class Contact(var name: String, var uri: String, var color: Int, val id: Long) {
                     BaresipService.contacts.add(contact)
                 }
             }
+            Utils.reloadContactNames()
             return true
         }
 

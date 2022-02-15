@@ -328,9 +328,15 @@ object Utils {
         return ContactsActivity.contactUri(name) ?: AndroidContactsActivity.contactUri(name)
     }
 
+    fun reloadContactNames() {
+        BaresipService.contactNames.clear()
+        BaresipService.contactNames.addAll(Contact.contacts().map{Contact -> Contact.name})
+        BaresipService.contactNames.addAll(AndroidContact.contacts().map{AndroidContact -> AndroidContact.name})
+        BaresipService.contactNames.sort()
+    }
+
     fun contactNames() : List<String> {
-        return Contact.contacts().map{Contact -> Contact.name} +
-                AndroidContact.contacts().map{AndroidContact -> AndroidContact.name}
+        return BaresipService.contactNames
     }
 
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
