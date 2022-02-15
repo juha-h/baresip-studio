@@ -122,6 +122,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                             ContactActivity.deleteAndroidContact(ctx, contact)
                         Contact.contacts().removeAt(position)
                         Contact.save()
+                        Utils.reloadContactNames()
                         this.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {

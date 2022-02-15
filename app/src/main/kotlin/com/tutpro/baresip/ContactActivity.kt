@@ -335,6 +335,7 @@ class ContactActivity : AppCompatActivity() {
                 }
 
                 Contact.save()
+                Utils.reloadContactNames()
 
                 BaresipService.activities.remove("contact,$newContact,$uOrI")
                 val i = Intent(this, MainActivity::class.java)
