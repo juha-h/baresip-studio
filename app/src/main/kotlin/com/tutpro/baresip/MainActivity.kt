@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map { Contact -> Contact.name }))
+                Utils.contactNames()))
         callUri.threshold = 2
         callUri.setOnFocusChangeListener { view, b ->
             if (b) {
@@ -456,7 +456,7 @@ class MainActivity : AppCompatActivity() {
 
         contactsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map { Contact -> Contact.name }))
+                    Utils.contactNames()))
             }
 
         contactsButton.setOnClickListener {
@@ -1403,7 +1403,7 @@ class MainActivity : AppCompatActivity() {
         titleView.text = getString(R.string.call_transfer)
         val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map { Contact -> Contact.name }))
+                Utils.contactNames()))
         transferUri.threshold = 2
         transferUri.requestFocus()
         val builder = AlertDialog.Builder(this)
@@ -1772,7 +1772,7 @@ class MainActivity : AppCompatActivity() {
             callUri.isFocusableInTouchMode = true
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Contact.contacts().map { Contact -> Contact.name }))
+                    Utils.contactNames()))
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true

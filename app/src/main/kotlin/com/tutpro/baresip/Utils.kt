@@ -295,7 +295,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return Regex("^([+][1-9])?[0-9- ]{0,15}\$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- ]{0,15}\$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
@@ -326,6 +326,11 @@ object Utils {
 
     fun contactUri(name: String) : String? {
         return ContactsActivity.contactUri(name) ?: AndroidContactsActivity.contactUri(name)
+    }
+
+    fun contactNames() : List<String> {
+        return Contact.contacts().map{Contact -> Contact.name} +
+                AndroidContact.contacts().map{AndroidContact -> AndroidContact.name}
     }
 
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {

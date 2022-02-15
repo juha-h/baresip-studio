@@ -118,16 +118,17 @@ class ChatsActivity: AppCompatActivity() {
         peerUri = binding.peer
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map{Contact -> Contact.name}))
+                Utils.contactNames()))
 
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val contactUri = Utils.contactUri(uriText)
-                val uri = if (contactUri == null)
-                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
-                else
-                    uriText
+                var uri = Utils.contactUri(uriText)
+                if (uri == null)
+                    uri = if (Utils.isTelNumber(uriText))
+                        "tel:$uriText"
+                    else
+                        Utils.uriComplete(uriText, Utils.aorDomain(aor))
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_sip_or_tel_uri), uri))

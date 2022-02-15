@@ -168,7 +168,7 @@ class AndroidContactsActivity : AppCompatActivity() {
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(id, name, 0, thumb)
+                    AndroidContact(id, name, Utils.randomColor(), thumb)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)

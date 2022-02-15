@@ -46,7 +46,6 @@ class AndroidContactListAdapter(private val ctx: Context,
         if (thumbNailUri != null) {
             viewHolder.imageAvatarView.setImageURI(thumbNailUri)
         } else {
-            contact.color = Utils.randomColor()
             viewHolder.textAvatarView.background.setTint(contact.color)
             if (contact.name.isNotEmpty())
                 viewHolder.textAvatarView.text = "${contact.name[0]}"

@@ -7,4 +7,11 @@ class AndroidContact(val id: Long, var name: String, var color: Int, var thumbna
 
     val uris = ArrayList<String>()
 
+    companion object {
+
+        fun contacts(): ArrayList<AndroidContact> {
+            return BaresipService.androidContacts
+        }
+    }
+
 }
