@@ -1,18 +1,15 @@
 package com.tutpro.baresip
 
-import android.Manifest
 import android.app.Activity
 import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
-import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
@@ -21,14 +18,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.core.app.ActivityCompat
 import androidx.exifinterface.media.ExifInterface
-import com.google.android.material.snackbar.Snackbar
-import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityContactBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -44,7 +37,6 @@ class ContactActivity : AppCompatActivity() {
     private lateinit var uriView: EditText
     private lateinit var androidCheck: CheckBox
     private lateinit var menu: Menu
-    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private var newContact = false
     private var newAvatar = ""
@@ -53,10 +45,6 @@ class ContactActivity : AppCompatActivity() {
     private var index = 0
     private var color = 0
     private var id: Long = 0
-    private var oldAndroid = false
-
-    private val permissions =
-        arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -75,6 +63,10 @@ class ContactActivity : AppCompatActivity() {
         newContact = intent.getBooleanExtra("new", false)
 
         if (newContact) {
+            if (BaresipService.contactsMode == "baresip") {
+                binding.AndroidTitle.visibility = View.GONE
+                androidCheck.visibility = View.GONE
+            }
             title = getString(R.string.new_contact)
             color = Utils.randomColor()
             id = System.currentTimeMillis()
@@ -88,26 +80,32 @@ class ContactActivity : AppCompatActivity() {
             else
                 uriView.setText(uri)
             uOrI = uri
-            androidCheck.isChecked = false
+            if ((BaresipService.contactsMode == "Android")) {
+                androidCheck.isChecked = true
+                androidCheck.isClickable = false
+            } else {
+                androidCheck.isChecked = false
+            }
         } else {
+            binding.AndroidTitle.visibility = View.GONE
+            androidCheck.visibility = View.GONE
             index = intent.getIntExtra("index", 0)
             val contact = Contact.contacts()[index]
-            val name = contact.name
-            color = contact.color
-            id = contact.id
-            val avatarImage = contact.avatarImage
-            if (avatarImage != null)
-                showImageAvatar(avatarImage)
-            else
-                showTextAvatar(name, color)
-            title = name
-            nameView.setText(name)
-            uriView.setText(contact.uri)
-            uOrI = index.toString()
-            androidCheck.isChecked = contact.androidContact
+            if (contact is Contact.BaresipContact) {
+                val name = contact.name
+                color = contact.color
+                id = contact.id
+                val avatarImage = contact.avatarImage
+                if (avatarImage != null)
+                    showImageAvatar(avatarImage)
+                else
+                    showTextAvatar(name, color)
+                title = name
+                nameView.setText(name)
+                uriView.setText(contact.uri)
+                uOrI = index.toString()
+            }
         }
-
-        oldAndroid = androidCheck.isChecked
 
         val avatarRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -175,23 +173,11 @@ class ContactActivity : AppCompatActivity() {
                 getString(R.string.android_contact_help))
         }
 
-        androidCheck.setOnClickListener{
-            if (Build.VERSION.SDK_INT >= 23)
-                if (!Utils.checkPermissions(this, permissions))
-                    requestPermissions(permissions, CONTACT_PERMISSION_REQUEST_CODE)
-        }
-
         // Log.d(TAG, "Android sip contacts ${logAndroidContacts(this, "sip")}")
         // Log.d(TAG, "Android tel contacts ${logAndroidContacts(this, "tel")}")
 
         Utils.addActivity("contact,$newContact,$uOrI")
 
-    }
-
-    override fun onStart() {
-        super.onStart()
-        requestPermissionsLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
     }
 
     override fun onCreateOptionsMenu(optionsMenu: Menu): Boolean {
@@ -203,48 +189,6 @@ class ContactActivity : AppCompatActivity() {
         menu = optionsMenu
         return true
 
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grandResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
-        when (requestCode) {
-            CONTACT_PERMISSION_REQUEST_CODE -> {
-                var allowed = true
-                for (res in grandResults)
-                    allowed = allowed && res == PackageManager.PERMISSION_GRANTED
-                if (!allowed) {
-                    androidCheck.isChecked = oldAndroid
-                    when {
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.READ_CONTACTS) -> {
-                            layout.showSnackBar(
-                                binding.root,
-                                getString(R.string.no_android_contacts),
-                                Snackbar.LENGTH_INDEFINITE,
-                                getString(R.string.ok)
-                            ) {
-                                requestPermissionsLauncher.launch(permissions)
-                            }
-                        }
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.WRITE_CONTACTS) -> {
-                            layout.showSnackBar(
-                                binding.root,
-                                getString(R.string.no_android_contacts),
-                                Snackbar.LENGTH_INDEFINITE,
-                                getString(R.string.ok)
-                            ) {
-                                requestPermissionsLauncher.launch(permissions)
-                            }
-                        }
-                        else -> {
-                            requestPermissionsLauncher.launch(permissions)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -265,11 +209,13 @@ class ContactActivity : AppCompatActivity() {
                             String.format(getString(R.string.invalid_contact), newName))
                     return false
                 }
+
                 val alert: Boolean = if (newContact)
-                    ContactsActivity.nameExists(newName, true)
-                else
-                    (Contact.contacts()[index].name != newName) &&
-                            ContactsActivity.nameExists(newName, false)
+                    Contact.nameExists(newName, true)
+                else {
+                    val c = Contact.contacts()[index] as Contact.BaresipContact
+                    (c.name != newName) && Contact.nameExists(newName, false)
+                }
                 if (alert) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.contact_already_exists), newName))
@@ -287,7 +233,8 @@ class ContactActivity : AppCompatActivity() {
                     return false
                 }
 
-                val contact: Contact
+                val contact: Contact.BaresipContact
+
                 if (newContact) {
                     if (Contact.contacts().size >= Contact.CONTACTS_SIZE) {
                         Utils.alertView(this, getString(R.string.notice),
@@ -296,16 +243,13 @@ class ContactActivity : AppCompatActivity() {
                         BaresipService.activities.removeAt(0)
                         return true
                     } else {
-                        contact = Contact(newName, newUri, color, id)
-                        contact.androidContact = androidCheck.isChecked
-                        Contact.contacts().add(contact)
+                        contact = Contact.BaresipContact(newName, newUri, color, id)
                     }
                 } else {
-                    contact = Contact.contacts()[index]
+                    contact = Contact.contacts()[index] as Contact.BaresipContact
                     contact.uri = newUri
                     contact.name = newName
                     contact.color = color
-                    contact.androidContact = androidCheck.isChecked
                 }
 
                 when (newAvatar) {
@@ -323,21 +267,18 @@ class ContactActivity : AppCompatActivity() {
                     }
                 }
 
-                Contact.contacts().sortBy { Contact -> Contact.name }
-
-                if (Utils.checkPermissions(this, permissions)) {
-                    if (contact.androidContact)
-                        addOrUpdateAndroidContact(this, contact)
-                    else if (oldAndroid)
-                        deleteAndroidContact(this, contact)
+                if (androidCheck.isChecked) {
+                    addOrUpdateAndroidContact(this, contact)
                 } else {
-                    contact.androidContact = oldAndroid
+                    if (newContact)
+                        Contact.contacts().add(contact)
+                    Contact.sortContacts()
+                    Contact.generateContactNames()
+                    Contact.saveBaresipContacts()
                 }
 
-                Contact.save()
-                Utils.reloadContactNames()
-
                 BaresipService.activities.remove("contact,$newContact,$uOrI")
+
                 val i = Intent(this, MainActivity::class.java)
                 i.putExtra("name", newName)
                 setResult(Activity.RESULT_OK, i)
@@ -407,7 +348,7 @@ class ContactActivity : AppCompatActivity() {
         return rotatedBitmap
     }
 
-    private fun addOrUpdateAndroidContact(ctx: Context, contact: Contact) {
+    private fun addOrUpdateAndroidContact(ctx: Context, contact: Contact.BaresipContact) {
         val projection = arrayOf(ContactsContract.Data.RAW_CONTACT_ID)
         val selection = ContactsContract.Data.MIMETYPE + "='" +
                 CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE + "' AND " +
@@ -420,10 +361,9 @@ class ContactActivity : AppCompatActivity() {
             addAndroidContact(ctx, contact)
         }
         c?.close()
-        contact.androidContact = true
     }
 
-    private fun addAndroidContact(ctx: Context, contact: Contact): Boolean {
+    private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Boolean {
         val ops = ArrayList<ContentProviderOperation>()
         ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
@@ -464,7 +404,7 @@ class ContactActivity : AppCompatActivity() {
         return true
     }
 
-    private fun updateAndroidContact(rawContactId: Long, contact: Contact) {
+    private fun updateAndroidContact(rawContactId: Long, contact: Contact.BaresipContact) {
         if (updateAndroidUri(rawContactId, contact.uri) == 0)
             addAndroidUri(rawContactId, contact.uri)
         if (updateAndroidPhoto(rawContactId, contact.avatarImage) == 0)
@@ -561,9 +501,9 @@ class ContactActivity : AppCompatActivity() {
 
         var contact: Contact? = null
 
-        fun deleteAndroidContact(ctx: Context, contact: Contact): Int {
+        fun deleteAndroidContact(ctx: Context, name: String): Int {
             return ctx.contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
-                    ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name + "'",
+                    ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
                     null)
         }
 

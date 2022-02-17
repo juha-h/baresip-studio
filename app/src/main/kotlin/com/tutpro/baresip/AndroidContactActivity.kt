@@ -26,7 +26,6 @@ class AndroidContactActivity : AppCompatActivity() {
 
     private var index = 0
     private var color = 0
-    private var id: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -43,10 +42,9 @@ class AndroidContactActivity : AppCompatActivity() {
         cardImageAvatarView = binding.ImageAvatar
         nameView = binding.Name
 
-        val contact = BaresipService.androidContacts[index]
+        val contact = Contact.contacts()[index] as Contact.AndroidContact
         val name = contact.name
         color = contact.color
-        id = contact.id
         val thumbnailUri = contact.thumbnailUri
         if (thumbnailUri != null)
             showImageAvatar(thumbnailUri)
@@ -105,5 +103,3 @@ class AndroidContactActivity : AppCompatActivity() {
     }
 
 }
-
-

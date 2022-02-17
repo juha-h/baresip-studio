@@ -209,11 +209,13 @@ class MainActivity : AppCompatActivity() {
             // Haven't found any explanation why this can happen.
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 Log.d(TAG, "aorSpinner selecting $position")
-                val acc = UserAgent.uas()[position].account
-                aorSpinner.tag = acc.aor
-                val ua = UserAgent.uas()[position]
-                showCall(ua)
-                updateIcons(acc)
+                if (position < UserAgent.uas().size) {
+                    val acc = UserAgent.uas()[position].account
+                    aorSpinner.tag = acc.aor
+                    val ua = UserAgent.uas()[position]
+                    showCall(ua)
+                    updateIcons(acc)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
                 Log.d(TAG, "Nothing selected")
@@ -273,7 +275,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Utils.contactNames()))
+                Contact.contactNames()))
         callUri.threshold = 2
         callUri.setOnFocusChangeListener { view, b ->
             if (b) {
@@ -456,27 +458,18 @@ class MainActivity : AppCompatActivity() {
 
         contactsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Utils.contactNames()))
+                    Contact.contactNames()))
             }
 
         contactsButton.setOnClickListener {
-            if (BaresipService.preferAndroidContacts) {
-                val i = Intent(this@MainActivity, AndroidContactsActivity::class.java)
-                if (aorSpinner.selectedItemPosition >= 0)
-                    i.putExtra("aor", aorSpinner.tag.toString())
-                else
-                    i.putExtra("aor", "")
-                startActivity(i)
-            } else {
-                val i = Intent(this@MainActivity, ContactsActivity::class.java)
-                val b = Bundle()
-                if (aorSpinner.selectedItemPosition >= 0)
-                    b.putString("aor", aorSpinner.tag.toString())
-                else
-                    b.putString("aor", "")
-                i.putExtras(b)
-                contactsRequest.launch(i)
-            }
+            val i = Intent(this@MainActivity, ContactsActivity::class.java)
+            val b = Bundle()
+            if (aorSpinner.selectedItemPosition >= 0)
+                b.putString("aor", aorSpinner.tag.toString())
+            else
+                b.putString("aor", "")
+            i.putExtras(b)
+            contactsRequest.launch(i)
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -932,6 +925,13 @@ class MainActivity : AppCompatActivity() {
         if (event == "started") {
             val callActionUri = params[0]
             Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
+            if (!this::uaAdapter.isInitialized) {
+                // Android has restarted baresip when permission has been denied in app settings
+                val i = Intent(this, MainActivity::class.java)
+                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(i)
+                return
+            }
             uaAdapter.notifyDataSetChanged()
             if (callActionUri != "") {
                 var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
@@ -1105,7 +1105,7 @@ class MainActivity : AppCompatActivity() {
                         val call = Call.ofCallp(callp)!!
                         val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
                         titleView.text = getString(R.string.transfer_request)
-                        val target = Utils.friendlyUri(Utils.contactName(ev[1]), Utils.aorDomain(aor))
+                        val target = Utils.friendlyUri(Contact.contactName(ev[1]), Utils.aorDomain(aor))
                         with(AlertDialog.Builder(this)) {
                             setCustomTitle(titleView)
                             setMessage(String.format(getString(R.string.transfer_request_query),
@@ -1403,7 +1403,7 @@ class MainActivity : AppCompatActivity() {
         titleView.text = getString(R.string.call_transfer)
         val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Utils.contactNames()))
+                Contact.contactNames()))
         transferUri.threshold = 2
         transferUri.requestFocus()
         val builder = AlertDialog.Builder(this)
@@ -1414,7 +1414,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    uriText = Utils.contactUri(uriText) ?: uriText
+                    uriText = Contact.contactUri(uriText) ?: uriText
                     if (Utils.isTelNumber(uriText))
                         uriText = "tel:$uriText"
                     val uri = if (Utils.isTelUri(uriText))
@@ -1702,7 +1702,7 @@ class MainActivity : AppCompatActivity() {
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                uriText = Utils.contactUri(uriText) ?: uriText
+                uriText = Contact.contactUri(uriText) ?: uriText
                 if (Utils.isTelNumber(uriText))
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
@@ -1750,10 +1750,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
-                    callUri.setText(
-                        Utils.friendlyUri(Utils.contactName(latest.peerUri), Utils.aorDomain(aor)
-                        )
-                    )
+                    callUri.setText(Utils.friendlyUri(Contact.contactName(latest.peerUri),
+                            Utils.aorDomain(aor)))
             }
         }
     }
@@ -1772,7 +1770,7 @@ class MainActivity : AppCompatActivity() {
             callUri.isFocusableInTouchMode = true
             imm.hideSoftInputFromWindow(callUri.windowToken, 0)
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Utils.contactNames()))
+                    Contact.contactNames()))
             securityButton.visibility = View.INVISIBLE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true
@@ -1797,7 +1795,7 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
+                    callUri.setText(Utils.friendlyUri(Contact.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     securityButton.visibility = View.INVISIBLE
                     callButton.visibility = View.INVISIBLE
@@ -1812,7 +1810,7 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
+                    callUri.setText(Utils.friendlyUri(Contact.contactName(call.peerUri),
                             Utils.aorDomain(ua.account.aor)))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
@@ -1832,7 +1830,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.referTo),
+                        callUri.setText(Utils.friendlyUri(Contact.contactName(call.referTo),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = false
                     } else {
@@ -1840,7 +1838,7 @@ class MainActivity : AppCompatActivity() {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(Utils.contactName(call.peerUri),
+                        callUri.setText(Utils.friendlyUri(Contact.contactName(call.peerUri),
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
@@ -1970,21 +1968,6 @@ class MainActivity : AppCompatActivity() {
                     b.putBoolean("new", false)
                     b.putInt("index", activity[2].toInt())
                 }
-                i.putExtras(b)
-                startActivity(i)
-            }
-            "android contacts" -> {
-                val i = Intent(this, AndroidContactsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", activity[1])
-                i.putExtras(b)
-                startActivity(i)
-            }
-            "android contact" -> {
-                val i = Intent(this, AndroidContactActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", activity[1])
-                b.putInt("index", activity[2].toInt())
                 i.putExtras(b)
                 startActivity(i)
             }

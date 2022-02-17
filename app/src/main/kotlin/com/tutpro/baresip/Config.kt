@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.content.Context
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
@@ -9,7 +10,7 @@ object Config {
     private val configPath = BaresipService.filesPath + "/config"
     private var config = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
 
-    fun initialize() {
+    fun initialize(ctx: Context) {
 
         config = config.replace("module_tmp uuid.so", "module uuid.so")
 
@@ -85,7 +86,19 @@ object Config {
             config = "${config}jitter_buffer_wish 6\n"
         }
 
-        BaresipService.preferAndroidContacts = config.contains("prefer_android_contacts yes")
+        removeVariable("prefer_android_contacts")
+
+        if (config.contains("contacts_mode")) {
+            BaresipService.contactsMode = variable("contacts_mode")[0]
+            if (BaresipService.contactsMode != "baresip" &&
+                    !Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS))) {
+                BaresipService.contactsMode = "baresip"
+                replaceVariable("contacts_mode", "baresip")
+            }
+        } else {
+            BaresipService.contactsMode = "baresip"
+        }
 
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true

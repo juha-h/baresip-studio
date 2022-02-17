@@ -85,7 +85,7 @@
         <activity
             android:name=".ContactsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/baresip_contacts"
+            android:label="@string/contacts"
             android:parentActivityName=".MainActivity"
             android:windowSoftInputMode="adjustPan" >
         </activity>
@@ -96,17 +96,10 @@
             android:parentActivityName=".ContactsActivity" >
         </activity>
         <activity
-            android:name=".AndroidContactsActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/android_contacts"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan" >
-        </activity>
-        <activity
             android:name=".AndroidContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
-            android:parentActivityName=".AndroidContactsActivity" >
+            android:parentActivityName=".ContactsActivity" >
         </activity>
         <activity
             android:name=".ConfigActivity"

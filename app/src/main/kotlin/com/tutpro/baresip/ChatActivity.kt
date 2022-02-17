@@ -63,7 +63,7 @@ class ChatActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        var chatPeer = Utils.contactName(peerUri)
+        var chatPeer = Contact.contactName(peerUri)
         if (chatPeer.startsWith("sip:"))
             chatPeer = Utils.friendlyUri(chatPeer, Utils.aorDomain(aor))
 
@@ -112,7 +112,7 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
             val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
-            if (Utils.contactName(peerUri) == peerUri)
+            if (Contact.contactName(peerUri) == peerUri)
                 with (builder) {
                     setMessage(String.format(getString(R.string.long_message_question),
                     chatPeer))

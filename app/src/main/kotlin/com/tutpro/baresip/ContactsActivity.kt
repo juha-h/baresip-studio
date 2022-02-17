@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
-import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Observer
 import com.tutpro.baresip.databinding.ActivityContactsBinding
 
 class ContactsActivity : AppCompatActivity() {
@@ -27,9 +27,14 @@ class ContactsActivity : AppCompatActivity() {
         Utils.addActivity("contacts,$aor")
 
         val listView = binding.contacts
-        clAdapter = ContactListAdapter(this, Contact.contacts(), aor)
+        clAdapter = ContactListAdapter(this, BaresipService.contacts, aor)
         listView.adapter = clAdapter
         listView.isLongClickable = true
+
+        val contactObserver = Observer<Long> {
+            clAdapter.notifyDataSetChanged()
+        }
+        BaresipService.contactUpdate.observe(this, contactObserver)
 
         val contactRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -58,34 +63,14 @@ class ContactsActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.swap_contacts_icon, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
     override fun onResume() {
-
         super.onResume()
-
         clAdapter.notifyDataSetChanged()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-
-            R.id.swapIcon -> {
-                if (SystemClock.elapsedRealtime() - lastClick > 1000) {
-                    lastClick = SystemClock.elapsedRealtime()
-                    BaresipService.activities.remove("contacts,$aor")
-                    val intent = Intent(this, AndroidContactsActivity::class.java)
-                    intent.putExtra("aor", aor)
-                    startActivity(intent)
-                    finish()
-                    return true
-                }
-            }
-
             android.R.id.home -> {
                 BaresipService.activities.remove("contacts,$aor")
                 setResult(Activity.RESULT_OK, Intent())
@@ -105,40 +90,4 @@ class ContactsActivity : AppCompatActivity() {
         
     }
 
-    companion object {
-
-        // Return uri of contact name or null if contact is not found
-        fun contactUri(name: String): String? {
-            for (c in Contact.contacts())
-                if (c.name.equals(name, ignoreCase = true))
-                    return c.uri.removePrefix("<")
-                            .replaceAfter(">", "")
-                            .replace(">", "")
-            return null
-        }
-
-        // Return contact name of uri or null if contact with uri is not found
-        fun contactName(uri: String): String? {
-            val userPart = Utils.uriUserPart(uri)
-            return if (Utils.isTelNumber(userPart))
-                findContact("tel:$userPart")?.name
-            else
-                findContact(uri)?.name
-        }
-
-        fun findContact(uri: String): Contact? {
-            for (c in Contact.contacts()) {
-                if (Utils.uriMatch(c.uri, uri))
-                    return c
-            }
-            return null
-        }
-
-        fun nameExists(name: String, ignoreCase: Boolean): Boolean {
-            for (c in Contact.contacts())
-                if (c.name.equals(name, ignoreCase = ignoreCase)) return true
-            return false
-        }
-
-    }
 }

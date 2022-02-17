@@ -32,6 +32,7 @@ class ConfigActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityConfigBinding
     private lateinit var layout: ScrollView
+    private lateinit var baresipService: Intent
     private lateinit var autoStart: CheckBox
     private lateinit var batteryOptimizations: CheckBox
     private lateinit var listenAddr: EditText
@@ -40,11 +41,14 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var verifyServer: CheckBox
     private lateinit var caFile: CheckBox
     private lateinit var darkTheme: CheckBox
-    private lateinit var androidContacts: CheckBox
+    private lateinit var contactsSpinner: Spinner
+    private lateinit var contactsMode: String
+    private lateinit var contactsModes: ArrayList<String>
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
@@ -54,7 +58,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldCAFile = false
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
-    private var oldAndroidContacts = ""
+    private var oldContactsMode = ""
     private var save = false
     private var restart = false
     private var menu: Menu? = null
@@ -63,11 +67,15 @@ class ConfigActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
+
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
         layout = binding.ConfigView
 
         Utils.addActivity("config")
+
+        baresipService = Intent(this@ConfigActivity, BaresipService::class.java)
 
         autoStart = binding.AutoStart
         val asCv = Config.variable("auto_start")
@@ -291,10 +299,27 @@ class ConfigActivity : AppCompatActivity() {
         oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
-        androidContacts = binding.AndroidContacts
-        val acCv = Config.variable("prefer_android_contacts")
-        oldAndroidContacts = if (acCv.size == 0) "no" else acCv[0]
-        androidContacts.isChecked =  oldAndroidContacts == "yes"
+        contactsModes = arrayListOf(
+                getString(R.string.baresip), getString(R.string.android), getString(R.string.both))
+        contactsSpinner = binding.contactsSpinner
+        val ctCv = Config.variable("contacts_mode")
+        oldContactsMode = if (ctCv.size == 0) "baresip" else ctCv[0]
+        contactsMode = oldContactsMode
+        contactsModes.removeAt(contactsModes.indexOf(oldContactsMode))
+        contactsModes.add(0, oldContactsMode)
+        val contactsAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
+                contactsModes)
+        contactsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        contactsSpinner.adapter = contactsAdapter
+        contactsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                contactsMode = contactsModes[position]
+                if (contactsMode != "baresip" && Build.VERSION.SDK_INT >= 23 &&
+                        !Utils.checkPermissions(applicationContext, contactsPermissions))
+                    requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         debug = binding.Debug
         val dbCv = Config.variable("log_level")
@@ -340,7 +365,14 @@ class ConfigActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        requestPermissionsLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                    if (it.containsValue(false)) {
+                        contactsMode = oldContactsMode
+                        contactsSpinner.setSelection(contactsModes.indexOf(oldContactsMode))
+                    }
+                }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -354,6 +386,44 @@ class ConfigActivity : AppCompatActivity() {
 
         return true
 
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grandResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
+        when (requestCode) {
+            CONTACTS_PERMISSION_REQUEST_CODE -> {
+                if (grandResults.contains(PackageManager.PERMISSION_DENIED)) {
+                    when {
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                Manifest.permission.READ_CONTACTS) -> {
+                            layout.showSnackBar(
+                                    binding.root,
+                                    getString(R.string.no_android_contacts),
+                                    Snackbar.LENGTH_INDEFINITE,
+                                    getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                Manifest.permission.WRITE_CONTACTS) -> {
+                            layout.showSnackBar(
+                                    binding.root,
+                                    getString(R.string.no_android_contacts),
+                                    Snackbar.LENGTH_INDEFINITE,
+                                    getString(R.string.ok)
+                            ) {
+                                requestPermissionsLauncher.launch(permissions)
+                            }
+                        }
+                        else -> {
+                            requestPermissionsLauncher.launch(permissions)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -433,13 +503,28 @@ class ConfigActivity : AppCompatActivity() {
                 if (oldDisplayTheme != newDisplayTheme)
                     Preferences(applicationContext).displayTheme = newDisplayTheme
 
-                val androidContactsString = if (androidContacts.isChecked)
-                    "yes"
-                else
-                    "no"
-                if (oldAndroidContacts != androidContactsString) {
-                    Config.replaceVariable("prefer_android_contacts", androidContactsString)
-                    BaresipService.preferAndroidContacts = androidContacts.isChecked
+                if (oldContactsMode != contactsMode) {
+                    Config.replaceVariable("contacts_mode", contactsMode)
+                    BaresipService.contactsMode = contactsMode
+                    when (contactsMode) {
+                        "baresip" -> {
+                            BaresipService.androidContacts.clear()
+                            Contact.restoreBaresipContacts()
+                            baresipService.action = "Stop Content Observer"
+                        }
+                        "Android" -> {
+                            BaresipService.baresipContacts.clear()
+                            Contact.loadAndroidContacts(this)
+                            baresipService.action = "Start Content Observer"
+                        }
+                        "Both" -> {
+                            Contact.restoreBaresipContacts()
+                            Contact.loadAndroidContacts(this)
+                            baresipService.action = "Start Content Observer"
+                        }
+                    }
+                    Contact.contactsUpdate()
+                    startService(baresipService)
                     save = true
                 }
 
@@ -530,9 +615,9 @@ class ConfigActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.dark_theme),
                     getString(R.string.dark_theme_help))
         }
-        binding.AndroidContactsTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.show_android_contacts),
-                    getString(R.string.show_android_contacts_help))
+        binding.ContactsTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.contacts),
+                    getString(R.string.contacts_help))
         }
         binding.DebugTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))

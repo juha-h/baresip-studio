@@ -78,14 +78,14 @@ class ChatsActivity: AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         val peerUri = uaMessages[pos].peerUri
-                        val msgs = ArrayList<Message>()
+                        val messages = ArrayList<Message>()
                         for (m in Message.messages())
                             if ((m.aor != aor) || (m.peerUri != peerUri))
-                                msgs.add(m)
+                                messages.add(m)
                             else
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
-                        BaresipService.messages = msgs
+                        BaresipService.messages = messages
                         Message.save()
                         uaMessages = uaMessages(aor)
                     }
@@ -95,7 +95,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
-            val peer = Utils.contactName(uaMessages[pos].peerUri)
+            val peer = Contact.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
                 with (builder) {
                     setMessage(String.format(getString(R.string.long_chat_question),
@@ -118,12 +118,12 @@ class ChatsActivity: AppCompatActivity() {
         peerUri = binding.peer
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Utils.contactNames()))
+                Contact.contactNames()))
 
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                var uri = Utils.contactUri(uriText)
+                var uri = Contact.contactUri(uriText)
                 if (uri == null)
                     uri = if (Utils.isTelNumber(uriText))
                         "tel:$uriText"
