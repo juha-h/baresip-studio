@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -176,7 +177,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                 this.notifyDataSetChanged()
                             }
                             is Contact.AndroidContact -> {
-                                ContactActivity.deleteAndroidContact(ctx, contact.name)
+                                deleteAndroidContact(ctx, contact.name)
                             }
                         }
                     }
@@ -202,4 +203,11 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
 
         return rowView
     }
+
+    private fun deleteAndroidContact(ctx: Context, name: String): Int {
+        return ctx.contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
+                ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
+                null)
+    }
+
 }

@@ -208,14 +208,14 @@ sealed class Contact {
             BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
-        fun sortContacts() {
+        private fun sortContacts() {
             BaresipService.contacts.sortBy{ when (it) {
                 is BaresipContact -> it.name
                 is AndroidContact -> it.name
             }}
         }
 
-        fun generateContactNames () {
+        private fun generateContactNames () {
             BaresipService.contactNames.clear()
             BaresipService.contactNames.addAll(
                     BaresipService.contacts.map {

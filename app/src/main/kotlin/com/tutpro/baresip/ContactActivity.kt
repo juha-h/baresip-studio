@@ -494,16 +494,4 @@ class ContactActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-
-        var contact: Contact? = null
-
-        fun deleteAndroidContact(ctx: Context, name: String): Int {
-            return ctx.contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI,
-                    ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
-                    null)
-        }
-
-    }
-
 }
