@@ -43,6 +43,7 @@ import java.io.IOException
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
@@ -76,6 +77,7 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
+    private var contentObserverRegistered = false
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -301,19 +303,14 @@ class BaresipService: Service() {
             this.registerReceiver(bluetoothReceiver, filter)
         }
 
-        val contentObserver: ContentObserver = object : ContentObserver(null) {
+        contentObserver = object : ContentObserver(null) {
             override fun onChange(self: Boolean) {
                 Log.d(TAG, "Contacts change")
-                AndroidContactsActivity.fetchAndroidContacts(this@BaresipService.applicationContext)
+                if (contactsMode != "baresip") {
+                    Contact.loadAndroidContacts(this@BaresipService.applicationContext)
+                    Contact.contactsUpdate()
+                }
             }
-        }
-
-        try {
-            AndroidContactsActivity.fetchAndroidContacts(this)
-            contentResolver.registerContentObserver(
-                    ContactsContract.Contacts.CONTENT_URI, true, contentObserver)
-        } catch(e: SecurityException) {
-            Log.i(TAG, "No Contacts permission")
         }
 
     }
@@ -360,15 +357,21 @@ class BaresipService: Service() {
                     } else {
                         Log.d(TAG, "Asset '$a' already copied")
                     }
-                    if (a == "config") {
-                        Config.initialize(this)
-                    }
+                    if (a == "config")
+                        Config.initialize(applicationContext)
                 }
 
                 if (File(filesDir, "history").exists())
                     File(filesDir, "history").renameTo(File(filesDir, "calls"))
 
-                Contact.restore()
+                if (contactsMode != "Android")
+                    Contact.restoreBaresipContacts()
+                if (contactsMode != "baresip") {
+                    Contact.loadAndroidContacts(applicationContext)
+                    registerContentObserver()
+                }
+                Contact.contactsUpdate()
+
                 val history = CallHistory.get()
                 if (history.isEmpty()) {
                     NewCallHistory.restore()
@@ -409,6 +412,14 @@ class BaresipService: Service() {
                     startActivity(newIntent)
                 }
 
+            }
+
+            "Start Content Observer" -> {
+                registerContentObserver()
+            }
+
+            "Stop Content Observer" -> {
+                unRegisterContentObserver()
             }
 
             "Call Answer" -> {
@@ -667,7 +678,7 @@ class BaresipService: Service() {
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val caller = Utils.friendlyUri(Utils.contactName(peerUri), Utils.aorDomain(aor))
+                            val caller = Utils.friendlyUri(Contact.contactName(peerUri), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -775,7 +786,7 @@ class BaresipService: Service() {
                             val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE, intent,
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val target = Utils.friendlyUri(Utils.contactName(ev[1]), Utils.aorDomain(aor))
+                            val target = Utils.friendlyUri(Contact.contactName(ev[1]), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -847,7 +858,7 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible()) {
                             if (missed) {
-                                val caller = Utils.friendlyUri(Utils.contactName(call.peerUri), Utils.aorDomain(aor))
+                                val caller = Utils.friendlyUri(Contact.contactName(call.peerUri), Utils.aorDomain(aor))
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -939,7 +950,7 @@ class BaresipService: Service() {
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(Utils.contactName(peer), Utils.aorDomain(ua.account.aor))
+            val sender = Utils.friendlyUri(Contact.contactName(peer), Utils.aorDomain(ua.account.aor))
             nb.setSmallIcon(R.drawable.ic_stat_message)
                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                     .setContentIntent(pi)
@@ -1388,6 +1399,24 @@ class BaresipService: Service() {
         }
     }
 
+    private fun registerContentObserver() {
+        if (!contentObserverRegistered)
+            try {
+                contentResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
+                        true, contentObserver)
+                contentObserverRegistered = true
+            } catch (e: SecurityException) {
+                Log.i(TAG, "No Contacts permission")
+            }
+    }
+
+    private fun unRegisterContentObserver() {
+        if (contentObserverRegistered) {
+            contentResolver.unregisterContentObserver(contentObserver)
+            contentObserverRegistered = false
+        }
+    }
+
     private fun cleanService() {
         am.mode = AudioManager.MODE_NORMAL
         abandonAudioFocus()
@@ -1430,7 +1459,6 @@ class BaresipService: Service() {
         var callActionUri = ""
         var isMainVisible = false
         var isMicMuted = false
-        var preferAndroidContacts = false
 
         val uas = ArrayList<UserAgent>()
         val status = ArrayList<Int>()
@@ -1438,9 +1466,13 @@ class BaresipService: Service() {
         var callHistory = ArrayList<NewCallHistory>()
         var messages = ArrayList<Message>()
         val messageUpdate = MutableLiveData<Long>()
+        val contactUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
+        val baresipContacts = ArrayList<Contact.BaresipContact>()
+        val androidContacts = ArrayList<Contact.AndroidContact>()
         val contacts = ArrayList<Contact>()
-        val androidContacts = ArrayList<AndroidContact>()
+        val contactNames = ArrayList<String>()
+        var contactsMode = "baresip"
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var dnsServers = listOf<InetAddress>()

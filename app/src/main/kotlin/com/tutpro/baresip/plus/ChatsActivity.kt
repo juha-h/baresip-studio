@@ -78,14 +78,14 @@ class ChatsActivity: AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         val peerUri = uaMessages[pos].peerUri
-                        val msgs = ArrayList<Message>()
+                        val messages = ArrayList<Message>()
                         for (m in Message.messages())
                             if ((m.aor != aor) || (m.peerUri != peerUri))
-                                msgs.add(m)
+                                messages.add(m)
                             else
                                 clAdapter.remove(m)
                         clAdapter.notifyDataSetChanged()
-                        BaresipService.messages = msgs
+                        BaresipService.messages = messages
                         Message.save()
                         uaMessages = uaMessages(aor)
                     }
@@ -95,7 +95,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
-            val peer = Utils.contactName(uaMessages[pos].peerUri)
+            val peer = Contact.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
                 with (builder) {
                     setMessage(String.format(getString(R.string.long_chat_question),
@@ -118,16 +118,17 @@ class ChatsActivity: AppCompatActivity() {
         peerUri = binding.peer
         peerUri.threshold = 2
         peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contacts().map{Contact -> Contact.name}))
+                Contact.contactNames()))
 
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                val contactUri = Utils.contactUri(uriText)
-                val uri = if (contactUri == null)
-                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
-                else
-                    uriText
+                var uri = Contact.contactUri(uriText)
+                if (uri == null)
+                    uri = if (Utils.isTelNumber(uriText))
+                        "tel:$uriText"
+                    else
+                        Utils.uriComplete(uriText, Utils.aorDomain(aor))
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_sip_or_tel_uri), uri))

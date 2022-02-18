@@ -328,46 +328,43 @@ object Utils {
                 name.lines().size == 1 && !name.contains('"')
     }
 
-    fun contactName(uri: String) : String {
-        return ContactsActivity.contactName(uri) ?: AndroidContactsActivity.contactName(uri)
-    }
-
-    fun contactUri(name: String) : String? {
-        return ContactsActivity.contactUri(name) ?: AndroidContactsActivity.contactUri(name)
-    }
-
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
-        val contact = ContactsActivity.findContact(uri)
-        if (contact != null) {
-            val avatarImage = contact.avatarImage
-            if (avatarImage != null) {
-                imageView.setImageBitmap(avatarImage)
-            } else {
-                textView.background.setTint(contact.color)
-                if (contact.name.isNotEmpty())
-                    textView.text = "${contact.name[0]}"
-                else
-                    textView.text = ""
-                imageView.setImageBitmap(bitmapFromView(textView))
-            }
-        } else {
-            val androidContact = AndroidContactsActivity.findContact(uri)
-            if (androidContact != null) {
-                val thumbnailUri = androidContact.thumbnailUri
-                if (thumbnailUri != null) {
-                    imageView.setImageURI(thumbnailUri)
+
+        when (val contact = Contact.findContact(uri)) {
+
+            is Contact.BaresipContact -> {
+                val avatarImage = contact.avatarImage
+                if (avatarImage != null) {
+                    imageView.setImageBitmap(avatarImage)
                 } else {
-                    textView.background.setTint(androidContact.color)
-                    if (androidContact.name.isNotEmpty())
-                        textView.text = "${androidContact.name[0]}"
+                    textView.background.setTint(contact.color)
+                    if (contact.name.isNotEmpty())
+                        textView.text = "${contact.name[0]}"
                     else
                         textView.text = ""
                     imageView.setImageBitmap(bitmapFromView(textView))
                 }
-            } else {
+            }
+
+            is Contact.AndroidContact -> {
+                val thumbnailUri = contact.thumbnailUri
+                if (thumbnailUri != null) {
+                    imageView.setImageURI(thumbnailUri)
+                } else {
+                    textView.background.setTint(contact.color)
+                    if (contact.name.isNotEmpty())
+                        textView.text = "${contact.name[0]}"
+                    else
+                        textView.text = ""
+                    imageView.setImageBitmap(bitmapFromView(textView))
+                }
+            }
+
+            null -> {
                 val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
                 imageView.setImageBitmap(bitmap)
             }
+
         }
     }
 

@@ -52,7 +52,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
 
-        val peerName = Utils.contactName(message.peerUri)
+        val peerName = Contact.contactName(message.peerUri)
         viewHolder.peerView.text = if (peerName !=message.peerUri )
             peerName
         else

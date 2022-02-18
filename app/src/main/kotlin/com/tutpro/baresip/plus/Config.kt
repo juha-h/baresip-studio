@@ -1,5 +1,6 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest
 import android.content.Context
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
@@ -77,7 +78,19 @@ object Config {
 
         removeLine("avcodec")
 
-        BaresipService.preferAndroidContacts = config.contains("prefer_android_contacts yes")
+        removeVariable("prefer_android_contacts")
+
+        if (config.contains("contacts_mode")) {
+            BaresipService.contactsMode = variable("contacts_mode")[0]
+            if (BaresipService.contactsMode != "baresip" &&
+                    !Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS))) {
+                BaresipService.contactsMode = "baresip"
+                replaceVariable("contacts_mode", "baresip")
+            }
+        } else {
+            BaresipService.contactsMode = "baresip"
+        }
 
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true

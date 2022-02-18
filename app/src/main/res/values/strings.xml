@@ -328,10 +328,9 @@
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height).
         Factory default is 800x600.</string>
-    <string name="android_settings">Android Settings</string>
-    <string name="show_android_contacts">Show Android Contacts</string>
-    <string name="show_android_contacts_help">If checked, Android contacts are shown when Contacts
-        button is touched.</string>
+    <string name="contacts_help">Chooses if baresip contacts, Android contacts, or both are used.
+        If both and contact with the same name exists in both, baresip contact is chosen.</string>
+    <string name="both">Both</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
     <string name="sip_trace">SIP Trace</string>
@@ -356,18 +355,14 @@
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
-    <string name="android" translatable="false">Android</string>
-    <string name="android_contact_help">If checked, this contact is available also in Android contacts.</string>
+    <string name="android_contact_help">If checked, this contact is added to Android contacts.</string>
     <string name="avatar_image">Profile image</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
-    <string name="baresip_contacts">baresip Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
     <string name="send_message">Send Message</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
     <string name="contacts_exceeded">Your maximum number of contacts %1$d has been exceeded.</string>
-    <!-- Android Contacts Activity -->
-    <string name="android_contacts">Android Contacts</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -392,6 +387,8 @@
     <string name="dots" translatable="false">…</string>
     <string name="bullet_item" translatable="false">\u2022 %1$s</string>
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
+    <string name="baresip" translatable="false">baresip</string>
+    <string name="android" translatable="false">Android</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
