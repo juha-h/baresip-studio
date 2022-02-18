@@ -329,7 +329,9 @@
     <string name="video_size_help">Size of transmitted video frames (width x height).
         Factory default is 800x600.</string>
     <string name="android_settings">Android Settings</string>
-    <string name="contacts_help">Chooses if baresip contacts, Android contacts, or both will be used.</string>
+    <string name="contacts_help">Chooses if baresip contacts, Android contacts, or both are used.
+        If both and contact with the same name exists in both, baresip contact is chosen.</string>
+    <string name="both">Both</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
     <string name="sip_trace">SIP Trace</string>
@@ -391,7 +393,6 @@
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
-    <string name="both">Both</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>

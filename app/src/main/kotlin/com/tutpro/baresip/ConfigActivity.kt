@@ -43,7 +43,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var darkTheme: CheckBox
     private lateinit var contactsSpinner: Spinner
     private lateinit var contactsMode: String
-    private lateinit var contactsModes: ArrayList<String>
+    private lateinit var contactsModeKeys: ArrayList<String>
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
@@ -299,21 +299,26 @@ class ConfigActivity : AppCompatActivity() {
         oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
-        contactsModes = arrayListOf(
-                getString(R.string.baresip), getString(R.string.android), getString(R.string.both))
         contactsSpinner = binding.contactsSpinner
+        contactsModeKeys = arrayListOf("baresip", "Android", "Both")
+        val contactsModeVals = arrayListOf(getString(R.string.baresip), getString(R.string.android),
+                getString(R.string.both))
         val ctCv = Config.variable("contacts_mode")
         oldContactsMode = if (ctCv.size == 0) "baresip" else ctCv[0]
         contactsMode = oldContactsMode
-        contactsModes.removeAt(contactsModes.indexOf(oldContactsMode))
-        contactsModes.add(0, oldContactsMode)
+        val keyIndex = contactsModeKeys.indexOf(oldContactsMode)
+        val keyValue = contactsModeVals.elementAt(keyIndex)
+        contactsModeKeys.removeAt(keyIndex)
+        contactsModeVals.removeAt(keyIndex)
+        contactsModeKeys.add(0, oldContactsMode)
+        contactsModeVals.add(0, keyValue)
         val contactsAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                contactsModes)
+                contactsModeVals)
         contactsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         contactsSpinner.adapter = contactsAdapter
         contactsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                contactsMode = contactsModes[position]
+                contactsMode = contactsModeKeys[position]
                 if (contactsMode != "baresip" && Build.VERSION.SDK_INT >= 23 &&
                         !Utils.checkPermissions(applicationContext, contactsPermissions))
                     requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
@@ -370,7 +375,7 @@ class ConfigActivity : AppCompatActivity() {
                 registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                     if (it.containsValue(false)) {
                         contactsMode = oldContactsMode
-                        contactsSpinner.setSelection(contactsModes.indexOf(oldContactsMode))
+                        contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
                     }
                 }
     }

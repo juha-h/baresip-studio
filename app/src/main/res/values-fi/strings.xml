@@ -370,6 +370,10 @@
     <string name="show_android_contacts">Näytä Androidin yhteystiedot</string>
     <string name="show_android_contacts_help">Jos valittu, niin Yhteystiedot-ikoni näyttää
         Androidin yhteystiedot.</string>
+    <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
+        yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
+        baresip-sovelluksen yhteystietoa.</string>
+    <string name="both">Molemmat</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
@@ -427,6 +431,8 @@
     <string name="help">Apua</string>
     <string name="confirmation">Vahvistus</string>
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
+    <string name="baresip" translatable="false">baresip</string>
+    <string name="android" translatable="false">Android</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>
