@@ -255,7 +255,7 @@
     <string name="missed_calls">Chamadas perdidas</string>
     <string name="avatar_image">Imagem do perfil</string>
     <string name="no_restore">Você não pode restaurar o backup sem a permissão de \"Armazenamento\".</string>
-    <string name="no_android_contacts">Você não pode adicionar ou remover contatos do Android sem a permissão dos \"Contatos\".</string>
+    <string name="no_android_contacts">Você não pode acessar os contatos do android sem a permissão dos \"Contatos\".</string>
     <string name="no_backup">Você não pode criar backups sem a permissão de \"Armazenamento\".</string>
     <string name="battery_optimizations">Otimizações da bateria</string>
     <string name="battery_optimizations_help">Desative as otimizações da bateria (recomendado) caso queira reduzir a probabilidade do Android restringir o acesso do baresip à rede ou coloque o baresip no modo de espera.</string>
@@ -280,4 +280,8 @@
     <string name="telephony_provider_help">SIP URI host é parcialmente usado nas chamadas para números de telefone. O padrão de fábrica é domínio da conta. Caso não seja informada, essa conta não pode ser usada para ligar para os números de telefone.</string>
     <string name="invalid_sip_or_tel_uri">SIP ou tel. URI inválido \'%1$s\'</string>
     <string name="no_telephony_providers">A operadora de telefonia não foi configurada para nenhuma conta.</string>
+    <string name="show_android_contacts_help">Se marcado, os contatos do android são mostrados quando o botão contatos for tocado.</string>
+    <string name="show_android_contacts">Mostra os contatos do android</string>
+    <string name="baresip_contacts">Contatos do bareip</string>
+    <string name="android_contacts">Contatos do android</string>
 </resources>
