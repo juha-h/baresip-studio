@@ -90,21 +90,19 @@ class ContactActivity : AppCompatActivity() {
             binding.AndroidTitle.visibility = View.GONE
             androidCheck.visibility = View.GONE
             index = intent.getIntExtra("index", 0)
-            val contact = Contact.contacts()[index]
-            if (contact is Contact.BaresipContact) {
-                val name = contact.name
-                color = contact.color
-                id = contact.id
-                val avatarImage = contact.avatarImage
-                if (avatarImage != null)
-                    showImageAvatar(avatarImage)
-                else
-                    showTextAvatar(name, color)
-                title = name
-                nameView.setText(name)
-                uriView.setText(contact.uri)
-                uOrI = index.toString()
-            }
+            val contact = Contact.contacts()[index] as Contact.BaresipContact
+            val name = contact.name
+            color = contact.color
+            id = contact.id
+            val avatarImage = contact.avatarImage
+            if (avatarImage != null)
+                showImageAvatar(avatarImage)
+            else
+                showTextAvatar(name, color)
+            title = name
+            nameView.setText(name)
+            uriView.setText(contact.uri)
+            uOrI = index.toString()
         }
 
         val avatarRequest =
@@ -272,9 +270,8 @@ class ContactActivity : AppCompatActivity() {
                 } else {
                     if (newContact)
                         Contact.contacts().add(contact)
-                    Contact.sortContacts()
-                    Contact.generateContactNames()
                     Contact.saveBaresipContacts()
+                    Contact.contactsUpdate()
                 }
 
                 BaresipService.activities.remove("contact,$newContact,$uOrI")
