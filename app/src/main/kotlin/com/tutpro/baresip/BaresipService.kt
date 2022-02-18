@@ -315,14 +315,14 @@ class BaresipService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val action: String?
+        val action: String
 
         if (intent == null) {
             action = "Start"
             Log.d(TAG, "Received onStartCommand with null intent")
         } else {
             // Utils.dumpIntent(intent)
-            action = intent.action
+            action = intent.action!!
             Log.d(TAG, "Received onStartCommand action $action")
         }
 

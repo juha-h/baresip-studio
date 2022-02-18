@@ -927,9 +927,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
             if (!this::uaAdapter.isInitialized) {
                 // Android has restarted baresip when permission has been denied in app settings
-                val i = Intent(this, MainActivity::class.java)
-                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(i)
+                recreate()
                 return
             }
             uaAdapter.notifyDataSetChanged()
