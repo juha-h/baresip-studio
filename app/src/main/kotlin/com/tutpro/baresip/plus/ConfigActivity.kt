@@ -394,6 +394,9 @@ class ConfigActivity : AppCompatActivity() {
                     if (it.containsValue(false)) {
                         contactsMode = oldContactsMode
                         contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
+                        Snackbar.make(layout, getString(R.string.no_android_contacts), Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.ok), {})
+                                .show()
                     }
                 }
     }
