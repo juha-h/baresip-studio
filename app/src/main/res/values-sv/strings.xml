@@ -223,7 +223,7 @@
     <string name="default_call_volume_help">Kryssa i för att använda en förvald ljudvolym, 1–10, vid samtal.</string>
     <string name="accept">Acceptera</string>
     <string name="aec_extended_filter">Utökat filter vid ekoutsläckning</string>
-    <string name="android_contact_help">Kryssa i för att inkludera kontakten även i dina Android-kontakter.</string>
+    <string name="android_contact_help">Kryssa i för att lägga till kontakten till dina Android-kontakter.</string>
     <string name="sip_trace_help">Kryssa i för att inkludera SIP-meddelanden i Logcat-meddelanden när Felsökning är aktiverat. Funktionen inaktiveras automatiskt när baresip startar.</string>
     <string name="debug_help">Kryssa i för att skicka felsöknings- och info-meddelanden till Logcat.</string>
     <string name="aec_extended_filter_help">Kryssa i för att använda ett utökat filter vid ekoutsläckning.</string>
@@ -244,7 +244,7 @@
     <string name="video_size">Storlek på bildrutor</string>
     <string name="no_cameras">Du har ingen videokamera som stöds.</string>
     <string name="no_video_calls">Aktivera behörigheten \"Kamera\" för att ringa eller ta emot samtal.</string>
-    <string name="no_calls">Du kan inte ringa eller ta emot samtal utan behörigheten \"Mikrofon\".</string>
+    <string name="no_calls">Det går inte att ringa eller ta emot samtal utan behörigheten \"Mikrofon\".</string>
     <string name="restore_failed">Kunde inte återställa programdata. Kontrollera att du angav rätt lösenord och att backup-filen skapats av den här appen. I Android 9 och tidigare versioner, kontrollera Appar → baresip → Behörigheter → Lagring och att filen \'%1$s\' finns i katalogen Nedladdningar.</string>
     <string name="restored">Programdata återställd. baresip behöver startas om. Starta om nu\?</string>
     <string name="backup_failed">Kunde inte säkerhetskopiera programdata till filen \'%1$s\'. Kontrollera Appar → baresip → Behörigheter → Lagring.</string>
@@ -255,8 +255,8 @@
     <string name="missed_calls_count">%1$d missade samtal</string>
     <string name="battery_optimizations">Batterioptimering</string>
     <string name="avatar_image">Profilbild</string>
-    <string name="no_backup">Du kan inte skapa en backup utan behörigheten \"Lagring\".</string>
-    <string name="no_restore">Du kan inte återställa en backup utan behörigheten \"Lagring\".</string>
+    <string name="no_backup">Det går inte att skapa en backup utan behörigheten \"Lagring\".</string>
+    <string name="no_restore">Det går inte att återställa en backup utan behörigheten \"Lagring\".</string>
     <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
     <string name="audio_settings">Ljudinställningar</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
@@ -278,4 +278,7 @@
     <string name="no_telephony_providers">Telefonileverantör har inte konfigurerats för något konto.</string>
     <string name="invalid_sip_or_tel_uri">Ogiltig SIP- eller tel-URI \'%1$s\'</string>
     <string name="choose_telephony_provider_account">Välj telefonileverantör-konto</string>
+    <string name="contacts_help">Välj om baresips kontakter, Androids kontakter eller båda ska användas. Om du väljer båda och en kontakt med samma namn finns i båda, då används baresips kontakt.</string>
+    <string name="both">Båda</string>
+    <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>
 </resources>
