@@ -239,7 +239,7 @@
     <string name="missed_call_from">Ligação perdida de</string>
     <string name="dark_theme_help">Impor o uso do tema escuro na tela</string>
     <string name="dark_theme">Tema Escuro</string>
-    <string name="android_contact_help">Se for marcado, este contato também estará disponível nos contatos do Android.</string>
+    <string name="android_contact_help">Se for marcado, este contato será adicionado nos contatos do Android.</string>
     <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado. Se estiver marcado, o arquivo TLS CA também deve ser carregado.</string>
     <string name="verify_server_error">Os certificados do servidor não podem ser aferidos sem o arquivo CA TLS.</string>
     <string name="verify_server">Verifique os certificados do servidor</string>
@@ -284,4 +284,6 @@
     <string name="show_android_contacts">Mostra os contatos do android</string>
     <string name="baresip_contacts">Contatos do bareip</string>
     <string name="android_contacts">Contatos do android</string>
+    <string name="contacts_help">Escolha se ambos os contatos do baresip e do Android serão usados. Caso use ambos, o contato do baresip será usado se houver um contato repetido no Android.</string>
+    <string name="both">Ambos</string>
 </resources>
