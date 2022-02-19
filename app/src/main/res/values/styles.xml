@@ -1,10 +1,11 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionBarTheme">@style/ActionBar</item>
+        <item name="actionOverflowMenuStyle">@style/Spinner</item>
         <item name="android:dropDownListViewStyle">@style/Spinner</item>
     </style>
 
@@ -13,7 +14,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorSecondaryDark</item>
         <item name="android:textColor">@color/colorLight</item>
         <item name="android:textColorPrimary">@color/colorLight</item>
@@ -21,13 +22,16 @@
     </style>
 
     <style name="Spinner" parent="Widget.AppCompat.ListView.DropDown">
+        <item name="android:popupBackground">@color/colorSecondaryDark</item>
+        <item name="android:textColor">@color/colorLight</item>
         <item name="android:dividerHeight">1dp</item>
         <item name="android:divider">@color/colorSpinnerDivider</item>
     </style>
 
-    <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="AlertDialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/colorAlertText</item>
+        <item name="android:windowBackground">#201D1D</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />

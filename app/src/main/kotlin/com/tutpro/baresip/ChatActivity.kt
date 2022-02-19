@@ -111,7 +111,7 @@ class ChatActivity : AppCompatActivity() {
                     }
                 }
             }
-            val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
+            val builder = AlertDialog.Builder(this@ChatActivity)
             if (Contact.contactName(peerUri) == peerUri)
                 with (builder) {
                     setMessage(String.format(getString(R.string.long_message_question),

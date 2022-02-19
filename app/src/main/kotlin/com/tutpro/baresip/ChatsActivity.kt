@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityChatsBinding
 import java.util.*
 
@@ -94,7 +95,7 @@ class ChatsActivity: AppCompatActivity() {
                 }
             }
 
-            val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
+            val builder = MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialog)
             val peer = Contact.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
                 with (builder) {

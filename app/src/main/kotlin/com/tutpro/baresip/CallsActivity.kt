@@ -75,7 +75,7 @@ class CallsActivity : AppCompatActivity() {
             }
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                with (AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)) {
+                with (AlertDialog.Builder(this@CallsActivity)) {
                     setMessage(String.format(getString(R.string.calls_call_message_question),
                             peerName))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
@@ -119,7 +119,7 @@ class CallsActivity : AppCompatActivity() {
                 getString(R.string.calls_calls)
             else
                 getString(R.string.calls_call)
-            val builder = AlertDialog.Builder(this@CallsActivity, R.style.Theme_AppCompat)
+            val builder = AlertDialog.Builder(this@CallsActivity)
             if (peerName.startsWith("sip:"))
                 with (builder) {
                     setMessage(String.format(getString(R.string.calls_add_delete_question),
