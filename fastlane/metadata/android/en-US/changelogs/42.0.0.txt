@@ -1,0 +1,3 @@
+- Replaced 'Show Android Contacts' setting with 'Contacts' setting that allows to choose if baresip contacts, Android contacts, or both are used
+- Contact name <-> contact URI mapping fixes and improvements
+- Avoid crash when Android forces baresip app restart
