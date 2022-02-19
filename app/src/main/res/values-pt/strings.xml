@@ -258,14 +258,12 @@
     <string name="lost">Perda</string>
     <string name="jitter">Variação: %1$s (ms)</string>
     <string name="no_restore">Não pode restaurar o backup sem a permissão de \"Armazenamento\".</string>
-    <string name="no_android_contacts">Não pode adicionar ou remover contatos do Android sem a permissão dos \"Contatos\".</string>
     <string name="call_is_on_hold">Chamada em espera</string>
     <string name="mic">Microfone ligado/desligado</string>
     <string name="no_network">Nenhuma conexão de rede!</string>
     <string name="average_rate">Taxa média: %1$s (Kbits/s)</string>
     <string name="no_backup">Não pode criar backups sem a permissão de \"Armazenamento\".</string>
     <string name="audio_settings">Configurações de áudio</string>
-    <string name="android_settings">Configurações do Android</string>
     <string name="peer">Par</string>
     <string name="direction">Direção</string>
     <string name="call_details">Detalhes da chamada</string>

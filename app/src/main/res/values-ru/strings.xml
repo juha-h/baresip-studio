@@ -239,7 +239,6 @@
     <string name="direction">Направление</string>
     <string name="calls_duration">Продолжительность</string>
     <string name="battery_optimizations">Оптимизация работы батареи</string>
-    <string name="android_settings">Настройки Android</string>
     <string name="dtmf_mode">Режим DTMF</string>
     <string name="dtmf_mode_help">Выбирает способ отправки сигналов DTMF 0-9, #, * и A-D.</string>
     <string name="dtmf_inband">Внутриполосные события RTP</string>
