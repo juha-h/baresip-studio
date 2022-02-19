@@ -258,8 +258,6 @@
     <string name="no_backup">Du kan inte skapa en backup utan behörigheten \"Lagring\".</string>
     <string name="no_restore">Du kan inte återställa en backup utan behörigheten \"Lagring\".</string>
     <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
-    <string name="no_android_contacts">Du kan inte komma åt Android-kontakter utan behörigheten \"Kontakter\".</string>
-    <string name="android_settings">Androidinställningar</string>
     <string name="audio_settings">Ljudinställningar</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="call_is_on_hold">Samtalet är parkerat</string>
@@ -280,8 +278,4 @@
     <string name="no_telephony_providers">Telefonileverantör har inte konfigurerats för något konto.</string>
     <string name="invalid_sip_or_tel_uri">Ogiltig SIP- eller tel-URI \'%1$s\'</string>
     <string name="choose_telephony_provider_account">Välj telefonileverantör-konto</string>
-    <string name="show_android_contacts_help">Kryssa i för att visa Android-kontakter i kontaktvyn.</string>
-    <string name="android_contacts">Android-kontakter</string>
-    <string name="show_android_contacts">Visa Android-kontakter</string>
-    <string name="baresip_contacts">baresip-kontakter</string>
 </resources>
