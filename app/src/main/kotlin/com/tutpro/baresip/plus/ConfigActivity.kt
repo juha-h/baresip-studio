@@ -5,22 +5,21 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.os.PowerManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import android.widget.AdapterView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
 import com.tutpro.baresip.plus.Utils.showSnackBar
@@ -337,8 +336,7 @@ class ConfigActivity : AppCompatActivity() {
         contactsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 contactsMode = contactsModeKeys[position]
-                if (contactsMode != "baresip" && Build.VERSION.SDK_INT >= 23 &&
-                        !Utils.checkPermissions(applicationContext, contactsPermissions))
+                if (contactsMode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions))
                     requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -360,10 +358,8 @@ class ConfigActivity : AppCompatActivity() {
 
         reset.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
-                titleView.text = getString(R.string.confirmation)
-                with(AlertDialog.Builder(this@ConfigActivity)) {
-                    setCustomTitle(titleView)
+                with(MaterialAlertDialogBuilder(this@ConfigActivity, R.style.AlertDialogTheme)) {
+                    setTitle(R.string.confirmation)
                     setMessage(getString(R.string.reset_config_alert))
                     setPositiveButton(getText(R.string.reset)) { dialog, _ ->
                         Config.reset(this@ConfigActivity)
@@ -372,7 +368,7 @@ class ConfigActivity : AppCompatActivity() {
                         done()
                         dialog.dismiss()
                     }
-                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
                         reset.isChecked = false
                         dialog.dismiss()
                     }
@@ -395,7 +391,7 @@ class ConfigActivity : AppCompatActivity() {
                         contactsMode = oldContactsMode
                         contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
                         Snackbar.make(layout, getString(R.string.no_android_contacts), Snackbar.LENGTH_LONG)
-                                .setAction(getString(R.string.ok), {})
+                                .setAction(getString(R.string.ok)) {}
                                 .show()
                     }
                 }

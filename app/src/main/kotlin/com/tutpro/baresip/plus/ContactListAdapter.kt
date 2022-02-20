@@ -14,8 +14,8 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.startActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.io.IOException
 
@@ -95,7 +95,8 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                     }
                     if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                         lastClick = SystemClock.elapsedRealtime()
-                        with(AlertDialog.Builder(ctx, R.style.Theme_AppCompat)) {
+                        with(MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)) {
+                            setTitle(R.string.confirmation)
                             setMessage(String.format(ctx.getString(R.string.contact_action_question),
                                     contact.name))
                             setNeutralButton(ctx.getText(R.string.cancel), dialogClickListener)
@@ -185,16 +186,14 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                     }
                 }
             }
-            val titleView = View.inflate(ctx, R.layout.alert_title, null) as TextView
-            titleView.text = ctx.getString(R.string.confirmation)
-            with(AlertDialog.Builder(ctx)) {
-                setCustomTitle(titleView)
+            with(MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)) {
+                setTitle(R.string.confirmation)
                 setMessage(String.format(ctx.getString(R.string.contact_delete_question),
                         when (contact) {
                             is Contact.BaresipContact -> contact.name
                             is Contact.AndroidContact -> contact.name
                         }))
-                setNegativeButton(ctx.getText(R.string.cancel), dialogClickListener)
+                setNeutralButton(ctx.getText(R.string.cancel), dialogClickListener)
                 setPositiveButton(ctx.getText(R.string.delete), dialogClickListener)
                 show()
             }

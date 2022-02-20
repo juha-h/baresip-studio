@@ -2,7 +2,6 @@ package com.tutpro.baresip.plus
 
 import android.app.Activity
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -21,7 +20,6 @@ import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AccountActivity : AppCompatActivity() {
 

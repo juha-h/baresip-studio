@@ -7,4 +7,3 @@
     android:background="@color/colorPrimary"
     android:textColor="@color/colorWhite" >
 </TextView>
-

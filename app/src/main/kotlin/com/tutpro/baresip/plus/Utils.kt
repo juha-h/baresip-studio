@@ -1,10 +1,10 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
-import android.content.ContentResolver
-import android.content.ContentValues
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,7 +16,7 @@ import android.graphics.Color
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.net.*
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -33,29 +33,28 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.*
 import java.lang.reflect.Method
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import java.security.SecureRandom
+import java.text.DateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.net.SocketException
-import java.text.DateFormat
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-import kotlin.collections.ArrayList
 
 object Utils {
 
@@ -77,10 +76,8 @@ object Utils {
     }
 
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
-        titleView.text = title
-        with(AlertDialog.Builder(context, R.style.AlertDialog)) {
-            setCustomTitle(titleView)
+        with(MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)) {
+            setTitle(title)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
                 dialog.dismiss()

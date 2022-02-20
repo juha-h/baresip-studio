@@ -1,17 +1,16 @@
 package com.tutpro.baresip.plus
 
 import android.app.Activity
-import android.content.*
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.plus.databinding.ActivityChatsBinding
-import java.util.*
 
 class ChatsActivity: AppCompatActivity() {
 
@@ -94,10 +93,11 @@ class ChatsActivity: AppCompatActivity() {
                 }
             }
 
-            val builder = AlertDialog.Builder(this@ChatsActivity, R.style.Theme_AppCompat)
+            val builder = MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialogTheme)
             val peer = Contact.contactName(uaMessages[pos].peerUri)
             if (peer.startsWith("sip:"))
                 with (builder) {
+                    setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_chat_question),
                             Utils.friendlyUri(peer, Utils.aorDomain(aor))))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
@@ -107,6 +107,7 @@ class ChatsActivity: AppCompatActivity() {
                 }
             else
                 with (builder) {
+                    setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.short_chat_question), peer))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
                     setNegativeButton(getText(R.string.delete), dialogClickListener)
@@ -178,10 +179,8 @@ class ChatsActivity: AppCompatActivity() {
         when (item.itemId) {
 
             R.id.delete_chats -> {
-                val titleView = View.inflate(this, R.layout.alert_title, null) as TextView
-                titleView.text = getString(R.string.confirmation)
-                with (AlertDialog.Builder(this@ChatsActivity)) {
-                    setCustomTitle(titleView)
+                with (MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialogTheme)) {
+                    setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.delete_chats_alert),
                             aor.substringAfter(":")))
                     setPositiveButton(getText(R.string.delete)) { dialog, _ ->
@@ -192,7 +191,7 @@ class ChatsActivity: AppCompatActivity() {
                         UserAgent.ofAor(aor)!!.account.unreadMessages = false
                         dialog.dismiss()
                     }
-                    setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
                         dialog.dismiss()
                     }
                     show()

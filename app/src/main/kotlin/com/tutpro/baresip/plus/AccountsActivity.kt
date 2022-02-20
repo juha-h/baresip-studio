@@ -3,16 +3,15 @@ package com.tutpro.baresip.plus
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
+import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.plus.databinding.ActivityAccountsBinding
-
-import java.util.ArrayList
 
 class AccountsActivity : AppCompatActivity() {
 
@@ -98,7 +97,7 @@ class AccountsActivity : AppCompatActivity() {
         val message = getString(R.string.account) + " " + Utils.plainAor(ua.account.aor)
         messageView.text = message
         val input = layout.findViewById(R.id.password) as EditText
-        with (AlertDialog.Builder(this)) {
+        with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
@@ -110,7 +109,7 @@ class AccountsActivity : AppCompatActivity() {
                 }
                 setAuthPass(ua, password)
             }
-            setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            setNeutralButton(android.R.string.cancel) { dialog, _ ->
                 dialog.cancel()
             }
             show()
