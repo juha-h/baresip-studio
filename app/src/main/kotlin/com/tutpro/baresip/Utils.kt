@@ -27,10 +27,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.*
 import java.lang.reflect.Method
@@ -70,10 +70,8 @@ object Utils {
     }
 
     fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        val titleView = View.inflate(context, R.layout.alert_title, null) as TextView
-        titleView.text = title
-        with(AlertDialog.Builder(context, R.style.AlertDialog)) {
-            setCustomTitle(titleView)
+        with(MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)) {
+            setTitle(title)
             setMessage(message)
             setPositiveButton(R.string.ok) { dialog, _ ->
                 dialog.dismiss()

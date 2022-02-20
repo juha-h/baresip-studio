@@ -8,15 +8,24 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="?dialogPreferredPadding"
+        android:paddingTop="?dialogPreferredPadding"
+        android:paddingStart="?dialogPreferredPadding"
+        android:paddingEnd="?dialogPreferredPadding"
         android:textSize="20sp"
-        android:background="@color/colorPrimary"
-        android:textColor="@color/colorWhite" />
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/transferDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="?dialogPreferredPadding"
+        android:textSize="16sp"
+        android:text="@string/transfer_destination"
+        android:textColor="@color/colorStrong" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
         android:paddingStart="?dialogPreferredPadding"
         android:paddingEnd="?dialogPreferredPadding" >
 
@@ -25,8 +34,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
+            android:textSize="18sp"
             android:imeOptions="actionDone"
-            android:hint="@string/transfer_destination"
+            android:labelFor="@id/transferUri"
             android:inputType="textEmailAddress" />
 
     </com.google.android.material.textfield.TextInputLayout>

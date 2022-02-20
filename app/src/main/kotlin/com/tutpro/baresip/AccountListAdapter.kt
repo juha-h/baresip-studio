@@ -3,13 +3,13 @@ package com.tutpro.baresip
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.TextView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import java.util.*
 
@@ -53,10 +53,8 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         }
 
         viewHolder.actionView.setOnClickListener {
-            val titleView = View.inflate(cxt, R.layout.alert_title, null) as TextView
-            titleView.text = cxt.getString(R.string.confirmation)
-            with (AlertDialog.Builder(cxt, R.style.AlertDialog)) {
-                setCustomTitle(titleView)
+            with (MaterialAlertDialogBuilder(cxt, R.style.AlertDialogTheme)) {
+                setTitle(R.string.confirmation)
                 setMessage(String.format(cxt.getString(R.string.delete_account),
                         viewHolder.aorView.text))
                 setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
@@ -69,7 +67,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                     this@AccountListAdapter.notifyDataSetChanged()
                     dialog.dismiss()
                 }
-                setNegativeButton(cxt.getText(R.string.cancel)) { dialog, _ ->
+                setNeutralButton(cxt.getText(R.string.cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }
                 show()
