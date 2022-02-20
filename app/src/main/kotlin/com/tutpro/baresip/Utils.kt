@@ -10,7 +10,7 @@ import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.net.*
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -34,21 +34,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.*
 import java.lang.reflect.Method
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import java.security.SecureRandom
+import java.text.DateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.net.SocketException
-import java.text.DateFormat
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-import kotlin.collections.ArrayList
 
 object Utils {
 

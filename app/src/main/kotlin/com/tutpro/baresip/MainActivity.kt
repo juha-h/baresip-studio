@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.net.Uri
+import android.os.*
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.InputType
@@ -18,9 +19,6 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import android.content.Intent
-import android.content.BroadcastReceiver
-import android.os.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -28,18 +26,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
 import java.net.URLDecoder
-import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
-import android.content.IntentFilter
-import androidx.core.net.toUri
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MainActivity : AppCompatActivity() {
 

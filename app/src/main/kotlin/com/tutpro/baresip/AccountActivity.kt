@@ -20,7 +20,6 @@ import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AccountActivity : AppCompatActivity() {
 
