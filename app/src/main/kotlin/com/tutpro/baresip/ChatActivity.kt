@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -13,6 +12,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
@@ -111,9 +111,10 @@ class ChatActivity : AppCompatActivity() {
                     }
                 }
             }
-            val builder = AlertDialog.Builder(this@ChatActivity, R.style.Theme_AppCompat)
+            val builder = MaterialAlertDialogBuilder(this@ChatActivity, R.style.AlertDialogTheme)
             if (Contact.contactName(peerUri) == peerUri)
                 with (builder) {
+                    setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_message_question),
                     chatPeer))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
@@ -123,6 +124,7 @@ class ChatActivity : AppCompatActivity() {
                 }
             else
                 with (builder) {
+                    setTitle(R.string.confirmation)
                     setMessage(getText(R.string.short_message_question))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setNegativeButton(getString(R.string.delete), dialogClickListener)
