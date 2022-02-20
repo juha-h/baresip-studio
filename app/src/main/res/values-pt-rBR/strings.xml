@@ -280,4 +280,5 @@
     <string name="no_telephony_providers">A operadora de telefonia não foi configurada para nenhuma conta.</string>
     <string name="contacts_help">Escolha se ambos os contatos do baresip e do Android serão usados. Caso use ambos, o contato do baresip será usado se houver um contato repetido no Android.</string>
     <string name="both">Ambos</string>
+    <string name="no_android_contacts">Você não pode acessar os contatos do Android sem a permissão \"Contatos\".</string>
 </resources>
