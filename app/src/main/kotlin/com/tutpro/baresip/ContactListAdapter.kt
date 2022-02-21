@@ -173,7 +173,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                     }
                                 }
                                 Contact.contacts().removeAt(position)
-                                Contact.contactNames().removeAt(position)
+                                Contact.generateContactNames()
                                 Contact.saveBaresipContacts()
                                 this.notifyDataSetChanged()
                             }

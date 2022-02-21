@@ -62,12 +62,10 @@ sealed class Contact {
                     }
                     is AndroidContact -> {
                         if (c.name == name) {
-                            if (c.uris.isNotEmpty()) {
-                                for (u in c.uris)
-                                    if (u.startsWith("sip:"))
-                                        return u
-                                return c.uris.first()
-                            }
+                            return if (c.uris.isNotEmpty())
+                                c.uris.first()
+                            else
+                                null
                         }
                     }
                 }
@@ -149,7 +147,7 @@ sealed class Contact {
             }
             cur?.close()
             for ((_, value) in contacts)
-                if (value.name != "")
+                if (value.name != "" && value.uris.isNotEmpty())
                     BaresipService.androidContacts.add(value)
         }
 
@@ -208,6 +206,18 @@ sealed class Contact {
             BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
+        fun generateContactNames () {
+            BaresipService.contactNames.clear()
+            for (c in BaresipService.contacts)
+                when (c) {
+                    is BaresipContact ->
+                        BaresipService.contactNames.add(c.name)
+                    is AndroidContact ->
+                        if (c.uris.size == 1)
+                            BaresipService.contactNames.add(c.name)
+                }
+        }
+
         private fun sortContacts() {
             BaresipService.contacts.sortBy{ when (it) {
                 is BaresipContact -> it.name
@@ -215,14 +225,5 @@ sealed class Contact {
             }}
         }
 
-        private fun generateContactNames () {
-            BaresipService.contactNames.clear()
-            BaresipService.contactNames.addAll(
-                    BaresipService.contacts.map {
-                        when (it) {
-                            is BaresipContact -> it.name
-                            is AndroidContact -> it.name
-                        }})
-        }
     }
 }
