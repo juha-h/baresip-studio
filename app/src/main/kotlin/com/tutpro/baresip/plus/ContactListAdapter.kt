@@ -172,9 +172,8 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                                         Log.e(TAG, "Could not delete file '$id.img")
                                     }
                                 }
-                                Contact.contacts().removeAt(position)
-                                Contact.generateContactNames()
-                                Contact.saveBaresipContacts()
+                                Contact.removeBaresipContact(contact)
+                                Contact.contactsUpdate()
                                 this.notifyDataSetChanged()
                             }
                             is Contact.AndroidContact -> {

@@ -89,20 +89,22 @@ sealed class Contact {
         }
 
         fun nameExists(name: String, ignoreCase: Boolean): Boolean {
-            for (c in BaresipService.baresipContacts)
-                if (c.name.equals(name, ignoreCase = ignoreCase))
-                    return true
-            for (c in BaresipService.androidContacts)
-                if (c.name.equals(name, ignoreCase = ignoreCase))
-                    return true
+            for (c in BaresipService.contacts)
+                when (c) {
+                    is BaresipContact ->
+                        if (c.name.equals(name, ignoreCase = ignoreCase))
+                            return true
+                    is AndroidContact ->
+                        if (c.name.equals(name, ignoreCase = ignoreCase))
+                            return true
+                }
             return false
         }
 
         fun saveBaresipContacts() {
             var contents = ""
-            for (c in BaresipService.contacts)
-                if (c is BaresipContact)
-                    contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}\n"
+            for (c in BaresipService.baresipContacts)
+                contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}\n"
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
                     contents.toByteArray())
         }
@@ -124,10 +126,6 @@ sealed class Contact {
                 val mime = cur.getString(2)
                 val data = cur.getString(3)
                 val thumb = cur.getString(4)?.toUri()
-                if (nameExists(name, true)) {
-                    Log.d(TAG, "Skipping Android contact with existing name '$name'")
-                    continue
-                }
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
@@ -200,13 +198,18 @@ sealed class Contact {
             if (BaresipService.contactsMode != "Android")
                 BaresipService.contacts.addAll(BaresipService.baresipContacts)
             if (BaresipService.contactsMode != "baresip")
-                BaresipService.contacts.addAll(BaresipService.androidContacts)
+                addAndroidContacts()
             sortContacts()
             generateContactNames()
             BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
-        fun generateContactNames () {
+        fun removeBaresipContact(contact: BaresipContact) {
+            BaresipService.baresipContacts.remove(contact)
+            saveBaresipContacts()
+        }
+
+        private fun generateContactNames () {
             BaresipService.contactNames.clear()
             for (c in BaresipService.contacts)
                 when (c) {
@@ -216,6 +219,12 @@ sealed class Contact {
                         if (c.uris.size == 1)
                             BaresipService.contactNames.add(c.name)
                 }
+        }
+
+        private fun addAndroidContacts() {
+            for (c in BaresipService.androidContacts)
+                if (!nameExists(c.name, true))
+                    BaresipService.contacts.add(c)
         }
 
         private fun sortContacts() {
