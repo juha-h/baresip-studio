@@ -1,0 +1,2 @@
+- Contact selection list now contains only those Android contacts that have exactly one URI
+- New Swedish and Portuguese (Brazil) translations
