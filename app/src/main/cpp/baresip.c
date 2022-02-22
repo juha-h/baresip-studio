@@ -1363,16 +1363,6 @@ Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring j
     return err;
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall)
-{
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call;
-    call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return (*env)->NewStringUTF(env, call_peeruri(call));
-}
-
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
                                               jchar digit) {
