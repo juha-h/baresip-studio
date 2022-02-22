@@ -175,7 +175,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            len = re_snprintf(event_buf, sizeof event_buf, "call incoming");
+            if (uag_call_count() > 1) {
+                LOGD("auto-rejecting call from %s\n", prm);
+                ua_hangup(ua, call, 486, "Busy Here");
+                len = re_snprintf(event_buf, sizeof event_buf, "call rejected,%s", prm);
+            } else {
+                len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
+            }
             break;
         case UA_EVENT_CALL_OUTGOING:
             len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");

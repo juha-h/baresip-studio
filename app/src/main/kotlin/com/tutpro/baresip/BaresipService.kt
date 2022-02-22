@@ -565,7 +565,7 @@ class BaresipService: Service() {
         }
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != "0" && ev[0] != "call incoming") {
+        if (call == null && callp != "0" && ev[0] != "call incoming" && ev[0] != "call rejected") {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -635,15 +635,17 @@ class BaresipService: Service() {
                         return
                     }
                     "call incoming" -> {
-                        val peerUri = Api.call_peeruri(callp)
-                        if (Call.calls().size > 0 ||
-                            !Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
-                                Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
-                                Api.ua_hangup(uap, callp, 486, "Busy Here")
-                                playUnInterrupted(R.raw.callwaiting, 1)
-                                if (!Utils.isVisible())
-                                    return
-                                newEvent = "call rejected"
+                        val peerUri = ev[1]
+                        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
+                            toast(getString(R.string.no_calls))
+                            if (ua.account.callHistory) {
+                                NewCallHistory.add(NewCallHistory(aor, peerUri, "in"))
+                                NewCallHistory.save()
+                                ua.account.missedCalls = true
+                            }
+                            if (!isMainVisible)
+                                return
+                            newEvent = "call rejected"
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming",
@@ -721,6 +723,19 @@ class BaresipService: Service() {
                             nb.addAction(R.drawable.ic_stat_call_end,
                                     getActionText(R.string.reject, R.color.colorRed), rpi)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
+                            return
+                        }
+                    }
+                    "call rejected" -> {
+                        playUnInterrupted(R.raw.callwaiting, 1)
+                        if (ua.account.callHistory) {
+                            NewCallHistory.add(NewCallHistory(aor, ev[1], "in"))
+                            NewCallHistory.save()
+                            ua.account.missedCalls = true
+                            if (!isMainVisible)
+                                return
+                            newEvent = "call rejected"
+                        } else {
                             return
                         }
                     }
