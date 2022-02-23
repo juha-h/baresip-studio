@@ -591,12 +591,10 @@ class AccountActivity : AppCompatActivity() {
                 }
 
                 if (defaultCheck.isChecked && (uaIndex > 0)) {
-                    val uasTmp = BaresipService.uas[0]
-                    val statusTmp = BaresipService.status[0]
-                    BaresipService.uas[0] = BaresipService.uas[uaIndex]
-                    BaresipService.status[0] = BaresipService.status[uaIndex]
-                    BaresipService.uas[uaIndex] = uasTmp
-                    BaresipService.status[uaIndex] = statusTmp
+                    BaresipService.uas.add(0, BaresipService.uas[uaIndex])
+                    BaresipService.status.add(0, BaresipService.status[uaIndex])
+                    BaresipService.uas.removeAt(uaIndex + 1)
+                    BaresipService.status.removeAt(uaIndex + 1)
                     save = true
                 }
 
