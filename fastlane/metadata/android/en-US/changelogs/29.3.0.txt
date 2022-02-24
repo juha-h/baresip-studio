@@ -1,0 +1,3 @@
+- Fixed adding of new baresip contact
+- When selecting a new default account, keep the order of the rest unchanged
+- Improved handling of call auto-rejection
