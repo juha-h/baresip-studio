@@ -204,6 +204,10 @@ sealed class Contact {
             BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
+        fun addBaresipContact(contact: BaresipContact) {
+            BaresipService.baresipContacts.add(contact)
+        }
+
         fun removeBaresipContact(contact: BaresipContact) {
             BaresipService.baresipContacts.remove(contact)
             saveBaresipContacts()
