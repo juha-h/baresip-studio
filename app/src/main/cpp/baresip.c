@@ -12,7 +12,6 @@
 
 typedef struct baresip_context {
     JavaVM  *javaVM;
-    JNIEnv  *env;
     jclass  mainActivityClz;
     jobject mainActivityObj;
 } BaresipContext;
@@ -211,7 +210,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
         case UA_EVENT_CALL_INCOMING:
-            len = re_snprintf(event_buf, sizeof event_buf, "call incoming");
+            if (uag_call_count() > 1) {
+                LOGD("auto-rejecting call from %s\n", prm);
+                ua_hangup(ua, call, 486, "Busy Here");
+                len = re_snprintf(event_buf, sizeof event_buf, "call rejected,%s", prm);
+            } else {
+                len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
+            }
             break;
         case UA_EVENT_CALL_OUTGOING:
             len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");
@@ -455,7 +460,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     memset(&g_ctx, 0, sizeof(g_ctx));
 
     g_ctx.javaVM = vm;
-    g_ctx.env = NULL;
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
 
@@ -479,7 +483,6 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
     jclass clz = (*env)->GetObjectClass(env, instance);
     g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
     g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
-    g_ctx.env = env;
 
     int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
@@ -1034,7 +1037,6 @@ Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1uri(JNIEnv *env, jobject th
     return res;
 }
 
-
 JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_plus_Api_account_1stun_1user(JNIEnv *env, jobject thiz, jstring jAcc)
 {
@@ -1427,15 +1429,6 @@ Java_com_tutpro_baresip_plus_Call_call_1transfer(JNIEnv *env, jobject thiz, jstr
     (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     return err;
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_plus_Api_call_1peeruri(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call;
-    call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return (*env)->NewStringUTF(env, call_peeruri(call));
 }
 
 JNIEXPORT jint JNICALL
