@@ -269,7 +269,7 @@ class ContactActivity : AppCompatActivity() {
                     addOrUpdateAndroidContact(this, contact)
                 } else {
                     if (newContact)
-                        Contact.contacts().add(contact)
+                        Contact.addBaresipContact(contact)
                     Contact.saveBaresipContacts()
                     Contact.contactsUpdate()
                 }
