@@ -89,7 +89,7 @@ object Config {
         removeVariable("prefer_android_contacts")
 
         if (config.contains("contacts_mode")) {
-            BaresipService.contactsMode = variable("contacts_mode")[0]
+            BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
             if (BaresipService.contactsMode != "baresip" &&
                     !Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_CONTACTS,
                             Manifest.permission.WRITE_CONTACTS))) {
