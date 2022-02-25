@@ -364,7 +364,7 @@ class BaresipService: Service() {
                 if (File(filesDir, "history").exists())
                     File(filesDir, "history").renameTo(File(filesDir, "calls"))
 
-                if (contactsMode != "Android")
+                if (contactsMode != "android")
                     Contact.restoreBaresipContacts()
                 if (contactsMode != "baresip") {
                     Contact.loadAndroidContacts(applicationContext)

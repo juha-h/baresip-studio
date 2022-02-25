@@ -80,7 +80,7 @@ class ContactActivity : AppCompatActivity() {
             else
                 uriView.setText(uri)
             uOrI = uri
-            if ((BaresipService.contactsMode == "Android")) {
+            if ((BaresipService.contactsMode == "android")) {
                 androidCheck.isChecked = true
                 androidCheck.isClickable = false
             } else {

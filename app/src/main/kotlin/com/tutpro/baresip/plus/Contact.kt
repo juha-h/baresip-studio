@@ -195,7 +195,7 @@ sealed class Contact {
 
         fun contactsUpdate() {
             BaresipService.contacts.clear()
-            if (BaresipService.contactsMode != "Android")
+            if (BaresipService.contactsMode != "android")
                 BaresipService.contacts.addAll(BaresipService.baresipContacts)
             if (BaresipService.contactsMode != "baresip")
                 addAndroidContacts()

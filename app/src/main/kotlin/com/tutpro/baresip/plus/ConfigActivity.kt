@@ -317,11 +317,11 @@ class ConfigActivity : AppCompatActivity() {
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
         contactsSpinner = binding.contactsSpinner
-        contactsModeKeys = arrayListOf("baresip", "Android", "Both")
+        contactsModeKeys = arrayListOf("baresip", "android", "both")
         val contactsModeVals = arrayListOf(getString(R.string.baresip), getString(R.string.android),
                 getString(R.string.both))
         val ctCv = Config.variable("contacts_mode")
-        oldContactsMode = if (ctCv.size == 0) "baresip" else ctCv[0]
+        oldContactsMode = if (ctCv.size == 0) "baresip" else ctCv[0].lowercase()
         contactsMode = oldContactsMode
         val keyIndex = contactsModeKeys.indexOf(oldContactsMode)
         val keyValue = contactsModeVals.elementAt(keyIndex)
@@ -540,12 +540,12 @@ class ConfigActivity : AppCompatActivity() {
                             Contact.restoreBaresipContacts()
                             baresipService.action = "Stop Content Observer"
                         }
-                        "Android" -> {
+                        "android" -> {
                             BaresipService.baresipContacts.clear()
                             Contact.loadAndroidContacts(this)
                             baresipService.action = "Start Content Observer"
                         }
-                        "Both" -> {
+                        "both" -> {
                             Contact.restoreBaresipContacts()
                             Contact.loadAndroidContacts(this)
                             baresipService.action = "Start Content Observer"
