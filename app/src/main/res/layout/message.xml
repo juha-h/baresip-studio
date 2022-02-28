@@ -30,6 +30,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:textSize="16sp"
+            android:textIsSelectable="true"
             android:text="" >
         </TextView>
 
