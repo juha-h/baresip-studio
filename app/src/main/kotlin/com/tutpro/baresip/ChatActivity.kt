@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
@@ -11,10 +10,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
@@ -78,62 +79,20 @@ class ChatActivity : AppCompatActivity() {
         listView = binding.messages
 
         chatMessages = uaPeerMessages(aor, peerUri)
-        mlAdapter = MessageListAdapter(this, chatMessages)
+        mlAdapter = MessageListAdapter(this, peerUri, chatMessages)
 
-        val messagesObserver = Observer<Long> { mlAdapter.notifyDataSetChanged() }
+        val messagesObserver = Observer<Long> {
+            chatMessages.clear()
+            chatMessages.addAll(uaPeerMessages(aor, peerUri))
+            mlAdapter.notifyDataSetChanged()
+        }
         BaresipService.messageUpdate.observe(this, messagesObserver)
 
         listView.adapter = mlAdapter
-        listView.isLongClickable = true
+        //listView.isLongClickable = true
         val footerView = View(applicationContext)
         listView.addFooterView(footerView)
         listView.smoothScrollToPosition(mlAdapter.count - 1)
-
-        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
-            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        val i = Intent(this, ContactActivity::class.java)
-                        val b = Bundle()
-                        b.putBoolean("new", true)
-                        b.putString("uri", peerUri)
-                        i.putExtras(b)
-                        startActivity(i)
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        Message.messages().remove(chatMessages[pos])
-                        chatMessages.removeAt(pos)
-                        mlAdapter.notifyDataSetChanged()
-                        if (chatMessages.size == 0) {
-                            listView.removeFooterView(footerView)
-                        }
-                        Message.save()
-                    }
-                    DialogInterface.BUTTON_NEUTRAL -> {
-                    }
-                }
-            }
-            val builder = MaterialAlertDialogBuilder(this@ChatActivity, R.style.AlertDialogTheme)
-            if (Contact.contactName(peerUri) == peerUri)
-                with (builder) {
-                    setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.long_message_question),
-                    chatPeer))
-                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setNegativeButton(getString(R.string.delete), dialogClickListener)
-                    setPositiveButton(getString(R.string.add_contact), dialogClickListener)
-                    show()
-                }
-            else
-                with (builder) {
-                    setTitle(R.string.confirmation)
-                    setMessage(getText(R.string.short_message_question))
-                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setNegativeButton(getString(R.string.delete), dialogClickListener)
-                    show()
-                }
-            true
-        }
 
         newMessage = binding.text
         newMessage.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -185,10 +144,9 @@ class ChatActivity : AppCompatActivity() {
             newMessage.requestFocus()
             BaresipService.chatTexts.remove("$aor::$peerUri")
         }
-        mlAdapter.clear()
-        chatMessages = uaPeerMessages(aor, peerUri)
-        mlAdapter = MessageListAdapter(this, chatMessages)
-        listView.adapter = mlAdapter
+        chatMessages.clear()
+        chatMessages.addAll(uaPeerMessages(aor, peerUri))
+        mlAdapter.notifyDataSetChanged()
     }
 
     override fun onPause() {
