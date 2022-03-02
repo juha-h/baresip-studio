@@ -1,18 +1,23 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Typeface
-import androidx.core.content.ContextCompat
+import android.os.Bundle
 import android.text.format.DateUtils.isToday
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-
+import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.DateFormat
 import java.util.*
 
-class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
+class MessageListAdapter(private val ctx: Context, private val peerUri: String, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
     private val layoutInflater = LayoutInflater.from(context)
@@ -36,6 +41,56 @@ class MessageListAdapter(private val ctx: Context, private val rows: ArrayList<M
             rowView = view
             viewHolder = rowView.tag as ViewHolder
         }
+
+        val listener = View.OnClickListener {
+            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                when (which) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        val i = Intent(ctx, ContactActivity::class.java)
+                        val b = Bundle()
+                        b.putBoolean("new", true)
+                        b.putString("uri", peerUri)
+                        i.putExtras(b)
+                        ctx.startActivity(i)
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        Message.messages().remove(rows[position])
+                        Message.save()
+                        rows.removeAt(position)
+                        this.notifyDataSetChanged()
+                        //if (rows.size == 0) {
+                        //    listView.removeFooterView(footerView)
+                        //}
+                    }
+                    DialogInterface.BUTTON_NEUTRAL -> {
+                    }
+                }
+            }
+            val builder = MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
+            val chatPeer = Contact.contactName(peerUri)
+            if (Contact.contactName(peerUri) == peerUri)
+                with (builder) {
+                    setTitle(R.string.confirmation)
+                    setMessage(String.format(ctx.getString(R.string.long_message_question),
+                            chatPeer))
+                    setNeutralButton(ctx.getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(ctx.getString(R.string.delete), dialogClickListener)
+                    setPositiveButton(ctx.getString(R.string.add_contact), dialogClickListener)
+                    show()
+                }
+            else
+                with (builder) {
+                    setTitle(R.string.confirmation)
+                    setMessage(ctx.getText(R.string.short_message_question))
+                    setNeutralButton(ctx.getString(R.string.cancel), dialogClickListener)
+                    setNegativeButton(ctx.getString(R.string.delete), dialogClickListener)
+                    show()
+                }
+        }
+
+        viewHolder.layoutView.setOnClickListener(listener)
+        viewHolder.infoView.setOnClickListener(listener)
+        viewHolder.textView.setOnClickListener(listener)
 
         val message = rows[position]
 

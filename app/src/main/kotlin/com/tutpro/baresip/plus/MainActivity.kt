@@ -1715,8 +1715,6 @@ class MainActivity : AppCompatActivity() {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content),
                         false)
-        val titleView = layout.findViewById(R.id.title) as TextView
-        titleView.text = getString(R.string.call_transfer)
         val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contactNames()))

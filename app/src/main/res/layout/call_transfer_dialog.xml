@@ -12,6 +12,7 @@
         android:paddingStart="?dialogPreferredPadding"
         android:paddingEnd="?dialogPreferredPadding"
         android:textSize="20sp"
+        android:text="@string/call_transfer"
         android:textColor="@color/colorPrimary" />
 
     <TextView
