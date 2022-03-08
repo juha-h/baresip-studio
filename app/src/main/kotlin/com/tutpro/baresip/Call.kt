@@ -3,7 +3,7 @@ package com.tutpro.baresip
 import android.text.TextWatcher
 import java.util.*
 
-class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: String,
+class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String,
            var status: String, val dtmfWatcher: TextWatcher?) {
 
     var onhold = false
@@ -67,17 +67,17 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }
 
-    private external fun call_connect(callp: String, peer_uri: String): Int
-    private external fun call_hold(callp: String, hold: Boolean): Int
-    private external fun call_ismuted(callp: String): Boolean
-    private external fun call_transfer(callp: String, peer_uri: String): Int
-    private external fun call_send_digit(callp: String, digit: Char): Int
-    private external fun call_notify_sipfrag(callp: String, code: Int, reason: String)
-    private external fun call_start_audio(callp: String)
-    private external fun call_audio_codecs(callp: String): String
-    private external fun call_duration(callp: String): Int
-    private external fun call_stats(callp: String, stream: String): String
-    private external fun call_has_video(callp: String): Boolean
+    private external fun call_connect(callp: Long, peer_uri: String): Int
+    private external fun call_hold(callp: Long, hold: Boolean): Int
+    private external fun call_ismuted(callp: Long): Boolean
+    private external fun call_transfer(callp: Long, peer_uri: String): Int
+    private external fun call_send_digit(callp: Long, digit: Char): Int
+    private external fun call_notify_sipfrag(callp: Long, code: Int, reason: String)
+    private external fun call_start_audio(callp: Long)
+    private external fun call_audio_codecs(callp: Long): String
+    private external fun call_duration(callp: Long): Int
+    private external fun call_stats(callp: Long, stream: String): String
+    private external fun call_has_video(callp: Long): Boolean
 
     companion object {
 
@@ -92,7 +92,7 @@ class Call(val callp: String, val ua: UserAgent, val peerUri: String, val dir: S
             return result
         }
 
-        fun ofCallp(callp: String): Call? {
+        fun ofCallp(callp: Long): Call? {
             for (c in BaresipService.calls)
                 if (c.callp == callp) return c
             return null

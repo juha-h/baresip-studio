@@ -7,7 +7,8 @@
 #include <baresip.h>
 #include "logger.h"
 
-typedef struct baresip_context {
+typedef struct baresip_context
+{
     JavaVM  *javaVM;
     JNIEnv  *env;
     jclass  mainActivityClz;
@@ -16,14 +17,16 @@ typedef struct baresip_context {
 
 BaresipContext g_ctx;
 
-static int vprintf_null(const char *p, size_t size, void *arg) {
+static int vprintf_null(const char *p, size_t size, void *arg)
+{
     (void)p;
     (void)size;
     (void)arg;
     return 0;
 }
 
-static void net_debug_log() {
+static void net_debug_log()
+{
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", net_debug, baresip_network());
@@ -33,7 +36,8 @@ static void net_debug_log() {
     }
 }
 
-static void net_dns_debug_log() {
+static void net_dns_debug_log()
+{
     char debug_buf[2048];
     int l;
     LOGD("net_dns_debug_log\n");
@@ -44,7 +48,8 @@ static void net_dns_debug_log() {
     }
 }
 
-static void ua_debug_log(struct ua *ua) {
+static void ua_debug_log(struct ua *ua)
+{
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_debug, ua);
@@ -54,7 +59,8 @@ static void ua_debug_log(struct ua *ua) {
     }
 }
 
-static void account_debug_log(struct account *acc) {
+static void account_debug_log(struct account *acc)
+{
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", account_debug, acc);
@@ -64,7 +70,8 @@ static void account_debug_log(struct account *acc) {
     }
 }
 
-static void ua_print_status_log(struct ua *ua) {
+static void ua_print_status_log(struct ua *ua)
+{
     char debug_buf[2048];
     int l;
     l = re_snprintf(&(debug_buf[0]), 2047, "%H", ua_print_status, ua);
@@ -156,8 +163,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     const char *event;
     const char *tone;
     char event_buf[256];
-    char ua_buf[32];
-    char call_buf[32];
     enum sdp_dir ardir;
     int len;
 
@@ -259,19 +264,12 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         }
     }
 
-    jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz,
-                                             "uaEvent",
-                                             "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-    sprintf(ua_buf, "%lu", (unsigned long)ua);
-    jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-    sprintf(call_buf, "%lu", (unsigned long)call);
-    jstring javaCall = (*env)->NewStringUTF(env, call_buf);
-    jstring javaEvent = (*env)->NewStringUTF(env, event);
-    LOGD("sending ua/call %s/%s event %s\n", ua_buf, call_buf, event);
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, javaEvent, javaUA, javaCall);
-    (*env)->DeleteLocalRef(env, javaUA);
-    (*env)->DeleteLocalRef(env, javaCall);
-    (*env)->DeleteLocalRef(env, javaEvent);
+    jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaEvent",
+                                             "(Ljava/lang/String;JJ)V");
+    jstring jEvent = (*env)->NewStringUTF(env, event);
+    LOGD("sending ua/call %lu/%lu event %s\n", (unsigned  long)ua, (unsigned  long)call, event);
+    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
+    (*env)->DeleteLocalRef(env, jEvent);
 
 }
 
@@ -301,27 +299,23 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
             return;
         }
     }
-    jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz,
-                                             "messageEvent",
-                                             "(Ljava/lang/String;Ljava/lang/String;[B)V");
-    sprintf(ua_buf, "%lu", (unsigned long)ua);
-    jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-    jstring javaPeer = (*env)->NewStringUTF(env, peer_buf);
-    jbyteArray javaMsg;
+    jmethodID methodId = (*env)->GetMethodID(env, pctx->mainActivityClz, "messageEvent",
+                                             "(JLjava/lang/String;[B)V");
+    jstring jPeer = (*env)->NewStringUTF(env, peer_buf);
+    jbyteArray jMsg;
     size = mbuf_get_left(body);
-    javaMsg = (*env)->NewByteArray(env, size);
-    if ((*env)->GetArrayLength(env, javaMsg) != size) {
-        (*env)->DeleteLocalRef(env, javaMsg);
-        javaMsg = (*env)->NewByteArray(env, size);
+    jMsg = (*env)->NewByteArray(env, size);
+    if ((*env)->GetArrayLength(env, jMsg) != size) {
+        (*env)->DeleteLocalRef(env, jMsg);
+        jMsg = (*env)->NewByteArray(env, size);
     }
-    void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)javaMsg, 0);
+    void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)jMsg, 0);
     memcpy(temp, mbuf_buf(body), size);
-    (*env)->ReleasePrimitiveArrayCritical(env, javaMsg, temp, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, jMsg, temp, 0);
     LOGD("sending message %s/%s/%.*s\n", ua_buf, peer_buf, (int)size, mbuf_buf(body));
-    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, javaUA, javaPeer, javaMsg);
-    (*env)->DeleteLocalRef(env, javaUA);
-    (*env)->DeleteLocalRef(env, javaPeer);
-    (*env)->DeleteLocalRef(env, javaMsg);
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, ua, jPeer, jMsg);
+    (*env)->DeleteLocalRef(env, jPeer);
+    (*env)->DeleteLocalRef(env, jMsg);
 }
 
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
@@ -378,7 +372,8 @@ static void mqueue_handler(int id, void *data, void *arg)
 static int pfd[2];
 static pthread_t loggingThread;
 
-static void *loggingFunction(void *arg) {
+static void *loggingFunction(void *arg)
+{
     ssize_t readSize;
     char buf[128];
 
@@ -393,7 +388,8 @@ static void *loggingFunction(void *arg) {
     return 0;
 }
 
-static int runLoggingThread() {
+static int runLoggingThread()
+{
     setvbuf(stdout, 0, _IOLBF, 0);
     setvbuf(stderr, 0, _IONBF, 0);
 
@@ -410,8 +406,8 @@ static int runLoggingThread() {
     return 0;
 }
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
-
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
+{
     LOGD("at JNI_OnLoad\n");
 
     memset(&g_ctx, 0, sizeof(g_ctx));
@@ -426,8 +422,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instance, jstring jPath,
-                                                    jstring jAddrs, jint jLogLevel) {
-
+                                                    jstring jAddrs, jint jLogLevel)
+{
     LOGI("starting baresip\n");
 
     char start_error[64] = "";
@@ -531,13 +527,9 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
         ua = le->data;
-        sprintf(ua_buf, "%lu", (unsigned long) ua);
-        jstring javaUA = (*env)->NewStringUTF(env, ua_buf);
-        LOGD("adding UA for AoR %s/%s\n", account_aor(ua_account(ua)), ua_buf);
-        jmethodID uaAddId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaAdd",
-                                                  "(Ljava/lang/String;)V");
-        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, javaUA);
-        (*env)->DeleteLocalRef(env, javaUA);
+        LOGD("adding UA for AoR %s/%lu\n", account_aor(ua_account(ua)), (unsigned long)ua);
+        jmethodID uaAddId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaAdd", "(J)V");
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, (unsigned long)ua);
     }
 
     err = mqueue_alloc(&mq, mqueue_handler, NULL);
@@ -591,11 +583,11 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
             "(Ljava/lang/String;)V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, stoppedId, javaError);
     (*env)->DeleteLocalRef(env, javaError);
-
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force) {
+Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force)
+{
     LOGD("ua_stop_all upon baresipStop");
 
     re_thread_enter();
@@ -604,12 +596,10 @@ Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jb
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1display_1name(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1display_1name(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc) {
-        const char *dn = account_display_name(acc);
+        const char *dn = account_display_name((struct account *)acc);
         if (dn)
             return (*env)->NewStringUTF(env, dn);
         else
@@ -619,39 +609,31 @@ Java_com_tutpro_baresip_Api_account_1display_1name(JNIEnv *env, jobject thiz, js
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1display_1name(JNIEnv *env, jobject thiz,
-                                                              jstring javaAcc, jstring javaDn) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *dn = (*env)->GetStringUTFChars(env, javaDn, 0);\
+Java_com_tutpro_baresip_Api_account_1set_1display_1name(JNIEnv *env, jobject thiz, jlong acc, jstring jDn)
+{
+    const char *dn = (*env)->GetStringUTFChars(env, jDn, 0);\
     int res;
     if (strlen(dn) > 0)
-        res = account_set_display_name(acc, dn);
+        res = account_set_display_name((struct account *)acc, dn);
     else
-        res = account_set_display_name(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaDn, dn);
+        res = account_set_display_name((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jDn, dn);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1aor(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1aor(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc)
-        return (*env)->NewStringUTF(env, account_aor(acc));
+        return (*env)->NewStringUTF(env, account_aor((struct account *)acc));
     else
         return (*env)->NewStringUTF(env, "");
 }
 
-
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1luri(JNIEnv *env, jclass clazz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const struct uri *uri = account_luri(acc);
+Java_com_tutpro_baresip_Api_account_1luri(JNIEnv *env, jclass clazz, jlong acc)
+{
+    const struct uri *uri = account_luri((struct account *)acc);
     char uri_buf[512];
     int l;
     l = re_snprintf(&(uri_buf[0]), 511, "%H", uri_encode, uri);
@@ -663,12 +645,10 @@ Java_com_tutpro_baresip_Api_account_1luri(JNIEnv *env, jclass clazz, jstring jav
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1auth_1user(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1auth_1user(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc) {
-        const char *au = account_auth_user(acc);
+        const char *au = account_auth_user((struct account *)acc);
         if (au)
             return (*env)->NewStringUTF(env, au);
         else
@@ -678,28 +658,23 @@ Java_com_tutpro_baresip_Api_account_1auth_1user(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1auth_1user(JNIEnv *env, jobject thiz,
-                                                           jstring javaAcc, jstring javaUser) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *user = (*env)->GetStringUTFChars(env, javaUser, 0);
+Java_com_tutpro_baresip_Api_account_1set_1auth_1user(JNIEnv *env, jobject thiz, jlong acc, jstring jUser)
+{
+    const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
     int res;
     if (strlen(user) > 0)
-        res = account_set_auth_user(acc, user);
+        res = account_set_auth_user((struct account *)acc, user);
     else
-        res = account_set_auth_user(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaUser, user);
+        res = account_set_auth_user((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jUser, user);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1auth_1pass(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1auth_1pass(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc) {
-        const char *ap = account_auth_pass(acc);
+        const char *ap = account_auth_pass((struct account *)acc);
         if (ap)
             return (*env)->NewStringUTF(env, ap);
         else
@@ -709,31 +684,25 @@ Java_com_tutpro_baresip_Api_account_1auth_1pass(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1auth_1pass(JNIEnv *env, jobject thiz,
-                                                           jstring javaAcc, jstring javaPass) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *pass = (*env)->GetStringUTFChars(env, javaPass, 0);
+Java_com_tutpro_baresip_Api_account_1set_1auth_1pass(JNIEnv *env, jobject thiz, jlong acc, jstring jPass)
+{
+    const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
     int res;
     if (strlen(pass) > 0)
-        res = account_set_auth_pass(acc, pass);
+        res = account_set_auth_pass((struct account *)acc, pass);
     else
-        res = account_set_auth_pass(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaPass, pass);
+        res = account_set_auth_pass((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jPass, pass);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1outbound(JNIEnv *env, jobject thiz, jstring javaAcc,
-                                                    jint ix) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    const uint16_t native_ix = ix;
+Java_com_tutpro_baresip_Api_account_1outbound(JNIEnv *env, jobject thiz, jlong acc, jint jIx)
+{
+    const uint16_t native_ix = jIx;
     const char *outbound;
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     if (acc) {
-        outbound = account_outbound(acc, native_ix);
+        outbound = account_outbound((struct account *)acc, native_ix);
         if (outbound)
             return (*env)->NewStringUTF(env, outbound);
         else
@@ -744,35 +713,29 @@ Java_com_tutpro_baresip_Api_account_1outbound(JNIEnv *env, jobject thiz, jstring
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1outbound(JNIEnv *env, jobject thiz, jstring javaAcc,
-                                                         jstring javaOb, jint javaIx) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *ob = (*env)->GetStringUTFChars(env, javaOb, 0);
-    const uint16_t ix = javaIx;
+Java_com_tutpro_baresip_Api_account_1set_1outbound(JNIEnv *env, jobject thiz, jlong acc, jstring jOb, jint jIx)
+{
+    const char *ob = (*env)->GetStringUTFChars(env, jOb, 0);
+    const uint16_t ix = jIx;
     int res;
     if (strlen(ob) > 0)
-        res = account_set_outbound(acc, ob, ix);
+        res = account_set_outbound((struct account *)acc, ob, ix);
     else
-        res = account_set_outbound(acc, NULL, ix);
-    (*env)->ReleaseStringUTFChars(env, javaOb, ob);
+        res = account_set_outbound((struct account *)acc, NULL, ix);
+    (*env)->ReleaseStringUTFChars(env, jOb, ob);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1audio_1codec(JNIEnv *env, jobject thiz,
-        jstring javaAcc, jint ix) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1audio_1codec(JNIEnv *env, jobject thiz, jlong acc, jint ix)
+{
     const struct list *codecl;
     char codec_buf[32];
     int len;
     struct le *le;
     codec_buf[0] = '\0';
     if (acc) {
-        codecl = account_aucodecl(acc);
+        codecl = account_aucodecl((struct account *)acc);
         if (!list_isempty(codecl)) {
             int i = -1;
             for (le = list_head(codecl); le != NULL; le = le->next) {
@@ -793,132 +756,103 @@ Java_com_tutpro_baresip_Api_account_1audio_1codec(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1audio_1codecs(JNIEnv *env, jobject thiz,
-                                                             jstring javaAcc, jstring javaCodecs) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *codecs = (*env)->GetStringUTFChars(env, javaCodecs, 0);
-    int res = account_set_audio_codecs(acc, codecs);
-    (*env)->ReleaseStringUTFChars(env, javaCodecs, codecs);
-    return res;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1video_1codecs(JNIEnv *env, jobject thiz,
-                                                              jstring jAcc, jstring jCodecs) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1audio_1codecs(JNIEnv *env, jobject thiz, jlong acc, jstring jCodecs)
+{
     const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
-    int res = account_set_video_codecs(acc, codecs);
+    int res = account_set_audio_codecs((struct account *)acc, codecs);
     (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
     return res;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1regint(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1video_1codecs(JNIEnv *env, jobject thiz, jlong acc, jstring jCodecs)
+{
+    const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
+    int res = account_set_video_codecs((struct account *)acc, codecs);
+    (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
+    return res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_account_1regint(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc)
-        return account_regint(acc);
+        return account_regint((struct account *)acc);
     else
         return 0;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1regint(JNIEnv *env, jobject thiz,
-                                                           jstring javaAcc, jint javaRegint) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const uint32_t regint = (uint32_t)javaRegint;
-    return account_set_regint(acc, regint);
+Java_com_tutpro_baresip_Api_account_1set_1regint(JNIEnv *env, jobject thiz, jlong acc, jint jRegint)
+{
+    const uint32_t regint = (uint32_t)jRegint;
+    return account_set_regint((struct account *)acc, regint);
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1mediaenc(JNIEnv *env, jobject thiz, jstring javaAcc)
+Java_com_tutpro_baresip_Api_account_1mediaenc(JNIEnv *env, jobject thiz, jlong acc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     if (acc) {
-        const char *mediaenc = account_mediaenc(acc);
+        const char *mediaenc = account_mediaenc((struct account *)acc);
         if (mediaenc) return (*env)->NewStringUTF(env, mediaenc);
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1mediaenc(JNIEnv *env, jobject thiz,
-                                                              jstring javaAcc, jstring javaMencid) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *mencid = (*env)->GetStringUTFChars(env, javaMencid, 0);
+Java_com_tutpro_baresip_Api_account_1set_1mediaenc(JNIEnv *env, jobject thiz, jlong acc, jstring jMencid)
+{
+    const char *mencid = (*env)->GetStringUTFChars(env, jMencid, 0);
     int res;
     if (strlen(mencid) > 0)
-        res = account_set_mediaenc(acc, mencid);
+        res = account_set_mediaenc((struct account *)acc, mencid);
     else
-        res = account_set_mediaenc(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaMencid, mencid);
+        res = account_set_mediaenc((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jMencid, mencid);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1medianat(JNIEnv *env, jobject thiz, jstring javaAcc)
+Java_com_tutpro_baresip_Api_account_1medianat(JNIEnv *env, jobject thiz, jlong acc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     if (acc) {
-        const char *medianat = account_medianat(acc);
+        const char *medianat = account_medianat((struct account *)acc);
         if (medianat) return (*env)->NewStringUTF(env, medianat);
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1medianat(JNIEnv *env, jobject thiz,
-                                                         jstring javaAcc, jstring javaMedNat) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *mednat = (*env)->GetStringUTFChars(env, javaMedNat, 0);
+Java_com_tutpro_baresip_Api_account_1set_1medianat(JNIEnv *env, jobject thiz, jlong acc, jstring jMedNat)
+{
+    const char *mednat = (*env)->GetStringUTFChars(env, jMedNat, 0);
     int res;
     if (strlen(mednat) > 0)
-        res = account_set_medianat(acc, mednat);
+        res = account_set_medianat((struct account *)acc, mednat);
     else
-        res = account_set_medianat(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaMedNat, mednat);
+        res = account_set_medianat((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jMedNat, mednat);
     return res;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1sipnat(JNIEnv *env, jobject thiz,
-                                                       jstring javaAcc, jstring javaSipNat) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *sipnat = (*env)->GetStringUTFChars(env, javaSipNat, 0);
+Java_com_tutpro_baresip_Api_account_1set_1sipnat(JNIEnv *env, jobject thiz, jlong acc, jstring jSipNat)
+{
+    const char *sipnat = (*env)->GetStringUTFChars(env, jSipNat, 0);
     int res;
     if (strlen(sipnat) > 0)
-        res = account_set_sipnat(acc, sipnat);
+        res = account_set_sipnat((struct account *)acc, sipnat);
     else
-        res = account_set_sipnat(acc, NULL);
-    (*env)->ReleaseStringUTFChars(env, javaSipNat, sipnat);
+        res = account_set_sipnat((struct account *)acc, NULL);
+    (*env)->ReleaseStringUTFChars(env, jSipNat, sipnat);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc)
+Java_com_tutpro_baresip_Api_account_1stun_1uri(JNIEnv *env, jobject thiz, jlong acc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
     if (acc) {
-        const struct stun_uri *stun_uri = account_stun_uri(acc);
+        const struct stun_uri *stun_uri = account_stun_uri((struct account *)acc);
         if (stun_uri) {
             char uri_str[256];
             if (stun_uri->port != 0) {
@@ -943,100 +877,81 @@ Java_com_tutpro_baresip_Api_account_1stun_1uri(JNIEnv *env, jobject thiz, jstrin
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1stun_1uri(JNIEnv *env, jobject thiz, jstring jAcc, jstring jUri) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1stun_1uri(JNIEnv *env, jobject thiz, jlong acc, jstring jUri)
+{
     const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     int res;
     if (strlen(uri) > 0)
-        res = account_set_stun_uri(acc, uri);
+        res = account_set_stun_uri((struct account *)acc, uri);
     else
-        res = account_set_stun_uri(acc, NULL);
+        res = account_set_stun_uri((struct account *)acc, NULL);
     (*env)->ReleaseStringUTFChars(env, jUri, uri);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1stun_1user(JNIEnv *env, jobject thiz, jstring jAcc)
+Java_com_tutpro_baresip_Api_account_1stun_1user(JNIEnv *env, jobject thiz, jlong acc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
     if (acc) {
-        const char *stun_user = account_stun_user(acc);
+        const char *stun_user = account_stun_user((struct account *)acc);
         if (stun_user) return (*env)->NewStringUTF(env, stun_user);
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1stun_1user(JNIEnv *env, jobject thiz,
-                                                           jstring jAcc, jstring jUser) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1stun_1user(JNIEnv *env, jobject thiz, jlong acc, jstring jUser)
+{
     const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
     int res;
     if (strlen(user) > 0)
-        res = account_set_stun_user(acc, user);
+        res = account_set_stun_user((struct account *)acc, user);
     else
-        res = account_set_stun_user(acc, NULL);
+        res = account_set_stun_user((struct account *)acc, NULL);
     (*env)->ReleaseStringUTFChars(env, jUser, user);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1stun_1pass(JNIEnv *env, jobject thiz, jstring jAcc)
+Java_com_tutpro_baresip_Api_account_1stun_1pass(JNIEnv *env, jobject thiz, jlong acc)
 {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
     if (acc) {
-        const char *stun_pass = account_stun_pass(acc);
+        const char *stun_pass = account_stun_pass((struct account *)acc);
         if (stun_pass) return (*env)->NewStringUTF(env, stun_pass);
     }
     return (*env)->NewStringUTF(env, "");
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1stun_1pass(JNIEnv *env, jobject thiz,
-                                                           jstring jAcc, jstring jPass) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1stun_1pass(JNIEnv *env, jobject thiz, jlong acc, jstring jPass)
+{
     const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
     int res;
     if (strlen(pass) > 0)
-        res = account_set_stun_pass(acc, pass);
+        res = account_set_stun_pass((struct account *)acc, pass);
     else
-        res = account_set_stun_pass(acc, NULL);
+        res = account_set_stun_pass((struct account *)acc, NULL);
     (*env)->ReleaseStringUTFChars(env, jPass, pass);
     return res;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1mwi(JNIEnv *env, jobject thiz,
-                                                    jstring javaAcc, jstring javaValue) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
-    const char *value = (*env)->GetStringUTFChars(env, javaValue, 0);
+Java_com_tutpro_baresip_Api_account_1set_1mwi(JNIEnv *env, jobject thiz, jlong acc, jstring jValue)
+{
+    const char *value = (*env)->GetStringUTFChars(env, jValue, 0);
     LOGD("setting account mwi '%s'\n", value);
-    int res = account_set_mwi(acc, value);
-    (*env)->ReleaseStringUTFChars(env, javaValue, value);
+    int res = account_set_mwi((struct account *)acc, value);
+    (*env)->ReleaseStringUTFChars(env, jValue, value);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1vm_1uri(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
+Java_com_tutpro_baresip_Api_account_1vm_1uri(JNIEnv *env, jobject thiz, jlong acc)
+{
     char uri_buf[256];
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
     if (acc) {
         struct pl pl;
-        const struct sip_addr *addr = account_laddr(acc);
+        const struct sip_addr *addr = account_laddr((struct account *)acc);
         int err = msg_param_decode(&(addr->params), "vm_uri", &pl);
         if (err) {
             return (*env)->NewStringUTF(env, "");
@@ -1049,48 +964,36 @@ Java_com_tutpro_baresip_Api_account_1vm_1uri(JNIEnv *env, jobject thiz, jstring 
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1answermode(JNIEnv *env, jobject thiz, jstring jAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    return account_answermode(acc);
+Java_com_tutpro_baresip_Api_account_1answermode(JNIEnv *env, jobject thiz, jlong acc)
+{
+    return account_answermode((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1answermode(JNIEnv *env, jobject thiz,
-        jstring jAcc, jint jMode) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1answermode(JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+{
     const uint32_t mode = (uint32_t)jMode;
-    return account_set_answermode(acc, mode);
+    return account_set_answermode((struct account *)acc, mode);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1dtmfmode(JNIEnv *env, jobject thiz, jstring jAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
-    return account_dtmfmode(acc);
+Java_com_tutpro_baresip_Api_account_1dtmfmode(JNIEnv *env, jobject thiz, jlong acc)
+{
+    return account_dtmfmode((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1dtmfmode(JNIEnv *env, jobject thiz,
-        jstring jAcc, jint jMode) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, jAcc, 0);
-    struct account *acc = (struct account *)strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1set_1dtmfmode(JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+{
     const uint32_t mode = (uint32_t)jMode;
-    return account_set_dtmfmode(acc, mode);
+    return account_set_dtmfmode((struct account *)acc, mode);
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_account_1extra(JNIEnv *env, jobject thiz, jstring javaAcc) {
-    const char *native_acc = (*env)->GetStringUTFChars(env, javaAcc, 0);
-    struct account *acc = (struct account *) strtoul(native_acc, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaAcc, native_acc);
+Java_com_tutpro_baresip_Api_account_1extra(JNIEnv *env, jobject thiz, jlong acc)
+{
     if (acc) {
-        const char *extra = account_extra(acc);
+        const char *extra = account_extra((struct account *)acc);
         if (extra)
             return (*env)->NewStringUTF(env, extra);
     }
@@ -1098,167 +1001,117 @@ Java_com_tutpro_baresip_Api_account_1extra(JNIEnv *env, jobject thiz, jstring ja
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_account_1debug(JNIEnv *env, jobject thiz, jstring javaAccount) {
-    const char *native_account = (*env)->GetStringUTFChars(env, javaAccount, 0);
-    struct account *acc = (struct account *)strtoul(native_account, NULL, 10);
-    account_debug_log(acc);
+Java_com_tutpro_baresip_Api_account_1debug(JNIEnv *env, jobject thiz, jlong acc)
+{
+    account_debug_log((struct account *)acc);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring javaUri) {
-    const char *uri = (*env)->GetStringUTFChars(env, javaUri, 0);
+JNIEXPORT jlong JNICALL
+Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring jUri)
+{
+    const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
     int res = ua_alloc(&ua, uri);
-    char ua_buf[32];
-    ua_buf[0] = '\0';
     if (res == 0) {
-        sprintf(ua_buf, "%lu", (unsigned long)ua);
         LOGD("allocated ua '%lu'\n", (unsigned long)ua);
     } else {
         LOGE("failed to allocate ua '%s'\n", uri);
     }
-    (*env)->ReleaseStringUTFChars(env, javaUri, uri);
-    return (*env)->NewStringUTF(env, ua_buf);
+    (*env)->ReleaseStringUTFChars(env, jUri, uri);
+    return (jlong)ua;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    LOGD("registering UA '%s'\n", native_ua);
-    return ua_register(ua);
+    LOGD("registering UA '%lu'\n", (unsigned long)ua);
+    return ua_register((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    ua_unregister(ua);
+    ua_unregister((struct ua *)ua);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    return ua_isregistered(ua)?true:false;
+    return ua_isregistered((struct ua *)ua) ? true : false;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    LOGD("updating account of ua %s\n", native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    return ua_update_account(ua);
+    LOGD("updating account of ua %lu\n", (unsigned long)ua);
+    return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jstring javaUA)
+Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    LOGD("destroying ua %s\n", native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (void)ua_destroy(ua);
+    LOGD("destroying ua %lu\n", (unsigned long)ua);
+    (void)ua_destroy((struct ua *)ua);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jstring javaUA)
+JNIEXPORT jlong JNICALL
+Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jlong ua)
 {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    struct account *acc;
-    char acc_buf[32];
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    acc_buf[0] = '\0';
-    if (ua) {
-        acc = ua_account(ua);
-        if (acc) sprintf(acc_buf, "%lu", (unsigned long) acc);
-    }
-    return (*env)->NewStringUTF(env, acc_buf);
+    struct account *acc = 0;
+    if (ua)
+        acc = ua_account((struct ua *)ua);
+    return (jlong)acc;
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz,
-                                                jstring javaUA, jstring javaCall, jint code,
-                                                jstring reason) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz, jlong ua, jlong call, jint code, jstring reason)
+{
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("hanging up call %s/%s\n", native_ua, native_call);
+    LOGD("hanging up call %lu/%lu\n", (unsigned long)ua, (unsigned long)call);
     re_thread_enter();
     if (strlen(native_reason) == 0)
-        ua_hangup(ua, call, native_code, NULL);
+        ua_hangup((struct ua *)ua, (struct call *)call, native_code, NULL);
     else
-        ua_hangup(ua, call, native_code, native_reason);
+        ua_hangup((struct ua *)ua, (struct call *)call, native_code, native_reason);
     re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jstring javaUA,
-        jstring javaXCall, jint javaVidMode) {
-    struct call *xcall = NULL, *call = NULL;
-    struct ua *ua;
+JNIEXPORT jlong JNICALL
+Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jlong ua, jlong xCall, jint vidMode)
+{
+    struct call *call = NULL;
     int err;
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_xcall = (*env)->GetStringUTFChars(env, javaXCall, 0);
-    char call_buf[32];
-    LOGD("allocating new call for ua %s xcall %s\n", native_ua, native_xcall);
-    ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    if (strlen(native_xcall) > 0)
-        xcall = (struct call *)strtoul(native_xcall, NULL, 10);
+    LOGD("allocating new call for ua %lu xcall %lu\n", (unsigned long)ua, (unsigned long)xCall);
     re_thread_enter();
-    err = ua_call_alloc(&call, ua, (enum vidmode)javaVidMode, NULL, xcall, call_localuri(xcall), true);
+    err = ua_call_alloc(&call, (struct ua *)ua, (enum vidmode)vidMode, NULL, (struct call *)xCall,
+            call_localuri((struct call *)xCall), true);
     re_thread_leave();
-    if (err) {
-        LOGW("call allocation for ua %s failed with error %d\n", native_ua, err);
-        call_buf[0] = '\0';
-    } else {
-        sprintf(call_buf, "%lu", (unsigned long)call);
-    }
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaXCall, native_xcall);
-    return (*env)->NewStringUTF(env, call_buf);
+    if (err)
+        LOGW("call allocation for ua %lu failed with error %d\n", (unsigned long)ua, err);
+    return (jlong)call;
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jstring javaUA,
-                                       jstring javaCall, jint javaVidMode) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    LOGD("answering call %s/%s\n", native_ua, native_call);
-    struct ua *ua = (struct ua *) strtoul(native_ua, NULL, 10);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jlong ua, jlong call, jint vidMode)
+{
+    LOGD("answering call %lu/%lu\n", (unsigned long)ua, (unsigned long)call);
     re_thread_enter();
-    ua_answer(ua, call, (enum vidmode)javaVidMode);
+    ua_answer((struct ua *)ua, (struct call *)call, (enum vidmode)vidMode);
     re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jstring javaUA) {
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    struct ua *ua = (struct ua *)strtoul(native_ua, NULL, 10);
-    ua_debug_log(ua);
+Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jlong ua)
+{
+    ua_debug_log((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute) {
+Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute)
+{
     struct le *ua_le;
     struct le *call_le;
     LOGD("muting calls %d\n", mute);
@@ -1274,116 +1127,97 @@ Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jstring javaCall,
-                                          jstring javaPeer) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("connecting call %s to %s\n", native_call, native_peer);
+Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+{
+    const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
+    LOGD("connecting call %lu to %s\n", (unsigned long)call, native_peer);
     re_thread_enter();
     struct pl pl;
     pl_set_str(&pl, native_peer);
-    int err = call_connect(call, &pl);
+    int err = call_connect((struct call *)call, &pl);
     re_thread_leave();
     if (err) LOGW("call_connect error: %d\n", err);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    (*env)->ReleaseStringUTFChars(env, javaPeer, native_peer);
+    (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     return err;
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jstring javaCall,
-                                                  jint code, jstring reason) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jlong call, jint code, jstring reason)
+{
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("notifying call %s/%s\n", native_call, native_reason);
+    LOGD("notifying call %lu/%s\n", (unsigned long)call, native_reason);
     re_thread_enter();
-    (void)call_notify_sipfrag(call, native_code, native_reason);
+    (void)call_notify_sipfrag((struct call *)call, native_code, native_reason);
     re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("starting audio of call %s\n", native_call);
+Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jlong call)
+{
+    LOGD("starting audio of call %lu\n", (unsigned long)call);
     re_thread_enter();
-    struct audio *a = call_audio(call);
+    struct audio *a = call_audio((struct call *)call);
     if (!audio_started(a)) audio_start(a);
     re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jstring jCall, jboolean hold) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
+Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jlong call, jboolean hold)
+{
     int err;
     if (hold) {
-        LOGD("holding call %s\n", native_call);
+        LOGD("holding call %lu\n", (unsigned long)call);
         re_thread_enter();
-        err = call_hold(call, true);
+        err = call_hold((struct call *)call, true);
         re_thread_leave();
     } else {
-        LOGD("resuming call %s\n", native_call);
+        LOGD("resuming call %lu\n", (unsigned long)call);
         re_thread_enter();
-        err = call_hold(call, false);
+        err = call_hold((struct call *)call, false);
         re_thread_leave();
     }
     if (err) LOGW("call_hold error: %d\n", err);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     return err;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1ismuted(JNIEnv *env, jobject thiz, jstring jCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
-    return audio_ismuted(call_audio(call));
+Java_com_tutpro_baresip_Call_call_1ismuted(JNIEnv *env, jobject thiz, jlong call)
+{
+    return audio_ismuted(call_audio((struct call *)call));
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jstring jCall,
-        jstring jPeer) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
+Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+{
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("transfering call %s to %s\n", native_call, native_peer);
+    LOGD("transfering call %lu to %s\n", (unsigned long)call, native_peer);
     re_thread_enter();
-    int err = call_transfer(call, native_peer);
+    int err = call_transfer((struct call *)call, native_peer);
     re_thread_leave();
     if (err) LOGW("call_transfer error: %d\n", err);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     return err;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jstring javaCall,
-                                              jchar digit) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
+Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jlong call, jchar digit)
+{
     const uint16_t native_digit = digit;
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    LOGD("sending DTMF digit '%c' to call %s\n", (char)native_digit, native_call);
+    LOGD("sending DTMF digit '%c' to call %lu\n", (char)native_digit, (unsigned long)call);
     re_thread_enter();
-    int res = call_send_digit(call, (char)native_digit);
-    if (!res) res = call_send_digit(call, KEYCODE_REL);
+    int res = call_send_digit((struct call *)call, (char)native_digit);
+    if (!res) res = call_send_digit((struct call *)call, KEYCODE_REL);
     re_thread_leave();
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return res;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstring javaCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *) strtoul(native_call, NULL, 10);
-    const struct aucodec *tx = audio_codec(call_audio(call), true);
-    const struct aucodec *rx = audio_codec(call_audio(call), false);
+Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlong call)
+{
+    const struct aucodec *tx = audio_codec(call_audio((struct call *)call), true);
+    const struct aucodec *rx = audio_codec(call_audio((struct call *)call), false);
     char codec_buf[256];
     char *start = &(codec_buf[0]);
     unsigned int left = sizeof codec_buf;
@@ -1392,32 +1226,28 @@ Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jstr
         len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", tx->name, tx->srate, tx->ch,
                           rx->name, rx->srate, rx->ch);
     if (len == -1) {
-        LOGE("failed to get audio codecs of call %s\n", native_call);
+        LOGE("failed to get audio codecs of call %lu\n", (unsigned long)call);
         codec_buf[0] = '\0';
     }
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1duration(JNIEnv *env, jobject thiz, jstring jCall) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    int duration = call_duration(call);
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
+Java_com_tutpro_baresip_Call_call_1duration(JNIEnv *env, jobject thiz, jlong call)
+{
+    int duration = call_duration((struct call *)call);
     return duration;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jstring jCall, jstring jStream) {
-    const char *native_call = (*env)->GetStringUTFChars(env, jCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
+Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jlong call, jstring jStream)
+{
     const char *native_stream = (*env)->GetStringUTFChars(env, jStream, 0);
     const struct stream *s;
     if (strcmp(native_stream, "audio") == 0)
-        s = audio_strm(call_audio(call));
+        s = audio_strm(call_audio((struct call *)call));
     else
-        s = video_strm(call_video(call));
+        s = video_strm(call_video((struct call *)call));
     const struct rtcp_stats *stats = stream_rtcp_stats(s);
     char stats_buf[256];
     int len;
@@ -1433,48 +1263,41 @@ Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jstring jCal
                           stats->tx.lost, stats->rx.lost,
                           1.0 * stats->tx.jit / 1000, 1.0 * stats->rx.jit / 1000);
         if (len == -1) {
-            LOGE("failed to get stats of call %s %s stream\n", native_call, native_stream);
+            LOGE("failed to get stats of call %lu %s stream\n", (unsigned long)call, native_stream);
             stats_buf[0] = '\0';
         }
     }
-    (*env)->ReleaseStringUTFChars(env, jCall, native_call);
     (*env)->ReleaseStringUTFChars(env, jStream, native_stream);
     return (*env)->NewStringUTF(env, stats_buf);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jstring javaCall)
+Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jlong call)
 {
-    const char *native_call = (*env)->GetStringUTFChars(env, javaCall, 0);
-    struct call *call = (struct call *)strtoul(native_call, NULL, 10);
-    (*env)->ReleaseStringUTFChars(env, javaCall, native_call);
-    return call_has_video(call) ? true : false;
+    return call_has_video((struct call *)call) ? true : false;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jstring javaUA,
-                                          jstring javaPeer, jstring javaMsg, jstring javaTime) {
-    struct ua *ua;
-    const char *native_ua = (*env)->GetStringUTFChars(env, javaUA, 0);
-    const char *native_peer = (*env)->GetStringUTFChars(env, javaPeer, 0);
-    const char *native_msg = (*env)->GetStringUTFChars(env, javaMsg, 0);
-    const char *native_time = (*env)->GetStringUTFChars(env, javaTime, 0);
-    LOGD("sending message from ua %s to %s at %s\n", native_ua, native_peer, native_time);
-    ua = (struct ua *)strtoul(native_ua, NULL, 10);
+Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jlong ua, jstring jPeer, jstring jMsg, jstring jTime)
+{
+    const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
+    const char *native_msg = (*env)->GetStringUTFChars(env, jMsg, 0);
+    const char *native_time = (*env)->GetStringUTFChars(env, jTime, 0);
+    LOGD("sending message from ua %lu to %s at %s\n", (unsigned long)ua, native_peer, native_time);
     re_thread_enter();
-    int err = message_send(ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
+    int err = message_send((struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
     re_thread_leave();
     if (err) {
         LOGW("message_send failed with error %d\n", err);
     }
-    (*env)->ReleaseStringUTFChars(env, javaUA, native_ua);
-    (*env)->ReleaseStringUTFChars(env, javaPeer, native_peer);
-    (*env)->ReleaseStringUTFChars(env, javaMsg, native_msg);
+    (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
+    (*env)->ReleaseStringUTFChars(env, jMsg, native_msg);
     return err;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz)
+{
     int err;
     re_thread_enter();
     err = conf_configure();
@@ -1488,7 +1311,8 @@ Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd) {
+Java_com_tutpro_baresip_Api_cmd_1exec(JNIEnv *env, jobject thiz, jstring javaCmd)
+{
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
     re_thread_enter();
@@ -1553,14 +1377,16 @@ Java_com_tutpro_baresip_Api_video_1codecs(JNIEnv *env, jobject thiz)
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint level) {
+Java_com_tutpro_baresip_Api_log_1level_1set(JNIEnv *env, jobject thiz, jint level)
+{
     const enum log_level native_level = (enum log_level)level;
     LOGD("setting log level to '%u'\n", native_level);
     log_level_set(native_level);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers) {
+Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstring javaServers)
+{
     const char *native_servers = (*env)->GetStringUTFChars(env, javaServers, 0);
     char servers[256];
     char *server;
@@ -1600,8 +1426,8 @@ Java_com_tutpro_baresip_Api_net_1use_1nameserver(JNIEnv *env, jobject thiz, jstr
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(JNIEnv *env, jobject thiz, jstring jAddr,
-                                                     jstring jIfName) {
+Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(JNIEnv *env, jobject thiz, jstring jAddr, jstring jIfName)
+{
     const char *addr = (*env)->GetStringUTFChars(env, jAddr, 0);
     const char *name = (*env)->GetStringUTFChars(env, jIfName, 0);
     int res = 0;
@@ -1623,7 +1449,8 @@ Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(JNIEnv *env, jobject thiz,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring jIp) {
+Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring jIp)
+{
     const char *native_ip = (*env)->GetStringUTFChars(env, jIp, 0);
     int res = 0;
     struct sa temp_sa;
@@ -1647,8 +1474,8 @@ Java_com_tutpro_baresip_Api_net_1rm_1address(JNIEnv *env, jobject thiz, jstring 
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg,
-        jboolean reinvite) {
+Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboolean reg, jboolean reinvite)
+{
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
     re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
@@ -1656,23 +1483,27 @@ Java_com_tutpro_baresip_Api_uag_1reset_1transp(JNIEnv *env, jobject thiz, jboole
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable) {
+Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, jboolean enable)
+{
     LOGD("enabling sip trace (%d)\n", enable);
     uag_enable_sip_trace(enable);
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz)
+{
     net_debug_log();
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz) {
+Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz)
+{
     net_dns_debug_log();
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule) {
+Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring javaModule)
+{
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
     int result = module_load(".", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
@@ -1680,7 +1511,8 @@ Java_com_tutpro_baresip_Api_module_1load(JNIEnv *env, jobject thiz, jstring java
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring javaModule) {
+Java_com_tutpro_baresip_Api_module_1unload(JNIEnv *env, jobject thiz, jstring javaModule)
+{
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
     module_unload(native_module);
     LOGD("unloaded module %s\n", native_module);
