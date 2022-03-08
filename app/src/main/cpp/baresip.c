@@ -267,7 +267,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaEvent",
                                              "(Ljava/lang/String;JJ)V");
     jstring jEvent = (*env)->NewStringUTF(env, event);
-    LOGD("sending ua/call %lu/%lu event %s\n", (unsigned  long)ua, (unsigned  long)call, event);
+    LOGD("sending ua/call %ld/%ld event %s\n", (long)ua, (long)call, event);
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
     (*env)->DeleteLocalRef(env, jEvent);
 
@@ -527,9 +527,9 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     struct ua *ua;
     for (le = list_head(uag_list()); le != NULL; le = le->next) {
         ua = le->data;
-        LOGD("adding UA for AoR %s/%lu\n", account_aor(ua_account(ua)), (unsigned long)ua);
+        LOGD("adding UA for AoR %s/%ld\n", account_aor(ua_account(ua)), (long)ua);
         jmethodID uaAddId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaAdd", "(J)V");
-        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, (unsigned long)ua);
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, (long)ua);
     }
 
     err = mqueue_alloc(&mq, mqueue_handler, NULL);
@@ -1014,7 +1014,7 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring jUri)
     LOGD("allocating UA '%s'\n", uri);
     int res = ua_alloc(&ua, uri);
     if (res == 0) {
-        LOGD("allocated ua '%lu'\n", (unsigned long)ua);
+        LOGD("allocated ua '%ld'\n", (long)ua);
     } else {
         LOGE("failed to allocate ua '%s'\n", uri);
     }
@@ -1025,7 +1025,7 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring jUri)
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jlong ua)
 {
-    LOGD("registering UA '%lu'\n", (unsigned long)ua);
+    LOGD("registering UA '%ld'\n", (long)ua);
     return ua_register((struct ua *)ua);
 }
 
@@ -1044,14 +1044,14 @@ Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jlong ua
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
 {
-    LOGD("updating account of ua %lu\n", (unsigned long)ua);
+    LOGD("updating account of ua %ld\n", (long)ua);
     return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jlong ua)
 {
-    LOGD("destroying ua %lu\n", (unsigned long)ua);
+    LOGD("destroying ua %ld\n", (long)ua);
     (void)ua_destroy((struct ua *)ua);
 }
 
@@ -1069,7 +1069,7 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz, jlong ua, jlon
 {
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("hanging up call %lu/%lu\n", (unsigned long)ua, (unsigned long)call);
+    LOGD("hanging up call %ld/%ld\n", (long)ua, (long)call);
     re_thread_enter();
     if (strlen(native_reason) == 0)
         ua_hangup((struct ua *)ua, (struct call *)call, native_code, NULL);
@@ -1084,20 +1084,20 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jlong ua,
 {
     struct call *call = NULL;
     int err;
-    LOGD("allocating new call for ua %lu xcall %lu\n", (unsigned long)ua, (unsigned long)xCall);
+    LOGD("allocating new call for ua %ld xcall %ld\n", (long)ua, (long)xCall);
     re_thread_enter();
     err = ua_call_alloc(&call, (struct ua *)ua, (enum vidmode)vidMode, NULL, (struct call *)xCall,
             call_localuri((struct call *)xCall), true);
     re_thread_leave();
     if (err)
-        LOGW("call allocation for ua %lu failed with error %d\n", (unsigned long)ua, err);
+        LOGW("call allocation for ua %ld failed with error %d\n", (long)ua, err);
     return (jlong)call;
 }
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jlong ua, jlong call, jint vidMode)
 {
-    LOGD("answering call %lu/%lu\n", (unsigned long)ua, (unsigned long)call);
+    LOGD("answering call %ld/%ld\n", (long)ua, (long)call);
     re_thread_enter();
     ua_answer((struct ua *)ua, (struct call *)call, (enum vidmode)vidMode);
     re_thread_leave();
@@ -1130,7 +1130,7 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
 {
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
-    LOGD("connecting call %lu to %s\n", (unsigned long)call, native_peer);
+    LOGD("connecting call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
     struct pl pl;
     pl_set_str(&pl, native_peer);
@@ -1146,7 +1146,7 @@ Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jl
 {
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    LOGD("notifying call %lu/%s\n", (unsigned long)call, native_reason);
+    LOGD("notifying call %ld/%s\n", (long)call, native_reason);
     re_thread_enter();
     (void)call_notify_sipfrag((struct call *)call, native_code, native_reason);
     re_thread_leave();
@@ -1156,7 +1156,7 @@ Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jl
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jlong call)
 {
-    LOGD("starting audio of call %lu\n", (unsigned long)call);
+    LOGD("starting audio of call %ld\n", (long)call);
     re_thread_enter();
     struct audio *a = call_audio((struct call *)call);
     if (!audio_started(a)) audio_start(a);
@@ -1168,12 +1168,12 @@ Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jlong call, j
 {
     int err;
     if (hold) {
-        LOGD("holding call %lu\n", (unsigned long)call);
+        LOGD("holding call %ld\n", (long)call);
         re_thread_enter();
         err = call_hold((struct call *)call, true);
         re_thread_leave();
     } else {
-        LOGD("resuming call %lu\n", (unsigned long)call);
+        LOGD("resuming call %ld\n", (long)call);
         re_thread_enter();
         err = call_hold((struct call *)call, false);
         re_thread_leave();
@@ -1192,7 +1192,7 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
 {
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
-    LOGD("transfering call %lu to %s\n", (unsigned long)call, native_peer);
+    LOGD("transfering call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
     int err = call_transfer((struct call *)call, native_peer);
     re_thread_leave();
@@ -1205,7 +1205,7 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jlong call, jchar digit)
 {
     const uint16_t native_digit = digit;
-    LOGD("sending DTMF digit '%c' to call %lu\n", (char)native_digit, (unsigned long)call);
+    LOGD("sending DTMF digit '%c' to call %ld\n", (char)native_digit, (long)call);
     re_thread_enter();
     int res = call_send_digit((struct call *)call, (char)native_digit);
     if (!res) res = call_send_digit((struct call *)call, KEYCODE_REL);
@@ -1226,7 +1226,7 @@ Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlon
         len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", tx->name, tx->srate, tx->ch,
                           rx->name, rx->srate, rx->ch);
     if (len == -1) {
-        LOGE("failed to get audio codecs of call %lu\n", (unsigned long)call);
+        LOGE("failed to get audio codecs of call %ld\n", (long)call);
         codec_buf[0] = '\0';
     }
     return (*env)->NewStringUTF(env, codec_buf);
@@ -1263,7 +1263,7 @@ Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jlong call, 
                           stats->tx.lost, stats->rx.lost,
                           1.0 * stats->tx.jit / 1000, 1.0 * stats->rx.jit / 1000);
         if (len == -1) {
-            LOGE("failed to get stats of call %lu %s stream\n", (unsigned long)call, native_stream);
+            LOGE("failed to get stats of call %ld %s stream\n", (long)call, native_stream);
             stats_buf[0] = '\0';
         }
     }
@@ -1283,7 +1283,7 @@ Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jlong ua, j
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     const char *native_msg = (*env)->GetStringUTFChars(env, jMsg, 0);
     const char *native_time = (*env)->GetStringUTFChars(env, jTime, 0);
-    LOGD("sending message from ua %lu to %s at %s\n", (unsigned long)ua, native_peer, native_time);
+    LOGD("sending message from ua %ld to %s at %s\n", (long)ua, native_peer, native_time);
     re_thread_enter();
     int err = message_send((struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
     re_thread_leave();
