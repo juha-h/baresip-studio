@@ -1,6 +1,6 @@
 package com.tutpro.baresip.plus
 
-class UserAgent(val uap: String) {
+class UserAgent(val uap: Long) {
 
     val account = Account(Api.ua_account(uap))
 
@@ -41,7 +41,7 @@ class UserAgent(val uap: String) {
             return null
         }
 
-        fun ofUap(uap: String): UserAgent? {
+        fun ofUap(uap: Long): UserAgent? {
             for (ua in BaresipService.uas)
                 if (ua.uap == uap) return ua
             return null
@@ -49,7 +49,7 @@ class UserAgent(val uap: String) {
 
         fun uaAlloc(uri: String): UserAgent? {
             val uap = Api.ua_alloc(uri)
-            return if (uap == "") {
+            return if (uap == 0L) {
                 Log.e(TAG, "Failed to allocate UserAgent for $uri")
                 null
             } else {

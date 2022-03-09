@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     private var alerting = false
 
     private var resumeUri = ""
-    private var resumeUap = ""
+    private var resumeUap = 0L
     private var resumeCall: Call? = null
     private var resumeAction = ""
     private var firstRun = false
@@ -1102,7 +1102,7 @@ class MainActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT).show()
                     return
                 }
-                val uap = intent.getStringExtra("uap")!!
+                val uap = intent.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w(TAG, "handleIntent 'call' did not find ua $uap")
@@ -1114,7 +1114,7 @@ class MainActivity : AppCompatActivity() {
                 ua.account.resumeUri = intent.getStringExtra("peer")!!
             }
             "call show", "call answer" -> {
-                val callp = intent.getStringExtra("callp")!!
+                val callp = intent.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w(TAG, "handleIntent '$action' did not find call $callp")
@@ -1127,7 +1127,7 @@ class MainActivity : AppCompatActivity() {
                 resumeCall = call
             }
             "call missed" -> {
-                val uap = intent.getStringExtra("uap")!!
+                val uap = intent.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w(TAG, "handleIntent did not find ua $uap")
@@ -1138,7 +1138,7 @@ class MainActivity : AppCompatActivity() {
                 resumeAction = action
             }
             "call transfer", "transfer show", "transfer accept" -> {
-                val callp = intent.getStringExtra("callp")!!
+                val callp = intent.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w(TAG, "handleIntent '$action' did not find call $callp")
@@ -1153,7 +1153,7 @@ class MainActivity : AppCompatActivity() {
                     intent.getStringExtra("uri")!!
             }
             "message", "message show", "message reply" -> {
-                val uap = intent.getStringExtra("uap")!!
+                val uap = intent.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
                     Log.w(TAG, "onNewIntent did not find ua $uap")
@@ -1187,7 +1187,7 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun handleServiceEvent(event: String, params: ArrayList<String>) {
+    private fun handleServiceEvent(event: String, params: ArrayList<Any>) {
 
         fun handleNextEvent(logMessage: String? = null) {
             if (logMessage != null)
@@ -1207,7 +1207,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (event == "started") {
-            val callActionUri = params[0]
+            val callActionUri = params[0] as String
             Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
             if (!this::uaAdapter.isInitialized) {
                 // Android has restarted baresip when permission has been denied in app settings
@@ -1253,7 +1253,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val uap = params[0]
+        val uap = params[0] as Long
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             handleNextEvent("handleServiceEvent '$event' did not find ua $uap")
@@ -1274,7 +1274,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call incoming", "call outgoing" -> {
-                        val callp = params[1]
+                        val callp = params[1] as Long
                         if (BaresipService.isMainVisible) {
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
@@ -1295,7 +1295,7 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call established" -> {
-                        if (Call.ofCallp(params[1])!!.videoEnabled()) {
+                        if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
                             am.isSpeakerphoneOn = true
                             speakerButton.setImageResource(R.drawable.speaker_on_button)
                             if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
@@ -1310,8 +1310,8 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call video request" -> {
-                        val callp = params[1]
-                        val dir = params[2].toInt()
+                        val callp = params[1] as Long
+                        val dir = params[2] as Int
                         val call = Call.ofCallp(callp)
                         if (call == null) {
                             Log.w(TAG, "Video request call $callp not found")
@@ -1344,7 +1344,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call verify" -> {
-                        val callp = params[1]
+                        val callp = params[1] as Long
                         val call = Call.ofCallp(callp)
                         if (call == null) {
                             handleNextEvent("Call $callp to be verified is not found")
@@ -1384,7 +1384,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call verified", "call secure" -> {
-                        val callp = params[1]
+                        val callp = params[1] as Long
                         val call = Call.ofCallp(callp)
                         if (call == null) {
                             handleNextEvent("Call $callp that is verified is not found")
@@ -1400,7 +1400,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "call transfer", "transfer show" -> {
-                        val callp = params[1]
+                        val callp = params[1] as Long
                         if (!BaresipService.isMainVisible) {
                             Log.d(TAG, "Reordering to front")
                             BaresipService.activities.clear()
@@ -1431,7 +1431,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     "transfer accept" -> {
-                        val callp = params[1]
+                        val callp = params[1] as Long
                         val call = Call.ofCallp(callp)
                         if (call in Call.calls())
                             Api.ua_hangup(uap, callp, 0, "")
@@ -1464,7 +1464,7 @@ class MainActivity : AppCompatActivity() {
                         i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         val b = Bundle()
                         b.putString("aor", aor)
-                        b.putString("peer", params[1])
+                        b.putString("peer", params[1] as String)
                         b.putBoolean("focus", ev[0] == "message reply")
                         i.putExtras(b)
                         chatRequests.launch(i)
@@ -2046,8 +2046,8 @@ class MainActivity : AppCompatActivity() {
             Utils.isCameraAvailable(this) -> Api.SDP_SENDRECV
             else -> Api.SDP_RECVONLY
         }
-        val callp = Api.ua_call_alloc(ua.uap, "", Api.VIDMODE_ON)
-        return if (callp != "") {
+        val callp = Api.ua_call_alloc(ua.uap, 0L, Api.VIDMODE_ON)
+        return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
             call.add()
@@ -2073,7 +2073,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun acceptTransfer(ua: UserAgent, call: Call, uri: String) {
         val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
-        if (newCallp != "") {
+        if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))

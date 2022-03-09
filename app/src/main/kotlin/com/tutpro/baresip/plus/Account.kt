@@ -6,7 +6,7 @@ import kotlin.collections.ArrayList
 import java.net.URLEncoder
 import java.net.URLDecoder
 
-class Account(val accp: String) {
+class Account(val accp: Long) {
 
     var displayName = Api.account_display_name(accp)
     val aor = Api.account_aor(accp)

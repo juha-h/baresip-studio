@@ -423,8 +423,8 @@ class BaresipService: Service() {
             }
 
             "Call Answer" -> {
-                val uap = intent!!.getStringExtra("uap")!!
-                val callp = intent.getStringExtra("callp")!!
+                val uap = intent!!.getLongExtra("uap", 0L)
+                val callp = intent.getLongExtra("callp", 0L)
                 stopRinging()
                 stopMediaPlayer()
                 if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
@@ -436,7 +436,7 @@ class BaresipService: Service() {
             }
 
             "Call Reject" -> {
-                val callp = intent!!.getStringExtra("callp")!!
+                val callp = intent!!.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
                 if (call == null) {
                     Log.w(TAG, "onStartCommand did not find call $callp")
@@ -450,7 +450,7 @@ class BaresipService: Service() {
             }
 
             "Transfer Deny" -> {
-                val callp = intent!!.getStringExtra("callp")!!
+                val callp = intent!!.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
                 if (call == null)
                     Log.w(TAG, "onStartCommand did not find call $callp")
@@ -460,7 +460,7 @@ class BaresipService: Service() {
             }
 
             "Message Save" -> {
-                val uap = intent!!.getStringExtra("uap")!!
+                val uap = intent!!.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
@@ -473,7 +473,7 @@ class BaresipService: Service() {
             }
 
             "Message Delete" -> {
-                val uap = intent!!.getStringExtra("uap")!!
+                val uap = intent!!.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
@@ -522,7 +522,7 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun uaAdd(uap: String) {
+    fun uaAdd(uap: Long) {
         val ua = UserAgent(uap)
         Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
         uas.add(ua)
@@ -539,7 +539,7 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun uaEvent(event: String, uap: String, callp: String) {
+    fun uaEvent(event: String, uap: Long, callp: Long) {
 
         if (!isServiceRunning) return
 
@@ -573,7 +573,7 @@ class BaresipService: Service() {
         }
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != "0" && ev[0] != "call incoming" && ev[0] != "call rejected") {
+        if (call == null && callp != 0L && ev[0] != "call incoming" && ev[0] != "call rejected") {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -738,7 +738,7 @@ class BaresipService: Service() {
                                 (!callHasVideo && remoteHasVideo &&
                                         (rdir != Api.SDP_INACTIVE) && (ldir != rdir))) {
                             postServiceEvent(ServiceEvent("call video request",
-                                    arrayListOf(uap, callp, "$rdir"), System.nanoTime()))
+                                    arrayListOf(uap, callp, rdir), System.nanoTime()))
                             return
                         }
                         newEvent = "call update"
@@ -922,7 +922,8 @@ class BaresipService: Service() {
             }
         }
 
-        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), System.nanoTime()))
+        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
+                System.nanoTime()))
 
     }
 
@@ -937,7 +938,7 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun messageEvent(uap: String, peer: String, msg: ByteArray) {
+    fun messageEvent(uap: Long, peer: String, msg: ByteArray) {
         var text = "Decoding of message failed!"
         try {
             text = String(msg, StandardCharsets.UTF_8)
