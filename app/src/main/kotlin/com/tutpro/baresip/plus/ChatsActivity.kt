@@ -21,6 +21,7 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var peerUri: AutoCompleteTextView
     private lateinit var plusButton: ImageButton
     internal lateinit var aor: String
+    internal lateinit var account: Account
     private var scrollPosition = -1
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +35,7 @@ class ChatsActivity: AppCompatActivity() {
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
+        account = UserAgent.ofAor(aor)!!.account
 
         val headerView = binding.account
         val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
@@ -188,7 +190,7 @@ class ChatsActivity: AppCompatActivity() {
                         Message.save()
                         uaMessages.clear()
                         clAdapter.notifyDataSetChanged()
-                        UserAgent.ofAor(aor)!!.account.unreadMessages = false
+                        account.unreadMessages = false
                         dialog.dismiss()
                     }
                     setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
@@ -221,6 +223,7 @@ class ChatsActivity: AppCompatActivity() {
 
     private fun uaMessages(aor: String) : ArrayList<Message> {
         val res = ArrayList<Message>()
+        account.unreadMessages = false
         for (m in Message.messages().reversed()) {
             if (m.aor != aor) continue
             var found = false
@@ -229,7 +232,11 @@ class ChatsActivity: AppCompatActivity() {
                     found = true
                     break
                 }
-            if (!found) res.add(m)
+            if (!found) {
+                res.add(m)
+                if (m.new)
+                    account.unreadMessages = true
+            }
         }
         return res
     }
