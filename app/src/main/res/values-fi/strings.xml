@@ -456,7 +456,6 @@
     <string name="attended">Osallistu</string>
     <string name="transfer_destination">Siirron kohde</string>
     <string name="transfer">Siirto</string>
-    <string name="execute_transfer">Suorita siirto</string>
     <string name="transfer_failed">Siirto epäonnistui</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>

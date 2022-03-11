@@ -416,7 +416,6 @@
     <string name="attended">Attended</string>
     <string name="transfer_destination">Transfer destination</string>
     <string name="transfer">Transfer</string>
-    <string name="execute_transfer">Execute Transfer</string>
     <string name="transfer_failed">Transfer Failed</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
