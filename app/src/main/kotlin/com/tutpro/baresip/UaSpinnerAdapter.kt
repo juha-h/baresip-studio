@@ -47,7 +47,7 @@ class UaSpinnerAdapter(private val cxt: Context, private val uas: ArrayList<User
         val ua = uas[position]
         viewHolder.textView.text = ua.account.aor.split(":")[1]
         viewHolder.textView.textSize = 17f
-        if (ua.calls().isNotEmpty())
+        if (UserAgent.uas().size > 1 && ua.calls().isNotEmpty())
             viewHolder.textView.setTextColor(getColor(cxt, R.color.colorRed))
         viewHolder.imageView.setImageResource(images[position])
 
