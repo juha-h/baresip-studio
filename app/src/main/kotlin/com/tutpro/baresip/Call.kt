@@ -46,8 +46,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     fun executeTransfer(): Boolean {
         return if (this.onHoldCall != null) {
-            call_hold(callp, true)
-            call_replace_transfer(this.onHoldCall!!.callp, callp)
+            if (call_hold(callp, true) == 0)
+                call_replace_transfer(this.onHoldCall!!.callp, callp)
+            else
+                false
         } else
             false
     }

@@ -76,7 +76,6 @@ class MainActivity : AppCompatActivity() {
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private var executeTransferDialog: androidx.appcompat.app.AlertDialog? = null
 
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
@@ -389,7 +388,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         transferButton.setOnClickListener {
-            makeTransfer(UserAgent.uas()[aorSpinner.selectedItemPosition])
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val call = ua.currentCall()
+            if (call != null ) {
+                if (call.onHoldCall != null) {
+                    if (!call.executeTransfer())
+                        Utils.alertView(this@MainActivity, getString(R.string.notice),
+                                String.format(getString(R.string.transfer_failed)))
+                } else {
+                    makeTransfer(ua)
+                }
+            }
         }
 
         infoButton.setOnClickListener {
@@ -1863,25 +1872,10 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    if (call.onHoldCall != null) {
-                        val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                        with(builder) {
-                            setTitle(getString(R.string.execute_transfer))
-                            setPositiveButton(getText(R.string.yes)) { dialog, _ ->
-                                dialog.dismiss()
-                                call.executeTransfer()
-                            }
-                            setNeutralButton(getText(R.string.no)) { dialog, _ ->
-                                dialog.dismiss()
-                                Api.ua_hangup(ua.uap, call.callp, 0, "")
-                            }
-                        }
-                        executeTransferDialog = builder.create()
-                        executeTransferDialog!!.show()
-                    } else {
-                        executeTransferDialog?.dismiss()
-                        executeTransferDialog = null
-                    }
+                    if (call.onHoldCall == null)
+                        transferButton.setImageResource(R.drawable.call_transfer)
+                    else
+                        transferButton.setImageResource(R.drawable.call_transfer_execute)
                     startCallTimer(call)
                     callTimer.visibility = View.VISIBLE
                     if (ua.account.mediaEnc == "") {
