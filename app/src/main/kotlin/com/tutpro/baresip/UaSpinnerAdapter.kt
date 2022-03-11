@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getColor
 
 import java.util.ArrayList
 
-class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
+class UaSpinnerAdapter(private val cxt: Context, private val uas: ArrayList<UserAgent>,
                        private val images: ArrayList<Int>) :
         ArrayAdapter<Int>(cxt, android.R.layout.simple_spinner_item, images) {
 
@@ -43,8 +44,11 @@ class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
             viewHolder = rowView.tag as ViewHolder
         }
 
-        viewHolder.textView.text = uas[position].account.aor.split(":")[1]
+        val ua = uas[position]
+        viewHolder.textView.text = ua.account.aor.split(":")[1]
         viewHolder.textView.textSize = 17f
+        if (ua.calls().isNotEmpty())
+            viewHolder.textView.setTextColor(getColor(cxt, R.color.colorRed))
         viewHolder.imageView.setImageResource(images[position])
 
         return rowView

@@ -123,6 +123,7 @@ object Utils {
         val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
+        u = u.substringBefore("?")
         u = u.replace(":5060", "")
         u = u.replace(";transport=udp", "", true)
         if (u.split(":").size == 3 ||

@@ -838,13 +838,18 @@ class BaresipService: Service() {
                         Log.d(TAG, "AoR $aor call $callp is closed")
                         stopRinging()
                         stopMediaPlayer()
-                        /* when (ev[2]) {
-                            "busy" ->
-                                playMedia(R.raw.busy, 1)
-                            "error" ->
-                                playMedia(R.raw.error, 1)
-                        } */
-                        call!!.remove()
+                        val newCall = call!!.newCall
+                        if (newCall != null) {
+                            newCall.onHoldCall = null
+                            call.newCall = null
+                        }
+                        val onHoldCall = call.onHoldCall
+                        if (onHoldCall != null) {
+                            onHoldCall.newCall = null
+                            onHoldCall.referTo = ""
+                            call.onHoldCall = null
+                        }
+                        call.remove()
                         if (Call.calls().size == 0) {
                             resetCallVolume()
                             am.isSpeakerphoneOn = false
@@ -911,7 +916,7 @@ class BaresipService: Service() {
                             return
                         }
                         val reason = ev[1].trim()
-                        if ((reason != "") && (Call.uaCalls(ua, "").size == 0)) {
+                        if ((reason != "") && (ua.calls().isEmpty())) {
                             if (reason[0].isDigit())
                                 toast("${getString(R.string.call_failed)}: $reason")
                             else

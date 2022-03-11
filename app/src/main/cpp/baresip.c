@@ -1277,6 +1277,21 @@ Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jlong c
     return call_has_video((struct call *)call) ? true : false;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_Call_call_1replaces(JNIEnv *env, jobject thiz, jlong call)
+{
+    return call_supported((struct call *)call, REPLACES) ? true : false;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_Call_call_1replace_1transfer(JNIEnv *env, jobject thiz, jlong xferCall, jlong call)
+{
+    re_thread_enter();
+    int res = call_replace_transfer((struct call *)xferCall, (struct call *)call);
+    re_thread_leave();
+    return res == 0 ? true : false;
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jlong ua, jstring jPeer, jstring jMsg, jstring jTime)
 {

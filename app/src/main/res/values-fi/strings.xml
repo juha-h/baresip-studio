@@ -452,8 +452,11 @@
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="mic">Mikrofoni päälle/pois</string>
     <string name="call_transfer">Puhelun siirto</string>
+    <string name="blind">Sokeasti</string>
+    <string name="attended">Osallistu</string>
     <string name="transfer_destination">Siirron kohde</string>
     <string name="transfer">Siirto</string>
+    <string name="execute_transfer">Suorita siirto</string>
     <string name="transfer_failed">Siirto epäonnistui</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>

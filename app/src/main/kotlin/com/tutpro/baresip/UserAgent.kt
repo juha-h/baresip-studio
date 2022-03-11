@@ -19,6 +19,20 @@ class UserAgent(val uap: Long) {
         BaresipService.status[BaresipService.uas.indexOf(this)] = status
     }
 
+    fun calls(dir: String = ""): ArrayList<Call> {
+        val result = ArrayList<Call>()
+        for (c in BaresipService.calls)
+            if ((c.ua == this) && ((dir == "") || c.dir == dir)) result.add(c)
+        return result
+    }
+
+    fun currentCall(): Call? {
+        for (c in BaresipService.calls)
+            if (c.ua == this)
+                return c
+        return null
+    }
+
     companion object {
 
         fun uas(): ArrayList<UserAgent> {

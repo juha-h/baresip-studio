@@ -8,6 +8,8 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     var onhold = false
     var held = false
+    var onHoldCall: Call? = null
+    var newCall: Call? = null
     var rejected = false
     var security = 0
     var zid = ""
@@ -15,31 +17,39 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var referTo = ""
 
     fun add() {
-        BaresipService.calls.add(this)
+        BaresipService.calls.add(0, this)
     }
 
     fun remove() {
         BaresipService.calls.remove(this)
     }
 
-    fun connect(uri: String): Int {
-        return call_connect(callp, uri)
+    fun connect(uri: String): Boolean {
+        return call_connect(callp, uri) == 0
     }
 
-    fun hold(): Int {
-        return call_hold(callp, true)
+    fun hold(): Boolean {
+        return call_hold(callp, true) == 0
     }
 
-    fun resume(): Int {
-        return call_hold(callp, false)
+    fun resume(): Boolean {
+        return call_hold(callp, false) == 0
     }
 
-    fun transfer(uri: String): Int {
+    fun transfer(uri: String): Boolean {
         val err = call_hold(callp, true)
         if (err != 0)
-            return err
+            return false
         referTo = uri
-        return call_transfer(callp, uri)
+        return call_transfer(callp, uri) == 0
+    }
+
+    fun executeTransfer(): Boolean {
+        return if (this.onHoldCall != null) {
+            call_hold(callp, true)
+            call_replace_transfer(this.onHoldCall!!.callp, callp)
+        } else
+            false
     }
 
     fun sendDigit(digit: Char): Int {
@@ -54,13 +64,16 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return call_duration(callp)
     }
 
-
     fun stats(stream: String): String {
         return call_stats(callp, stream)
     }
 
     fun audioCodecs(): String {
         return call_audio_codecs(callp)
+    }
+
+    fun replaces(): Boolean {
+        return call_replaces(callp)
     }
 
     init {
@@ -78,18 +91,13 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     private external fun call_duration(callp: Long): Int
     private external fun call_stats(callp: Long, stream: String): String
     private external fun call_has_video(callp: Long): Boolean
+    private external fun call_replaces(callp: Long): Boolean
+    private external fun call_replace_transfer(xfer_callp: Long, callp: Long): Boolean
 
     companion object {
 
         fun calls(): ArrayList<Call> {
             return BaresipService.calls
-        }
-
-        fun uaCalls(ua: UserAgent, dir: String): ArrayList<Call> {
-            val result = ArrayList<Call>()
-            for (c in BaresipService.calls)
-                if ((c.ua == ua) && ((dir == "") || c.dir == dir)) result.add(c)
-            return result
         }
 
         fun ofCallp(callp: Long): Call? {
@@ -102,13 +110,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             for (c in BaresipService.calls)
                 if (c.status == status) return c
             return null
-        }
-
-        fun isStatus(status: String): Boolean {
-            for (call in BaresipService.calls)
-                if (call.status == status)
-                    return true
-            return false
         }
 
     }
