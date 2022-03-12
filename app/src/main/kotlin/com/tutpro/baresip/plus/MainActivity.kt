@@ -3,6 +3,7 @@ package com.tutpro.baresip.plus
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
@@ -320,7 +321,8 @@ class MainActivity : AppCompatActivity() {
                         setTitle(R.string.info)
                         setMessage(getString(R.string.call_is_secure))
                         setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
-                            val calls = Call.uaCalls(UserAgent.uas()[aorSpinner.selectedItemPosition], "")
+                            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                            val calls = ua.calls()
                             if (calls.size > 0) {
                                 if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
                                     Log.e(TAG, "Command 'zrtp_unverify ${calls[0].zid}' failed")
@@ -372,7 +374,7 @@ class MainActivity : AppCompatActivity() {
         hangupButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val uaCalls = Call.uaCalls(ua, "")
+            val uaCalls = ua.calls()
             if (uaCalls.size > 0) {
                 val call = uaCalls[uaCalls.size - 1]
                 val callp = call.callp
@@ -387,7 +389,7 @@ class MainActivity : AppCompatActivity() {
         answerButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = Call.uaCalls(ua, "in")[0]
+            val call = ua.calls("in")[0]
             Log.d(TAG, "AoR $aor answering call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
@@ -404,7 +406,7 @@ class MainActivity : AppCompatActivity() {
         answerVideoButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = Call.uaCalls(ua, "in")[0]
+            val call = ua.calls("in")[0]
             Log.d(TAG, "AoR $aor answering video call ${call.callp} from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
@@ -424,7 +426,7 @@ class MainActivity : AppCompatActivity() {
         rejectButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = Call.uaCalls(ua, "in")[0]
+            val call = ua.calls("in")[0]
             val callp = call.callp
             Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.text}")
             answerButton.isEnabled = false
@@ -437,7 +439,7 @@ class MainActivity : AppCompatActivity() {
         holdButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = Call.uaCalls(ua, "")[0]
+            val call = ua.calls()[0]
             if (call.onhold) {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
@@ -452,12 +454,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         transferButton.setOnClickListener {
-            makeTransfer(UserAgent.uas()[aorSpinner.selectedItemPosition])
+            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val call = ua.currentCall()
+            if (call != null ) {
+                if (call.onHoldCall != null) {
+                    if (!call.executeTransfer())
+                        Utils.alertView(this@MainActivity, getString(R.string.notice),
+                                String.format(getString(R.string.transfer_failed)))
+                } else {
+                    makeTransfer(ua)
+                }
+            }
         }
 
         infoButton.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val calls = Call.uaCalls(ua, "")
+            val calls = ua.calls()
             if (calls.size > 0) {
                 val call = calls[0]
                 val stats = call.stats("audio")
@@ -977,7 +989,7 @@ class MainActivity : AppCompatActivity() {
         ib.layoutParams = prm
         ib.setOnClickListener {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val calls = Call.uaCalls(ua, "")
+            val calls = ua.calls()
             if (calls.size > 0) {
                 val call = calls[0]
                 val stats = call.stats("video")
@@ -1276,6 +1288,7 @@ class MainActivity : AppCompatActivity() {
                     "call incoming", "call outgoing" -> {
                         val callp = params[1] as Long
                         if (BaresipService.isMainVisible) {
+                            uaAdapter.notifyDataSetChanged()
                             if (aor != aorSpinner.tag)
                                 spinToAor(aor)
                             showCall(ua, Call.ofCallp(callp))
@@ -1442,6 +1455,14 @@ class MainActivity : AppCompatActivity() {
                         showCall(ua)
                     }
                     "call closed" -> {
+                        uaAdapter.notifyDataSetChanged()
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            call.resume()
+                            startCallTimer(call)
+                        } else {
+                            callTimer.stop()
+                        }
                         if (aor == aorSpinner.tag) {
                             callUri.inputType = InputType.TYPE_CLASS_TEXT +
                                     InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -1455,7 +1476,6 @@ class MainActivity : AppCompatActivity() {
                         if (speakerIcon != null)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        callTimer.stop()
                         if (kgm.isDeviceLocked)
                             Utils.setShowWhenLocked(this, false)
                     }
@@ -1712,14 +1732,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeTransfer(ua: UserAgent) {
+
         val layout = LayoutInflater.from(this)
-                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content),
-                        false)
+                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content), false)
+        val blind = layout.findViewById(R.id.blind) as CheckBox
+        val attended = layout.findViewById(R.id.attended) as CheckBox
+
         val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contactNames()))
         transferUri.threshold = 2
         transferUri.requestFocus()
+
         val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
         with(builder) {
             setView(layout)
@@ -1739,8 +1763,19 @@ class MainActivity : AppCompatActivity() {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                     } else {
-                        if (Call.uaCalls(ua, "").size > 0) {
-                            Call.uaCalls(ua, "")[0].transfer(uri)
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            if (attended.isChecked) {
+                                if (call.hold()) {
+                                    call.referTo = uri
+                                    call(ua, uri, "voice", call)
+                                }
+                            } else {
+                                if (!call.transfer(uri)) {
+                                    Utils.alertView(this@MainActivity, getString(R.string.notice),
+                                            String.format(getString(R.string.transfer_failed)))
+                                }
+                            }
                             showCall(ua)
                         }
                     }
@@ -1752,6 +1787,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val alertDialog = builder.create()
+
+        val call = ua.currentCall() ?: return
+        val blindOrAttended = layout.findViewById(R.id.blindOrAttended) as RelativeLayout
+        if (call.replaces()) {
+            blind.setOnClickListener {
+                if (blind.isChecked) {
+                    attended.isChecked = false
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.transfer)
+                }
+            }
+            attended.setOnClickListener {
+                if (attended.isChecked) {
+                    blind.isChecked = false
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.call)
+                }
+            }
+            blindOrAttended.visibility = View.VISIBLE
+        } else {
+            blindOrAttended.visibility = View.GONE
+        }
+
         // This needs to be done after dialog has been created and before it is shown
         alertDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         alertDialog.show()
@@ -2016,6 +2072,7 @@ class MainActivity : AppCompatActivity() {
                         hangupButton.visibility = View.INVISIBLE
                         hangupButton.isEnabled = false
                     } else {
+                        uaAdapter.notifyDataSetChanged()
                         callButton.visibility = View.INVISIBLE
                         callButton.isEnabled = false
                         callVideoButton.visibility = View.INVISIBLE
@@ -2033,7 +2090,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun call(ua: UserAgent, uri: String, kind: String): Boolean {
+    private fun call(ua: UserAgent, uri: String, kind: String, onHoldCall: Call? = null): Boolean {
         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
             Toast.makeText(applicationContext, getString(R.string.no_calls),
                     Toast.LENGTH_LONG).show()
@@ -2050,19 +2107,21 @@ class MainActivity : AppCompatActivity() {
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
+            call.onHoldCall = onHoldCall
             call.add()
-            var err = call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-            if (err == 0) {
-                err = call.connect(uri)
-                if (err == 0) {
+            if (call.setMediaDirection(Api.SDP_SENDRECV, videoDir) == 0) {
+                if (onHoldCall != null)
+                    onHoldCall.newCall = call
+                if (call.connect(uri)) {
                     showCall(ua)
                     true
                 } else {
-                    Log.w(TAG, "Call $callp call_connect failed with error $err")
+                    showCall(ua)
+                    Log.w(TAG, "call_connect $callp failed")
                     false
                 }
             } else {
-                Log.w(TAG, "Call $callp callSetMediaDirection failed with error $err")
+                Log.w(TAG, "Call $callp callSetMediaDirection failed")
                 false
             }
         } else {
@@ -2078,13 +2137,12 @@ class MainActivity : AppCompatActivity() {
             val newCall = Call(newCallp, ua, uri, "out", "transferring",
                     Utils.dtmfWatcher(newCallp))
             newCall.add()
-            val err = newCall.connect(uri)
-            if (err == 0) {
+            if (newCall.connect(uri)) {
                 if (ua.account.aor != aorSpinner.tag)
                     spinToAor(ua.account.aor)
                 showCall(ua)
             } else {
-                Log.w(TAG, "call_connect $newCallp failed with error $err")
+                Log.w(TAG, "call_connect $newCallp failed")
                 call.notifySipfrag(500, "Call Error")
             }
         } else {
@@ -2108,7 +2166,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showCall(ua: UserAgent, showCall: Call? = null) {
-        if (Call.uaCalls(ua, "").size == 0) {
+        val call = showCall ?: ua.currentCall()
+        if (call == null) {
             swipeRefresh.isEnabled = true
             videoLayout.visibility = View.INVISIBLE
             defaultLayout.visibility = View.VISIBLE
@@ -2143,7 +2202,6 @@ class MainActivity : AppCompatActivity() {
             onHoldNotice.visibility = View.GONE
         } else {
             swipeRefresh.isEnabled = false
-            val call = showCall ?: Call.uaCalls(ua, "")[0]
             callUri.isFocusable = false
             when (call.status) {
                 "outgoing", "transferring", "answered" -> {
@@ -2222,9 +2280,11 @@ class MainActivity : AppCompatActivity() {
                                 Utils.aorDomain(ua.account.aor)))
                         transferButton.isEnabled = true
                     }
-                    callTimer.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
-                    callTimer.stop()
-                    callTimer.start()
+                    if (call.onHoldCall == null)
+                        transferButton.setImageResource(R.drawable.call_transfer)
+                    else
+                        transferButton.setImageResource(R.drawable.call_transfer_execute)
+                    startCallTimer(call)
                     callTimer.visibility = View.VISIBLE
                     videoButton.setImageResource(R.drawable.video_on)
                     videoButton.visibility = View.VISIBLE
@@ -2394,11 +2454,17 @@ class MainActivity : AppCompatActivity() {
     private fun saveCallUri() {
         if (UserAgent.uas().isNotEmpty() && aorSpinner.selectedItemPosition >= 0) {
             val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            if (Call.uaCalls(ua, "").size == 0)
+            if (ua.calls().isEmpty())
                 ua.account.resumeUri = callUri.text.toString()
             else
                 ua.account.resumeUri = ""
         }
+    }
+
+    private fun startCallTimer(call: Call) {
+        callTimer.stop()
+        callTimer.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
+        callTimer.start()
     }
 
     companion object {

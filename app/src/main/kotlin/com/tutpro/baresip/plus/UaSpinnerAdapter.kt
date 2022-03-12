@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,11 @@ class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
             viewHolder = rowView.tag as ViewHolder
         }
 
-        viewHolder.textView.text = uas[position].account.aor.split(":")[1]
+        val ua = uas[position]
+        viewHolder.textView.text = ua.account.aor.split(":")[1]
         viewHolder.textView.textSize = 17f
+        if (UserAgent.uas().size > 1 && ua.calls().isNotEmpty())
+            viewHolder.textView.setTypeface(null, Typeface.BOLD)
         viewHolder.imageView.setImageResource(images[position])
 
         return rowView

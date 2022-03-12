@@ -412,6 +412,8 @@
     <string name="call_is_on_hold">Call is on hold</string>
     <string name="mic">Microphone On/Off</string>
     <string name="call_transfer">Call Transfer</string>
+    <string name="blind">Blind</string>
+    <string name="attended">Attended</string>
     <string name="transfer_destination">Transfer destination</string>
     <string name="transfer">Transfer</string>
     <string name="transfer_failed">Transfer Failed</string>

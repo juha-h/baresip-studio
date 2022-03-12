@@ -412,7 +412,7 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
 
         err = vidframe_alloc(&st->vf, VID_FMT_RGB565, &frame->size);
         if (err) {
-            LOGW("opengles_display: vidframe_alloc failed\n");
+            LOGW("opengles_display: vidframe_alloc failed: %d\n", err);
             return err;
         }
     }
