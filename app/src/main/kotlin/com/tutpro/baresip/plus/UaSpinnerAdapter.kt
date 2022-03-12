@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 
-import java.util.ArrayList
-
 class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
                        private val images: ArrayList<Int>) :
         ArrayAdapter<Int>(cxt, android.R.layout.simple_spinner_item, images) {
