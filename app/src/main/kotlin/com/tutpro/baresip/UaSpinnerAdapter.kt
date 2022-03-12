@@ -1,17 +1,15 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getColor
 
-import java.util.ArrayList
-
-class UaSpinnerAdapter(private val cxt: Context, private val uas: ArrayList<UserAgent>,
+class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
                        private val images: ArrayList<Int>) :
         ArrayAdapter<Int>(cxt, android.R.layout.simple_spinner_item, images) {
 
@@ -48,7 +46,7 @@ class UaSpinnerAdapter(private val cxt: Context, private val uas: ArrayList<User
         viewHolder.textView.text = ua.account.aor.split(":")[1]
         viewHolder.textView.textSize = 17f
         if (UserAgent.uas().size > 1 && ua.calls().isNotEmpty())
-            viewHolder.textView.setTextColor(getColor(cxt, R.color.colorRed))
+            viewHolder.textView.setTypeface(null, Typeface.BOLD)
         viewHolder.imageView.setImageResource(images[position])
 
         return rowView
