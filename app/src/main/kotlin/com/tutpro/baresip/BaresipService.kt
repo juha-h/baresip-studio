@@ -533,18 +533,18 @@ class BaresipService: Service() {
     @Keep
     fun uaAdd(uap: Long) {
         val ua = UserAgent(uap)
-        Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
-        uas.add(ua)
-        if (Api.ua_isregistered(uap)) {
+        ua.status = if (Api.ua_isregistered(uap)) {
             Log.d(TAG, "Ua ${ua.account.aor} is registered")
-            status.add(R.drawable.dot_green)
+            R.drawable.dot_green
         } else {
             Log.d(TAG, "Ua ${ua.account.aor} is NOT registered")
             if (ua.account.regint == 0)
-                status.add(R.drawable.dot_white)
+                R.drawable.dot_white
             else
-                status.add(R.drawable.dot_yellow)
+                R.drawable.dot_yellow
         }
+        Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
+        uas.add(ua)
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -579,17 +579,17 @@ class BaresipService: Service() {
                         return
                     }
                     "registered" -> {
-                        if (ua.account.regint == 0)
-                            status[account_index] = R.drawable.dot_white
+                        ua.status = if (ua.account.regint == 0)
+                            R.drawable.dot_white
                         else
-                            status[account_index] = R.drawable.dot_green
+                            R.drawable.dot_green
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "registering failed" -> {
-                        status[account_index] = R.drawable.dot_red
+                       ua.status = R.drawable.dot_red
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -606,7 +606,7 @@ class BaresipService: Service() {
                         return
                     }
                     "unregistering" -> {
-                        status[account_index] = R.drawable.dot_white
+                        ua.status = R.drawable.dot_white
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -1113,14 +1113,14 @@ class BaresipService: Service() {
         val contentView = RemoteViews(packageName, R.layout.status_notification)
         for (i: Int in 0..5) {
             val resID = resources.getIdentifier("status$i", "id", packageName)
-            if (i < status.size) {
-                contentView.setImageViewResource(resID, status[i])
+            if (i < uas.size) {
+                contentView.setImageViewResource(resID, uas[i].status)
                 contentView.setViewVisibility(resID, View.VISIBLE)
             } else {
                 contentView.setViewVisibility(resID, View.INVISIBLE)
             }
         }
-        if (status.size > 4)
+        if (uas.size > 4)
             contentView.setViewVisibility(R.id.etc, View.VISIBLE)
         else
             contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
@@ -1447,7 +1447,6 @@ class BaresipService: Service() {
         stopRinging()
         stopMediaPlayer()
         uas.clear()
-        status.clear()
         callHistory.clear()
         messages.clear()
         if (this::nm.isInitialized)
@@ -1483,7 +1482,6 @@ class BaresipService: Service() {
         var isMicMuted = false
 
         val uas = ArrayList<UserAgent>()
-        val status = ArrayList<Int>()
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<NewCallHistory>()
         var messages = ArrayList<Message>()

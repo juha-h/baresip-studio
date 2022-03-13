@@ -9,9 +9,8 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 
-class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
-                       private val images: ArrayList<Int>) :
-        ArrayAdapter<Int>(cxt, android.R.layout.simple_spinner_item, images) {
+class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>) :
+        ArrayAdapter<UserAgent>(cxt, android.R.layout.simple_spinner_item, uas) {
 
     private val layoutInflater = LayoutInflater.from(context)
 
@@ -47,7 +46,7 @@ class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>,
         viewHolder.textView.textSize = 17f
         if (UserAgent.uas().size > 1 && ua.calls().isNotEmpty())
             viewHolder.textView.setTypeface(null, Typeface.BOLD)
-        viewHolder.imageView.setImageResource(images[position])
+        viewHolder.imageView.setImageResource(ua.status)
 
         return rowView
     }

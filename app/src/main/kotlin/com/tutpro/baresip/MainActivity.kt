@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas, BaresipService.status)
+        uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas)
         aorSpinner.adapter = uaAdapter
         aorSpinner.setSelection(-1)
         aorSpinner.tag = ""
