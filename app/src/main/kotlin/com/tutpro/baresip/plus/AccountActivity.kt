@@ -448,12 +448,12 @@ class AccountActivity : AppCompatActivity() {
                 if (regCheck.isChecked) {
                     if (acc.regint != 3600) {
                         newRegint = 3600
-                        ua.updateStatus(R.drawable.dot_yellow)
+                        ua.status = R.drawable.dot_yellow
                     }
                 } else {
                     if (acc.regint != 0) {
                         Api.ua_unregister(ua.uap)
-                        ua.updateStatus(R.drawable.dot_white)
+                        ua.status = R.drawable.dot_white
                         newRegint = 0
                     }
                 }
@@ -593,9 +593,7 @@ class AccountActivity : AppCompatActivity() {
 
                 if (defaultCheck.isChecked && (uaIndex > 0)) {
                     BaresipService.uas.add(0, BaresipService.uas[uaIndex])
-                    BaresipService.status.add(0, BaresipService.status[uaIndex])
                     BaresipService.uas.removeAt(uaIndex + 1)
-                    BaresipService.status.removeAt(uaIndex + 1)
                     save = true
                 }
 

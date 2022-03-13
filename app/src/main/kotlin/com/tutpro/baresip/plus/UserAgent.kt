@@ -3,20 +3,14 @@ package com.tutpro.baresip.plus
 class UserAgent(val uap: Long) {
 
     val account = Account(Api.ua_account(uap))
+    var status = R.drawable.dot_white
 
-    fun add(status: Int) {
+    fun add() {
         BaresipService.uas.add(this)
-        BaresipService.status.add(status)
     }
 
     fun remove() {
-        val index = BaresipService.uas.indexOf(this)
         BaresipService.uas.remove(this)
-        BaresipService.status.removeAt(index)
-    }
-
-    fun updateStatus(status: Int) {
-        BaresipService.status[BaresipService.uas.indexOf(this)] = status
     }
 
     fun calls(dir: String = ""): ArrayList<Call> {
@@ -37,10 +31,6 @@ class UserAgent(val uap: Long) {
 
         fun uas(): ArrayList<UserAgent> {
             return BaresipService.uas
-        }
-
-        fun status(): ArrayList<Int> {
-            return BaresipService.status
         }
 
         fun ofAor(aor: String): UserAgent? {
