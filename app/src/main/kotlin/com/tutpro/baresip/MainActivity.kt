@@ -320,12 +320,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         callButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition == -1)
-                return@setOnClickListener
-            if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-                makeCall()
-            else
-                Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
+            if (aorSpinner.selectedItemPosition >= 0) {
+                if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                    makeCall()
+                else
+                    Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
+            }
         }
 
         hangupButton.setOnClickListener {
