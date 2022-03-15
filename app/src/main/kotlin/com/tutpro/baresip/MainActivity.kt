@@ -206,10 +206,10 @@ class MainActivity : AppCompatActivity() {
             // Haven't found any explanation why this can happen.
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 Log.d(TAG, "aorSpinner selecting $position")
-                if (position < UserAgent.uas().size) {
-                    val acc = UserAgent.uas()[position].account
+                if (position < BaresipService.uas.size) {
+                    val ua = BaresipService.uas[position]
+                    val acc = ua.account
                     aorSpinner.tag = acc.aor
-                    val ua = UserAgent.uas()[position]
                     showCall(ua)
                     updateIcons(acc)
                 }
@@ -260,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                         accountRequest!!.launch(i)
                         true
                     } else {
-                        UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri =
+                        BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
                                 callUri.text.toString()
                         false
                     }
@@ -298,11 +298,11 @@ class MainActivity : AppCompatActivity() {
                         setTitle(R.string.info)
                         setMessage(getString(R.string.call_is_secure))
                         setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
-                            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-                            val calls = ua.calls()
-                            if (calls.size > 0) {
-                                if (Api.cmd_exec("zrtp_unverify " + calls[0].zid) != 0) {
-                                    Log.e(TAG, "Command 'zrtp_unverify ${calls[0].zid}' failed")
+                            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+                            val call = ua.currentCall()
+                            if (call != null) {
+                                if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0) {
+                                    Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                 } else {
                                     securityButton.setImageResource(R.drawable.box_yellow)
                                     securityButton.tag = "yellow"
@@ -329,7 +329,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         hangupButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
             val uaCalls = ua.calls()
             if (uaCalls.size > 0) {
@@ -344,9 +344,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         answerButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val callp = ua.calls("in")[0].callp
+            val callp = ua.currentCall()!!.callp
             Log.d(TAG, "AoR $aor answering call $callp from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
@@ -359,9 +359,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         rejectButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = ua.calls("in")[0]
+            val call = ua.currentCall()!!
             val callp = call.callp
             Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.text}")
             answerButton.isEnabled = false
@@ -371,9 +371,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         holdButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             val aor = ua.account.aor
-            val call = ua.calls()[0]
+            val call = ua.currentCall()!!
             if (call.onhold) {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
@@ -388,7 +388,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         transferButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             val call = ua.currentCall()
             if (call != null ) {
                 if (call.onHoldCall != null) {
@@ -402,10 +402,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         infoButton.setOnClickListener {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
-            val calls = ua.calls()
-            if (calls.size > 0) {
-                val call = calls[0]
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+            val call = ua.currentCall()
+            if (call != null) {
                 val stats = call.stats("audio")
                 if (stats != "") {
                     val parts = stats.split(",")
@@ -431,7 +430,7 @@ class MainActivity : AppCompatActivity() {
 
         voicemailButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
-                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
                 val acc = ua.account
                 if (acc.vmUri != "") {
                     val dialogClickListener = DialogInterface.OnClickListener { _, which ->
@@ -565,41 +564,41 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                if (UserAgent.uas().size > 0) {
+                if (BaresipService.uas.size > 0) {
                     val curPos = aorSpinner.selectedItemPosition
                     val newPos = if (curPos == -1)
                         0
                     else
-                        (curPos + 1) % UserAgent.uas().size
+                        (curPos + 1) % BaresipService.uas.size
                     if (curPos != newPos) {
                         aorSpinner.setSelection(newPos)
-                        showCall(UserAgent.uas()[newPos])
+                        showCall(BaresipService.uas[newPos])
                     }
                 }
             }
 
             override fun onSwipeRight() {
                 super.onSwipeRight()
-                if (UserAgent.uas().size > 0) {
+                if (BaresipService.uas.size > 0) {
                     val curPos = aorSpinner.selectedItemPosition
                     val newPos = when (curPos) {
                         -1 -> 0
-                        0 -> UserAgent.uas().size - 1
+                        0 -> BaresipService.uas.size - 1
                         else -> curPos - 1
                     }
                     if (curPos != newPos) {
                         aorSpinner.setSelection(newPos)
-                        showCall(UserAgent.uas()[newPos])
+                        showCall(BaresipService.uas[newPos])
                     }
                 }
             }
         })
 
         swipeRefresh.setOnRefreshListener {
-            if (UserAgent.uas().size > 0) {
+            if (BaresipService.uas.size > 0) {
                 if (aorSpinner.selectedItemPosition == -1)
                     aorSpinner.setSelection(0)
-                val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
                 if (ua.account.regint > 0)
                     Api.ua_register(ua.uap)
             }
@@ -676,7 +675,7 @@ class MainActivity : AppCompatActivity() {
             "call reject" ->
                 rejectButton.performClick()
             "call" -> {
-                callUri.setText(UserAgent.uas()[aorSpinner.selectedItemPosition].account.resumeUri)
+                callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
             "call transfer", "transfer show", "transfer accept" ->
@@ -690,20 +689,20 @@ class MainActivity : AppCompatActivity() {
                     spinToAor(incomingCall.ua.account.aor)
                 } else {
                     restoreActivities()
-                    if (UserAgent.uas().size > 0) {
+                    if (BaresipService.uas.size > 0) {
                         if (aorSpinner.selectedItemPosition == -1) {
                             if (Call.calls().size > 0)
                                 spinToAor(Call.calls()[0].ua.account.aor)
                             else {
                                 aorSpinner.setSelection(0)
-                                aorSpinner.tag = UserAgent.uas()[0].account.aor
+                                aorSpinner.tag = BaresipService.uas[0].account.aor
                             }
                         }
                     }
                 }
                 uaAdapter.notifyDataSetChanged()
-                if (UserAgent.uas().size > 0) {
-                    val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+                if (BaresipService.uas.size > 0) {
+                    val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
                     showCall(ua)
                     updateIcons(ua.account)
                 }
@@ -947,9 +946,9 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(callActionUri)
                 callButton.performClick()
             } else {
-                if ((aorSpinner.selectedItemPosition == -1) && (UserAgent.uas().size > 0)) {
+                if ((aorSpinner.selectedItemPosition == -1) && (BaresipService.uas.size > 0)) {
                     aorSpinner.setSelection(0)
-                    aorSpinner.tag = UserAgent.uas()[0].account.aor
+                    aorSpinner.tag = BaresipService.uas[0].account.aor
                 }
             }
             handleNextEvent()
@@ -983,201 +982,196 @@ class MainActivity : AppCompatActivity() {
         val acc = ua.account
         val aor = ua.account.aor
 
-        for (account_index in UserAgent.uas().indices) {
-            if (UserAgent.uas()[account_index].account.aor == aor) {
-                when (ev[0]) {
-                    "call rejected" -> {
-                        if (aor == aorSpinner.tag) {
-                            callsButton.setImageResource(R.drawable.calls_missed)
-                        }
-                    }
-                    "call incoming", "call outgoing" -> {
-                        val callp = params[1] as Long
-                        if (BaresipService.isMainVisible) {
-                            uaAdapter.notifyDataSetChanged()
-                            if (aor != aorSpinner.tag)
-                                spinToAor(aor)
-                            showCall(ua, Call.ofCallp(callp))
-                        } else {
-                            Log.d(TAG, "Reordering to front")
-                            BaresipService.activities.clear()
-                            BaresipService.serviceEvents.clear()
-                            val i = Intent(applicationContext, MainActivity::class.java)
-                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            i.putExtra("action", "call show")
-                            i.putExtra("callp", callp)
-                            startActivity(i)
-                            return
-                        }
-                    }
-                    "call answered" -> {
-                        showCall(ua)
-                    }
-                    "call established" -> {
-                        if (aor == aorSpinner.tag) {
-                            dtmf.setText("")
-                            dtmf.hint = getString(R.string.dtmf)
-                            showCall(ua)
-                        }
-                    }
-                    "call update" -> {
-                        showCall(ua)
-                    }
-                    "call verify" -> {
-                        val callp = params[1] as Long
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            handleNextEvent("Call $callp to be verified is not found")
-                            return
-                        }
-                        with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                            setTitle(R.string.verify)
-                            setMessage(String.format(getString(R.string.verify_sas),
-                                    ev[1], ev[2]))
-                            setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                                val security: Int = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                                    Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
-                                    R.drawable.box_yellow
-                                } else {
-                                    R.drawable.box_green
-                                }
-                                call.security = security
-                                call.zid = ev[3]
-                                if (aor == aorSpinner.tag) {
-                                    securityButton.setImageResource(security)
-                                    setSecurityButtonTag(securityButton, security)
-                                    securityButton.visibility = View.VISIBLE
-                                    dialog.dismiss()
-                                }
-                            }
-                            setNeutralButton(getString(R.string.no)) { dialog, _ ->
-                                call.security = R.drawable.box_yellow
-                                call.zid = ev[3]
-                                if (aor == aorSpinner.tag) {
-                                    securityButton.setImageResource(R.drawable.box_yellow)
-                                    securityButton.tag = "yellow"
-                                    securityButton.visibility = View.VISIBLE
-                                }
-                                dialog.dismiss()
-                            }
-                            show()
-                        }
-                    }
-                    "call verified", "call secure" -> {
-                        val callp = params[1] as Long
-                        val call = Call.ofCallp(callp)
-                        if (call == null) {
-                            handleNextEvent("Call $callp that is verified is not found")
-                            return
-                        }
-                        val tag: String = if (call.security == R.drawable.box_yellow)
-                            "yellow"
-                        else
-                            "green"
-                        if (aor == aorSpinner.tag) {
-                            securityButton.setImageResource(call.security)
-                            securityButton.tag = tag
-                        }
-                    }
-                    "call transfer", "transfer show" -> {
-                        val callp = params[1] as Long
-                        if (!BaresipService.isMainVisible) {
-                            Log.d(TAG, "Reordering to front")
-                            BaresipService.activities.clear()
-                            BaresipService.serviceEvents.clear()
-                            val i = Intent(applicationContext, MainActivity::class.java)
-                            i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            i.putExtra("action", event)
-                            i.putExtra("callp", callp)
-                            startActivity(i)
-                            return
-                        }
-                        val call = Call.ofCallp(callp)!!
-                        val target = Utils.friendlyUri(Contact.contactName(ev[1]), Utils.aorDomain(aor))
-                        with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                            setTitle(R.string.transfer_request)
-                            setMessage(String.format(getString(R.string.transfer_request_query),
-                                    target))
-                            setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                                if (call in Call.calls())
-                                    acceptTransfer(ua, call, ev[1])
-                                dialog.dismiss()
-                            }
-                            setNeutralButton(getString(R.string.no)) { dialog, _ ->
-                                if (call in Call.calls())
-                                    call.notifySipfrag(603, "Decline")
-                                dialog.dismiss()
-                            }
-                            show()
-                        }
-                    }
-                    "transfer accept" -> {
-                        val callp = params[1] as Long
-                        val call = Call.ofCallp(callp)
-                        if (call in Call.calls())
-                            Api.ua_hangup(uap, callp, 0, "")
-                        call(ua, ev[1])
-                        showCall(ua)
-                    }
-                    "transfer failed" -> {
-                        showCall(ua)
-                    }
-                    "call closed" -> {
-                        uaAdapter.notifyDataSetChanged()
-                        val call = ua.currentCall()
-                        if (call != null) {
-                            call.resume()
-                            startCallTimer(call)
-                        } else {
-                            callTimer.stop()
-                        }
-                        if (aor == aorSpinner.tag) {
-                            callUri.inputType = InputType.TYPE_CLASS_TEXT +
-                                    InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                            dialpadButton.setImageResource(R.drawable.dialpad_off)
-                            dialpadButton.tag = "off"
-                            ua.account.resumeUri = ""
-                            showCall(ua)
-                            if (acc.missedCalls)
-                                callsButton.setImageResource(R.drawable.calls_missed)
-                        }
-                        if (speakerIcon != null)
-                            speakerIcon!!.setIcon(R.drawable.speaker_off)
-                        if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
-                                (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
-                            Utils.setShowWhenLocked(this, false)
-                    }
-                    "message", "message show", "message reply" -> {
-                        val i = Intent(applicationContext, ChatActivity::class.java)
-                        i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        val b = Bundle()
-                        b.putString("aor", aor)
-                        b.putString("peer", params[1] as String)
-                        b.putBoolean("focus", ev[0] == "message reply")
-                        i.putExtras(b)
-                        chatRequests.launch(i)
-                    }
-                    "mwi notify" -> {
-                        val lines = ev[1].split("\n")
-                        for (line in lines) {
-                            if (line.startsWith("Voice-Message:")) {
-                                val counts = (line.split(" ")[1]).split("/")
-                                acc.vmNew = counts[0].toInt()
-                                acc.vmOld = counts[1].toInt()
-                                break
-                            }
-                        }
-                        if (aor == aorSpinner.tag) {
-                            if (acc.vmNew > 0)
-                                voicemailButton.setImageResource(R.drawable.voicemail_new)
-                            else
-                                voicemailButton.setImageResource(R.drawable.voicemail)
-                        }
-                    }
-                    else -> Log.e(TAG, "Unknown event '${ev[0]}'")
+        when (ev[0]) {
+            "call rejected" -> {
+                if (aor == aorSpinner.tag) {
+                    callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                break
             }
+            "call incoming", "call outgoing" -> {
+                val callp = params[1] as Long
+                if (BaresipService.isMainVisible) {
+                    uaAdapter.notifyDataSetChanged()
+                    if (aor != aorSpinner.tag)
+                        spinToAor(aor)
+                    showCall(ua, Call.ofCallp(callp))
+                } else {
+                    Log.d(TAG, "Reordering to front")
+                    BaresipService.activities.clear()
+                    BaresipService.serviceEvents.clear()
+                    val i = Intent(applicationContext, MainActivity::class.java)
+                    i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    i.putExtra("action", "call show")
+                    i.putExtra("callp", callp)
+                    startActivity(i)
+                    return
+                }
+            }
+            "call answered" -> {
+                showCall(ua)
+            }
+            "call established" -> {
+                if (aor == aorSpinner.tag) {
+                    dtmf.setText("")
+                    dtmf.hint = getString(R.string.dtmf)
+                    showCall(ua)
+                }
+            }
+            "call update" -> {
+                showCall(ua)
+            }
+            "call verify" -> {
+                val callp = params[1] as Long
+                val call = Call.ofCallp(callp)
+                if (call == null) {
+                    handleNextEvent("Call $callp to be verified is not found")
+                    return
+                }
+                with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                    setTitle(R.string.verify)
+                    setMessage(String.format(getString(R.string.verify_sas),
+                            ev[1], ev[2]))
+                    setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                        val security: Int = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                            Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
+                            R.drawable.box_yellow
+                        } else {
+                            R.drawable.box_green
+                        }
+                        call.security = security
+                        call.zid = ev[3]
+                        if (aor == aorSpinner.tag) {
+                            securityButton.setImageResource(security)
+                            setSecurityButtonTag(securityButton, security)
+                            securityButton.visibility = View.VISIBLE
+                            dialog.dismiss()
+                        }
+                    }
+                    setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                        call.security = R.drawable.box_yellow
+                        call.zid = ev[3]
+                        if (aor == aorSpinner.tag) {
+                            securityButton.setImageResource(R.drawable.box_yellow)
+                            securityButton.tag = "yellow"
+                            securityButton.visibility = View.VISIBLE
+                        }
+                        dialog.dismiss()
+                    }
+                    show()
+                }
+            }
+            "call verified", "call secure" -> {
+                val callp = params[1] as Long
+                val call = Call.ofCallp(callp)
+                if (call == null) {
+                    handleNextEvent("Call $callp that is verified is not found")
+                    return
+                }
+                val tag: String = if (call.security == R.drawable.box_yellow)
+                    "yellow"
+                else
+                    "green"
+                if (aor == aorSpinner.tag) {
+                    securityButton.setImageResource(call.security)
+                    securityButton.tag = tag
+                }
+            }
+            "call transfer", "transfer show" -> {
+                val callp = params[1] as Long
+                if (!BaresipService.isMainVisible) {
+                    Log.d(TAG, "Reordering to front")
+                    BaresipService.activities.clear()
+                    BaresipService.serviceEvents.clear()
+                    val i = Intent(applicationContext, MainActivity::class.java)
+                    i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    i.putExtra("action", event)
+                    i.putExtra("callp", callp)
+                    startActivity(i)
+                    return
+                }
+                val call = Call.ofCallp(callp)!!
+                val target = Utils.friendlyUri(Contact.contactName(ev[1]), Utils.aorDomain(aor))
+                with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                    setTitle(R.string.transfer_request)
+                    setMessage(String.format(getString(R.string.transfer_request_query),
+                            target))
+                    setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                        if (call in Call.calls())
+                            acceptTransfer(ua, call, ev[1])
+                        dialog.dismiss()
+                    }
+                    setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                        if (call in Call.calls())
+                            call.notifySipfrag(603, "Decline")
+                        dialog.dismiss()
+                    }
+                    show()
+                }
+            }
+            "transfer accept" -> {
+                val callp = params[1] as Long
+                val call = Call.ofCallp(callp)
+                if (call in Call.calls())
+                    Api.ua_hangup(uap, callp, 0, "")
+                call(ua, ev[1])
+                showCall(ua)
+            }
+            "transfer failed" -> {
+                showCall(ua)
+            }
+            "call closed" -> {
+                uaAdapter.notifyDataSetChanged()
+                val call = ua.currentCall()
+                if (call != null) {
+                    call.resume()
+                    startCallTimer(call)
+                } else {
+                    callTimer.stop()
+                }
+                if (aor == aorSpinner.tag) {
+                    callUri.inputType = InputType.TYPE_CLASS_TEXT +
+                            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                    dialpadButton.setImageResource(R.drawable.dialpad_off)
+                    dialpadButton.tag = "off"
+                    ua.account.resumeUri = ""
+                    showCall(ua)
+                    if (acc.missedCalls)
+                        callsButton.setImageResource(R.drawable.calls_missed)
+                }
+                if (speakerIcon != null)
+                    speakerIcon!!.setIcon(R.drawable.speaker_off)
+                if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
+                        (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
+                    Utils.setShowWhenLocked(this, false)
+            }
+            "message", "message show", "message reply" -> {
+                val i = Intent(applicationContext, ChatActivity::class.java)
+                i.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                val b = Bundle()
+                b.putString("aor", aor)
+                b.putString("peer", params[1] as String)
+                b.putBoolean("focus", ev[0] == "message reply")
+                i.putExtras(b)
+                chatRequests.launch(i)
+            }
+            "mwi notify" -> {
+                val lines = ev[1].split("\n")
+                for (line in lines) {
+                    if (line.startsWith("Voice-Message:")) {
+                        val counts = (line.split(" ")[1]).split("/")
+                        acc.vmNew = counts[0].toInt()
+                        acc.vmOld = counts[1].toInt()
+                        break
+                    }
+                }
+                if (aor == aorSpinner.tag) {
+                    if (acc.vmNew > 0)
+                        voicemailButton.setImageResource(R.drawable.voicemail_new)
+                    else
+                        voicemailButton.setImageResource(R.drawable.voicemail)
+                }
+            }
+            else -> Log.e(TAG, "Unknown event '${ev[0]}'")
         }
 
         handleNextEvent()
@@ -1648,15 +1642,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun spinToAor(aor: String) {
-        for (account_index in UserAgent.uas().indices)
-            if (UserAgent.uas()[account_index].account.aor == aor) {
+        for (account_index in BaresipService.uas.indices)
+            if (BaresipService.uas[account_index].account.aor == aor) {
                 aorSpinner.setSelection(account_index)
                 aorSpinner.tag = aor
                 return
             }
-        if (UserAgent.uas().isNotEmpty()) {
+        if (BaresipService.uas.isNotEmpty()) {
             aorSpinner.setSelection(0)
-            aorSpinner.tag = UserAgent.uas()[0].account.aor
+            aorSpinner.tag = BaresipService.uas[0].account.aor
         } else {
             aorSpinner.setSelection(-1)
             aorSpinner.tag = ""
@@ -1726,7 +1720,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun makeCall() {
         callUri.setAdapter(null)
-        val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+        val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
@@ -2040,8 +2034,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveCallUri() {
-        if (UserAgent.uas().isNotEmpty() && aorSpinner.selectedItemPosition >= 0) {
-            val ua = UserAgent.uas()[aorSpinner.selectedItemPosition]
+        if (BaresipService.uas.isNotEmpty() && aorSpinner.selectedItemPosition >= 0) {
+            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             if (ua.calls().isEmpty())
                 ua.account.resumeUri = callUri.text.toString()
             else

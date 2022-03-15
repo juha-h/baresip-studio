@@ -161,7 +161,7 @@ class AccountsActivity : AppCompatActivity() {
 
         fun generateAccounts() {
             accounts.clear()
-            for (ua in UserAgent.uas())
+            for (ua in BaresipService.uas)
                 accounts.add(AccountRow(ua.account.aor.replace("sip:", ""),
                         R.drawable.action_remove))
         }

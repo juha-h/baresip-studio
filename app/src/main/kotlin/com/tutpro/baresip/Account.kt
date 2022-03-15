@@ -192,7 +192,7 @@ class Account(val accp: Long) {
 
         fun accounts(): ArrayList<Account> {
             val res = ArrayList<Account>()
-            for (ua in UserAgent.uas()) {
+            for (ua in BaresipService.uas) {
                 res.add(ua.account)
             }
             return res
@@ -207,7 +207,7 @@ class Account(val accp: Long) {
         }
 
         fun ofAor(aor: String): Account? {
-            for (ua in UserAgent.uas())
+            for (ua in BaresipService.uas)
                 if (ua.account.aor == aor) return ua.account
             return null
         }

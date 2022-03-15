@@ -29,10 +29,6 @@ class UserAgent(val uap: Long) {
 
     companion object {
 
-        fun uas(): ArrayList<UserAgent> {
-            return BaresipService.uas
-        }
-
         fun ofAor(aor: String): UserAgent? {
             for (ua in BaresipService.uas)
                 if (ua.account.aor == aor) return ua
