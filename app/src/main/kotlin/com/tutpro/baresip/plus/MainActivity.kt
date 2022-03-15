@@ -343,32 +343,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         callButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition == -1)
-                return@setOnClickListener
-            if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-                makeCall("voice")
-            else
-                Toast.makeText(applicationContext, getString(R.string.no_calls),
-                        Toast.LENGTH_SHORT).show()
+            if (aorSpinner.selectedItemPosition >= 0) {
+                if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                    makeCall("voice")
+                else
+                    Toast.makeText(applicationContext, getString(R.string.no_calls),
+                            Toast.LENGTH_SHORT).show()
+            }
         }
 
         callVideoButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition == -1)
-                return@setOnClickListener
-            val permissions =
-                if (BaresipService.supportedCameras)
+            if (aorSpinner.selectedItemPosition >= 0) {
+                val permissions = if (BaresipService.supportedCameras)
                     arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
                 else
                     arrayOf(Manifest.permission.RECORD_AUDIO)
-            if (Utils.checkPermissions(this, permissions))
-                makeCall("video")
-            else
-                if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-                    Toast.makeText(applicationContext, getString(R.string.no_calls),
-                            Toast.LENGTH_SHORT).show()
+                if (Utils.checkPermissions(this, permissions))
+                    makeCall("video")
                 else
-                    Toast.makeText(applicationContext, getString(R.string.no_video_calls),
-                            Toast.LENGTH_SHORT).show()
+                    if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                        Toast.makeText(applicationContext, getString(R.string.no_calls),
+                                Toast.LENGTH_SHORT).show()
+                    else
+                        Toast.makeText(applicationContext, getString(R.string.no_video_calls),
+                                Toast.LENGTH_SHORT).show()
+            }
         }
 
         hangupButton.setOnClickListener {
