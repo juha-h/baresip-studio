@@ -25,7 +25,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
 
         val viewHolder: ViewHolder
         val rowView: View
-        val ua = UserAgent.uas()[position]
+        val ua = BaresipService.uas[position]
 
         if (view == null) {
             rowView = layoutInflater.inflate(R.layout.account_row, parent, false)
@@ -45,7 +45,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
         viewHolder.aorView.setOnClickListener {
             val i = Intent(cxt, AccountActivity::class.java)
             val b = Bundle()
-            b.putString("aor", UserAgent.uas()[position].account.aor)
+            b.putString("aor", BaresipService.uas[position].account.aor)
             i.putExtras(b)
             MainActivity.accountRequest!!.launch(i)
         }

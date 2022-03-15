@@ -44,7 +44,7 @@ class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>) :
         val ua = uas[position]
         viewHolder.textView.text = ua.account.aor.split(":")[1]
         viewHolder.textView.textSize = 17f
-        if (UserAgent.uas().size > 1 && ua.calls().isNotEmpty())
+        if (BaresipService.uas.size > 1 && ua.calls().isNotEmpty())
             viewHolder.textView.setTypeface(null, Typeface.BOLD)
         viewHolder.imageView.setImageResource(ua.status)
 
