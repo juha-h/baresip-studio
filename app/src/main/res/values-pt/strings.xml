@@ -269,4 +269,18 @@
     <string name="call_details">Detalhes da chamada</string>
     <string name="time">Hora</string>
     <string name="calls_duration">Duração</string>
+    <string name="telephony_provider_help">Parte do host SIP URI usada em chamadas para números de telefone. O padrão de fábrica é o domínio da conta. Se não for fornecida, esta conta não pode ser usada para ligar para números de telefone.</string>
+    <string name="no_android_contacts">Você não pode acessar os contatos do Android sem a permissão \"Contatos\".</string>
+    <string name="sip_or_tel_uri">SIP ou tel URI</string>
+    <string name="user_domain_or_number">usuário@domínio ou número de telefone</string>
+    <string name="choose_telephony_provider_account">Escolha a conta do provedor de telefonia</string>
+    <string name="contacts_help">Escolhe se os contatos do Baresip, os contatos do Android ou ambos são usados. Se ambos e contato com o mesmo nome existirem em ambos, o contato Baresip será escolhido.</string>
+    <string name="both">Ambos</string>
+    <string name="invalid_sip_or_tel_uri">SIP ou tel URI \'%1$s\' inválido</string>
+    <string name="no_telephony_providers">O Provedor de Telefonia não foi configurado para nenhuma conta.</string>
+    <string name="blind">Cego</string>
+    <string name="attended">Participou</string>
+    <string name="telephony_provider">Provedor de telefonia</string>
+    <string name="telephony_provider_hint">Parte do host SIP URI</string>
+    <string name="invalid_sip_uri_hostpart">Parte do host URI SIP inválida \'%1$s\'</string>
 </resources>
