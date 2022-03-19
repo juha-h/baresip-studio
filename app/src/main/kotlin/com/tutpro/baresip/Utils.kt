@@ -118,7 +118,7 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(uri: String, domain: String): String {
+    fun friendlyUri(ctx: Context, uri: String, domain: String): String {
         var u = uri
         val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
@@ -135,7 +135,12 @@ object Utils {
             if (isTelNumber(user) || host == domain)
                 user
             else
-                "$user@$host"
+                if (host == "anonymous.invalid")
+                    ctx.getString(R.string.anonymous)
+                else if (host == "unknown.invalid")
+                    ctx.getString(R.string.unknown)
+                else
+                    "$user@$host"
         } else {
             u
         }

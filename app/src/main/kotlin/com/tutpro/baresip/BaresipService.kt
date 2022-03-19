@@ -553,16 +553,16 @@ class BaresipService: Service() {
 
         if (!isServiceRunning) return
 
-        val ev = event.split(",")
         val ua = UserAgent.ofUap(uap)
-        val aor = ua?.account?.aor
-
-        Log.d(TAG, "got uaEvent $event/$aor/$callp")
-
         if (ua == null) {
             Log.w(TAG, "uaEvent $event did not find ua $uap")
             return
         }
+
+        val ev = event.split(",")
+        val aor = ua.account.aor
+
+        Log.d(TAG, "got uaEvent $event/$aor/$callp")
 
         val call = Call.ofCallp(callp)
         if (call == null && callp != 0L && ev[0] != "call incoming" && ev[0] != "call rejected") {
@@ -681,7 +681,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val caller = Utils.friendlyUri(Contact.contactName(peerUri), Utils.aorDomain(aor))
+                            val caller = Utils.friendlyUri(this, Contact.contactName(peerUri), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -788,7 +788,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
                                     intent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val target = Utils.friendlyUri(Contact.contactName(ev[1]), Utils.aorDomain(aor))
+                            val target = Utils.friendlyUri(this, Contact.contactName(ev[1]), Utils.aorDomain(aor))
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                 .setContentIntent(pi)
@@ -869,7 +869,7 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible()) {
                             if (missed) {
-                                val caller = Utils.friendlyUri(Contact.contactName(call.peerUri), Utils.aorDomain(aor))
+                                val caller = Utils.friendlyUri(this, Contact.contactName(call.peerUri), Utils.aorDomain(aor))
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -976,7 +976,7 @@ class BaresipService: Service() {
                 PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(Contact.contactName(peer), Utils.aorDomain(ua.account.aor))
+            val sender = Utils.friendlyUri(this, Contact.contactName(peer), Utils.aorDomain(ua.account.aor))
             nb.setSmallIcon(R.drawable.ic_stat_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                 .setContentIntent(pi)
