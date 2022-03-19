@@ -7,6 +7,10 @@
 #include <baresip.h>
 #include "logger.h"
 
+#if defined(__ARM_ARCH_7A__)
+    #define long long long
+#endif
+
 typedef struct baresip_context
 {
     JavaVM  *javaVM;
