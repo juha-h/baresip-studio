@@ -56,7 +56,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
         viewHolder.peerView.text = if (peerName !=message.peerUri )
             peerName
         else
-            Utils.friendlyUri(message.peerUri, message.aor)
+            Utils.friendlyUri(ctx, message.peerUri, message.aor)
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp

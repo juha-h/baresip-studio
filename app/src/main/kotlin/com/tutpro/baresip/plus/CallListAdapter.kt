@@ -64,7 +64,7 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
 
         val contactName = Contact.contactName(callRow.peerUri)
         if (contactName.startsWith("sip:"))
-            viewHolder.peerURIView.text = Utils.friendlyUri(contactName, Utils.aorDomain(callRow.aor))
+            viewHolder.peerURIView.text = Utils.friendlyUri(ctx, contactName, Utils.aorDomain(callRow.aor))
         else
             viewHolder.peerURIView.text = contactName
 

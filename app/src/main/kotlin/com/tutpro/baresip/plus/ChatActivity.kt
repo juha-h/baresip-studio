@@ -68,7 +68,7 @@ class ChatActivity : AppCompatActivity() {
 
         var chatPeer = Contact.contactName(peerUri)
         if (chatPeer.startsWith("sip:"))
-            chatPeer = Utils.friendlyUri(chatPeer, Utils.aorDomain(aor))
+            chatPeer = Utils.friendlyUri(this, chatPeer, Utils.aorDomain(aor))
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
