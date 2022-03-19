@@ -1,0 +1,2 @@
+- Fixed 32 bit armeabi-v7a architecture related bug
+- Display Anonymous or Unknown if URI host is anonymous.invalid or unknown.invalid
