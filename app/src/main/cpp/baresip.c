@@ -1131,7 +1131,7 @@ Java_com_tutpro_baresip_Api_calls_1mute(JNIEnv *env, jobject thiz, jboolean mute
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+Java_com_tutpro_baresip_Api_call_1connect(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
 {
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("connecting call %ld to %s\n", (long)call, native_peer);
@@ -1146,7 +1146,7 @@ Java_com_tutpro_baresip_Call_call_1connect(JNIEnv *env, jobject thiz, jlong call
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jlong call, jint code, jstring reason)
+Java_com_tutpro_baresip_Api_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jlong call, jint code, jstring reason)
 {
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
@@ -1158,7 +1158,7 @@ Java_com_tutpro_baresip_Call_call_1notify_1sipfrag(JNIEnv *env, jobject thiz, jl
 }
 
 JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1start_1audio(JNIEnv *env, jobject thiz, jlong call)
 {
     LOGD("starting audio of call %ld\n", (long)call);
     re_thread_enter();
@@ -1168,7 +1168,7 @@ Java_com_tutpro_baresip_Call_call_1start_1audio(JNIEnv *env, jobject thiz, jlong
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jlong call, jboolean hold)
+Java_com_tutpro_baresip_Api_call_1hold(JNIEnv *env, jobject thiz, jlong call, jboolean hold)
 {
     int err;
     if (hold) {
@@ -1187,13 +1187,13 @@ Java_com_tutpro_baresip_Call_call_1hold(JNIEnv *env, jobject thiz, jlong call, j
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1ismuted(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1ismuted(JNIEnv *env, jobject thiz, jlong call)
 {
     return audio_ismuted(call_audio((struct call *)call));
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+Java_com_tutpro_baresip_Api_call_1transfer(JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
 {
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("transfering call %ld to %s\n", (long)call, native_peer);
@@ -1206,7 +1206,7 @@ Java_com_tutpro_baresip_Call_call_1transfer(JNIEnv *env, jobject thiz, jlong cal
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jlong call, jchar digit)
+Java_com_tutpro_baresip_Api_call_1send_1digit(JNIEnv *env, jobject thiz, jlong call, jchar digit)
 {
     const uint16_t native_digit = digit;
     LOGD("sending DTMF digit '%c' to call %ld\n", (char)native_digit, (long)call);
@@ -1218,7 +1218,7 @@ Java_com_tutpro_baresip_Call_call_1send_1digit(JNIEnv *env, jobject thiz, jlong 
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlong call)
 {
     const struct aucodec *tx = audio_codec(call_audio((struct call *)call), true);
     const struct aucodec *rx = audio_codec(call_audio((struct call *)call), false);
@@ -1237,14 +1237,14 @@ Java_com_tutpro_baresip_Call_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlon
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Call_call_1duration(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1duration(JNIEnv *env, jobject thiz, jlong call)
 {
     int duration = call_duration((struct call *)call);
     return duration;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jlong call, jstring jStream)
+Java_com_tutpro_baresip_Api_call_1stats(JNIEnv *env, jobject thiz, jlong call, jstring jStream)
 {
     const char *native_stream = (*env)->GetStringUTFChars(env, jStream, 0);
     const struct stream *s;
@@ -1276,19 +1276,19 @@ Java_com_tutpro_baresip_Call_call_1stats(JNIEnv *env, jobject thiz, jlong call, 
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1has_1video(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1has_1video(JNIEnv *env, jobject thiz, jlong call)
 {
     return call_has_video((struct call *)call) ? true : false;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1replaces(JNIEnv *env, jobject thiz, jlong call)
+Java_com_tutpro_baresip_Api_call_1replaces(JNIEnv *env, jobject thiz, jlong call)
 {
     return call_supported((struct call *)call, REPLACES) ? true : false;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_tutpro_baresip_Call_call_1replace_1transfer(JNIEnv *env, jobject thiz, jlong xferCall, jlong call)
+Java_com_tutpro_baresip_Api_call_1replace_1transfer(JNIEnv *env, jobject thiz, jlong xferCall, jlong call)
 {
     re_thread_enter();
     int res = call_replace_transfer((struct call *)xferCall, (struct call *)call);
