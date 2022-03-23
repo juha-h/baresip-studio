@@ -65,6 +65,27 @@ object Api {
     external fun ua_answer(uap: Long, callp: Long)
     external fun ua_debug(uap: Long)
 
+    external fun call_connect(callp: Long, peer_uri: String): Int
+    external fun call_hold(callp: Long, hold: Boolean): Int
+    external fun call_ismuted(callp: Long): Boolean
+    external fun call_transfer(callp: Long, peer_uri: String): Int
+    external fun call_send_digit(callp: Long, digit: Char): Int
+    external fun call_notify_sipfrag(callp: Long, code: Int, reason: String)
+    external fun call_start_video_display(callp: Long): Int
+    external fun call_stop_video_display(callp: Long)
+    external fun call_audio_codecs(callp: Long): String
+    external fun call_video_codecs(callp: Long): String
+    external fun call_duration(callp: Long): Int
+    external fun call_stats(callp: Long, stream: String): String
+    external fun call_has_video(callp: Long): Boolean
+    external fun call_set_video_source(callp: Long, front: Boolean): Int
+    external fun call_set_video_direction(callp: Long, dir: Int)
+    external fun call_set_media_direction(callp: Long, adir: Int, vdir: Int): Int
+    external fun call_disable_video_stream(callp: Long, disable: Boolean)
+    external fun call_video_enabled(callp: Long): Boolean
+    external fun call_replaces(callp: Long): Boolean
+    external fun call_replace_transfer(xfer_callp: Long, callp: Long): Boolean
+
     external fun calls_mute(mute: Boolean)
 
     external fun message_send(uap: Long, peer_uri: String, message: String, time: String): Int
