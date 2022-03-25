@@ -574,7 +574,10 @@ object Utils {
             name = cursor.getString(index)
             cursor.close()
         }
-        return name
+        return if (name == "")
+            "$uri".substringAfterLast("/")
+        else
+            name
     }
 
     fun saveBitmap(bitmap: Bitmap, file: File): Boolean {
@@ -690,7 +693,13 @@ object Utils {
 
     fun decryptFromUri(ctx: Context, uri: Uri, password: String): ByteArray? {
         var plainData: ByteArray? = null
-        var stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
+        var stream: FileInputStream
+        try {
+            stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
+        } catch(e: Exception) {
+            Log.w(TAG, "decryptFromUri could not open stream: $e")
+            return null
+        }
         try {
             ObjectInputStream(stream).use {
                 val content = it.readObject() as ByteArray
