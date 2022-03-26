@@ -85,11 +85,13 @@ object Utils {
             uri.substringAfter("@")
                     .substringBefore(":")
                     .substringBefore(";")
+                    .substringBefore("?")
                     .substringBefore(">")
         } else {
             val parts = uri.split(":")
             when (parts.size) {
                 2 -> parts[1].substringBefore(";")
+                        .substringBefore("?")
                         .substringBefore(">")
                 3 -> parts[1]
                 else -> ""
