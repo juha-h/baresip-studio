@@ -758,8 +758,8 @@ class BaresipService: Service() {
                     }
                     "call update" -> {
                         when (ev[1]) {
-                            "0", "1" -> call!!.held = true
-                            "2", "3" -> call!!.held = false
+                            "0", "1" -> call!!.held = true  // inactive, recvonly
+                            "2", "3" -> call!!.held = false // sendonly, sendrecv
                         }
                         if (!isMainVisible || call!!.status != "connected")
                             return
