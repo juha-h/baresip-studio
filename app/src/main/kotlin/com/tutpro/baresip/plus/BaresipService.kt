@@ -729,8 +729,8 @@ class BaresipService: Service() {
                         else
                             ev[4].toInt() and Api.SDP_RECVONLY
                         when (ev[5]) {
-                            "0", "1" -> call!!.held = true
-                            "2", "3" -> call!!.held = false
+                            "0", "1" -> call!!.held = true  // inactive, recvonly
+                            "2", "3" -> call!!.held = false // sendonly, sendrecv
                         }
                         if (!isMainVisible || call!!.status != "connected")
                             return
