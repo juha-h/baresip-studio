@@ -1296,6 +1296,15 @@ Java_com_tutpro_baresip_Api_call_1replace_1transfer(JNIEnv *env, jobject thiz, j
     return res == 0 ? true : false;
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_Api_call_1diverter_1uri(JNIEnv *env, jobject thiz, jlong call)
+{
+    const char *uri = call_diverteruri((struct call *)call);
+    if (uri)
+        return (*env)->NewStringUTF(env, uri);
+    return (*env)->NewStringUTF(env, "");
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jlong ua, jstring jPeer, jstring jMsg, jstring jTime)
 {

@@ -78,6 +78,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return Api.call_replaces(callp)
     }
 
+    fun diverterUri(): String {
+        return Api.call_diverter_uri(callp)
+    }
+
     init {
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }

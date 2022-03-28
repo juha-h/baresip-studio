@@ -84,8 +84,7 @@
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/callTitleRow"
-                    android:paddingBottom="10dp" >
+                    android:layout_below="@id/callTitleRow" >
 
                     <AutoCompleteTextView
                         android:id="@+id/callUri"
@@ -110,12 +109,45 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/diverter"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/uriRow"
+                    android:visibility="gone"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="3dp"
+                        android:paddingEnd="0dp"
+                        android:gravity="start"
+                        android:text="@string/diverted_by_dots"
+                        android:textSize="20sp">
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/diverterUri"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:paddingTop="10dp"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="24dp"
+                        android:textColor="@color/colorStrong"
+                        android:textSize="20sp"
+                        android:layout_weight="1" >
+                    </TextView>
+
+                </LinearLayout>
+
                 <RelativeLayout
                     android:id="@+id/callRow"
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/uriRow"
+                    android:layout_below="@id/diverter"
+                    android:paddingTop="10dp"
                     android:paddingBottom="10dp" >
 
                     <ImageButton
