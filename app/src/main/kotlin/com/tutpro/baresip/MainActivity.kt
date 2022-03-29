@@ -1094,7 +1094,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val call = Call.ofCallp(callp)!!
-                val target = Utils.friendlyUri(this, Contact.contactName(ev[1]), Utils.aorDomain(aor))
+                val target = Utils.friendlyUri(this, ev[1], aor)
                 with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setTitle(R.string.transfer_request)
                     setMessage(String.format(getString(R.string.transfer_request_query),
@@ -1415,7 +1415,7 @@ class MainActivity : AppCompatActivity() {
                     val uri = if (Utils.isTelUri(uriText))
                         Utils.telToSip(uriText, ua.account)
                     else
-                        Utils.uriComplete(uriText, Utils.aorDomain(ua.account.aor))
+                        Utils.uriComplete(uriText, ua.account.aor)
                     if (!Utils.checkUri(uri)) {
                         Utils.alertView(this@MainActivity, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
@@ -1754,7 +1754,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Utils.telToSip(uriText, ua.account)
                 } else {
-                    Utils.uriComplete(uriText, Utils.aorDomain(aor))
+                    Utils.uriComplete(uriText, aor)
                 }
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
@@ -1778,8 +1778,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
-                    callUri.setText(Utils.friendlyUri(this, Contact.contactName(latest.peerUri),
-                            Utils.aorDomain(aor)))
+                    callUri.setText(Utils.friendlyUri(this, latest.peerUri, aor))
             }
         }
     }
@@ -1824,8 +1823,7 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, Contact.contactName(call.peerUri),
-                            Utils.aorDomain(ua.account.aor)))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
                     securityButton.visibility = View.INVISIBLE
                     diverter.visibility = View.GONE
                     callButton.visibility = View.INVISIBLE
@@ -1840,14 +1838,12 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, Contact.contactName(call.peerUri),
-                            Utils.aorDomain(ua.account.aor)))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        diverterUri.text = Utils.friendlyUri(this, Contact.contactName(uri),
-                                Utils.aorDomain(ua.account.aor))
+                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account.aor)
                         diverter.visibility = View.VISIBLE
                     } else {
                         diverter.visibility = View.GONE
@@ -1868,16 +1864,14 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(this, Contact.contactName(call.referTo),
-                                Utils.aorDomain(ua.account.aor)))
+                        callUri.setText(Utils.friendlyUri(this, call.referTo, ua.account.aor))
                         transferButton.isEnabled = false
                     } else {
                         if (call.dir == "out")
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
                         else
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(this, Contact.contactName(call.peerUri),
-                                Utils.aorDomain(ua.account.aor)))
+                        callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
                         transferButton.isEnabled = true
                     }
                     if (call.onHoldCall == null)

@@ -66,9 +66,7 @@ class ChatActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        var chatPeer = Contact.contactName(peerUri)
-        if (chatPeer.startsWith("sip:"))
-            chatPeer = Utils.friendlyUri(this, chatPeer, Utils.aorDomain(aor))
+        val chatPeer = Utils.friendlyUri(this, peerUri, aor)
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 

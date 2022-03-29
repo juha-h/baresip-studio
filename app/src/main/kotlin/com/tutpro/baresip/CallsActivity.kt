@@ -46,9 +46,7 @@ class CallsActivity : AppCompatActivity() {
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerUri
-            var peerName = Contact.contactName(peerUri)
-            if (peerName.startsWith("sip:"))
-                peerName = Utils.friendlyUri(this, peerName, Utils.aorDomain(aor))
+            val peerName = Utils.friendlyUri(this, peerUri, aor)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
@@ -121,7 +119,7 @@ class CallsActivity : AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.calls_add_delete_question),
-                            Utils.friendlyUri(this@CallsActivity, peerName, Utils.aorDomain(aor)), callText))
+                            Utils.friendlyUri(this@CallsActivity, peerName, aor), callText))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
                     setNegativeButton(getString(R.string.add_contact), dialogClickListener)
@@ -131,7 +129,7 @@ class CallsActivity : AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.calls_delete_question),
-                            Utils.friendlyUri(this@CallsActivity, peerName, Utils.aorDomain(aor)), callText))
+                            Utils.friendlyUri(this@CallsActivity, peerName, aor), callText))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
                     show()

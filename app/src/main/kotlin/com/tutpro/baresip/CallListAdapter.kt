@@ -62,12 +62,7 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         if (count <= 3)
             viewHolder.etcView.text = ""
 
-        val contactName = Contact.contactName(callRow.peerUri)
-        if (contactName.startsWith("sip:"))
-            viewHolder.peerURIView.text = Utils.friendlyUri(ctx, contactName, Utils.aorDomain(callRow.aor))
-        else
-            viewHolder.peerURIView.text = contactName
-
+        viewHolder.peerURIView.text = Utils.friendlyUri(ctx, callRow.peerUri, callRow.aor)
         viewHolder.timeView.text = Utils.relativeTime(ctx, callRow.stopTime)
 
         viewHolder.timeView.setOnClickListener {
