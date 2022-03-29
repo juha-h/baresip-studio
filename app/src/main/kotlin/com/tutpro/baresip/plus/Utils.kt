@@ -128,8 +128,10 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, domain: String): String {
-        var u = uri
+    fun friendlyUri(ctx: Context, uri: String, aor: String): String {
+        var u = Contact.contactName(uri)
+        if (u != uri)
+            return u
         val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
@@ -142,7 +144,7 @@ object Utils {
         return if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (isTelNumber(user) || host == domain)
+            if (isTelNumber(user) || host == aorDomain(aor))
                 user
             else
                 if (host == "anonymous.invalid")
@@ -156,9 +158,9 @@ object Utils {
         }
     }
 
-    fun uriComplete(uri: String, domain: String): String {
+    fun uriComplete(uri: String, aor: String): String {
         val res = if (!uri.startsWith("sip:")) "sip:$uri" else uri
-        return if (checkUriUser(uri)) "$res@$domain" else res
+        return if (checkUriUser(uri)) "$res@${aorDomain(aor)}" else res
     }
 
     fun aorDomain(aor: String): String {

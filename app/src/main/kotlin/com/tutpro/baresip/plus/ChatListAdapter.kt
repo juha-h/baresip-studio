@@ -52,11 +52,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
 
-        val peerName = Contact.contactName(message.peerUri)
-        viewHolder.peerView.text = if (peerName !=message.peerUri )
-            peerName
-        else
-            Utils.friendlyUri(ctx, message.peerUri, message.aor)
+        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, message.aor)
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp
