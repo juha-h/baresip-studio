@@ -17,6 +17,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var referTo = ""
     var videoRequest = 0
 
+    fun diverterUri(): String {
+        return Api.call_diverter_uri(callp)
+    }
+
     init {
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }

@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var callTimer: Chronometer
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
+    private lateinit var diverter: LinearLayout
+    private lateinit var diverterUri: TextView
     private lateinit var callButton: ImageButton
     private lateinit var callVideoButton: ImageButton
     private lateinit var hangupButton: ImageButton
@@ -142,6 +144,8 @@ class MainActivity : AppCompatActivity() {
         callTimer = binding.callTimer
         callUri = binding.callUri
         securityButton = binding.securityButton
+        diverter = binding.diverter
+        diverterUri = binding.diverterUri
         callButton = binding.callButton
         callVideoButton = binding.callVideoButton
         hangupButton = binding.hangupButton
@@ -2177,6 +2181,7 @@ class MainActivity : AppCompatActivity() {
             callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                     Contact.contactNames()))
             securityButton.visibility = View.INVISIBLE
+            diverter.visibility = View.GONE
             callButton.visibility = View.VISIBLE
             callButton.isEnabled = true
             callVideoButton.visibility = View.VISIBLE
@@ -2207,6 +2212,7 @@ class MainActivity : AppCompatActivity() {
                             Utils.aorDomain(ua.account.aor)))
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
+                    diverter.visibility = View.GONE
                     callButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
@@ -2225,6 +2231,14 @@ class MainActivity : AppCompatActivity() {
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
+                    val uri = call.diverterUri()
+                    if (uri != "") {
+                        diverterUri.text = Utils.friendlyUri(this, Contact.contactName(uri),
+                                Utils.aorDomain(ua.account.aor))
+                        diverter.visibility = View.VISIBLE
+                    } else {
+                        diverter.visibility = View.GONE
+                    }
                     callButton.visibility = View.INVISIBLE
                     callVideoButton.visibility = View.INVISIBLE
                     hangupButton.visibility = View.INVISIBLE

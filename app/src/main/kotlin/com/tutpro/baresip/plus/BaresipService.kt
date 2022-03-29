@@ -655,8 +655,7 @@ class BaresipService: Service() {
                             newEvent = "call rejected"
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
-                            Call(callp, ua, peerUri, "in", "incoming",
-                                    Utils.dtmfWatcher(callp)).add()
+                            Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
                                 Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
                                 if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
@@ -775,8 +774,8 @@ class BaresipService: Service() {
                     }
                     "call update" -> {
                         when (ev[1]) {
-                            "0", "1" -> call!!.held = true
-                            "2", "3" -> call!!.held = false
+                            "0", "1" -> call!!.held = true  // inactive, recvonly
+                            "2", "3" -> call!!.held = false // sendonly, sendrecv
                         }
                         if (!isMainVisible || call!!.status != "connected")
                             return
