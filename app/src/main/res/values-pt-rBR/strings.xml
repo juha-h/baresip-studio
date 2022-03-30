@@ -285,4 +285,5 @@
     <string name="attended">Participou</string>
     <string name="anonymous">Anônimo</string>
     <string name="unknown">Desconhecido</string>
+    <string name="diverted_by_dots">Desviado por …</string>
 </resources>
