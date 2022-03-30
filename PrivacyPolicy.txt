@@ -1,6 +1,8 @@
 baresip Privacy Policy
 
-baresip application does not collect any personal information.  User can choose in Settings that baresip is using Android contacts. If so, contact information is only used inside the application for voice calling and messaging and is not leaked outside of the application.
+baresip application does not collect any personal information.
+
+User can choose in Settings that baresip is using Android contacts. If so, contact information is only used inside the application while the application is running for voice calling and messaging and is not leaked outside of the application.
 
 baresip needs access to microphone for the purpose of voice communication with other parties.
 
