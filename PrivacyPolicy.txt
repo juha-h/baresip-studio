@@ -5,6 +5,10 @@ baresip+ does not collect any personal information.
 baresip+ needs access to microphone and camera for the purpose of voice
 and video communication with other parties.
 
+User can choose in Settings that baresip is using Android contacts for
+calling and messaging. If so, contact information is only used inside
+the application while baresip+ is running and is not leaked outside of
+the application.
+
 baresip+ supports secure call setup via TLS and secure media via
 ZRTP and (DTLS) SRTP encapsulation options.
-
