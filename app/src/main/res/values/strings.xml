@@ -346,6 +346,13 @@
     <string name="config_restart">You need to restart baresip in order to activate the new
         settings. Restart now?
     </string>
+    <string name="consent_request">Consent Request</string>
+    <string name="contacts_consent">If Android contacts is chosen, they can be used
+        in calling and messaging as references to SIP and tel URIs. baresip app does not store Android
+        contacts nor share them with anyone.  In order to make Android contacts available in baresip,
+        Google requires that you accept their use as described here and in app\'s
+        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">Privacy Policy</a>.
+    </string>
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>

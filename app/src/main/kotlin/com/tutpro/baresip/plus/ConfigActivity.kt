@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -337,7 +338,22 @@ class ConfigActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 contactsMode = contactsModeKeys[position]
                 if (contactsMode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions))
-                    requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
+                    with(MaterialAlertDialogBuilder(this@ConfigActivity, R.style.AlertDialogTheme)) {
+                        setTitle(getText(R.string.consent_request))
+                        setMessage(getText(R.string.contacts_consent))
+                        setPositiveButton(getText(R.string.accept)) { dialog, _ ->
+                            dialog.dismiss()
+                            requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
+                        }
+                        setNegativeButton(getText(R.string.deny)) { dialog, _ ->
+                            contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
+                            dialog.dismiss()
+                        }
+                        show().apply {
+                            findViewById<TextView>(android.R.id.message)
+                                    ?.movementMethod = LinkMovementMethod.getInstance()
+                        }
+                    }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
