@@ -387,6 +387,13 @@
     <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset
         käyttöön. Käynnistä nyt?
     </string>
+    <string name="consent_request">Suostumuspyyntö</string>
+    <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä
+        puheluissa ja viesteissä SIP ja tel URI:en ohella. baresip ei talleta Androidin yhteystietoja
+        eikä jaa niitä kenellekään. Jotta baresip saisi käyttöönsä Androidin yhteystiedot,
+        Google vaatii, että annat siihen siihen suostumuksen hyväksymällä baresip-sovelluksen
+        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">yksityisyyskäytännöt</a>.
+    </string>
     <!-- Contact Activity -->
     <string name="contact">Yhteystieto</string>
     <string name="new_contact">Uusi yhteystieto</string>
