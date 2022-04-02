@@ -1,0 +1,2 @@
+-  Due to Google's requirement, ask user's consent if Android contacts is chosen in Settings
+- New Portuguese (Brazil) translations
