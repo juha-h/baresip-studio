@@ -1,0 +1,4 @@
+-  Due to Google's requirement, ask user's consent if Android contacts
+is chosen in Settings
+- Fixed possible crash when setting video codecs
+- New Portuguese (Brazil) translations
