@@ -432,7 +432,7 @@ class BaresipService: Service() {
                 requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
                 setCallVolume()
                 proximitySensing(true)
-                Api.ua_answer(uap, callp)
+                Api.ua_answer(uap, callp, Api.VIDMODE_ON)
             }
 
             "Call Reject" -> {

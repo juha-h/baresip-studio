@@ -62,7 +62,7 @@ object Api {
     external fun ua_unregister(uap: Long)
     external fun ua_hangup(uap: Long, callp: Long, code: Int, reason: String)
     external fun ua_call_alloc(uap: Long, xcallp: Long, video: Int): Long
-    external fun ua_answer(uap: Long, callp: Long)
+    external fun ua_answer(uap: Long, callp: Long, vmode: Int)
     external fun ua_debug(uap: Long)
 
     external fun call_connect(callp: Long, peer_uri: String): Int
