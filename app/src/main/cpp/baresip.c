@@ -411,8 +411,12 @@ static struct mqueue *mq;
 static void mqueue_handler(int id, void *data, void *arg)
 {
     if (id == ID_UA_STOP_ALL) {
-        LOGD("calling ua_stop_all with force %u\n", (unsigned)data);
-        ua_stop_all((bool)data);
+        const unsigned long forced = (unsigned long)data;
+        LOGD("calling ua_stop_all with force %lu\n", forced);
+        if (forced == 1)
+            ua_stop_all(true);
+        else
+            ua_stop_all(false);
     }
 }
 
