@@ -282,7 +282,6 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
 {
     (void)ctype;
     (void)arg;
-    char ua_buf[32];
     char peer_buf[256];
     size_t size;
 
@@ -316,8 +315,8 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)jMsg, 0);
     memcpy(temp, mbuf_buf(body), size);
     (*env)->ReleasePrimitiveArrayCritical(env, jMsg, temp, 0);
-    LOGD("sending message %s/%s/%.*s\n", ua_buf, peer_buf, (int)size, mbuf_buf(body));
-    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, ua, jPeer, jMsg);
+    LOGD("sending message %ld/%s/%.*s\n", (long)ua, peer_buf, (int)size, mbuf_buf(body));
+    (*env)->CallVoidMethod(env, pctx->mainActivityObj, methodId, (jlong)ua, jPeer, jMsg);
     (*env)->DeleteLocalRef(env, jPeer);
     (*env)->DeleteLocalRef(env, jMsg);
 }
