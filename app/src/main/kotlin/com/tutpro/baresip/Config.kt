@@ -81,9 +81,15 @@ object Config {
             }
         }
 
+        if (!config.contains("audio_buffer_mode")) {
+            config = "${config}audio_buffer_mode adaptive\n"
+            config = "${config}audio_buffer 40-200\n"
+        }
+
         if (!config.contains("jitter_buffer_type")) {
             config = "${config}jitter_buffer_type adaptive\n"
-            config = "${config}jitter_buffer_wish 6\n"
+        } else {
+            removeVariable("jitter_buffer_wish")
         }
 
         removeVariable("prefer_android_contacts")

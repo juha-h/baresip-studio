@@ -9,6 +9,8 @@ audio_player opensles,nil
 audio_source opensles,nil
 audio_alert opensles,nil
 audio_level no
+audio_buffer_mode adaptive
+audio_buffer 40-200
 ausrc_format s16
 auenc_format s16
 auplay_format s16
@@ -17,7 +19,6 @@ rtp_tos 184
 rtcp_mux no
 jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
-jitter_buffer_wish 6
 rtp_stats yes
 dyn_dns yes
 module opus.so
