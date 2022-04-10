@@ -1829,7 +1829,8 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account,
+                            call.status == "answered"))
                     securityButton.visibility = View.INVISIBLE
                     diverter.visibility = View.GONE
                     callButton.visibility = View.INVISIBLE
@@ -1844,14 +1845,12 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    val caller =  Utils.friendlyUri(this, call.peerUri, ua.account, true)
-                    callUri.setText(caller)
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account, true))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        val diversionUri =  Utils.friendlyUri(this, uri, ua.account, true)
-                        diverterUri.text = diversionUri
+                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account, true)
                         diverter.visibility = View.VISIBLE
                     } else {
                         diverter.visibility = View.GONE
