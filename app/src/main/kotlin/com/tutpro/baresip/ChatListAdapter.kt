@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat
 import java.text.DateFormat
 import java.util.*
 
-class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Message>) :
+class ChatListAdapter(private val ctx: Context, private val account: Account, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
     private val layoutInflater = LayoutInflater.from(context)
@@ -52,7 +52,7 @@ class ChatListAdapter(private val ctx: Context, private val rows: ArrayList<Mess
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
 
-        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, message.aor)
+        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, account)
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp

@@ -47,6 +47,7 @@ class AccountActivity : AppCompatActivity() {
     private var answerMode = Api.ANSWERMODE_MANUAL
     private lateinit var answerModeSpinner: Spinner
     private lateinit var vmUri: EditText
+    private lateinit var countryCode: EditText
     private lateinit var telProvider: EditText
     private lateinit var defaultCheck: CheckBox
 
@@ -84,6 +85,7 @@ class AccountActivity : AppCompatActivity() {
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         vmUri = binding.voicemailUri
+        countryCode = binding.countryCode
         telProvider = binding.telephonyProvider
         defaultCheck = binding.Default
 
@@ -182,6 +184,8 @@ class AccountActivity : AppCompatActivity() {
                                 "voicemail-uri" ->
                                     if (text.isNotEmpty())
                                         acc.vmUri = text
+                                "country-code" ->
+                                    acc.countryCode = text
                                 "tel-provider" ->
                                     acc.telProvider = text
                             }
@@ -313,6 +317,9 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        if (acc.countryCode != "")
+            countryCode.setText(acc.countryCode)
 
         telProvider.setText(acc.telProvider)
 
@@ -579,6 +586,17 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
+                val newCountryCode = countryCode.text.toString().trim()
+                if (newCountryCode != acc.countryCode) {
+                    if (newCountryCode != "" && !Utils.checkCountryCode(newCountryCode)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_country_code), newCountryCode))
+                        return false
+                    }
+                    acc.countryCode = newCountryCode
+                    save = true
+                }
+
                 val hostPart = telProvider.text.toString().trim()
                 if (hostPart != acc.telProvider) {
                     if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
@@ -716,6 +734,12 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.voicemail_uri),
                 getString(R.string.voicemain_uri_help)
+            )
+        }
+        binding.CountryCodeTitle.setOnClickListener {
+            Utils.alertView(
+                    this, getString(R.string.country_code),
+                    getString(R.string.country_code_help)
             )
         }
         binding.TelephonyProviderTitle.setOnClickListener {

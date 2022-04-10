@@ -42,7 +42,7 @@ class ChatsActivity: AppCompatActivity() {
         headerView.text = headerText
 
         uaMessages = uaMessages(aor)
-        clAdapter = ChatListAdapter(this, uaMessages)
+        clAdapter = ChatListAdapter(this, account, uaMessages)
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
@@ -51,7 +51,7 @@ class ChatsActivity: AppCompatActivity() {
                 if (it.resultCode == RESULT_OK) {
                     clAdapter.clear()
                     uaMessages = uaMessages(aor)
-                    clAdapter = ChatListAdapter(this, uaMessages)
+                    clAdapter = ChatListAdapter(this, account, uaMessages)
                     listView.adapter = clAdapter
                 }
             }
@@ -101,7 +101,7 @@ class ChatsActivity: AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_chat_question),
-                            Utils.friendlyUri(this@ChatsActivity, peer, aor)))
+                            Utils.friendlyUri(this@ChatsActivity, peer, account)))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
                     setNegativeButton(getText(R.string.delete), dialogClickListener)
                     setPositiveButton(getText(R.string.add_contact), dialogClickListener)
@@ -159,7 +159,7 @@ class ChatsActivity: AppCompatActivity() {
         super.onResume()
         clAdapter.clear()
         uaMessages = uaMessages(aor)
-        clAdapter = ChatListAdapter(this, uaMessages)
+        clAdapter = ChatListAdapter(this, account, uaMessages)
         listView.adapter = clAdapter
         if (uaMessages.count() > 0) {
             if (scrollPosition >= 0) {

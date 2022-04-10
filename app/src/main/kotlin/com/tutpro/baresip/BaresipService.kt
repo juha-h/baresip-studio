@@ -680,7 +680,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val caller = Utils.friendlyUri(this, peerUri, aor)
+                            val caller = Utils.friendlyUri(this, peerUri, ua.account, true)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -787,7 +787,7 @@ class BaresipService: Service() {
                                 PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
                                     intent, PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val target = Utils.friendlyUri(this, ev[1], aor)
+                            val target = Utils.friendlyUri(this, ev[1], ua.account)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                 .setContentIntent(pi)
@@ -868,7 +868,7 @@ class BaresipService: Service() {
                         }
                         if (!Utils.isVisible()) {
                             if (missed) {
-                                val caller = Utils.friendlyUri(this, call.peerUri, aor)
+                                val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -975,7 +975,7 @@ class BaresipService: Service() {
                 PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(this, peer, ua.account.aor)
+            val sender = Utils.friendlyUri(this, peer, ua.account)
             nb.setSmallIcon(R.drawable.ic_stat_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                 .setContentIntent(pi)
