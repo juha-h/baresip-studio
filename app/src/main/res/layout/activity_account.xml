@@ -313,6 +313,25 @@
         </EditText>
 
         <TextView
+            android:id="@+id/CountryCodeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:text="@string/country_code" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/countryCode"
+            android:layout_height="wrap_content"
+            android:hint="@string/country_code_hint"
+            android:textSize="18sp"
+            android:inputType="phone"
+            android:importantForAutofill="no"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
             android:id="@+id/TelephonyProviderTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

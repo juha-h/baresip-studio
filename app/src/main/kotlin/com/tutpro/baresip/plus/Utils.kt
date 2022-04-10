@@ -35,6 +35,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -128,10 +129,15 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, aor: String): String {
+    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = false): String {
         var u = Contact.contactName(uri)
         if (u != uri)
             return u
+        if (e164Check) {
+            u = Contact.contactName(e164Uri(uri, account.countryCode))
+            if (u != uri)
+                return u
+        }
         val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
@@ -144,7 +150,7 @@ object Utils {
         return if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            if (isTelNumber(user) || host == aorDomain(aor))
+            if (isTelNumber(user) || host == aorDomain(account.aor))
                 user
             else
                 if (host == "anonymous.invalid")
@@ -156,6 +162,20 @@ object Utils {
         } else {
             u
         }
+    }
+
+    fun e164Uri(uri: String, countryCode: String): String {
+        if (countryCode == "") return uri
+        val userPart = uriUserPart(uri)
+        return if (userPart.isDigitsOnly()) {
+            when {
+                userPart.startsWith("00") -> uri.replace("sip:$userPart",
+                        "sip:+" + userPart.substring(2))
+                userPart.startsWith("0") -> uri.replace("sip:0", "sip:$countryCode")
+                else -> uri.replace("sip:", "sip:$countryCode")
+            }
+        } else
+            uri
     }
 
     fun uriComplete(uri: String, aor: String): String {
@@ -333,6 +353,11 @@ object Utils {
     fun checkName(name: String): Boolean {
         return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
                 name.lines().size == 1 && !name.contains('"')
+    }
+
+    fun checkCountryCode(cc: String): Boolean {
+        return cc.startsWith("+") && cc.length > 1 && cc.length < 5 &&
+                cc.substring(1).isDigitsOnly() && cc[1] != '0'
     }
 
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {

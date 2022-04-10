@@ -1333,7 +1333,8 @@ class MainActivity : AppCompatActivity() {
                 if (!isFinishing && !alerting) {
                     with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                         setTitle(R.string.video_request)
-                        val peerUri = Utils.friendlyUri(this@MainActivity, call.peerUri, aor)
+                        val peerUri = Utils.friendlyUri(this@MainActivity, call.peerUri, acc,
+                                call.status == "answered")
                         val msg = when (dir) {
                             1 -> String.format(getString(R.string.allow_video_recv), peerUri)
                             2 -> String.format(getString(R.string.allow_video_send), peerUri)
@@ -1379,9 +1380,12 @@ class MainActivity : AppCompatActivity() {
                         if (aor == aorSpinner.tag) {
                             securityButton.setImageResource(security)
                             setSecurityButtonTag(securityButton, security)
-                            securityButton.visibility = View.VISIBLE
-                            dialog.dismiss()
+                            securityButton.visibility = if (Call.ofCallp(callp) == null)
+                                View.INVISIBLE
+                            else
+                                View.VISIBLE
                         }
+                        dialog.dismiss()
                     }
                     setNeutralButton(getString(R.string.no)) { dialog, _ ->
                         call.security = R.drawable.box_yellow
@@ -1389,7 +1393,10 @@ class MainActivity : AppCompatActivity() {
                         if (aor == aorSpinner.tag) {
                             securityButton.setImageResource(R.drawable.box_yellow)
                             securityButton.tag = "yellow"
-                            securityButton.visibility = View.VISIBLE
+                            securityButton.visibility = if (Call.ofCallp(callp) == null)
+                                View.INVISIBLE
+                            else
+                                View.VISIBLE
                         }
                         dialog.dismiss()
                     }
@@ -1426,7 +1433,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val call = Call.ofCallp(callp)!!
-                val target = Utils.friendlyUri(this, ev[1], aor)
+                val target = Utils.friendlyUri(this, ev[1], acc)
                 with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setTitle(R.string.transfer_request)
                     setMessage(String.format(getString(R.string.transfer_request_query),
@@ -2081,7 +2088,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val latest = NewCallHistory.aorLatestHistory(aor)
                 if (latest != null)
-                    callUri.setText(Utils.friendlyUri(this, latest.peerUri, aor))
+                    callUri.setText(Utils.friendlyUri(this, latest.peerUri, ua.account))
             }
         }
     }
@@ -2207,7 +2214,8 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account,
+                            call.status == "answered"))
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     diverter.visibility = View.GONE
@@ -2224,13 +2232,14 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
+                    val caller =  Utils.friendlyUri(this, call.peerUri, ua.account, true)
+                    callUri.setText(caller)
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account.aor)
+                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account, true)
                         diverter.visibility = View.VISIBLE
                     } else {
                         diverter.visibility = View.GONE
@@ -2271,14 +2280,16 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (call.referTo != "") {
                         callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(this, call.referTo, ua.account.aor))
+                        callUri.setText(Utils.friendlyUri(this, call.referTo, ua.account))
                         transferButton.isEnabled = false
                     } else {
-                        if (call.dir == "out")
+                        if (call.dir == "out") {
                             callTitle.text = getString(R.string.outgoing_call_to_dots)
-                        else
+                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
+                        } else {
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                        callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account.aor))
+                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account, true))
+                        }
                         transferButton.isEnabled = true
                     }
                     if (call.onHoldCall == null)

@@ -11,7 +11,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-class CallListAdapter(private val ctx: Context, private val aor: String, private val rows: ArrayList<CallRow>) :
+class CallListAdapter(private val ctx: Context, private val account: Account,
+                      private val rows: ArrayList<CallRow>) :
         ArrayAdapter<CallRow>(ctx, R.layout.call_row, rows) {
 
     private val layoutInflater = LayoutInflater.from(context)
@@ -62,13 +63,18 @@ class CallListAdapter(private val ctx: Context, private val aor: String, private
         if (count <= 3)
             viewHolder.etcView.text = ""
 
-        viewHolder.peerURIView.text = Utils.friendlyUri(ctx, callRow.peerUri, callRow.aor)
+        var peer = Contact.contactName(callRow.peerUri)
+        if (peer == callRow.peerUri)
+            peer = Contact.contactName(Utils.e164Uri(peer, account.countryCode))
+        if (peer == callRow.peerUri)
+            peer = Utils.friendlyUri(ctx, peer, account, false)
+        viewHolder.peerURIView.text = peer
         viewHolder.timeView.text = Utils.relativeTime(ctx, callRow.stopTime)
 
         viewHolder.timeView.setOnClickListener {
             val i = Intent(ctx, CallDetailsActivity::class.java)
             val b = Bundle()
-            b.putString("aor", aor)
+            b.putString("aor", account.aor)
             b.putString("peer", viewHolder.peerURIView.text!!.toString())
             b.putInt("position", position)
             i.putExtras(b)

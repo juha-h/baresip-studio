@@ -204,6 +204,15 @@
         mahdollista puhepostiviesteistä (Message Waiting Indications) ei tilata.
     </string>
     <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
+    <string name="country_code">Maakoodi</string>
+    <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun From URI:n
+        etsintä yhteystiedoista epäonnistuu ja sen käyttäjäosa sisältää puhelinnumeron,
+        joka ei ala \'+\' merkillä, niin tämä maakoodi lisätään numeron eteen ja etsintä tehdään
+        uudelleen. Jos puhelinnumero alkaa yhdellä numerolla \'0\', niin numero \'0\'
+        poistetaan ennen maakoodin lisäämistä.
+    </string>
+    <string name="country_code_hint">+code</string>
+    <string name="invalid_country_code">Invalid Country Code \'%1$s\'</string>
     <string name="telephony_provider">Puhelinpalvelun tarjoaja</string>
     <string name="telephony_provider_help">SIP URI:n domain-osa, jota käytetään soitettaessa
         puhelinnumeroihin. Tehdasasetus on tilin domain-osa.  Jos tyhjä, niin tätä tiliä ei

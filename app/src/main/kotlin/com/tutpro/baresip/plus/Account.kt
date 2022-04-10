@@ -30,6 +30,7 @@ class Account(val accp: Long) {
     var missedCalls = false
     var unreadMessages = false
     var callHistory = true
+    var countryCode = ""
     var telProvider = Utils.aorDomain(aor)
     var resumeUri = ""
 
@@ -66,6 +67,10 @@ class Account(val accp: Long) {
 
         val extra = Api.account_extra(accp)
         callHistory = Utils.paramValue(extra,"call_history") == ""
+        countryCode = if (Utils.paramExists(extra, "country_code"))
+            Utils.paramValue(extra,"country_code")
+        else
+            ""
         telProvider = if (Utils.paramExists(extra, "tel_provider"))
             URLDecoder.decode(Utils.paramValue(extra,"tel_provider"), "UTF-8")
         else
@@ -146,6 +151,9 @@ class Account(val accp: Long) {
             extra += ";call_history=no"
 
         extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
+
+        if (countryCode != "")
+            extra += ";country_code=$countryCode"
 
         if (extra != "")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
