@@ -3,106 +3,8 @@
     <!-- About Activity -->
     <string name="about_title">baresip sovelluksesta</string>
     <string name="about_title_plus">baresip+ sovelluksesta</string>
-    <string name="about_text">
-        <![CDATA[
-        <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Versio %1$s</p>
-        <h2>Käyttövihjeitä</h2>
-        <ul>
-            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip-sovellus ja
-                salli Ilmoitukset.</li>
-            <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
-                kosketus tarjoaa apua.</li>
-            <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-            <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
-                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
-                Wiki</a>-sivulta.</li>
-            <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
-                keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
-                (rekisteröintiä ei ole aktivoitu).</li>
-            <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
-            <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-            <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
-            <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
-            <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
-                puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
-                näppäimistön tyylin vaihtamisen.</li>
-            <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
-                kun puhelun kohde on tyhjä.</li>
-            <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
-            <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja
-                yhteystietoja.</li>
-            <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia
-                lyhyesti/pitkästi.</li>
-        </ul>
-        <h2>Lähdekoodi</h2>
-        Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
-        missä voi myös raportoida virheistä.
-        <h2>Lisenssit</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
-            <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
-            <li><b>LGPL 2.1</b> G.722 ja G.726 koodausmenetelmät</li>
-            <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
-            <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
-        </ul>
-        ]]>
-    </string>
-    <string name="about_text_plus">
-        <![CDATA[
-        <h1>Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Versio %1$s</p>
-        <h2>Käyttövihjeitä</h2>
-        <ul>
-            <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip+-sovellus ja
-                salli Ilmoitukset.</li>
-            <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon
-                kosketus tarjoaa apua.</li>
-            <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-            <li>Uusi tili voidaan myös konfiguida osittain automaattisesti.  Katso lisätietoja
-                <a href="https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration">
-                Wiki</a>-sivulta.</li>
-            <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
-                keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen
-                (rekisteröintiä ei ole aktivoitu).</li>
-            <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
-            <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
-            <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
-            <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
-            <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu
-                puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa
-                näppäimistön tyylin vaihtamisen.</li>
-            <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin,
-                kun puhelun kohde on tyhjä.</li>
-            <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
-            <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja
-                yhteystietoja.</li>
-            <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia
-                lyhyesti/pitkästi.</li>
-        </ul>
-        <h2>Tunnetut ongelmat</h2>
-        <ul>
-            <li>Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa
-            kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.</li>
-            <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
-        </ul>
-        <h2>Lähdekoodi</h2>
-        Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHub</a>:ssa,
-        missä voi myös raportoida virheistä.
-        <h2>Lisenssit</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
-            <li><b>Apache 2.0</b> AMR koodausmenetelmä ja TLS turvallisuus</li>
-            <li><b>LGPL 2.1</b> G.722 ja G.726 koodausmenetelmät</li>
-            <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
-            <li><b>GNU GPLv2</b> H.264 ja H.265 koodausmenetelmät</li>
-            <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
-            <li><b>AOMedia</b> AV1 koodausmenetelmä</li>
-        </ul>
-        ]]>
-    </string>
+    <string name="about_text">&lt;h1&gt;Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Versio %1$s&lt;/p&gt; &lt;h2&gt;Käyttövihjeitä&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip-sovellus ja salli Ilmoitukset.&lt;/li&gt; &lt;li&gt;Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.&lt;/li&gt; &lt;li&gt;Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.&lt;/li&gt; &lt;li&gt;Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt; Wiki&lt;/a&gt;-sivulta.&lt;/li&gt; &lt;li&gt;Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui), keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen (rekisteröintiä ei ole aktivoitu).&lt;/li&gt; &lt;li&gt;Pisteen kosketus johtaa suoraan tilin asetuksiin.&lt;/li&gt; &lt;li&gt;Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.&lt;/li&gt; &lt;li&gt;Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.&lt;/li&gt; &lt;li&gt;Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.&lt;/li&gt; &lt;li&gt;Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa näppäimistön tyylin vaihtamisen.&lt;/li&gt; &lt;li&gt;Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.&lt;/li&gt; &lt;li&gt;Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.&lt;/li&gt; &lt;li&gt;Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.&lt;/li&gt; &lt;li&gt;Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Lähdekoodi&lt;/h2&gt; Lähdekoodi on saatavilla &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;:ssa, missä voi myös raportoida virheistä. &lt;h2&gt;Lisenssit&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; paitsi seuraavat:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR koodausmenetelmä ja TLS turvallisuus&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; G.722 ja G.726 koodausmenetelmät&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP median salausmenetelmä&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 koodausmenetelmä&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="about_text_plus">&lt;h1&gt;Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Versio %1$s&lt;/p&gt; &lt;h2&gt;Käyttövihjeitä&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip+-sovellus ja salli Ilmoitukset.&lt;/li&gt; &lt;li&gt;Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.&lt;/li&gt; &lt;li&gt;Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.&lt;/li&gt; &lt;li&gt;Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt; Wiki&lt;/a&gt;-sivulta.&lt;/li&gt; &lt;li&gt;Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui), keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui), valkoinen (rekisteröintiä ei ole aktivoitu).&lt;/li&gt; &lt;li&gt;Pisteen kosketus johtaa suoraan tilin asetuksiin.&lt;/li&gt; &lt;li&gt;Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.&lt;/li&gt; &lt;li&gt;Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.&lt;/li&gt; &lt;li&gt;Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.&lt;/li&gt; &lt;li&gt;Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu puhepostin SIP URI), yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa näppäimistön tyylin vaihtamisen.&lt;/li&gt; &lt;li&gt;Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.&lt;/li&gt; &lt;li&gt;Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.&lt;/li&gt; &lt;li&gt;Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.&lt;/li&gt; &lt;li&gt;Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Tunnetut ongelmat&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Videopuheluissa laitetta on pidettävä vaakasuorassa asennossa kiertämällä sitä 90 astetta vasempaan pystysuorasta asennosta.&lt;/li&gt; &lt;li&gt;Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Lähdekoodi&lt;/h2&gt; Lähdekoodi on saatavilla &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;:ssa, missä voi myös raportoida virheistä. &lt;h2&gt;Lisenssit&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; paitsi seuraavat:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR koodausmenetelmä ja TLS turvallisuus&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; G.722 ja G.726 koodausmenetelmät&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP median salausmenetelmä&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv2&lt;/b&gt; H.264 ja H.265 koodausmenetelmät&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 koodausmenetelmä&lt;/li&gt; &lt;li&gt;&lt;b&gt;AOMedia&lt;/b&gt; AV1 koodausmenetelmä&lt;/li&gt; &lt;/ul&gt;</string>
     <!-- Account Activity -->
     <string name="account">Tili</string>
     <string name="display_name">Tilin käyttäjän nimi</string>
@@ -382,9 +284,7 @@
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
-    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit
-        sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen
-        käynnistyessä.</string>
+    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen käynnistyessä.</string>
     <string name="reset_config">Palauta oletusasetukset</string>
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
@@ -412,8 +312,7 @@
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
-    <string name="android_contact_help">Jos merkitty, tämä yhteystieto näkyy myös Androidin
-        yhteystiedoissa.</string>
+    <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
@@ -467,7 +366,7 @@
     <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'?</string>
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
-    <string name="hold">Aseta puhelu pitoon</string>
+    <string name="hold">Puhelu pitoon/pidosta</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="mic">Mikrofoni päälle/pois</string>
     <string name="call_transfer">Puhelun siirto</string>
@@ -533,12 +432,8 @@
         Android versioon 9 saakka tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
         Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.
     </string>
-    <string name="no_calls">Et voi soittaa puheluita tai vastata niihin
-        ilman Mikrofoni-käyttöoikeutta.
-    </string>
-    <string name="no_video_calls">Et voi soittaa video-puheluita tai vastata niihin
-        ilman Kamera-käyttöoikeutta.
-    </string>
+    <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-käyttöoikeutta.</string>
+    <string name="no_video_calls">Salli Kamera-sovelluslupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman
         Tallennustila-käyttöoikeutta.</string>
     <string name="no_restore">Et voi palauttaa sovelluksen tietoja ilman
@@ -546,4 +441,7 @@
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>
     <string name="no_network">Ei verkkoyhteyttä!</string>
+    <string name="choose_telephony_provider_account">Valitse puhelinpalvelun tarjoava tili</string>
+    <string name="call_details">Puhelutiedot</string>
+    <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-sovelluslupaa.</string>
 </resources>
