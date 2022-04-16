@@ -85,7 +85,7 @@
     <string name="mic">Mikrofon på/av</string>
     <string name="call_transfer">Koppla samtal</string>
     <string name="transfer_destination">Koppla till</string>
-    <string name="transfer_failed">Koppling misslyckaded</string>
+    <string name="transfer_failed">Koppling misslyckades</string>
     <string name="transfer">Koppling</string>
     <string name="dtmf">DTMF</string>
     <string name="codecs">Kodekar</string>
@@ -281,4 +281,10 @@
     <string name="contacts_help">Välj om baresips kontakter, Androids kontakter eller båda ska användas. Om du väljer båda och en kontakt med samma namn finns i båda, då används baresips kontakt.</string>
     <string name="both">Båda</string>
     <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>
+    <string name="country_code">Landsnummer</string>
+    <string name="country_code_hint">+nummer</string>
+    <string name="invalid_country_code">Ogiltigt landsnummer \'%1$s\'</string>
+    <string name="country_code_help">Det här kontots landsnummer, enligt E.164. Om telefonnumret i From-URI för ett inkommande samtal inte börjar med en \'+\'-symbol och en matchande kontakt inte kan hittas, då läggs landsnumret till telefonnumret och en kontaktsökning görs igen. Om telefonnumret börjar med siffran \'0\' tas denna siffra bort innan landsnumret läggs till.</string>
+    <string name="anonymous">Anonym</string>
+    <string name="unknown">Okänd</string>
 </resources>
