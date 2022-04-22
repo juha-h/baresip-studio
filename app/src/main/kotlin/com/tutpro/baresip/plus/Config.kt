@@ -98,6 +98,9 @@ object Config {
             BaresipService.contactsMode = "baresip"
         }
 
+        if (!config.contains("dtls_srtp_use_ec"))
+            config = "${config}dtls_srtp_use_ec prime256v1\n"
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i(TAG, "Initialized config to '$config'")

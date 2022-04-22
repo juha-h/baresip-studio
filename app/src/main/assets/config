@@ -64,3 +64,5 @@ video_selfview pip
 ice_turn no
 ice_nomination regular
 zrtp_hash yes
+dtls_srtp_use_ec prime256v1
+
