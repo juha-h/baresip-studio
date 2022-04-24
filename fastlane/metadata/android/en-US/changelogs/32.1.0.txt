@@ -1,0 +1,2 @@
+- Use elliptic curve cryptography based DTLS Key Establishment Protocol
+- New Swedish translations
