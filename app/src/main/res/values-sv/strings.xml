@@ -287,4 +287,9 @@
     <string name="country_code_help">Det här kontots landsnummer, enligt E.164. Om telefonnumret i From-URI för ett inkommande samtal inte börjar med en \'+\'-symbol och en matchande kontakt inte kan hittas, då läggs landsnumret till telefonnumret och en kontaktsökning görs igen. Om telefonnumret börjar med siffran \'0\' tas denna siffra bort innan landsnumret läggs till.</string>
     <string name="anonymous">Anonym</string>
     <string name="unknown">Okänd</string>
+    <string name="consent_request">Begäran om medgivande</string>
+    <string name="diverted_by_dots">Omdirigerad av…</string>
+    <string name="attended">Vägledd</string>
+    <string name="blind">Blind</string>
+    <string name="contacts_consent">Om Androids kontakter används då kan de användas som SIP- eller tel-URI-referenser för samtal och för att skicka meddelanden. baresip sparar inte Androids kontakter och delar dem inte heller med någon. För att Androids kontakter ska bli tillgängliga i baresip kräver Google att du accepterar användningen som beskrivs här och i appens <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">Privacy Policy</a>. </string>
 </resources>
