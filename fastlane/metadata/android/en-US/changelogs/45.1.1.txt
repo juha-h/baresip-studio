@@ -1,0 +1,3 @@
+- Use elliptic curve cryptography based DTLS Key Establishment Protocol
+- Fixed backup of call history
+- New Swedish translations
