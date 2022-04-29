@@ -14,6 +14,6 @@ Then in latest stable version of Android Studio:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
-Available also on <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a> and <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip&hl=en_US">Google Play</a>.
+Ready to be installed baresip app is available from <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a> and <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip&hl=en_US">Google Play</a>.
 
 Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
