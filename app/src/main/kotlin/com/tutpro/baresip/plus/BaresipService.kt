@@ -1209,7 +1209,6 @@ class BaresipService: Service() {
     private fun startRinging() {
         requestAudioFocus(AudioAttributes.CONTENT_TYPE_MUSIC)
         am.mode = AudioManager.MODE_RINGTONE
-
         if (rt == null) {
             val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                     RingtoneManager.TYPE_RINGTONE)
