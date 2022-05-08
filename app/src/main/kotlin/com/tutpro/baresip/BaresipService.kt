@@ -49,7 +49,6 @@ class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     internal lateinit var am: AudioManager
-    internal lateinit var rt: Ringtone
     private lateinit var nt: Ringtone
     private lateinit var nm: NotificationManager
     private lateinit var snb: NotificationCompat.Builder
@@ -65,6 +64,7 @@ class BaresipService: Service() {
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var contentObserver: ContentObserver
 
+    private var rt: Ringtone? = null
     private var rtTimer: Timer? = null
     private var audioFocusRequest: AudioFocusRequestCompat? = null
     private var origVolume = mutableMapOf<Int, Int>()
@@ -89,9 +89,6 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
-                RingtoneManager.TYPE_RINGTONE)
-        rt = RingtoneManager.getRingtone(applicationContext, rtUri)
 
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_NOTIFICATION)
@@ -1195,16 +1192,22 @@ class BaresipService: Service() {
     private fun startRinging() {
         requestAudioFocus(AudioAttributes.CONTENT_TYPE_MUSIC)
         am.mode = AudioManager.MODE_RINGTONE
+
+        if (rt == null) {
+            val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
+                    RingtoneManager.TYPE_RINGTONE)
+            rt = RingtoneManager.getRingtone(applicationContext, rtUri)
+        }
         if (VERSION.SDK_INT >= 28) {
-            rt.isLooping = true
-            rt.play()
+            rt!!.isLooping = true
+            rt!!.play()
         } else {
-            rt.play()
+            rt!!.play()
             rtTimer = Timer()
             rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    if (!rt.isPlaying) {
-                        rt.play()
+                    if (rt != null && !rt!!.isPlaying) {
+                        rt!!.play()
                     }
                 }
             }, 1000, 1000)
@@ -1214,11 +1217,14 @@ class BaresipService: Service() {
     private fun stopRinging() {
         if (am.mode == AudioManager.MODE_RINGTONE)
             abandonAudioFocus()
-        if ((VERSION.SDK_INT < 28) && (rtTimer != null)) {
+        if (VERSION.SDK_INT < 28 && rtTimer != null) {
             rtTimer!!.cancel()
             rtTimer = null
         }
-        rt.stop()
+        if (rt != null) {
+            rt!!.stop()
+            rt = null
+        }
     }
 
     private fun playRingBack() {
