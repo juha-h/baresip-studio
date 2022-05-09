@@ -1015,7 +1015,11 @@ class BaresipService: Service() {
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
         }
-        nt.play()
+        if (VERSION.SDK_INT >= 23) {
+            if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
+                nt.play()
+        } else
+            nt.play()
         postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peer), System.nanoTime()))
     }
 
