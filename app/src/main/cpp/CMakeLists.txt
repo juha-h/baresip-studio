@@ -1,3 +1,4 @@
+project(baresip)
 
 cmake_minimum_required(VERSION 3.4.1)
 
@@ -70,6 +71,8 @@ target_include_directories(baresip PRIVATE
         ${distribution_DIR}/re/include
         ${distribution_DIR}/rem/include
         ${distribution_DIR}/baresip/include)
+
+add_definitions(-DHAVE_PTHREAD)
 
 target_link_libraries(baresip
         android
