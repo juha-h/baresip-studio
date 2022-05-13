@@ -527,28 +527,23 @@ class BaresipService: Service() {
         }
     }
 
-    @Keep
-    fun uaAdd(uap: Long) {
-        val ua = UserAgent(uap)
-        ua.status = if (Api.ua_isregistered(uap)) {
-            Log.d(TAG, "Ua ${ua.account.aor} is registered")
-            R.drawable.dot_green
-        } else {
-            Log.d(TAG, "Ua ${ua.account.aor} is NOT registered")
-            if (ua.account.regint == 0)
-                R.drawable.dot_white
-            else
-                R.drawable.dot_yellow
-        }
-        Log.d(TAG, "uaAdd ${ua.account.aor} at BaresipService")
-        uas.add(ua)
-    }
-
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
     fun uaEvent(event: String, uap: Long, callp: Long) {
 
         if (!isServiceRunning) return
+
+        val ev = event.split(",")
+
+        if (ev[0] == "create") {
+            val ua = UserAgent(uap)
+            ua.status = if (ua.account.regint == 0)
+                R.drawable.dot_white
+            else
+                R.drawable.dot_yellow
+            uas.add(UserAgent(uap))
+            return;
+        }
 
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
@@ -556,7 +551,7 @@ class BaresipService: Service() {
             return
         }
 
-        val ev = event.split(",")
+
         val aor = ua.account.aor
 
         Log.d(TAG, "got uaEvent $event/$aor/$callp")
