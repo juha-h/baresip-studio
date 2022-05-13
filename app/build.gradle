@@ -46,6 +46,7 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+    namespace 'com.tutpro.baresip'
 }
 
 dependencies {
