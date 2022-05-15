@@ -76,6 +76,19 @@ static void account_debug_log(struct account *acc)
     }
 }
 
+static void sdp_media_debug_log(const struct sdp_media *m) {
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", sdp_media_debug, m);
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+        LOGD("local media dir %d\n", sdp_media_ldir(m));
+        LOGD("remote media dir %d\n", sdp_media_rdir(m));
+    }
+}
+
+#if 0
 static void ua_print_status_log(struct ua *ua)
 {
     char debug_buf[2048];
@@ -97,18 +110,6 @@ static void call_video_debug_log(struct call *call) {
     }
 }
 
-static void sdp_media_debug_log(const struct sdp_media *m) {
-    char debug_buf[2048];
-    int l;
-    l = re_snprintf(&(debug_buf[0]), 2047, "%H", sdp_media_debug, m);
-    if (l != -1) {
-        debug_buf[l] = '\0';
-        LOGD("%s\n", debug_buf);
-        LOGD("local media dir %d\n", sdp_media_ldir(m));
-        LOGD("remote media dir %d\n", sdp_media_rdir(m));
-    }
-}
-
 static void stream_debug_log(const struct stream *s) {
     char debug_buf[2048];
     int l;
@@ -118,6 +119,7 @@ static void stream_debug_log(const struct stream *s) {
         LOGD("%s\n", debug_buf);
     }
 }
+#endif
 
 static struct re_printf pf_null = {vprintf_null, 0};
 
@@ -208,6 +210,9 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
     switch (ev) {
+        case UA_EVENT_CREATE:
+            len = re_snprintf(event_buf, sizeof event_buf, "create");
+            break;
         case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
@@ -574,24 +579,12 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
         goto out;
     }
 
-    char ua_buf[32];
-    struct ua *ua;
-    for (le = list_head(uag_list()); le != NULL; le = le->next) {
-        ua = le->data;
-        LOGD("adding UA for AoR %s/%ld\n", account_aor(ua_account(ua)), (long)ua);
-        jmethodID uaAddId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaAdd", "(J)V");
-        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, uaAddId, (long)ua);
-    }
-
     err = mqueue_alloc(&mq, mqueue_handler, NULL);
     if (err) {
         LOGW("mqueue_alloc failed (%d)\n", err);
         strcpy(start_error, "mqueue_alloc");
         goto out;
     }
-
-    for (le = list_head(uag_list()); le != NULL; le = le->next)
-        ua_print_status_log(le->data);
 
     jmethodID startedId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "started", "()V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, startedId);
