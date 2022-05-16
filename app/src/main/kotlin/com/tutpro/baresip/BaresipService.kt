@@ -542,7 +542,7 @@ class BaresipService: Service() {
             else
                 R.drawable.dot_yellow
             uas.add(UserAgent(uap))
-            return;
+            return
         }
 
         val ua = UserAgent.ofUap(uap)

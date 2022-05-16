@@ -14,7 +14,6 @@
 typedef struct baresip_context
 {
     JavaVM  *javaVM;
-    JNIEnv  *env;
     jclass  mainActivityClz;
     jobject mainActivityObj;
 } BaresipContext;
@@ -74,6 +73,7 @@ static void account_debug_log(struct account *acc)
     }
 }
 
+#if 0
 static void ua_print_status_log(struct ua *ua)
 {
     char debug_buf[2048];
@@ -84,6 +84,7 @@ static void ua_print_status_log(struct ua *ua)
         LOGD("%s\n", debug_buf);
     }
 }
+#endif
 
 static struct re_printf pf_null = {vprintf_null, 0};
 
@@ -419,7 +420,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
     memset(&g_ctx, 0, sizeof(g_ctx));
 
     g_ctx.javaVM = vm;
-    g_ctx.env = NULL;
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
 
@@ -443,7 +443,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     jclass clz = (*env)->GetObjectClass(env, instance);
     g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
     g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
-    g_ctx.env = env;
 
     int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
