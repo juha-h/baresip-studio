@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion = 31
+    compileSdkVersion = 32
     ndkVersion = '23.1.7779620'
     defaultConfig {
         applicationId = 'com.tutpro.baresip.plus'
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode = 95
         versionName = '32.1.2'
         externalNativeBuild {
