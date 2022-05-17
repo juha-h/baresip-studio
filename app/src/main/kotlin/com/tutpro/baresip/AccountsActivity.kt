@@ -73,7 +73,6 @@ class AccountsActivity : AppCompatActivity() {
             newAorView.setText("")
             newAorView.hint = getString(R.string.user_domain)
             newAorView.clearFocus()
-            ua.add()
             generateAccounts()
             alAdapter.notifyDataSetChanged()
             saveAccounts()
