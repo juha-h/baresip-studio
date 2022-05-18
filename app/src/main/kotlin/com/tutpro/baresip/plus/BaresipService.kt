@@ -531,7 +531,7 @@ class BaresipService: Service() {
                 R.drawable.dot_white
             else
                 R.drawable.dot_yellow
-            uas.add(UserAgent(uap))
+            uas.add(ua)
             return
         }
 

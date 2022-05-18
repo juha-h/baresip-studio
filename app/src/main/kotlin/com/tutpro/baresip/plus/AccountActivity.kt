@@ -113,7 +113,7 @@ class AccountActivity : AppCompatActivity() {
             val config = try {
                 URL(url).readText()
             } catch (e: java.lang.Exception) {
-                Log.d(TAG, "Network request failed")
+                Log.d(TAG, "Failed to get account configuration from network")
                 null
             }
             if (config != null && !ctx.isFinishing) {
