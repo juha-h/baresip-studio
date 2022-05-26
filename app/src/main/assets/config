@@ -49,8 +49,5 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
-ice_turn no
-ice_nomination regular
 zrtp_hash yes
 dtls_srtp_use_ec prime256v1
-
