@@ -156,6 +156,16 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".TaskReceiver"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.tutpro.baresip.REGISTER" />
+                <action android:name="com.tutpro.baresip.UNREGISTER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
