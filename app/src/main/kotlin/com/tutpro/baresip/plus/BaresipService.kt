@@ -577,7 +577,7 @@ class BaresipService: Service() {
                         return
                     }
                     "registered" -> {
-                        ua.status = if (ua.account.regint == 0)
+                        ua.status = if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.dot_white
                         else
                             R.drawable.dot_green
