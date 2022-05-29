@@ -24,18 +24,16 @@ class TaskReceiver : BroadcastReceiver() {
         when (intent.action) {
             "com.tutpro.baresip.REGISTER" -> {
                 Log.d(TAG, "TaskReceiver: registering $aor")
+                Api.account_set_regint(acc.accp,3600)
                 Api.ua_register(ua.uap)
-                acc.regint = 3600
             }
             "com.tutpro.baresip.UNREGISTER" -> {
                 Log.d(TAG, "TaskReceiver: un-registering $aor")
                 Api.ua_unregister(ua.uap)
-                acc.regint = 0
+                Api.account_set_regint(acc.accp,0)
             }
             else -> return
         }
-        AccountsActivity.saveAccounts()
-        Api.ua_update_account(ua.uap)
     }
 
 }
