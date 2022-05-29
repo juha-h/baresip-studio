@@ -1,0 +1,5 @@
+- Added possibility to turn on/off account's registration via
+  broadcast intents (see Wiki for details)
+- Upstream addition of DNS query caching
+- Upstream fix of ICE candidate priorities
+- Increased Android target API level to 32 (Android 12L)
