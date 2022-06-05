@@ -473,6 +473,9 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
+    // Turn off DNS client cache
+    dnsc_cache_max(net_dnsc(baresip_network()), 0);
+
     if (strlen(addrs) > 0) {
         char* addr_list = (char*)malloc(strlen(addrs));
         struct sa temp_sa;
