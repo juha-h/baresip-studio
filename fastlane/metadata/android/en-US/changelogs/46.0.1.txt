@@ -1,0 +1,1 @@
+- Do not use DNS cache that may cause long delays to address resolution
