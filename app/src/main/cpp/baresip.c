@@ -39,6 +39,17 @@ static void net_debug_log()
     }
 }
 
+static void re_debug_log()
+{
+    char debug_buf[2048];
+    int l;
+    l = re_snprintf(&(debug_buf[0]), 2047, "%H", re_debug, baresip_network());
+    if (l != -1) {
+        debug_buf[l] = '\0';
+        LOGD("%s\n", debug_buf);
+    }
+}
+
 static void net_dns_debug_log()
 {
     char debug_buf[2048];
@@ -197,6 +208,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             }
             break;
         case UA_EVENT_CALL_OUTGOING:
+            re_debug_log();
             len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");
             break;
         case UA_EVENT_CALL_ANSWERED:
@@ -474,7 +486,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     }
 
     // Turn off DNS client cache
-    dnsc_cache_max(net_dnsc(baresip_network()), 0);
+    // dnsc_cache_max(net_dnsc(baresip_network()), 0);
 
     if (strlen(addrs) > 0) {
         char* addr_list = (char*)malloc(strlen(addrs));
