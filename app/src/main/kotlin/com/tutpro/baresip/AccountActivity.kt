@@ -147,7 +147,7 @@ class AccountActivity : AppCompatActivity() {
                                     if (text.isNotEmpty())
                                         acc.outbound.add(text)
                                 "register" ->
-                                    acc.regint = if (text == "yes") 3600 else 0
+                                    acc.regint = if (text == "yes") REGISTRATION_INTERVAL else 0
                                 "audio-codec" ->
                                     if (text in audioCodecs)
                                         acc.audioCodec.add(text)
@@ -452,8 +452,8 @@ class AccountActivity : AppCompatActivity() {
 
                 var newRegint = -1
                 if (regCheck.isChecked) {
-                    if (acc.regint != 3600) {
-                        newRegint = 3600
+                    if (acc.regint != REGISTRATION_INTERVAL) {
+                        newRegint = REGISTRATION_INTERVAL
                         ua.status = R.drawable.dot_yellow
                     }
                 } else {
