@@ -26,7 +26,7 @@ class TaskReceiver : BroadcastReceiver() {
         when (intent.action) {
             "com.tutpro.baresip.plus.REGISTER" -> {
                 Log.d(TAG, "TaskReceiver: registering $aor")
-                Api.account_set_regint(acc.accp,3600)
+                Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
                 Api.ua_update_account(ua.uap)
                 if (!Api.ua_isregistered(ua.uap))
                     Api.ua_register(ua.uap)
