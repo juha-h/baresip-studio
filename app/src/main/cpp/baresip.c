@@ -1022,13 +1022,18 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jlong ua)
 {
     LOGD("registering UA '%ld'\n", (long)ua);
-    return ua_register((struct ua *)ua);
+    re_thread_enter();
+    int res = ua_register((struct ua *)ua);
+    re_thread_leave();
+    return res;
 }
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1unregister(JNIEnv *env, jobject thiz, jlong ua)
 {
+    re_thread_enter();
     ua_unregister((struct ua *)ua);
+    re_thread_leave();
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1512,13 +1517,17 @@ Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(JNIEnv *env, jobject thiz, j
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz)
 {
+    re_thread_enter();
     net_debug_log();
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, jobject thiz)
 {
+    re_thread_enter();
     net_dns_debug_log();
+    re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL
