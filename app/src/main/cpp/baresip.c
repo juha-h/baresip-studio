@@ -1041,13 +1041,6 @@ Java_com_tutpro_baresip_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jlong ua
     return ua_isregistered((struct ua *)ua) ? true : false;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
-{
-    LOGD("updating account of ua %ld\n", (long)ua);
-    return ua_update_account((struct ua *)ua);
-}
-
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jlong ua)
 {
