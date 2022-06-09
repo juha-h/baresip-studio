@@ -584,10 +584,7 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force)
 {
     LOGD("ua_stop_all upon baresipStop");
-
-    re_thread_enter();
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
-    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
