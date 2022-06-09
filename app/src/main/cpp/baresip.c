@@ -177,7 +177,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CREATE:
             len = re_snprintf(event_buf, sizeof event_buf, "create");
             break;
-        case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
         case UA_EVENT_FALLBACK_OK:

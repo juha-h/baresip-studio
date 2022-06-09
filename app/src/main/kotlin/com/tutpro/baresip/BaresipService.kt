@@ -567,9 +567,6 @@ class BaresipService: Service() {
         for (account_index in uas.indices) {
             if (uas[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "registering" -> {
-                        return
-                    }
                     "registered" -> {
                         ua.status = if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.dot_white
