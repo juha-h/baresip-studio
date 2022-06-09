@@ -458,19 +458,19 @@ class AccountActivity : AppCompatActivity() {
                     }
                 } else {
                     if (acc.regint != 0) {
-                        Api.ua_unregister(ua.uap)
                         ua.status = R.drawable.dot_white
                         newRegint = 0
                     }
                 }
-                if (newRegint != -1)
-                    if (Api.account_set_regint(acc.accp, newRegint) == 0) {
+                if (newRegint != -1) {
+                    if (Api.account_set_regint(acc.accp, newRegint) != 0) {
+                        Log.e(TAG, "Setting of regint failed")
+                    } else {
                         acc.regint = Api.account_regint(acc.accp)
                         Log.d(TAG, "New regint is ${acc.regint}")
                         save = true
-                    } else {
-                        Log.e(TAG, "Setting of regint failed")
                     }
+                }
 
                 if (mediaNat != acc.mediaNat) {
                     if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
@@ -616,14 +616,11 @@ class AccountActivity : AppCompatActivity() {
 
                 if (save) {
                     AccountsActivity.saveAccounts()
-                    if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
-                    //else
-                        //Api.ua_debug(ua.uap)
+                    if (newRegint == 0)
+                        Api.ua_unregister(ua.uap)
+                    else if (acc.regint != 0)
+                        Api.ua_register(ua.uap)
                 }
-
-                if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
-                    Api.ua_register(ua.uap)
 
                 BaresipService.activities.remove("account,$aor")
                 returnResult(Activity.RESULT_OK)
