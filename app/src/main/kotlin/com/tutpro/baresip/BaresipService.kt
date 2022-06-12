@@ -551,7 +551,6 @@ class BaresipService: Service() {
             return
         }
 
-
         val aor = ua.account.aor
 
         Log.d(TAG, "got uaEvent $event/$aor/$callp")
