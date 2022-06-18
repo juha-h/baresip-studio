@@ -27,6 +27,24 @@
         </TextView>
 
         <TextView
+            android:id="@+id/NickNameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="@string/account_nickname" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/NickName"
+            android:layout_height="wrap_content"
+            android:hint="@string/nickname"
+            android:inputType="textPersonName|textCapWords"
+            android:textSize="18sp"
+            android:autofillHints="name"
+            android:layout_width="fill_parent">
+        </EditText>
+
+        <TextView
             android:id="@+id/DisplayNameTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

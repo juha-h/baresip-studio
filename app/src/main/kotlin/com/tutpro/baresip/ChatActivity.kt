@@ -71,7 +71,11 @@ class ChatActivity : AppCompatActivity() {
         title = String.format(getString(R.string.chat_with), chatPeer)
 
         val headerView = binding.account
-        val headerText = "${getString(R.string.account)} ${aor.substringAfter(":")}"
+        val headerText = getString(R.string.account) + " " +
+                if (ua.account.nickName != "")
+                    ua.account.nickName
+                else
+                    aor.split(":")[1]
         headerView.text = headerText
 
         listView = binding.messages

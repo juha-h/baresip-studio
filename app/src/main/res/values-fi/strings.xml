@@ -92,6 +92,12 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Tili</string>
+    <string name="account_nickname">Tilin lempinimi</string>
+    <string name="account_nickname_help">Lempinimi (jos annettu) millä tämä tili identifioidaan
+        baresip sovelluksessa.</string>
+    <string name="nickname">Tilin lempinimi</string>
+    <string name="invalid_account_nickname">Virheellinen tilin lempinimi \'%1$s\'</string>
+    <string name="non_unique_account_nickname">Lempinimi \'%1$s\' on jo olemassa</string>
     <string name="display_name">Tilin käyttäjän nimi</string>
     <string name="your_name">Tilin käyttäjän nimi</string>
     <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
