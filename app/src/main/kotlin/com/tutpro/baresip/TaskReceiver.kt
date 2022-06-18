@@ -25,14 +25,12 @@ class TaskReceiver : BroadcastReceiver() {
             "com.tutpro.baresip.REGISTER" -> {
                 Log.d(TAG, "TaskReceiver: registering $aor")
                 Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
-                if (!Api.ua_isregistered(ua.uap))
-                    Api.ua_register(ua.uap)
+                Api.ua_register(ua.uap)
             }
             "com.tutpro.baresip.UNREGISTER" -> {
                 Log.d(TAG, "TaskReceiver: un-registering $aor")
                 Api.account_set_regint(acc.accp,0)
-                if (Api.ua_isregistered(ua.uap))
-                    Api.ua_unregister(ua.uap)
+                Api.ua_unregister(ua.uap)
             }
             else -> return
         }

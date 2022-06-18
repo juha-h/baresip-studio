@@ -8,7 +8,7 @@
     <string name="about_text">
         <![CDATA[
         <h1>Baresip library based SIP User Agent</h1>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Juha Heinanen <jh@tutpro.com></p>
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
@@ -24,6 +24,7 @@
                 has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Long touch on currently shown account enables or disables account\'s registration.</li>
             <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Icon at the top of the main screen toggles speakerphone.</li>
             <li>Icons at the bottom of the main screen lead to voicemail (if Voicemail URI has been
@@ -35,8 +36,8 @@
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
         </ul>
         <h2>Source code</h2>
-        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        where also issues can be reported.
+            Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            where also issues can be reported.
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
@@ -66,6 +67,7 @@
                 has not been activated).</li>
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
+            <li>Long touch on currently shown account enables or disables account\'s registration.</li>
             <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Icon at the top of the main screen toggles speakerphone.</li>
             <li>Icons at the bottom of the main screen lead to voicemail (if Voicemail URI has been
