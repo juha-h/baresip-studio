@@ -281,12 +281,15 @@ class MainActivity : AppCompatActivity() {
                 if (ua != null) {
                     val acc = ua.account
                     if (Api.ua_isregistered(ua.uap)) {
+                        acc.regint = 0
                         Api.account_set_regint(acc.accp, 0)
                         Api.ua_unregister(ua.uap)
                     } else {
+                        acc.regint = REGISTRATION_INTERVAL
                         Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
                         Api.ua_register(ua.uap)
                     }
+                    AccountsActivity.saveAccounts()
                 }
             }
             true
