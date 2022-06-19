@@ -3,8 +3,6 @@ package com.tutpro.baresip.plus
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import java.util.*
-import kotlin.concurrent.schedule
 
 class TaskReceiver : BroadcastReceiver() {
 
