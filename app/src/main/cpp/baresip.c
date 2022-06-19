@@ -213,6 +213,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CREATE:
             len = re_snprintf(event_buf, sizeof event_buf, "create");
             break;
+        case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
         case UA_EVENT_FALLBACK_OK:
@@ -1133,6 +1134,13 @@ Java_com_tutpro_baresip_plus_Api_ua_1account(JNIEnv *env, jobject thiz, jlong ua
     if (ua)
         acc = ua_account((struct ua *)ua);
     return (jlong)acc;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
+{
+    LOGD("updating account of ua %ld\n", (long)ua);
+    return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL

@@ -308,6 +308,7 @@ class MainActivity : AppCompatActivity() {
                         Api.ua_unregister(ua.uap)
                     } else {
                         Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
+                        Api.ua_update_account(ua.uap)
                         Api.ua_register(ua.uap)
                     }
                     acc.regint = Api.account_regint(acc.accp)
