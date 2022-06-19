@@ -24,7 +24,7 @@ class TaskReceiver : BroadcastReceiver() {
         }
         val acc = ua.account
         when (intent.action) {
-            "com.tutpro.baresip.REGISTER" -> {
+            "com.tutpro.baresip.plus.REGISTER" -> {
                 Log.d(TAG, "TaskReceiver: registering $aor")
                 if (!Api.ua_isregistered(ua.uap)) {
                     Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
@@ -33,7 +33,7 @@ class TaskReceiver : BroadcastReceiver() {
                     AccountsActivity.saveAccounts()
                 }
             }
-            "com.tutpro.baresip.UNREGISTER" -> {
+            "com.tutpro.baresip.plus.UNREGISTER" -> {
                 Log.d(TAG, "TaskReceiver: un-registering $aor")
                 if (Api.ua_isregistered(ua.uap)) {
                     Api.ua_unregister(ua.uap)
