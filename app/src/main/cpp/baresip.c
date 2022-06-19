@@ -638,7 +638,9 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force)
 {
     LOGD("ua_stop_all upon baresipStop");
+    re_thread_enter();
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
+    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1134,6 +1136,13 @@ Java_com_tutpro_baresip_plus_Api_ua_1account(JNIEnv *env, jobject thiz, jlong ua
     if (ua)
         acc = ua_account((struct ua *)ua);
     return (jlong)acc;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
+{
+    LOGD("updating account of ua %ld\n", (long)ua);
+    return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT jint JNICALL
