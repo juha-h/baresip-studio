@@ -104,7 +104,7 @@
     <string name="account_nickname">Account Nickname</string>
     <string name="account_nickname_help">Nickname (if any) used to identify this account within
         baresip app.</string>
-    <string name="nickname">Nickname of Account</string>
+    <string name="nickname">Nickname</string>
     <string name="invalid_account_nickname">Invalid Account Nickname \'%1$s\'</string>
     <string name="non_unique_account_nickname">Nickname \'%1$s\' already exists</string>
     <string name="display_name">Display Name</string>
