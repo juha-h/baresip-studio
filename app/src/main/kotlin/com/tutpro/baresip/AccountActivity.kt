@@ -642,10 +642,12 @@ class AccountActivity : AppCompatActivity() {
 
                 if (save) {
                     AccountsActivity.saveAccounts()
-                    if (newRegint == 0)
-                        Api.ua_unregister(ua.uap)
-                    else if (acc.regint != 0)
-                        Api.ua_register(ua.uap)
+                    if (newRegint != -1) {
+                        if (newRegint == 0)
+                            Api.ua_unregister(ua.uap)
+                        else
+                            Api.ua_register(ua.uap)
+                    }
                 }
 
                 BaresipService.activities.remove("account,$aor")

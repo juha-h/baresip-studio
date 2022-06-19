@@ -275,14 +275,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        aorSpinner.setOnLongClickListener() { view ->
+        aorSpinner.setOnLongClickListener {
             if (aorSpinner.selectedItemPosition != -1) {
                 val ua = UserAgent.ofAor(aorSpinner.tag.toString())
                 if (ua != null) {
                     val acc = ua.account
                     if (Api.ua_isregistered(ua.uap)) {
-                        Api.account_set_regint(acc.accp, 0)
                         Api.ua_unregister(ua.uap)
+                        Api.account_set_regint(acc.accp, 0)
                     } else {
                         Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
                         Api.ua_register(ua.uap)

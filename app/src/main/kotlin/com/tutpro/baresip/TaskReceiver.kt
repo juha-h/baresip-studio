@@ -24,17 +24,21 @@ class TaskReceiver : BroadcastReceiver() {
         when (intent.action) {
             "com.tutpro.baresip.REGISTER" -> {
                 Log.d(TAG, "TaskReceiver: registering $aor")
-                Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
-                Api.ua_register(ua.uap)
-                acc.regint = Api.account_regint(acc.accp)
-                AccountsActivity.saveAccounts()
+                if (!Api.ua_isregistered(ua.uap)) {
+                    Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
+                    Api.ua_register(ua.uap)
+                    acc.regint = Api.account_regint(acc.accp)
+                    AccountsActivity.saveAccounts()
+                }
             }
             "com.tutpro.baresip.UNREGISTER" -> {
                 Log.d(TAG, "TaskReceiver: un-registering $aor")
-                Api.account_set_regint(acc.accp,0)
-                Api.ua_unregister(ua.uap)
-                acc.regint = Api.account_regint(acc.accp)
-                AccountsActivity.saveAccounts()
+                if (Api.ua_isregistered(ua.uap)) {
+                    Api.account_set_regint(acc.accp, 0)
+                    Api.ua_unregister(ua.uap)
+                    acc.regint = Api.account_regint(acc.accp)
+                    AccountsActivity.saveAccounts()
+                }
             }
             else -> return
         }
