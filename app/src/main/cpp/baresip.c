@@ -1138,14 +1138,7 @@ Java_com_tutpro_baresip_plus_Api_ua_1account(JNIEnv *env, jobject thiz, jlong ua
     return (jlong)acc;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
-{
-    LOGD("updating account of ua %ld\n", (long)ua);
-    return ua_update_account((struct ua *)ua);
-}
-
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_tutpro_baresip_plus_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
 {
     LOGD("updating account of ua %ld\n", (long)ua);
