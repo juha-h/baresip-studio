@@ -1,0 +1,2 @@
+- Long touch on current account enables or disables account's registration
+- Added possibility to nickname accounts
