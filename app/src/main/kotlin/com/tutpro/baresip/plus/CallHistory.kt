@@ -33,7 +33,7 @@ class NewCallHistory(val aor: String, val peerUri: String, val direction: String
         }
 
         private fun aorHistorySize(aor: String): Int {
-            return BaresipService.callHistory.filter { it.aor == aor }.count()
+            return BaresipService.callHistory.count { it.aor == aor }
         }
 
         fun aorLatestHistory(aor: String): NewCallHistory? {

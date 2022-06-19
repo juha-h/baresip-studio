@@ -141,14 +141,8 @@ class CodecsActivity : AppCompatActivity() {
                         }
                     }
 
-                if (save) {
+                if (save)
                     AccountsActivity.saveAccounts()
-                    if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
-                }
-
-                if ((acc.regint > 0) && !((acc.authUser != "") && (acc.authPass == "")))
-                    Api.ua_register(ua.uap)
 
                 BaresipService.activities.remove("codecs,$aor,$media")
                 finish()

@@ -55,7 +55,6 @@ object Api {
 
     external fun ua_account(uap: Long): Long
     external fun ua_alloc(uri: String): Long
-    external fun ua_update_account(uap: Long): Int
     external fun ua_destroy(uap: Long)
     external fun ua_register(uap: Long): Int
     external fun ua_isregistered(uap: Long): Boolean

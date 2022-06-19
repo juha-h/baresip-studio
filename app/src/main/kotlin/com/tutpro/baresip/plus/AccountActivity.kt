@@ -27,6 +27,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var acc: Account
     private lateinit var ua: UserAgent
     private lateinit var uri: TextView
+    private lateinit var nickName: EditText
     private lateinit var displayName: EditText
     private lateinit var aor: String
     private lateinit var authUser: EditText
@@ -70,6 +71,7 @@ class AccountActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         uri = binding.Uri
+        nickName = binding.NickName
         displayName = binding.DisplayName
         authUser = binding.AuthUser
         authPass = binding.AuthPass
@@ -99,7 +101,10 @@ class AccountActivity : AppCompatActivity() {
         if (intent.getBooleanExtra("new", false))
             initAccountFromConfig(this)
 
-        title = aor.split(":")[1]
+        title = if (acc.nickName != "")
+            acc.nickName
+        else
+            aor.split(":")[1]
 
         initLayoutFromAccount(acc)
 
@@ -202,6 +207,7 @@ class AccountActivity : AppCompatActivity() {
     private fun initLayoutFromAccount(acc: Account) {
 
         uri.text = acc.luri
+        nickName.setText(acc.nickName)
         displayName.setText(acc.displayName)
         authUser.setText(acc.authUser)
 
@@ -347,6 +353,26 @@ class AccountActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.checkIcon -> {
+
+                val nn = nickName.text.toString().trim()
+                if (nn != acc.nickName) {
+                    if (Account.checkDisplayName(nn)) {
+                        if (nn == "" || Account.uniqueNickName(nn)) {
+                            acc.nickName = nn
+                            Log.d(TAG, "New nickname is ${acc.nickName}")
+                            save = true
+                        } else {
+                            Utils.alertView(this, getString(R.string.notice),
+                                    String.format(getString(R.string.non_unique_account_nickname), nn))
+                            return false
+                        }
+                    } else {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_account_nickname), nn))
+                        return false
+                    }
+                }
+
                 val dn = displayName.text.toString().trim()
                 if (dn != acc.displayName) {
                     if (Account.checkDisplayName(dn)) {
@@ -459,19 +485,19 @@ class AccountActivity : AppCompatActivity() {
                     }
                 } else {
                     if (acc.regint != 0) {
-                        Api.ua_unregister(ua.uap)
                         ua.status = R.drawable.dot_white
                         newRegint = 0
                     }
                 }
-                if (newRegint != -1)
-                    if (Api.account_set_regint(acc.accp, newRegint) == 0) {
+                if (newRegint != -1) {
+                    if (Api.account_set_regint(acc.accp, newRegint) != 0) {
+                        Log.e(TAG, "Setting of regint failed")
+                    } else {
                         acc.regint = Api.account_regint(acc.accp)
                         Log.d(TAG, "New regint is ${acc.regint}")
                         save = true
-                    } else {
-                        Log.e(TAG, "Setting of regint failed")
                     }
+                }
 
                 if (mediaNat != acc.mediaNat) {
                     if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
@@ -617,14 +643,11 @@ class AccountActivity : AppCompatActivity() {
 
                 if (save) {
                     AccountsActivity.saveAccounts()
-                    if (Api.ua_update_account(ua.uap) != 0)
-                        Log.e(TAG, "Failed to update UA ${ua.uap} with AoR $aor")
-                    //else
-                        //Api.ua_debug(ua.uap)
+                    if (newRegint == 0)
+                        Api.ua_unregister(ua.uap)
+                    else if (acc.regint != 0)
+                        Api.ua_register(ua.uap)
                 }
-
-                if (regCheck.isChecked && !((acc.authUser != "") && (acc.authPass == "")))
-                    Api.ua_register(ua.uap)
 
                 BaresipService.activities.remove("account,$aor")
                 returnResult(Activity.RESULT_OK)
@@ -653,6 +676,10 @@ class AccountActivity : AppCompatActivity() {
     }
 
     private fun bindTitles() {
+        binding.NickNameTitle.setOnClickListener{
+            Utils.alertView(this, getString(R.string.nickname),
+                    getString(R.string.account_nickname_help))
+        }
         binding.DisplayNameTitle.setOnClickListener{
             Utils.alertView(this, getString(R.string.display_name),
                 getString(R.string.display_name_help))

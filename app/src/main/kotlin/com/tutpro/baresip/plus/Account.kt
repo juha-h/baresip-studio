@@ -8,6 +8,7 @@ import java.net.URLDecoder
 
 class Account(val accp: Long) {
 
+    var nickName = ""
     var displayName = Api.account_display_name(accp)
     val aor = Api.account_aor(accp)
     var luri = Api.account_luri(accp)
@@ -66,16 +67,13 @@ class Account(val accp: Long) {
             videoCodec = videoCodecsList
 
         val extra = Api.account_extra(accp)
+        if (Utils.paramExists(extra, "nickname"))
+            nickName = Utils.paramValue(extra,"nickname")
         callHistory = Utils.paramValue(extra,"call_history") == ""
-        countryCode = if (Utils.paramExists(extra, "country_code"))
-            Utils.paramValue(extra,"country_code")
-        else
-            ""
-        telProvider = if (Utils.paramExists(extra, "tel_provider"))
-            URLDecoder.decode(Utils.paramValue(extra,"tel_provider"), "UTF-8")
-        else
-            Utils.aorDomain(aor)
-
+        if (Utils.paramExists(extra, "country_code"))
+            countryCode = Utils.paramValue(extra,"country_code")
+        if (Utils.paramExists(extra, "tel_provider"))
+            telProvider = URLDecoder.decode(Utils.paramValue(extra,"tel_provider"), "UTF-8")
     }
 
     fun print() : String {
@@ -146,6 +144,9 @@ class Account(val accp: Long) {
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
         var extra = ""
+
+        if (nickName != "")
+            extra += ";nickname=$nickName"
 
         if (!callHistory)
             extra += ";call_history=no"
@@ -258,6 +259,13 @@ class Account(val accp: Long) {
         fun checkAuthPass(ap: String): Boolean {
             return (ap.isNotEmpty()) && (ap.length <= 64) &&
                     Regex("^[ -~]*\$").matches(ap) && !ap.contains('"')
+        }
+
+        fun uniqueNickName(nickName: String): Boolean {
+            for (ua in BaresipService.uas)
+                if (ua.account.nickName == nickName)
+                    return false
+            return true
         }
     }
 }

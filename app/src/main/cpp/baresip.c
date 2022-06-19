@@ -213,7 +213,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_CREATE:
             len = re_snprintf(event_buf, sizeof event_buf, "create");
             break;
-        case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
         case UA_EVENT_REGISTER_OK:
         case UA_EVENT_FALLBACK_OK:
@@ -638,9 +637,7 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jboolean force)
 {
     LOGD("ua_stop_all upon baresipStop");
-    re_thread_enter();
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
-    re_thread_leave();
 }
 
 JNIEXPORT jstring JNICALL
@@ -1120,13 +1117,6 @@ JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_plus_Api_ua_1isregistered(JNIEnv *env, jobject thiz, jlong ua)
 {
     return ua_isregistered((struct ua *)ua) ? true : false;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_plus_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
-{
-    LOGD("updating account of ua %ld\n", (long)ua);
-    return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL

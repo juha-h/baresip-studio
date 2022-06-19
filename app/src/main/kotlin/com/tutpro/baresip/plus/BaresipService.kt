@@ -573,7 +573,11 @@ class BaresipService: Service() {
         for (account_index in uas.indices) {
             if (uas[account_index].account.aor == aor) {
                 when (ev[0]) {
-                    "registering" -> {
+                    "registering", "unregistering" -> {
+                        ua.status = R.drawable.dot_yellow
+                        updateStatusNotification()
+                        if (isMainVisible)
+                            registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "registered" -> {
@@ -601,13 +605,6 @@ class BaresipService: Service() {
                                 ""
                             toast(String.format(getString(R.string.registering_failed), aor) + reason)
                         }
-                        return
-                    }
-                    "unregistering" -> {
-                        ua.status = R.drawable.dot_white
-                        updateStatusNotification()
-                        if (isMainVisible)
-                            registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "call outgoing" -> {

@@ -38,7 +38,11 @@ class ChatsActivity: AppCompatActivity() {
         account = UserAgent.ofAor(aor)!!.account
 
         val headerView = binding.account
-        val headerText = "${getString(R.string.account)} ${aor.split(":")[1]}"
+        val headerText = getString(R.string.account) + " " +
+                if (account.nickName != "")
+                    account.nickName
+                else
+                    aor.split(":")[1]
         headerView.text = headerText
 
         uaMessages = uaMessages(aor)
