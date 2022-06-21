@@ -364,16 +364,6 @@ enum {
     ID_UA_STOP_ALL
 };
 
-static struct mqueue *mq;
-
-static void mqueue_handler(int id, void *data, void *arg)
-{
-    if (id == ID_UA_STOP_ALL) {
-        LOGD("calling ua_stop_all with force %u\n", (unsigned)(uintptr_t)data);
-        ua_stop_all((bool)(uintptr_t)data);
-    }
-}
-
 #include <unistd.h>
 
 static int pfd[2];
@@ -531,13 +521,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    err = mqueue_alloc(&mq, mqueue_handler, NULL);
-    if (err) {
-        LOGW("mqueue_alloc failed (%d)\n", err);
-        strcpy(start_error, "mqueue_alloc");
-        goto out;
-    }
-
     jmethodID startedId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "started", "()V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, startedId);
 
@@ -552,8 +535,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     } else {
         LOGI("main loop exit\n");
     }
-
-    mq = mem_deref(mq);
 
     LOGD("closing ...");
     ua_close();
@@ -586,7 +567,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStop(JNIEnv *env, jobject thiz, jb
 {
     LOGD("ua_stop_all upon baresipStop");
     re_thread_enter();
-    mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
+    ua_stop_all(force);
     re_thread_leave();
 }
 
@@ -1057,7 +1038,7 @@ Java_com_tutpro_baresip_Api_ua_1account(JNIEnv *env, jobject thiz, jlong ua)
     return (jlong)acc;
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_tutpro_baresip_Api_ua_1update_1account(JNIEnv *env, jobject thiz, jlong ua)
 {
     LOGD("updating account of ua %ld\n", (long)ua);
