@@ -1,0 +1,3 @@
+- If unregistering fails, update registration status to white anyway
+- Set asked password when user agent is created
+- New Portuguese (Brazil) translations
