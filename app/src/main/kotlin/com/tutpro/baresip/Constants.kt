@@ -27,4 +27,4 @@ const val SAVE_REQ_CODE = 10
 const val DELETE_REQ_CODE = 11
 
 const val REGISTRATION_INTERVAL = 900
-
+const val NO_AUTH_PASS = "t%Qa?~?J8,~6"
