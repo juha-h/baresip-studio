@@ -532,6 +532,17 @@ class BaresipService: Service() {
             else
                 R.drawable.dot_yellow
             uas.add(ua)
+
+            val acc = ua.account
+            if (acc.authUser != "" && acc.authPass == NO_AUTH_PASS) {
+                val password = if (MainActivity.aorPasswords[acc.aor] != null)
+                    MainActivity.aorPasswords[acc.aor]!!
+                else
+                 ""
+                Api.account_set_auth_pass(acc.accp, password)
+                acc.authPass = Api.account_auth_pass(ua.account.accp)
+            }
+
             return
         }
 
@@ -1036,16 +1047,6 @@ class BaresipService: Service() {
                 if (m.timeStamp < timeStamp - 60000)
                     break
             }
-    }
-
-    @Keep
-    fun getPassword(aor: String): String {
-        if (!isServiceRunning) return ""
-        Log.d(TAG, "getPassword of $aor")
-        return if (MainActivity.aorPasswords[aor] != null)
-            MainActivity.aorPasswords[aor]!!
-        else
-            ""
     }
 
     /*

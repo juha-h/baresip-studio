@@ -172,28 +172,6 @@ static const char *translate_errorcode(uint16_t scode)
 	}
 }
 
-static void get_password(char *aor, char *password)
-{
-    LOGD("getting password of AoR %s\n", aor);
-
-    JavaVM *javaVM = g_ctx.javaVM;
-    JNIEnv *env;
-    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
-    if (res != JNI_OK) {
-        LOGE("failed to GetEnv, ErrorCode = %d", res);
-        strcpy(password, "");
-        return;
-    }
-
-    jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "getPassword",
-                                                 "(Ljava/lang/String;)Ljava/lang/String;");
-    jstring javaAoR = (*env)->NewStringUTF(env, aor);
-    jstring javaPassword = (*env)->CallObjectMethod(env, g_ctx.mainActivityObj, methodId, javaAoR);
-    const char *pwd = (*env)->GetStringUTFChars(env, javaPassword, 0);
-    strcpy(password, pwd);
-    (*env)->ReleaseStringUTFChars(env, javaPassword, pwd);
-}
-
 static void ua_event_handler(struct ua *ua, enum ua_event ev,
 			     struct call *call, const char *prm, void *arg)
 {
@@ -293,9 +271,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MODULE:
             len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
             break;
-        case UA_EVENT_CUSTOM:
-            get_password((char *)ua, (char *)call);
-            return;
         default:
             return;
     }

@@ -37,6 +37,9 @@ class Account(val accp: Long) {
 
     init {
 
+        if (authPass == "")
+            authPass = NO_AUTH_PASS
+
         var i = 0
         while (true) {
             val ob = Api.account_outbound(accp, i)
