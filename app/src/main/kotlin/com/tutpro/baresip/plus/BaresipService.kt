@@ -591,7 +591,10 @@ class BaresipService: Service() {
                         return
                     }
                     "registering failed" -> {
-                       ua.status = R.drawable.dot_red
+                        ua.status = if (Api.account_regint(ua.account.accp) == 0)
+                            R.drawable.dot_white
+                        else
+                            R.drawable.dot_red
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
