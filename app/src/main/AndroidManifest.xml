@@ -168,6 +168,7 @@
             <intent-filter>
                 <action android:name="com.tutpro.baresip.plus.REGISTER" />
                 <action android:name="com.tutpro.baresip.plus.UNREGISTER" />
+                <action android:name="com.tutpro.baresip.plus.QUIT" />
             </intent-filter>
         </receiver>
     </application>

@@ -15,11 +15,8 @@ import android.graphics.BitmapFactory
 import android.media.*
 import android.net.*
 import android.net.wifi.WifiManager
+import android.os.*
 import android.os.Build.VERSION
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
-import android.os.PowerManager
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.telecom.TelecomManager
@@ -46,6 +43,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
+import kotlin.system.exitProcess
 
 class BaresipService: Service() {
 
@@ -65,6 +63,8 @@ class BaresipService: Service() {
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var contentObserver: ContentObserver
+    private lateinit var stopState: String
+    private lateinit var quitTimer: CountDownTimer
 
     private var rt: Ringtone? = null
     private var rtTimer: Timer? = null
@@ -78,6 +78,7 @@ class BaresipService: Service() {
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
     private var contentObserverRegistered = false
+    private var isServiceClean = false
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -310,6 +311,30 @@ class BaresipService: Service() {
             }
         }
 
+        stopState = "initial"
+        quitTimer = object : CountDownTimer(5000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                Log.d(TAG, "Seconds remaining: ${millisUntilFinished / 1000}")
+            }
+            override fun onFinish() {
+                when (stopState) {
+                    "initial" -> {
+                        if (isServiceRunning)
+                            baresipStop(true)
+                        stopState = "force"
+                        quitTimer.start()
+                    }
+                    "force" -> {
+                        cleanService()
+                        isServiceRunning = false
+                        stopForeground(true)
+                        stopSelf()
+                        exitProcess(0)
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -486,17 +511,12 @@ class BaresipService: Service() {
                 updateStatusNotification()
             }
 
-            "Stop", "Stop Force" -> {
-                if (!isServiceClean) cleanService()
-                if (isServiceRunning) baresipStop(action == "Stop Force")
+            "Stop" -> {
+                cleanService()
+                if (isServiceRunning)
+                    baresipStop(false)
             }
 
-            "Kill" -> {
-                if (!isServiceClean) cleanService()
-                isServiceRunning = false
-                stopForeground(true)
-                stopSelf()
-            }
         }
 
         return START_STICKY
@@ -1084,7 +1104,9 @@ class BaresipService: Service() {
 
     @Keep
     fun stopped(error: String) {
-        Log.d(TAG, "Received 'stopped' from baresip with param '$error'")
+        Log.d(TAG, "Received 'stopped' from baresip with start error '$error'")
+        if (error == "")
+            quitTimer.cancel()
         isServiceRunning = false
         postServiceEvent(ServiceEvent("stopped", arrayListOf(error), System.nanoTime()))
         stopForeground(true)
@@ -1439,25 +1461,26 @@ class BaresipService: Service() {
     }
 
     private fun cleanService() {
-        am.mode = AudioManager.MODE_NORMAL
-        abandonAudioFocus()
-        stopRinging()
-        stopMediaPlayer()
-        uas.clear()
-        callHistory.clear()
-        messages.clear()
-        if (this::nm.isInitialized)
-            nm.cancelAll()
-        if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
-            partialWakeLock.release()
-        if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
-            proximityWakeLock.release()
-        if (this::wifiLock.isInitialized)
-            wifiLock.release()
-        if (this::contentObserver.isInitialized)
-            contentResolver.unregisterContentObserver(contentObserver)
-
-        isServiceClean = true
+        if (!isServiceClean) {
+            am.mode = AudioManager.MODE_NORMAL
+            abandonAudioFocus()
+            stopRinging()
+            stopMediaPlayer()
+            uas.clear()
+            callHistory.clear()
+            messages.clear()
+            if (this::nm.isInitialized)
+                nm.cancelAll()
+            if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
+                partialWakeLock.release()
+            if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
+                proximityWakeLock.release()
+            if (this::wifiLock.isInitialized)
+                wifiLock.release()
+            if (this::contentObserver.isInitialized)
+                contentResolver.unregisterContentObserver(contentObserver)
+            isServiceClean = true
+        }
     }
 
     private external fun baresipStart(path: String, addresses: String, logLevel: Int)
@@ -1468,7 +1491,6 @@ class BaresipService: Service() {
         var isServiceRunning = false
         var isConfigInitialized = false
         var libraryLoaded = false
-        var isServiceClean = false
         var supportedCameras = false
         var cameraFront = true
         var callVolume = 0
