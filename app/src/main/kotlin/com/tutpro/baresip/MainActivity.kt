@@ -72,8 +72,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var kgm: KeyguardManager
     private lateinit var screenEventReceiver: BroadcastReceiver
     private lateinit var serviceEventObserver: Observer<Event<Long>>
-    private lateinit var quitTimer: CountDownTimer
-    private lateinit var stopState: String
     private var micIcon: MenuItem? = null
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
@@ -177,29 +175,6 @@ class MainActivity : AppCompatActivity() {
         this.registerReceiver(screenEventReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
         })
-
-        stopState = "initial"
-        quitTimer = object : CountDownTimer(5000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                Log.d(TAG, "Seconds remaining: ${millisUntilFinished / 1000}")
-            }
-            override fun onFinish() {
-                when (stopState) {
-                    "initial" -> {
-                        baresipService.action = "Stop Force"
-                        startService(baresipService)
-                        stopState = "force"
-                        quitTimer.start()
-                    }
-                    "force" -> {
-                        baresipService.action = "Kill"
-                        startService(baresipService)
-                        finishAndRemoveTask()
-                        exitProcess(0)
-                    }
-                }
-            }
-        }
 
         uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas)
         aorSpinner.adapter = uaAdapter
@@ -979,11 +954,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (event == "stopped") {
-            Log.d(TAG, "Handling service event 'stopped' with param '${params[0]}'")
+            Log.d(TAG, "Handling service event 'stopped' with start error '${params[0]}'")
             if (params[0] != "") {
                 Utils.alertView(this, getString(R.string.notice), getString(R.string.start_failed))
             } else {
-                quitTimer.cancel()
                 finishAndRemoveTask()
                 if (restart)
                     reStart()
@@ -1396,20 +1370,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun quitRestart(reStart: Boolean) {
-        if (stopState == "initial") {
-            Log.d(TAG, "quitRestart Restart = $reStart")
-            if (BaresipService.isServiceRunning) {
-                restart = reStart
-                baresipService.action = "Stop"
-                startService(baresipService)
-                quitTimer.start()
-            } else {
-                finishAndRemoveTask()
-                if (reStart)
-                    reStart()
-                else
-                    exitProcess(0)
-            }
+        Log.d(TAG, "quitRestart Restart = $reStart")
+        if (BaresipService.isServiceRunning) {
+            restart = reStart
+            baresipService.action = "Stop"
+            startService(baresipService)
+        } else {
+            finishAndRemoveTask()
+            if (reStart)
+                reStart()
+            else
+                exitProcess(0)
         }
     }
 

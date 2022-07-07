@@ -55,9 +55,7 @@
                 <action android:name="android.intent.action.DIAL" />
                 <action android:name="android.intent.action.CALL" />
                 <action android:name="android.intent.action.CALL_PRIVILEGED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="tel" />
                 <data android:scheme="sip" />
             </intent-filter>
@@ -164,6 +162,7 @@
             <intent-filter>
                 <action android:name="com.tutpro.baresip.REGISTER" />
                 <action android:name="com.tutpro.baresip.UNREGISTER" />
+                <action android:name="com.tutpro.baresip.QUIT" />
             </intent-filter>
         </receiver>
     </application>
