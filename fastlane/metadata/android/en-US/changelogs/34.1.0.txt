@@ -1,0 +1,2 @@
+- Added support for SIP UPDATE method (RFC 3311)
+- Upstream fix of early audio (183 Session Progress) related bug
