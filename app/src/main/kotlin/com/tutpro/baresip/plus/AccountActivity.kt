@@ -211,7 +211,7 @@ class AccountActivity : AppCompatActivity() {
         displayName.setText(acc.displayName)
         authUser.setText(acc.authUser)
 
-        if (MainActivity.aorPasswords.containsKey(aor))
+        if (MainActivity.aorPasswords.containsKey(aor) || acc.authPass == NO_AUTH_PASS)
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
