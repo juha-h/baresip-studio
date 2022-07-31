@@ -1,0 +1,6 @@
+- Delay calling by 1 sec after call icon is touched because audio mode
+  does not immediately change to communication
+- Unstream fix of PRACK handling
+- New Swedish translations
+
+  
