@@ -87,7 +87,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
     private lateinit var configRequest: ActivityResultLauncher<Intent>
@@ -96,6 +95,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
 
+    private var callHandler: Handler = Handler(Looper.getMainLooper())
+    private var callRunnable: Runnable? = null
     private var downloadsInputUri: Uri? = null
     private var downloadsOutputUri: Uri? = null
 
@@ -369,6 +370,13 @@ class MainActivity : AppCompatActivity() {
 
         hangupButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+            if (callRunnable != null && callHandler.hasCallbacks(callRunnable!!)) {
+                callHandler.removeCallbacks(callRunnable!!)
+                callRunnable = null
+                am.mode = AudioManager.MODE_NORMAL
+                showCall(ua)
+                return@setOnClickListener
+            }
             val aor = ua.account.aor
             val uaCalls = ua.calls()
             if (uaCalls.size > 0) {
@@ -2057,22 +2065,25 @@ class MainActivity : AppCompatActivity() {
                             String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     callUri.isFocusable = false
-                    if (!call(ua, uri, kind)) {
-                        callButton.visibility = View.VISIBLE
-                        callButton.isEnabled = true
-                        callVideoButton.visibility = View.VISIBLE
-                        callVideoButton.isEnabled = true
-                        hangupButton.visibility = View.INVISIBLE
-                        hangupButton.isEnabled = false
-                    } else {
-                        uaAdapter.notifyDataSetChanged()
-                        callButton.visibility = View.INVISIBLE
-                        callButton.isEnabled = false
-                        callVideoButton.visibility = View.INVISIBLE
-                        callVideoButton.isEnabled = false
-                        hangupButton.visibility = View.VISIBLE
-                        hangupButton.isEnabled = true
+                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+                    uaAdapter.notifyDataSetChanged()
+                    callButton.visibility = View.INVISIBLE
+                    callButton.isEnabled = false
+                    callVideoButton.visibility = View.INVISIBLE
+                    callVideoButton.isEnabled = false
+                    hangupButton.visibility = View.VISIBLE
+                    hangupButton.isEnabled = true
+                    callRunnable = Runnable {
+                        if (!call(ua, uri, kind)) {
+                            callButton.visibility = View.VISIBLE
+                            callButton.isEnabled = true
+                            callVideoButton.visibility = View.VISIBLE
+                            callVideoButton.isEnabled = true
+                            hangupButton.visibility = View.INVISIBLE
+                            hangupButton.isEnabled = false
+                        }
                     }
+                    callHandler.postDelayed(callRunnable!!, 1000)
                 }
             } else {
                 val latest = NewCallHistory.aorLatestHistory(aor)
