@@ -1399,11 +1399,11 @@ Java_com_tutpro_baresip_plus_Api_call_1set_1video_1direction(JNIEnv *env, jobjec
 
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Api_call_1set_1media_1direction(JNIEnv *env, jobject thiz,
-                                                              jlong call, jint adir, jint vdir)
+                                                             jlong call, jint adir, jint vdir)
 {
     int err;
+    LOGD("call set audio/video media direction of call %ld to %d/%d\n", call, adir, vdir);
     re_thread_enter();
-    LOGD("call set audio/video media direction to %d/%d\n", adir, vdir);
     err = call_set_media_direction((struct call *)call, (enum sdp_dir)adir, (enum sdp_dir)vdir);
     re_thread_leave();
     return err;
@@ -1447,6 +1447,14 @@ Java_com_tutpro_baresip_plus_Api_call_1set_1video_1source(JNIEnv *env, jobject t
     err = video_set_source(call_video((struct call *)call), "avformat", dev);
     re_thread_leave();
     return err;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_plus_Api_call_1destroy(JNIEnv *env, jobject thiz, jlong call)
+{
+    re_thread_enter();
+    mem_deref((struct call *)call);
+    re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL

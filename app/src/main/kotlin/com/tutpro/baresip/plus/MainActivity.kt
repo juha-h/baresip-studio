@@ -2094,11 +2094,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun call(ua: UserAgent, uri: String, kind: String, onHoldCall: Call? = null): Boolean {
-        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
-            Toast.makeText(applicationContext, getString(R.string.no_calls),
-                    Toast.LENGTH_LONG).show()
-            return false
-        }
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
         val videoDir = when {
@@ -2106,25 +2101,30 @@ class MainActivity : AppCompatActivity() {
             Utils.isCameraAvailable(this) -> Api.SDP_SENDRECV
             else -> Api.SDP_RECVONLY
         }
-        val callp = Api.ua_call_alloc(ua.uap, 0L, Api.VIDMODE_ON)
+        val callp = ua.callAlloc(0L, Api.VIDMODE_ON)
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
             call.onHoldCall = onHoldCall
-            call.add()
             if (call.setMediaDirection(Api.SDP_SENDRECV, videoDir) == 0) {
+                call.add()
                 if (onHoldCall != null)
                     onHoldCall.newCall = call
                 if (call.connect(uri)) {
                     showCall(ua)
                     true
                 } else {
-                    showCall(ua)
                     Log.w(TAG, "call_connect $callp failed")
+                    if (onHoldCall != null)
+                        onHoldCall.newCall = null
+                    call.remove()
+                    call.destroy()
+                    showCall(ua)
                     false
                 }
             } else {
-                Log.w(TAG, "Call $callp callSetMediaDirection failed")
+                Log.w(TAG, "Call $callp setMedia[Answer]Direction failed")
+                call.destroy()
                 false
             }
         } else {
@@ -2134,7 +2134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun acceptTransfer(ua: UserAgent, call: Call, uri: String) {
-        val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
+        val newCallp = ua.callAlloc(call.callp, Api.VIDMODE_OFF)
         if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",

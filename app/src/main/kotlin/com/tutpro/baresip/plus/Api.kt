@@ -86,6 +86,7 @@ object Api {
     external fun call_replaces(callp: Long): Boolean
     external fun call_replace_transfer(xfer_callp: Long, callp: Long): Boolean
     external fun call_diverter_uri(callp: Long): String
+    external fun call_destroy(callp: Long)
 
     external fun calls_mute(mute: Boolean)
 

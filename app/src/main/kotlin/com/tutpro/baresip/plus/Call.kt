@@ -123,6 +123,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return Api.call_replaces(callp)
     }
 
+    fun destroy() {
+        Api.call_destroy(callp)
+    }
+
     companion object {
 
         fun calls(): ArrayList<Call> {
