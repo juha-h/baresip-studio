@@ -86,6 +86,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         if (ua.account.mediaEnc != "") security = R.drawable.box_red
     }
 
+    fun destroy() {
+        Api.call_destroy(callp)
+    }
+
     companion object {
 
         fun calls(): ArrayList<Call> {

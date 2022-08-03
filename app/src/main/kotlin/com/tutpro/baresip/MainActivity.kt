@@ -1669,7 +1669,7 @@ class MainActivity : AppCompatActivity() {
     private fun call(ua: UserAgent, uri: String, onHoldCall: Call? = null): Boolean {
         if (ua.account.aor != aorSpinner.tag)
             spinToAor(ua.account.aor)
-        val callp = Api.ua_call_alloc(ua.uap, 0L, Api.VIDMODE_OFF)
+        val callp = ua.callAlloc(0L, Api.VIDMODE_OFF)
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
@@ -1681,8 +1681,12 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
                 true
             } else {
-                showCall(ua)
                 Log.w(TAG, "call_connect $callp failed")
+                if (onHoldCall != null)
+                    onHoldCall.newCall = null
+                call.remove()
+                call.destroy()
+                showCall(ua)
                 false
             }
         } else {
@@ -1692,7 +1696,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun acceptTransfer(ua: UserAgent, call: Call, uri: String) {
-        val newCallp = Api.ua_call_alloc(ua.uap, call.callp, Api.VIDMODE_OFF)
+        val newCallp = ua.callAlloc(call.callp, Api.VIDMODE_OFF)
         if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
             val newCall = Call(newCallp, ua, uri, "out", "transferring",

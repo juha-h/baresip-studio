@@ -1290,6 +1290,14 @@ Java_com_tutpro_baresip_Api_message_1send(JNIEnv *env, jobject thiz, jlong ua, j
     return err;
 }
 
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_call_1destroy(JNIEnv *env, jobject thiz, jlong call)
+{
+    re_thread_enter();
+    mem_deref((struct call *)call);
+    re_thread_leave();
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_reload_1config(JNIEnv *env, jobject thiz)
 {
