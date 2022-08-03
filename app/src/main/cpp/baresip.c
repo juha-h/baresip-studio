@@ -1068,7 +1068,7 @@ Java_com_tutpro_baresip_Api_ua_1call_1alloc(JNIEnv *env, jobject thiz, jlong ua,
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jlong ua, jlong call, jint vidMode)
 {
-    LOGD("answering call %ld/%ld\n", (long)ua, (long)call);
+    LOGD("answering ua/call %ld/%ld with video mode %d\n", (long)ua, (long)call, vidMode);
     re_thread_enter();
     ua_answer((struct ua *)ua, (struct call *)call, (enum vidmode)vidMode);
     re_thread_leave();
