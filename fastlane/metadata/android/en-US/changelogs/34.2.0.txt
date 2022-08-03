@@ -1,0 +1,5 @@
+- Delay calling by 1 sec after call icon is touched because audio mode
+  does not immediately change to communication
+- Video call and answer fixes and improvements
+- Upstream fix of PRACK handling
+- New Swedish translations
