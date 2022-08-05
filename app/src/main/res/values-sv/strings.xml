@@ -292,4 +292,5 @@
     <string name="attended">Vägledd</string>
     <string name="blind">Blind</string>
     <string name="contacts_consent">Om Androids kontakter används då kan de användas som SIP- eller tel-URI-referenser för samtal och för att skicka meddelanden. baresip sparar inte Androids kontakter och delar dem inte heller med någon. För att Androids kontakter ska bli tillgängliga i baresip kräver Google att du accepterar användningen som beskrivs här och i appens <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">Privacy Policy</a>. </string>
+    <string name="account_nickname">Konto smeknamn</string>
 </resources>
