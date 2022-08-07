@@ -29,6 +29,8 @@
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
                 <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
             </ul>
+            <h2>Tietosuoja</h2>
+                Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.
             <h2>Lähdekoodi</h2>
                 Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
                 missä voi myös raportoida virheistä.
@@ -75,6 +77,8 @@
                     pystysuorasta asennosta.</li>
                 <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
             </ul>
+            <h2>Tietosuoja</h2>
+                Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">täältä</a>.
             <h2>Lähdekoodi</h2>
                 Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
                 missä voi myös raportoida virheistä.
