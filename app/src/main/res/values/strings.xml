@@ -35,6 +35,8 @@
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
         </ul>
+        <h2>Privacy Policy</h2>
+            Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.
         <h2>Source code</h2>
             Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
             where also issues can be reported.
@@ -84,6 +86,8 @@
             mode rotated 90 degrees left from portrait orientation.</li>
             <li>Selfview is not properly shown when video stream is sendonly.</li>
         </ul>
+        <h2>Privacy Policy</h2>
+            Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">here</a>.
         <h2>Source code</h2>
         Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         where also issues can be reported.
