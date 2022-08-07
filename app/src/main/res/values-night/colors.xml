@@ -15,6 +15,7 @@
     <color name="colorStrong">@color/colorWhite</color>
     <color name="colorGreen">#01df01</color>
     <color name="colorRed">#df0101</color>
+    <color name="colorYellow">#ffef00</color>
     <color name="colorLight">@color/colorGrayLight</color>
     <color name="colorDark">#383838</color>
     <color name="colorSpinnerText">@color/colorDark</color>
