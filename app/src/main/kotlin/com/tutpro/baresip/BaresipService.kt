@@ -788,9 +788,9 @@ class BaresipService: Service() {
                     }
                     "call verified", "call secure" -> {
                         if (ev[0] == "call secure") {
-                            call!!.security = R.drawable.box_yellow
+                            call!!.security = R.drawable.locked_yellow
                         } else {
-                            call!!.security = R.drawable.box_green
+                            call!!.security = R.drawable.locked_green
                             call.zid = ev[1]
                         }
                         if (!isMainVisible)

@@ -83,7 +83,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     init {
-        if (ua.account.mediaEnc != "") security = R.drawable.box_red
+        if (ua.account.mediaEnc != "") security = R.drawable.unlocked
     }
 
     fun destroy() {
