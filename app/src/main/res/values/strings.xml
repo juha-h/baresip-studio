@@ -372,7 +372,7 @@
         in calling and messaging as references to SIP and tel URIs. baresip app does not store Android
         contacts nor share them with anyone.  In order to make Android contacts available in baresip,
         Google requires that you accept their use as described here and in app\'s
-        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">Privacy Policy</a>.
+        <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Privacy Policy</a>.
     </string>
     <!-- Contact Activity -->
     <string name="contact">Contact</string>
