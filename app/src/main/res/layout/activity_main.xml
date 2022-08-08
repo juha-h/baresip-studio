@@ -110,6 +110,7 @@
                             android:layout_weight="0"
                             android:layout_gravity ="center_vertical"
                             android:visibility="invisible"
+                            android:background="#00000000"
                             android:contentDescription="@string/app_name_plus" >
                         </ImageButton>
 

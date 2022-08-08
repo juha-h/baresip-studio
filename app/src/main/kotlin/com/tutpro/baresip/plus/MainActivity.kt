@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                                 if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0) {
                                     Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                 } else {
-                                    securityButton.setImageResource(R.drawable.box_yellow)
+                                    securityButton.setImageResource(R.drawable.locked_yellow)
                                     securityButton.tag = "yellow"
                                 }
                             }
@@ -1371,9 +1371,9 @@ class MainActivity : AppCompatActivity() {
                     setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                         val security: Int = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                             Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
-                            R.drawable.box_yellow
+                            R.drawable.locked_yellow
                         } else {
-                            R.drawable.box_green
+                            R.drawable.locked_green
                         }
                         call.security = security
                         call.zid = ev[3]
@@ -1388,10 +1388,10 @@ class MainActivity : AppCompatActivity() {
                         dialog.dismiss()
                     }
                     setNeutralButton(getString(R.string.no)) { dialog, _ ->
-                        call.security = R.drawable.box_yellow
+                        call.security = R.drawable.locked_yellow
                         call.zid = ev[3]
                         if (aor == aorSpinner.tag) {
-                            securityButton.setImageResource(R.drawable.box_yellow)
+                            securityButton.setImageResource(R.drawable.locked_yellow)
                             securityButton.tag = "yellow"
                             securityButton.visibility = if (Call.ofCallp(callp) == null)
                                 View.INVISIBLE
@@ -1410,7 +1410,7 @@ class MainActivity : AppCompatActivity() {
                     handleNextEvent("Call $callp that is verified is not found")
                     return
                 }
-                val tag: String = if (call.security == R.drawable.box_yellow)
+                val tag: String = if (call.security == R.drawable.locked_yellow)
                     "yellow"
                 else
                     "green"
@@ -2156,13 +2156,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setSecurityButtonTag(button: ImageButton, security: Int) {
         when (security) {
-            R.drawable.box_red -> {
+            R.drawable.unlocked -> {
                 button.tag = "red"
             }
-            R.drawable.box_yellow -> {
+            R.drawable.locked_yellow -> {
                 button.tag = "yellow"
             }
-            R.drawable.box_green -> {
+            R.drawable.locked_green -> {
                 button.tag = "green"
             }
         }
