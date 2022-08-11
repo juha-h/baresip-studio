@@ -1,5 +1,5 @@
 baresip Privacy Policy
 
-baresip does not collect any personal or app usage information nor share such information with anyone.
+baresip does not collect any personal, app usage, or any other information nor share any information with anyone.
 
 It can be optionally chosen in Settings that baresip uses Android contacts as references to SIP and tel URIs.  If chosen, baresip does not store Android contacts nor share them with anyone.
