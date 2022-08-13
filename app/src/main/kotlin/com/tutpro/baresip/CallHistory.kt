@@ -36,9 +36,9 @@ class NewCallHistory(val aor: String, val peerUri: String, val direction: String
             return BaresipService.callHistory.count { it.aor == aor }
         }
 
-        fun aorLatestHistory(aor: String): NewCallHistory? {
+        fun aorLatestPeerUri(aor: String): String? {
             for (h in BaresipService.callHistory.reversed())
-                if (h.aor == aor) return h
+                if (h.aor == aor) return h.peerUri
             return null
         }
 

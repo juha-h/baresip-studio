@@ -1413,7 +1413,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    uriText = Contact.contactUri(uriText) ?: uriText
+                    uriText = Contact.contactUri(uriText, null) ?: uriText
                     if (Utils.isTelNumber(uriText))
                         uriText = "tel:$uriText"
                     val uri = if (Utils.isTelUri(uriText))
@@ -1737,7 +1737,7 @@ class MainActivity : AppCompatActivity() {
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                uriText = Contact.contactUri(uriText) ?: uriText
+                uriText = Contact.contactUri(uriText, NewCallHistory.aorLatestPeerUri(aor)) ?: uriText
                 if (Utils.isTelNumber(uriText))
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
@@ -1787,9 +1787,9 @@ class MainActivity : AppCompatActivity() {
                     callHandler.postDelayed(callRunnable!!, 1000)
                 }
             } else {
-                val latest = NewCallHistory.aorLatestHistory(aor)
-                if (latest != null)
-                    callUri.setText(Utils.friendlyUri(this, latest.peerUri, ua.account))
+                val latestPeerUri = NewCallHistory.aorLatestPeerUri(aor)
+                if (latestPeerUri != null)
+                    callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }
         }
     }
