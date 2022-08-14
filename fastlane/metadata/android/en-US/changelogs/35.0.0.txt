@@ -1,0 +1,3 @@
+- Use lock icons for call security indication
+- When calling Android contact, use contact URI matching the latest peer URI
+- In About text, added link to app's raw privacy policy
