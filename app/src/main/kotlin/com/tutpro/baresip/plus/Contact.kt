@@ -51,7 +51,8 @@ sealed class Contact {
         }
 
         // Return uri of contact name or null if contact is not found
-        fun contactUri(name: String): String? {
+        // If Android contact has more than one uri, return latest if given and found
+        fun contactUri(name: String, latest: String?): String? {
             for (c in contacts())
                 when (c) {
                     is BaresipContact -> {
@@ -62,10 +63,19 @@ sealed class Contact {
                     }
                     is AndroidContact -> {
                         if (c.name == name) {
-                            return if (c.uris.isNotEmpty())
-                                c.uris.first()
-                            else
+                            return if (c.uris.isNotEmpty()) {
+                                var uri = c.uris.first()
+                                if (c.uris.size > 1 && latest != null) {
+                                    for (u in c.uris)
+                                        if (u == latest) {
+                                            uri = latest
+                                            break
+                                        }
+                                }
+                                uri
+                            } else {
                                 null
+                            }
                         }
                     }
                 }

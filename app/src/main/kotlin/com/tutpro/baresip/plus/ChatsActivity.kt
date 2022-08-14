@@ -130,7 +130,7 @@ class ChatsActivity: AppCompatActivity() {
         plusButton.setOnClickListener {
             val uriText = peerUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                var uri = Contact.contactUri(uriText)
+                var uri = Contact.contactUri(uriText, null)
                 if (uri == null)
                     uri = if (Utils.isTelNumber(uriText))
                         "tel:$uriText"
