@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var callTimer: Chronometer
     private lateinit var callUri: AutoCompleteTextView
     private lateinit var securityButton: ImageButton
+    private lateinit var videoSecurityButton: ImageButton
     private lateinit var diverter: LinearLayout
     private lateinit var diverterUri: TextView
     private lateinit var callButton: ImageButton
@@ -306,15 +307,15 @@ class MainActivity : AppCompatActivity() {
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
-                "red" -> {
+                R.drawable.unlocked -> {
                     Utils.alertView(this, getString(R.string.alert),
                             getString(R.string.call_not_secure))
                 }
-                "yellow" -> {
+                R.drawable.locked_yellow -> {
                     Utils.alertView(this, getString(R.string.alert),
                             getString(R.string.peer_not_verified))
                 }
-                "green" -> {
+                R.drawable.locked_green -> {
                     with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                         setTitle(R.string.info)
                         setMessage(getString(R.string.call_is_secure))
@@ -326,12 +327,12 @@ class MainActivity : AppCompatActivity() {
                                     Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                 } else {
                                     securityButton.setImageResource(R.drawable.locked_yellow)
-                                    securityButton.tag = "yellow"
+                                    securityButton.tag = R.drawable.locked_yellow
                                 }
                             }
                             dialog.dismiss()
                         }
-                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                        setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         show()
@@ -840,6 +841,7 @@ class MainActivity : AppCompatActivity() {
 
         // Video Button
         val vb = ImageButton(this)
+        vb.id = View.generateViewId()
         vb.setImageResource(R.drawable.video_off)
         vb.setBackgroundResource(0)
         var prm: RelativeLayout.LayoutParams =
@@ -857,6 +859,37 @@ class MainActivity : AppCompatActivity() {
         }
         videoLayout.addView(vb)
 
+        // Camera Button
+        val cb = ImageButton(this)
+        if (!Utils.isCameraAvailable(this))
+            cb.visibility = View.INVISIBLE
+        cb.id = View.generateViewId()
+        cb.setImageResource(R.drawable.camera_front)
+        cb.setBackgroundResource(0)
+        prm = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        prm.marginStart = 15
+        prm.topMargin = 15
+        cb.layoutParams = prm
+        cb.setOnClickListener {
+            val call = Call.call("connected")
+            if (call != null) {
+                if (call.setVideoSource(!BaresipService.cameraFront) != 0)
+                    Log.w(TAG, "Failed to set video source")
+                else
+                    BaresipService.cameraFront = !BaresipService.cameraFront
+                if (BaresipService.cameraFront)
+                    cb.setImageResource(R.drawable.camera_front)
+                else
+                    cb.setImageResource(R.drawable.camera_rear)
+            }
+        }
+        videoLayout.addView(cb)
+
         // Snapshot Button
         if ((Build.VERSION.SDK_INT >= 29) ||
                 Utils.checkPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
@@ -866,8 +899,9 @@ class MainActivity : AppCompatActivity() {
             prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT)
             prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-            prm.addRule(RelativeLayout.CENTER_VERTICAL)
+            prm.addRule(RelativeLayout.BELOW, cb.id)
             prm.marginStart = 15
+            prm.topMargin= 24
             sb.layoutParams = prm
             sb.setOnClickListener {
                 val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
@@ -881,35 +915,53 @@ class MainActivity : AppCompatActivity() {
             videoLayout.addView(sb)
         }
 
-        // Camera Button
-        if (Utils.isCameraAvailable(this)) {
-            val cb = ImageButton(this)
-            cb.setImageResource(R.drawable.camera_front)
-            cb.setBackgroundResource(0)
-            prm = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-            )
-            prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-            prm.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            prm.marginStart = 15
-            prm.topMargin = 15
-            cb.layoutParams = prm
-            cb.setOnClickListener {
-                val call = Call.call("connected")
-                if (call != null) {
-                    if (call.setVideoSource(!BaresipService.cameraFront) != 0)
-                        Log.w(TAG, "Failed to set video source")
-                    else
-                        BaresipService.cameraFront = !BaresipService.cameraFront
-                    if (BaresipService.cameraFront)
-                        cb.setImageResource(R.drawable.camera_front)
-                    else
-                        cb.setImageResource(R.drawable.camera_rear)
+        // Lock Button
+        videoSecurityButton = ImageButton(this)
+        videoSecurityButton.visibility = View.INVISIBLE
+        videoSecurityButton.setBackgroundResource(0)
+        prm = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
+        prm.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        prm.addRule(RelativeLayout.ABOVE, vb.id)
+        prm.marginStart = 15
+        prm.bottomMargin= 24
+        videoSecurityButton.layoutParams = prm
+        videoSecurityButton.setOnClickListener {
+            when (securityButton.tag) {
+                R.drawable.unlocked -> {
+                    Utils.alertView(this, getString(R.string.alert),
+                            getString(R.string.call_not_secure))
+                }
+                R.drawable.locked_yellow -> {
+                    Utils.alertView(this, getString(R.string.alert),
+                            getString(R.string.peer_not_verified))
+                }
+                R.drawable.locked_green -> {
+                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                        setTitle(R.string.info)
+                        setMessage(getString(R.string.call_is_secure))
+                        setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
+                            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+                            val call = ua.currentCall()
+                            if (call != null) {
+                                if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0) {
+                                    Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
+                                } else {
+                                    securityButton.tag = R.drawable.locked_yellow
+                                    videoSecurityButton.setImageResource(R.drawable.locked_yellow)
+                                }
+                            }
+                            dialog.dismiss()
+                        }
+                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
                 }
             }
-            videoLayout.addView(cb)
         }
+        videoLayout.addView(videoSecurityButton)
 
         // Speaker Button
         speakerButton = ImageButton(this)
@@ -1378,12 +1430,9 @@ class MainActivity : AppCompatActivity() {
                         call.security = security
                         call.zid = ev[3]
                         if (aor == aorSpinner.tag) {
-                            securityButton.setImageResource(security)
-                            setSecurityButtonTag(securityButton, security)
-                            securityButton.visibility = if (Call.ofCallp(callp) == null)
-                                View.INVISIBLE
-                            else
-                                View.VISIBLE
+                            securityButton.tag = call.security
+                            securityButton.setImageResource(call.security)
+                            setVideoSecurityButton(call.security)
                         }
                         dialog.dismiss()
                     }
@@ -1391,12 +1440,9 @@ class MainActivity : AppCompatActivity() {
                         call.security = R.drawable.locked_yellow
                         call.zid = ev[3]
                         if (aor == aorSpinner.tag) {
+                            securityButton.tag = R.drawable.locked_yellow
                             securityButton.setImageResource(R.drawable.locked_yellow)
-                            securityButton.tag = "yellow"
-                            securityButton.visibility = if (Call.ofCallp(callp) == null)
-                                View.INVISIBLE
-                            else
-                                View.VISIBLE
+                            setVideoSecurityButton(R.drawable.locked_yellow)
                         }
                         dialog.dismiss()
                     }
@@ -1410,13 +1456,10 @@ class MainActivity : AppCompatActivity() {
                     handleNextEvent("Call $callp that is verified is not found")
                     return
                 }
-                val tag: String = if (call.security == R.drawable.locked_yellow)
-                    "yellow"
-                else
-                    "green"
                 if (aor == aorSpinner.tag) {
                     securityButton.setImageResource(call.security)
-                    securityButton.tag = tag
+                    securityButton.tag = call.security
+                    setVideoSecurityButton(call.security)
                 }
             }
             "call transfer", "transfer show" -> {
@@ -2154,16 +2197,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setSecurityButtonTag(button: ImageButton, security: Int) {
+    private fun setVideoSecurityButton(security: Int) {
         when (security) {
             R.drawable.unlocked -> {
-                button.tag = "red"
+                videoSecurityButton.setImageResource(R.drawable.unlocked_video)
             }
             R.drawable.locked_yellow -> {
-                button.tag = "yellow"
+                videoSecurityButton.setImageResource(R.drawable.locked_video_yellow)
             }
             R.drawable.locked_green -> {
-                button.tag = "green"
+                videoSecurityButton.setImageResource(R.drawable.locked_video_green)
             }
         }
     }
@@ -2269,6 +2312,13 @@ class MainActivity : AppCompatActivity() {
                             videoLayout.visibility = View.VISIBLE
                         }
                         videoOnHoldNotice.visibility = if (call.held) View.VISIBLE else View.GONE
+                        if (ua.account.mediaEnc == "") {
+                            videoSecurityButton.visibility = View.INVISIBLE
+                        } else {
+                            securityButton.tag = call.security
+                            setVideoSecurityButton(call.security)
+                            videoSecurityButton.visibility = View.VISIBLE
+                        }
                         return
                     }
                     if (defaultLayout.visibility == View.INVISIBLE) {
@@ -2304,8 +2354,8 @@ class MainActivity : AppCompatActivity() {
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
+                        securityButton.tag = call.security
                         securityButton.setImageResource(call.security)
-                        setSecurityButtonTag(securityButton, call.security)
                         securityButton.visibility = View.VISIBLE
                     }
                     callButton.visibility = View.INVISIBLE
