@@ -476,7 +476,7 @@
     </string>
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
     <string name="verify">Verify Request</string>
-    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;?</string>
+    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
     <string name="transfer_request">Transfer Request</string>
     <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'?</string>
     <string name="call_failed">Call failed</string>
