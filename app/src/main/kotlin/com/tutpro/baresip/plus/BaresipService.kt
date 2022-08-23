@@ -954,12 +954,17 @@ class BaresipService: Service() {
     }
 
     private fun postServiceEvent(event: ServiceEvent) {
-        serviceEvents.add(event)
-        if (serviceEvents.size == 1) {
-            Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+        if (serviceEvents.size == 0) {
+            serviceEvents.add(event)
+            Log.d(TAG, "Posting service event '${event.event}' at ${event.timeStamp}")
             serviceEvent.postValue(Event(event.timeStamp))
         } else {
-            Log.d(TAG, "Added service event ${event.event}")
+            if (serviceEvents.last().event == event.event){
+                Log.d(TAG, "Skipped duplicate service event '${event.event}'")
+            } else {
+                serviceEvents.add(event)
+                Log.d(TAG, "Added service event ${event.event}")
+            }
         }
     }
 
