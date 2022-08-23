@@ -62,12 +62,16 @@ class Account(val accp: Long) {
             }
         }
 
-        val videoCodecsList = ArrayList(Api.video_codecs().split(",").distinct())
-        val videoCodecsString = Utils.implode(videoCodecsList, ",")
-        if (Api.account_set_video_codecs(accp, videoCodecsString) != 0)
-            Log.e(TAG, "Setting of video codecs '$videoCodecsString' failed")
-        else
-            videoCodec = videoCodecsList
+        i = 0
+        while (true) {
+            val vc = Api.account_video_codec(accp, i)
+            if (vc != "") {
+                videoCodec.add(vc)
+                i++
+            } else {
+                break
+            }
+        }
 
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
