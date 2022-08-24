@@ -11,7 +11,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var onHoldCall: Call? = null
     var newCall: Call? = null
     var rejected = false
-    var security = 0
+    var security = R.drawable.unlocked
     var zid = ""
     var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""

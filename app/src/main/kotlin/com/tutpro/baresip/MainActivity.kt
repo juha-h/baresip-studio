@@ -284,15 +284,15 @@ class MainActivity : AppCompatActivity() {
 
         securityButton.setOnClickListener {
             when (securityButton.tag) {
-                "red" -> {
+                R.drawable.unlocked -> {
                     Utils.alertView(this, getString(R.string.alert),
                             getString(R.string.call_not_secure))
                 }
-                "yellow" -> {
+                R.drawable.locked_yellow -> {
                     Utils.alertView(this, getString(R.string.alert),
                             getString(R.string.peer_not_verified))
                 }
-                "green" -> {
+                R.drawable.locked_green -> {
                     with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                         setTitle(R.string.info)
                         setMessage(getString(R.string.call_is_secure))
@@ -304,12 +304,12 @@ class MainActivity : AppCompatActivity() {
                                     Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                 } else {
                                     securityButton.setImageResource(R.drawable.locked_yellow)
-                                    securityButton.tag = "yellow"
+                                    securityButton.tag = R.drawable.locked_yellow
                                 }
                             }
                             dialog.dismiss()
                         }
-                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                        setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         show()
@@ -1037,21 +1037,16 @@ class MainActivity : AppCompatActivity() {
                     setMessage(String.format(getString(R.string.verify_sas),
                             ev[1], ev[2]))
                     setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                        val security: Int = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
+                        call.security = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
                             Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
                             R.drawable.locked_yellow
                         } else {
                             R.drawable.locked_green
                         }
-                        call.security = security
                         call.zid = ev[3]
                         if (aor == aorSpinner.tag) {
-                            securityButton.setImageResource(security)
-                            setSecurityButtonTag(securityButton, security)
-                            securityButton.visibility = if (Call.ofCallp(callp) == null)
-                                View.INVISIBLE
-                            else
-                                View.VISIBLE
+                            securityButton.tag = call.security
+                            securityButton.setImageResource(call.security)
                         }
                         dialog.dismiss()
                     }
@@ -1059,12 +1054,8 @@ class MainActivity : AppCompatActivity() {
                         call.security = R.drawable.locked_yellow
                         call.zid = ev[3]
                         if (aor == aorSpinner.tag) {
+                            securityButton.tag = R.drawable.locked_yellow
                             securityButton.setImageResource(R.drawable.locked_yellow)
-                            securityButton.tag = "yellow"
-                            securityButton.visibility = if (Call.ofCallp(callp) == null)
-                                View.INVISIBLE
-                            else
-                                View.VISIBLE
                         }
                         dialog.dismiss()
                     }
@@ -1078,13 +1069,9 @@ class MainActivity : AppCompatActivity() {
                     handleNextEvent("Call $callp that is verified is not found")
                     return
                 }
-                val tag: String = if (call.security == R.drawable.locked_yellow)
-                    "yellow"
-                else
-                    "green"
                 if (aor == aorSpinner.tag) {
                     securityButton.setImageResource(call.security)
-                    securityButton.tag = tag
+                    securityButton.tag = call.security
                 }
             }
             "call transfer", "transfer show" -> {
@@ -1716,20 +1703,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setSecurityButtonTag(button: ImageButton, security: Int) {
-        when (security) {
-            R.drawable.unlocked -> {
-                button.tag = "red"
-            }
-            R.drawable.locked_yellow -> {
-                button.tag = "yellow"
-            }
-            R.drawable.locked_green -> {
-                button.tag = "green"
-            }
-        }
-    }
-
     private fun makeCall() {
         callUri.setAdapter(null)
         val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
@@ -1897,8 +1870,8 @@ class MainActivity : AppCompatActivity() {
                     if (ua.account.mediaEnc == "") {
                         securityButton.visibility = View.INVISIBLE
                     } else {
+                        securityButton.tag = call.security
                         securityButton.setImageResource(call.security)
-                        setSecurityButtonTag(securityButton, call.security)
                         securityButton.visibility = View.VISIBLE
                     }
                     callButton.visibility = View.INVISIBLE
