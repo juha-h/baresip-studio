@@ -807,7 +807,7 @@ class BaresipService: Service() {
                             call!!.security = R.drawable.locked_yellow
                         } else {
                             call!!.security = R.drawable.locked_green
-                            call.zid = ev[1]
+                            call.zid = ev[3]
                         }
                         if (!isMainVisible)
                             return

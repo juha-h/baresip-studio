@@ -112,13 +112,9 @@ add_library(lib_webrtc STATIC IMPORTED)
 set_target_properties(lib_webrtc PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/webrtc/lib/${ANDROID_ABI}/libwebrtc.a)
 
-add_library(lib_bn STATIC IMPORTED)
-set_target_properties(lib_bn PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/bn/lib/${ANDROID_ABI}/libbn.a)
-
-add_library(lib_zrtp STATIC IMPORTED)
-set_target_properties(lib_zrtp PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/zrtp/lib/${ANDROID_ABI}/libzrtp.a)
+add_library(lib_zrtpcppcore STATIC IMPORTED)
+set_target_properties(lib_zrtpcppcore PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/gzrtp/lib/${ANDROID_ABI}/libzrtpcppcore.a)
 
 add_library(lib_baresip STATIC IMPORTED)
 set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
@@ -170,8 +166,7 @@ target_link_libraries(baresip
         lib_amrwb
         lib_amrwbenc
         lib_webrtc
-        lib_zrtp
-        lib_bn
+        lib_zrtpcppcore
         z
         log
         camera2ndk
