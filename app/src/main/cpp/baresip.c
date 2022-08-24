@@ -11,6 +11,8 @@
     #define long long long
 #endif
 
+enum { ASYNC_WORKERS = 4 };
+
 typedef struct baresip_context
 {
     JavaVM  *javaVM;
@@ -428,6 +430,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     if (err)
         goto out;
 
+    re_thread_async_init(ASYNC_WORKERS);
+
     conf_path_set(path);
 
     log_level_set((enum log_level)jLogLevel);
@@ -446,8 +450,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
-    // Turn off DNS client cache
-    dnsc_cache_max(net_dnsc(baresip_network()), 0);
+    // Turn off DNS client cache (should be OK with async workers)
+    // dnsc_cache_max(net_dnsc(baresip_network()), 0);
 
     if (strlen(addrs) > 0) {
         char* addr_list = (char*)malloc(strlen(addrs));
@@ -538,6 +542,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
 
     LOGD("unloading modules ...");
     mod_close();
+
+    re_thread_async_close();
 
     libre_close();
 
