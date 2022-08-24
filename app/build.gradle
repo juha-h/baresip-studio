@@ -12,7 +12,8 @@ android {
         versionName = '47.3.0'
         externalNativeBuild {
             cmake {
-                cFlags '-DHAVE_INTTYPES_H'
+                cFlags '-DHAVE_INTTYPES_H -lstdc++'
+                arguments '-DANDROID_STL=c++_shared'
 		        version '3.18.1'
             }
         }
