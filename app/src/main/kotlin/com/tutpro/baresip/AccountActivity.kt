@@ -32,8 +32,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var aor: String
     private lateinit var authUser: EditText
     private lateinit var authPass: EditText
-    private lateinit var outbound1: EditText
-    private lateinit var outbound2: EditText
+    private lateinit var outbound: Array<EditText>
     private lateinit var mediaNat: String
     private lateinit var stun: LinearLayout
     private lateinit var stunServer: EditText
@@ -75,8 +74,7 @@ class AccountActivity : AppCompatActivity() {
         displayName = binding.DisplayName
         authUser = binding.AuthUser
         authPass = binding.AuthPass
-        outbound1 = binding.Outbound1
-        outbound2 = binding.Outbound2
+        outbound = arrayOf(binding.Outbound1, binding.Outbound2)
         regCheck = binding.Register
         mediaNatSpinner = binding.mediaNatSpinner
         stun = binding.Stun
@@ -217,9 +215,9 @@ class AccountActivity : AppCompatActivity() {
             authPass.setText(acc.authPass)
 
         if (acc.outbound.size > 0) {
-            outbound1.setText(acc.outbound[0])
+            outbound[0].setText(acc.outbound[0])
             if (acc.outbound.size > 1)
-                outbound2.setText(acc.outbound[1])
+                outbound[1].setText(acc.outbound[1])
         }
 
         regCheck.isChecked = acc.regint > 0
@@ -439,37 +437,33 @@ class AccountActivity : AppCompatActivity() {
                 }
 
                 val ob = ArrayList<String>()
-                var uri: String
-                if (outbound1.text.toString().trim() != "") {
-                    uri = outbound1.text.toString().trim().replace(" ", "")
-                    if (!uri.startsWith("sip:")) uri = "sip:$uri"
-                    ob.add(uri)
-                }
-                if (outbound2.text.toString().trim() != "") {
-                    uri = outbound2.text.toString().trim().replace(" ", "")
-                    if (!uri.startsWith("sip:")) uri = "sip:$uri"
-                    ob.add(uri)
-                }
-                if (ob != acc.outbound) {
-                    val outbound = ArrayList<String>()
-                    for (i in ob.indices) {
-                        if ((ob[i] == "") || checkOutboundUri(ob[i])) {
-                            if (Api.account_set_outbound(acc.accp, ob[i], i) == 0) {
-                                if (ob[i] != "")
-                                    outbound.add(Api.account_outbound(acc.accp, i))
-                            } else {
-                                Log.e(TAG, "Setting of outbound proxy ${ob[i]} failed")
-                                break
-                            }
+                for (i in 0..1) {
+                    var uri: String
+                    if (outbound[i].text.toString().trim() != "") {
+                        uri = outbound[i].text.toString().trim().replace(" ", "")
+                        if (!uri.startsWith("sip:"))
+                            uri = "sip:$uri"
+                        if (checkOutboundUri(uri)) {
+                            ob.add(uri)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_proxy_server_uri), ob[i]))
                             return false
                         }
                     }
-                    Log.d(TAG, "New outbound proxies are $outbound")
-                    acc.outbound = outbound
-                    if (outbound.isEmpty())
+                }
+                if (ob != acc.outbound) {
+                    for (i in 0..1) {
+                        val uri = if (ob.size > i)
+                            ob[i]
+                        else
+                            ""
+                        if (Api.account_set_outbound(acc.accp, uri, i) != 0)
+                            Log.e(TAG, "Setting of outbound proxy $i uri '$uri' failed")
+                    }
+                    Log.d(TAG, "New outbound proxies are $ob")
+                    acc.outbound = ob
+                    if (ob.isEmpty())
                         Api.account_set_sipnat(acc.accp, "")
                     else
                         Api.account_set_sipnat(acc.accp, "outbound")
