@@ -240,7 +240,8 @@ class MainActivity : AppCompatActivity() {
                         accountRequest!!.launch(i)
                         true
                     } else {
-                        BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
+                        if (aorSpinner.selectedItemPosition < BaresipService.uas.size)
+                            BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
                                 callUri.text.toString()
                         false
                     }
