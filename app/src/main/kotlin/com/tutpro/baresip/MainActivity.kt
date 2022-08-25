@@ -1034,16 +1034,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setTitle(R.string.verify)
-                    setMessage(String.format(getString(R.string.verify_sas),
-                            ev[1], ev[2]))
+                    setMessage(String.format(getString(R.string.verify_sas), ev[1]))
                     setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                        call.security = if (Api.cmd_exec("zrtp_verify ${ev[3]}") != 0) {
-                            Log.e(TAG, "Command 'zrtp_verify ${ev[3]}' failed")
+                        call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
+                            Log.e(TAG, "Command 'zrtp_verify ${ev[2]}' failed")
                             R.drawable.locked_yellow
                         } else {
                             R.drawable.locked_green
                         }
-                        call.zid = ev[3]
+                        call.zid = ev[2]
                         if (aor == aorSpinner.tag) {
                             securityButton.tag = call.security
                             securityButton.setImageResource(call.security)
@@ -1052,7 +1051,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     setNeutralButton(getString(R.string.no)) { dialog, _ ->
                         call.security = R.drawable.locked_yellow
-                        call.zid = ev[3]
+                        call.zid = ev[2]
                         if (aor == aorSpinner.tag) {
                             securityButton.tag = R.drawable.locked_yellow
                             securityButton.setImageResource(R.drawable.locked_yellow)
