@@ -948,12 +948,12 @@ class MainActivity : AppCompatActivity() {
                                     Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                 } else {
                                     securityButton.tag = R.drawable.locked_yellow
-                                    videoSecurityButton.setImageResource(R.drawable.locked_yellow)
+                                    videoSecurityButton.setImageResource(R.drawable.locked_video_yellow)
                                 }
                             }
                             dialog.dismiss()
                         }
-                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                        setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         show()
