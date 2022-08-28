@@ -43,9 +43,9 @@
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
-            <li><b>Apache 2.0</b> AMR codec and TLS security</li>
+            <li><b>Apache 2.0</b> AMR codec, TLS security, and ZRTP
+            media encryption</li>
             <li><b>LGPL 2.1</b> G.722 and G.726 codecs</li>
-            <li><b>AGPLv4</b> ZRTP media encryption</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
         </ul>
         ]]>
@@ -476,7 +476,7 @@
     </string>
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
     <string name="verify">Verify Request</string>
-    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
+    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;?</string>
     <string name="transfer_request">Transfer Request</string>
     <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'?</string>
     <string name="call_failed">Call failed</string>

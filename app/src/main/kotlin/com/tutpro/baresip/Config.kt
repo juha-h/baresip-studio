@@ -18,6 +18,8 @@ object Config {
 
         config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
 
+        config = config.replace("module zrtp.so", "module gzrtp.so")
+
         if (config.contains("rtp_stats no"))
             replaceVariable("rtp_stats", "yes")
 
