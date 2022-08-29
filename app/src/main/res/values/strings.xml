@@ -154,7 +154,7 @@
         Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN Server</string>
-    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port][?transport=udp|tcp],
+    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port][\?transport=udp|tcp],
         where scheme is \'stun\', \'stuns\', \'turn\', or \'turns\'. Factory default STUN Server
         for STUN and ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google
         STUN server. There is no factory default TURN server.
@@ -229,7 +229,7 @@
     <string name="account_allocation_failure">"Failed to allocate new account.</string>
     <string name="encrypt_password">Encrypt Password</string>
     <string name="decrypt_password">Decrypt Password</string>
-    <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
+    <string name="delete_account">Do you want to delete account \'%1$s\'\?</string>
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
@@ -251,22 +251,22 @@
     <string name="direction">Direction</string>
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
-    <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'?</string>
+    <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
-        %2$s from call history?
+        %2$s from call history\?
     </string>
-    <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history?
+    <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history\?
     </string>
     <string name="delete_history">Delete</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
-    <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'?</string>
+    <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'\?</string>
     <!-- Chat Activity -->
     <string name="chat">Chat Messages</string>
     <string name="chat_with">Chat with %1$s</string>
     <string name="new_message">New message</string>
-    <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts?</string>
-    <string name="short_message_question">Do you want to delete message?</string>
+    <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts\?</string>
+    <string name="short_message_question">Do you want to delete message\?</string>
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>
     <string name="message_failed">Failed</string>
@@ -277,10 +277,10 @@
     <string name="new_chat_peer">New Chat Peer</string>
     <string name="invalid_chat_peer_uri">Invalid chat peer URI</string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
-        add peer to contacts?</string>
-    <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
+        add peer to contacts\?</string>
+    <string name="short_chat_question">Do you want to delete chat with \'%1$s\'\?</string>
     <string name="delete_chats">Delete</string>
-    <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'?</string>
+    <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'\?</string>
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
@@ -360,12 +360,12 @@
     <string name="reset_config">Reset to Factory Defaults</string>
     <string name="reset_config_help">If checked, settings are reset to factory default values.</string>
     <string name="reset_config_alert">Are you sure you want to reset settings to factory
-        default values?</string>
+        default values\?</string>
     <string name="reset">Reset</string>
     <string name="read_cert_error">Failed to read file \'cert.pem\'.</string>
     <string name="read_ca_certs_error">Failed to read file \'ca_certs.crt\'.</string>
     <string name="config_restart">You need to restart baresip in order to activate the new
-        settings. Restart now?
+        settings. Restart now\?
     </string>
     <string name="consent_request">Consent Request</string>
     <string name="contacts_consent">If Android contacts is chosen, they can be used
@@ -387,9 +387,9 @@
     <string name="avatar_image">Profile image</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
-    <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>
+    <string name="contact_action_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="send_message">Send Message</string>
-    <string name="contact_delete_question">Do you want to delete contact \'%1$s\'?</string>
+    <string name="contact_delete_question">Do you want to delete contact \'%1$s\'\?</string>
     <string name="contacts_exceeded">Your maximum number of contacts %1$d has been exceeded.</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
@@ -436,9 +436,9 @@
     <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
-    <string name="allow_video">Accept sending and receiving video with \'%1$s\'?</string>
-    <string name="allow_video_send">Accept sending of video to \'%1$s\'?</string>
-    <string name="allow_video_recv">Accept receiving video from \'%1$s\'?</string>
+    <string name="allow_video">Accept sending and receiving video with \'%1$s\'\?</string>
+    <string name="allow_video_send">Accept sending of video to \'%1$s\'\?</string>
+    <string name="allow_video_recv">Accept receiving video from \'%1$s\'\?</string>
     <string name="hold">Call Hold/Unhold</string>
     <string name="call_is_on_hold">Call is on hold</string>
     <string name="mic">Microphone On/Off</string>
@@ -476,15 +476,15 @@
     </string>
     <string name="registering_failed">Registering of \`%1$s\` failed.</string>
     <string name="verify">Verify Request</string>
-    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;?</string>
+    <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Transfer Request</string>
-    <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'?</string>
+    <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'\?</string>
     <string name="call_failed">Call failed</string>
     <string name="call_closed">Call is closed</string>
     <string name="call_not_secure">This call is NOT secure!</string>
     <string name="peer_not_verified">This call is SECURE, but peer is NOT verified!</string>
     <string name="call_is_secure">This call is SECURE and peer is VERIFIED!
-        Do you want to unverify the peer?
+        Do you want to unverify the peer\?
     </string>
     <string name="unverify">Unverify</string>
     <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
@@ -493,7 +493,7 @@
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.</string>
     <string name="restart_request">Restart Request</string>
     <string name="restored">Application data restored. baresip needs to be restarted.
-        Restart now?
+        Restart now\?
     </string>
     <string name="restore_failed">Failed to restore application data. Check that you gave correct
         password and that the backup file is from this application. In Android versions 9 and below,
