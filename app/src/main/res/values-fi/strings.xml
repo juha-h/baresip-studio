@@ -155,7 +155,7 @@
         for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
-    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][?transport=udp|tcp]\'
+    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][\?transport=udp|tcp]\'
         oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletus STUN-palvelin
         STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
         julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
@@ -238,7 +238,7 @@
     <string name="account_allocation_failure">Uuden tilin luonti epäonnistui.</string>
     <string name="encrypt_password">Tallenna salasanalla</string>
     <string name="decrypt_password">Palauta salasanalla</string>
-    <string name="delete_account">Haluatko poistaa tilin \'%1$s\'?</string>
+    <string name="delete_account">Haluatko poistaa tilin \'%1$s\'\?</string>
     <!-- Baresip Service -->
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
@@ -260,23 +260,23 @@
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
     <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
-        \'%1$s\'?
+        \'%1$s\'\?
     </string>
     <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
-        %2$s puheluhistoriasta?
+        %2$s puheluhistoriasta\?
     </string>
-    <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta?</string>
+    <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta\?</string>
     <string name="delete_history">Tyhjennä</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
-    <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian?</string>
+    <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
     <!-- Chat Activity -->
     <string name="chat">Viestiketju</string>
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
     <string name="long_message_question">Haluatko poistaa viestin tai
-    luoda uuden yhteystiedon \'%1$s\'?</string>
-    <string name="short_message_question">Haluatko poistaa viestin?</string>
+    luoda uuden yhteystiedon \'%1$s\'\?</string>
+    <string name="short_message_question">Haluatko poistaa viestin\?</string>
     <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
@@ -287,10 +287,10 @@
     <string name="new_chat_peer">Uusi viestin kohde</string>
     <string name="invalid_chat_peer_uri">Virheellinen viestikumppanin URI</string>
     <string name="long_chat_question">Haluatko poistaa viestiketjun tai
-    luoda uuden yhteystiedon \'%1$s\'?</string>
-    <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'?</string>
+    luoda uuden yhteystiedon \'%1$s\'\?</string>
+    <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'\?</string>
     <string name="delete_chats">Tyhjennä</string>
-    <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian?</string>
+    <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian\?</string>
     <!-- Config Activity -->
     <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
@@ -384,19 +384,19 @@
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
-    <string name="reset_config_alert">Oletko varma, että haluat palauttaa oletusasetukset?</string>
+    <string name="reset_config_alert">Oletko varma, että haluat palauttaa oletusasetukset\?</string>
     <string name="reset">Palauta</string>
     <string name="read_cert_error">Tiedoston \'cert.pem\' luku epäonnistui.</string>
     <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' epäonnistui.</string>
     <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset
-        käyttöön. Käynnistä nyt?
+        käyttöön. Käynnistä nyt\?
     </string>
     <string name="consent_request">Suostumuspyyntö</string>
     <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä
         puheluissa ja viesteissä SIP ja tel URI:en ohella. baresip ei talleta Androidin yhteystietoja
         eikä jaa niitä kenellekään. Jotta baresip saisi käyttöönsä Androidin yhteystiedot,
         Google vaatii, että annat siihen siihen suostumuksen hyväksymällä baresip-sovelluksen
-        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt?">yksityisyyskäytännöt</a>.
+        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">yksityisyyskäytännöt</a>.
     </string>
     <!-- Contact Activity -->
     <string name="contact">Yhteystieto</string>
@@ -412,9 +412,9 @@
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää
-    viestin ositteeseen \'%1$s\'?</string>
+    viestin ositteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
-    <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'?</string>
+    <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
     <string name="contacts_exceeded">Yhteystietojesi enimmäismäärä %1$d on ylittynyt.</string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
@@ -458,9 +458,9 @@
     <string name="hangup">Lopeta</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>
-    <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'?</string>
-    <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
-    <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
+    <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'\?</string>
+    <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'\?</string>
+    <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'\?</string>
     <string name="hold">Puhelu pitoon/pidosta</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="mic">Mikrofoni päälle/pois</string>
@@ -499,9 +499,9 @@
     </string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
     <string name="verify">Todennuspyyntö</string>
-    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;?</string>
+    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Siirtopyyntö</string>
-    <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'?</string>
+    <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'\?</string>
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
@@ -509,7 +509,7 @@
     kohdetta ei ole todennettu!
     </string>
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
-    todennettu! Haluatko poistaa todennuksen?</string>
+    todennettu! Haluatko poistaa todennuksen\?</string>
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
         versioon 9 saakka tiedosto löytyy Download-kansiosta.
@@ -519,7 +519,7 @@
     </string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
-        uudelleen. Käynnistä uudelleen nyt?
+        uudelleen. Käynnistä uudelleen nyt\?
     </string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
         annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
