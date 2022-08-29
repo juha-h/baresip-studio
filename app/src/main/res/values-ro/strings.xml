@@ -127,7 +127,7 @@
     <string name="call_already_active">Aveți deja un apel activ.</string>
     <string name="registering_failed">Înregistrarea %1$s a eșuat.</string>
     <string name="verify">Verificare</string>
-    <string name="verify_sas">Doriți să verificați SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
+    <string name="verify_sas">Doriți să verificați SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request_query">Acceptați să transferați apelul către \'%1$s\'\?</string>
     <string name="call_failed">Apelul a eșuat.</string>
     <string name="call_closed">Apel închis.</string>

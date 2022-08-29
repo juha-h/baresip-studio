@@ -208,7 +208,7 @@
     <string name="start_failed">Baresip no se ha podido iniciar. Esto puede deberse a un valor de configuración no válido. Compruebe la dirección de escucha, el archivo de certificado TLS y el archivo TLS CA. Luego reinicie baresip.</string>
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
     <string name="verify">Verificar la solicitud</string>
-    <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt; &lt;%2$s&gt;?</string>
+    <string name="verify_sas">¿Quieres verificar SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request_query">¿Acepta transferir la llamada a «%1$s»\?</string>
     <string name="call_failed">Llamada fallida</string>
     <string name="call_closed">La llamada está cerrada</string>

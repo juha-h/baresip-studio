@@ -136,7 +136,7 @@
 		IPv4 адрес 0.0.0.0 или IPv6 адрес [::] позволява на baresip да слуша всички налични адреси. 
 		Ако се остави празно (фабрично по подразбиране), baresip ще слуша на порт 5060 от всички налични адреси. 
 	</string>
-	<string name="invalid_listen_address">Невалиден адрес за слушане</string>
+    <string name="invalid_listen_address">Невалиден адрес за слушане</string>
     <string name="dns_servers">DNS сървъри</string>
     <string name="dns_servers_help">Списък разделен със запетая на адреси на DNS сървъри. Ако не е зададено, 
 		адресите на DNS сървъра се получават динамично от системата. Всеки DNS адрес е във форма \'ip:port\' 
@@ -245,7 +245,7 @@
 	</string>
     <string name="registering_failed">Регистрация на \`%1$s\` се провали.</string>
     <string name="verify">Потвърди</string>
-    <string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt; &lt;%2$s&gt;?</string>
+    <string name="verify_sas">Искате ли да потвърдите &lt;%1$s&gt;\?</string>
     <string name="transfer_request_query">Приемате ли да прехвърлите обаждане до \'%1$s\'?</string>
     <string name="call_failed">Обаждането не бе успешно</string>
     <string name="call_closed">Обаждането е затворено</string>
