@@ -156,7 +156,7 @@
     <string name="call_already_active">Du har allerede et aktivt anrop.</string>
     <string name="start_failed">Baresip kunne ikke starte. Dette kan ha oppstått på grunn av en ugyldig oppstartsverdi. Sjekk lytteadressen, TLS-sertifikatsfilen, og TLS CA-filen. Start så programmet på ny.</string>
     <string name="registering_failed">Registrering av %1$s mislyktes.</string>
-    <string name="verify_sas">Ønsker du å bekrefte SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
+    <string name="verify_sas">Ønsker du å bekrefte SAS &lt;%1$s&gt;\?</string>
     <string name="call_failed">Anrop mislyktes.</string>
     <string name="call_closed">Samtale lukket.</string>
     <string name="tls_certificate_file">TLS-sertifikatsfil</string>

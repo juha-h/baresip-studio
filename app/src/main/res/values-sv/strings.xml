@@ -218,7 +218,7 @@
     <string name="opus_bit_rate_help">Genomsnittlig maximal bitrate för Opus-ljudström. Giltiga värden är 6000-510000. Förvalt värde är 28000.</string>
     <string name="restart_request">Omstartsbegäran</string>
     <string name="verify">Verifikationsbegäran</string>
-    <string name="verify_sas">Vill du verifiera SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
+    <string name="verify_sas">Vill du verifiera SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Kopplingsbegäran</string>
     <string name="default_call_volume_help">Kryssa i för att använda en förvald ljudvolym, 1–10, vid samtal.</string>
     <string name="accept">Acceptera</string>

@@ -374,7 +374,7 @@
     <string name="allow_video_recv"> %1$s からのテレビ通話を許可しますか?</string>
     <string name="listen">受信</string>
     <string name="registering_failed"> %1$s への登録失敗</string>
-    <string name="verify_sas">SASを検証しますか?</string>
+    <string name="verify_sas">SAS &lt;%1$s&gt; を検証しますか\?</string>
     <string name="transfer_request_query"> %1$s への通話転送を許可しますか?</string>
     <string name="backed_up">アプリケーションデータがダウンロードフォルダ %1$s にバックアップされました</string>
     <string name="no_calls">マイクへの権限付与がなく電話をかけたり、応答したりすることはできません。</string>
