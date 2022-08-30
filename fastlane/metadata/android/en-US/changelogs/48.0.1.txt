@@ -1,0 +1,5 @@
+- Use lock icons for call security indication
+- When calling Android contact, use the latest peer URI if Android contact has it
+- Use ZRTPCPP lib for ZRTP media encryption (peers need to be re-verified)
+- Enable DNS caching
+- New Portuguese (Brazil) translations
