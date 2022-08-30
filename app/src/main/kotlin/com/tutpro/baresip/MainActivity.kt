@@ -1564,7 +1564,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun backup(password: String) {
         val files = arrayListOf("accounts", "call_history", "config", "contacts", "messages", "uuid",
-                "zrtp_cache.dat", "zrtp_zid", "cert.pem", "ca_cert", "ca_certs.crt")
+                "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png")) files.add(it.name)
         }
