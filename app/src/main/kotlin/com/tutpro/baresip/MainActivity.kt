@@ -38,6 +38,7 @@ import java.io.File
 import java.net.URLDecoder
 import kotlin.system.exitProcess
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -240,8 +241,7 @@ class MainActivity : AppCompatActivity() {
                         accountRequest!!.launch(i)
                         true
                     } else {
-                        if (aorSpinner.selectedItemPosition < BaresipService.uas.size)
-                            BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
+                        BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
                                 callUri.text.toString()
                         false
                     }
@@ -1366,6 +1366,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun quitRestart(reStart: Boolean) {
         Log.d(TAG, "quitRestart Restart = $reStart")
+        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         if (BaresipService.isServiceRunning) {
             restart = reStart
             baresipService.action = "Stop"
