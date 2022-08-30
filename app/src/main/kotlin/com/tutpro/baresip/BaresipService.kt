@@ -522,8 +522,10 @@ class BaresipService: Service() {
 
             "Stop" -> {
                 cleanService()
-                if (isServiceRunning)
+                if (isServiceRunning) {
                     baresipStop(false)
+                    quitTimer.start()
+                }
             }
 
         }
