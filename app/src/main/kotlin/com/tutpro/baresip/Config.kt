@@ -20,6 +20,10 @@ object Config {
 
         config = config.replace("module zrtp.so", "module gzrtp.so")
 
+        if (!config.contains("module gsm.so")) {
+            config = "${config}module gsm.so\n"
+        }
+
         if (config.contains("rtp_stats no"))
             replaceVariable("rtp_stats", "yes")
 

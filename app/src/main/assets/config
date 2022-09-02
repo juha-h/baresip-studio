@@ -27,6 +27,7 @@ module g722.so
 module g7221.so
 module g726.so
 module g729.so
+module gsm.so
 module g711.so
 module webrtc_aecm.so
 module opensles.so
