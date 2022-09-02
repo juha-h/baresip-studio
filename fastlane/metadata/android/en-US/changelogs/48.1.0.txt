@@ -1,0 +1,2 @@
+- Added GSM codec
+- Made window un-touchable and started 5 second timer at Quit or Restart
