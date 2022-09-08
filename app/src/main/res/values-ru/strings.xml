@@ -161,7 +161,7 @@
     <string name="backup_failed">Не удалось создать резервную копию данных приложения в файл \'%1$s\' папки загрузки. Проверьте Приложения → baresip → Разрешения → Хранилище.</string>
     <string name="peer_not_verified">Этот вызов БЕЗОПАСНЫЙ, но собеседник НЕ проверен!</string>
     <string name="transfer">Передача</string>
-    <string name="verify_sas">Вы хотите проверить SAS &lt;%1$s&gt; &lt;%2$s&gt;\?</string>
+    <string name="verify_sas">Вы хотите проверить SAS &lt;%1$s&gt;\?</string>
     <string name="start_failed">Baresip не запустился. Это может быть из-за неверного значения настроек. Проверьте адрес прослушивания, файл сертификата TLS и файл CA TLS. Затем перезапустите baresip.</string>
     <string name="listen">Слушать</string>
     <string name="call_info_not_available">Нет информации</string>
@@ -256,4 +256,6 @@
     <string name="sip_trace_help">Если флажок установлен и если установлен флажок Отладка, сообщения Logcat также включают трассировку запросов и ответов SIP. Автоматически снимается при запуске baresip.</string>
     <string name="battery_optimizations_help">Отключите оптимизацию работы батареи (рекомендуется), если вы хотите снизить вероятность того, что Android ограничит доступ baresip к сети или переведет baresip в режим ожидания.</string>
     <string name="audio_settings">Аудионастройки</string>
+    <string name="account_nickname_help">Псевдоним (если есть), используемый для идентификации этой учетной записи в baresip app.</string>
+    <string name="account_nickname">Псевдоним учетной записи</string>
 </resources>
