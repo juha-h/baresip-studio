@@ -256,4 +256,6 @@
     <string name="sip_trace_help">Если флажок установлен и если установлен флажок Отладка, сообщения Logcat также включают трассировку запросов и ответов SIP. Автоматически снимается при запуске baresip.</string>
     <string name="battery_optimizations_help">Отключите оптимизацию работы батареи (рекомендуется), если вы хотите снизить вероятность того, что Android ограничит доступ baresip к сети или переведет baresip в режим ожидания.</string>
     <string name="audio_settings">Аудионастройки</string>
+    <string name="account_nickname_help">Псевдоним (если есть), используемый для идентификации этой учетной записи в baresip app.</string>
+    <string name="account_nickname">Псевдоним учетной записи</string>
 </resources>
