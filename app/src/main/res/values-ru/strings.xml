@@ -258,4 +258,8 @@
     <string name="audio_settings">Аудионастройки</string>
     <string name="account_nickname_help">Псевдоним (если есть), используемый для идентификации этой учетной записи в baresip app.</string>
     <string name="account_nickname">Псевдоним учетной записи</string>
+    <string name="invalid_account_nickname">Неверный никнейм учетной записи \'%1$s\'</string>
+    <string name="non_unique_account_nickname">Никнейм \'%1$s\' уже существует</string>
+    <string name="country_code">Код страны</string>
+    <string name="nickname">Никнейм</string>
 </resources>
