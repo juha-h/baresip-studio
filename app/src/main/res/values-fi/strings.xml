@@ -288,11 +288,14 @@
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audion koodausmenetelmät</string>
     <string name="audio_codecs_help">Luettelo käytössä olevista audion
-        koodausmenetelmistä prioriteettijärjestyksessä</string>
+        koodausmenetelmistä prioriteettijärjestyksessä. Ota käyttöön koskettamalla,
+        järjestä vetämällä ja pudottamalla, poista käytöstä pyyhkäisemällä oikealle.</string>
     <string name="video_codecs">Videon koodausmenetelmät</string>
     <string name="video_codecs_help">Luettelo käytössä olevista videon
-        koodausmenetelmistä prioriteettijärjestyksessä</string>
-    <string name="codec_action">Koodausmenetelmä toiminto (järjestä tai lisää)</string>
+        koodausmenetelmistä prioriteettijärjestyksessä. Ota käyttöön koskettamalla,
+        järjestä vetämällä ja pudottamalla, poista käytöstä pyyhkäisemällä oikealle.</string>
+    <string name="codec_action">Koodausmenetelmä toiminto (ota käyttöön, järjestä, poista
+        käytöstä)</string>
     <!-- Config Activity -->
     <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
