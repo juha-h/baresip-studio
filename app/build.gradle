@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion = 32
@@ -23,6 +24,7 @@ android {
 	    lintOptions {
             checkDependencies true
         }
+        vectorDrawables.useSupportLibrary = true
     }
     splits {
         abi {
@@ -38,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -52,7 +55,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'com.google.android.material:material:1.6.1'

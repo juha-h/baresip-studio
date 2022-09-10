@@ -143,12 +143,6 @@
     <string name="register_help">Jos merkitty, rekisteröinti on
         aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
     </string>
-    <string name="audio_codecs">Audion koodausmenetelmät</string>
-    <string name="audio_codecs_help">Luettelo käytössä olevista audion
-        koodausmenetelmistä prioriteettijärjestyksessä</string>
-    <string name="video_codecs">Videon koodausmenetelmät</string>
-    <string name="video_codecs_help">Luettelo käytössä olevista videon
-        koodausmenetelmistä prioriteettijärjestyksessä</string>
     <string name="media_nat">Media NAT hallinta</string>
     <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
@@ -291,6 +285,14 @@
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'\?</string>
     <string name="delete_chats">Tyhjennä</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian\?</string>
+    <!-- Codecs Activity -->
+    <string name="audio_codecs">Audion koodausmenetelmät</string>
+    <string name="audio_codecs_help">Luettelo käytössä olevista audion
+        koodausmenetelmistä prioriteettijärjestyksessä</string>
+    <string name="video_codecs">Videon koodausmenetelmät</string>
+    <string name="video_codecs_help">Luettelo käytössä olevista videon
+        koodausmenetelmistä prioriteettijärjestyksessä</string>
+    <string name="codec_action">Koodausmenetelmä toiminto (järjestä tai lisää)</string>
     <!-- Config Activity -->
     <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>

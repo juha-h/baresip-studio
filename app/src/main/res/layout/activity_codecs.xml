@@ -17,11 +17,11 @@
         android:text="@string/audio_codecs" >
     </TextView>
 
-    <TableLayout
-        android:id="@+id/SpinnerTable"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/CodecList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="36dp" >
-    </TableLayout>
+        android:layout_marginTop="32dp"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>
