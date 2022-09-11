@@ -11,19 +11,9 @@ import java.util.*
 class CodecsAdapter(private val codecs: ArrayList<Codec>):
         RecyclerView.Adapter<CodecsAdapter.CodecViewHolder>() {
 
-    private var codecListener: OnItemClickListener? = null
-
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        codecListener = listener
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CodecViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.codec, parent, false)
-        return CodecViewHolder(v, codecListener!!)
+        return CodecViewHolder(v)
     }
 
     override fun getItemCount(): Int {
@@ -37,7 +27,14 @@ class CodecsAdapter(private val codecs: ArrayList<Codec>):
         codecs.add(toPosition, codec)
     }
 
-    fun removeItem(position: Int) {
+    fun enableItem(position: Int) {
+        val codec: Codec = codecs[position]
+        codec.enabled = true
+        codecs.removeAt(position)
+        codecs.add(0, codec)
+    }
+
+    fun disableItem(position: Int) {
         val codec: Codec = codecs[position]
         if (codec.enabled) {
             codec.enabled = false
@@ -46,33 +43,17 @@ class CodecsAdapter(private val codecs: ArrayList<Codec>):
         }
     }
 
-    fun enableItem(position: Int) {
-        val codec: Codec = codecs[position]
-        codec.enabled = true
-        codecs.removeAt(position)
-        codecs.add(0, codec)
-    }
-
     override fun onBindViewHolder(holder: CodecViewHolder, position: Int) {
         val codec = codecs[position]
         holder.codecName.text = codec.name
         holder.codecName.alpha = if (codec.enabled) 1.0f else 0.5f
-        holder.actionImage.setImageResource(
-                if (codec.enabled) R.drawable.reorder else R.drawable.add
+        holder.reorderImage.setImageResource(
+                if (codec.enabled) R.drawable.reorder else android.R.color.transparent
         )
     }
 
-    class CodecViewHolder(itemView: View, listener: OnItemClickListener):
-            RecyclerView.ViewHolder(itemView) {
+    class CodecViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         var codecName: TextView = itemView.findViewById(R.id.codecName)
-        var actionImage: ImageView = itemView.findViewById(R.id.actionImage)
-        init {
-            itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(position)
-                }
-            }
-        }
+        var reorderImage: ImageView = itemView.findViewById(R.id.reorderImage)
     }
 }

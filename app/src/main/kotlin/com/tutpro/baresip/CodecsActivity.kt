@@ -68,16 +68,6 @@ class CodecsActivity : AppCompatActivity() {
         codecList.layoutManager = LinearLayoutManager(this)
         codecList.adapter = codecsAdapter
 
-        codecsAdapter.setOnItemClickListener(object : CodecsAdapter.OnItemClickListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onItemClick(position: Int) {
-                if (!newCodecs[position].enabled) {
-                    codecsAdapter.enableItem(position)
-                    codecsAdapter.notifyDataSetChanged()
-                }
-            }
-        })
-
         itemTouchHelper.attachToRecyclerView(binding.CodecList)
 
         codecsTitle.setOnClickListener {
@@ -93,9 +83,8 @@ class CodecsActivity : AppCompatActivity() {
 
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
-                UP or DOWN or START or END,
-                RIGHT
-        ) {
+                UP or DOWN or START or END, RIGHT) {
+
             override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
@@ -108,9 +97,16 @@ class CodecsActivity : AppCompatActivity() {
                 return true
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                codecsAdapter.removeItem(viewHolder.adapterPosition)
-                codecsAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                val position = viewHolder.adapterPosition
+                if (newCodecs[position].enabled) {
+                    codecsAdapter.disableItem(position)
+                    codecsAdapter.notifyItemRemoved(position)
+                } else {
+                    codecsAdapter.enableItem(position)
+                    codecsAdapter.notifyDataSetChanged()
+                }
             }
 
             @SuppressLint("NotifyDataSetChanged")

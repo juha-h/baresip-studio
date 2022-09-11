@@ -279,12 +279,12 @@
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'\?</string>
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audio Codecs</string>
-    <string name="audio_codecs_help">List of enabled audio codecs in priority order. Click to enable,
-        drag to reorder, swipe right to disable.</string>
+    <string name="audio_codecs_help">List of audio codecs in priority order. Drag to reorder,
+        swipe right to enable or disable.</string>
     <string name="video_codecs">Video Codecs</string>
-    <string name="video_codecs_help">List of enabled video codecs in priority order. Click to enable,
-        drag to reorder, swipe right to disable.</string>
-    <string name="codec_action">Codec action (enable, reorder, disable)</string>
+    <string name="video_codecs_help">List of video codecs in priority order. Drag to reorder,
+        swipe right to enable or disable.</string>
+    <string name="codec_action">Reorder</string>
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
