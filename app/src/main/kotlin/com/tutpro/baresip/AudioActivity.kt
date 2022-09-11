@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.tutpro.baresip.databinding.ActivityAudioBinding
@@ -26,6 +27,12 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusPacketLoss = ""
     private var oldAec = false
     private val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -115,6 +122,8 @@ class AudioActivity : AppCompatActivity() {
         aec.isChecked = oldAec
 
         bindTitles()
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
     }
 
@@ -220,7 +229,7 @@ class AudioActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -230,10 +239,9 @@ class AudioActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("audio")
         finish()
-        super.onBackPressed()
     }
 
     private fun bindTitles() {

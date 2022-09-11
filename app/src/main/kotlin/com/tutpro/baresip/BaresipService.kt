@@ -325,7 +325,11 @@ class BaresipService: Service() {
                     "force" -> {
                         cleanService()
                         isServiceRunning = false
-                        stopForeground(true)
+                        if (VERSION.SDK_INT < 33)
+                            @Suppress("DEPRECATION")
+                            stopForeground(true)
+                        else
+                            stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
                         exitProcess(0)
                     }
@@ -1093,7 +1097,11 @@ class BaresipService: Service() {
             quitTimer.cancel()
         isServiceRunning = false
         postServiceEvent(ServiceEvent("stopped", arrayListOf(error), System.nanoTime()))
-        stopForeground(true)
+        if (VERSION.SDK_INT < 33)
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        else
+            stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
@@ -1131,13 +1139,18 @@ class BaresipService: Service() {
 
     private fun updateStatusNotification() {
         val contentView = RemoteViews(packageName, R.layout.status_notification)
-        for (i: Int in 0..5) {
-            val resID = resources.getIdentifier("status$i", "id", packageName)
+        for (i: Int in 0..3) {
+            val resId = when (i) {
+                0-> R.id.status0
+                1-> R.id.status1
+                2-> R.id.status2
+                else -> R.id.status3
+            }
             if (i < uas.size) {
-                contentView.setImageViewResource(resID, uas[i].status)
-                contentView.setViewVisibility(resID, View.VISIBLE)
+                contentView.setImageViewResource(resId, uas[i].status)
+                contentView.setViewVisibility(resId, View.VISIBLE)
             } else {
-                contentView.setViewVisibility(resID, View.INVISIBLE)
+                contentView.setViewVisibility(resId, View.INVISIBLE)
             }
         }
         if (uas.size > 4)
@@ -1172,7 +1185,7 @@ class BaresipService: Service() {
     private fun isBluetoothHeadsetConnected(): Boolean {
         return if (VERSION.SDK_INT < 31)
             btAdapter != null && btAdapter!!.isEnabled &&
-                btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothHeadset.STATE_CONNECTED
+                btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothAdapter.STATE_CONNECTED
         else
             // getProfileConnectionState requires asking fot BLUETOOTH_CONNECT permission
             true

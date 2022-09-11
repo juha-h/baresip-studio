@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -64,6 +65,11 @@ class ConfigActivity : AppCompatActivity() {
     private var restart = false
     private var menu: Menu? = null
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -379,6 +385,8 @@ class ConfigActivity : AppCompatActivity() {
 
         bindTitles()
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onStart() {
@@ -567,11 +575,7 @@ class ConfigActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-
-                BaresipService.activities.remove("config")
-                setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
-                finish()
-
+                goBack()
             }
         }
 
@@ -592,12 +596,11 @@ class ConfigActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
 
         BaresipService.activities.remove("config")
         setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
         finish()
-        super.onBackPressed()
 
     }
 

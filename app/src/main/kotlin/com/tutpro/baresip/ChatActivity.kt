@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.databinding.ActivityChatBinding
@@ -33,6 +34,12 @@ class ChatActivity : AppCompatActivity() {
 
     private var focus = false
     private var lastCall: Long = 0
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -130,6 +137,8 @@ class ChatActivity : AppCompatActivity() {
 
         ua.account.unreadMessages = false
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -184,7 +193,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -194,7 +203,7 @@ class ChatActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
 
         var save = false
         for (m in chatMessages) {
@@ -210,7 +219,6 @@ class ChatActivity : AppCompatActivity() {
         BaresipService.activities.remove("chat,$aor,$peerUri,false")
         BaresipService.activities.remove("chat,$aor,$peerUri,true")
         returnResult(Activity.RESULT_OK)
-        super.onBackPressed()
 
     }
 

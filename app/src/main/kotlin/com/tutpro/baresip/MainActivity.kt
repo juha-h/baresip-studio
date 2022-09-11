@@ -20,6 +20,7 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -100,12 +101,20 @@ class MainActivity : AppCompatActivity() {
     private var resumeAction = ""
     private var firstRun = false
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            moveTaskToBack(true)
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -351,15 +360,14 @@ class MainActivity : AppCompatActivity() {
 
         answerButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            val callp = ua.currentCall()!!.callp
-            Log.d(TAG, "AoR $aor answering call $callp from ${callUri.text}")
+            val call = ua.currentCall() ?: return@setOnClickListener
+            Log.d(TAG, "AoR ${ua.account.aor} answering call from ${callUri.text}")
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
             val intent = Intent(this@MainActivity, BaresipService::class.java)
             intent.action = "Call Answer"
             intent.putExtra("uap", ua.uap)
-            intent.putExtra("callp", callp)
+            intent.putExtra("callp", call.callp)
             intent.putExtra("video", Api.VIDMODE_OFF)
             startService(intent)
         }
@@ -1182,10 +1190,6 @@ class MainActivity : AppCompatActivity() {
         this.finishAffinity()
         this.startActivity(intent)
         exitProcess(0)
-    }
-
-    override fun onBackPressed() {
-        moveTaskToBack(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

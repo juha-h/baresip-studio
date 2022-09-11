@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
@@ -22,6 +23,12 @@ class CodecsActivity : AppCompatActivity() {
     private var aor = ""
     private var newCodecs = ArrayList<Codec>()
     private var media = ""
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -78,6 +85,8 @@ class CodecsActivity : AppCompatActivity() {
                 Utils.alertView(this, getString(R.string.video_codecs),
                         getString(R.string.video_codecs_help))
         }
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
     }
 
@@ -177,7 +186,7 @@ class CodecsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -187,10 +196,9 @@ class CodecsActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("codecs,$aor,$media")
         finish()
-        super.onBackPressed()
     }
 
     override fun onPause() {

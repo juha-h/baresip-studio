@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,6 +19,12 @@ class AccountsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAccountsBinding
     private lateinit var alAdapter: AccountListAdapter
     internal lateinit var aor: String
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -84,6 +91,8 @@ class AccountsActivity : AppCompatActivity() {
             accountRequest.launch(i)
         }
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     private fun askPassword(ua: UserAgent) {
@@ -129,7 +138,7 @@ class AccountsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
         }
@@ -143,7 +152,7 @@ class AccountsActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("accounts,$aor")
         setResult(Activity.RESULT_CANCELED, Intent())
         finish()

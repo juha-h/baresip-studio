@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.databinding.ActivityContactsBinding
@@ -16,6 +17,12 @@ class ContactsActivity : AppCompatActivity() {
     private lateinit var clAdapter: ContactListAdapter
     private lateinit var aor: String
     private var lastClick: Long = 0
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -61,6 +68,8 @@ class ContactsActivity : AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onResume() {
@@ -71,18 +80,15 @@ class ContactsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            android.R.id.home -> {
-                BaresipService.activities.remove("contacts,$aor")
-                setResult(Activity.RESULT_OK, Intent())
-                finish()
-            }
+            android.R.id.home ->
+                goBack()
         }
 
         return true
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
 
         BaresipService.activities.remove("contacts,$aor")
         setResult(Activity.RESULT_OK, Intent())

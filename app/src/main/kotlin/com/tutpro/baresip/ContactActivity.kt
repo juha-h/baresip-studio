@@ -18,6 +18,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -45,6 +46,12 @@ class ContactActivity : AppCompatActivity() {
     private var index = 0
     private var color = 0
     private var id: Long = 0
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -176,6 +183,8 @@ class ContactActivity : AppCompatActivity() {
 
         Utils.addActivity("contact,$newContact,$uOrI")
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onCreateOptionsMenu(optionsMenu: Menu): Boolean {
@@ -283,10 +292,7 @@ class ContactActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-
-                BaresipService.activities.remove("contact,$newContact,$uOrI")
-                setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
-                finish()
+                goBack()
             }
 
         }
@@ -295,13 +301,10 @@ class ContactActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
-
+    private fun goBack() {
         BaresipService.activities.remove("contact,$newContact,$uOrI")
         setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
         finish()
-        super.onBackPressed()
-
     }
 
     private fun showTextAvatar(name: String, color: Int) {
