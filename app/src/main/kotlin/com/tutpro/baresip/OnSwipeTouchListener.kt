@@ -22,7 +22,13 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View?, event: MotionEvent): Boolean {
-        return gestureDetector.onTouchEvent(event)
+        return try {
+            gestureDetector.onTouchEvent(event)
+        } catch (e: Exception) {
+            Log.e(TAG, "onTouch exception $e")
+            e.printStackTrace()
+            false
+        }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
