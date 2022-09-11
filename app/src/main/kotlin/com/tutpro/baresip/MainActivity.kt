@@ -38,7 +38,6 @@ import java.io.File
 import java.net.URLDecoder
 import kotlin.system.exitProcess
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

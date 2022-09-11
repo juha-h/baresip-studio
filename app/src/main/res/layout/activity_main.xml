@@ -240,6 +240,7 @@
                             android:hint="@string/dtmf"
                             android:importantForAutofill="no"
                             android:inputType="phone"
+                            android:digits="0123456789#*"
                             android:textSize="20sp" >
                         </EditText>
 

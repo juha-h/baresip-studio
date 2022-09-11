@@ -144,10 +144,6 @@
     <string name="register_help">If checked, registration is enabled and REGISTER requests are sent at
         12 minute intervals.
     </string>
-    <string name="audio_codecs">Audio Codecs</string>
-    <string name="audio_codecs_help">List of supported audio codecs in priority order</string>
-    <string name="video_codecs">Video Codecs</string>
-    <string name="video_codecs_help">List of supported video codecs in priority order</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
@@ -281,6 +277,14 @@
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'\?</string>
     <string name="delete_chats">Delete</string>
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'\?</string>
+    <!-- Codecs Activity -->
+    <string name="audio_codecs">Audio Codecs</string>
+    <string name="audio_codecs_help">List of audio codecs in priority order. Drag to reorder,
+        swipe right to enable or disable.</string>
+    <string name="video_codecs">Video Codecs</string>
+    <string name="video_codecs_help">List of video codecs in priority order. Drag to reorder,
+        swipe right to enable or disable.</string>
+    <string name="codec_action">Reorder</string>
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
