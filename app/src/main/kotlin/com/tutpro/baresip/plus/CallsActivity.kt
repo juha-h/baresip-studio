@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -21,6 +22,12 @@ class CallsActivity : AppCompatActivity() {
 
     private var aor = ""
     private var lastClick: Long = 0
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -143,6 +150,9 @@ class CallsActivity : AppCompatActivity() {
 
         ua.account.missedCalls = false
         invalidateOptionsMenu()
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -180,7 +190,7 @@ class CallsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
         }
@@ -188,7 +198,7 @@ class CallsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("calls,$aor")
         returnResult()
     }

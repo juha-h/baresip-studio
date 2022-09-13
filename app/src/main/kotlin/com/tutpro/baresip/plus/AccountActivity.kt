@@ -9,6 +9,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tutpro.baresip.plus.databinding.ActivityAccountBinding
 import kotlinx.coroutines.CoroutineScope
@@ -61,6 +62,12 @@ class AccountActivity : AppCompatActivity() {
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -107,6 +114,8 @@ class AccountActivity : AppCompatActivity() {
         initLayoutFromAccount(acc)
 
         bindTitles()
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
     }
 
@@ -651,7 +660,7 @@ class AccountActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -661,7 +670,7 @@ class AccountActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("account,$aor")
         returnResult(Activity.RESULT_CANCELED)
     }

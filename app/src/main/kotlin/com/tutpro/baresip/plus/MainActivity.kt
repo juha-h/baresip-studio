@@ -22,6 +22,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -113,12 +114,20 @@ class MainActivity : AppCompatActivity() {
     private var resumeAction = ""
     private var firstRun = false
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            moveTaskToBack(true)
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -393,9 +402,8 @@ class MainActivity : AppCompatActivity() {
 
         answerButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            val call = ua.currentCall()!!
-            Log.d(TAG, "AoR $aor answering call ${call.callp} from ${callUri.text}")
+            val call = ua.currentCall() ?: return@setOnClickListener
+            Log.d(TAG, "AoR ${ua.account.aor} answering call from ${callUri.text}")
             answerButton.isEnabled = false
             answerVideoButton.isEnabled = false
             rejectButton.isEnabled = false
@@ -1568,10 +1576,6 @@ class MainActivity : AppCompatActivity() {
         this.finishAffinity()
         this.startActivity(intent)
         exitProcess(0)
-    }
-
-    override fun onBackPressed() {
-        moveTaskToBack(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

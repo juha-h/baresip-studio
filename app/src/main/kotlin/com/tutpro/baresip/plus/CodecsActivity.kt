@@ -1,23 +1,34 @@
 package com.tutpro.baresip.plus
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.*
-import android.widget.LinearLayout.LayoutParams
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tutpro.baresip.plus.databinding.ActivityCodecsBinding
+import java.util.*
 
 class CodecsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCodecsBinding
     private lateinit var acc: Account
     private lateinit var ua: UserAgent
+    private lateinit var codecsAdapter: CodecsAdapter
+
     private var aor = ""
-    private var newCodecs = ArrayList<String>()
+    private var newCodecs = ArrayList<Codec>()
     private var media = ""
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -35,66 +46,86 @@ class CodecsActivity : AppCompatActivity() {
         ua = UserAgent.ofAor(aor)!!
         acc = ua.account
 
-        val codecs: ArrayList<String>
+        val allCodecs: ArrayList<String>
         val accCodecs: ArrayList<String>
 
-        val title = binding.CodecsTitle
+        val codecsTitle = binding.CodecsTitle
+        val codecList = binding.CodecList
+
+        itemTouchHelper.attachToRecyclerView(codecList)
 
         if (media == "audio") {
-            title.text = getString(R.string.audio_codecs)
-            codecs = ArrayList(Api.audio_codecs().split(","))
+            codecsTitle.text = getString(R.string.audio_codecs)
+            allCodecs = ArrayList(Api.audio_codecs().split(","))
             accCodecs = acc.audioCodec
         } else {
-            title.text = getString(R.string.video_codecs)
-            codecs = ArrayList(Api.video_codecs().split(",").distinct())
+            codecsTitle.text = getString(R.string.video_codecs)
+            allCodecs = ArrayList(Api.video_codecs().split(",").distinct())
             accCodecs = acc.videoCodec
         }
 
-        newCodecs.addAll(accCodecs)
+        for (codec in accCodecs)
+            newCodecs.add(Codec(codec, true))
+        for (codec in allCodecs)
+            if (codec !in accCodecs)
+                newCodecs.add(Codec(codec, false))
 
-        while (newCodecs.size < codecs.size) newCodecs.add("-")
+        codecsAdapter = CodecsAdapter(newCodecs)
 
-        val layout = binding.SpinnerTable
-        val spinnerList = Array(codecs.size) { ArrayList<String>() }
-        for (i in codecs.indices) {
-            val spinner = Spinner(applicationContext)
-            spinner.id = i + 100
-            spinner.layoutParams = TableRow.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT)
-            spinner.layoutParams.height = 75
-            layout.addView(spinner)
-            if (accCodecs.size > i) {
-                val codec = accCodecs[i]
-                spinnerList[i].add(codec)
-                spinnerList[i].add("-")
-                for (c in codecs) if (c != codec) spinnerList[i].add(c)
-            } else {
-                spinnerList[i].addAll(codecs)
-                spinnerList[i].add(0, "-")
-            }
-            val codecSpinner = findViewById<Spinner>(spinner.id)
-            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
-                    spinnerList[i])
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            codecSpinner.adapter = adapter
-            codecSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    newCodecs[parent.id - 100] = parent.selectedItem.toString()
-                }
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                }
-            }
-        }
+        codecList.layoutManager = LinearLayoutManager(this)
+        codecList.adapter = codecsAdapter
 
-        binding.CodecsTitle.setOnClickListener {
+        itemTouchHelper.attachToRecyclerView(binding.CodecList)
+
+        codecsTitle.setOnClickListener {
             if (media == "audio")
                 Utils.alertView(this, getString(R.string.audio_codecs),
-                    getString(R.string.audio_codecs_help))
+                        getString(R.string.audio_codecs_help))
             else
                 Utils.alertView(this, getString(R.string.video_codecs),
-                    getString(R.string.video_codecs_help))
+                        getString(R.string.video_codecs_help))
         }
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
+    }
+
+    private val itemTouchHelper by lazy {
+        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
+                UP or DOWN or START or END, RIGHT) {
+
+            override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+            ): Boolean {
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                codecsAdapter.moveItem(fromPosition, toPosition)
+                codecsAdapter.notifyItemMoved(fromPosition, toPosition)
+                return true
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if (newCodecs[position].enabled) {
+                    codecsAdapter.disableItem(position)
+                    codecsAdapter.notifyItemRemoved(position)
+                } else {
+                    codecsAdapter.enableItem(position)
+                    codecsAdapter.notifyDataSetChanged()
+                }
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                recyclerView.post { codecsAdapter.notifyDataSetChanged() }
+            }
+        }
+
+        ItemTouchHelper(simpleItemTouchCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -116,28 +147,33 @@ class CodecsActivity : AppCompatActivity() {
             R.id.checkIcon -> {
 
                 var save = false
-                val mc = ArrayList(LinkedHashSet<String>(newCodecs.filter { it != "-" } as ArrayList<String>))
-                val mcList = Utils.implode(mc, ",")
+                val codecs = ArrayList<String>()
+
+                for (codec in newCodecs)
+                    if (codec.enabled)
+                        codecs.add(codec.name)
+
+                val codecList = Utils.implode(codecs, ",")
 
                 if (media == "audio")
-                    if (mc != acc.audioCodec) {
-                        if (Api.account_set_audio_codecs(acc.accp, mcList) == 0) {
-                            Log.d(TAG, "New audio codecs '$mcList'")
-                            acc.audioCodec = mc
+                    if (codecs != acc.audioCodec) {
+                        if (Api.account_set_audio_codecs(acc.accp, codecList) == 0) {
+                            Log.d(TAG, "New audio codecs '$codecList'")
+                            acc.audioCodec = codecs
                             save = true
                         } else {
-                            Log.e(TAG, "Setting of audio codecs '$mcList' failed")
+                            Log.e(TAG, "Setting of audio codecs '$codecList' failed")
                         }
                     }
 
                 if (media == "video")
-                    if (mc != acc.videoCodec) {
-                        if (Api.account_set_video_codecs(acc.accp, mcList) == 0) {
-                            Log.d(TAG, "New video codecs '$mcList'")
-                            acc.videoCodec = mc
+                    if (codecs != acc.videoCodec) {
+                        if (Api.account_set_video_codecs(acc.accp, codecList) == 0) {
+                            Log.d(TAG, "New video codecs '$codecs'")
+                            acc.videoCodec = codecs
                             save = true
                         } else {
-                            Log.e(TAG, "Setting of video codecs '$mcList' failed")
+                            Log.e(TAG, "Setting of video codecs '$codecs' failed")
                         }
                     }
 
@@ -150,7 +186,7 @@ class CodecsActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -160,10 +196,9 @@ class CodecsActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("codecs,$aor,$media")
         finish()
-        super.onBackPressed()
     }
 
     override fun onPause() {

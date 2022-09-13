@@ -3,6 +3,7 @@ package com.tutpro.baresip.plus
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import com.tutpro.baresip.plus.databinding.ActivityCallDetailsBinding
 
 class CallDetailsActivity : AppCompatActivity() {
@@ -11,6 +12,12 @@ class CallDetailsActivity : AppCompatActivity() {
     private lateinit var aor: String
     private lateinit var peer: String
     private var position = 0
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -33,6 +40,7 @@ class CallDetailsActivity : AppCompatActivity() {
         val listView = binding.calls
         listView.adapter = CallDetailsAdapter(this, CallsActivity.uaHistory[position].details)
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onPause() {
@@ -47,7 +55,7 @@ class CallDetailsActivity : AppCompatActivity() {
 
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
         }
@@ -55,10 +63,9 @@ class CallDetailsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("call_details,$aor,$peer,$position")
         finish()
-        super.onBackPressed()
     }
 
 }

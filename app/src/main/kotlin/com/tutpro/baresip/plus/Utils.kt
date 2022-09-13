@@ -861,7 +861,7 @@ object Utils {
         Log.d(TAG, "Dumping intent start")
         while (it.hasNext()) {
             val key = it.next()
-            Log.d(TAG, "[" + key + "=" + bundle.get(key) + "]")
+            Log.d(TAG, "[" + key + "=" + bundle.getBundle(key) + "]")
         }
         Log.d(TAG, "Dumping intent finish")
     }

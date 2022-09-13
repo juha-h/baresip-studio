@@ -140,6 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Register"
                 android:textSize="18sp"
                 android:text="@string/register" >
@@ -150,6 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="end"
+                android:layout_centerVertical="true"
                 android:checked="false" >
             </CheckBox>
         </RelativeLayout>
@@ -378,6 +380,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/Default"
                 android:textSize="18sp"
                 android:text="@string/default_account" >
@@ -387,6 +390,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_gravity="end"
                 android:checked="false" >
             </CheckBox>

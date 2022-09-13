@@ -7,11 +7,18 @@ import androidx.core.text.HtmlCompat
 import androidx.appcompat.app.AppCompatActivity
 import android.text.method.LinkMovementMethod
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import com.tutpro.baresip.plus.databinding.ActivityAboutBinding
 
 class AboutActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAboutBinding
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -26,26 +33,24 @@ class AboutActivity : AppCompatActivity() {
         binding.aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.aboutText.movementMethod = LinkMovementMethod.getInstance()
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            android.R.id.home -> {
-                BaresipService.activities.remove("about")
-                setResult(Activity.RESULT_CANCELED, Intent())
-                finish()
-            }
+            android.R.id.home ->
+                goBack()
         }
 
         return true
     }
 
-    override fun onBackPressed() {
-
+    private fun goBack() {
         BaresipService.activities.remove("about")
-        super.onBackPressed()
-
+        setResult(Activity.RESULT_CANCELED, Intent())
+        finish()
     }
 
 }

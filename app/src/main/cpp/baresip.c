@@ -496,8 +496,8 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
         goto out;
     }
 
-    // Turn off DNS client cache (should be OK with async workers)
-    // dnsc_cache_max(net_dnsc(baresip_network()), 0);
+    // Turn off DNS client cache (should be OK with async workers, but it not)
+    dnsc_cache_max(net_dnsc(baresip_network()), 0);
 
     if (strlen(addrs) > 0) {
         char* addr_list = (char*)malloc(strlen(addrs));

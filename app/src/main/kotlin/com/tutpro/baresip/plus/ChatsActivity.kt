@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -23,6 +24,12 @@ class ChatsActivity: AppCompatActivity() {
     internal lateinit var aor: String
     internal lateinit var account: Account
     private var scrollPosition = -1
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goBack()
+        }
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -152,6 +159,8 @@ class ChatsActivity: AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     override fun onPause() {
@@ -165,7 +174,7 @@ class ChatsActivity: AppCompatActivity() {
         uaMessages = uaMessages(aor)
         clAdapter = ChatListAdapter(this, account, uaMessages)
         listView.adapter = clAdapter
-        if (uaMessages.count() > 0) {
+        if (uaMessages.isNotEmpty()) {
             if (scrollPosition >= 0) {
                 listView.setSelection(scrollPosition)
                 scrollPosition = -1
@@ -206,7 +215,7 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                onBackPressed()
+                goBack()
                 return true
             }
 
@@ -215,7 +224,7 @@ class ChatsActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun goBack() {
         BaresipService.activities.remove("chats,$aor")
         returnResult()
     }

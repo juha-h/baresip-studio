@@ -21,8 +21,14 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(view: View?, event: MotionEvent?): Boolean {
-        return gestureDetector.onTouchEvent(event)
+    override fun onTouch(view: View?, event: MotionEvent): Boolean {
+        return try {
+            gestureDetector.onTouchEvent(event)
+        } catch (e: Exception) {
+            Log.e(TAG, "onTouch exception $e")
+            e.printStackTrace()
+            false
+        }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
@@ -31,34 +37,32 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
             return true
         }
 
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velX: Float, velY: Float): Boolean {
+        override fun onFling(e1: MotionEvent, e2: MotionEvent, velX: Float, velY: Float): Boolean {
             var result = false
-            if (e1 != null && e2 != null) {
-                try {
-                    val diffY = e2.y - e1.y
-                    val diffX = e2.x - e1.x
-                    if (abs(diffX) > abs(diffY)) {
-                        if (abs(diffX) > SWIPE_THRESHOLD && abs(velX) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffX > 0) {
-                                onSwipeRight()
-                            } else {
-                                onSwipeLeft()
-                            }
-                            result = true
-                        }
-                    } else if (abs(diffY) > SWIPE_THRESHOLD && abs(velY) > SWIPE_VELOCITY_THRESHOLD) {
-                        result = if (diffY > 0) {
-                            onSwipeBottom()
-                            false
+            try {
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+                if (abs(diffX) > abs(diffY)) {
+                    if (abs(diffX) > SWIPE_THRESHOLD && abs(velX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            onSwipeRight()
                         } else {
-                            onSwipeTop()
-                            true
+                            onSwipeLeft()
                         }
+                        result = true
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "onFling exception $e")
-                    e.printStackTrace()
+                } else if (abs(diffY) > SWIPE_THRESHOLD && abs(velY) > SWIPE_VELOCITY_THRESHOLD) {
+                    result = if (diffY > 0) {
+                        onSwipeBottom()
+                        false
+                    } else {
+                        onSwipeTop()
+                        true
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "onFling exception $e")
+                e.printStackTrace()
             }
             return result
         }
