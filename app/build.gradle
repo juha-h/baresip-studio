@@ -15,7 +15,7 @@ android {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
                 arguments "-DANDROID_STL=c++_shared"
-                version '3.18.1'
+                version '3.24.1'
             }
         }
         ndk {
