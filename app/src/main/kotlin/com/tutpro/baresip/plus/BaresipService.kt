@@ -333,7 +333,7 @@ class BaresipService: Service() {
                         else
                             stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
-                        exitProcess(0)
+                        // exitProcess(0)
                     }
                 }
             }
