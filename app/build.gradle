@@ -14,8 +14,8 @@ android {
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
-                arguments "-DANDROID_STL=c++_shared"
-                version '3.24.1'
+                arguments '-DANDROID_STL=c++_shared'
+                version '3.22.1'
             }
         }
         ndk {
