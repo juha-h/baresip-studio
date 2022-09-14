@@ -4,7 +4,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion = 33
-    ndkVersion = '23.1.7779620'
+    ndkVersion = '25.1.8937393'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
@@ -15,7 +15,7 @@ android {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
                 arguments '-DANDROID_STL=c++_shared'
-		        version '3.18.1'
+		        version '3.24.1'
             }
         }
         ndk {
