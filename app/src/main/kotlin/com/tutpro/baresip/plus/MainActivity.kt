@@ -651,8 +651,7 @@ class MainActivity : AppCompatActivity() {
             if (it.resultCode == Activity.RESULT_OK)
                 it.data?.data?.also { uri ->
                     downloadsOutputUri = uri
-                    if (downloadsOutputUri != null)
-                        askPassword(getString(R.string.encrypt_password))
+                    askPassword(getString(R.string.encrypt_password))
                 }
         }
 
@@ -660,8 +659,7 @@ class MainActivity : AppCompatActivity() {
             if (it.resultCode == Activity.RESULT_OK)
                 it.data?.data?.also { uri ->
                     downloadsInputUri = uri
-                    if (downloadsInputUri != null)
-                        askPassword(getString(R.string.decrypt_password))
+                    askPassword(getString(R.string.decrypt_password))
                 }
         }
 
