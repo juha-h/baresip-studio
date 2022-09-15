@@ -1186,7 +1186,7 @@ class MainActivity : AppCompatActivity() {
         val pm = applicationContext.packageManager
         val intent = pm.getLaunchIntentForPackage(this.packageName)
         this.startActivity(intent)
-        exitProcess(0)
+        // exitProcess(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
