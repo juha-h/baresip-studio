@@ -1573,9 +1573,8 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Trigger restart")
         val pm = applicationContext.packageManager
         val intent = pm.getLaunchIntentForPackage(this.packageName)
-        this.finishAffinity()
         this.startActivity(intent)
-        exitProcess(0)
+        // exitProcess(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

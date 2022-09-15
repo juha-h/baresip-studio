@@ -327,11 +327,6 @@ class BaresipService: Service() {
                     "force" -> {
                         cleanService()
                         isServiceRunning = false
-                        if (VERSION.SDK_INT < 33)
-                            @Suppress("DEPRECATION")
-                            stopForeground(true)
-                        else
-                            stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
                         // exitProcess(0)
                     }
@@ -534,14 +529,16 @@ class BaresipService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "At Baresip Service onDestroy")
+        Log.d(TAG, "onDestroy at Baresip Service")
         this.unregisterReceiver(bluetoothReceiver)
         this.unregisterReceiver(hotSpotReceiver)
-        if (am.isBluetoothScoOn) am.stopBluetoothSco()
+        if (am.isBluetoothScoOn)
+            am.stopBluetoothSco()
         cleanService()
-        if (isServiceRunning) {
+        if (isServiceRunning)
             sendBroadcast(Intent("com.tutpro.baresip.plus.Restart"))
-        }
+        else
+            exitProcess(0)
     }
 
     @Keep
@@ -1115,11 +1112,6 @@ class BaresipService: Service() {
             quitTimer.cancel()
         isServiceRunning = false
         postServiceEvent(ServiceEvent("stopped", arrayListOf(error), System.nanoTime()))
-        if (VERSION.SDK_INT < 33)
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        else
-            stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
