@@ -176,7 +176,7 @@
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="audio_codecs_help">Lista dos codecs de áudio compatíveis em ordem de prioridade</string>
+    <string name="audio_codecs_help">Lista dos codecs de áudio em ordem de prioridade. Arraste para reordenar, deslize para a direita para ativar ou desativar.</string>
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="register_help">Se selecionado, registro é habilitado e requisições de REGISTRO serão enviadas em intervalos de 12 minutos.</string>
     <string name="register">Registro</string>
@@ -222,7 +222,7 @@
     <string name="invalid_stun_username">Nome do usuário inválido \'%1$s\'</string>
     <string name="stun_username_help">Nome do usuário, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="stun_username">Nome do Usuário STUN/TURN</string>
-    <string name="video_codecs_help">Lista dos codecs de vídeo compatíveis em ordem de prioridade</string>
+    <string name="video_codecs_help">Lista dos codecs de vídeo em ordem de prioridade. Arraste para reordenar, deslize para a direita para ativar ou desativar.</string>
     <string name="video_codecs">Codecs de Vídeo</string>
     <string name="transfer_request_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="transfer_failed">A transferência falhou</string>
@@ -297,4 +297,5 @@
     <string name="invalid_account_nickname">Apelido inválido da conta \'%1$s\'</string>
     <string name="non_unique_account_nickname">O apelido \'%1$s\' já existe</string>
     <string name="nickname">Apelido</string>
+    <string name="codec_action">Reordenar</string>
 </resources>
