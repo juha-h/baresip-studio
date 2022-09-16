@@ -1,0 +1,4 @@
+- Fixed upstream bug that caused long Quit delay if Voicemail checking was
+  activated for an account
+- Simplified Quit/Restart process and avoided crash at exit
+- New Portuguese (Brazil) translations
