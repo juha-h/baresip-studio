@@ -660,7 +660,7 @@ class BaresipService: Service() {
                         return
                     }
                     "call progress" -> {
-                        if (ev[1] != "0")
+                        if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else
                             playRingBack()
@@ -798,11 +798,17 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
-                        when (ev[1]) {
-                            "0", "1" -> call!!.held = true  // inactive, recvonly
-                            "2", "3" -> call!!.held = false // sendonly, sendrecv
+                        call!!.held = when (ev[1].toInt()) {
+                            Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
+                            else /* Api.SDP_SENDONLY, Api.SDP_SENDRECV */ -> false
                         }
-                        if (!isMainVisible || call!!.status != "connected")
+                        if (call.state() == Api.CALL_STATE_EARLY) {
+                            if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
+                                stopMediaPlayer()
+                            else
+                                playRingBack()
+                        }
+                        if (!isMainVisible || call.status != "connected")
                             return
                     }
                     "call verified", "call secure" -> {

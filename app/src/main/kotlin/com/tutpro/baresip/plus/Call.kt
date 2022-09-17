@@ -107,6 +107,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return Api.call_stats(callp, stream)
     }
 
+    fun state(): Int {
+        return Api.call_state(callp)
+    }
+
     fun audioCodecs(): String {
         return Api.call_audio_codecs(callp)
     }

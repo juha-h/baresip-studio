@@ -14,6 +14,8 @@ object Api {
     // const val SDP_SENDONLY = 2
     const val SDP_SENDRECV = 3
 
+    const val CALL_STATE_EARLY = 4
+
     external fun account_set_display_name(acc: Long, dn: String): Int
     external fun account_display_name(acc: Long): String
     external fun account_aor(acc: Long): String
@@ -77,6 +79,7 @@ object Api {
     external fun call_video_codecs(callp: Long): String
     external fun call_duration(callp: Long): Int
     external fun call_stats(callp: Long, stream: String): String
+    external fun call_state(callp: Long): Int
     external fun call_has_video(callp: Long): Boolean
     external fun call_set_video_source(callp: Long, front: Boolean): Int
     external fun call_set_video_direction(callp: Long, dir: Int)

@@ -1339,6 +1339,12 @@ Java_com_tutpro_baresip_plus_Api_call_1stats(JNIEnv *env, jobject thiz, jlong ca
     return (*env)->NewStringUTF(env, stats_buf);
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_call_1state(JNIEnv *env, jobject thiz, jlong call)
+{
+    return call_state((struct call *)call);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_plus_Api_call_1has_1video(JNIEnv *env, jobject thiz, jlong call)
 {
