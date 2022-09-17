@@ -71,7 +71,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     fun state(): Int {
-        return Api.call_state(callp);
+        return Api.call_state(callp)
     }
 
     fun audioCodecs(): String {
