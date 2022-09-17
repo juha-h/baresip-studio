@@ -1254,6 +1254,12 @@ Java_com_tutpro_baresip_Api_call_1has_1video(JNIEnv *env, jobject thiz, jlong ca
     return call_has_video((struct call *)call) ? true : false;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_call_1state(JNIEnv *env, jobject thiz, jlong call)
+{
+    return call_state((struct call *)call);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_com_tutpro_baresip_Api_call_1replaces(JNIEnv *env, jobject thiz, jlong call)
 {

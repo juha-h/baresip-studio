@@ -9,6 +9,13 @@ object Api {
     const val DTMFMODE_RTP_EVENT = 0
     const val DTMFMODE_SIP_INFO = 1
 
+    const val SDP_INACTIVE = 0
+    const val SDP_RECVONLY = 1
+    // const val SDP_SENDONLY = 2
+    // const val SDP_SENDRECV = 3
+
+    const val CALL_STATE_EARLY = 4
+
     external fun account_set_display_name(acc: Long, dn: String): Int
     external fun account_display_name(acc: Long): String
     external fun account_aor(acc: Long): String
@@ -69,7 +76,7 @@ object Api {
     external fun call_audio_codecs(callp: Long): String
     external fun call_duration(callp: Long): Int
     external fun call_stats(callp: Long, stream: String): String
-    external fun call_has_video(callp: Long): Boolean
+    external fun call_state(callp: Long): Int
     external fun call_replaces(callp: Long): Boolean
     external fun call_replace_transfer(xfer_callp: Long, callp: Long): Boolean
     external fun call_diverter_uri(callp: Long): String
