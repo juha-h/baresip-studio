@@ -1,5 +1,7 @@
 baresip Privacy Policy
 
+Last updated: Sept 21, 2022
+
 baresip does not collect any personal, app usage, or any other information nor share any information with anyone. Information you submit in baresip app is stored privately and securely on your Android device and is deleted when you uninstall the app.
 
 You can be optionally choose in Settings that baresip uses Android contacts as references to SIP and tel URIs.  If chosen, baresip does not store Android contacts nor share them with anyone.
