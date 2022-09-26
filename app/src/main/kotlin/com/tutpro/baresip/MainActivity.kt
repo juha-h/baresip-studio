@@ -1679,7 +1679,7 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         } else {
-            Log.w(TAG, "ua_connect ${ua.uap}/$uri failed")
+            Log.w(TAG, "callAlloc for ${ua.uap} to $uri failed")
             false
         }
     }
@@ -1700,7 +1700,7 @@ class MainActivity : AppCompatActivity() {
                 call.notifySipfrag(500, "Call Error")
             }
         } else {
-            Log.w(TAG, "ua_call_alloc ${ua.uap}/${call.callp} failed")
+            Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
             call.notifySipfrag(500, "Call Error")
         }
     }
