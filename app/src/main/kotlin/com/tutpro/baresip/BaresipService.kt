@@ -591,8 +591,8 @@ class BaresipService: Service() {
         Log.d(TAG, "got uaEvent $event/$aor/$callp")
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != 0L && ev[0] != "call incoming" && ev[0] != "call rejected" &&
-                ev[0] != "call closed") {
+        if (call == null && callp != 0L &&
+                !setOf("call incoming", "call rejected", "call closed").contains(ev[0])) {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -954,8 +954,7 @@ class BaresipService: Service() {
                             if (reason[0].isDigit())
                                 toast("${getString(R.string.call_failed)}: $reason")
                             else
-                                toast("${getString(R.string.call_closed)}: " +
-                                        "$reason ${Api.call_peer_uri(callp)}")
+                                toast("${getString(R.string.call_closed)}: ${Api.call_peer_uri(callp)}: $reason")
                         }
                     }
                 }
