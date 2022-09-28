@@ -598,7 +598,8 @@ class BaresipService: Service() {
         }
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != 0L && ev[0] != "call incoming" && ev[0] != "call rejected") {
+        if (call == null && callp != 0L &&
+                !setOf("call incoming", "call rejected", "call closed").contains(ev[0])) {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -873,84 +874,86 @@ class BaresipService: Service() {
                             return
                     }
                     "call closed" -> {
-                        nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp is closed")
-                        stopRinging()
-                        stopMediaPlayer()
-                        val newCall = call!!.newCall
-                        if (newCall != null) {
-                            newCall.onHoldCall = null
-                            call.newCall = null
-                        }
-                        val onHoldCall = call.onHoldCall
-                        if (onHoldCall != null) {
-                            onHoldCall.newCall = null
-                            onHoldCall.referTo = ""
-                            call.onHoldCall = null
-                        }
-                        call.remove()
-                        if (Call.calls().size == 0) {
-                            resetCallVolume()
-                            am.isSpeakerphoneOn = false
-                            am.stopBluetoothSco()
-                            abandonAudioFocus()
-                            am.mode = AudioManager.MODE_NORMAL
-                            proximitySensing(false)
-                        }
-                        val missed = call.startTime == null && call.dir == "in" && !call.rejected
-                        if (ua.account.callHistory) {
-                            val history = NewCallHistory(aor, call.peerUri, call.dir)
-                            history.startTime = call.startTime
-                            history.stopTime = GregorianCalendar()
-                            NewCallHistory.add(history)
-                            NewCallHistory.save()
-                            ua.account.missedCalls = ua.account.missedCalls || missed
-                        }
-                        if (!Utils.isVisible()) {
-                            if (missed) {
-                                val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
-                                val intent = Intent(applicationContext, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                                intent.putExtra("action", "call missed")
-                                        .putExtra("uap", uap)
-                                val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                                val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                                nb.setSmallIcon(R.drawable.ic_stat_phone_missed)
-                                        .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
-                                        .setContentIntent(pi)
-                                        .setCategory(Notification.CATEGORY_CALL)
-                                        .setAutoCancel(true)
-                                var missedCalls = 0
-                                for (notification in nm.activeNotifications)
-                                    if (notification.id == CALL_MISSED_NOTIFICATION_ID)
-                                        missedCalls++
-                                if (missedCalls == 0) {
-                                    nb.setContentTitle(getString(R.string.missed_call_from))
-                                    nb.setContentText(caller)
-                                } else {
-                                    nb.setContentTitle(getString(R.string.missed_calls))
-                                    nb.setContentText(
-                                            String.format(getString(R.string.missed_calls_count),
-                                                    missedCalls + 1))
-                                }
-                                if (VERSION.SDK_INT < 26) {
-                                    @Suppress("DEPRECATION")
-                                    nb.setVibrate(LongArray(0))
-                                            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                            .priority = Notification.PRIORITY_HIGH
-                                }
-                                nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
+                        if (call != null) {
+                            nm.cancel(CALL_NOTIFICATION_ID)
+                            stopRinging()
+                            stopMediaPlayer()
+                            val newCall = call.newCall
+                            if (newCall != null) {
+                                newCall.onHoldCall = null
+                                call.newCall = null
                             }
-                            return
+                            val onHoldCall = call.onHoldCall
+                            if (onHoldCall != null) {
+                                onHoldCall.newCall = null
+                                onHoldCall.referTo = ""
+                                call.onHoldCall = null
+                            }
+                            call.remove()
+                            if (Call.calls().size == 0) {
+                                resetCallVolume()
+                                am.isSpeakerphoneOn = false
+                                am.stopBluetoothSco()
+                                abandonAudioFocus()
+                                am.mode = AudioManager.MODE_NORMAL
+                                proximitySensing(false)
+                            }
+                            val missed = call.startTime == null && call.dir == "in" && !call.rejected
+                            if (ua.account.callHistory) {
+                                val history = NewCallHistory(aor, call.peerUri, call.dir)
+                                history.startTime = call.startTime
+                                history.stopTime = GregorianCalendar()
+                                NewCallHistory.add(history)
+                                NewCallHistory.save()
+                                ua.account.missedCalls = ua.account.missedCalls || missed
+                            }
+                            if (!Utils.isVisible()) {
+                                if (missed) {
+                                    val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
+                                    val intent = Intent(applicationContext, MainActivity::class.java)
+                                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                                    intent.putExtra("action", "call missed")
+                                            .putExtra("uap", uap)
+                                    val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
+                                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                                    val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                                    nb.setSmallIcon(R.drawable.ic_stat_phone_missed)
+                                            .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                                            .setContentIntent(pi)
+                                            .setCategory(Notification.CATEGORY_CALL)
+                                            .setAutoCancel(true)
+                                    var missedCalls = 0
+                                    for (notification in nm.activeNotifications)
+                                        if (notification.id == CALL_MISSED_NOTIFICATION_ID)
+                                            missedCalls++
+                                    if (missedCalls == 0) {
+                                        nb.setContentTitle(getString(R.string.missed_call_from))
+                                        nb.setContentText(caller)
+                                    } else {
+                                        nb.setContentTitle(getString(R.string.missed_calls))
+                                        nb.setContentText(
+                                                String.format(getString(R.string.missed_calls_count),
+                                                        missedCalls + 1))
+                                    }
+                                    if (VERSION.SDK_INT < 26) {
+                                        @Suppress("DEPRECATION")
+                                        nb.setVibrate(LongArray(0))
+                                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                                .priority = Notification.PRIORITY_HIGH
+                                    }
+                                    nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
+                                }
+                                return
+                            }
                         }
                         val reason = ev[1].trim()
                         if ((reason != "") && (ua.calls().isEmpty())) {
                             if (reason[0].isDigit())
                                 toast("${getString(R.string.call_failed)}: $reason")
                             else
-                                toast("${getString(R.string.call_closed)}: $reason")
+                                toast("${getString(R.string.call_closed)}: ${Api.call_peer_uri(callp)}: $reason")
                         }
                     }
                 }

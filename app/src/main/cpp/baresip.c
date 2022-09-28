@@ -1367,6 +1367,15 @@ Java_com_tutpro_baresip_plus_Api_call_1replace_1transfer(JNIEnv *env, jobject th
 }
 
 JNIEXPORT jstring JNICALL
+Java_com_tutpro_baresip_plus_Api_call_1peer_1uri(JNIEnv *env, jobject thiz, jlong call)
+{
+    const char *uri = call_peeruri((struct call *)call);
+    if (uri)
+        return (*env)->NewStringUTF(env, uri);
+    return (*env)->NewStringUTF(env, "");
+}
+
+JNIEXPORT jstring JNICALL
 Java_com_tutpro_baresip_plus_Api_call_1diverter_1uri(JNIEnv *env, jobject thiz, jlong call)
 {
     const char *uri = call_diverteruri((struct call *)call);
