@@ -92,7 +92,7 @@ class CodecsActivity : AppCompatActivity() {
     }
 
     private val itemTouchHelper by lazy {
-        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
+        val simpleItemTouchCallback = object : SimpleCallback(
                 UP or DOWN or START or END, RIGHT) {
 
             override fun onMove(
