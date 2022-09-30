@@ -65,7 +65,8 @@ class CodecsActivity : AppCompatActivity() {
         }
 
         for (codec in accCodecs)
-            newCodecs.add(Codec(codec, true))
+            if (codec in allCodecs)
+                newCodecs.add(Codec(codec, true))
         for (codec in allCodecs)
             if (codec !in accCodecs)
                 newCodecs.add(Codec(codec, false))
