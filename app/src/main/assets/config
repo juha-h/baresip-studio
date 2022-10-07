@@ -36,7 +36,7 @@ module turn.so
 module ice.so
 module srtp.so
 module dtls_srtp.so
-module zrtp.so
+module gzrtp.so
 module uuid.so
 module_app account.so
 module_app contact.so
@@ -50,5 +50,4 @@ opus_inbandfec yes
 opus_application voip
 opus_stereo no
 opus_sprop_stereo no
-zrtp_hash yes
 dtls_srtp_use_ec prime256v1
