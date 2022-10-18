@@ -72,10 +72,6 @@ add_library(lib_avfilter SHARED IMPORTED)
 set_target_properties(lib_avfilter PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavfilter.so)
 
-add_library(lib_postproc SHARED IMPORTED)
-set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.so)
-
 add_library(lib_swscale SHARED IMPORTED)
 set_target_properties(lib_swscale PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libswscale.so)
@@ -162,7 +158,6 @@ target_link_libraries(baresip
         lib_vpx
         lib_avutil
         lib_swresample
-        lib_postproc
         lib_spandsp
         lib_g722_1
         lib_g729
