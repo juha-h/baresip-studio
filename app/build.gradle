@@ -9,8 +9,8 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode = 238
-        versionName = '49.1.2'
+        versionCode = 239
+        versionName = '49.1.3'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
@@ -58,7 +58,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
