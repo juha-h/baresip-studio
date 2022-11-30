@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var holdButton: ImageButton
     private lateinit var transferButton: ImageButton
     private lateinit var voicemailButton: ImageButton
+    private lateinit var voicemailButtonSpace: Space
     private lateinit var contactsButton: ImageButton
     private lateinit var messagesButton: ImageButton
     private lateinit var callsButton: ImageButton
@@ -151,6 +152,7 @@ class MainActivity : AppCompatActivity() {
         infoButton = binding.info
         onHoldNotice = binding.onHoldNotice
         voicemailButton = binding.voicemailButton
+        voicemailButtonSpace = binding.voicemailButtonSpace
         contactsButton = binding.contactsButton
         messagesButton = binding.messagesButton
         callsButton = binding.callsButton
@@ -1927,8 +1929,10 @@ class MainActivity : AppCompatActivity() {
             else
                 voicemailButton.setImageResource(R.drawable.voicemail)
             voicemailButton.visibility = View.VISIBLE
+            voicemailButtonSpace.visibility = View.VISIBLE
         } else {
-            voicemailButton.visibility = View.INVISIBLE
+            voicemailButton.visibility = View.GONE
+            voicemailButtonSpace.visibility =View.GONE
         }
     }
 

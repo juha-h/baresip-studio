@@ -93,7 +93,8 @@
                         android:layout_weight = "1"
                         android:inputType="textEmailAddress"
                         android:textSize="20sp"
-                        android:hint="@string/callee" >
+                        android:hint="@string/callee"
+                        android:textColorHint="@color/colorSecondaryDark" >
                         <!-- <requestFocus /> -->
                     </AutoCompleteTextView>
 
@@ -238,6 +239,7 @@
                             android:singleLine="true"
                             android:scrollHorizontally="true"
                             android:hint="@string/dtmf"
+                            android:textColorHint="@color/colorSecondaryDark"
                             android:importantForAutofill="no"
                             android:inputType="phone"
                             android:digits="0123456789#*"
@@ -285,65 +287,97 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end"
+        android:gravity="center"
         android:layout_alignParentBottom="true" >
 
-    <ImageButton
-        android:id="@+id/voicemailButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/voicemail"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="5dp"
-        android:visibility="invisible"
-        android:contentDescription="@string/voicemail" >
-    </ImageButton>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
 
-    <ImageButton
-        android:id="@+id/contactsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/contacts"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="5dp"
-        android:contentDescription="@string/contacts" >
-    </ImageButton>
+        <ImageButton
+            android:id="@+id/voicemailButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/voicemail"
+            android:visibility="gone"
+            android:contentDescription="@string/voicemail" >
+        </ImageButton>
 
-    <ImageButton
-        android:id="@+id/messagesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/messages"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="5dp"
-        android:contentDescription="@string/messages" >
-    </ImageButton>
+        <Space
+            android:id="@+id/voicemailButtonSpace"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:visibility="gone" >
+        </Space>
 
-    <ImageButton
-        android:id="@+id/callsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="5dp"
-        android:padding="0dp"
-        android:background="@null"
-        android:src="@drawable/calls"
-        android:contentDescription="@string/call_history" >
-    </ImageButton>
+        <ImageButton
+            android:id="@+id/contactsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/contacts"
+            android:contentDescription="@string/contacts" >
+        </ImageButton>
 
-    <ImageButton
-        android:id="@+id/dialpadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="8dp"
-        android:background="@null"
-        android:src="@drawable/dialpad_off"
-        android:contentDescription="@string/dialpad" >
-    </ImageButton>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+
+        <ImageButton
+            android:id="@+id/messagesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/messages"
+            android:contentDescription="@string/messages" >
+        </ImageButton>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+
+        <ImageButton
+            android:id="@+id/callsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/calls"
+            android:contentDescription="@string/call_history" >
+        </ImageButton>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+
+        <ImageButton
+            android:id="@+id/dialpadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/dialpad_off"
+            android:contentDescription="@string/dialpad" >
+        </ImageButton>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
 
     </LinearLayout>
 
