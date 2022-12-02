@@ -86,6 +86,7 @@
                 android:scrollHorizontally="true"
                 android:inputType="numberDecimal"
                 android:hint="@string/_28000"
+                android:textColorHint="@color/colorSecondaryDark"
                 android:importantForAutofill="no" >
             </EditText>
         </RelativeLayout>
@@ -115,6 +116,7 @@
                 android:scrollHorizontally="true"
                 android:inputType="numberDecimal"
                 android:hint="@string/_0"
+                android:textColorHint="@color/colorSecondaryDark"
                 android:importantForAutofill="no" >
             </EditText>
         </RelativeLayout>

@@ -30,7 +30,8 @@
             android:inputType="textEmailAddress"
             android:autofillHints="username"
             android:scrollHorizontally="true"
-            android:hint="@string/user_domain" >
+            android:hint="@string/user_domain"
+            android:textColorHint="@color/colorSecondaryDark" >
         </EditText>
 
         <ImageButton

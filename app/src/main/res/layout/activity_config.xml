@@ -84,6 +84,7 @@
             android:layout_marginBottom="12dp"
             android:textSize="18sp"
             android:hint="@string/_0_0_0_0_5060"
+            android:textColorHint="@color/colorSecondaryDark"
             android:inputType="textUri"
             android:importantForAutofill="no" >
         </EditText>
