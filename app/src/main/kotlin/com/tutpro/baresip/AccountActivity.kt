@@ -43,6 +43,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var mediaNatSpinner: Spinner
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
+    private lateinit var rtcpCheck: CheckBox
     private var dtmfMode = Api.DTMFMODE_RTP_EVENT
     private lateinit var dtmfModeSpinner: Spinner
     private var answerMode = Api.ANSWERMODE_MANUAL
@@ -89,6 +90,7 @@ class AccountActivity : AppCompatActivity() {
         stunUser = binding.StunUser
         stunPass = binding.StunPass
         mediaEncSpinner = binding.mediaEncSpinner
+        rtcpCheck = binding.RtcpMux
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         vmUri = binding.voicemailUri
@@ -179,6 +181,8 @@ class AccountActivity : AppCompatActivity() {
                                 "stun-turn-server" ->
                                     if (text.isNotEmpty())
                                         acc.stunServer = text
+                                "rtcp-mux" ->
+                                    acc.rtcpMux = text == "yes"
                                 "dtmf-mode" ->
                                     if (text in arrayOf("rtp-event", "sip-info")) {
                                         acc.dtmfMode = if (text == "rtp-event")
@@ -288,6 +292,8 @@ class AccountActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        rtcpCheck.isChecked = acc.rtcpMux
 
         dtmfMode = acc.dtmfMode
         val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO)
@@ -577,6 +583,15 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
+                if (rtcpCheck.isChecked != acc.rtcpMux)
+                    if (Api.account_set_rtcp_mux(acc.accp, rtcpCheck.isChecked) == 0) {
+                        acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
+                        Log.d(TAG, "New rtcpMux is ${acc.rtcpMux}")
+                        save = true
+                    } else {
+                        Log.e(TAG, "Setting of account_rtc_mux failed")
+                    }
+
                 if (dtmfMode != acc.dtmfMode) {
                     if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
                         acc.dtmfMode = Api.account_dtmfmode(acc.accp)
@@ -748,6 +763,12 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.media_encryption),
                 getString(R.string.media_encryption_help)
+            )
+        }
+        binding.RtcpMuxTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.rtcp_mux),
+                getString(R.string.rtcp_mux_help)
             )
         }
         binding.DtmfModeTitle.setOnClickListener {

@@ -23,6 +23,7 @@ class Account(val accp: Long) {
     var videoCodec = ArrayList<String>()
     var regint = Api.account_regint(accp)
     var mediaEnc = Api.account_mediaenc(accp)
+    var rtcpMux = Api.account_rtcp_mux(accp)
     var dtmfMode = Api.account_dtmfmode(accp)
     var answerMode = Api.account_answermode(accp)
     var vmUri = Api.account_vm_uri(accp)
@@ -116,6 +117,9 @@ class Account(val accp: Long) {
         }
 
         if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
+
+        if (rtcpMux)
+             res += ";rtcp_mux=yes"
 
         res = if (vmUri == "")
             "$res;mwi=no"

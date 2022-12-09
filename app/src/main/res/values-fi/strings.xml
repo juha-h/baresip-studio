@@ -181,6 +181,10 @@
         se on käytettävissä), jos puhelun molempien osapuolten tukemaa mediaprotokollaa
         ei saada automaattisesti selvitettyä.
     </string>
+    <string name="rtcp_mux">RTCP-multipleksaus</string>
+    <string name="rtcp_mux_help">Jos merkitty, RTP- and RTCP-paketit multipleksataan samaan porttiin
+        (RFC 5761).
+    </string>
     <string name="dtmf_mode">DTMF-moodi</string>
     <string name="dtmf_mode_help">Valitsee tavan, miten DTMF-merkit 0–9, #, * ja A-D lähetetään.</string>
     <string name="dtmf_inband">RTP</string>
