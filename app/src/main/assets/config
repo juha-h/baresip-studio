@@ -20,7 +20,6 @@ video_size 800x600
 video_fps 15.0
 videoenc_format yuv420p
 rtp_tos 184
-rtcp_mux no
 jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
 rtp_stats yes
