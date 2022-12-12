@@ -9,8 +9,8 @@ android {
         applicationId = 'com.tutpro.baresip.plus'
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode = 116
-        versionName = '37.1.3'
+        versionCode = 117
+        versionName = '37.2.0'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
@@ -69,7 +69,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.activity:activity-ktx:1.6.1"
-    implementation "androidx.fragment:fragment-ktx:1.5.4"
+    implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation 'androidx.media:media:1.6.0'
 }
 
