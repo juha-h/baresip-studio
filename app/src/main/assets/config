@@ -16,7 +16,6 @@ auenc_format s16
 auplay_format s16
 audec_format s16
 rtp_tos 184
-rtcp_mux no
 jitter_buffer_type adaptive
 jitter_buffer_delay 5-10
 rtp_stats yes
