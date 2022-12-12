@@ -76,6 +76,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/user_domain_or_number"
+        android:textColorHint="@color/colorSecondaryDark"
         android:inputType="textEmailAddress"
         android:textSize="18sp"
         android:importantForAutofill="no"

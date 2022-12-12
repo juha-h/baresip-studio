@@ -38,6 +38,7 @@
             android:id="@+id/NickName"
             android:layout_height="wrap_content"
             android:hint="@string/nickname"
+            android:textColorHint="@color/colorSecondaryDark"
             android:inputType="textPersonName|textCapWords"
             android:textSize="18sp"
             android:autofillHints="name"
@@ -56,6 +57,7 @@
             android:id="@+id/DisplayName"
             android:layout_height="wrap_content"
             android:hint="@string/your_name"
+            android:textColorHint="@color/colorSecondaryDark"
             android:inputType="textPersonName|textCapWords"
             android:textSize="18sp"
             android:autofillHints="name"
@@ -74,6 +76,7 @@
             android:id="@+id/AuthUser"
             android:layout_height="wrap_content"
             android:hint="@string/user_id"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:autofillHints="username"
@@ -115,6 +118,7 @@
             android:id="@+id/Outbound1"
             android:layout_height="wrap_content"
             android:hint="@string/sip_uri_of_proxy_server"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:importantForAutofill="no"
@@ -126,6 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:hint="@string/sip_uri_of_another_proxy_server"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="textEmailAddress"
             android:importantForAutofill="no" >
@@ -232,6 +237,7 @@
                 android:scrollHorizontally="true"
                 android:importantForAutofill="no"
                 android:hint="@string/stun_server_uri"
+                android:textColorHint="@color/colorSecondaryDark"
                 android:inputType="textEmailAddress" >
             </EditText>
 
@@ -249,6 +255,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="fill_parent"
                 android:hint="@string/user_id"
+                android:textColorHint="@color/colorSecondaryDark"
                 android:textSize="18sp"
                 android:inputType="textEmailAddress"
                 android:autofillHints="username" >
@@ -275,6 +282,7 @@
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="textPassword"
                     android:hint="@string/password"
+                    android:textColorHint="@color/colorSecondaryDark"
                     android:maxLines="1">
                 </androidx.appcompat.widget.AppCompatEditText>
             </com.google.android.material.textfield.TextInputLayout>
@@ -326,6 +334,7 @@
             android:id="@+id/voicemailUri"
             android:layout_height="wrap_content"
             android:hint="@string/sip_uri"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="textUri"
             android:importantForAutofill="no"
@@ -345,6 +354,7 @@
             android:id="@+id/countryCode"
             android:layout_height="wrap_content"
             android:hint="@string/country_code_hint"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="phone"
             android:importantForAutofill="no"
@@ -364,6 +374,7 @@
             android:id="@+id/telephonyProvider"
             android:layout_height="wrap_content"
             android:hint="@string/telephony_provider_hint"
+            android:textColorHint="@color/colorSecondaryDark"
             android:textSize="18sp"
             android:inputType="textUri"
             android:importantForAutofill="no"

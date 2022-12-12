@@ -39,7 +39,8 @@
         android:inputType="textMultiLine|textShortMessage|textCapSentences"
         android:scrollHorizontally="false"
         android:autofillHints="text"
-        android:hint="@string/new_message" >
+        android:hint="@string/new_message"
+        android:textColorHint="@color/colorSecondaryDark" >
     </EditText>
 
     <ImageButton
