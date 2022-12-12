@@ -1032,6 +1032,19 @@ Java_com_tutpro_baresip_plus_Api_account_1set_1answermode(JNIEnv *env, jobject t
     return account_set_answermode((struct account *)acc, mode);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_tutpro_baresip_plus_Api_account_1rtcp_1mux(JNIEnv *env, jobject thiz, jlong acc)
+{
+    return account_rtcp_mux((struct account *)acc);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_plus_Api_account_1set_1rtcp_1mux(JNIEnv *env, jobject thiz, jlong acc,
+                                                    jboolean value)
+{
+    return account_set_rtcp_mux((struct account *)acc, value);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_plus_Api_account_1dtmfmode(JNIEnv *env, jobject thiz, jlong acc)
 {

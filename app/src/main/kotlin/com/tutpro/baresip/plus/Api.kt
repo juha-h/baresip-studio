@@ -47,6 +47,8 @@ object Api {
     external fun account_vm_uri(acc: Long): String
     external fun account_answermode(acc: Long): Int
     external fun account_set_answermode(acc: Long, mode: Int): Int
+    external fun account_rtcp_mux(acc: Long): Boolean
+    external fun account_set_rtcp_mux(acc: Long, value: Boolean): Int
     external fun account_dtmfmode(acc: Long): Int
     external fun account_set_dtmfmode(acc: Long, mode: Int): Int
     external fun account_extra(acc: Long): String
