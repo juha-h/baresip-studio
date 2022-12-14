@@ -623,9 +623,9 @@ class AccountActivity : AppCompatActivity() {
                                     String.format(getString(R.string.invalid_sip_or_tel_uri), tVmUri))
                             return false
                         }
-                        Api.account_set_mwi(acc.accp, "yes")
+                        Api.account_set_mwi(acc.accp, true)
                     } else {
-                        Api.account_set_mwi(acc.accp, "no")
+                        Api.account_set_mwi(acc.accp, false)
                     }
                     acc.vmUri = tVmUri
                     save = true

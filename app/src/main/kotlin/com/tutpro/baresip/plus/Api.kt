@@ -43,7 +43,7 @@ object Api {
     external fun account_set_medianat(acc: Long, medianat: String): Int
     external fun account_set_audio_codecs(acc: Long, codecs: String): Int
     external fun account_set_video_codecs(acc: Long, codecs: String): Int
-    external fun account_set_mwi(acc: Long, value: String): Int
+    external fun account_set_mwi(acc: Long, value: Boolean): Int
     external fun account_vm_uri(acc: Long): String
     external fun account_answermode(acc: Long): Int
     external fun account_set_answermode(acc: Long, mode: Int): Int
