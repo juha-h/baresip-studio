@@ -908,13 +908,9 @@ Java_com_tutpro_baresip_Api_account_1set_1stun_1pass(JNIEnv *env, jobject thiz, 
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1mwi(JNIEnv *env, jobject thiz, jlong acc, jstring jValue)
+Java_com_tutpro_baresip_Api_account_1set_1mwi(JNIEnv *env, jobject thiz, jlong acc, jboolean value)
 {
-    const char *value = (*env)->GetStringUTFChars(env, jValue, 0);
-    LOGD("setting account mwi '%s'\n", value);
-    int res = account_set_mwi((struct account *)acc, value);
-    (*env)->ReleaseStringUTFChars(env, jValue, value);
-    return res;
+    return account_set_mwi((struct account *)acc, value);
 }
 
 JNIEXPORT jstring JNICALL
@@ -955,8 +951,7 @@ Java_com_tutpro_baresip_Api_account_1rtcp_1mux(JNIEnv *env, jobject thiz, jlong 
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_account_1set_1rtcp_1mux(JNIEnv *env, jobject thiz, jlong acc,
-                                                    jboolean value)
+Java_com_tutpro_baresip_Api_account_1set_1rtcp_1mux(JNIEnv *env, jobject thiz, jlong acc, jboolean value)
 {
     return account_set_rtcp_mux((struct account *)acc, value);
 }
