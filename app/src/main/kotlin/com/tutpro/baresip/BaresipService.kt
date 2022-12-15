@@ -1094,6 +1094,7 @@ class BaresipService: Service() {
                     "${pm.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
         Log.d(TAG, "Partial wake lock/wifi lock is held: " +
                 "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
+        updateStatusNotification()
     }
 
     @Keep
