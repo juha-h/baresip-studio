@@ -1,0 +1,4 @@
+- Added "RTCP Multiplexing" account setting
+- Distributes action buttons evenly at the bottom of main activity
+- Used colorSecondaryDark as text view hint color
+- Show correct status notification when there is no registered UAs
