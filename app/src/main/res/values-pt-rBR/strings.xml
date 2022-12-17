@@ -298,4 +298,6 @@
     <string name="non_unique_account_nickname">O apelido \'%1$s\' já existe</string>
     <string name="nickname">Apelido</string>
     <string name="codec_action">Reordenar</string>
+    <string name="rtcp_mux">Multiplexagem RTCP</string>
+    <string name="rtcp_mux_help">Se marcada, os pacotes RTP e RTCP são multiplexados numa única porta (RFC 5761).</string>
 </resources>
