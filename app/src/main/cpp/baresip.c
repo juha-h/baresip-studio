@@ -500,7 +500,7 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
     dnsc_cache_max(net_dnsc(baresip_network()), 0);
 
     if (strlen(addrs) > 0) {
-        char* addr_list = (char*)malloc(strlen(addrs));
+        char *addr_list = (char *)malloc(strlen(addrs) + 1);
         struct sa temp_sa;
         char buf[256];
         net_flush_addresses(baresip_network());
@@ -512,10 +512,10 @@ Java_com_tutpro_baresip_plus_BaresipService_baresipStart(JNIEnv *env, jobject in
                 ptr = strtok(NULL, ";");
                 net_add_address_ifname(baresip_network(), &temp_sa, ptr);
             } else {
-                LOGE("invalid ip address %s\n", ptr);
+                LOGE("invalid ip address (%s)\n", ptr);
                 ptr = strtok(NULL, ";");
-                res = EAFNOSUPPORT;
             }
+            *(ptr - 1) = ';';
             ptr = strtok(NULL, ";");
         }
         free(addr_list);
