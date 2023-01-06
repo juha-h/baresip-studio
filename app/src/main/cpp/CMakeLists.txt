@@ -16,6 +16,10 @@ add_library(lib_re STATIC IMPORTED)
 set_target_properties(lib_re PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/re/lib/${ANDROID_ABI}/libre.a)
 
+set(re_DIR ${distribution_DIR}/re/cmake)
+find_package(re CONFIG REQUIRED HINTS ${distribution_DIR}/re/cmake)
+add_definitions(${RE_DEFINITIONS})
+
 add_library(lib_rem STATIC IMPORTED)
 set_target_properties(lib_rem PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/rem/lib/${ANDROID_ABI}/librem.a)
