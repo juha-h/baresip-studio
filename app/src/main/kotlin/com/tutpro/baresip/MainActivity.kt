@@ -383,7 +383,7 @@ class MainActivity : AppCompatActivity() {
             answerButton.isEnabled = false
             rejectButton.isEnabled = false
             call.rejected = true
-            Api.ua_hangup(ua.uap, callp, 486, "Rejected")
+            Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
         }
 
         holdButton.setOnClickListener {
