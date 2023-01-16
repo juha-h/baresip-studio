@@ -1991,7 +1991,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.shouldShowRequestPermissionRationale(
                     this, Manifest.permission.POST_NOTIFICATIONS
                 ) -> {
-                    layout.showSnackBar(
+                    defaultLayout.showSnackBar(
                         binding.root,
                         getString(R.string.no_notifications),
                         Snackbar.LENGTH_INDEFINITE,
