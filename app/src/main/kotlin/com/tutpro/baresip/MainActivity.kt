@@ -630,7 +630,10 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
         }
 
-        if (!BaresipService.isServiceRunning)
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
+        if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
                     Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
@@ -642,14 +645,12 @@ class MainActivity : AppCompatActivity() {
                 firstRun = true
                 startBaresip()
             }
+        }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
             delegate.applyDayNight()
         }
-
-        requestPermissionLauncher =
-                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     } // OnCreate
 
@@ -1180,7 +1181,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         handleNextEvent()
-
     }
 
     private fun reStart() {
@@ -1560,10 +1560,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBaresip() {
-        baresipService.action = "Start"
-        startService(baresipService)
-        if (atStartup)
-            moveTaskToBack(true)
+        if (Build.VERSION.SDK_INT >= 33) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Log.d(TAG, "Notifications permission granted")
+                    baresipService.action = "Start"
+                    startService(baresipService)
+                    if (atStartup)
+                        moveTaskToBack(true)
+                }
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) -> {
+                    layout.showSnackBar(
+                        binding.root,
+                        getString(R.string.no_notifications),
+                        Snackbar.LENGTH_INDEFINITE,
+                        getString(R.string.ok)
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            baresipService.action = "Start"
+            startService(baresipService)
+            if (atStartup)
+                moveTaskToBack(true)
+        }
     }
 
     private fun backup(password: String) {
