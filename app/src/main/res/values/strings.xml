@@ -506,6 +506,8 @@
         also check Apps → baresip → Permissions → Storage and that file \'%1$s\' exists
         in Download folder.
     </string>
+    <string name="no_notifications">You are not able to use this application without \"Notifications\"
+        permission.</string>
     <string name="no_calls">You are not able to make or answer calls without \"Microphone\"
         permission.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
