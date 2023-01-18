@@ -43,7 +43,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
-import kotlin.system.exitProcess
 
 class BaresipService: Service() {
 
@@ -327,6 +326,7 @@ class BaresipService: Service() {
                     "force" -> {
                         cleanService()
                         isServiceRunning = false
+                        postServiceEvent(ServiceEvent("stopped", arrayListOf(""), System.nanoTime()))
                         stopSelf()
                         // exitProcess(0)
                     }
@@ -530,15 +530,9 @@ class BaresipService: Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy at Baresip Service")
-        this.unregisterReceiver(bluetoothReceiver)
-        this.unregisterReceiver(hotSpotReceiver)
-        if (am.isBluetoothScoOn)
-            am.stopBluetoothSco()
         cleanService()
         if (isServiceRunning)
             sendBroadcast(Intent("com.tutpro.baresip.plus.Restart"))
-        else
-            exitProcess(0)
     }
 
     @Keep
@@ -1118,8 +1112,8 @@ class BaresipService: Service() {
     @Keep
     fun stopped(error: String) {
         Log.d(TAG, "Received 'stopped' from baresip with start error '$error'")
-        if (error == "")
-            quitTimer.cancel()
+        quitTimer.cancel()
+        cleanService()
         isServiceRunning = false
         postServiceEvent(ServiceEvent("stopped", arrayListOf(error), System.nanoTime()))
         stopSelf()
@@ -1479,6 +1473,10 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (!isServiceClean) {
+            this.unregisterReceiver(bluetoothReceiver)
+            this.unregisterReceiver(hotSpotReceiver)
+            if (am.isBluetoothScoOn)
+                am.stopBluetoothSco()
             am.mode = AudioManager.MODE_NORMAL
             abandonAudioFocus()
             stopRinging()
