@@ -623,7 +623,6 @@ class MainActivity : AppCompatActivity() {
                     Utils.setSpeakerPhone(am, true)
                     if (am.isSpeakerphoneOn)
                         speakerButton.setImageResource(R.drawable.speaker_on_button)
-                    }
                     imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                 }
             }, 250)
