@@ -16,6 +16,8 @@ import android.graphics.Color
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -951,5 +953,33 @@ object Utils {
         view.draw(canvas)
         return bitmap
     }
-    
+
+    fun setSpeakerPhone(am: AudioManager, state: Boolean) {
+        // Currently at API levels 31+, speakerphone cannot be turned on during call
+        Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
+        if (state) {
+            if (Build.VERSION.SDK_INT >= 31 && am.mode != AudioManager.MODE_IN_COMMUNICATION) {
+                var speakerDevice: AudioDeviceInfo? = null
+                for (device in am.availableCommunicationDevices)
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                        speakerDevice = device
+                        break
+                    }
+                if (speakerDevice != null) {
+                    if (!am.setCommunicationDevice(speakerDevice))
+                        Log.e(TAG, "Could not turn on speaker device")
+                }
+            } else {
+                if (Build.VERSION.SDK_INT < 31)
+                    am.isSpeakerphoneOn = true
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= 31)
+                am.clearCommunicationDevice()
+            else
+                am.isSpeakerphoneOn = false
+        }
+        Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
+    }
+
 }

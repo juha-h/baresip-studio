@@ -620,8 +620,10 @@ class MainActivity : AppCompatActivity() {
                         else
                             call.setVideoDirection(Api.SDP_RECVONLY)
                     }
-                    am.isSpeakerphoneOn = true
-                    speakerButton.setImageResource(R.drawable.speaker_on_button)
+                    Utils.setSpeakerPhone(am, true)
+                    if (am.isSpeakerphoneOn)
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                    }
                     imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                 }
             }, 250)
@@ -863,8 +865,9 @@ class MainActivity : AppCompatActivity() {
         vb.layoutParams = prm
         vb.setOnClickListener {
             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
-            am.isSpeakerphoneOn = false
-            if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+            Utils.setSpeakerPhone(am, false)
+            if (speakerIcon != null)
+                speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
         videoLayout.addView(vb)
 
@@ -984,13 +987,15 @@ class MainActivity : AppCompatActivity() {
         prm.topMargin = 15
         speakerButton.layoutParams = prm
         speakerButton.setOnClickListener {
-            am.isSpeakerphoneOn = !am.isSpeakerphoneOn
+            Utils.setSpeakerPhone(am, !am.isSpeakerphoneOn)
             if (am.isSpeakerphoneOn) {
                 speakerButton.setImageResource(R.drawable.speaker_on_button)
-                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+                if (speakerIcon != null)
+                    speakerIcon!!.setIcon(R.drawable.speaker_on)
             } else {
                 speakerButton.setImageResource(R.drawable.speaker_off_button)
-                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                if (speakerIcon != null)
+                    speakerIcon!!.setIcon(R.drawable.speaker_off)
             }
         }
         videoLayout.addView(speakerButton)
@@ -1370,9 +1375,12 @@ class MainActivity : AppCompatActivity() {
             }
             "call established" -> {
                 if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
-                    am.isSpeakerphoneOn = true
-                    speakerButton.setImageResource(R.drawable.speaker_on_button)
-                    if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+                    Utils.setSpeakerPhone(am, true)
+                    if (am.isSpeakerphoneOn) {
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_on)
+                    }
                 }
                 if (aor == aorSpinner.tag) {
                     dtmf.setText("")
@@ -1530,9 +1538,12 @@ class MainActivity : AppCompatActivity() {
                     if (acc.missedCalls)
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                if (speakerIcon != null)
-                    speakerIcon!!.setIcon(R.drawable.speaker_off)
-                speakerButton.setImageResource(R.drawable.speaker_off_button)
+                Utils.setSpeakerPhone(am, false)
+                if (!am.isSpeakerphoneOn) {
+                    if (speakerIcon != null)
+                        speakerIcon!!.setIcon(R.drawable.speaker_off)
+                    speakerButton.setImageResource(R.drawable.speaker_off_button)
+                }
                 if (kgm.isDeviceLocked)
                     Utils.setShowWhenLocked(this, false)
             }
@@ -1616,7 +1627,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
-                am.isSpeakerphoneOn = !am.isSpeakerphoneOn
+                Utils.setSpeakerPhone(am, !am.isSpeakerphoneOn)
                 if (am.isSpeakerphoneOn) {
                     item.setIcon(R.drawable.speaker_on)
                     speakerButton.setImageResource(R.drawable.speaker_on_button)
