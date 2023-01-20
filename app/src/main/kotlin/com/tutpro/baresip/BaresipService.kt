@@ -41,7 +41,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
-import kotlin.system.exitProcess
 
 class BaresipService: Service() {
 
@@ -880,7 +879,7 @@ class BaresipService: Service() {
                             call.remove()
                             if (Call.calls().size == 0) {
                                 resetCallVolume()
-                                am.isSpeakerphoneOn = false
+                                Utils.setSpeakerPhone(am, false)
                                 am.stopBluetoothSco()
                                 abandonAudioFocus()
                                 am.mode = AudioManager.MODE_NORMAL

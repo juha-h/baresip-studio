@@ -25,6 +25,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
@@ -888,6 +890,34 @@ object Utils {
         view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
         view.draw(canvas)
         return bitmap
+    }
+
+    fun setSpeakerPhone(am: AudioManager, state: Boolean) {
+        // Currently at API levels 31+, speakerphone cannot be turned on during call
+        Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
+        if (state) {
+            if (Build.VERSION.SDK_INT >= 31 && am.mode != AudioManager.MODE_IN_COMMUNICATION) {
+                var speakerDevice: AudioDeviceInfo? = null
+                for (device in am.availableCommunicationDevices)
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                        speakerDevice = device
+                        break
+                    }
+                if (speakerDevice != null) {
+                    if (!am.setCommunicationDevice(speakerDevice))
+                        Log.e(TAG, "Could not turn on speaker device")
+                }
+            } else {
+                if (Build.VERSION.SDK_INT < 31)
+                    am.isSpeakerphoneOn = true
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= 31)
+                am.clearCommunicationDevice()
+            else
+                am.isSpeakerphoneOn = false
+        }
+        Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
     }
 
 }
