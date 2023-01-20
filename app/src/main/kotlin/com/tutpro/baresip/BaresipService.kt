@@ -880,9 +880,9 @@ class BaresipService: Service() {
                             if (Call.calls().size == 0) {
                                 resetCallVolume()
                                 Utils.setSpeakerPhone(am, false)
+                                am.mode = AudioManager.MODE_NORMAL
                                 am.stopBluetoothSco()
                                 abandonAudioFocus()
-                                am.mode = AudioManager.MODE_NORMAL
                                 proximitySensing(false)
                             }
                             val missed = call.startTime == null && call.dir == "in" && !call.rejected

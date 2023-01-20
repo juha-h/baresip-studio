@@ -1144,12 +1144,12 @@ class MainActivity : AppCompatActivity() {
                     if (acc.missedCalls)
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                if (speakerIcon != null) {
-                    if (am.isSpeakerphoneOn)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (Utils.isSpeakerPhoneOn(am))
                         speakerIcon!!.setIcon(R.drawable.speaker_on)
                     else
                         speakerIcon!!.setIcon(R.drawable.speaker_off)
-                }
+                }, 750)
                 if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
                         (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
                     Utils.setShowWhenLocked(this, false)
@@ -1208,7 +1208,7 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
-        if (am.isSpeakerphoneOn)
+        if (Utils.isSpeakerPhoneOn(am))
             speakerIcon!!.setIcon(R.drawable.speaker_on)
         else
             speakerIcon!!.setIcon(R.drawable.speaker_off)
@@ -1234,11 +1234,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
-                Utils.setSpeakerPhone(am, !am.isSpeakerphoneOn)
-                if (am.isSpeakerphoneOn)
-                    item.setIcon(R.drawable.speaker_on)
-                else
-                    item.setIcon(R.drawable.speaker_off)
+                Utils.toggleSpeakerPhone(am)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (Utils.isSpeakerPhoneOn(am))
+                        item.setIcon(R.drawable.speaker_on)
+                    else
+                        item.setIcon(R.drawable.speaker_off)
+                }, 750)
             }
 
             R.id.config -> {
