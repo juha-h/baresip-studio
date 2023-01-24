@@ -637,8 +637,6 @@ class BaresipService: Service() {
                         if (call!!.status == "transferring")
                             break
                         stopMediaPlayer()
-                        if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
                         requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         proximitySensing(true)
@@ -879,7 +877,6 @@ class BaresipService: Service() {
                             call.remove()
                             if (Call.calls().size == 0) {
                                 resetCallVolume()
-                                Utils.setSpeakerPhone(am, false)
                                 am.mode = AudioManager.MODE_NORMAL
                                 am.stopBluetoothSco()
                                 abandonAudioFocus()

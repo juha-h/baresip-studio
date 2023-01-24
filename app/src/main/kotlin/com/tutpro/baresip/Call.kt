@@ -112,5 +112,11 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             return null
         }
 
+        fun connectedCall(): Call? {
+            for (c in BaresipService.calls.reversed())
+                if (c.status == "connected") return c
+            return null
+        }
+
     }
 }
