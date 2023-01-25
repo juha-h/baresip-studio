@@ -1815,6 +1815,7 @@ class MainActivity : AppCompatActivity() {
                     if (Build.VERSION.SDK_INT < 31) {
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                         callRunnable = Runnable {
+                            callRunnable = null
                             if (!call(ua, uri)) {
                                 callButton.visibility = View.VISIBLE
                                 callButton.isEnabled = true
