@@ -1701,9 +1701,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun spinToAor(aor: String) {
-        for (account_index in BaresipService.uas.indices)
-            if (BaresipService.uas[account_index].account.aor == aor) {
-                aorSpinner.setSelection(account_index)
+        for (accountIndex in BaresipService.uas.indices)
+            if (BaresipService.uas[accountIndex].account.aor == aor) {
+                aorSpinner.setSelection(accountIndex)
                 aorSpinner.tag = aor
                 return
             }
