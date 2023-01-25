@@ -404,7 +404,7 @@ class MainActivity : AppCompatActivity() {
         hangupButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             if (Build.VERSION.SDK_INT < 31) {
-                if (callRunnable != null && callHandler.hasCallbacks(callRunnable!!)) {
+                if (callRunnable != null) {
                     callHandler.removeCallbacks(callRunnable!!)
                     callRunnable = null
                     am.mode = AudioManager.MODE_NORMAL
