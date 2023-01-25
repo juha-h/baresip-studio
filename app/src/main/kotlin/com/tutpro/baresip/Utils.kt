@@ -942,7 +942,7 @@ object Utils {
                         "${AudioDeviceInfo.TYPE_BUILTIN_EARPIECE} in mode ${am.mode}")
                 am.clearCommunicationDevice()
                 // Restore communication mode
-                if (Call.connectedCall() != null && am.mode == AudioManager.MODE_NORMAL)
+                if (Call.call("connected") != null && am.mode == AudioManager.MODE_NORMAL)
                     am.mode = AudioManager.MODE_IN_COMMUNICATION
                 Log.d(TAG, "Type of current device is ${am.communicationDevice!!.type}")
             } else {

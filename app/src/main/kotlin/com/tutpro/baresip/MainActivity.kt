@@ -359,7 +359,7 @@ class MainActivity : AppCompatActivity() {
         hangupButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
             if (Build.VERSION.SDK_INT < 31) {
-                if (callRunnable != null && callHandler.hasCallbacks(callRunnable!!)) {
+                if (callRunnable != null) {
                     callHandler.removeCallbacks(callRunnable!!)
                     callRunnable = null
                     am.mode = AudioManager.MODE_NORMAL
@@ -1174,12 +1174,6 @@ class MainActivity : AppCompatActivity() {
                     if (acc.missedCalls)
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                Handler(Looper.getMainLooper()).postDelayed({
-                    if (Utils.isSpeakerPhoneOn(am))
-                        speakerIcon!!.setIcon(R.drawable.speaker_on)
-                    else
-                        speakerIcon!!.setIcon(R.drawable.speaker_off)
-                }, 750)
                 if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
                         (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
                     Utils.setShowWhenLocked(this, false)
@@ -1264,7 +1258,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
-                Utils.toggleSpeakerPhone(mainExecutor, am)
+                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
+                if (Build.VERSION.SDK_INT < 31 && speakerIcon != null) {
+                    if (am.isSpeakerphoneOn)
+                        speakerIcon!!.setIcon(R.drawable.speaker_on)
+                    else
+                        speakerIcon!!.setIcon(R.drawable.speaker_off)
+                }
             }
 
             R.id.config -> {
