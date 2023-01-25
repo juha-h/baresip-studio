@@ -1,0 +1,3 @@
+- Quit/Restart process improvements
+- Speakerphone and call related fixes and enhancements for API 31+
+- New Portuguese (Brazil) translations
