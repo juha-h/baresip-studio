@@ -10,6 +10,7 @@ import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
@@ -97,11 +98,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restoreRequest: ActivityResultLauncher<Intent>
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
+    private lateinit var comDevChangedListener: AudioManager.OnCommunicationDeviceChangedListener
 
     private var callHandler: Handler = Handler(Looper.getMainLooper())
     private var callRunnable: Runnable? = null
     private var downloadsInputUri: Uri? = null
     private var downloadsOutputUri: Uri? = null
+    private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
 
     private lateinit var baresipService: Intent
 
@@ -209,6 +212,24 @@ class MainActivity : AppCompatActivity() {
         this.registerReceiver(screenEventReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
         })
+
+        if (Build.VERSION.SDK_INT >= 31) {
+            comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
+                if (device != null) {
+                    Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_on)
+                    } else {
+                        speakerButton.setImageResource(R.drawable.speaker_off_button)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_off)
+                    }
+                }
+            }
+            am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
+        }
 
         uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas)
         aorSpinner.adapter = uaAdapter
@@ -382,12 +403,22 @@ class MainActivity : AppCompatActivity() {
 
         hangupButton.setOnClickListener {
             val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            if (callRunnable != null && callHandler.hasCallbacks(callRunnable!!)) {
-                callHandler.removeCallbacks(callRunnable!!)
-                callRunnable = null
-                am.mode = AudioManager.MODE_NORMAL
-                showCall(ua)
-                return@setOnClickListener
+            if (Build.VERSION.SDK_INT < 31) {
+                if (callRunnable != null && callHandler.hasCallbacks(callRunnable!!)) {
+                    callHandler.removeCallbacks(callRunnable!!)
+                    callRunnable = null
+                    am.mode = AudioManager.MODE_NORMAL
+                    showCall(ua)
+                    return@setOnClickListener
+                }
+            } else {
+                if (audioModeChangedListener != null) {
+                    am.removeOnModeChangedListener(audioModeChangedListener!!)
+                    audioModeChangedListener = null
+                    am.mode = AudioManager.MODE_NORMAL
+                    showCall(ua)
+                    return@setOnClickListener
+                }
             }
             val aor = ua.account.aor
             val uaCalls = ua.calls()
@@ -620,8 +651,8 @@ class MainActivity : AppCompatActivity() {
                         else
                             call.setVideoDirection(Api.SDP_RECVONLY)
                     }
-                    Utils.setSpeakerPhone(am, true)
-                    if (am.isSpeakerphoneOn)
+                    Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
+                    if (Build.VERSION.SDK_INT < 31)
                         speakerButton.setImageResource(R.drawable.speaker_on_button)
                     imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                 }
@@ -840,6 +871,8 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d(TAG, "Main onDestroy")
         this.unregisterReceiver(screenEventReceiver)
+        if (Build.VERSION.SDK_INT >= 31)
+            am.removeOnCommunicationDeviceChangedListener(comDevChangedListener)
         BaresipService.serviceEvent.removeObserver(serviceEventObserver)
         BaresipService.serviceEvents.clear()
         BaresipService.activities.clear()
@@ -864,8 +897,8 @@ class MainActivity : AppCompatActivity() {
         vb.layoutParams = prm
         vb.setOnClickListener {
             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
-            Utils.setSpeakerPhone(am, false)
-            if (speakerIcon != null)
+            Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, false)
+            if (Build.VERSION.SDK_INT < 31 && speakerIcon != null)
                 speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
         videoLayout.addView(vb)
@@ -986,15 +1019,15 @@ class MainActivity : AppCompatActivity() {
         prm.topMargin = 15
         speakerButton.layoutParams = prm
         speakerButton.setOnClickListener {
-            Utils.setSpeakerPhone(am, !am.isSpeakerphoneOn)
-            if (am.isSpeakerphoneOn) {
-                speakerButton.setImageResource(R.drawable.speaker_on_button)
-                if (speakerIcon != null)
-                    speakerIcon!!.setIcon(R.drawable.speaker_on)
-            } else {
-                speakerButton.setImageResource(R.drawable.speaker_off_button)
-                if (speakerIcon != null)
-                    speakerIcon!!.setIcon(R.drawable.speaker_off)
+            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
+            if (Build.VERSION.SDK_INT < 31) {
+                if (am.isSpeakerphoneOn) {
+                    speakerButton.setImageResource(R.drawable.speaker_on_button)
+                    if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+                } else {
+                    speakerButton.setImageResource(R.drawable.speaker_off_button)
+                    if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                }
             }
         }
         videoLayout.addView(speakerButton)
@@ -1374,11 +1407,10 @@ class MainActivity : AppCompatActivity() {
             }
             "call established" -> {
                 if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
-                    Utils.setSpeakerPhone(am, true)
-                    if (am.isSpeakerphoneOn) {
+                    Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
+                    if (Build.VERSION.SDK_INT < 31) {
                         speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        if (speakerIcon != null)
-                            speakerIcon!!.setIcon(R.drawable.speaker_on)
+                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
                     }
                 }
                 if (aor == aorSpinner.tag) {
@@ -1537,12 +1569,6 @@ class MainActivity : AppCompatActivity() {
                     if (acc.missedCalls)
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                Utils.setSpeakerPhone(am, false)
-                if (!am.isSpeakerphoneOn) {
-                    if (speakerIcon != null)
-                        speakerIcon!!.setIcon(R.drawable.speaker_off)
-                    speakerButton.setImageResource(R.drawable.speaker_off_button)
-                }
                 if (kgm.isDeviceLocked)
                     Utils.setShowWhenLocked(this, false)
             }
@@ -1600,7 +1626,7 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
-        if (am.isSpeakerphoneOn)
+        if (Utils.isSpeakerPhoneOn(am))
             speakerIcon!!.setIcon(R.drawable.speaker_on)
         else
             speakerIcon!!.setIcon(R.drawable.speaker_off)
@@ -1626,13 +1652,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
-                Utils.setSpeakerPhone(am, !am.isSpeakerphoneOn)
-                if (am.isSpeakerphoneOn) {
-                    item.setIcon(R.drawable.speaker_on)
-                    speakerButton.setImageResource(R.drawable.speaker_on_button)
-                } else {
-                    item.setIcon(R.drawable.speaker_off)
-                    speakerButton.setImageResource(R.drawable.speaker_off_button)
+                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
+                if (Build.VERSION.SDK_INT < 31) {
+                    if (am.isSpeakerphoneOn) {
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+                    } else {
+                        speakerButton.setImageResource(R.drawable.speaker_off_button)
+                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                    }
                 }
             }
 
@@ -2151,7 +2179,6 @@ class MainActivity : AppCompatActivity() {
                             String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     callUri.isFocusable = false
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
                     uaAdapter.notifyDataSetChanged()
                     callButton.visibility = View.INVISIBLE
                     callButton.isEnabled = false
@@ -2159,17 +2186,45 @@ class MainActivity : AppCompatActivity() {
                     callVideoButton.isEnabled = false
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
-                    callRunnable = Runnable {
-                        if (!call(ua, uri, kind)) {
-                            callButton.visibility = View.VISIBLE
-                            callButton.isEnabled = true
-                            callVideoButton.visibility = View.VISIBLE
-                            callVideoButton.isEnabled = true
-                            hangupButton.visibility = View.INVISIBLE
-                            hangupButton.isEnabled = false
+                    if (Build.VERSION.SDK_INT < 31) {
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        callRunnable = Runnable {
+                            if (!call(ua, uri, kind)) {
+                                callButton.visibility = View.VISIBLE
+                                callButton.isEnabled = true
+                                callVideoButton.visibility = View.VISIBLE
+                                callVideoButton.isEnabled = true
+                                hangupButton.visibility = View.INVISIBLE
+                                hangupButton.isEnabled = false
+                            }
                         }
+                        callHandler.postDelayed(callRunnable!!, 1000)
+                    } else {
+                        audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
+                            if (mode == AudioManager.MODE_IN_COMMUNICATION) {
+                                Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
+                                        "device ${am.communicationDevice!!.type}")
+                                if (audioModeChangedListener != null) {
+                                    am.removeOnModeChangedListener(audioModeChangedListener!!)
+                                    audioModeChangedListener = null
+                                }
+                                if (!call(ua, uri, kind)) {
+                                    callButton.visibility = View.VISIBLE
+                                    callButton.isEnabled = true
+                                    callVideoButton.visibility = View.VISIBLE
+                                    callVideoButton.isEnabled = true
+                                    hangupButton.visibility = View.INVISIBLE
+                                    hangupButton.isEnabled = false
+                                }
+                            } else {
+                                Log.d(TAG, "Audio mode changed to MODE_NORMAL using " +
+                                        "device ${am.communicationDevice!!.type}")
+                            }
+                        }
+                        am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
+                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                     }
-                    callHandler.postDelayed(callRunnable!!, 1000)
                 }
             } else {
                 val latestPeerUri = NewCallHistory.aorLatestPeerUri(aor)
