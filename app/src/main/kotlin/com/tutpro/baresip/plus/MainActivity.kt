@@ -217,14 +217,14 @@ class MainActivity : AppCompatActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        if (speakerIcon != null)
-                            speakerIcon!!.setIcon(R.drawable.speaker_on)
-                    } else {
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
                         if (speakerIcon != null)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
+                    } else {
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                        if (speakerIcon != null)
+                            speakerIcon!!.setIcon(R.drawable.speaker_on)
                     }
                 }
             }
@@ -1652,6 +1652,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
+                if (Build.VERSION.SDK_INT >= 31)
+                    Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                            "${am.communicationDevice!!.type}/${am.mode}")
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                 if (Build.VERSION.SDK_INT < 31) {
                     if (am.isSpeakerphoneOn) {
@@ -2125,9 +2128,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun spinToAor(aor: String) {
-        for (account_index in BaresipService.uas.indices)
-            if (BaresipService.uas[account_index].account.aor == aor) {
-                aorSpinner.setSelection(account_index)
+        for (accountIndex in BaresipService.uas.indices)
+            if (BaresipService.uas[accountIndex].account.aor == aor) {
+                aorSpinner.setSelection(accountIndex)
                 aorSpinner.tag = aor
                 return
             }
@@ -2218,7 +2221,7 @@ class MainActivity : AppCompatActivity() {
                                     hangupButton.isEnabled = false
                                 }
                             } else {
-                                Log.d(TAG, "Audio mode changed to MODE_NORMAL using " +
+                                Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
                                         "device ${am.communicationDevice!!.type}")
                             }
                         }

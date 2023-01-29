@@ -599,8 +599,9 @@ class BaresipService: Service() {
         }
 
         var newEvent: String? = null
-        for (account_index in uas.indices) {
-            if (uas[account_index].account.aor == aor) {
+
+	    for (accountIndex in uas.indices) {
+            if (uas[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
                         ua.status = R.drawable.dot_yellow
@@ -1214,6 +1215,7 @@ class BaresipService: Service() {
                 .build()
         if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.d(TAG, "Audio focus granted")
+            isAudioFocused = true
             if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
                 Log.d(TAG, "Starting Bluetooth SCO")
                 am.startBluetoothSco()
@@ -1221,6 +1223,7 @@ class BaresipService: Service() {
         } else {
             Log.d(TAG, "Audio focus denied")
             audioFocusRequest = null
+            isAudioFocused = false
         }
     }
 
@@ -1228,6 +1231,7 @@ class BaresipService: Service() {
         if (audioFocusRequest != null) {
             AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!)
             audioFocusRequest = null
+            isAudioFocused = false
             Log.d(TAG, "Audio focus abandoned")
         }
     }
@@ -1502,6 +1506,7 @@ class BaresipService: Service() {
 
         var isServiceRunning = false
         var isConfigInitialized = false
+        var isAudioFocused = false
         var libraryLoaded = false
         var supportedCameras = false
         var cameraFront = true
@@ -1531,6 +1536,7 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
+
 
     }
 
