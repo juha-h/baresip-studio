@@ -589,7 +589,6 @@ object Utils {
         }
     }
 
-    @Suppress("DEPRECATION")
     fun downloadsPath(fileName: String): String {
         return Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DOWNLOADS).path + "/$fileName"
@@ -893,62 +892,73 @@ object Utils {
 
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
         return if (Build.VERSION.SDK_INT >= 31)
-                am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+                am.communicationDevice!!.type != AudioDeviceInfo.TYPE_BUILTIN_EARPIECE
         else
             am.isSpeakerphoneOn
     }
 
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
-        if (enable == isSpeakerPhoneOn(am))
-            return
-        if (enable) {
-            if (Build.VERSION.SDK_INT >= 31) {
-                Log.d(TAG, "Setting current device from ${am.communicationDevice!!.type} to " +
-                    "${AudioDeviceInfo.TYPE_BUILTIN_SPEAKER} in mode ${am.mode}")
-                var speakerDevice: AudioDeviceInfo? = null
+        if (Build.VERSION.SDK_INT >= 31) {
+            val current = am.communicationDevice!!.type
+            Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
+            var speakerDevice: AudioDeviceInfo? = null
+            if (enable) {
                 for (device in am.availableCommunicationDevices)
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                    if (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
                         speakerDevice = device
                         break
                     }
-                if (speakerDevice != null) {
-                    if (am.mode == AudioManager.MODE_NORMAL) {
+                if (speakerDevice == null)
+                    for (device in am.availableCommunicationDevices)
+                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                            speakerDevice = device
+                            break
+                        }
+            } else {
+                for (device in am.availableCommunicationDevices)
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                        speakerDevice = device
+                        break
+                    }
+            }
+            if (speakerDevice != null && current != speakerDevice.type) {
+                if (speakerDevice.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                    am.clearCommunicationDevice()
+                    Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
+                    if (!am.setCommunicationDevice(speakerDevice))
+                        Log.e(TAG, "Could not set com device")
+                    if (BaresipService.isAudioFocused && am.mode == AudioManager.MODE_NORMAL) {
+                        Log.d(TAG, "Setting mode to communication")
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                    }
+                } else {
+                    // Currently at API levels 31+, speakerphone needs normal mode
+                    if (am.mode ==  AudioManager.MODE_NORMAL) {
+                        Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
                         if (!am.setCommunicationDevice(speakerDevice))
-                            Log.e(TAG, "Could not turn on speaker device")
-                        Log.d(TAG, "Type of current device is ${am.communicationDevice!!.type}")
+                            Log.e(TAG, "Could not set com device")
                     } else {
-                        // Currently at API levels 31+, speakerphone needs to be turned on in normal mode
                         val normalListener = object : AudioManager.OnModeChangedListener {
                             override fun onModeChanged(mode: Int) {
                                 if (mode == AudioManager.MODE_NORMAL) {
                                     am.removeOnModeChangedListener(this)
+                                    Log.d(TAG, "Setting com device to ${speakerDevice.type}" +
+                                            " in mode ${am.mode}")
                                     if (!am.setCommunicationDevice(speakerDevice))
-                                        Log.e(TAG, "Could not turn on speaker device")
-                                    Log.d(TAG, "Type of current device is ${am.communicationDevice!!.type}")
+                                        Log.e(TAG, "Could not set com device")
                                 }
                             }
                         }
                         am.addOnModeChangedListener(executor, normalListener)
+                        Log.d(TAG, "Setting mode to NORMAL")
                         am.mode = AudioManager.MODE_NORMAL
                     }
                 }
-            } else {
-                am.isSpeakerphoneOn = true
-                Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
+                Log.d(TAG, "New com device/mode is ${am.communicationDevice!!.type}/${am.mode}")
             }
         } else {
-            if (Build.VERSION.SDK_INT >= 31) {
-                Log.d(TAG, "Setting current device from type ${am.communicationDevice!!.type} to " +
-                        "${AudioDeviceInfo.TYPE_BUILTIN_EARPIECE} in mode ${am.mode}")
-                am.clearCommunicationDevice()
-                // Restore communication mode
-                if (Call.call("connected") != null && am.mode == AudioManager.MODE_NORMAL)
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
-                Log.d(TAG, "Type of current device is ${am.communicationDevice!!.type}")
-            } else {
-                am.isSpeakerphoneOn = false
-                Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
-            }
+            am.isSpeakerphoneOn = enable
+            Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
         }
     }
 

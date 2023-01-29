@@ -196,10 +196,10 @@ class MainActivity : AppCompatActivity() {
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
                     if (speakerIcon != null) {
-                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
-                            speakerIcon!!.setIcon(R.drawable.speaker_on)
-                        else
+                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
+                        else
+                            speakerIcon!!.setIcon(R.drawable.speaker_on)
                     }
                 }
             }
@@ -1258,6 +1258,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.speakerIcon -> {
+                if (Build.VERSION.SDK_INT >= 31)
+                    Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                            "${am.communicationDevice!!.type}/${am.mode}")
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                 if (Build.VERSION.SDK_INT < 31 && speakerIcon != null) {
                     if (am.isSpeakerphoneOn)
@@ -1840,7 +1843,7 @@ class MainActivity : AppCompatActivity() {
                                     hangupButton.isEnabled = false
                                 }
                             } else {
-                                Log.d(TAG, "Audio mode changed to MODE_NORMAL using " +
+                                Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
                                     "device ${am.communicationDevice!!.type}")
                             }
                         }
