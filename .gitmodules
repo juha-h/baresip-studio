@@ -2,3 +2,7 @@
 	path = libbaresip-android
 	url = https://github.com/juha-h/libbaresip-android.git
 	branch = video
+[submodule "libbaresip-android.video"]
+	path = libbaresip-android.video
+	url = https://github.com/juha-h/libbaresip-android.git
+	branch = video
