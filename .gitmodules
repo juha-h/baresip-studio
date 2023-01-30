@@ -1,0 +1,4 @@
+[submodule "libbaresip-android"]
+	path = libbaresip-android
+	url = https://github.com/juha-h/libbaresip-android.git
+	branch = master
