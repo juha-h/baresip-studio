@@ -433,16 +433,14 @@ object Utils {
             while (interfaces.hasMoreElements()) {
                 val iface: NetworkInterface = interfaces.nextElement()
                 val ifName = iface.name
-                if (ifName.startsWith("ap") || ifName.startsWith("wlan")) {
-                    val addresses: Enumeration<InetAddress> = iface.inetAddresses
-                    while (addresses.hasMoreElements()) {
-                        val inetAddress: InetAddress = addresses.nextElement()
-                        if (inetAddress.hostAddress != null && !inetAddress.isLoopbackAddress &&
-                            !inetAddress.isLinkLocalAddress)
-                            result[inetAddress.hostAddress!!] = ifName
-                    }
-                    if (result.isNotEmpty()) return result
+                Log.d(TAG, "Found interface with name $ifName")
+                val addresses: Enumeration<InetAddress> = iface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val inetAddress: InetAddress = addresses.nextElement()
+                    if (inetAddress.isSiteLocalAddress)
+                        result[inetAddress.hostAddress!!] = ifName
                 }
+                if (result.isNotEmpty()) return result
             }
         } catch (ex: SocketException) {
             Log.e(TAG, ex.toString())
