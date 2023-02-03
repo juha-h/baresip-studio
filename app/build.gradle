@@ -9,8 +9,8 @@ android {
         applicationId = 'com.tutpro.baresip.plus'
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode = 124
-        versionName = '38.1.1'
+        versionCode = 125
+        versionName = '38.1.2'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
@@ -21,9 +21,6 @@ android {
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters 'armeabi-v7a', 'arm64-v8a'
-        }
-        lintOptions {
-            checkDependencies true
         }
         vectorDrawables.useSupportLibrary = true
     }
