@@ -443,12 +443,12 @@ object Utils {
             while (interfaces.hasMoreElements()) {
                 val iface: NetworkInterface = interfaces.nextElement()
                 val ifName = iface.name
-                if (ifName.startsWith("ap") || ifName.startsWith("wlan")) {
+                Log.d(TAG, "Found interface with name $ifName")
+                if (ifName.startsWith("ap") || ifName.contains("wlan")) {
                     val addresses: Enumeration<InetAddress> = iface.inetAddresses
                     while (addresses.hasMoreElements()) {
                         val inetAddress: InetAddress = addresses.nextElement()
-                        if (inetAddress.hostAddress != null && !inetAddress.isLoopbackAddress &&
-                            !inetAddress.isLinkLocalAddress)
+                        if (inetAddress.isSiteLocalAddress)
                             result[inetAddress.hostAddress!!] = ifName
                     }
                     if (result.isNotEmpty()) return result
