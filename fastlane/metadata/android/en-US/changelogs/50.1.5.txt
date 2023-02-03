@@ -1,0 +1,1 @@
+- Fixed WiFi hotspot interface detection on some devices
