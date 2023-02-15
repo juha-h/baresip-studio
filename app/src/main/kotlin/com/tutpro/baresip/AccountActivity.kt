@@ -658,6 +658,8 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
+                Api.ua_add_custom_header(ua.uap, "test_name", "test_value")
+
                 if (save) {
                     AccountsActivity.saveAccounts()
                     if (newRegint != -1) {

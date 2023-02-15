@@ -1003,6 +1003,33 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring jUri)
 }
 
 JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_ua_1add_1custom_1header(JNIEnv *env, jobject thiz,
+                                                                  jlong ua,
+                                                                  jstring name,
+                                                                  jstring value) {
+    const char *native_name = (*env)->GetStringUTFChars(env, name, 0);
+    const char *native_value = (*env)->GetStringUTFChars(env, value, 0);
+
+    LOGD("saving header %ld %s to %s \n", (long)ua, native_name, native_value);
+
+    re_thread_enter();
+    struct pl plName;
+    pl_set_str(&plName, native_name);
+
+    struct pl plValue;
+    pl_set_str(&plValue, native_value);
+
+    int err = ua_add_custom_hdr((struct ua *)ua, &plName, &plValue);
+    re_thread_leave();
+
+    if (err) LOGW("header error: %d\n", err);
+    (*env)->ReleaseStringUTFChars(env, name, native_name);
+    (*env)->ReleaseStringUTFChars(env, value, native_value);
+
+    return err;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, jobject thiz, jlong ua)
 {
     LOGD("registering UA '%ld'\n", (long)ua);
