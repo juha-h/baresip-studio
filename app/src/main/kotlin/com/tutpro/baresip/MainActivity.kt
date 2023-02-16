@@ -1820,7 +1820,7 @@ class MainActivity : AppCompatActivity() {
                         if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH)) {
                             Toast.makeText(
                                 applicationContext,
-                                getString(R.audio_focus_denied),
+                                R.string.audio_focus_denied,
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -1859,7 +1859,7 @@ class MainActivity : AppCompatActivity() {
                         if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH))
                             Toast.makeText(
                                 applicationContext,
-                                getString(R.audio_focus_denied),
+                                R.string.audio_focus_denied,
                                 Toast.LENGTH_SHORT
                             ).show()
                     }
