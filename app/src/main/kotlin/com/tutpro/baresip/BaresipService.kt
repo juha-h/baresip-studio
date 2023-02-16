@@ -1491,6 +1491,7 @@ class BaresipService: Service() {
         private var btAdapter: BluetoothAdapter? = null
 
         fun requestAudioFocus(am: AudioManager, type: Int): Boolean  {
+            Log.d(TAG, "Requesting audio focus of type $type")
             if (audioFocusRequest != null) {
                 if (audioFocusRequest!!.audioAttributesCompat.contentType == type)
                     return true
@@ -1515,7 +1516,7 @@ class BaresipService: Service() {
                 if (type == AudioAttributes.CONTENT_TYPE_SPEECH)
                     am.mode = AudioManager.MODE_IN_COMMUNICATION
             } else {
-                Log.d(TAG, "Audio focus denied")
+                Log.i(TAG, "Audio focus denied")
                 audioFocusRequest = null
                 isAudioFocused = false
             }

@@ -197,10 +197,10 @@ class MainActivity : AppCompatActivity() {
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
                     if (speakerIcon != null) {
-                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
-                            speakerIcon!!.setIcon(R.drawable.speaker_off)
-                        else
+                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
                             speakerIcon!!.setIcon(R.drawable.speaker_on)
+                        else
+                            speakerIcon!!.setIcon(R.drawable.speaker_off)
                     }
                 }
             }
@@ -1856,7 +1856,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
-                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
                         if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH))
                             Toast.makeText(
                                 applicationContext,
