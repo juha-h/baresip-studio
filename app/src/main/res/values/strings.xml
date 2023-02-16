@@ -518,4 +518,5 @@
     <string name="no_cameras">You don\'t have any supported video cameras.</string>
     <string name="show_password">Show Password</string>
     <string name="no_network">No network connection!</string>
+    <string name="audio_focus_denied">Audio focus denied!</string>
 </resources>
