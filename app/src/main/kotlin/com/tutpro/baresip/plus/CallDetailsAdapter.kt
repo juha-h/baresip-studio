@@ -44,7 +44,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
         val stopTime = rows[position].stopTime
 
         val stopText = if (DateUtils.isToday(stopTime.timeInMillis)) {
-            val fmt = DateFormat.getTimeInstance(DateFormat.LONG)
+            val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
             ctx.getString(R.string.today) + " " + fmt.format(stopTime.time)
         } else {
             val fmt = DateFormat.getDateTimeInstance()
