@@ -430,8 +430,6 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
     if (err)
         goto out;
 
-    re_thread_async_init(ASYNC_WORKERS);
-
     conf_path_set(path);
 
     log_level_set((enum log_level)jLogLevel);
@@ -442,6 +440,8 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         strcpy(start_error, "conf_configure");
         goto out;
     }
+
+    re_thread_async_init(ASYNC_WORKERS);
 
     err = baresip_init(conf_config());
     if (err) {
