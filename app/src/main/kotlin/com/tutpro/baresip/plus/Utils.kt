@@ -955,28 +955,22 @@ object Utils {
 
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
         return if (Build.VERSION.SDK_INT >= 31)
-            am.communicationDevice!!.type != AudioDeviceInfo.TYPE_BUILTIN_EARPIECE
+            am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         else
             am.isSpeakerphoneOn
     }
 
-    fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
+    private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
             if (enable) {
                 for (device in am.availableCommunicationDevices)
-                    if (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
                         speakerDevice = device
                         break
                     }
-                if (speakerDevice == null)
-                    for (device in am.availableCommunicationDevices)
-                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                            speakerDevice = device
-                            break
-                        }
             } else {
                 for (device in am.availableCommunicationDevices)
                     if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
@@ -984,7 +978,11 @@ object Utils {
                         break
                     }
             }
-            if (speakerDevice != null && current != speakerDevice.type) {
+            if (speakerDevice == null) {
+                Log.w(TAG,"Could not find requested communication device")
+                return
+            }
+            if (current != speakerDevice.type) {
                 if (speakerDevice.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
                     am.clearCommunicationDevice()
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
@@ -996,7 +994,7 @@ object Utils {
                     }
                 } else {
                     // Currently at API levels 31+, speakerphone needs normal mode
-                    if (am.mode ==  AudioManager.MODE_NORMAL) {
+                    if (am.mode == AudioManager.MODE_NORMAL) {
                         Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
                         if (!am.setCommunicationDevice(speakerDevice))
                             Log.e(TAG, "Could not set com device")
@@ -1005,8 +1003,10 @@ object Utils {
                             override fun onModeChanged(mode: Int) {
                                 if (mode == AudioManager.MODE_NORMAL) {
                                     am.removeOnModeChangedListener(this)
-                                    Log.d(TAG, "Setting com device to ${speakerDevice.type}" +
-                                            " in mode ${am.mode}")
+                                    Log.d(
+                                        TAG, "Setting com device to ${speakerDevice.type}" +
+                                                " in mode ${am.mode}"
+                                    )
                                     if (!am.setCommunicationDevice(speakerDevice))
                                         Log.e(TAG, "Could not set com device")
                                 }
@@ -1026,11 +1026,14 @@ object Utils {
     }
 
     fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
-        if (Build.VERSION.SDK_INT >= 31)
-            setSpeakerPhone(executor, am,
-                am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
-        else
+        if (Build.VERSION.SDK_INT >= 31) {
+            if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
+                setSpeakerPhone(executor, am, true)
+            else if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
+                setSpeakerPhone(executor, am, false)
+        } else {
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
+        }
     }
 
 }
