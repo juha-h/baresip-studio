@@ -960,7 +960,7 @@ object Utils {
             am.isSpeakerphoneOn
     }
 
-    private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
+    fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")

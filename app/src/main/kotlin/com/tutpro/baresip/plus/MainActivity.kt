@@ -10,6 +10,7 @@ import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaActionSound
@@ -217,14 +218,11 @@ class MainActivity : AppCompatActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
-                        speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        if (speakerIcon != null)
-                            speakerIcon!!.setIcon(R.drawable.speaker_off)
-                    } else {
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        if (speakerIcon != null)
+                    if (speakerIcon != null) {
+                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
                             speakerIcon!!.setIcon(R.drawable.speaker_on)
+                        else
+                            speakerIcon!!.setIcon(R.drawable.speaker_off)
                     }
                 }
             }
@@ -2190,19 +2188,26 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     if (Build.VERSION.SDK_INT < 31) {
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        callRunnable = Runnable {
-                            callRunnable = null
-                            if (!call(ua, uri, kind)) {
-                                callButton.visibility = View.VISIBLE
-                                callButton.isEnabled = true
-                                callVideoButton.visibility = View.VISIBLE
-                                callVideoButton.isEnabled = true
-                                hangupButton.visibility = View.INVISIBLE
-                                hangupButton.isEnabled = false
+                        if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH)) {
+                            Toast.makeText(
+                                applicationContext,
+                                R.string.audio_focus_denied,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            callRunnable = Runnable {
+                                callRunnable = null
+                                if (!call(ua, uri, kind)) {
+                                    callButton.visibility = View.VISIBLE
+                                    callButton.isEnabled = true
+                                    callVideoButton.visibility = View.VISIBLE
+                                    callVideoButton.isEnabled = true
+                                    hangupButton.visibility = View.INVISIBLE
+                                    hangupButton.isEnabled = false
+                                }
                             }
+                            callHandler.postDelayed(callRunnable!!, 1000)
                         }
-                        callHandler.postDelayed(callRunnable!!, 1000)
                     } else {
                         audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                             if (mode == AudioManager.MODE_IN_COMMUNICATION) {
@@ -2226,8 +2231,12 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
-                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH))
+                            Toast.makeText(
+                                applicationContext,
+                                R.string.audio_focus_denied,
+                                Toast.LENGTH_SHORT
+                            ).show()
                     }
                 }
             } else {

@@ -67,9 +67,7 @@ class BaresipService: Service() {
 
     private var rt: Ringtone? = null
     private var rtTimer: Timer? = null
-    private var audioFocusRequest: AudioFocusRequestCompat? = null
     private var origVolume = mutableMapOf<Int, Int>()
-    private var btAdapter: BluetoothAdapter? = null
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
     private var allNetworks = mutableSetOf<Network>()
@@ -448,9 +446,7 @@ class BaresipService: Service() {
                 val callp = intent.getLongExtra("callp", 0L)
                 stopRinging()
                 stopMediaPlayer()
-                if (am.mode != AudioManager.MODE_IN_COMMUNICATION)
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
-                requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
+                requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH)
                 setCallVolume()
                 proximitySensing(true)
                 Api.ua_answer(uap, callp, Api.VIDMODE_ON)
@@ -644,7 +640,6 @@ class BaresipService: Service() {
                         if (call!!.status == "transferring")
                             break
                         stopMediaPlayer()
-                        requestAudioFocus(AudioAttributes.CONTENT_TYPE_SPEECH)
                         setCallVolume()
                         proximitySensing(true)
                         return
@@ -888,7 +883,7 @@ class BaresipService: Service() {
                                 resetCallVolume()
                                 am.mode = AudioManager.MODE_NORMAL
                                 am.stopBluetoothSco()
-                                abandonAudioFocus()
+                                abandonAudioFocus(am)
                                 proximitySensing(false)
                             }
                             val missed = call.startTime == null && call.dir == "in" && !call.rejected
@@ -1188,56 +1183,8 @@ class BaresipService: Service() {
         return spannable
     }
 
-    @SuppressLint("MissingPermission")
-    private fun isBluetoothHeadsetConnected(): Boolean {
-        return if (VERSION.SDK_INT < 31)
-            btAdapter != null && btAdapter!!.isEnabled &&
-                btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothAdapter.STATE_CONNECTED
-        else
-            // getProfileConnectionState requires asking fot BLUETOOTH_CONNECT permission
-            true
-    }
-
-    private fun requestAudioFocus(type: Int) {
-        if (audioFocusRequest != null) {
-            if (audioFocusRequest!!.audioAttributesCompat.contentType == type)
-                return
-            else
-                abandonAudioFocus()
-        }
-        val attributes = AudioAttributesCompat.Builder()
-                .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
-                .setContentType(type)
-                .build()
-        audioFocusRequest = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT)
-                .setAudioAttributes(attributes)
-                .setOnAudioFocusChangeListener { }
-                .build()
-        if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.d(TAG, "Audio focus granted")
-            isAudioFocused = true
-            if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
-                Log.d(TAG, "Starting Bluetooth SCO")
-                am.startBluetoothSco()
-            }
-        } else {
-            Log.d(TAG, "Audio focus denied")
-            audioFocusRequest = null
-            isAudioFocused = false
-        }
-    }
-
-    private fun abandonAudioFocus() {
-        if (audioFocusRequest != null) {
-            AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!)
-            audioFocusRequest = null
-            isAudioFocused = false
-            Log.d(TAG, "Audio focus abandoned")
-        }
-    }
-
     private fun startRinging() {
-        requestAudioFocus(AudioAttributes.CONTENT_TYPE_MUSIC)
+        requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_MUSIC)
         am.mode = AudioManager.MODE_RINGTONE
         if (rt == null) {
             val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
@@ -1262,7 +1209,7 @@ class BaresipService: Service() {
 
     private fun stopRinging() {
         if (am.mode == AudioManager.MODE_RINGTONE)
-            abandonAudioFocus()
+            abandonAudioFocus(am)
         if (VERSION.SDK_INT < 28 && rtTimer != null) {
             rtTimer!!.cancel()
             rtTimer = null
@@ -1479,7 +1426,7 @@ class BaresipService: Service() {
             if (am.isBluetoothScoOn)
                 am.stopBluetoothSco()
             am.mode = AudioManager.MODE_NORMAL
-            abandonAudioFocus()
+            abandonAudioFocus(am)
             stopRinging()
             stopMediaPlayer()
             uas.clear()
@@ -1537,6 +1484,60 @@ class BaresipService: Service() {
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
 
+        private var audioFocusRequest: AudioFocusRequestCompat? = null
+        private var btAdapter: BluetoothAdapter? = null
+
+        fun requestAudioFocus(am: AudioManager, type: Int): Boolean  {
+            Log.d(TAG, "Requesting audio focus of type $type")
+            if (audioFocusRequest != null) {
+                if (audioFocusRequest!!.audioAttributesCompat.contentType == type)
+                    return true
+                else
+                    abandonAudioFocus(am)
+            }
+            val attributes = AudioAttributesCompat.Builder()
+                .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
+                .setContentType(type)
+                .build()
+            audioFocusRequest = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT)
+                .setAudioAttributes(attributes)
+                .setOnAudioFocusChangeListener { }
+                .build()
+            if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                Log.d(TAG, "Audio focus granted")
+                isAudioFocused = true
+                if (isBluetoothHeadsetConnected() && !am.isBluetoothScoOn) {
+                    Log.d(TAG, "Starting Bluetooth SCO")
+                    am.startBluetoothSco()
+                }
+                if (type == AudioAttributes.CONTENT_TYPE_SPEECH)
+                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+            } else {
+                Log.i(TAG, "Audio focus denied")
+                audioFocusRequest = null
+                isAudioFocused = false
+            }
+            return isAudioFocused
+        }
+
+        private fun abandonAudioFocus(am: AudioManager) {
+            if (audioFocusRequest != null) {
+                AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!)
+                audioFocusRequest = null
+                isAudioFocused = false
+                Log.d(TAG, "Audio focus abandoned")
+            }
+        }
+
+        @SuppressLint("MissingPermission")
+        private fun isBluetoothHeadsetConnected(): Boolean {
+            return if (VERSION.SDK_INT < 31)
+                btAdapter != null && btAdapter!!.isEnabled &&
+                        btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothAdapter.STATE_CONNECTED
+            else
+                // getProfileConnectionState requires asking for BLUETOOTH_CONNECT permission
+                true
+        }
 
     }
 
