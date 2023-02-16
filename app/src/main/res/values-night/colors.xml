@@ -25,4 +25,5 @@
     <color name="colorSpinnerDivider">@color/colorGrayLight</color>
     <color name="colorItemText">@color/colorGrayLight</color>
     <color name="colorAlertText">@color/colorGrayLight</color>
+    <color name="colorCodec">@color/colorSecondaryDark</color>
 </resources>

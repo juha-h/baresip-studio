@@ -26,4 +26,5 @@
     <color name="colorSpinnerDivider">@color/colorGray</color>
     <color name="colorItemText">@color/colorBlack</color>
     <color name="colorAlertText">@color/colorBlack</color>
+    <color name="colorCodec">@color/colorBlack</color>
 </resources>
