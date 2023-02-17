@@ -20,10 +20,6 @@ set(re_DIR ${distribution_DIR}/re/cmake)
 find_package(re CONFIG REQUIRED HINTS ${distribution_DIR}/re/cmake)
 add_definitions(${RE_DEFINITIONS})
 
-add_library(lib_rem STATIC IMPORTED)
-set_target_properties(lib_rem PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/rem/lib/${ANDROID_ABI}/librem.a)
-
 add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
@@ -133,7 +129,6 @@ target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include
         ${distribution_DIR}/ffmpeg/include
         ${distribution_DIR}/re/include
-        ${distribution_DIR}/rem/include
         ${distribution_DIR}/baresip/include)
 
 add_definitions(-DHAVE_PTHREAD)
@@ -145,7 +140,6 @@ target_link_libraries(baresip
         GLESv1_CM
         OpenSLES
         lib_baresip
-        lib_rem
         lib_re
         lib_ssl
         lib_crypto
