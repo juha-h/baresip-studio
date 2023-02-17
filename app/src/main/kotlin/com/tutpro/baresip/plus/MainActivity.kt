@@ -224,6 +224,10 @@ class MainActivity : AppCompatActivity() {
                         else
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
                     }
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
+                        speakerButton.setImageResource(R.drawable.speaker_on_button)
+                    else
+                        speakerButton.setImageResource(R.drawable.speaker_off_button)
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
