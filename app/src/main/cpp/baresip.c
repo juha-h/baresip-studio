@@ -1088,6 +1088,25 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jlong ua, jlon
     re_thread_leave();
 }
 
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_ua_1add_1custom_1header(JNIEnv *env, jobject thiz, jlong ua,
+						    jstring jname, jstring jbody) {
+    const char *name = (*env)->GetStringUTFChars(env, jname, 0);
+    const char *body = (*env)->GetStringUTFChars(env, jbody, 0);
+    LOGD("adding header to %ld with name/body %s/%s\n", (long)ua, name, body);
+    re_thread_enter();
+    struct pl pl_name, pl_body;
+    pl_set_str(&pl_name, name);
+    pl_set_str(&pl_body, body);
+    int err = ua_add_custom_hdr((struct ua *)ua, &pl_name, &pl_body);
+    re_thread_leave();
+    if (err)
+	    LOGW("adding custom header to ua %ld failed with  error %d\n", (long)ua, err);
+    (*env)->ReleaseStringUTFChars(env, jname, name);
+    (*env)->ReleaseStringUTFChars(env, jbody, body);
+    return err;
+}
+
 JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobject thiz, jlong ua)
 {

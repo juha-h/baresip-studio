@@ -66,6 +66,7 @@ object Api {
     external fun ua_hangup(uap: Long, callp: Long, code: Int, reason: String)
     external fun ua_call_alloc(uap: Long, xcallp: Long, video: Int): Long
     external fun ua_answer(uap: Long, callp: Long, video: Int)
+    external fun ua_add_custom_header(uap: Long, name: String, body: String)
     external fun ua_debug(uap: Long)
 
     external fun call_connect(callp: Long, peer_uri: String): Int
