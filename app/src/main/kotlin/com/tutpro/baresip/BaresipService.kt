@@ -28,6 +28,7 @@ import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -705,7 +706,8 @@ class BaresipService: Service() {
                             else
                                 PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
                                     PendingIntent.FLAG_UPDATE_CURRENT)
-                            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                            val nb = NotificationCompat.Builder(this,
+                                if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account, true)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
@@ -1116,6 +1118,11 @@ class BaresipService: Service() {
             highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             highChannel.enableVibration(true)
             nm.createNotificationChannel(highChannel)
+            val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Medium",
+                NotificationManager.IMPORTANCE_HIGH)
+            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            highChannel.enableVibration(false)
+            nm.createNotificationChannel(mediumChannel)
         }
     }
 
@@ -1218,7 +1225,7 @@ class BaresipService: Service() {
                         )
                     }
                 }
-            }, 0L, 2000L)
+            }, 500L, 2000L)
         }
     }
 
@@ -1228,8 +1235,12 @@ class BaresipService: Service() {
                 true
             } else {
                 if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
-                    @Suppress("DEPRECATION")
-                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
+                    if (VERSION.SDK_INT >= Build.VERSION_CODES.M) /* M == 23 */ {
+                        @Suppress("DEPRECATION")
+                        Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
+                    } else {
+                        true
+                    }
                 } else {
                     false
                 }
