@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.database.ContentObserver
 import android.media.*
+import android.media.AudioManager.RINGER_MODE_SILENT
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.*
@@ -28,6 +29,7 @@ import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -54,6 +56,7 @@ class BaresipService: Service() {
     private lateinit var wm: WifiManager
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
+    private lateinit var vibrator: Vibrator
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
@@ -65,6 +68,7 @@ class BaresipService: Service() {
 
     private var rt: Ringtone? = null
     private var rtTimer: Timer? = null
+    private var vbTimer: Timer? = null
     private var origVolume = mutableMapOf<Int, Int>()
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
@@ -97,6 +101,14 @@ class BaresipService: Service() {
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
 
         pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        vibrator = if (VERSION.SDK_INT >= 31) {
+            val vibratorManager = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            applicationContext.getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+        }
 
         // This is needed to keep service running also in Doze Mode
         partialWakeLock = pm.run {
@@ -1190,6 +1202,41 @@ class BaresipService: Service() {
                 }
             }, 1000, 1000)
         }
+        if (shouldVibrate()) {
+            vbTimer = Timer()
+            vbTimer!!.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    if (VERSION.SDK_INT < 26) {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(500)
+                    } else {
+                        vibrator.vibrate(
+                            VibrationEffect.createOneShot(
+                                500,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    }
+                }
+            }, 0L, 2000L)
+        }
+    }
+
+    private fun shouldVibrate(): Boolean {
+        return if (am.ringerMode != RINGER_MODE_SILENT) {
+            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
+                true
+            } else {
+                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
+                    @Suppress("DEPRECATION")
+                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
+                } else {
+                    false
+                }
+            }
+        } else {
+            false
+        }
     }
 
     private fun stopRinging() {
@@ -1202,6 +1249,10 @@ class BaresipService: Service() {
         if (rt != null) {
             rt!!.stop()
             rt = null
+        }
+        if (vbTimer != null) {
+            vbTimer!!.cancel()
+            vbTimer = null
         }
     }
 
