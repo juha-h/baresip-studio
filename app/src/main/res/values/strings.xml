@@ -508,8 +508,9 @@
     </string>
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
-    <string name="no_calls">You are not able to make or answer calls without \"Microphone\"
-        permission.</string>
+    <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
+    <string name="no_bluetooth">baresip is not able to detect Bluetooth connectivity without
+        \"Nearby devices\" permission.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>
     <string name="no_restore">You are not able restore backup without \"Storage\" permission.</string>
@@ -519,4 +520,6 @@
     <string name="show_password">Show Password</string>
     <string name="no_network">No network connection!</string>
     <string name="audio_focus_denied">Audio focus denied!</string>
+    <string name="mic_and_bluetooth">baresip needs \"Microphone\" permission for calls and
+        \"Nearby devices\" permission for Bluetooth detection.</string>
 </resources>
