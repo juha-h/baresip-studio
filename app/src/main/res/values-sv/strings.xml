@@ -301,4 +301,5 @@
     <string name="nickname">Namn</string>
     <string name="invalid_account_nickname">Ogiltigt kontonamn \'%1$s\'</string>
     <string name="non_unique_account_nickname">Namnet \'%1$s\' används redan</string>
+    <string name="audio_focus_denied">Ljudfokus nekad!</string>
 </resources>
