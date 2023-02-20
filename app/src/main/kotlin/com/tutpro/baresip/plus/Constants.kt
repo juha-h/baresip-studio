@@ -3,6 +3,7 @@ package com.tutpro.baresip.plus
 const val TAG = "Baresip+"
 
 const val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.plus.default"
+const val MEDIUM_CHANNEL_ID = "com.tutpro.baresip.plus.medium"
 const val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
 const val MIC_PERMISSION_REQUEST_CODE = 1

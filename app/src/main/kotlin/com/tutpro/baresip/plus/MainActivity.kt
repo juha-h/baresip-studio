@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var speakerButton: ImageButton
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
     private lateinit var chatRequests: ActivityResultLauncher<Intent>
     private lateinit var configRequest: ActivityResultLauncher<Intent>
@@ -100,6 +102,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
     private lateinit var comDevChangedListener: AudioManager.OnCommunicationDeviceChangedListener
+    private lateinit var permissions: Array<String>
 
     private var callHandler: Handler = Handler(Looper.getMainLooper())
     private var callRunnable: Runnable? = null
@@ -772,6 +775,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        permissions = if (BaresipService.supportedCameras) {
+            if (Build.VERSION.SDK_INT >= 31)
+                arrayOf(RECORD_AUDIO, CAMERA, BLUETOOTH_CONNECT)
+            else
+                arrayOf(RECORD_AUDIO, CAMERA)
+        } else {
+            if (Build.VERSION.SDK_INT >= 31)
+                arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
+            else
+                arrayOf(RECORD_AUDIO)
+        }
+
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
+                if (firstRun && isGranted.isEmpty())
+                    askPermissions(permissions)
+            }
+
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
             delegate.applyDayNight()
@@ -782,6 +803,17 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "Main onStart")
+
+        if (!Utils.checkPermissions(this, permissions))
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT) ||
+                    (CAMERA in permissions &&
+                        ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA))) {
+                askPermissions(permissions)
+            } else {
+                requestPermissionsLauncher.launch(permissions)
+            }
+
 
         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
             requestCallPermission(Manifest.permission.RECORD_AUDIO)
@@ -1152,6 +1184,21 @@ class MainActivity : AppCompatActivity() {
                 intent.removeExtra("action")
                 handleIntent(intent, action)
             }
+        }
+    }
+
+    private fun askPermissions(permissions: Array<String>) {
+        with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+            setTitle(getString(R.string.permissions_rationale))
+            setMessage(if (CAMERA in permissions)
+                getString(R.string.audio_and_video_permissions)
+            else
+                getString(R.string.audio_permissions))
+            setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                requestPermissionsLauncher.launch(permissions)
+                dialog.dismiss()
+            }
+            show()
         }
     }
 
@@ -2192,7 +2239,7 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     if (Build.VERSION.SDK_INT < 31) {
-                        if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH)) {
+                        if (!BaresipService.requestAudioFocus(this, am, AudioAttributes.CONTENT_TYPE_SPEECH)) {
                             Toast.makeText(
                                 applicationContext,
                                 R.string.audio_focus_denied,
@@ -2235,7 +2282,7 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
-                        if (!BaresipService.requestAudioFocus(am, AudioAttributes.CONTENT_TYPE_SPEECH))
+                        if (!BaresipService.requestAudioFocus(this, am, AudioAttributes.CONTENT_TYPE_SPEECH))
                             Toast.makeText(
                                 applicationContext,
                                 R.string.audio_focus_denied,

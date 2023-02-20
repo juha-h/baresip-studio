@@ -984,7 +984,7 @@ object Utils {
             }
             if (current != speakerDevice.type) {
                 if (speakerDevice.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
-                    am.clearCommunicationDevice()
+                    clearCommunicationDevice(am)
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
@@ -1033,6 +1033,26 @@ object Utils {
                 setSpeakerPhone(executor, am, false)
         } else {
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
+        }
+    }
+
+    fun setCommunicationDevice(am: AudioManager, type: Int) {
+        val current = am.communicationDevice!!.type
+        Log.d(TAG, "Current com dev/mode $current/${am.mode}")
+        for (device in am.availableCommunicationDevices)
+            if (device.type == type) {
+                    am.setCommunicationDevice(device)
+                    break
+                }
+        Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
+    }
+
+    fun clearCommunicationDevice(am: AudioManager) {
+        if (Build.VERSION.SDK_INT >= 31) {
+            am.clearCommunicationDevice()
+        } else {
+            if (am.isSpeakerphoneOn)
+                am.isSpeakerphoneOn = false
         }
     }
 
