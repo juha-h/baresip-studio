@@ -680,18 +680,8 @@ class MainActivity : AppCompatActivity() {
 
         requestPermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
-                Log.e(TAG, "********** isGranted $isGranted")
-                if (firstRun && isGranted.isEmpty()) {
-                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                        setTitle("Permissions")
-                        setMessage(getString(R.string.mic_and_bluetooth))
-                        setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                            requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
-                            dialog.dismiss()
-                        }
-                        show()
-                    }
-                }
+                if (firstRun && isGranted.isEmpty())
+                    askMicAndBtPermissions()
             }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
@@ -707,31 +697,12 @@ class MainActivity : AppCompatActivity() {
 
         if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)))
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
-                ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT)) {
-                layout.showSnackBar(
-                    binding.root,
-                    if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)) &&
-                        !Utils.checkPermissions(this, arrayOf(BLUETOOTH_CONNECT)))
-                        getString(R.string.mic_and_bluetooth)
-                    else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
-                        getString(R.string.no_calls)
-                    else
-                        getString(R.string.no_bluetooth),
-                    Snackbar.LENGTH_INDEFINITE,
-                    getString(R.string.ok)
-                ) {
-                    requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
-                }
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT)) {
+                askMicAndBtPermissions()
             } else {
-                requestPermissionsLauncher.launch(
-                    arrayOf(
-                        RECORD_AUDIO,
-                        BLUETOOTH_CONNECT
-                    )
+                requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
                 )
             }
-        else
-            Log.e(TAG, "********** all permissions granted")
 
         val action = intent.getStringExtra("action")
         if (action != null) {
@@ -842,6 +813,18 @@ class MainActivity : AppCompatActivity() {
                 intent.removeExtra("action")
                 handleIntent(intent, action)
             }
+        }
+    }
+
+    private fun askMicAndBtPermissions() {
+        with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+            setTitle(getString(R.string.permissions_rationale))
+            setMessage(getString(R.string.mic_and_bt_permissions))
+            setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
+                dialog.dismiss()
+            }
+            show()
         }
     }
 

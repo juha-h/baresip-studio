@@ -503,8 +503,7 @@
     <string name="call_already_active">Sinulla on jo puhelu käynnissä.</string>
     <string name="start_failed">Sovelluksen käynnistäminen epäonnistui. Tämä voi johtua virheellisestä
         Asetukset arvosta.  Tarkista Kuunteluosoite, TLS-varmennintiedosto ja TLS CA-tiedosto.
-        Sen jälkeen käynnistä baresip uudelleen.
-    </string>
+        Sen jälkeen käynnistä baresip uudelleen.</string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
     <string name="verify">Todennuspyyntö</string>
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;\?</string>
@@ -513,27 +512,22 @@
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
-    <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta
-    kohdetta ei ole todennettu!
-    </string>
+    <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta kohdetta ei ole
+        todennettu!</string>
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen\?</string>
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
-        versioon 9 saakka tiedosto löytyy Download-kansiosta.
-    </string>
+        versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
     <string name="backup_failed">Sovelluksen tietojen talletus epäonnistui. Android versioon 9 saakka
-        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.
-    </string>
+        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
-        uudelleen. Käynnistä uudelleen nyt\?
-    </string>
+        uudelleen. Käynnistä uudelleen nyt\?</string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
         annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
         Android versioon 9 saakka tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
-        Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.
-    </string>
+        Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.</string>
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
@@ -544,6 +538,10 @@
     <string name="no_network">Ei verkkoyhteyttä!</string>
     <string name="choose_telephony_provider_account">Valitse puhelinpalvelun tarjoava tili</string>
     <string name="call_details">Puhelutiedot</string>
-    <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-sovelluslupaa.</string>
+    <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audio fokus evätty!</string>
+    <string name="permissions_rationale">Tarvittavat luvat</string>
+    <string name="mic_and_bt_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja
+        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten, mikäli
+        sellaista halutaan käyttää.</string>
 </resources>

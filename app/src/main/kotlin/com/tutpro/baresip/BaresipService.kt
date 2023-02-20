@@ -13,6 +13,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.media.*
+import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
 import android.media.AudioManager.RINGER_MODE_SILENT
 import android.net.*
@@ -45,7 +46,6 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
-
 
 class BaresipService: Service() {
 
@@ -246,23 +246,13 @@ class BaresipService: Service() {
                         when (state) {
                             BluetoothHeadset.STATE_CONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset is connected")
-                                if (audioFocusRequest != null) {
-                                    //Handler(Looper.getMainLooper()).postDelayed({
-                                        //am.startBluetoothSco()
-                                        startBluetoothSco(am, 1000L)
-
-                                    //}, 1000)
-                                }
-                                //Timer("Sco", false).schedule(1000) {
-                                //        startBluetoothSco(am)
-                                //    }
+                                if (audioFocusRequest != null)
+                                    startBluetoothSco(am, 1000L, 3)
                             }
                             BluetoothHeadset.STATE_DISCONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset is disconnected")
-                                if (isBluetoothScoOn(am)) {
-                                    Log.d(TAG, "Stopping Bluetooth SCO")
+                                if (audioFocusRequest != null)
                                     stopBluetoothSco(am)
-                                }
                             }
 
                         }
@@ -276,9 +266,6 @@ class BaresipService: Service() {
                             }
                             BluetoothHeadset.STATE_AUDIO_DISCONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset audio is disconnected")
-                                if (isBluetoothScoOn(am)) {
-                                    stopBluetoothSco(am)
-                                }
                             }
                         }
                     }
@@ -778,7 +765,9 @@ class BaresipService: Service() {
                     }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
-                        Log.d(TAG, "AoR $aor call $callp established")
+                        Log.d(TAG, "AoR $aor call $callp established in mode ${am.mode}")
+                        if (am.mode != MODE_IN_COMMUNICATION)
+                            am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
                         call.onhold = false
                         if (ua.account.callHistory)
@@ -1571,7 +1560,7 @@ class BaresipService: Service() {
                 isAudioFocused = true
                 if (isBluetoothHeadsetConnected(ctx) /* && !am.isBluetoothScoOn */) {
                     Log.d(TAG, "Starting Bluetooth SCO")
-                    startBluetoothSco(am, 0L)
+                    startBluetoothSco(am, 10L, 1)
                 }
                 am.mode = AudioManager.MODE_IN_COMMUNICATION
                 //if (type == AudioAttributes.CONTENT_TYPE_SPEECH || isBluetoothHeadsetConnected(ctx))
@@ -1616,26 +1605,23 @@ class BaresipService: Service() {
                     false
         }
 
-        private fun startBluetoothSco(am: AudioManager, delay: Long) {
-            Log.d(TAG, "Starting Bluetooth SCO")
+        private fun startBluetoothSco(am: AudioManager, delay: Long, count: Int) {
+            Log.d(TAG, "Starting Bluetooth SCO at count $count")
             Handler(Looper.getMainLooper()).postDelayed({
-                if (VERSION.SDK_INT < 35)
+                if (VERSION.SDK_INT < 31) {
                     am.startBluetoothSco()
-                else
+                } else {
                     Utils.setCommunicationDevice(am, AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
-                if (!isBluetoothScoOn(am)) {
-                    Log.d(TAG, "Trying to start Bluetooth SCO again")
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        am.startBluetoothSco()
-                    }, delay)
                 }
+                if (!isBluetoothScoOn(am) && count > 1)
+                    startBluetoothSco(am, delay, count - 1)
             }, delay)
         }
 
         private fun stopBluetoothSco(am: AudioManager) {
             Log.d(TAG, "Stopping Bluetooth SCO")
             Handler(Looper.getMainLooper()).postDelayed({
-                if (VERSION.SDK_INT < 35)
+                if (VERSION.SDK_INT < 31)
                     am.stopBluetoothSco()
                 else
                     am.clearCommunicationDevice()
