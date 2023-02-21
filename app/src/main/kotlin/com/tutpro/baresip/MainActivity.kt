@@ -681,7 +681,7 @@ class MainActivity : AppCompatActivity() {
         requestPermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
                 if (firstRun && isGranted.isEmpty())
-                    askMicAndBtPermissions()
+                    askPermissions(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
             }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
@@ -698,7 +698,7 @@ class MainActivity : AppCompatActivity() {
         if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)))
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
                     ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT)) {
-                askMicAndBtPermissions()
+                askPermissions(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
             } else {
                 requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
                 )
@@ -816,12 +816,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun askMicAndBtPermissions() {
+    private fun askPermissions(permissions: Array<String>) {
         with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setTitle(getString(R.string.permissions_rationale))
-            setMessage(getString(R.string.mic_and_bt_permissions))
+            setMessage(getString(R.string.audio_permissions))
             setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
+                requestPermissionsLauncher.launch(permissions)
                 dialog.dismiss()
             }
             show()
@@ -1378,30 +1378,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            MIC_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty()) {
-                    if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                                        Manifest.permission.RECORD_AUDIO))
-                            layout.showSnackBar(
-                                    binding.root,
-                                    getString(R.string.no_calls),
-                                    Snackbar.LENGTH_INDEFINITE,
-                                    getString(R.string.ok)
-                            ) {
-                                ActivityCompat.requestPermissions(this,
-                                        arrayOf(Manifest.permission.RECORD_AUDIO),
-                                MIC_PERMISSION_REQUEST_CODE)
-                            }
-                    }
-                }
-            }
-        }
     }
 
     @RequiresApi(29)
