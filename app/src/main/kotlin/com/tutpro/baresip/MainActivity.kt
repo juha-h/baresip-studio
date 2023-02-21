@@ -662,9 +662,6 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
         }
 
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-
         if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -684,11 +681,10 @@ class MainActivity : AppCompatActivity() {
             else
                 arrayOf(RECORD_AUDIO)
 
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
         requestPermissionsLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
-                if (firstRun && isGranted.isEmpty())
-                    askPermissions(permissions)
-            }
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
@@ -701,10 +697,10 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.e(TAG, "Main onStart")
 
+
         if (!Utils.checkPermissions(this, permissions))
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
-                ((BLUETOOTH_CONNECT in permissions) &&
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT))) {
+            if (firstRun) {
+                firstRun = false
                 askPermissions(permissions)
             } else {
                 requestPermissionsLauncher.launch(permissions)
@@ -1319,7 +1315,7 @@ class MainActivity : AppCompatActivity() {
                     Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("backup")
                     ContextCompat.checkSelfPermission(
                         this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        WRITE_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Write External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
@@ -1328,18 +1324,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
+                        WRITE_EXTERNAL_STORAGE) -> {
                         layout.showSnackBar(
                             binding.root,
                             getString(R.string.no_backup),
                             Snackbar.LENGTH_INDEFINITE,
                             getString(R.string.ok)
                         ) {
-                            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
                         }
                     }
                     else -> {
-                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
                     }
                 }
             }
@@ -1350,7 +1346,7 @@ class MainActivity : AppCompatActivity() {
                         pickupFileFromDownloads("restore")
                     ContextCompat.checkSelfPermission(
                         this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        READ_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Read External Storage permission granted")
                         val path = Utils.downloadsPath("baresip.bs")
@@ -1359,18 +1355,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                        READ_EXTERNAL_STORAGE) -> {
                         layout.showSnackBar(
                             binding.root,
                             getString(R.string.no_restore),
                             Snackbar.LENGTH_INDEFINITE,
                             getString(R.string.ok)
                         ) {
-                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
                         }
                     }
                     else -> {
-                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
                     }
                 }
             }
@@ -1605,7 +1601,7 @@ class MainActivity : AppCompatActivity() {
             when {
                 ContextCompat.checkSelfPermission(
                     this,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     Log.d(TAG, "Notifications permission granted")
                     baresipService.action = "Start"
@@ -1614,7 +1610,7 @@ class MainActivity : AppCompatActivity() {
                         moveTaskToBack(true)
                 }
                 ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.POST_NOTIFICATIONS
+                    this, POST_NOTIFICATIONS
                 ) -> {
                     layout.showSnackBar(
                         binding.root,
@@ -1622,11 +1618,11 @@ class MainActivity : AppCompatActivity() {
                         Snackbar.LENGTH_INDEFINITE,
                         getString(R.string.ok)
                     ) {
-                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        requestPermissionLauncher.launch(POST_NOTIFICATIONS)
                     }
                 }
                 else -> {
-                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    requestPermissionLauncher.launch(POST_NOTIFICATIONS)
                 }
             }
         } else {
