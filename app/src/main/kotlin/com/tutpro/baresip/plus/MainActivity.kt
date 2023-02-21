@@ -380,7 +380,7 @@ class MainActivity : AppCompatActivity() {
 
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
-                if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                if (Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                     makeCall("voice")
                 else
                     Toast.makeText(applicationContext, getString(R.string.no_calls),
@@ -390,19 +390,13 @@ class MainActivity : AppCompatActivity() {
 
         callVideoButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
-                val permissions = if (BaresipService.supportedCameras)
-                    arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
-                else
-                    arrayOf(Manifest.permission.RECORD_AUDIO)
-                if (Utils.checkPermissions(this, permissions))
+                if (Utils.checkPermissions(this, arrayOf(RECORD_AUDIO, CAMERA)))
                     makeCall("video")
                 else
-                    if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-                        Toast.makeText(applicationContext, getString(R.string.no_calls),
-                                Toast.LENGTH_SHORT).show()
-                    else
-                        Toast.makeText(applicationContext, getString(R.string.no_video_calls),
-                                Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        applicationContext, getString(R.string.no_video_calls),
+                        Toast.LENGTH_SHORT
+                    ).show()
             }
         }
 
@@ -789,7 +783,7 @@ class MainActivity : AppCompatActivity() {
 
         requestPermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
-                if (firstRun && isGranted.isEmpty())
+                if (firstRun && !isGranted.containsValue(true))
                     askPermissions(permissions)
             }
 
@@ -804,23 +798,16 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "Main onStart")
 
-        if (!Utils.checkPermissions(this, permissions))
+        if (!Utils.checkPermissions(this, permissions)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT) ||
-                    (CAMERA in permissions &&
+                ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT) ||
+                (CAMERA in permissions &&
                         ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA))) {
                 askPermissions(permissions)
             } else {
                 requestPermissionsLauncher.launch(permissions)
             }
-
-
-        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-            requestCallPermission(Manifest.permission.RECORD_AUDIO)
-        else
-            if (BaresipService.supportedCameras)
-                if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.CAMERA)))
-                    requestCallPermission(Manifest.permission.CAMERA)
+        }
 
         val action = intent.getStringExtra("action")
         if (action != null) {
@@ -1799,56 +1786,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-
-            MIC_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty()) {
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (BaresipService.supportedCameras &&
-                                !Utils.checkPermissions(this, arrayOf(Manifest.permission.CAMERA)))
-                            requestCallPermission(Manifest.permission.CAMERA)
-                    } else {
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO))
-                            defaultLayout.showSnackBar(
-                                    binding.root,
-                                    getString(R.string.no_calls),
-                                    Snackbar.LENGTH_INDEFINITE,
-                                    getString(R.string.ok)
-                            ) {
-                                requestCallPermission(Manifest.permission.RECORD_AUDIO)
-                            }
-                    }
-                }
-            }
-
-            CAMERA_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty())
-                    if (grantResults[0] == PackageManager.PERMISSION_DENIED)
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA))
-                            defaultLayout.showSnackBar(
-                                    binding.root,
-                                    getString(R.string.no_video_calls),
-                                    Snackbar.LENGTH_INDEFINITE,
-                                    getString(R.string.ok)
-                            ) {
-                                requestCallPermission(Manifest.permission.CAMERA)
-                            }
-            }
-
-        }
-    }
-
-    private fun requestCallPermission(permission: String) {
-        ActivityCompat.requestPermissions(this, arrayOf(permission),
-                if (permission == Manifest.permission.RECORD_AUDIO)
-                    MIC_PERMISSION_REQUEST_CODE
-                else
-                    CAMERA_PERMISSION_REQUEST_CODE)
     }
 
     private fun quitRestart(reStart: Boolean) {
