@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
     private lateinit var comDevChangedListener: AudioManager.OnCommunicationDeviceChangedListener
+    private lateinit var permissions: Array<String>
 
     private var callHandler: Handler = Handler(Looper.getMainLooper())
     private var callRunnable: Runnable? = null
@@ -678,10 +679,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        permissions = if (Build.VERSION.SDK_INT >= 31)
+                arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
+            else
+                arrayOf(RECORD_AUDIO)
+
         requestPermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted: Map<String, Boolean> ->
                 if (firstRun && isGranted.isEmpty())
-                    askPermissions(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
+                    askPermissions(permissions)
             }
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
@@ -695,13 +701,13 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.e(TAG, "Main onStart")
 
-        if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)))
+        if (!Utils.checkPermissions(this, permissions))
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECORD_AUDIO) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT)) {
-                askPermissions(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT))
+                ((BLUETOOTH_CONNECT in permissions) &&
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, BLUETOOTH_CONNECT))) {
+                askPermissions(permissions)
             } else {
-                requestPermissionsLauncher.launch(arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
-                )
+                requestPermissionsLauncher.launch(permissions)
             }
 
         val action = intent.getStringExtra("action")
