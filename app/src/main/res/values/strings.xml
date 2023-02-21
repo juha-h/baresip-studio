@@ -521,7 +521,10 @@
     <string name="no_network">No network connection!</string>
     <string name="audio_focus_denied">Audio focus denied!</string>
     <string name="permissions_rationale">Permissions rationale</string>
-    <string name="mic_and_bt_permissions">baresip needs \"Microphone\" permission for voice calls and
+    <string name="audio_permissions">baresip needs \"Microphone\" permission for voice calls and
         \"Nearby devices\" permission for Bluetooth microphone/speaker detection if you want to use
         such a device.</string>
+    <string name="audio_and_video_permissions">baresip needs \"Microphone\" permission for voice calls,
+        \"Camera\" permission for video calls, and \"Nearby devices\" permission for Bluetooth
+        microphone/speaker detection if you want to use such a device.</string>
 </resources>
