@@ -1,0 +1,4 @@
+- Vibrate and vibrate while ringing according to Sound and vibration settings
+- Bluetooth fixes and improvements for Android 12+ devices
+- Show permissions rationale when baresip is started the first time
+- New Swedish and Portuguese (Brazil) translations
