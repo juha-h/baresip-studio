@@ -5,7 +5,7 @@
     <string name="dtmf">DTMF</string>
     <string name="backup">Cópia de Segurança</string>
     <string name="show_password">Mostrar Senha</string>
-    <string name="no_calls">Você não pode fazer ou atender chamadas sem a permissão do \"Microfone\".</string>
+    <string name="no_calls">O baresip precisa de permissão do \"Microfone\" para realizar chamadas de voz.</string>
     <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Nas versões do Android 9 e anteriores, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
     <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
     <string name="backup_failed">Falha ao fazer o backup dos dados do aplicativo no arquivo \'%1$s\'. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
@@ -302,4 +302,8 @@
     <string name="rtcp_mux_help">Se marcada, os pacotes RTP e RTCP são multiplexados numa única porta (RFC 5761).</string>
     <string name="no_notifications">Você não pode usar este aplicativo sem a permissão \"Notificações\".</string>
     <string name="audio_focus_denied">Foco de áudio negado!</string>
+    <string name="no_bluetooth">O baresip não é capaz de detectar a conectividade Bluetooth sem a permissão \"Dispositivos próximos\".</string>
+    <string name="permissions_rationale">Justificativa das permissões</string>
+    <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, e a permissão \"Notificações\" para enviar notificações.</string>
+    <string name="audio_and_video_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo e da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>
 </resources>
