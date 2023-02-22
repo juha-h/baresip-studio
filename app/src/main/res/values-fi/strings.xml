@@ -542,7 +542,7 @@
     <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja
         Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja
         Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
-    <string name="audio_and_video_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten,
+    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten,
         Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan
         Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten
         näyttämistä varten.</string>
