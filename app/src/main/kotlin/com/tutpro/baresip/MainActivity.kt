@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -107,7 +106,6 @@ class MainActivity : AppCompatActivity() {
     private var resumeUap = 0L
     private var resumeCall: Call? = null
     private var resumeAction = ""
-    private var firstRun = false
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -353,7 +351,7 @@ class MainActivity : AppCompatActivity() {
 
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
-                if (Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                if (Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                     makeCall()
                 else
                     Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
@@ -662,6 +660,46 @@ class MainActivity : AppCompatActivity() {
                 BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
         }
 
+        permissions = if (Build.VERSION.SDK_INT >= 33)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else if (Build.VERSION.SDK_INT >= 31)
+            arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else
+            arrayOf(RECORD_AUDIO)
+
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                val denied = mutableListOf<String>()
+                val shouldShow = mutableListOf<String>()
+                it.forEach { permission ->
+                    Log.e(TAG, "${permission.key} : ${permission.value}")
+                    if (!permission.value) {
+                        denied.add(permission.key)
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                permission.key))
+                            shouldShow.add(permission.key)
+                    }
+                }
+                if (denied.contains(POST_NOTIFICATIONS) &&
+                        !shouldShow.contains(POST_NOTIFICATIONS)) {
+                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                        setTitle("Cannot start baresip")
+                        setMessage("Notifications permission has not been granted")
+                        setPositiveButton(getString(R.string.ok)) { _, _ ->
+                            quitRestart(false)
+                        }
+                        show()
+                    }
+                } else {
+                    if (shouldShow.isNotEmpty())
+                        askPermissions(permissions)
+                    else
+                        startBaresip()
+                }
+            }
+
         if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -671,20 +709,9 @@ class MainActivity : AppCompatActivity() {
                 askPasswords(accounts)
             } else {
                 // Baresip is started for the first time
-                firstRun = true
-                startBaresip()
+                askPermissions(permissions)
             }
         }
-
-        permissions = if (Build.VERSION.SDK_INT >= 31)
-                arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
-            else
-                arrayOf(RECORD_AUDIO)
-
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        requestPermissionsLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
 
         if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
@@ -696,15 +723,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.e(TAG, "Main onStart")
-
-
-        if (!Utils.checkPermissions(this, permissions))
-            if (firstRun) {
-                firstRun = false
-                askPermissions(permissions)
-            } else {
-                requestPermissionsLauncher.launch(permissions)
-            }
 
         val action = intent.getStringExtra("action")
         if (action != null) {
@@ -1592,45 +1610,15 @@ class MainActivity : AppCompatActivity() {
                 askPasswords(accounts)
             }
         } else {
-            startBaresip()
+            requestPermissionsLauncher.launch(permissions)
         }
     }
 
     private fun startBaresip() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    Log.d(TAG, "Notifications permission granted")
-                    baresipService.action = "Start"
-                    startService(baresipService)
-                    if (atStartup)
-                        moveTaskToBack(true)
-                }
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, POST_NOTIFICATIONS
-                ) -> {
-                    layout.showSnackBar(
-                        binding.root,
-                        getString(R.string.no_notifications),
-                        Snackbar.LENGTH_INDEFINITE,
-                        getString(R.string.ok)
-                    ) {
-                        requestPermissionLauncher.launch(POST_NOTIFICATIONS)
-                    }
-                }
-                else -> {
-                    requestPermissionLauncher.launch(POST_NOTIFICATIONS)
-                }
-            }
-        } else {
-            baresipService.action = "Start"
-            startService(baresipService)
-            if (atStartup)
-                moveTaskToBack(true)
-        }
+        baresipService.action = "Start"
+        startService(baresipService)
+        if (atStartup)
+            moveTaskToBack(true)
     }
 
     private fun backup(password: String) {

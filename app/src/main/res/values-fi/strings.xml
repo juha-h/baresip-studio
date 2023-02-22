@@ -542,10 +542,10 @@
     <string name="audio_focus_denied">Audio fokus evätty!</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
     <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja
-        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten, mikäli
-        sellaista halutaan käyttää, ja Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
+        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja
+        Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
     <string name="audio_and_video_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten,
-        Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen
-        havaitsemista varten, mikäli sellaista halutaan käyttää, ja Ilmoitukset-luvan ilmoitusten
-        lähettämistä varten.</string>
+        Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan
+        Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten
+        näyttämistä varten.</string>
 </resources>
