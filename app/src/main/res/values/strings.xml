@@ -56,7 +56,6 @@
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
-            <li>In Android\'s \`Apps & notifications\` settings, select baresip+ app and allow Notifications.</li>
             <li>Check that default values in baresip+\'s Settings meet your needs
                 (touch item titles for help).</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>

@@ -10,7 +10,6 @@
             <p>Versio %1$s</p>
             <h2>Käyttövihjeitä</h2>
             <ul>
-                <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip-sovellus ja salli Ilmoitukset.</li>
                 <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja
@@ -51,7 +50,6 @@
             <p>Versio %1$s</p>
             <h2>Käyttövihjeitä</h2>
             <ul>
-                <li>Android-asetusten \'Sovellukset ja ilmoitukset\' osiossa valitse baresip+-sovellus ja salli Ilmoitukset.</li>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja
