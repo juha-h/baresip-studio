@@ -669,12 +669,12 @@ class MainActivity : AppCompatActivity() {
 
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
         requestPermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 val denied = mutableListOf<String>()
                 val shouldShow = mutableListOf<String>()
                 it.forEach { permission ->
-                    Log.e(TAG, "${permission.key} : ${permission.value}")
                     if (!permission.value) {
                         denied.add(permission.key)
                         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -685,8 +685,8 @@ class MainActivity : AppCompatActivity() {
                 if (denied.contains(POST_NOTIFICATIONS) &&
                         !shouldShow.contains(POST_NOTIFICATIONS)) {
                     with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                        setTitle("Cannot start baresip")
-                        setMessage("Notifications permission has not been granted")
+                        setTitle(getString(R.string.notice))
+                        setMessage(getString(R.string.no_notifications))
                         setPositiveButton(getString(R.string.ok)) { _, _ ->
                             quitRestart(false)
                         }
@@ -694,7 +694,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else {
                     if (shouldShow.isNotEmpty())
-                        askPermissions(permissions)
+                        Utils.alertView(this, getString(R.string.permissions_rationale),
+                            getString(R.string.audio_permissions)
+                        ) { requestPermissionsLauncher.launch(permissions) }
                     else
                         startBaresip()
                 }
@@ -709,7 +711,7 @@ class MainActivity : AppCompatActivity() {
                 askPasswords(accounts)
             } else {
                 // Baresip is started for the first time
-                askPermissions(permissions)
+                requestPermissionsLauncher.launch(permissions)
             }
         }
 
@@ -723,7 +725,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.e(TAG, "Main onStart")
-
         val action = intent.getStringExtra("action")
         if (action != null) {
             // MainActivity was not visible when call, message, or transfer request came in
@@ -833,18 +834,6 @@ class MainActivity : AppCompatActivity() {
                 intent.removeExtra("action")
                 handleIntent(intent, action)
             }
-        }
-    }
-
-    private fun askPermissions(permissions: Array<String>) {
-        with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-            setTitle(getString(R.string.permissions_rationale))
-            setMessage(getString(R.string.audio_permissions))
-            setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                requestPermissionsLauncher.launch(permissions)
-                dialog.dismiss()
-            }
-            show()
         }
     }
 
