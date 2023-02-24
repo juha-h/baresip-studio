@@ -304,6 +304,6 @@
     <string name="audio_focus_denied">Foco de áudio negado!</string>
     <string name="no_bluetooth">O baresip não é capaz de detectar a conectividade Bluetooth sem a permissão \"Dispositivos próximos\".</string>
     <string name="permissions_rationale">Justificativa das permissões</string>
-    <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para enviar notificações.</string>
-    <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo e da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>
+    <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para postar notificações.</string>
+    <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo. da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>
 </resources>
