@@ -114,7 +114,6 @@ class MainActivity : AppCompatActivity() {
     private var restart = false
     private var atStartup = false
     private var alerting = false
-    private var firstRun = false
 
     private var resumeUri = ""
     private var resumeUap = 0L
@@ -184,8 +183,6 @@ class MainActivity : AppCompatActivity() {
         swipeRefresh = binding.swipeRefresh
 
         BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
-
-        addVideoLayoutViews()
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -795,8 +792,8 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     if (shouldShow.isNotEmpty())
                         askPermissions()
-                    //else
-                        //startBaresip()
+                    else
+                        startBaresip()
                 }
             }
 
@@ -808,9 +805,8 @@ class MainActivity : AppCompatActivity() {
                 ).lines().toMutableList()
                 askPasswords(accounts)
             } else {
-                // Baresip is started for the first time\
-                firstRun = true
-                startBaresip()
+                // Baresip is started for the first time
+                requestPermissionsLauncher.launch(permissions)
             }
         }
 
@@ -824,23 +820,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "Main onStart")
-
-        if (!Utils.checkPermissions(this, permissions)) {
-            if (firstRun) {
-                firstRun = false
-                askPermissions()
-            } else {
-                requestPermissionsLauncher.launch(permissions)
-            }
-        }
-
         val action = intent.getStringExtra("action")
         if (action != null) {
             // MainActivity was not visible when call, message, or transfer request came in
             intent.removeExtra("action")
             handleIntent(intent, action)
         }
-
     }
 
     override fun onResume() {
@@ -1385,6 +1370,9 @@ class MainActivity : AppCompatActivity() {
                 recreate()
                 return
             }
+            // For some reason baresip crashes it permissions or passwords are asked after
+            // video layout views have been added
+            addVideoLayoutViews()
             uaAdapter.notifyDataSetChanged()
             if (callActionUri != "") {
                 var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
@@ -2020,8 +2008,7 @@ class MainActivity : AppCompatActivity() {
                 askPasswords(accounts)
             }
         } else {
-            startBaresip()
-            // requestPermissionsLauncher.launch(permissions)
+            requestPermissionsLauncher.launch(permissions)
         }
     }
 
