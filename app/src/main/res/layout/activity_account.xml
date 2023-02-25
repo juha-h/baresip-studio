@@ -161,6 +161,33 @@
             </CheckBox>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/RegIntTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/RegInt"
+                android:textSize="18sp"
+                android:text="@string/reg_int" >
+            </TextView>
+            <EditText
+                android:id="@+id/RegInt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:textSize="18sp"
+                android:inputType="number"
+                android:importantForAutofill="no" >
+            </EditText>
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/AudioCodecsTitle"
             android:layout_width="wrap_content"
@@ -355,25 +382,35 @@
             android:layout_width="fill_parent">
         </EditText>
 
-        <TextView
-            android:id="@+id/CountryCodeTitle"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:textSize="18sp"
-            android:text="@string/country_code" >
-        </TextView>
-
-        <EditText
-            android:id="@+id/countryCode"
-            android:layout_height="wrap_content"
-            android:hint="@string/country_code_hint"
-            android:textColorHint="@color/colorSecondaryDark"
-            android:textSize="18sp"
-            android:inputType="phone"
-            android:importantForAutofill="no"
-            android:layout_width="fill_parent">
-        </EditText>
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/CountryCodeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/countryCode"
+                android:paddingTop="10dp"
+                android:textSize="18sp"
+                android:text="@string/country_code" >
+            </TextView>
+            <EditText
+                android:id="@+id/countryCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:hint="@string/country_code_hint"
+                android:textColorHint="@color/colorSecondaryDark"
+                android:textSize="18sp"
+                android:inputType="phone"
+                android:importantForAutofill="no" >
+            </EditText>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/TelephonyProviderTitle"
