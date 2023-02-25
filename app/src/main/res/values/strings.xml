@@ -139,9 +139,12 @@
     <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
     <string name="invalid_proxy_server_uri">Invalid Proxy Server URI \'%1$s\'</string>
     <string name="register">Register</string>
-    <string name="register_help">If checked, registration is enabled and REGISTER requests are sent at
-        12 minute intervals.
-    </string>
+    <string name="register_help">If checked, registration is enabled and REGISTER requests are sent
+        at the interval specified by Registration Interval.</string>
+    <string name="reg_int">Registration Interval</string>
+    <string name="reg_int_help">Tells how often (in seconds) baresip sends REGISTER requests.
+        Valid values are from 60 to 3600.</string>
+    <string name="invalid_reg_int">Invalid Registration Interval\'%1$s\'</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity

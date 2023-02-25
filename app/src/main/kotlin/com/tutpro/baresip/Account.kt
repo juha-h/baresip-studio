@@ -22,6 +22,7 @@ class Account(val accp: Long) {
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
     var regint = Api.account_regint(accp)
+    var configuredRegInt = REGISTRATION_INTERVAL
     var mediaEnc = Api.account_mediaenc(accp)
     var rtcpMux = Api.account_rtcp_mux(accp)
     var dtmfMode = Api.account_dtmfmode(accp)
@@ -66,6 +67,8 @@ class Account(val accp: Long) {
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
             nickName = Utils.paramValue(extra,"nickname")
+        if (Utils.paramExists(extra, "regint"))
+            configuredRegInt = Utils.paramValue(extra,"regint").toInt()
         callHistory = Utils.paramValue(extra,"call_history") == ""
         if (Utils.paramExists(extra, "country_code"))
             countryCode = Utils.paramValue(extra,"country_code")
@@ -144,7 +147,10 @@ class Account(val accp: Long) {
         if (countryCode != "")
             extra += ";country_code=$countryCode"
 
-        if (extra != "")
+        if (configuredRegInt != REGISTRATION_INTERVAL)
+            extra += ";regint=$configuredRegInt"
+
+        if (extra !="")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
 
         return res

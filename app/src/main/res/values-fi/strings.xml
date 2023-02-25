@@ -138,9 +138,12 @@
         välityspalvelimen SIP URI</string>
     <string name="invalid_proxy_server_uri">Virheellinen välityspalvelimen URI \'%1$s\'</string>
     <string name="register">Rekisteröi</string>
-    <string name="register_help">Jos merkitty, rekisteröinti on
-        aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
-    </string>
+    <string name="register_help">Jos merkitty, rekisteröinti on aktiivinen ja REGISTER-sanomat
+        lähetetään Rekisteröintitaajuus-asetuksen mukaisesti.</string>
+    <string name="reg_int">Rekisteröintitaajuus</string>
+    <string name="reg_int_help">Kertoo kuinka usein baresip lähettää REGISTER-sanomia. Arvon on
+        oltava välillä 60-3600 (sekunttia).</string>
+    <string name="invalid_reg_int">Virheellinen Rekisteröintitaajuus \'%1$s\'</string>
     <string name="media_nat">Media NAT hallinta</string>
     <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
@@ -385,7 +388,9 @@
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
-    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen käynnistyessä.</string>
+    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit
+        sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen
+        käynnistyessä.</string>
     <string name="reset_config">Palauta oletusasetukset</string>
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.

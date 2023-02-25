@@ -40,6 +40,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var stunUser: EditText
     private lateinit var stunPass: EditText
     private lateinit var regCheck: CheckBox
+    private lateinit var regInt: EditText
     private lateinit var mediaNatSpinner: Spinner
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
@@ -84,6 +85,7 @@ class AccountActivity : AppCompatActivity() {
         authPass = binding.AuthPass
         outbound = arrayOf(binding.Outbound1, binding.Outbound2)
         regCheck = binding.Register
+        regInt = binding.RegInt
         mediaNatSpinner = binding.mediaNatSpinner
         stun = binding.Stun
         stunServer = binding.StunServer
@@ -234,6 +236,7 @@ class AccountActivity : AppCompatActivity() {
         }
 
         regCheck.isChecked = acc.regint > 0
+        regInt.setText(acc.configuredRegInt.toString())
 
         this.acc.audioCodec = acc.audioCodec
 
@@ -485,24 +488,36 @@ class AccountActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var newRegint = -1
-                if (regCheck.isChecked) {
-                    if (acc.regint != REGISTRATION_INTERVAL) {
-                        newRegint = REGISTRATION_INTERVAL
-                        ua.status = R.drawable.dot_yellow
-                    }
-                } else {
-                    if (acc.regint != 0) {
-                        ua.status = R.drawable.dot_white
-                        newRegint = 0
-                    }
+                val newConfiguredRegInt = regInt.text.toString().trim().toInt()
+                if (newConfiguredRegInt < 60 || newConfiguredRegInt > 3600) {
+                    Utils.alertView(
+                        this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_reg_int), newConfiguredRegInt)
+                    )
+                    return false
                 }
-                if (newRegint != -1) {
-                    if (Api.account_set_regint(acc.accp, newRegint) != 0) {
+                val reRegister = (regCheck.isChecked != acc.regint > 0) ||
+                        (regCheck.isChecked && newConfiguredRegInt != acc.configuredRegInt)
+                if (reRegister) {
+                    if (Api.account_set_regint(
+                            acc.accp,
+                            if (regCheck.isChecked) newConfiguredRegInt else 0
+                        ) != 0
+                    ) {
                         Log.e(TAG, "Setting of regint failed")
                     } else {
+                        ua.status = if (regCheck.isChecked)
+                            R.drawable.dot_yellow
+                        else
+                            R.drawable.dot_white
                         acc.regint = Api.account_regint(acc.accp)
+                        acc.configuredRegInt = newConfiguredRegInt
                         Log.d(TAG, "New regint is ${acc.regint}")
+                        save = true
+                    }
+                } else {
+                    if (newConfiguredRegInt != acc.configuredRegInt) {
+                        acc.configuredRegInt = newConfiguredRegInt
                         save = true
                     }
                 }
@@ -660,8 +675,8 @@ class AccountActivity : AppCompatActivity() {
 
                 if (save) {
                     AccountsActivity.saveAccounts()
-                    if (newRegint != -1) {
-                        if (newRegint == 0)
+                    if (reRegister) {
+                        if (acc.regint == 0)
                             Api.ua_unregister(ua.uap)
                         else
                             Api.ua_register(ua.uap)
