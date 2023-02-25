@@ -178,7 +178,7 @@
     <string name="media_nat">NAT Transversal de Mídia</string>
     <string name="audio_codecs_help">Lista dos codecs de áudio em ordem de prioridade. Arraste para reordenar, deslize para a direita para ativar ou desativar.</string>
     <string name="audio_codecs">Codecs de Áudio</string>
-    <string name="register_help">Se selecionado, registro é habilitado e requisições de REGISTRO serão enviadas em intervalos de 12 minutos.</string>
+    <string name="register_help">Se marcado, o registro é ativado e as solicitações de REGISTRO são enviadas no intervalo determinado pelo Intervalo de registro.</string>
     <string name="register">Registro</string>
     <string name="invalid_proxy_server_uri">URI do Servidor Proxy Inválido \'%1$s\'</string>
     <string name="sip_uri_of_another_proxy_server">URI SIP de outro Servidor Proxy</string>
@@ -306,4 +306,7 @@
     <string name="permissions_rationale">Justificativa das permissões</string>
     <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para postar notificações.</string>
     <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo. da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>
+    <string name="reg_int">Intervalo de registro</string>
+    <string name="invalid_reg_int">Intervalo de registro inválido\'%1$s\'</string>
+    <string name="reg_int_help">Informa com que frequência (em segundos) o baresip envia solicitações REGISTER. Os valores válidos são entre 60 a 3600.</string>
 </resources>
