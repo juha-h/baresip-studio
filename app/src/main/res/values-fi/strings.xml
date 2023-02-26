@@ -465,6 +465,8 @@
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="no_telephony_providers">Millekään tilille ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
+    <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
+        tarjoajaa</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
     <string name="video_call">Videopuhelu</string>
