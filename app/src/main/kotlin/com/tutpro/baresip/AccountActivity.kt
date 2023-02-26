@@ -60,6 +60,7 @@ class AccountActivity : AppCompatActivity() {
     private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
 
     private var save = false
+    private var reRegister = false
     private var uaIndex= -1
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -414,6 +415,7 @@ class AccountActivity : AppCompatActivity() {
                             acc.authUser = Api.account_auth_user(acc.accp)
                             Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
+                            reRegister = true
                         } else {
                             Log.e(TAG, "Setting of auth user failed")
                         }
@@ -486,6 +488,7 @@ class AccountActivity : AppCompatActivity() {
                     else
                         Api.account_set_sipnat(acc.accp, "outbound")
                     save = true
+                    reRegister = true
                 }
 
                 val newConfiguredRegInt = regInt.text.toString().trim().toInt()
@@ -496,24 +499,19 @@ class AccountActivity : AppCompatActivity() {
                     )
                     return false
                 }
-                val reRegister = (regCheck.isChecked != acc.regint > 0) ||
+                val reReg = (regCheck.isChecked != acc.regint > 0) ||
                         (regCheck.isChecked && newConfiguredRegInt != acc.configuredRegInt)
-                if (reRegister) {
-                    if (Api.account_set_regint(
-                            acc.accp,
+                if (reReg) {
+                    if (Api.account_set_regint(acc.accp,
                             if (regCheck.isChecked) newConfiguredRegInt else 0
-                        ) != 0
-                    ) {
+                        ) != 0) {
                         Log.e(TAG, "Setting of regint failed")
                     } else {
-                        ua.status = if (regCheck.isChecked)
-                            R.drawable.dot_yellow
-                        else
-                            R.drawable.dot_white
                         acc.regint = Api.account_regint(acc.accp)
                         acc.configuredRegInt = newConfiguredRegInt
                         Log.d(TAG, "New regint is ${acc.regint}")
                         save = true
+                        reRegister = true
                     }
                 } else {
                     if (newConfiguredRegInt != acc.configuredRegInt) {
@@ -676,6 +674,7 @@ class AccountActivity : AppCompatActivity() {
                 if (save) {
                     AccountsActivity.saveAccounts()
                     if (reRegister) {
+                        ua.status = R.drawable.dot_yellow
                         if (acc.regint == 0)
                             Api.ua_unregister(ua.uap)
                         else
@@ -837,6 +836,7 @@ class AccountActivity : AppCompatActivity() {
             acc.authPass = Api.account_auth_pass(acc.accp)
             MainActivity.aorPasswords.remove(acc.aor)
             save = true
+            reRegister = true
         } else {
             Log.e(TAG, "Setting of auth pass failed")
         }
