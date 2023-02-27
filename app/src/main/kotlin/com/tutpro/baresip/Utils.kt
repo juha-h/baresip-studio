@@ -323,7 +323,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- ]{0,15}\$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- ()]{0,20}\$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
@@ -339,7 +339,7 @@ object Utils {
             account.telProvider
         else
             aorDomain(account.aor)
-        return "sip:" + telUri.substring(4).filterNot{setOf('-', ' ').contains(it)} +
+        return "sip:" + telUri.substring(4).filterNot{setOf('-', ' ', '(', ')').contains(it)} +
                 "@" + hostPart + ";user=phone"
     }
 
