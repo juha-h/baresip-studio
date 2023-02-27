@@ -21,9 +21,7 @@
     <string name="sip_uri_of_proxy_server">SIP URI del servidor proxy</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI de otro servidor proxy</string>
     <string name="register">Registrar</string>
-    <string name="register_help">Si está marcado, el registro está habilitado y las solicitudes de REGISTRO se envían a
-        Intervalos de 12 minutos.
-    </string>
+    <string name="register_help">Si está marcado, el registro está habilitado y las solicitudes de REGISTRO se envían en el intervalo especificado por Intervalo de registro.</string>
     <string name="audio_codecs">Códecs de audio</string>
     <string name="audio_codecs_help">Lista de códecs de audio compatibles en orden de prioridad</string>
     <string name="media_nat">Media NAT transversal</string>
@@ -286,4 +284,15 @@
     <string name="invalid_display_name">Nombre de pantalla inválido \'%1$s\'</string>
     <string name="about_text_plus">&lt;h1&gt;Aplicación SIP basada en la biblioteca Baresip, que permite videollamadas y mensajes instantáneos&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Versión %1$s&lt;/p&gt; &lt; h2&gt; Consejos de uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Compruebe que la configuración de la aplicación baresip+ se ajuste a sus necesidades. Tocar cada encabezado proporciona ayuda.&lt;/li&gt; &lt;li&gt;Luego, cree una o más cuentas. Una vez más, un toque de cada encabezado proporciona ayuda.&lt;/li&gt; &lt;li&gt;La nueva cuenta también se puede configurar de forma parcialmente automática. Consulte la página &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt; Wiki&lt;/a&gt; para obtener más información.&lt;/li&gt; &lt;li&gt;El estado de registro de la cuenta es indicado por un punto de color: verde (registro exitoso), amarillo (registro en curso), a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt&gt;aquí&lt;/a&gt;. &lt;h2&gt;Código fuente&lt;/h2&gt; El código fuente está disponible en &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, donde también puede informar errores. &lt;h2&gt;Licencias&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Cláusula&lt;/b&gt; excepto por lo siguiente:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; Método de codificación AMR y seguridad TLS &lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; Métodos de codificación G.722 y G.726&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; Método de cifrado de medios ZRTP&lt;/li &gt; &lt;li&gt;&lt; b&gt;GNU GPLv2&lt;/b&gt; Métodos de codificación H.264 y H.265&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; Método de codificación G.729&lt;/li&gt; &lt;li&gt; &lt;b&gt;AOMedia&lt;/b&gt; Método de codificación AV1&lt;</string>
     <string name="about_title_plus">Acerca de baresip+</string>
+    <string name="reg_int">Intervalo de inscripción</string>
+    <string name="invalid_reg_int">Intervalo de registro no válido\'%1$s\'</string>
+    <string name="rtcp_mux">Multiplexación RTCP</string>
+    <string name="country_code">Código del país</string>
+    <string name="reg_int_help">Indica la frecuencia (en segundos) con la que baresip envía peticiones REGISTRO. Los valores válidos van de 60 a 3600.</string>
+    <string name="rtcp_mux_help">Si está marcada, los paquetes RTP y RTCP se multiplexan en un único puerto (RFC 5761).</string>
+    <string name="account_nickname">Apodo de la cuenta</string>
+    <string name="account_nickname_help">Apodo (si lo hay) utilizado para identificar esta cuenta dentro de la aplicación baresip.</string>
+    <string name="invalid_account_nickname">Apodo de la cuenta no válido \"%1$s</string>
+    <string name="non_unique_account_nickname">El apodo \'%1$s\' ya existe</string>
+    <string name="nickname">Apodo</string>
 </resources>
