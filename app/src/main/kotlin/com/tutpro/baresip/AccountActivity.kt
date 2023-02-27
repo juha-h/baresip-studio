@@ -163,8 +163,10 @@ class AccountActivity : AppCompatActivity() {
                                 "outbound-proxy-2" ->
                                     if (text.isNotEmpty())
                                         acc.outbound.add(text)
+                                "registration-interval" ->
+                                    acc.configuredRegInt = text.toInt()
                                 "register" ->
-                                    acc.regint = if (text == "yes") REGISTRATION_INTERVAL else 0
+                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
                                 "audio-codec" ->
                                     if (text in audioCodecs)
                                         acc.audioCodec.add(text)
