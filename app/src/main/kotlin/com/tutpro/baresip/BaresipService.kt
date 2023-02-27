@@ -685,17 +685,17 @@ class BaresipService: Service() {
                             }
                         }
                         if (!Utils.isVisible()) {
+                            val piFlags = if (VERSION.SDK_INT >= 23)
+                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            else
+                                PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "call show")
                                 .putExtra("callp", callp)
-                            val pi = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            else
-                                PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                            val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
+                                    piFlags)
                             val nb = NotificationCompat.Builder(this,
                                 if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account, true)
@@ -720,21 +720,13 @@ class BaresipService: Service() {
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                             answerIntent.putExtra("action", "call answer")
                                 .putExtra("callp", callp)
-                            val api = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.getActivity(applicationContext, ANSWER_REQ_CODE, answerIntent,
-                                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            else
-                                PendingIntent.getActivity(applicationContext, ANSWER_REQ_CODE, answerIntent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                            val api = PendingIntent.getActivity(applicationContext, ANSWER_REQ_CODE,
+                                answerIntent, piFlags)
                             val rejectIntent = Intent(this, BaresipService::class.java)
                             rejectIntent.action = "Call Reject"
                             rejectIntent.putExtra("callp", callp)
-                            val rpi = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.getService(this, REJECT_REQ_CODE, rejectIntent,
-                                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            else
-                                PendingIntent.getService(this, REJECT_REQ_CODE, rejectIntent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                            val rpi = PendingIntent.getService(this, REJECT_REQ_CODE,
+                                rejectIntent, piFlags)
                             nb.addAction(R.drawable.ic_stat_call,
                                     getActionText(R.string.answer, R.color.colorGreen), api)
                             nb.addAction(R.drawable.ic_stat_call_end,
@@ -801,17 +793,17 @@ class BaresipService: Service() {
                     }
                     "call transfer" -> {
                         if (!Utils.isVisible()) {
+                            val piFlags = if (VERSION.SDK_INT >= 23)
+                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            else
+                                PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "transfer show")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
-                            val pi = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE, intent,
-                                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            else
-                                PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
-                                    intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
+                                intent, piFlags)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(this, ev[1], ua.account)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
@@ -831,18 +823,13 @@ class BaresipService: Service() {
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                             acceptIntent.putExtra("action","transfer accept")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
-                            val acceptPendingIntent = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.getActivity(applicationContext, ACCEPT_REQ_CODE,
-                                    acceptIntent, PendingIntent.FLAG_IMMUTABLE or
-                                            PendingIntent.FLAG_UPDATE_CURRENT)
-                            else
-                                PendingIntent.getActivity(applicationContext, ACCEPT_REQ_CODE,
-                                    acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            val acceptPendingIntent = PendingIntent.getActivity(applicationContext,
+                                ACCEPT_REQ_CODE, acceptIntent, piFlags)
                             val denyIntent = Intent(this, BaresipService::class.java)
                             denyIntent.action = "Transfer Deny"
                             denyIntent.putExtra("callp", callp)
                             val denyPendingIntent = PendingIntent.getService(this,
-                                    DENY_REQ_CODE, denyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                                    DENY_REQ_CODE, denyIntent, piFlags)
                             nb.addAction(R.drawable.ic_stat_call, getString(R.string.accept), acceptPendingIntent)
                             nb.addAction(R.drawable.ic_stat_call_end, getString(R.string.deny), denyPendingIntent)
                             nm.notify(TRANSFER_NOTIFICATION_ID, nb.build())
@@ -893,18 +880,18 @@ class BaresipService: Service() {
                             }
                             if (!Utils.isVisible()) {
                                 if (missed) {
+                                    val piFlags = if (VERSION.SDK_INT >= 23)
+                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                                    else
+                                        PendingIntent.FLAG_UPDATE_CURRENT
                                     val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
                                     val intent = Intent(applicationContext, MainActivity::class.java)
                                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                                     intent.putExtra("action", "call missed")
                                             .putExtra("uap", uap)
-                                    val pi = if (VERSION.SDK_INT >= 23)
-                                        PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                                    else
-                                        PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                                PendingIntent.FLAG_UPDATE_CURRENT)
+                                    val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
+                                        intent, piFlags)
                                     val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                                     nb.setSmallIcon(R.drawable.ic_stat_phone_missed)
                                             .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
@@ -989,17 +976,16 @@ class BaresipService: Service() {
         Message.save()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
+            val piFlags = if (VERSION.SDK_INT >= 23)
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            else
+                PendingIntent.FLAG_UPDATE_CURRENT
             val intent = Intent(applicationContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("action", "message show").putExtra("uap", uap)
                     .putExtra("peer", peer)
-            val pi = if (VERSION.SDK_INT >= 23)
-                PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            else
-                PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+            val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent, piFlags)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
             val sender = Utils.friendlyUri(this, peer, ua.account)
             nb.setSmallIcon(R.drawable.ic_stat_message)
@@ -1020,24 +1006,20 @@ class BaresipService: Service() {
                     Intent.FLAG_ACTIVITY_NEW_TASK
             replyIntent.putExtra("action", "message reply")
                 .putExtra("uap", uap).putExtra("peer", peer)
-            val rpi = if (VERSION.SDK_INT >= 23)
-                PendingIntent.getActivity(applicationContext, REPLY_REQ_CODE, replyIntent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            else
-                PendingIntent.getActivity(applicationContext, REPLY_REQ_CODE, replyIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+            val rpi = PendingIntent.getActivity(applicationContext, REPLY_REQ_CODE, replyIntent,
+                    piFlags)
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
             saveIntent.putExtra("uap", uap)
                 .putExtra("time", timeStampString)
-            val savePendingIntent = PendingIntent.getService(this,
-                    SAVE_REQ_CODE, saveIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent,
+                piFlags)
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
             deleteIntent.putExtra("uap", uap)
                 .putExtra("time", timeStampString)
-            val deletePendingIntent = PendingIntent.getService(this,
-                DELETE_REQ_CODE, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE,
+                deleteIntent, piFlags)
             nb.addAction(R.drawable.ic_stat_reply, "Reply", rpi)
             nb.addAction(R.drawable.ic_stat_save, "Save", savePendingIntent)
             nb.addAction(R.drawable.ic_stat_delete, "Delete", deletePendingIntent)
@@ -1541,7 +1523,7 @@ class BaresipService: Service() {
             if (audioFocusRequest != null) {
                 if (audioFocusRequest!!.audioAttributesCompat.contentType == type) {
                     Log.d(TAG, "Already focused")
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+                    am.mode = MODE_IN_COMMUNICATION
                     return true
                 } else {
                     abandonAudioFocus(am)
@@ -1562,7 +1544,7 @@ class BaresipService: Service() {
                     Log.d(TAG, "Starting Bluetooth SCO")
                     startBluetoothSco(am, 10L, 1)
                 }
-                am.mode = AudioManager.MODE_IN_COMMUNICATION
+                am.mode = MODE_IN_COMMUNICATION
                 //if (type == AudioAttributes.CONTENT_TYPE_SPEECH || isBluetoothHeadsetConnected(ctx))
                     //am.mode = AudioManager.MODE_IN_COMMUNICATION
             } else {

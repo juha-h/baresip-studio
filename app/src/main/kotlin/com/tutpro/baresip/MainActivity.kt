@@ -522,6 +522,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            Log.d(TAG, "************ activityAor = $activityAor")
             spinToAor(activityAor)
             updateIcons(Account.ofAor(activityAor)!!)
         }
