@@ -17,7 +17,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.DateFormat
 import java.util.*
 
-class MessageListAdapter(private val ctx: Context, private val peerUri: String, private val rows: ArrayList<Message>) :
+class MessageListAdapter(private val ctx: Context, private val peerUri: String,
+                         private val chatPeer: String, private val rows: ArrayList<Message>) :
         ArrayAdapter<Message>(ctx, R.layout.message, rows) {
 
     private val layoutInflater = LayoutInflater.from(context)
@@ -67,12 +68,11 @@ class MessageListAdapter(private val ctx: Context, private val peerUri: String, 
                 }
             }
             val builder = MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
-            val chatPeer = Contact.contactName(peerUri)
-            if (Contact.contactName(peerUri) == peerUri)
+            if (chatPeer == peerUri)
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(ctx.getString(R.string.long_message_question),
-                            chatPeer))
+                            peerUri))
                     setNeutralButton(ctx.getString(R.string.cancel), dialogClickListener)
                     setNegativeButton(ctx.getString(R.string.delete), dialogClickListener)
                     setPositiveButton(ctx.getString(R.string.add_contact), dialogClickListener)
@@ -100,12 +100,11 @@ class MessageListAdapter(private val ctx: Context, private val peerUri: String, 
         val peer: String = if (down) {
             lp.setMargins(0, 10, 75, 10)
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
-            val contactName = Contact.contactName(message.peerUri)
-            if (contactName.startsWith("sip:") &&
+            if (chatPeer.startsWith("sip:") &&
                     (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
                 Utils.uriUserPart(message.peerUri)
             else
-                contactName
+                chatPeer
         } else {
             lp.setMargins(75, 10, 0, 10)
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)

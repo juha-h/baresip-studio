@@ -17,7 +17,7 @@ class ChatsActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityChatsBinding
     private lateinit var uaMessages: ArrayList<Message>
-    internal lateinit var listView: ListView
+    private lateinit var listView: ListView
     private lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     private lateinit var plusButton: ImageButton

@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
@@ -18,7 +17,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityChatBinding
 
 class ChatActivity : AppCompatActivity() {
@@ -75,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account)
+        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account, true)
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
@@ -90,7 +88,7 @@ class ChatActivity : AppCompatActivity() {
         listView = binding.messages
 
         chatMessages = uaPeerMessages(aor, peerUri)
-        mlAdapter = MessageListAdapter(this, peerUri, chatMessages)
+        mlAdapter = MessageListAdapter(this, peerUri, chatPeer, chatMessages)
 
         val messagesObserver = Observer<Long> {
             chatMessages.clear()

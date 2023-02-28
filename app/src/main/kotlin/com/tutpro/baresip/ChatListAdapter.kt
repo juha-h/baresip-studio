@@ -44,15 +44,18 @@ class ChatListAdapter(private val ctx: Context, private val account: Account, pr
 
         val message = rows[position]
 
-        Utils.setAvatar(ctx, viewHolder.imageAvatarView, viewHolder.textAvatarView, message.peerUri)
+        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, account, true)
+        Utils.setAvatar(ctx, viewHolder.imageAvatarView, viewHolder.textAvatarView,
+            if (Contact.contactName(message.peerUri) == message.peerUri)
+                Utils.e164Uri(message.peerUri, account.countryCode)
+            else
+                message.peerUri)
 
         if ((message.direction == R.drawable.arrow_down_green) ||
                 (message.direction == R.drawable.arrow_down_red))
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
-
-        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, account)
 
         val cal = GregorianCalendar()
         cal.timeInMillis = message.timeStamp

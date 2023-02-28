@@ -130,6 +130,9 @@ object Utils {
             u = Contact.contactName(e164Uri(uri, account.countryCode))
             if (u != uri)
                 return u
+            u = friendlyUri(ctx, uri, account, false)
+            if (u != uri)
+                return u
         }
         val params = uriParams(u)
         if (uri.startsWith("<") && (uri.endsWith(">")))
@@ -973,6 +976,7 @@ object Utils {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     fun setCommunicationDevice(am: AudioManager, type: Int) {
         val current = am.communicationDevice!!.type
         Log.d(TAG, "Current com dev/mode $current/${am.mode}")
