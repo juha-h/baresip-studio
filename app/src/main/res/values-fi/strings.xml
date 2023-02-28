@@ -201,8 +201,8 @@
     </string>
     <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
     <string name="country_code">Maakoodi</string>
-    <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun From URI:n
-        etsintä yhteystiedoista epäonnistuu ja sen käyttäjäosa sisältää puhelinnumeron,
+    <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun tai viestin
+        From URI:n  Utils.e164Uri(message.peerUri, account.countryCode)viesetsintä yhteystiedoista epäonnistuu ja sen käyttäjäosa sisältää puhelinnumeron,
         joka ei ala \'+\' merkillä, niin tämä maakoodi lisätään numeron eteen ja etsintä tehdään
         uudelleen. Jos puhelinnumero alkaa yhdellä numerolla \'0\', niin numero \'0\'
         poistetaan ennen maakoodin lisäämistä.

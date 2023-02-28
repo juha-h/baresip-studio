@@ -195,7 +195,7 @@
     <string name="invalid_voicemail_uri">Invalid Voicemail URI \'%1$s\'</string>
     <string name="country_code">Country Code</string>
     <string name="country_code_help">E.164 country code of this account.  If From URI userpart of
-        incoming call contains a telephone number that does not start with \'+\' sign and if contact
+        incoming call or message contains a telephone number that does not start with \'+\' sign and if contact
         lookup fails, the number is prefixed with this country code and contact lookup is
         tried again. If the telephone number starts with a single digit \'0\', digit \'0\' is removed
         before the number is prefixed.
