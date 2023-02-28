@@ -1,0 +1,6 @@
+- Added registration interval account setting
+- Use Telephony Provider also when sending messages to tel URIs
+- Now also ( and ) characters are accepted in telephone number
+- Fixed posting notifications in later Android versions
+- Improved permission handling in later Android versions
+- New Spanish, Portuguese (Brazil)), and Swedish translations
