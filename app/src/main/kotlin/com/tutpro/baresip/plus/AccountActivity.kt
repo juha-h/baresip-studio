@@ -40,6 +40,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var stunUser: EditText
     private lateinit var stunPass: EditText
     private lateinit var regCheck: CheckBox
+    private lateinit var regInt: EditText
     private lateinit var mediaNatSpinner: Spinner
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
@@ -59,6 +60,7 @@ class AccountActivity : AppCompatActivity() {
     private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
 
     private var save = false
+    private var reRegister = false
     private var uaIndex= -1
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -84,6 +86,7 @@ class AccountActivity : AppCompatActivity() {
         authPass = binding.AuthPass
         outbound = arrayOf(binding.Outbound1, binding.Outbound2)
         regCheck = binding.Register
+        regInt = binding.RegInt
         mediaNatSpinner = binding.mediaNatSpinner
         stun = binding.Stun
         stunServer = binding.StunServer
@@ -160,8 +163,10 @@ class AccountActivity : AppCompatActivity() {
                                 "outbound-proxy-2" ->
                                     if (text.isNotEmpty())
                                         acc.outbound.add(text)
+                                "registration-interval" ->
+                                    acc.configuredRegInt = text.toInt()
                                 "register" ->
-                                    acc.regint = if (text == "yes") REGISTRATION_INTERVAL else 0
+                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
                                 "audio-codec" ->
                                     if (text in audioCodecs)
                                         acc.audioCodec.add(text)
@@ -234,6 +239,7 @@ class AccountActivity : AppCompatActivity() {
         }
 
         regCheck.isChecked = acc.regint > 0
+        regInt.setText(acc.configuredRegInt.toString())
 
         this.acc.audioCodec = acc.audioCodec
         this.acc.videoCodec = acc.videoCodec
@@ -412,6 +418,7 @@ class AccountActivity : AppCompatActivity() {
                             acc.authUser = Api.account_auth_user(acc.accp)
                             Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
+                            reRegister = true
                         } else {
                             Log.e(TAG, "Setting of auth user failed")
                         }
@@ -484,26 +491,34 @@ class AccountActivity : AppCompatActivity() {
                     else
                         Api.account_set_sipnat(acc.accp, "outbound")
                     save = true
+                    reRegister = true
                 }
 
-                var newRegint = -1
-                if (regCheck.isChecked) {
-                    if (acc.regint != REGISTRATION_INTERVAL) {
-                        newRegint = REGISTRATION_INTERVAL
-                        ua.status = R.drawable.dot_yellow
-                    }
-                } else {
-                    if (acc.regint != 0) {
-                        ua.status = R.drawable.dot_white
-                        newRegint = 0
-                    }
+                val newConfiguredRegInt = regInt.text.toString().trim().toInt()
+                if (newConfiguredRegInt < 60 || newConfiguredRegInt > 3600) {
+                    Utils.alertView(
+                        this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_reg_int), newConfiguredRegInt)
+                    )
+                    return false
                 }
-                if (newRegint != -1) {
-                    if (Api.account_set_regint(acc.accp, newRegint) != 0) {
+                val reReg = (regCheck.isChecked != acc.regint > 0) ||
+                        (regCheck.isChecked && newConfiguredRegInt != acc.configuredRegInt)
+                if (reReg) {
+                    if (Api.account_set_regint(acc.accp,
+                            if (regCheck.isChecked) newConfiguredRegInt else 0
+                        ) != 0) {
                         Log.e(TAG, "Setting of regint failed")
                     } else {
                         acc.regint = Api.account_regint(acc.accp)
+                        acc.configuredRegInt = newConfiguredRegInt
                         Log.d(TAG, "New regint is ${acc.regint}")
+                        save = true
+                        reRegister = true
+                    }
+                } else {
+                    if (newConfiguredRegInt != acc.configuredRegInt) {
+                        acc.configuredRegInt = newConfiguredRegInt
                         save = true
                     }
                 }
@@ -661,8 +676,9 @@ class AccountActivity : AppCompatActivity() {
 
                 if (save) {
                     AccountsActivity.saveAccounts()
-                    if (newRegint != -1) {
-                        if (newRegint == 0)
+                    if (reRegister) {
+                        ua.status = R.drawable.dot_yellow
+                        if (acc.regint == 0)
                             Api.ua_unregister(ua.uap)
                         else
                             Api.ua_register(ua.uap)
@@ -831,6 +847,7 @@ class AccountActivity : AppCompatActivity() {
             acc.authPass = Api.account_auth_pass(acc.accp)
             MainActivity.aorPasswords.remove(acc.aor)
             save = true
+            reRegister = true
         } else {
             Log.e(TAG, "Setting of auth pass failed")
         }
