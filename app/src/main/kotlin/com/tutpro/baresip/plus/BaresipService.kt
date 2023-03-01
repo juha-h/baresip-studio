@@ -1538,7 +1538,7 @@ class BaresipService: Service() {
             if (audioFocusRequest != null) {
                 if (audioFocusRequest!!.audioAttributesCompat.contentType == type) {
                     Log.d(TAG, "Already focused")
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+                    am.mode = MODE_IN_COMMUNICATION
                     return true
                 } else {
                     abandonAudioFocus(am)
@@ -1559,7 +1559,7 @@ class BaresipService: Service() {
                     Log.d(TAG, "Starting Bluetooth SCO")
                     startBluetoothSco(am, 10L, 1)
                 }
-                am.mode = AudioManager.MODE_IN_COMMUNICATION
+                am.mode = MODE_IN_COMMUNICATION
                 //if (type == AudioAttributes.CONTENT_TYPE_SPEECH || isBluetoothHeadsetConnected(ctx))
                     //am.mode = AudioManager.MODE_IN_COMMUNICATION
             } else {
