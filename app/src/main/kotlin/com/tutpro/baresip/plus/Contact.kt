@@ -91,7 +91,7 @@ sealed class Contact {
                     }
                     is AndroidContact -> {
                         for (u in c.uris)
-                            if (Utils.uriMatch(u, uri))
+                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)}, uri))
                                 return c
                     }
                 }

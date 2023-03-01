@@ -17,7 +17,7 @@ class ChatsActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityChatsBinding
     private lateinit var uaMessages: ArrayList<Message>
-    internal lateinit var listView: ListView
+    private lateinit var listView: ListView
     private lateinit var clAdapter: ChatListAdapter
     internal lateinit var peerUri: AutoCompleteTextView
     private lateinit var plusButton: ImageButton
@@ -112,7 +112,7 @@ class ChatsActivity: AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_chat_question),
-                            Utils.friendlyUri(this@ChatsActivity, peer, account)))
+                            Utils.friendlyUri(this@ChatsActivity, peer, account, true)))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
                     setNegativeButton(getText(R.string.delete), dialogClickListener)
                     setPositiveButton(getText(R.string.add_contact), dialogClickListener)

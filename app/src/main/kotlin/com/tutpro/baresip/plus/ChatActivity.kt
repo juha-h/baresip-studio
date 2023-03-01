@@ -73,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account)
+        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account, true)
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
@@ -88,7 +88,7 @@ class ChatActivity : AppCompatActivity() {
         listView = binding.messages
 
         chatMessages = uaPeerMessages(aor, peerUri)
-        mlAdapter = MessageListAdapter(this, peerUri, chatMessages)
+        mlAdapter = MessageListAdapter(this, peerUri, chatPeer, chatMessages)
 
         val messagesObserver = Observer<Long> {
             chatMessages.clear()
@@ -121,16 +121,28 @@ class ChatActivity : AppCompatActivity() {
                 val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
                         0, "", true)
                 msg.add()
+                var msgUri = ""
                 chatMessages.add(msg)
-                if (Api.message_send(ua.uap, peerUri, msgText, time.toString()) != 0) {
-                    Toast.makeText(applicationContext, "${getString(R.string.message_failed)}!",
-                            Toast.LENGTH_SHORT).show()
-                    msg.direction = R.drawable.arrow_up_red
-                    msg.responseReason = getString(R.string.message_failed)
-                } else {
-                    newMessage.text.clear()
-                    BaresipService.chatTexts.remove("$aor::$peerUri")
-                }
+                if (Utils.isTelUri(peerUri))
+                    if (ua.account.telProvider == "") {
+                        Utils.alertView(this, getString(R.string.notice),
+                            String.format(getString(R.string.no_telephony_provider),
+                                Utils.plainAor(aor)))
+                    } else {
+                        msgUri = Utils.telToSip(peerUri, ua.account)
+                    }
+                else
+                    msgUri = peerUri
+                if (msgUri != "")
+                    if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
+                        Toast.makeText(applicationContext, "${getString(R.string.message_failed)}!",
+                                Toast.LENGTH_SHORT).show()
+                        msg.direction = R.drawable.arrow_up_red
+                        msg.responseReason = getString(R.string.message_failed)
+                    } else {
+                        newMessage.text.clear()
+                        BaresipService.chatTexts.remove("$aor::$peerUri")
+                    }
                 mlAdapter.notifyDataSetChanged()
             }
         }
