@@ -138,9 +138,12 @@
         välityspalvelimen SIP URI</string>
     <string name="invalid_proxy_server_uri">Virheellinen välityspalvelimen URI \'%1$s\'</string>
     <string name="register">Rekisteröi</string>
-    <string name="register_help">Jos merkitty, rekisteröinti on
-        aktiivinen ja REGISTER-sanomat lähetetään noin 12 minuutin välein.
-    </string>
+    <string name="register_help">Jos merkitty, rekisteröinti on aktiivinen ja REGISTER-sanomat
+        lähetetään Rekisteröintitaajuus-asetuksen mukaisesti.</string>
+    <string name="reg_int">Rekisteröintitaajuus</string>
+    <string name="reg_int_help">Kertoo kuinka usein baresip lähettää REGISTER-sanomia. Arvon on
+        oltava välillä 60-3600 (sekunttia).</string>
+    <string name="invalid_reg_int">Virheellinen Rekisteröintitaajuus \'%1$s\'</string>
     <string name="media_nat">Media NAT hallinta</string>
     <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
@@ -198,8 +201,8 @@
     </string>
     <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
     <string name="country_code">Maakoodi</string>
-    <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun From URI:n
-        etsintä yhteystiedoista epäonnistuu ja sen käyttäjäosa sisältää puhelinnumeron,
+    <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun tai viestin
+        From URI:n  Utils.e164Uri(message.peerUri, account.countryCode)viesetsintä yhteystiedoista epäonnistuu ja sen käyttäjäosa sisältää puhelinnumeron,
         joka ei ala \'+\' merkillä, niin tämä maakoodi lisätään numeron eteen ja etsintä tehdään
         uudelleen. Jos puhelinnumero alkaa yhdellä numerolla \'0\', niin numero \'0\'
         poistetaan ennen maakoodin lisäämistä.
@@ -385,7 +388,9 @@
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
     <string name="sip_trace">SIP-sanomien jäljitys</string>
-    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen käynnistyessä.</string>
+    <string name="sip_trace_help">Jos merkitty ja jos Lokiviestit on merkitty, Logcat-viestit
+        sisältävät myös lähetetyt ja vastaanotetut SIP-sanomat. On aina merkitsemättä sovelluksen
+        käynnistyessä.</string>
     <string name="reset_config">Palauta oletusasetukset</string>
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
@@ -459,6 +464,8 @@
     <string name="transferring_call_to_dots">Puhelun siirto …</string>
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="no_telephony_providers">Millekään tilille ei ole konfiguroitu puhelinpalvelun
+        tarjoajaa</string>
+    <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
     <string name="callee">Puhelun kohde</string>
     <string name="hangup">Lopeta</string>
@@ -539,11 +546,11 @@
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audio fokus evätty!</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
-    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten,
-        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemiseksi, mikäli
-        sellaista halutaan käyttää, ja Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
-    <string name="audio_and_video_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten,
-        Kamera-luvan videopuheluita varten, Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen
-        havaitsemiseksi, mikäli sellaista halutaan käyttää, ja Ilmoitukset-luvan ilmoitusten
-        lähettämistä varten.</string>
+    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja
+        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja
+        Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
+    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten,
+        Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan
+        Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten
+        näyttämistä varten.</string>
 </resources>

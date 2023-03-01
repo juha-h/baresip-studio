@@ -139,9 +139,12 @@
     <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
     <string name="invalid_proxy_server_uri">Invalid Proxy Server URI \'%1$s\'</string>
     <string name="register">Register</string>
-    <string name="register_help">If checked, registration is enabled and REGISTER requests are sent at
-        12 minute intervals.
-    </string>
+    <string name="register_help">If checked, registration is enabled and REGISTER requests are sent
+        at the interval specified by Registration Interval.</string>
+    <string name="reg_int">Registration Interval</string>
+    <string name="reg_int_help">Tells how often (in seconds) baresip sends REGISTER requests.
+        Valid values are from 60 to 3600.</string>
+    <string name="invalid_reg_int">Invalid Registration Interval\'%1$s\'</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
@@ -192,7 +195,7 @@
     <string name="invalid_voicemail_uri">Invalid Voicemail URI \'%1$s\'</string>
     <string name="country_code">Country Code</string>
     <string name="country_code_help">E.164 country code of this account.  If From URI userpart of
-        incoming call contains a telephone number that does not start with \'+\' sign and if contact
+        incoming call or message contains a telephone number that does not start with \'+\' sign and if contact
         lookup fails, the number is prefixed with this country code and contact lookup is
         tried again. If the telephone number starts with a single digit \'0\', digit \'0\' is removed
         before the number is prefixed.
@@ -434,6 +437,7 @@
     <string name="diverted_by_dots">Diverted by …</string>
     <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
+    <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
     <string name="no_telephony_providers">Telephony Provider has not been configured for any account.</string>
     <string name="choose_telephony_provider_account">Choose Telephony Provider account</string>
     <string name="callee">Callee</string>
