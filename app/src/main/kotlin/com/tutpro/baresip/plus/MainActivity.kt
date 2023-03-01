@@ -791,7 +791,54 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else {
                     if (shouldShow.isNotEmpty())
-                        askPermissions()
+                        Utils.alertView(this, getString(R.string.permissions_rationale),
+                            if (CAMERA in permissions)
+                                getString(R.string.audio_and_video_permissions)
+                            else
+                                getString(R.string.audio_permissions)
+                        ) { requestPermissionsLauncher.launch(permissions) }
+                    else
+                        startBaresip()
+                }
+            }
+
+        permissions = if (Build.VERSION.SDK_INT >= 33)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else if (Build.VERSION.SDK_INT >= 31)
+            arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else
+            arrayOf(RECORD_AUDIO)
+
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                val denied = mutableListOf<String>()
+                val shouldShow = mutableListOf<String>()
+                it.forEach { permission ->
+                    if (!permission.value) {
+                        denied.add(permission.key)
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                permission.key))
+                            shouldShow.add(permission.key)
+                    }
+                }
+                if (denied.contains(POST_NOTIFICATIONS) &&
+                        !shouldShow.contains(POST_NOTIFICATIONS)) {
+                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                        setTitle(getString(R.string.notice))
+                        setMessage(getString(R.string.no_notifications))
+                        setPositiveButton(getString(R.string.ok)) { _, _ ->
+                            quitRestart(false)
+                        }
+                        show()
+                    }
+                } else {
+                    if (shouldShow.isNotEmpty())
+                        Utils.alertView(this, getString(R.string.permissions_rationale),
+                            getString(R.string.audio_permissions)
+                        ) { requestPermissionsLauncher.launch(permissions) }
                     else
                         startBaresip()
                 }
@@ -1185,15 +1232,6 @@ class MainActivity : AppCompatActivity() {
                 handleIntent(intent, action)
             }
         }
-    }
-
-    private fun askPermissions() {
-        Utils.alertView(this, getString(R.string.permissions_rationale),
-            if (CAMERA in permissions)
-                getString(R.string.audio_and_video_permissions)
-            else
-                getString(R.string.audio_permissions)
-        ) { requestPermissionsLauncher.launch(permissions) }
     }
 
     private fun callAction(intent: Intent) {
