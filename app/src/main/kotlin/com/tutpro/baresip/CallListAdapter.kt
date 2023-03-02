@@ -63,12 +63,7 @@ class CallListAdapter(private val ctx: Context, private val account: Account,
         if (count <= 3)
             viewHolder.etcView.text = ""
 
-        var peer = Contact.contactName(callRow.peerUri)
-        if (peer == callRow.peerUri)
-            peer = Contact.contactName(Utils.e164Uri(peer, account.countryCode))
-        if (peer == callRow.peerUri)
-            peer = Utils.friendlyUri(ctx, peer, account, false)
-        viewHolder.peerURIView.text = peer
+        viewHolder.peerURIView.text = Utils.friendlyUri(ctx, callRow.peerUri, account, true)
         viewHolder.timeView.text = Utils.relativeTime(ctx, callRow.stopTime)
 
         viewHolder.timeView.setOnClickListener {
