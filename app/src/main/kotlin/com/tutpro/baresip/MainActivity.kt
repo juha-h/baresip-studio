@@ -859,7 +859,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "tel" -> {
                     val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
-                            .filterNot{setOf('-', ' ').contains(it)}
+                            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
