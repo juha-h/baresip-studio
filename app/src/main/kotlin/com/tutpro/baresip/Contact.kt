@@ -90,8 +90,10 @@ sealed class Contact {
                             return c
                     }
                     is AndroidContact -> {
+                        val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
                         for (u in c.uris)
-                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)}, uri))
+                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)},
+                                    cleanUri))
                                 return c
                     }
                 }
