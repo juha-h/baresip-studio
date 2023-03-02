@@ -162,13 +162,15 @@ object Utils {
 
     fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
+        val scheme = uri.substring(0, 3)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
-                userPart.startsWith("00") -> uri.replace("sip:$userPart",
-                        "sip:+" + userPart.substring(2))
-                userPart.startsWith("0") -> uri.replace("sip:0", "sip:$countryCode")
-                else -> uri.replace("sip:", "sip:$countryCode")
+                userPart.startsWith("00") -> uri.replace("$scheme$userPart",
+                        scheme + userPart.substring(2))
+                userPart.startsWith("0") -> uri.replace("${scheme}0",
+                    "$scheme$countryCode")
+                else -> uri.replace(scheme, "$scheme$countryCode")
             }
         } else
             uri
