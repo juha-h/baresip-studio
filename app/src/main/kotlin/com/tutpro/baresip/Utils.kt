@@ -162,7 +162,7 @@ object Utils {
 
     fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
-        val scheme = uri.substring(0, 3)
+        val scheme = uri.substring(0, 4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
