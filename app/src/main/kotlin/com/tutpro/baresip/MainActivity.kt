@@ -522,7 +522,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            Log.d(TAG, "************ activityAor = $activityAor")
             spinToAor(activityAor)
             updateIcons(Account.ofAor(activityAor)!!)
         }
@@ -1893,8 +1892,8 @@ class MainActivity : AppCompatActivity() {
                     else
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account,
-                            call.status == "answered"))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
+                            //call.status == "answered"))
                     securityButton.visibility = View.INVISIBLE
                     diverter.visibility = View.GONE
                     callButton.visibility = View.INVISIBLE
@@ -1909,12 +1908,12 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account, true))
+                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
                     callUri.setAdapter(null)
                     securityButton.visibility = View.INVISIBLE
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account, true)
+                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account)
                         diverter.visibility = View.VISIBLE
                     } else {
                         diverter.visibility = View.GONE
@@ -1943,7 +1942,7 @@ class MainActivity : AppCompatActivity() {
                             callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
                         } else {
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account, true))
+                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
                         }
                         transferButton.isEnabled = true
                     }

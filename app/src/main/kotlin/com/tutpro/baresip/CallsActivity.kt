@@ -101,7 +101,7 @@ class CallsActivity : AppCompatActivity() {
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
             val peerUri = uaHistory[pos].peerUri
-            val peerName = Contact.contactName(peerUri)
+            val peerName = Utils.friendlyUri(this, peerUri, account)
             val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_NEGATIVE -> {
@@ -126,11 +126,11 @@ class CallsActivity : AppCompatActivity() {
             else
                 getString(R.string.calls_call)
             val builder = MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)
-            if (peerName.startsWith("sip:"))
+            if (!Contact.nameExists(peerName, false))
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.calls_add_delete_question),
-                            Utils.friendlyUri(this@CallsActivity, peerName, account), callText))
+                            peerName, callText))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
                     setNegativeButton(getString(R.string.add_contact), dialogClickListener)
@@ -140,7 +140,7 @@ class CallsActivity : AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.calls_delete_question),
-                            Utils.friendlyUri(this@CallsActivity, peerName, account), callText))
+                            peerName, callText))
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
                     show()

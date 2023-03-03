@@ -122,7 +122,7 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = false): String {
+    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true): String {
         var u = Contact.contactName(uri)
         if (u != uri)
             return u

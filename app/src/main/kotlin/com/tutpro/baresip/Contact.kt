@@ -147,7 +147,7 @@ sealed class Contact {
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
                 if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-                    contact.uris.add("tel:${data.filterNot{setOf('-', ' ').contains(it)}}")
+                    contact.uris.add("tel:${data.filterNot{setOf('-', ' ', '(', ')').contains(it)}}")
                 else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
                     contact.uris.add("sip:$data")
                 else

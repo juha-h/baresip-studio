@@ -63,7 +63,7 @@ class CallListAdapter(private val ctx: Context, private val account: Account,
         if (count <= 3)
             viewHolder.etcView.text = ""
 
-        viewHolder.peerURIView.text = Utils.friendlyUri(ctx, callRow.peerUri, account, true)
+        viewHolder.peerURIView.text = Utils.friendlyUri(ctx, callRow.peerUri, account)
         viewHolder.timeView.text = Utils.relativeTime(ctx, callRow.stopTime)
 
         viewHolder.timeView.setOnClickListener {

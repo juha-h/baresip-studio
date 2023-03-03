@@ -107,12 +107,12 @@ class ChatsActivity: AppCompatActivity() {
             }
 
             val builder = MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialogTheme)
-            val peer = Contact.contactName(uaMessages[pos].peerUri)
-            if (peer.startsWith("sip:"))
+            val peer = Utils.friendlyUri(this@ChatsActivity, uaMessages[pos].peerUri, account)
+            if (!Contact.nameExists(peer, false))
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_chat_question),
-                            Utils.friendlyUri(this@ChatsActivity, peer, account, true)))
+                            Utils.friendlyUri(this@ChatsActivity, peer, account)))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
                     setNegativeButton(getText(R.string.delete), dialogClickListener)
                     setPositiveButton(getText(R.string.add_contact), dialogClickListener)

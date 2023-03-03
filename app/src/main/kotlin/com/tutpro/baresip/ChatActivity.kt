@@ -73,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         this@ChatActivity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account, true)
+        val chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account)
 
         title = String.format(getString(R.string.chat_with), chatPeer)
 
