@@ -112,7 +112,7 @@ class ChatsActivity: AppCompatActivity() {
                 with (builder) {
                     setTitle(R.string.confirmation)
                     setMessage(String.format(getString(R.string.long_chat_question),
-                            Utils.friendlyUri(this@ChatsActivity, peer, account)))
+                            peer))
                     setNeutralButton(getText(R.string.cancel), dialogClickListener)
                     setNegativeButton(getText(R.string.delete), dialogClickListener)
                     setPositiveButton(getText(R.string.add_contact), dialogClickListener)

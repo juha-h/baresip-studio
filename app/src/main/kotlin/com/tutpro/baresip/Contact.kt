@@ -122,6 +122,8 @@ sealed class Contact {
         }
 
         fun loadAndroidContacts(ctx: Context) {
+            // If phone type is needed, add DATA2 to projection. Then phone type can be get from
+            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                     ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                     ContactsContract.Data.PHOTO_THUMBNAIL_URI)

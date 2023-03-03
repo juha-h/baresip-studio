@@ -207,7 +207,7 @@ class ContactActivity : AppCompatActivity() {
             R.id.checkIcon -> {
 
                 var newName = nameView.text.toString().trim()
-                var newUri = uriView.text.toString().filterNot{setOf('-', ' ').contains(it)}
+                var newUri = uriView.text.toString().filterNot{setOf('-', ' ', '(', ')').contains(it)}
 
                 if (newName == "") newName = newUri
 
