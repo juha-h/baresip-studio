@@ -578,7 +578,7 @@ class MainActivity : AppCompatActivity() {
                 b.putString("aor", aorSpinner.tag.toString())
             else
                 b.putString("aor", "")
-            i.putExtras(b)
+            i.putExtras(b)""
             contactsRequest.launch(i)
         }
 
@@ -1255,7 +1255,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "tel" -> {
                     val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
-                            .filterNot{setOf('-', ' ').contains(it)}
+                            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
@@ -1517,8 +1517,7 @@ class MainActivity : AppCompatActivity() {
                 if (!isFinishing && !alerting) {
                     with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                         setTitle(R.string.video_request)
-                        val peerUri = Utils.friendlyUri(this@MainActivity, call.peerUri, acc,
-                                call.status == "answered")
+                        val peerUri = Utils.friendlyUri(this@MainActivity, call.peerUri, acc)
                         val msg = when (dir) {
                             1 -> String.format(getString(R.string.allow_video_recv), peerUri)
                             2 -> String.format(getString(R.string.allow_video_send), peerUri)
@@ -2392,14 +2391,14 @@ class MainActivity : AppCompatActivity() {
                 "incoming" -> {
                     callTitle.text = getString(R.string.incoming_call_from_dots)
                     callTimer.visibility = View.INVISIBLE
-                    val caller =  Utils.friendlyUri(this, call.peerUri, ua.account, true)
+                    val caller =  Utils.friendlyUri(this, call.peerUri, ua.account)
                     callUri.setText(caller)
                     callUri.setAdapter(null)
                     videoButton.visibility = View.INVISIBLE
                     securityButton.visibility = View.INVISIBLE
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account, true)
+                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account)
                         diverter.visibility = View.VISIBLE
                     } else {
                         diverter.visibility = View.GONE
@@ -2455,7 +2454,7 @@ class MainActivity : AppCompatActivity() {
                             callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
                         } else {
                             callTitle.text = getString(R.string.incoming_call_from_dots)
-                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account, true))
+                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
                         }
                         transferButton.isEnabled = true
                     }

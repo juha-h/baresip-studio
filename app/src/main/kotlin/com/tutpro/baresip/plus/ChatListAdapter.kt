@@ -44,7 +44,7 @@ class ChatListAdapter(private val ctx: Context, private val account: Account, pr
 
         val message = rows[position]
 
-        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, account, true)
+        viewHolder.peerView.text = Utils.friendlyUri(ctx, message.peerUri, account)
         Utils.setAvatar(ctx, viewHolder.imageAvatarView, viewHolder.textAvatarView,
             if (Contact.contactName(message.peerUri) == message.peerUri)
                 Utils.e164Uri(message.peerUri, account.countryCode)

@@ -132,7 +132,7 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = false): String {
+    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true): String {
         var u = Contact.contactName(uri)
         if (u != uri)
             return u
@@ -172,13 +172,15 @@ object Utils {
 
     fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
+        val scheme = uri.substring(0, 4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
-                userPart.startsWith("00") -> uri.replace("sip:$userPart",
-                        "sip:+" + userPart.substring(2))
-                userPart.startsWith("0") -> uri.replace("sip:0", "sip:$countryCode")
-                else -> uri.replace("sip:", "sip:$countryCode")
+                userPart.startsWith("00") -> uri.replace("$scheme$userPart",
+                        scheme + userPart.substring(2))
+                userPart.startsWith("0") -> uri.replace("${scheme}0",
+                    "$scheme$countryCode")
+                else -> uri.replace(scheme, "$scheme$countryCode")
             }
         } else
             uri

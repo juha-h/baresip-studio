@@ -34,11 +34,12 @@ sealed class Contact {
 
         // Return contact name of uri or uri itself if contact with uri is not found
         fun contactName(uri: String): String {
-            val userPart = Utils.uriUserPart(uri)
-            val contact = if (Utils.isTelNumber(userPart))
-                findContact("tel:$userPart")
-            else
-                findContact(uri)
+            var contact = findContact(uri)
+            if (contact == null) {
+                val userPart = Utils.uriUserPart(uri)
+                if (Utils.isTelNumber(userPart))
+                    contact = findContact("tel:$userPart")
+            }
             if (contact != null) {
                 return when (contact) {
                     is BaresipContact ->
@@ -90,8 +91,10 @@ sealed class Contact {
                             return c
                     }
                     is AndroidContact -> {
+                        val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
                         for (u in c.uris)
-                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)}, uri))
+                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)},
+                                    cleanUri))
                                 return c
                     }
                 }
@@ -120,6 +123,8 @@ sealed class Contact {
         }
 
         fun loadAndroidContacts(ctx: Context) {
+            // If phone type is needed, add DATA2 to projection. Then phone type can be get from
+            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                     ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                     ContactsContract.Data.PHOTO_THUMBNAIL_URI)
@@ -145,7 +150,7 @@ sealed class Contact {
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
                 if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-                    contact.uris.add("tel:${data.filterNot{setOf('-', ' ').contains(it)}}")
+                    contact.uris.add("tel:${data.filterNot{setOf('-', ' ', '(', ')').contains(it)}}")
                 else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
                     contact.uris.add("sip:$data")
                 else

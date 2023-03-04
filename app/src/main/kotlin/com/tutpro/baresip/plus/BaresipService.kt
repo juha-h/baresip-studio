@@ -697,7 +697,7 @@ class BaresipService: Service() {
                                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                             val nb = NotificationCompat.Builder(this,
                                 if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
-                            val caller = Utils.friendlyUri(this, peerUri, ua.account, true)
+                            val caller = Utils.friendlyUri(this, peerUri, ua.account)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -968,7 +968,7 @@ class BaresipService: Service() {
     }
 
     @Keep
-    fun messageEvent(uap: Long, peer: String, msg: ByteArray) {
+    fun messageEvent(uap: Long, peerUri: String, msg: ByteArray) {
         var text = "Decoding of message failed!"
         try {
             text = String(msg, StandardCharsets.UTF_8)
@@ -982,8 +982,8 @@ class BaresipService: Service() {
         }
         val timeStamp = System.currentTimeMillis()
         val timeStampString = timeStamp.toString()
-        Log.d(TAG, "Message event for $uap from $peer at $timeStampString")
-        Message(ua.account.aor, peer, text, timeStamp,
+        Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
+        Message(ua.account.aor, peerUri, text, timeStamp,
                 R.drawable.arrow_down_green, 0, "", true).add()
         Message.save()
         ua.account.unreadMessages = true
@@ -992,11 +992,11 @@ class BaresipService: Service() {
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("action", "message show").putExtra("uap", uap)
-                    .putExtra("peer", peer)
+                    .putExtra("peer", peerUri)
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(this, peer, ua.account)
+            val sender = Utils.friendlyUri(this, peerUri, ua.account)
             nb.setSmallIcon(R.drawable.ic_stat_message)
                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                     .setContentIntent(pi)
@@ -1013,7 +1013,7 @@ class BaresipService: Service() {
             replyIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_NEW_TASK
             replyIntent.putExtra("action", "message reply")
-                .putExtra("uap", uap).putExtra("peer", peer)
+                .putExtra("uap", uap).putExtra("peer", peerUri)
             val rpi = PendingIntent.getActivity(applicationContext, REPLY_REQ_CODE, replyIntent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             val saveIntent = Intent(this, BaresipService::class.java)
@@ -1036,7 +1036,7 @@ class BaresipService: Service() {
         }
         if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
             nt.play()
-        postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peer), System.nanoTime()))
+        postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peerUri), System.nanoTime()))
     }
 
     @Keep
