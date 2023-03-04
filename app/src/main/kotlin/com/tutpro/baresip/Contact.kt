@@ -34,11 +34,12 @@ sealed class Contact {
 
         // Return contact name of uri or uri itself if contact with uri is not found
         fun contactName(uri: String): String {
-            val userPart = Utils.uriUserPart(uri)
-            val contact = if (Utils.isTelNumber(userPart))
-                findContact("tel:$userPart")
-            else
-                findContact(uri)
+            var contact = findContact(uri)
+            if (contact == null) {
+                val userPart = Utils.uriUserPart(uri)
+                if (Utils.isTelNumber(userPart))
+                    contact = findContact("tel:$userPart")
+            }
             if (contact != null) {
                 return when (contact) {
                     is BaresipContact ->
