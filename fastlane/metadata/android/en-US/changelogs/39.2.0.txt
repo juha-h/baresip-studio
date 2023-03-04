@@ -1,2 +1,2 @@
 - Several contact related fixes and improvements
-- New Portuguese (Brizil) translations
+- New Portuguese (Brazil) translations
