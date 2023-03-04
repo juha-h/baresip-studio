@@ -1242,12 +1242,8 @@ class BaresipService: Service() {
                 true
             } else {
                 if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
-                    if (VERSION.SDK_INT >= Build.VERSION_CODES.M) /* M == 23 */ {
-                        @Suppress("DEPRECATION")
-                        Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
-                    } else {
-                        true
-                    }
+                    @Suppress("DEPRECATION")
+                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
                 } else {
                     false
                 }
