@@ -578,7 +578,7 @@ class MainActivity : AppCompatActivity() {
                 b.putString("aor", aorSpinner.tag.toString())
             else
                 b.putString("aor", "")
-            i.putExtras(b)""
+            i.putExtras(b)
             contactsRequest.launch(i)
         }
 
