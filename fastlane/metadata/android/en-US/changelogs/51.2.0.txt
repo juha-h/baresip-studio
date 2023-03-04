@@ -1,0 +1,2 @@
+- Several contact related fixes and improvements
+- New Portuguese (Brazil) translations
