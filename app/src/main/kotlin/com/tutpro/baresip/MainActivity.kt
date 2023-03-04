@@ -1893,7 +1893,6 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.outgoing_call_to_dots)
                     callTimer.visibility = View.INVISIBLE
                     callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
-                            //call.status == "answered"))
                     securityButton.visibility = View.INVISIBLE
                     diverter.visibility = View.GONE
                     callButton.visibility = View.INVISIBLE
