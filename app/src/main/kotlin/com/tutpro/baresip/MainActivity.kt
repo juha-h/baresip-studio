@@ -1751,14 +1751,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeCall() {
+    private fun makeCall(lookContact: Boolean = true) {
         callUri.setAdapter(null)
         val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                uriText = Contact.contactUri(uriText, NewCallHistory.aorLatestPeerUri(aor)) ?: uriText
+                if (lookContact) {
+                    val uris = Contact.contactUris(uriText)
+                    if (uris.size == 1)
+                        uriText = uris[0]
+                    else if (uris.size > 1) {
+                        val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
+                        with(builder) {
+                            setTitle("Choose Destination")
+                            setItems(uris.toTypedArray()) { _, which ->
+                                callUri.setText(uris[which])
+                                makeCall(false)
+                            }
+                            setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
+                            show()
+                        }
+                        return
+                    }
+                }
                 if (Utils.isTelNumber(uriText))
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
@@ -1785,6 +1802,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Utils.uriComplete(uriText, aor)
                 }
+                Log.d(TAG, "********* uriText = $uriText")
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
                             String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
