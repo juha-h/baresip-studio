@@ -1448,7 +1448,9 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
-                    uriText = Contact.contactUri(uriText, null) ?: uriText
+                    val uris = Contact.contactUris(uriText)
+                    if (uris.size >= 1)
+                        uriText = uris[0]
                     if (Utils.isTelNumber(uriText))
                         uriText = "tel:$uriText"
                     val uri = if (Utils.isTelUri(uriText))

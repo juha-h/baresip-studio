@@ -51,37 +51,7 @@ sealed class Contact {
             return uri
         }
 
-        fun contactUri(name: String, latest: String?): String? {
-            for (c in contacts())
-                when (c) {
-                    is BaresipContact -> {
-                        if (c.name.equals(name, ignoreCase = true))
-                            return c.uri.removePrefix("<")
-                                .replaceAfter(">", "")
-                                .replace(">", "")
-                    }
-                    is AndroidContact -> {
-                        if (c.name == name) {
-                            return if (c.uris.isNotEmpty()) {
-                                var uri = c.uris.first()
-                                if (c.uris.size > 1 && latest != null) {
-                                    for (u in c.uris)
-                                        if (u == latest) {
-                                            uri = latest
-                                            break
-                                        }
-                                }
-                                uri
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                }
-            return null
-        }
-
-        // Return URIs of contact name or null if contact is not found
+        // Return URIs of contact name
         fun contactUris(name: String): ArrayList<String> {
             val uris = ArrayList<String>()
             for (c in contacts())
