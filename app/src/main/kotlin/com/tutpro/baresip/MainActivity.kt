@@ -1751,14 +1751,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeCall(lookContact: Boolean = true) {
+    private fun makeCall(lookForContact: Boolean = true) {
         callUri.setAdapter(null)
         val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
         if (Call.calls().isEmpty()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
-                if (lookContact) {
+                if (lookForContact) {
                     val uris = Contact.contactUris(uriText)
                     if (uris.size == 1)
                         uriText = uris[0]
@@ -1780,33 +1780,17 @@ class MainActivity : AppCompatActivity() {
                     uriText = "tel:$uriText"
                 val uri = if (Utils.isTelUri(uriText)) {
                     if (ua.account.telProvider == "") {
-                        val telAccounts = Account.telProviderAccounts()
-                        if (telAccounts.isEmpty()) {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    getString(R.string.no_telephony_providers))
-                        } else {
-                            val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                            with(builder) {
-                                setTitle(getString(R.string.choose_telephony_provider_account))
-                                setItems(telAccounts) { _, which ->
-                                    spinToAor("sip:${telAccounts[which]}")
-                                    makeCall()
-                                }
-                                setNeutralButton("Cancel") { _: DialogInterface, _: Int -> }
-                                show()
-                            }
-                        }
+                        Utils.alertView(this, getString(R.string.notice),
+                            getString(R.string.no_telephony_provider))
                         return
                     }
                     Utils.telToSip(uriText, ua.account)
                 } else {
                     Utils.uriComplete(uriText, aor)
                 }
-                Log.d(TAG, "********* uriText = $uriText")
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
-                    )
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     callUri.isFocusable = false
                     uaAdapter.notifyDataSetChanged()
