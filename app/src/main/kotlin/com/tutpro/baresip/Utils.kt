@@ -123,15 +123,13 @@ object Utils {
     }
 
     fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true): String {
-        Log.d(TAG, "******* uri=$uri, country_code=${account.countryCode}, aor=${account.aor}")
         var u = Contact.contactName(uri)
-        Log.d(TAG, "******* Contact.contactName=$u")
         if (u != uri)
             return u
         if (e164Check) {
-            u = Contact.contactName(e164Uri(uri, account.countryCode))
-            Log.d(TAG, "******* Contact.contactName(e164Uri)=$u")
-            if (u != uri)
+            val e164Uri = e164Uri(uri, account.countryCode)
+            u = Contact.contactName(e164Uri)
+            if (u != e164Uri)
                 return u
         }
         if (u.contains("@")) {
