@@ -1781,7 +1781,7 @@ class MainActivity : AppCompatActivity() {
                 val uri = if (Utils.isTelUri(uriText)) {
                     if (ua.account.telProvider == "") {
                         Utils.alertView(this, getString(R.string.notice),
-                            getString(R.string.no_telephony_provider))
+                            String.format(getString(R.string.no_telephony_provider), aor))
                         return
                     }
                     Utils.telToSip(uriText, ua.account)
@@ -1790,7 +1790,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+                        String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
                 } else {
                     callUri.isFocusable = false
                     uaAdapter.notifyDataSetChanged()

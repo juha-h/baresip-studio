@@ -275,9 +275,7 @@
     <string name="sip_or_tel_uri">SIP- eller tel-URI</string>
     <string name="user_domain_or_number">användare@domän eller telefonnummer</string>
     <string name="lost">Tappade</string>
-    <string name="no_telephony_providers">Telefonileverantör har inte konfigurerats för något konto.</string>
     <string name="invalid_sip_or_tel_uri">Ogiltig SIP- eller tel-URI \'%1$s\'</string>
-    <string name="choose_telephony_provider_account">Välj telefonileverantör-konto</string>
     <string name="contacts_help">Välj om baresips kontakter, Androids kontakter eller båda ska användas. Om du väljer båda och en kontakt med samma namn finns i båda, då används baresips kontakt.</string>
     <string name="both">Båda</string>
     <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>

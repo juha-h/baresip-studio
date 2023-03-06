@@ -169,7 +169,8 @@ class ChatsActivity: AppCompatActivity() {
                 uriText = "tel:$uriText"
             val uri = if (Utils.isTelUri(uriText)) {
                 if (account.telProvider == "") {
-                    Utils.alertView(this, getString(R.string.notice), getString(R.string.no_telephony_provider))
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.no_telephony_provider), account.aor))
                     return
                 }
                 Utils.telToSip(uriText, account)

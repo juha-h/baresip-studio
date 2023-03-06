@@ -463,8 +463,6 @@
     <string name="diverted_by_dots">Siirtäjä …</string>
     <string name="transferring_call_to_dots">Puhelun siirto …</string>
     <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
-    <string name="no_telephony_providers">Millekään tilille ei ole konfiguroitu puhelinpalvelun
-        tarjoajaa</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
     <string name="callee">Puhelun kohde</string>
@@ -541,7 +539,6 @@
     <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
     <string name="show_password">Näytä salasana</string>
     <string name="no_network">Ei verkkoyhteyttä!</string>
-    <string name="choose_telephony_provider_account">Valitse puhelinpalvelun tarjoava tili</string>
     <string name="call_details">Puhelutiedot</string>
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audio fokus evätty!</string>
