@@ -342,4 +342,5 @@
     <string name="no_android_contacts">No se puede acceder a los contactos de Android sin el permiso \"Contactos\".</string>
     <string name="audio_focus_denied">¡Enfoque de audio denegado!</string>
     <string name="audio_and_video_permissions">baresip+ necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Cámara\" para las videollamadas, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>
+    <string name="choose_destination_uri">Seleccione la URI de destino</string>
 </resources>
