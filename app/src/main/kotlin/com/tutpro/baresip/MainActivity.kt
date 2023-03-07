@@ -1449,34 +1449,30 @@ class MainActivity : AppCompatActivity() {
                 var uriText = transferUri.text.toString().trim()
                 if (uriText.isNotEmpty()) {
                     val uris = Contact.contactUris(uriText)
-                    if (uris.size >= 1)
-                        uriText = uris[0]
-                    if (Utils.isTelNumber(uriText))
-                        uriText = "tel:$uriText"
-                    val uri = if (Utils.isTelUri(uriText))
-                        Utils.telToSip(uriText, ua.account)
-                    else
-                        Utils.uriComplete(uriText, ua.account.aor)
-                    if (!Utils.checkUri(uri)) {
-                        Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
-                    } else {
-                        val call = ua.currentCall()
-                        if (call != null) {
-                            if (attended.isChecked) {
-                                if (call.hold()) {
-                                    call.referTo = uri
-                                    call(ua, uri, call)
-                                }
-                            } else {
-                                if (!call.transfer(uri)) {
-                                    Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                            String.format(getString(R.string.transfer_failed)))
-                                }
+                    if (uris.size > 1) {
+                        val destinationBuilder = MaterialAlertDialogBuilder(
+                            this@MainActivity,
+                            R.style.AlertDialogTheme
+                        )
+                        with(destinationBuilder) {
+                            setTitle(R.string.choose_destination_uri)
+                            setItems(uris.toTypedArray()) { _, which ->
+                                uriText = uris[which]
+                                transfer(
+                                    ua,
+                                    if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                    attended.isChecked
+                                )
                             }
-                            showCall(ua)
+                            setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
+                            show()
                         }
+                    } else {
+                        if (uris.size == 1)
+                            uriText = uris[0]
                     }
+                    transfer(ua, if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                        attended.isChecked)
                 }
             }
             setNeutralButton(android.R.string.cancel) { dialog, _ ->
@@ -1511,6 +1507,32 @@ class MainActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
+    private fun transfer(ua: UserAgent, uriText: String, attended: Boolean) {
+        val uri = if (Utils.isTelUri(uriText))
+            Utils.telToSip(uriText, ua.account)
+        else
+            Utils.uriComplete(uriText, ua.account.aor)
+        if (!Utils.checkUri(uri)) {
+            Utils.alertView(this@MainActivity, getString(R.string.notice),
+                String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+        } else {
+            val call = ua.currentCall()
+            if (call != null) {
+                if (attended) {
+                    if (call.hold()) {
+                        call.referTo = uri
+                        call(ua, uri, call)
+                    }
+                } else {
+                    if (!call.transfer(uri)) {
+                        Utils.alertView(this@MainActivity, getString(R.string.notice),
+                            String.format(getString(R.string.transfer_failed)))
+                    }
+                }
+                showCall(ua)
+            }
+        }
+    }
     private fun askPassword(title: String, ua: UserAgent? = null) {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
@@ -1767,7 +1789,7 @@ class MainActivity : AppCompatActivity() {
                     else if (uris.size > 1) {
                         val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
                         with(builder) {
-                            setTitle("Choose Destination")
+                            setTitle(R.string.choose_destination_uri)
                             setItems(uris.toTypedArray()) { _, which ->
                                 callUri.setText(uris[which])
                                 makeCall(false)

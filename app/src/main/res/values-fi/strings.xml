@@ -479,6 +479,7 @@
     <string name="blind">Sokeasti</string>
     <string name="attended">Osallistu</string>
     <string name="transfer_destination">Siirron kohde</string>
+    <string name="choose_destination_uri">Valitse kohteen URI</string>
     <string name="transfer">Siirto</string>
     <string name="transfer_failed">Siirto epäonnistui</string>
     <string name="dtmf">DTMF</string>

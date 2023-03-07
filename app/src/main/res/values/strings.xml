@@ -452,6 +452,7 @@
     <string name="blind">Blind</string>
     <string name="attended">Attended</string>
     <string name="transfer_destination">Transfer destination</string>
+    <string name="choose_destination_uri">Choose destination URI</string>
     <string name="transfer">Transfer</string>
     <string name="transfer_failed">Transfer failed</string>
     <string name="dtmf">DTMF</string>
