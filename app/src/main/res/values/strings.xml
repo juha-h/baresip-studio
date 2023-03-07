@@ -438,8 +438,6 @@
     <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
-    <string name="no_telephony_providers">Telephony Provider has not been configured for any account.</string>
-    <string name="choose_telephony_provider_account">Choose Telephony Provider account</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>
@@ -454,6 +452,7 @@
     <string name="blind">Blind</string>
     <string name="attended">Attended</string>
     <string name="transfer_destination">Transfer destination</string>
+    <string name="choose_destination_uri">Choose destination URI</string>
     <string name="transfer">Transfer</string>
     <string name="transfer_failed">Transfer failed</string>
     <string name="dtmf">DTMF</string>
