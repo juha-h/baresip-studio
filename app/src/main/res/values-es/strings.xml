@@ -332,8 +332,6 @@
     <string name="packets">Paquetes</string>
     <string name="audio_permissions">baresip necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>
     <string name="missed_calls">Llamadas perdidas</string>
-    <string name="choose_telephony_provider_account">Elija la cuenta del proveedor de telefonía</string>
-    <string name="no_telephony_providers">El proveedor de telefonía no se ha configurado para ninguna cuenta.</string>
     <string name="country_code_help">Código de país E.164 de esta cuenta. Si la parte de usuario From URI de la llamada entrante o del mensaje contiene un número de teléfono que no empieza por el signo \"+\" y si falla la búsqueda de contacto, se antepone al número este prefijo de país y se vuelve a intentar la búsqueda de contacto. Si el número de teléfono comienza con un solo dígito \"0\", el dígito \"0\" se elimina antes de anteponer el prefijo al número.</string>
     <string name="time">Tiempo</string>
     <string name="diverted_by_dots">Desviada por …</string>
