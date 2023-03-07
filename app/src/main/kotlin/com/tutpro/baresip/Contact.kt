@@ -51,36 +51,28 @@ sealed class Contact {
             return uri
         }
 
-        // Return uri of contact name or null if contact is not found
-        // If Android contact has more than one uri, return latest if given and found
-        fun contactUri(name: String, latest: String?): String? {
+        // Return URIs of contact name
+        fun contactUris(name: String): ArrayList<String> {
+            val uris = ArrayList<String>()
             for (c in contacts())
                 when (c) {
                     is BaresipContact -> {
-                        if (c.name.equals(name, ignoreCase = true))
-                            return c.uri.removePrefix("<")
-                                    .replaceAfter(">", "")
-                                    .replace(">", "")
+                        if (c.name.equals(name, ignoreCase = true)) {
+                            uris.add(c.uri.removePrefix("<")
+                                .replaceAfter(">", "")
+                                .replace(">", ""))
+                            return uris
+                        }
                     }
                     is AndroidContact -> {
                         if (c.name == name) {
-                            return if (c.uris.isNotEmpty()) {
-                                var uri = c.uris.first()
-                                if (c.uris.size > 1 && latest != null) {
-                                    for (u in c.uris)
-                                        if (u == latest) {
-                                            uri = latest
-                                            break
-                                        }
-                                }
-                                uri
-                            } else {
-                                null
-                            }
+                            for (u in c.uris)
+                                uris.add(u)
+                            return uris
                         }
                     }
                 }
-            return null
+            return uris
         }
 
         fun findContact(uri: String): Contact? {
@@ -127,7 +119,7 @@ sealed class Contact {
             // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                     ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
-                    ContactsContract.Data.PHOTO_THUMBNAIL_URI)
+                    /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI)
             val selection =
                     ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
                             ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
@@ -149,8 +141,10 @@ sealed class Contact {
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
-                if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-                    contact.uris.add("tel:${data.filterNot{setOf('-', ' ', '(', ')').contains(it)}}")
+                if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+                    contact.uris.add("tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}")
+                    // contact.types.add(typeToString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)))
+                }
                 else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
                     contact.uris.add("sip:$data")
                 else
@@ -162,6 +156,16 @@ sealed class Contact {
             for ((_, value) in contacts)
                 if (value.name != "" && value.uris.isNotEmpty())
                     BaresipService.androidContacts.add(value)
+        }
+
+        @Suppress("unused")
+        private fun typeToString(type: Int): String {
+            return when(type) {
+                ContactsContract.CommonDataKinds.Phone.TYPE_HOME -> "Home"
+                ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> "Mobile"
+                ContactsContract.CommonDataKinds.Phone.TYPE_WORK -> "Work"
+                else -> "Unknown"
+            }
         }
 
         fun restoreBaresipContacts(): Boolean {
@@ -235,8 +239,7 @@ sealed class Contact {
                     is BaresipContact ->
                         BaresipService.contactNames.add(c.name)
                     is AndroidContact ->
-                        if (c.uris.size == 1)
-                            BaresipService.contactNames.add(c.name)
+                        BaresipService.contactNames.add(c.name)
                 }
         }
 
