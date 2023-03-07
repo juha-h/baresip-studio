@@ -274,8 +274,10 @@
     <string name="invalid_sip_uri_hostpart">Parte inválida do host SIP URI \'%1$s\'</string>
     <string name="sip_or_tel_uri">SIP ou tel. URI</string>
     <string name="user_domain_or_number">usuário@domínio ou o número de telefone</string>
+    <string name="choose_telephony_provider_account">Escolha a conta da operadora de telefonia</string>
     <string name="telephony_provider_help">SIP URI host é parcialmente usado nas chamadas para números de telefone. O padrão de fábrica é domínio da conta. Caso não seja informada, essa conta não pode ser usada para ligar para os números de telefone.</string>
     <string name="invalid_sip_or_tel_uri">SIP ou tel. URI inválido \'%1$s\'</string>
+    <string name="no_telephony_providers">A operadora de telefonia não foi configurada para nenhuma conta.</string>
     <string name="contacts_help">Escolha se ambos os contatos do baresip e do Android serão usados. Caso use ambos, o contato do baresip será usado se houver um contato repetido no Android.</string>
     <string name="both">Ambos</string>
     <string name="no_android_contacts">Você não pode acessar os contatos do Android sem a permissão \"Contatos\".</string>
