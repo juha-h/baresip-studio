@@ -185,6 +185,7 @@ class ChatsActivity: AppCompatActivity() {
                 peerUri.isCursorVisible = false
                 val i = Intent(this@ChatsActivity, ChatActivity::class.java)
                 val b = Bundle()
+                b.putString("aor", aor)
                 b.putString("peer", uri)
                 i.putExtras(b)
                 chatRequest.launch(i)
