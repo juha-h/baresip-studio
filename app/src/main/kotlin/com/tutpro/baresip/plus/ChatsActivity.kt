@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -23,6 +24,7 @@ class ChatsActivity: AppCompatActivity() {
     private lateinit var plusButton: ImageButton
     internal lateinit var aor: String
     internal lateinit var account: Account
+    private lateinit var chatRequest: ActivityResultLauncher<Intent>
     private var scrollPosition = -1
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -57,7 +59,7 @@ class ChatsActivity: AppCompatActivity() {
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
-        val chatRequest =
+        chatRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
                     clAdapter.clear()
@@ -135,32 +137,60 @@ class ChatsActivity: AppCompatActivity() {
                 Contact.contactNames()))
 
         plusButton.setOnClickListener {
-            val uriText = peerUri.text.toString().trim()
-            if (uriText.isNotEmpty()) {
-                var uri = Contact.contactUri(uriText, null)
-                if (uri == null)
-                    uri = if (Utils.isTelNumber(uriText))
-                        "tel:$uriText"
-                    else
-                        Utils.uriComplete(uriText, aor)
-                if (!Utils.checkUri(uri)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
-                } else {
-                    peerUri.text.clear()
-                    peerUri.isCursorVisible = false
-                    val i = Intent(this@ChatsActivity, ChatActivity::class.java)
-                    val b = Bundle()
-                    b.putString("aor", aor)
-                    b.putString("peer", uri)
-                    i.putExtras(b)
-                    chatRequest.launch(i)
-                }
-            }
+            makeChat(true)
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
+    }
+
+    private fun makeChat(lookForContact: Boolean = true) {
+        var uriText = peerUri.text.toString().trim()
+        if (uriText.isNotEmpty()) {
+            if (lookForContact) {
+                val uris = Contact.contactUris(uriText)
+                if (uris.size == 1)
+                    uriText = uris[0]
+                else if (uris.size > 1) {
+                    val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
+                    with(builder) {
+                        setTitle("Choose Destination")
+                        setItems(uris.toTypedArray()) { _, which ->
+                            peerUri.setText(uris[which])
+                            makeChat(false)
+                        }
+                        setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
+                        show()
+                    }
+                    return
+                }
+            }
+            if (Utils.isTelNumber(uriText))
+                uriText = "tel:$uriText"
+            val uri = if (Utils.isTelUri(uriText)) {
+                if (account.telProvider == "") {
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.no_telephony_provider), account.aor))
+                    return
+                }
+                Utils.telToSip(uriText, account)
+            } else {
+                Utils.uriComplete(uriText, aor)
+            }
+            if (!Utils.checkUri(uri)) {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+            } else {
+                peerUri.text.clear()
+                peerUri.isCursorVisible = false
+                val i = Intent(this@ChatsActivity, ChatActivity::class.java)
+                val b = Bundle()
+                b.putString("aor", aor)
+                b.putString("peer", uri)
+                i.putExtras(b)
+                chatRequest.launch(i)
+            }
+        }
     }
 
     override fun onPause() {

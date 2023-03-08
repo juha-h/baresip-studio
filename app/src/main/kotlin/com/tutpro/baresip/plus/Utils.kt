@@ -137,37 +137,30 @@ object Utils {
         if (u != uri)
             return u
         if (e164Check) {
-            u = Contact.contactName(e164Uri(uri, account.countryCode))
-            if (u != uri)
-                return u
-            u = friendlyUri(ctx, uri, account, false)
-            if (u != uri)
+            val e164Uri = e164Uri(uri, account.countryCode)
+            u = Contact.contactName(e164Uri)
+            if (u != e164Uri)
                 return u
         }
-        val params = uriParams(u)
+        if (u.contains("@")) {
+            val user = uriUserPart(u)
+            val host = uriHostPart(u)
+            val params = uriParams(u)
+            return if (host == aorDomain(account.aor) || params.contains("user=phone"))
+                user
+            else if (host == "anonymous.invalid")
+                ctx.getString(R.string.anonymous)
+            else if (host == "unknown.invalid")
+                ctx.getString(R.string.unknown)
+            else
+                "$user@$host"
+        }
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
         u = u.substringBefore("?")
         u = u.replace(":5060", "")
         u = u.replace(";transport=udp", "", true)
-        if (u.split(":").size == 3 ||
-                (params.isNotEmpty() && !params.contains("user=phone")))
-            return u
-        return if (u.contains("@")) {
-            val user = uriUserPart(u)
-            val host = uriHostPart(u)
-            if (isTelNumber(user) || host == aorDomain(account.aor))
-                user
-            else
-                if (host == "anonymous.invalid")
-                    ctx.getString(R.string.anonymous)
-                else if (host == "unknown.invalid")
-                    ctx.getString(R.string.unknown)
-                else
-                    "$user@$host"
-        } else {
-            u
-        }
+        return u
     }
 
     fun e164Uri(uri: String, countryCode: String): String {
