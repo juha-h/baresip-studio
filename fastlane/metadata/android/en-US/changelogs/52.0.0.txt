@@ -1,0 +1,5 @@
+- Added support for selecting from multiple tel:/sip: URIs in Android
+- contacts 
+- Active account now has to have Telephony Provider configured in order to
+  make call or send message to tel: URI
+- New Portuguese (Brazil), Spanish, Swedish, and Finnish translations
