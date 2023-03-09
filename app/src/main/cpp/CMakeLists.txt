@@ -60,6 +60,10 @@ add_library(lib_zrtpcppcore STATIC IMPORTED)
 set_target_properties(lib_zrtpcppcore PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/gzrtp/lib/${ANDROID_ABI}/libzrtpcppcore.a)
 
+add_library(lib_sndfile STATIC IMPORTED)
+set_target_properties(lib_sndfile PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/sndfile/lib/${ANDROID_ABI}/libsndfile.a)
+
 add_library(lib_baresip STATIC IMPORTED)
 set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/baresip/lib/${ANDROID_ABI}/libbaresip.a)
@@ -90,5 +94,6 @@ target_link_libraries(baresip
         lib_amrwbenc
         lib_webrtc
         lib_zrtpcppcore
+        lib_sndfile
         z
         log)

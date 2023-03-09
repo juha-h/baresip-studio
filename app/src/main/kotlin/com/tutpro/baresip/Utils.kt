@@ -10,6 +10,7 @@ import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.media.AudioAttributes
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.provider.DocumentsContract
@@ -24,10 +25,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -989,6 +992,107 @@ object Utils {
         } else {
             if (am.isSpeakerphoneOn)
                 am.isSpeakerphoneOn = false
+        }
+    }
+
+    fun playRecording(ctx: Context, recording: String) {
+        Log.d(TAG, "Playing recording $recording")
+        val decPlayer = MediaPlayer()
+        decPlayer.apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setOnPreparedListener {
+                val encPlayer = MediaPlayer()
+                encPlayer.apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setOnPreparedListener {
+                        it.start()
+                        decPlayer.start()
+                        Log.d(TAG, "Started players")
+                    }
+                    setOnCompletionListener {
+                        Log.d(TAG, "Stopping encPlayer")
+                        it.stop()
+                        it.release()
+                    }
+                    try {
+                        val file = "$recording-enc.wav"
+                        val encFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/encode.wav"), true)
+                        val encUri = encFile.toUri()
+                        Log.d(TAG, "Setting data source $encUri")
+                        setDataSource(ctx, encUri)
+                        prepareAsync()
+                    } catch (e: IllegalArgumentException) {
+                        Log.e(TAG, "encPlayer IllegalArgumentException: $e")
+                    } catch (e: IOException) {
+                        Log.e(TAG, "encPlayer IOException: $e")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "encPlayer Exception: $e")
+                    }
+                }
+            }
+            setOnCompletionListener {
+                Log.d(TAG, "Stopping decPlayer")
+                it.stop()
+                it.release()
+            }
+            try {
+                val file = "$recording-dec.wav"
+                val decFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/decode.wav"), true)
+                val decUri = decFile.toUri()
+                Log.d(TAG, "Setting data source $decUri")
+                setDataSource(ctx, decUri)
+                prepareAsync()
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "decPlayer IllegalArgumentException: $e")
+            } catch (e: IOException) {
+                Log.e(TAG, "decPlayer IOException: $e")
+            } catch (e: Exception) {
+                Log.e(TAG, "decPlayer Exception: $e")
+            }
+        }
+    }
+
+    @Suppress("unused")
+    fun playFile(ctx: Context, path: String) {
+        Log.d(TAG, "Playing file $path")
+        MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setOnPreparedListener {
+                Log.d(TAG, "Starting MediaPlayer")
+                it.start()
+                Log.d(TAG, "MediaPlayer started")
+            }
+            setOnCompletionListener {
+                Log.d(TAG, "Stopping MediaPlayer")
+                it.stop()
+                it.release()
+            }
+            try {
+                Log.d(TAG, "Preparing $path")
+                setDataSource(ctx, path.toUri())
+                prepareAsync()
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "MediaPlayer IllegalArgumentException: ${e.printStackTrace()}")
+            } catch (e: IOException) {
+                Log.e(TAG, "MediaPlayer IOException: ${e.printStackTrace()}")
+            } catch (e: Exception) {
+                Log.e(TAG, "MediaPlayer Exception: ${e.printStackTrace()}")
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package com.tutpro.baresip
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 import java.util.*
 
@@ -23,6 +26,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
         val durationView = view?.findViewById(R.id.duration) as TextView
     }
 
+    @SuppressLint("SimpleDateFormat")
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
 
         val viewHolder: ViewHolder
@@ -59,7 +63,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.durationView.text = ""
             } else {
                 val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
-                    val fmt = DateFormat.getTimeInstance(DateFormat.LONG)
+                    val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
                     ctx.getString(R.string.today) + " " + fmt.format(startTime.time)
                 } else {
                     val fmt = DateFormat.getDateTimeInstance()
@@ -68,6 +72,14 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.timeView.text = startText
                 val duration = (stopTime.time.time - startTime.time.time) / 1000
                 viewHolder.durationView.text = DateUtils.formatElapsedTime(duration)
+                val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+                val time = format.format(startTime.time).toString()
+                if (BaresipService.recordings.containsKey(time)) {
+                    viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
+                    viewHolder.durationView.setOnClickListener {
+                        Utils.playRecording(ctx, BaresipService.recordings[time]!!)
+                    }
+                }
             }
         }
 

@@ -147,7 +147,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     const char *tone;
     char event_buf[256];
     enum sdp_dir ardir;
-    int len;
+    int len, err;
+    struct pl module, module_event, data;
 
     LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
@@ -225,6 +226,15 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         case UA_EVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
+        case UA_EVENT_MODULE:
+            err = re_regex(prm, strlen(prm), "[^,]*,[^,]*,[~]*",
+                           &module, &module_event, &data);
+            if (err)
+                return;
+            if (!pl_strcmp(&module_event, "dump")) {
+                len = re_snprintf(event_buf, sizeof event_buf, "sndfile dump,%r", &data);
+                break;
+            }
         default:
             return;
     }
@@ -1088,7 +1098,7 @@ Java_com_tutpro_baresip_Api_ua_1answer(JNIEnv *env, jobject thiz, jlong ua, jlon
     re_thread_leave();
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1add_1custom_1header(JNIEnv *env, jobject thiz, jlong ua,
 						    jstring jname, jstring jbody) {
     const char *name = (*env)->GetStringUTFChars(env, jname, 0);
@@ -1104,7 +1114,6 @@ Java_com_tutpro_baresip_Api_ua_1add_1custom_1header(JNIEnv *env, jobject thiz, j
 	    LOGW("adding custom header to ua %ld failed with  error %d\n", (long)ua, err);
     (*env)->ReleaseStringUTFChars(env, jname, name);
     (*env)->ReleaseStringUTFChars(env, jbody, body);
-    return err;
 }
 
 JNIEXPORT void JNICALL

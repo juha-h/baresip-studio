@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var kgm: KeyguardManager
     private lateinit var screenEventReceiver: BroadcastReceiver
     private lateinit var serviceEventObserver: Observer<Event<Long>>
+    private var recIcon: MenuItem? = null
     private var micIcon: MenuItem? = null
     private var speakerIcon: MenuItem? = null
     private lateinit var swipeRefresh: SwipeRefreshLayout
@@ -1258,6 +1259,13 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.main_menu, menu)
 
+        menuInflater.inflate(R.menu.rec_icon, menu)
+        recIcon = menu.findItem(R.id.recIcon)
+        if (BaresipService.isRecOn)
+            recIcon!!.setIcon(R.drawable.rec_on)
+        else
+            recIcon!!.setIcon(R.drawable.rec_off)
+
         menuInflater.inflate(R.menu.mic_icon, menu)
         micIcon = menu.findItem(R.id.micIcon)
         if (BaresipService.isMicMuted)
@@ -1278,6 +1286,19 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+
+            R.id.recIcon -> {
+                if (Call.call("connected") == null) {
+                    BaresipService.isRecOn = !BaresipService.isRecOn
+                    if (BaresipService.isRecOn) {
+                        item.setIcon(R.drawable.rec_on)
+                        Api.module_load("sndfile")
+                    } else {
+                        item.setIcon(R.drawable.rec_off)
+                        Api.module_unload("sndfile")
+                    }
+                }
+            }
 
             R.id.micIcon -> {
                 if (Call.call("connected") != null) {

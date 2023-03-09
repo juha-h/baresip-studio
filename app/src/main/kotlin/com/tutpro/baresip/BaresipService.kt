@@ -43,6 +43,7 @@ import androidx.media.AudioManagerCompat
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
@@ -384,6 +385,23 @@ class BaresipService: Service() {
                 if (File(filesDir, "history").exists())
                     File(filesDir, "history").renameTo(File(filesDir, "calls"))
 
+                if (!File(filesDir, "tmp").exists())
+                    File(filesDir, "tmp").mkdir()
+
+                if (!File(filesDir, "recordings").exists())
+                    File(filesDir, "recordings").mkdir()
+                else {
+                    File(filesDir, "recordings").walk().forEach { f ->
+                        Log.d(TAG, "***** file ${f.name}")
+                        val recording = f.name.substringBeforeLast("-")
+                        if (recording.startsWith("dump")) {
+                            val time = recording.takeLast(19)
+                            if (!recordings.containsKey(time))
+                                recordings[time] = filesDir.absolutePath + "/recordings/" + recording
+                        }
+                    }
+                    Log.d(TAG, "Recordings $recordings")
+                }
 
                 if (contactsMode != "android")
                     Contact.restoreBaresipContacts()
@@ -570,6 +588,11 @@ class BaresipService: Service() {
                 acc.authPass = Api.account_auth_pass(ua.account.accp)
             }
 
+            return
+        }
+
+        if (ev[0] == "sndfile dump") {
+            Log.d(TAG, "Got sndfile dump ${ev[1]}")
             return
         }
 
@@ -877,6 +900,23 @@ class BaresipService: Service() {
                                 NewCallHistory.add(history)
                                 NewCallHistory.save()
                                 ua.account.missedCalls = ua.account.missedCalls || missed
+                                if (isRecOn && call.startTime != null) {
+                                    val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+                                    val startTime = call.startTime!!
+                                    var time = format.format(startTime.time).toString()
+                                    var recording = filesDir.absolutePath + "/recordings/" +
+                                            "dump-$aor=>${call.peerUri}-$time"
+                                    if (File("$recording-dec.wav").exists()) {
+                                        recordings[time] = recording
+                                    } else {
+                                        startTime.add(Calendar.SECOND, 1)
+                                        time = format.format(startTime.time).toString()
+                                        recording = filesDir.absolutePath + "/recordings/" +
+                                                "dump-$aor=>${call.peerUri}-$time"
+                                        recordings[time] = recording
+                                    }
+
+                                }
                             }
                             if (!Utils.isVisible()) {
                                 if (missed) {
@@ -1496,6 +1536,7 @@ class BaresipService: Service() {
         var callActionUri = ""
         var isMainVisible = false
         var isMicMuted = false
+        var isRecOn = false
 
         val uas = ArrayList<UserAgent>()
         val calls = ArrayList<Call>()
@@ -1514,6 +1555,7 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
+        val recordings: MutableMap<String, String> = mutableMapOf()
 
         private var audioFocusRequest: AudioFocusRequestCompat? = null
         private var btAdapter: BluetoothAdapter? = null
