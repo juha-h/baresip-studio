@@ -308,4 +308,5 @@
     <string name="invalid_reg_int">Intervalo de registro inválido\'%1$s\'</string>
     <string name="reg_int_help">Informa com que frequência (em segundos) o baresip envia solicitações REGISTER. Os valores válidos são entre 60 a 3600.</string>
     <string name="no_telephony_provider">A conta \'%1$s\' não tem provedor telefonico</string>
+    <string name="choose_destination_uri">Escolha a URI de destino</string>
 </resources>
