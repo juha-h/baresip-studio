@@ -56,6 +56,10 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                 Log.e(TAG, "OutputStream exception: $e")
                 e.printStackTrace()
             }
+            if (file.exists())
+                Log.d(TAG, "******** file ${BaresipService.filesPath}/history exists")
+            else
+                Log.d(TAG, "******** file ${BaresipService.filesPath}/history does NOT exist")
         }
 
         fun restore() {
