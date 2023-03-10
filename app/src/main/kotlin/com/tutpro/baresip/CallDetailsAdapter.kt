@@ -18,7 +18,8 @@ import java.util.*
 class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<CallRow.Details>) :
         ArrayAdapter<CallRow.Details>(ctx, R.layout.call_detail_row, rows) {
 
-    private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val layoutInflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     private class ViewHolder(view: View?) {
         val directionView = view?.findViewById(R.id.direction) as ImageView
@@ -72,12 +73,11 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.timeView.text = startText
                 val duration = (stopTime.time.time - startTime.time.time) / 1000
                 viewHolder.durationView.text = DateUtils.formatElapsedTime(duration)
-                val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
-                val time = format.format(startTime.time).toString()
-                if (BaresipService.recordings.containsKey(time)) {
+                val recording = rows[position].recording
+                if (recording != "") {
                     viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
                     viewHolder.durationView.setOnClickListener {
-                        Utils.playRecording(ctx, BaresipService.recordings[time]!!)
+                        Utils.playRecording(ctx, recording)
                     }
                 }
             }
@@ -85,5 +85,4 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
 
         return rowView
     }
-
 }

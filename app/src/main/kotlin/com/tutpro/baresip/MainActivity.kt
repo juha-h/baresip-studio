@@ -1200,6 +1200,11 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     callTimer.stop()
                 }
+                if (BaresipService.isRecOn) {
+                    Api.module_unload("sndfile")
+                    BaresipService.isRecOn = false
+                    recIcon!!.setIcon(R.drawable.rec_off)
+                }
                 if (aor == aorSpinner.tag) {
                     callUri.inputType = InputType.TYPE_CLASS_TEXT +
                             InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -1892,7 +1897,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                val latestPeerUri = NewCallHistory.aorLatestPeerUri(aor)
+                val latestPeerUri = CallHistory.aorLatestPeerUri(aor)
                 if (latestPeerUri != null)
                     callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }

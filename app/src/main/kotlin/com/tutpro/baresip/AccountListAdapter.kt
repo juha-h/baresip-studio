@@ -59,7 +59,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                         viewHolder.aorView.text))
                 setPositiveButton(cxt.getText(R.string.delete)) { dialog, _ ->
                     Api.ua_destroy(ua.uap)
-                    NewCallHistory.clear(ua.account.aor)
+                    CallHistory.clear(ua.account.aor)
                     Message.clear(ua.account.aor)
                     ua.remove()
                     AccountsActivity.generateAccounts()

@@ -114,7 +114,7 @@ class CallsActivity : AppCompatActivity() {
                     }
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        NewCallHistory.save()
+                        CallHistory.save()
                         clAdapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
@@ -168,8 +168,8 @@ class CallsActivity : AppCompatActivity() {
                     setMessage(String.format(getString(R.string.delete_history_alert),
                             aor.substringAfter(":")))
                     setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        NewCallHistory.clear(aor)
-                        NewCallHistory.save()
+                        CallHistory.clear(aor)
+                        CallHistory.save()
                         aorGenerateHistory(aor)
                         clAdapter.notifyDataSetChanged()
                         dialog.dismiss()
@@ -244,9 +244,11 @@ class CallsActivity : AppCompatActivity() {
                     else
                         R.drawable.arrow_up_red
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
-                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime, h.stopTime))
+                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime,
+                        h.stopTime, h.recording))
                 else
-                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime))
+                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime,
+                        h.stopTime, h.recording))
             }
         }
     }
