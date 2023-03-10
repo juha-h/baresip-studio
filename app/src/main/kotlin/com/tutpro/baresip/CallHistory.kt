@@ -72,6 +72,8 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                 } catch (e: Exception) {
                     Log.e(TAG, "InputStream exception: - $e")
                 }
+            } else {
+                Log.d(TAG, "File ${BaresipService.filesPath}/history does not exist")
             }
         }
 
