@@ -381,26 +381,11 @@ class BaresipService: Service() {
                         Config.initialize(applicationContext)
                 }
 
-                if (File(filesDir, "history").exists())
-                    File(filesDir, "history").renameTo(File(filesDir, "calls"))
-
                 if (!File(filesDir, "tmp").exists())
                     File(filesDir, "tmp").mkdir()
 
                 if (!File(filesDir, "recordings").exists())
                     File(filesDir, "recordings").mkdir()
-                else {
-                    File(filesDir, "recordings").walk().forEach { f ->
-                        Log.d(TAG, "***** file ${f.name}")
-                        val recording = f.name.substringBeforeLast("-")
-                        if (recording.startsWith("dump")) {
-                            val time = recording.takeLast(19)
-                            if (!recordings.containsKey(time))
-                                recordings[time] = filesDir.absolutePath + "/recordings/" + recording
-                        }
-                    }
-                    Log.d(TAG, "Recordings $recordings")
-                }
 
                 if (contactsMode != "android")
                     Contact.restoreBaresipContacts()
@@ -897,11 +882,8 @@ class BaresipService: Service() {
                                 val history = CallHistory(aor, call.peerUri, call.dir)
                                 history.startTime = call.startTime
                                 history.stopTime = GregorianCalendar()
-                                if (call.startTime != null && call.dumpfile != "") {
-                                    val recording = filesDir.absolutePath + "/recordings/" +
-                                            call.dumpfile.substringBeforeLast("-")
-                                    history.recording = recording
-                                }
+                                if (call.startTime != null && call.dumpfile != "")
+                                    history.recording = call.dumpfile.substringBeforeLast("-")
                                 CallHistory.add(history)
                                 CallHistory.save()
                                 ua.account.missedCalls = ua.account.missedCalls || missed
@@ -1543,7 +1525,6 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
-        val recordings: MutableMap<String, String> = mutableMapOf()
 
         private var audioFocusRequest: AudioFocusRequestCompat? = null
         private var btAdapter: BluetoothAdapter? = null

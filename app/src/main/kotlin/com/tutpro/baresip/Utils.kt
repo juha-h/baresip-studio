@@ -783,7 +783,7 @@ object Utils {
     }
 
     fun unZip(zipFilePath: String): Boolean {
-        val allFiles = listOf("accounts", "calls", "config", "contacts", "messages", "uuid",
+        val allFiles = listOf("accounts", "history", "config", "contacts", "messages", "uuid",
                 "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val zipFiles = mutableListOf<String>()
         try {
@@ -1028,7 +1028,6 @@ object Utils {
                         val file = "$recording-enc.wav"
                         val encFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/encode.wav"), true)
                         val encUri = encFile.toUri()
-                        Log.d(TAG, "Setting data source $encUri")
                         setDataSource(ctx, encUri)
                         prepareAsync()
                     } catch (e: IllegalArgumentException) {
@@ -1049,7 +1048,6 @@ object Utils {
                 val file = "$recording-dec.wav"
                 val decFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/decode.wav"), true)
                 val decUri = decFile.toUri()
-                Log.d(TAG, "Setting data source $decUri")
                 setDataSource(ctx, decUri)
                 prepareAsync()
             } catch (e: IllegalArgumentException) {

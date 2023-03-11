@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityCallsBinding
+import java.io.File
 
 class CallsActivity : AppCompatActivity() {
 
@@ -74,16 +75,21 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtra("peer", peerUri)
                         startActivity(i)
                     }
+
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                with (MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)) {
+                with(MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_call_message_question),
-                            peerName))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_call_message_question),
+                            peerName
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setNegativeButton(getString(R.string.call), dialogClickListener)
                     setPositiveButton(getString(R.string.send_message), dialogClickListener)
@@ -112,11 +118,13 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtras(b)
                         contactRequest.launch(i)
                     }
+
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
                         CallHistory.save()
                         clAdapter.notifyDataSetChanged()
                     }
+
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
@@ -127,22 +135,36 @@ class CallsActivity : AppCompatActivity() {
                 getString(R.string.calls_call)
             val builder = MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)
             if (!Contact.nameExists(peerName, false))
-                with (builder) {
+                with(builder) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_add_delete_question),
-                            peerName, callText))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_add_delete_question),
+                            peerName, callText
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    setPositiveButton(
+                        String.format(getString(R.string.delete), callText),
+                        dialogClickListener
+                    )
                     setNegativeButton(getString(R.string.add_contact), dialogClickListener)
                     show()
                 }
             else
-                with (builder) {
+                with(builder) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_delete_question),
-                            peerName, callText))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_delete_question),
+                            peerName, callText
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    setPositiveButton(
+                        String.format(getString(R.string.delete), callText),
+                        dialogClickListener
+                    )
                     show()
                 }
             true
@@ -153,6 +175,9 @@ class CallsActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
+        File("${BaresipService.filesPath}/recordings").walk().forEach { f ->
+            Log.d(TAG, "***** recording ${f.name}")
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -254,10 +279,14 @@ class CallsActivity : AppCompatActivity() {
     }
 
     private fun removeUaHistoryAt(i: Int) {
-        for (details in uaHistory[i].details)
+        for (details in uaHistory[i].details) {
+            if (details.recording != "")
+                CallHistory.deleteRecording(details.recording)
             BaresipService.callHistory.removeAll {
                 it.startTime == details.startTime && it.stopTime == details.stopTime
             }
+        }
+        CallHistory.deleteRecording(uaHistory[i].recording)
         uaHistory.removeAt(i)
     }
 

@@ -18,19 +18,25 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
         fun add(history: CallHistory) {
             BaresipService.callHistory.add(history)
             if (aorHistorySize(history.aor) > CALL_HISTORY_SIZE) {
-                var i = 0
                 for (h in BaresipService.callHistory)
-                    if (h.aor == history.aor)
+                    if (h.aor == history.aor) {
+                        if (h.recording != "")
+                            deleteRecording(h.recording)
+                        BaresipService.callHistory.remove(h)
                         break
-                    else
-                        i++
-                BaresipService.callHistory.removeAt(i)
+                    }
             }
         }
 
         fun clear(aor: String) {
-            val it = BaresipService.callHistory.iterator()
-            while (it.hasNext()) if (it.next().aor == aor) it.remove()
+            for (i in BaresipService.callHistory.indices.reversed()) {
+                val h = BaresipService.callHistory[i]
+                if (h.aor == aor) {
+                    if (h.recording != "")
+                        deleteRecording(h.recording)
+                    BaresipService.callHistory.removeAt(i)
+                }
+            }
         }
 
         private fun aorHistorySize(aor: String): Int {
@@ -45,7 +51,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
 
         fun save() {
             Log.d(TAG, "Saving history of ${BaresipService.callHistory.size} calls")
-            val file = File(BaresipService.filesPath, "history")
+            val file = File(BaresipService.filesPath + "/history")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
@@ -56,14 +62,10 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                 Log.e(TAG, "OutputStream exception: $e")
                 e.printStackTrace()
             }
-            if (file.exists())
-                Log.d(TAG, "******** file ${BaresipService.filesPath}/history exists")
-            else
-                Log.d(TAG, "******** file ${BaresipService.filesPath}/history does NOT exist")
         }
 
         fun restore() {
-            val file = File(BaresipService.filesPath, "history")
+            val file = File(BaresipService.filesPath + "/history")
             if (file.exists()) {
                 try {
                     val fis = FileInputStream(file)
@@ -76,9 +78,12 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                 } catch (e: Exception) {
                     Log.e(TAG, "InputStream exception: - $e")
                 }
-            } else {
-                Log.d(TAG, "File ${BaresipService.filesPath}/history does not exist")
             }
+        }
+
+        fun deleteRecording(recording: String) {
+            Utils.deleteFile(File("$recording-enc.wav"))
+            Utils.deleteFile(File("$recording-dec.wav"))
         }
 
         @Suppress("UNUSED")
