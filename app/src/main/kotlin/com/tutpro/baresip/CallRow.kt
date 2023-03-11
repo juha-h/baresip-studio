@@ -6,7 +6,7 @@ import kotlin.collections.ArrayList
 class CallRow(val aor: String, val peerUri: String, val direction: Int,
               startTime: GregorianCalendar?,
               val stopTime: GregorianCalendar,
-              var recording: String)
+              val recording: String)
 
 {
 
