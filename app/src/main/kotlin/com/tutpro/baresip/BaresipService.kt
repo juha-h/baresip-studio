@@ -92,6 +92,7 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip")
 
         filesPath = filesDir.absolutePath
+        pName = packageName
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -576,7 +577,7 @@ class BaresipService: Service() {
 
         if (ev[0] == "sndfile dump") {
             Log.d(TAG, "Got sndfile dump ${ev[1]}")
-            if (Call.calls().size > 0)
+            if (Call.inCall())
                 Call.calls()[0].dumpfile = ev[1]
             return
         }
@@ -871,7 +872,7 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
-                            if (Call.calls().size == 0) {
+                            if (!Call.inCall()) {
                                 resetCallVolume()
                                 abandonAudioFocus(am)
                                 Utils.clearCommunicationDevice(am)
@@ -1074,7 +1075,7 @@ class BaresipService: Service() {
         callActionUri = ""
         if (VERSION.SDK_INT >= 23)
             Log.d(TAG, "Battery optimizations are ignored: " +
-                    "${pm.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
+                    "${pm.isIgnoringBatteryOptimizations(packageName)}")
         Log.d(TAG, "Partial wake lock/wifi lock is held: " +
                 "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
         updateStatusNotification()
@@ -1501,6 +1502,7 @@ class BaresipService: Service() {
         var callVolume = 0
         var dynDns = false
         var filesPath = ""
+        var pName = ""
         var logLevel = 2
         var sipTrace = false
         var callActionUri = ""

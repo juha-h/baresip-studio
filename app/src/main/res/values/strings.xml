@@ -448,6 +448,7 @@
     <string name="hold">Call Hold/Unhold</string>
     <string name="call_is_on_hold">Call is on hold</string>
     <string name="mic">Microphone On/Off</string>
+    <string name="rec_in_call">Recording can be turned on or off only when not in call</string>
     <string name="call_transfer">Call Transfer</string>
     <string name="blind">Blind</string>
     <string name="attended">Attended</string>

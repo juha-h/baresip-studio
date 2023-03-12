@@ -113,5 +113,9 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             return null
         }
 
+        fun inCall(): Boolean {
+            return BaresipService.calls.isNotEmpty()
+        }
+
     }
 }

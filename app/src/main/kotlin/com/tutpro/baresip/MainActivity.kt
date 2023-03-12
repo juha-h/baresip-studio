@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(contxt: Context, intent: Intent) {
                 if (kgm.isKeyguardLocked) {
                     Log.d(TAG, "Screen on when locked")
-                    Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+                    Utils.setShowWhenLocked(this@MainActivity, Call.inCall())
                 }
             }
         }
@@ -770,7 +770,7 @@ class MainActivity : AppCompatActivity() {
                     restoreActivities()
                     if (BaresipService.uas.size > 0) {
                         if (aorSpinner.selectedItemPosition == -1) {
-                            if (Call.calls().size > 0)
+                            if (Call.inCall())
                                 spinToAor(Call.calls()[0].ua.account.aor)
                             else {
                                 aorSpinner.setSelection(0)
@@ -839,7 +839,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun callAction(intent: Intent) {
-        if (Call.calls().isNotEmpty() || BaresipService.uas.size == 0)
+        if (Call.inCall() || BaresipService.uas.size == 0)
             return
         val uri: Uri? = intent.data
         if (uri != null) {
@@ -895,7 +895,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             "call" -> {
-                if (Call.calls().isNotEmpty()) {
+                if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return
@@ -1293,7 +1293,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.recIcon -> {
-                if (Call.call("connected") == null) {
+                if (!Call.inCall()) {
                     BaresipService.isRecOn = !BaresipService.isRecOn
                     if (BaresipService.isRecOn) {
                         item.setIcon(R.drawable.rec_on)
@@ -1302,6 +1302,12 @@ class MainActivity : AppCompatActivity() {
                         item.setIcon(R.drawable.rec_off)
                         Api.module_unload("sndfile")
                     }
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        R.string.rec_in_call,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -1664,7 +1670,12 @@ class MainActivity : AppCompatActivity() {
         val files = arrayListOf("accounts", "history", "config", "contacts", "messages", "uuid",
                 "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         File(BaresipService.filesPath).walk().forEach {
-            if (it.name.endsWith(".png")) files.add(it.name)
+            if (it.name.endsWith(".png"))
+                files.add(it.name)
+        }
+        File("${BaresipService.filesPath}/recordings").walk().forEach {
+            if (it.name.startsWith("dump"))
+                files.add("recordings/${it.name}")
         }
         val zipFile = getString(R.string.app_name) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
@@ -1805,7 +1816,7 @@ class MainActivity : AppCompatActivity() {
         callUri.setAdapter(null)
         val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
-        if (Call.calls().isEmpty()) {
+        if (!Call.inCall()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
                 if (lookForContact) {
@@ -2075,7 +2086,7 @@ class MainActivity : AppCompatActivity() {
         BaresipService.activities.removeAt(0)
         when (activity[0]) {
             "main" -> {
-                if ((Call.calls().size == 0) && (BaresipService.activities.size > 1))
+                if (!Call.inCall() && (BaresipService.activities.size > 1))
                     restoreActivities()
             }
             "config" -> {
