@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
                     if (speakerIcon != null) {
-                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
+                        if (Utils.isSpeakerPhoneOn(am))
                             speakerIcon!!.setIcon(R.drawable.speaker_on)
                         else
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
@@ -1326,11 +1326,13 @@ class MainActivity : AppCompatActivity() {
 
             R.id.speakerIcon -> {
                 if (Build.VERSION.SDK_INT >= 31)
-                    Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                            "${am.communicationDevice!!.type}/${am.mode}")
+                    Log.d(
+                        TAG, "Toggling speakerphone when dev/mode is " +
+                                "${am.communicationDevice!!.type}/${am.mode}"
+                    )
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                if (Build.VERSION.SDK_INT < 31 && speakerIcon != null) {
-                    if (am.isSpeakerphoneOn)
+                if (speakerIcon != null) {
+                    if (Utils.isSpeakerPhoneOn(am))
                         speakerIcon!!.setIcon(R.drawable.speaker_on)
                     else
                         speakerIcon!!.setIcon(R.drawable.speaker_off)
