@@ -175,9 +175,6 @@ class CallsActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        File("${BaresipService.filesPath}/recordings").walk().forEach { f ->
-            Log.d(TAG, "***** recording ${f.name}")
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

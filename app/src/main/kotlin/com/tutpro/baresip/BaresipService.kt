@@ -564,14 +564,16 @@ class BaresipService: Service() {
 
             val acc = ua.account
             if (acc.authUser != "" && acc.authPass == NO_AUTH_PASS) {
-                val password = if (MainActivity.aorPasswords[acc.aor] != null)
-                    MainActivity.aorPasswords[acc.aor]!!
-                else
-                    ""
-                Api.account_set_auth_pass(acc.accp, password)
-                acc.authPass = Api.account_auth_pass(ua.account.accp)
+                val password = aorPasswords[acc.aor]
+                if (password != null) {
+                    Api.account_set_auth_pass(acc.accp, password)
+                    acc.authPass = password
+                } else {
+                    Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
+                }
             }
 
+            Log.d(TAG, "got uaEvent $event/${acc.aor}")
             return
         }
 
@@ -1527,6 +1529,8 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
+        // <aor, password> of those accounts that have auth username without auth password
+        val aorPasswords = mutableMapOf<String, String>()
 
         private var audioFocusRequest: AudioFocusRequestCompat? = null
         private var btAdapter: BluetoothAdapter? = null

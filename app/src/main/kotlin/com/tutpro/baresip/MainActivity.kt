@@ -11,7 +11,6 @@ import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioAttributes
-import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.net.Uri
 import android.os.*
@@ -250,7 +249,7 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.ofAor(activityAor)!!
             updateIcons(ua.account)
             if (it.resultCode == Activity.RESULT_OK)
-                if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
+                if (BaresipService.aorPasswords[activityAor] == NO_AUTH_PASS)
                     askPassword(getString(R.string.authentication_password), ua)
         }
 
@@ -288,11 +287,11 @@ class MainActivity : AppCompatActivity() {
                 val ua = UserAgent.ofAor(aorSpinner.tag.toString())
                 if (ua != null) {
                     val acc = ua.account
-                    if (Api.account_regint(acc.accp) == REGISTRATION_INTERVAL) {
+                    if (Api.account_regint(acc.accp) > 0) {
                         Api.account_set_regint(acc.accp, 0)
                         Api.ua_unregister(ua.uap)
                     } else {
-                        Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
+                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
                         Api.ua_register(ua.uap)
                     }
                     acc.regint = Api.account_regint(acc.accp)
@@ -1580,7 +1579,6 @@ class MainActivity : AppCompatActivity() {
         }
         val input = layout.findViewById(R.id.password) as EditText
         input.requestFocus()
-        val context = this
         with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
@@ -1588,8 +1586,11 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var password = input.text.toString().trim()
                 if (!Account.checkAuthPass(password)) {
-                    Utils.alertView(context, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_authentication_password), password))
+                    Toast.makeText(
+                        applicationContext,
+                        String.format(getString(R.string.invalid_authentication_password), password),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     password = ""
                 }
                 when (title) {
@@ -1598,7 +1599,17 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.decrypt_password) ->
                         if (password != "") restore(password)
                     else ->
-                        AccountsActivity.setAuthPass(ua!!, password)
+                        if (password == "") {
+                            askPassword(title, ua!!)
+                        } else {
+                            Api.account_set_auth_pass(ua!!.account.accp, password)
+                            ua.account.authPass =  Api.account_auth_pass(ua.account.accp)
+                            BaresipService.aorPasswords[ua.account.aor] = ua.account.authPass
+                            if (ua.account.regint == 0)
+                                Api.ua_unregister(ua.uap)
+                            else
+                                Api.ua_register(ua.uap)
+                        }
                 }
             }
             setNeutralButton(android.R.string.cancel) { dialog, _ ->
@@ -1606,6 +1617,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             }
             val dialog = this.create()
+            dialog.setCanceledOnTouchOutside(false)
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             dialog.show()
         }
@@ -1628,28 +1640,34 @@ class MainActivity : AppCompatActivity() {
                 messageView.text = message
                 val input = layout.findViewById(R.id.password) as EditText
                 input.requestFocus()
-                val context = this
                 with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setView(layout)
+
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.dismiss()
                         val password = input.text.toString().trim()
                         if (!Account.checkAuthPass(password)) {
-                            Utils.alertView(context, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_authentication_password), password))
+                            Toast.makeText(
+                                applicationContext,
+                                String.format(getString(R.string.invalid_authentication_password),
+                                    password),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            accounts.add(0, account)
                         } else {
-                            aorPasswords[aor] = password
+                            BaresipService.aorPasswords[aor] = password
                         }
                         askPasswords(accounts)
                     }
                     setNeutralButton(android.R.string.cancel) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.cancel()
-                        aorPasswords[aor] = ""
+                        BaresipService.aorPasswords[aor] = NO_AUTH_PASS
                         askPasswords(accounts)
                     }
                     val dialog = this.create()
+                    dialog.setCanceledOnTouchOutside(false)
                     dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     dialog.show()
                 }
@@ -2199,8 +2217,6 @@ class MainActivity : AppCompatActivity() {
 
         var accountRequest: ActivityResultLauncher<Intent>? = null
         var activityAor = ""
-        // <aor, password> of those accounts that have auth username without auth password
-        val aorPasswords = mutableMapOf<String, String>()
 
     }
 

@@ -227,7 +227,7 @@ class AccountActivity : AppCompatActivity() {
         displayName.setText(acc.displayName)
         authUser.setText(acc.authUser)
 
-        if (MainActivity.aorPasswords.containsKey(aor) || acc.authPass == NO_AUTH_PASS)
+        if (BaresipService.aorPasswords[aor] != null || acc.authPass == NO_AUTH_PASS)
             authPass.setText("")
         else
             authPass.setText(acc.authPass)
@@ -351,7 +351,6 @@ class AccountActivity : AppCompatActivity() {
         vmUri.setText(acc.vmUri)
 
         defaultCheck.isChecked = uaIndex == 0
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -431,31 +430,31 @@ class AccountActivity : AppCompatActivity() {
                 if (ap != "") {
                     if (ap != acc.authPass) {
                         if (Account.checkAuthPass(ap)) {
-                            setAuthPass(acc, ap)
-                            MainActivity.aorPasswords.remove(aor)
+                            if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
+                                acc.authPass = Api.account_auth_pass(acc.accp)
+                                save = true
+                                if (acc.regint > 0)
+                                    reRegister = true
+                            } else {
+                                Log.e(TAG, "Setting of auth pass failed")
+                            }
+                            BaresipService.aorPasswords.remove(acc.aor)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.invalid_authentication_password), ap))
                             return false
                         }
                     } else {
-                        if (MainActivity.aorPasswords.containsKey(aor)) {
-                            MainActivity.aorPasswords.remove(aor)
-                            save = true
-                        }
+                        BaresipService.aorPasswords.remove(acc.aor)
                     }
                 } else { // ap == ""
-                    if (acc.authUser != "") {
-                        if (!MainActivity.aorPasswords.containsKey(aor)) {
-                            setAuthPass(acc, "")
-                            MainActivity.aorPasswords[aor] = ""
+                    if (acc.authPass != NO_AUTH_PASS &&
+                            acc.authPass != BaresipService.aorPasswords[acc.aor])
+                        if (Api.account_set_auth_pass(acc.accp, "") == 0) {
+                            acc.authPass = NO_AUTH_PASS
+                            BaresipService.aorPasswords[aor] = NO_AUTH_PASS
+                            save = true
                         }
-                    } else {
-                        if (acc.authPass != "") {
-                            setAuthPass(acc, "")
-                            MainActivity.aorPasswords.remove(aor)
-                        }
-                    }
                 }
 
                 val ob = ArrayList<String>()
@@ -505,8 +504,7 @@ class AccountActivity : AppCompatActivity() {
                         (regCheck.isChecked && newConfiguredRegInt != acc.configuredRegInt)
                 if (reReg) {
                     if (Api.account_set_regint(acc.accp,
-                            if (regCheck.isChecked) newConfiguredRegInt else 0
-                        ) != 0) {
+                            if (regCheck.isChecked) newConfiguredRegInt else 0) != 0) {
                         Log.e(TAG, "Setting of regint failed")
                     } else {
                         acc.regint = Api.account_regint(acc.accp)
@@ -831,17 +829,6 @@ class AccountActivity : AppCompatActivity() {
             i.putExtra("aor", aor)
         setResult(code, i)
         finish()
-    }
-
-    private fun setAuthPass(acc: Account, ap: String) {
-        if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
-            acc.authPass = Api.account_auth_pass(acc.accp)
-            MainActivity.aorPasswords.remove(acc.aor)
-            save = true
-            reRegister = true
-        } else {
-            Log.e(TAG, "Setting of auth pass failed")
-        }
     }
 
     private fun checkOutboundUri(uri: String): Boolean {
