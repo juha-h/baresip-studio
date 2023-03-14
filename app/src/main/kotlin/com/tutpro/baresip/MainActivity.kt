@@ -1617,6 +1617,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             }
             val dialog = this.create()
+            dialog.setCancelable(false)
             dialog.setCanceledOnTouchOutside(false)
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             dialog.show()
@@ -1667,6 +1668,7 @@ class MainActivity : AppCompatActivity() {
                         askPasswords(accounts)
                     }
                     val dialog = this.create()
+                    dialog.setCancelable(false)
                     dialog.setCanceledOnTouchOutside(false)
                     dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     dialog.show()
