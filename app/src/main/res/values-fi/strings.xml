@@ -475,6 +475,8 @@
     <string name="hold">Puhelu pitoon/pidosta</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="mic">Mikrofoni päälle/pois</string>
+    <string name="rec_in_call">Tallennus voidaan asettaa päälle tai pois vain silloin, kun puhelu
+        ei ole yhdistetty</string>
     <string name="call_transfer">Puhelun siirto</string>
     <string name="blind">Sokeasti</string>
     <string name="attended">Osallistu</string>

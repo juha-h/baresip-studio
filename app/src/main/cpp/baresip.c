@@ -272,9 +272,6 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
         case UA_EVENT_MODULE:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
-            break;
-        case UA_EVENT_MODULE:
             err = re_regex(prm, strlen(prm), "[^,]*,[^,]*,[~]*",
                            &module, &module_event, &data);
             if (err)
@@ -282,6 +279,8 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
             if (!pl_strcmp(&module_event, "dump")) {
                 len = re_snprintf(event_buf, sizeof event_buf, "sndfile dump,%r", &data);
                 break;
+            } else {
+                len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
             }
         default:
             return;
