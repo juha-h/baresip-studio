@@ -7,8 +7,8 @@ import java.util.GregorianCalendar
 class CallHistory(val aor: String, val peerUri: String, val direction: String) : Serializable {
 
     var startTime: GregorianCalendar? = null  // Set to time when call is established (if ever)
-    var stopTime = GregorianCalendar()  // Set to time when call is closed
-    var recording = ""
+    var stopTime = GregorianCalendar()        // Set to time when call is closed
+    var recording = arrayOf("", "")           // Encoder and decoder recording files
 
     companion object {
 
@@ -20,7 +20,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
             if (aorHistorySize(history.aor) > CALL_HISTORY_SIZE) {
                 for (h in BaresipService.callHistory)
                     if (h.aor == history.aor) {
-                        if (h.recording != "")
+                        if (h.recording[0] != "")
                             deleteRecording(h.recording)
                         BaresipService.callHistory.remove(h)
                         break
@@ -32,7 +32,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
             for (i in BaresipService.callHistory.indices.reversed()) {
                 val h = BaresipService.callHistory[i]
                 if (h.aor == aor) {
-                    if (h.recording != "")
+                    if (h.recording[0] != "")
                         deleteRecording(h.recording)
                     BaresipService.callHistory.removeAt(i)
                 }
@@ -81,16 +81,16 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
             }
         }
 
-        fun deleteRecording(recording: String) {
-            Utils.deleteFile(File("$recording-enc.wav"))
-            Utils.deleteFile(File("$recording-dec.wav"))
+        fun deleteRecording(recording: Array<String>) {
+            Utils.deleteFile(File(recording[0]))
+            Utils.deleteFile(File(recording[1]))
         }
 
         @Suppress("UNUSED")
         fun print() {
             for (h in BaresipService.callHistory)
                 Log.d(TAG, "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.startTime}," +
-                        "${h.stopTime}, ${h.recording}]")
+                        "${h.stopTime}, ${h.recording}")
         }
     }
 

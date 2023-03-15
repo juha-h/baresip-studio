@@ -74,7 +74,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 val duration = (stopTime.time.time - startTime.time.time) / 1000
                 viewHolder.durationView.text = DateUtils.formatElapsedTime(duration)
                 val recording = rows[position].recording
-                if (recording != "") {
+                if (recording[0] != "") {
                     viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
                     viewHolder.durationView.setOnClickListener {
                         Utils.playRecording(ctx, recording)

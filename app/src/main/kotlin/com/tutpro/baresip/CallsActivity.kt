@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.databinding.ActivityCallsBinding
-import java.io.File
 
 class CallsActivity : AppCompatActivity() {
 
@@ -277,7 +276,7 @@ class CallsActivity : AppCompatActivity() {
 
     private fun removeUaHistoryAt(i: Int) {
         for (details in uaHistory[i].details) {
-            if (details.recording != "")
+            if (details.recording[0] != "")
                 CallHistory.deleteRecording(details.recording)
             BaresipService.callHistory.removeAll {
                 it.startTime == details.startTime && it.stopTime == details.stopTime

@@ -995,7 +995,7 @@ object Utils {
         }
     }
 
-    fun playRecording(ctx: Context, recording: String) {
+    fun playRecording(ctx: Context, recording: Array<String>) {
         Log.d(TAG, "Playing recording $recording")
         val decPlayer = MediaPlayer()
         decPlayer.apply {
@@ -1025,7 +1025,7 @@ object Utils {
                         it.release()
                     }
                     try {
-                        val file = "$recording-enc.wav"
+                        val file = recording[0]
                         val encFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/encode.wav"), true)
                         val encUri = encFile.toUri()
                         setDataSource(ctx, encUri)
@@ -1045,7 +1045,7 @@ object Utils {
                 it.release()
             }
             try {
-                val file = "$recording-dec.wav"
+                val file = recording[1]
                 val decFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/decode.wav"), true)
                 val decUri = decFile.toUri()
                 setDataSource(ctx, decUri)

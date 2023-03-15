@@ -579,8 +579,12 @@ class BaresipService: Service() {
 
         if (ev[0] == "sndfile dump") {
             Log.d(TAG, "Got sndfile dump ${ev[1]}")
-            if (Call.inCall())
-                Call.calls()[0].dumpfile = ev[1]
+            if (Call.inCall()) {
+                if (ev[1].endsWith("enc.wav"))
+                    Call.calls()[0].dumpfiles[0] = ev[1]
+                else
+                    Call.calls()[0].dumpfiles[1] = ev[1]
+            }
             return
         }
 
@@ -885,8 +889,8 @@ class BaresipService: Service() {
                                 val history = CallHistory(aor, call.peerUri, call.dir)
                                 history.startTime = call.startTime
                                 history.stopTime = GregorianCalendar()
-                                if (call.startTime != null && call.dumpfile != "")
-                                    history.recording = call.dumpfile.substringBeforeLast("-")
+                                if (call.startTime != null && call.dumpfiles[0] != "")
+                                    history.recording = call.dumpfiles
                                 CallHistory.add(history)
                                 CallHistory.save()
                                 ua.account.missedCalls = ua.account.missedCalls || missed

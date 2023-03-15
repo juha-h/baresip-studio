@@ -15,7 +15,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var zid = ""
     var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""
-    var dumpfile = ""
+    var dumpfiles = arrayOf("", "")
 
     fun add() {
         BaresipService.calls.add(0, this)

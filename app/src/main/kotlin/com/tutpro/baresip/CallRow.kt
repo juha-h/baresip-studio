@@ -6,12 +6,12 @@ import kotlin.collections.ArrayList
 class CallRow(val aor: String, val peerUri: String, val direction: Int,
               startTime: GregorianCalendar?,
               val stopTime: GregorianCalendar,
-              val recording: String)
+              val recording: Array<String>)
 
 {
 
     class Details(val direction: Int, val startTime: GregorianCalendar?,
-                  val stopTime: GregorianCalendar, val recording: String)
+                  val stopTime: GregorianCalendar, val recording: Array<String>)
 
     val details = ArrayList<Details>()
 
