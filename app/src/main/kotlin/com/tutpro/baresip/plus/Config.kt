@@ -107,6 +107,8 @@ object Config {
         if (!config.contains("dtls_srtp_use_ec"))
             config = "${config}dtls_srtp_use_ec prime256v1\n"
 
+        replaceVariable("snd_path", "${BaresipService.filesPath}/recordings")
+
         Utils.putFileContents(configPath, config.toByteArray())
         BaresipService.isConfigInitialized = true
         Log.i(TAG, "Initialized config to '$config'")

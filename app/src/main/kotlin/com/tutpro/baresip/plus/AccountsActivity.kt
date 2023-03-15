@@ -3,15 +3,11 @@ package com.tutpro.baresip.plus
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.plus.databinding.ActivityAccountsBinding
 
 class AccountsActivity : AppCompatActivity() {
@@ -41,15 +37,7 @@ class AccountsActivity : AppCompatActivity() {
         listView.adapter = alAdapter
 
         val accountRequest =
-           registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-               if (it.resultCode == RESULT_OK) {
-                   val aor = it.data!!.getStringExtra("aor")!!
-                    val ua = UserAgent.ofAor(aor)!!
-                    if (MainActivity.aorPasswords.containsKey(aor) &&
-                        MainActivity.aorPasswords[aor] == "")
-                        askPassword(ua)
-                }
-            }
+           registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
         val addAccountButton = binding.addAccount
         val newAorView = binding.newAor
@@ -93,35 +81,6 @@ class AccountsActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-    }
-
-    private fun askPassword(ua: UserAgent) {
-        val layout = LayoutInflater.from(this)
-                .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
-                        false)
-        val titleView = layout.findViewById(R.id.title) as TextView
-        titleView.text = getString(R.string.authentication_password)
-        val messageView = layout.findViewById(R.id.message) as TextView
-        val message = getString(R.string.account) + " " + Utils.plainAor(ua.account.aor)
-        messageView.text = message
-        val input = layout.findViewById(R.id.password) as EditText
-        with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-            setView(layout)
-            setPositiveButton(android.R.string.ok) { dialog, _ ->
-                dialog.dismiss()
-                var password = input.text.toString().trim()
-                if (!Account.checkAuthPass(password)) {
-                    Utils.alertView(this@AccountsActivity, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_authentication_password), password))
-                    password = ""
-                }
-                setAuthPass(ua, password)
-            }
-            setNeutralButton(android.R.string.cancel) { dialog, _ ->
-                dialog.cancel()
-            }
-            show()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -189,17 +148,6 @@ class AccountsActivity : AppCompatActivity() {
             return contents == null || contents.isEmpty()
         }
 
-        fun setAuthPass(ua: UserAgent, ap: String) {
-            val acc = ua.account
-            if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
-                acc.authPass = Api.account_auth_pass(acc.accp)
-                MainActivity.aorPasswords[acc.aor] = ap
-                if ((ap != "") && (acc.regint > 0))
-                    Api.ua_register(ua.uap)
-            } else {
-                Log.e(TAG, "Setting of auth pass failed")
-            }
-        }
     }
 
 }

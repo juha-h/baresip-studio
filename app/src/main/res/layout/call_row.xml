@@ -43,7 +43,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="41dp"
-        android:layout_centerVertical="true" >
+        android:layout_centerVertical="true"
+        android:paddingBottom="5dp" >
     </LinearLayout>
 
     <TextView

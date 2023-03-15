@@ -13,11 +13,13 @@ import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.media.AudioAttributes
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -37,6 +39,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -794,17 +797,17 @@ object Utils {
     }
 
     fun unZip(zipFilePath: String): Boolean {
-        val allFiles = listOf("accounts", "calls", "config", "contacts", "messages", "uuid",
+        val allFiles = listOf("accounts", "history", "config", "contacts", "messages", "uuid",
                 "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val zipFiles = mutableListOf<String>()
         try {
             ZipFile(zipFilePath).use { zip ->
                 zip.entries().asSequence().forEach { entry ->
-                    if (!entry.name.contains("/com.tutpro.baresip.plus/")) {
-                        Log.e(TAG, "Backup file is not from baresip+ application")
+                    if (!entry.name.contains("/${BaresipService.pName}/")) {
+                        Log.e(TAG, "Backup file is not from this application")
                         return false
                     }
-                    zipFiles.add(entry.name.substringAfterLast("/"))
+                    zipFiles.add(entry.name.substringAfter("/files/"))
                     zip.getInputStream(entry).use { input ->
                         File(entry.name).outputStream().use { output ->
                             input.copyTo(output)
@@ -952,14 +955,14 @@ object Utils {
     }
 
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
-        return if (Build.VERSION.SDK_INT >= 31)
+        return if (Build.VERSION.SDK_INT > 33)
             am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         else
             am.isSpeakerphoneOn
     }
 
     fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT > 33) {
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
@@ -1024,7 +1027,7 @@ object Utils {
     }
 
     fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT > 33) {
             if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
                 setSpeakerPhone(executor, am, true)
             else if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
@@ -1047,11 +1050,110 @@ object Utils {
     }
 
     fun clearCommunicationDevice(am: AudioManager) {
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT > 33) {
             am.clearCommunicationDevice()
         } else {
             if (am.isSpeakerphoneOn)
                 am.isSpeakerphoneOn = false
+        }
+    }
+
+    fun playRecording(ctx: Context, recording: Array<String>) {
+        Log.d(TAG, "Playing recording $recording")
+        val decPlayer = MediaPlayer()
+        decPlayer.apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setOnPreparedListener {
+                val encPlayer = MediaPlayer()
+                encPlayer.apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setOnPreparedListener {
+                        it.start()
+                        decPlayer.start()
+                        Log.d(TAG, "Started players")
+                    }
+                    setOnCompletionListener {
+                        Log.d(TAG, "Stopping encPlayer")
+                        it.stop()
+                        it.release()
+                    }
+                    try {
+                        val file = recording[0]
+                        val encFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/encode.wav"), true)
+                        val encUri = encFile.toUri()
+                        setDataSource(ctx, encUri)
+                        prepareAsync()
+                    } catch (e: IllegalArgumentException) {
+                        Log.e(TAG, "encPlayer IllegalArgumentException: $e")
+                    } catch (e: IOException) {
+                        Log.e(TAG, "encPlayer IOException: $e")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "encPlayer Exception: $e")
+                    }
+                }
+            }
+            setOnCompletionListener {
+                Log.d(TAG, "Stopping decPlayer")
+                it.stop()
+                it.release()
+            }
+            try {
+                val file = recording[1]
+                val decFile = File(file).copyTo(File(BaresipService.filesPath + "/tmp/decode.wav"), true)
+                val decUri = decFile.toUri()
+                setDataSource(ctx, decUri)
+                prepareAsync()
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "decPlayer IllegalArgumentException: $e")
+            } catch (e: IOException) {
+                Log.e(TAG, "decPlayer IOException: $e")
+            } catch (e: Exception) {
+                Log.e(TAG, "decPlayer Exception: $e")
+            }
+        }
+    }
+
+    @Suppress("unused")
+    fun playFile(ctx: Context, path: String) {
+        Log.d(TAG, "Playing file $path")
+        MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setOnPreparedListener {
+                Log.d(TAG, "Starting MediaPlayer")
+                it.start()
+                Log.d(TAG, "MediaPlayer started")
+            }
+            setOnCompletionListener {
+                Log.d(TAG, "Stopping MediaPlayer")
+                it.stop()
+                it.release()
+            }
+            try {
+                Log.d(TAG, "Preparing $path")
+                setDataSource(ctx, path.toUri())
+                prepareAsync()
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "MediaPlayer IllegalArgumentException: ${e.printStackTrace()}")
+            } catch (e: IOException) {
+                Log.e(TAG, "MediaPlayer IOException: ${e.printStackTrace()}")
+            } catch (e: Exception) {
+                Log.e(TAG, "MediaPlayer Exception: ${e.printStackTrace()}")
+            }
         }
     }
 

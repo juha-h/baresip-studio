@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var kgm: KeyguardManager
     private lateinit var screenEventReceiver: BroadcastReceiver
     private lateinit var serviceEventObserver: Observer<Event<Long>>
+    private var recIcon: MenuItem? = null
     private var micIcon: MenuItem? = null
     private var speakerIcon: MenuItem? = null
     private lateinit var speakerButton: ImageButton
@@ -204,7 +205,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(contxt: Context, intent: Intent) {
                 if (kgm.isKeyguardLocked) {
                     Log.d(TAG, "Screen on when locked")
-                    Utils.setShowWhenLocked(this@MainActivity, Call.calls().size > 0)
+                    Utils.setShowWhenLocked(this@MainActivity, Call.inCall())
                 }
             }
         }
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
                     if (speakerIcon != null) {
-                        if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
+                        if (Utils.isSpeakerPhoneOn(am))
                             speakerIcon!!.setIcon(R.drawable.speaker_on)
                         else
                             speakerIcon!!.setIcon(R.drawable.speaker_off)
@@ -274,7 +275,7 @@ class MainActivity : AppCompatActivity() {
             val ua = UserAgent.ofAor(activityAor)!!
             updateIcons(ua.account)
             if (it.resultCode == Activity.RESULT_OK)
-                if (aorPasswords.containsKey(activityAor) && aorPasswords[activityAor] == "")
+                if (BaresipService.aorPasswords[activityAor] == NO_AUTH_PASS)
                     askPassword(getString(R.string.authentication_password), ua)
         }
 
@@ -312,11 +313,11 @@ class MainActivity : AppCompatActivity() {
                 val ua = UserAgent.ofAor(aorSpinner.tag.toString())
                 if (ua != null) {
                     val acc = ua.account
-                    if (Api.account_regint(acc.accp) == REGISTRATION_INTERVAL) {
+                    if (Api.account_regint(acc.accp) > 0) {
                         Api.account_set_regint(acc.accp, 0)
                         Api.ua_unregister(ua.uap)
                     } else {
-                        Api.account_set_regint(acc.accp, REGISTRATION_INTERVAL)
+                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
                         Api.ua_register(ua.uap)
                     }
                     acc.regint = Api.account_regint(acc.accp)
@@ -911,7 +912,7 @@ class MainActivity : AppCompatActivity() {
                     restoreActivities()
                     if (BaresipService.uas.size > 0) {
                         if (aorSpinner.selectedItemPosition == -1) {
-                            if (Call.calls().size > 0)
+                            if (Call.inCall())
                                 spinToAor(Call.calls()[0].ua.account.aor)
                             else {
                                 aorSpinner.setSelection(0)
@@ -1235,7 +1236,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun callAction(intent: Intent) {
-        if (Call.calls().isNotEmpty() || BaresipService.uas.size == 0)
+        if (Call.inCall() || BaresipService.uas.size == 0)
             return
         val uri: Uri? = intent.data
         if (uri != null) {
@@ -1291,7 +1292,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             "call" -> {
-                if (Call.calls().isNotEmpty()) {
+                if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
                     return
@@ -1642,6 +1643,11 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     callTimer.stop()
                 }
+                if (BaresipService.isRecOn) {
+                    Api.module_unload("sndfile")
+                    BaresipService.isRecOn = false
+                    recIcon!!.setIcon(R.drawable.rec_off)
+                }
                 if (aor == aorSpinner.tag) {
                     callUri.inputType = InputType.TYPE_CLASS_TEXT +
                             InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -1700,6 +1706,13 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.main_menu, menu)
 
+        menuInflater.inflate(R.menu.rec_icon, menu)
+        recIcon = menu.findItem(R.id.recIcon)
+        if (BaresipService.isRecOn)
+            recIcon!!.setIcon(R.drawable.rec_on)
+        else
+            recIcon!!.setIcon(R.drawable.rec_off)
+
         menuInflater.inflate(R.menu.mic_icon, menu)
         micIcon = menu.findItem(R.id.micIcon)
         if (BaresipService.isMicMuted)
@@ -1721,6 +1734,25 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
 
+            R.id.recIcon -> {
+                if (Call.call("connected") == null) {
+                    BaresipService.isRecOn = !BaresipService.isRecOn
+                    if (BaresipService.isRecOn) {
+                        item.setIcon(R.drawable.rec_on)
+                        Api.module_load("sndfile")
+                    } else {
+                        item.setIcon(R.drawable.rec_off)
+                        Api.module_unload("sndfile")
+                    }
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        R.string.rec_in_call,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
             R.id.micIcon -> {
                 if (Call.call("connected") != null) {
                     BaresipService.isMicMuted = !BaresipService.isMicMuted
@@ -1739,13 +1771,13 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "Toggling speakerphone when dev/mode is " +
                             "${am.communicationDevice!!.type}/${am.mode}")
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                if (Build.VERSION.SDK_INT < 31) {
-                    if (am.isSpeakerphoneOn) {
+                if (speakerIcon != null) {
+                    if (Utils.isSpeakerPhoneOn(am)) {
                         speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+                        speakerIcon!!.setIcon(R.drawable.speaker_on)
                     } else {
                         speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+                        speakerIcon!!.setIcon(R.drawable.speaker_off)
                     }
                 }
             }
@@ -1992,7 +2024,6 @@ class MainActivity : AppCompatActivity() {
         }
         val input = layout.findViewById(R.id.password) as EditText
         input.requestFocus()
-        val context = this
         with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setView(layout)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
@@ -2000,8 +2031,11 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var password = input.text.toString().trim()
                 if (!Account.checkAuthPass(password)) {
-                    Utils.alertView(context, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_authentication_password), password))
+                    Toast.makeText(
+                        applicationContext,
+                        String.format(getString(R.string.invalid_authentication_password), password),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     password = ""
                 }
                 when (title) {
@@ -2010,7 +2044,17 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.decrypt_password) ->
                         if (password != "") restore(password)
                     else ->
-                        AccountsActivity.setAuthPass(ua!!, password)
+                        if (password == "") {
+                            askPassword(title, ua!!)
+                        } else {
+                            Api.account_set_auth_pass(ua!!.account.accp, password)
+                            ua.account.authPass =  Api.account_auth_pass(ua.account.accp)
+                            BaresipService.aorPasswords[ua.account.aor] = ua.account.authPass
+                            if (ua.account.regint == 0)
+                                Api.ua_unregister(ua.uap)
+                            else
+                                Api.ua_register(ua.uap)
+                        }
                 }
             }
             setNeutralButton(android.R.string.cancel) { dialog, _ ->
@@ -2018,6 +2062,8 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             }
             val dialog = this.create()
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             dialog.show()
         }
@@ -2040,7 +2086,6 @@ class MainActivity : AppCompatActivity() {
                 messageView.text = message
                 val input = layout.findViewById(R.id.password) as EditText
                 input.requestFocus()
-                val context = this
                 with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setView(layout)
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
@@ -2048,20 +2093,27 @@ class MainActivity : AppCompatActivity() {
                         dialog.dismiss()
                         val password = input.text.toString().trim()
                         if (!Account.checkAuthPass(password)) {
-                            Utils.alertView(context, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_authentication_password), password))
+                            Toast.makeText(
+                                applicationContext,
+                                String.format(getString(R.string.invalid_authentication_password),
+                                    password),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            accounts.add(0, account)
                         } else {
-                            aorPasswords[aor] = password
+                            BaresipService.aorPasswords[aor] = password
                         }
                         askPasswords(accounts)
                     }
                     setNeutralButton(android.R.string.cancel) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.cancel()
-                        aorPasswords[aor] = ""
+                        BaresipService.aorPasswords[aor] = NO_AUTH_PASS
                         askPasswords(accounts)
                     }
                     val dialog = this.create()
+                    dialog.setCancelable(false)
+                    dialog.setCanceledOnTouchOutside(false)
                     dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     dialog.show()
                 }
@@ -2081,10 +2133,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun backup(password: String) {
-        val files = arrayListOf("accounts", "call_history", "config", "contacts", "messages", "uuid",
+        val files = arrayListOf("accounts", "history", "config", "contacts", "messages", "uuid",
                 "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         File(BaresipService.filesPath).walk().forEach {
-            if (it.name.endsWith(".png")) files.add(it.name)
+            if (it.name.endsWith(".png"))
+                files.add(it.name)
+        }
+        File("${BaresipService.filesPath}/recordings").walk().forEach {
+            if (it.name.startsWith("dump"))
+                files.add("recordings/${it.name}")
         }
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
@@ -2174,7 +2231,7 @@ class MainActivity : AppCompatActivity() {
         callUri.setAdapter(null)
         val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
         val aor = ua.account.aor
-        if (Call.calls().isEmpty()) {
+        if (!Call.inCall()) {
             var uriText = callUri.text.toString().trim()
             if (uriText.isNotEmpty()) {
                 if (lookForContact) {
@@ -2272,7 +2329,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                val latestPeerUri = NewCallHistory.aorLatestPeerUri(aor)
+                val latestPeerUri = CallHistory.aorLatestPeerUri(aor)
                 if (latestPeerUri != null)
                     callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }
@@ -2567,7 +2624,7 @@ class MainActivity : AppCompatActivity() {
         BaresipService.activities.removeAt(0)
         when (activity[0]) {
             "main" -> {
-                if ((Call.calls().size == 0) && (BaresipService.activities.size > 1))
+                if (!Call.inCall() && (BaresipService.activities.size > 1))
                     restoreActivities()
             }
             "config" -> {
@@ -2678,8 +2735,6 @@ class MainActivity : AppCompatActivity() {
 
         var accountRequest: ActivityResultLauncher<Intent>? = null
         var activityAor = ""
-        // <aor, password> of those accounts that have auth username without auth password
-        val aorPasswords = mutableMapOf<String, String>()
 
     }
 

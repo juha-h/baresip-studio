@@ -16,6 +16,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""
     var videoRequest = 0
+    var dumpfiles = arrayOf("", "")
 
     fun diverterUri(): String {
         return Api.call_diverter_uri(callp)
@@ -143,6 +144,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             for (c in BaresipService.calls.reversed())
                 if (c.status == status) return c
             return null
+        }
+
+        fun inCall(): Boolean {
+            return BaresipService.calls.isNotEmpty()
         }
 
     }

@@ -1,6 +1,8 @@
 package com.tutpro.baresip.plus
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +17,8 @@ import java.util.*
 class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<CallRow.Details>) :
         ArrayAdapter<CallRow.Details>(ctx, R.layout.call_detail_row, rows) {
 
-    private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val layoutInflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     private class ViewHolder(view: View?) {
         val directionView = view?.findViewById(R.id.direction) as ImageView
@@ -23,6 +26,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
         val durationView = view?.findViewById(R.id.duration) as TextView
     }
 
+    @SuppressLint("SimpleDateFormat")
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
 
         val viewHolder: ViewHolder
@@ -59,7 +63,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.durationView.text = ""
             } else {
                 val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
-                    val fmt = DateFormat.getTimeInstance(DateFormat.LONG)
+                    val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
                     ctx.getString(R.string.today) + " " + fmt.format(startTime.time)
                 } else {
                     val fmt = DateFormat.getDateTimeInstance()
@@ -68,10 +72,16 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.timeView.text = startText
                 val duration = (stopTime.time.time - startTime.time.time) / 1000
                 viewHolder.durationView.text = DateUtils.formatElapsedTime(duration)
+                val recording = rows[position].recording
+                if (recording[0] != "") {
+                    viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
+                    viewHolder.durationView.setOnClickListener {
+                        Utils.playRecording(ctx, recording)
+                    }
+                }
             }
         }
 
         return rowView
     }
-
 }

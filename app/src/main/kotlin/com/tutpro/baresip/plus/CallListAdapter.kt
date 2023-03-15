@@ -2,6 +2,7 @@ package com.tutpro.baresip.plus
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -47,9 +48,11 @@ class CallListAdapter(private val ctx: Context, private val account: Account,
         viewHolder.directionsView.removeAllViews()
         var count = 1
         for (d in callRow.details) {
+            if (d.recording[0] != "")
+                viewHolder.timeView.typeface = Typeface.DEFAULT_BOLD
             if (count > 3) {
                 viewHolder.etcView.text = "..."
-                break
+                continue
             }
             val dirView = ImageView(ctx)
             val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

@@ -355,9 +355,12 @@ class ConfigActivity : AppCompatActivity() {
                             contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
                             dialog.dismiss()
                         }
-                        show().apply {
+                        val dialog = this.create()
+                        dialog.setCancelable(false)
+                        dialog.setCanceledOnTouchOutside(false)
+                        dialog.show().apply {
                             findViewById<TextView>(android.R.id.message)
-                                    ?.movementMethod = LinkMovementMethod.getInstance()
+                                ?.movementMethod = LinkMovementMethod.getInstance()
                         }
                     }
             }

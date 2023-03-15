@@ -94,6 +94,7 @@ class BaresipService: Service() {
         intent.setPackage("com.tutpro.baresip.plus")
 
         filesPath = filesDir.absolutePath
+        pName = packageName
 
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -383,8 +384,11 @@ class BaresipService: Service() {
                         Config.initialize(applicationContext)
                 }
 
-                if (File(filesDir, "history").exists())
-                    File(filesDir, "history").renameTo(File(filesDir, "calls"))
+                if (!File(filesDir, "tmp").exists())
+                    File(filesDir, "tmp").mkdir()
+
+                if (!File(filesDir, "recordings").exists())
+                    File(filesDir, "recordings").mkdir()
 
                 if (contactsMode != "android")
                     Contact.restoreBaresipContacts()
@@ -394,18 +398,17 @@ class BaresipService: Service() {
                 }
                 Contact.contactsUpdate()
 
-                val history = CallHistory.get()
+                val history = NewCallHistory.get()
                 if (history.isEmpty()) {
-                    NewCallHistory.restore()
+                    CallHistory.restore()
                 } else {
                     for (old in history) {
-                        val new = NewCallHistory(old.aor, old.peerUri, old.direction)
-                        new.stopTime = old.time
-                        if (old.connected)
-                            new.startTime = GregorianCalendar(0, 0, 0)
+                        val new = CallHistory(old.aor, old.peerUri, old.direction)
+                        new.stopTime = old.stopTime
+                        new.startTime = old.startTime
                         callHistory.add(new)
                     }
-                    NewCallHistory.save()
+                    CallHistory.save()
                 }
 
                 Message.restore()
@@ -551,14 +554,27 @@ class BaresipService: Service() {
 
             val acc = ua.account
             if (acc.authUser != "" && acc.authPass == NO_AUTH_PASS) {
-                val password = if (MainActivity.aorPasswords[acc.aor] != null)
-                    MainActivity.aorPasswords[acc.aor]!!
-                else
-                 ""
-                Api.account_set_auth_pass(acc.accp, password)
-                acc.authPass = Api.account_auth_pass(ua.account.accp)
+                val password = aorPasswords[acc.aor]
+                if (password != null) {
+                    Api.account_set_auth_pass(acc.accp, password)
+                    acc.authPass = password
+                } else {
+                    Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
+                }
             }
 
+            Log.d(TAG, "got uaEvent $event/${acc.aor}")
+            return
+        }
+
+        if (ev[0] == "sndfile dump") {
+            Log.d(TAG, "Got sndfile dump ${ev[1]}")
+            if (Call.inCall()) {
+                if (ev[1].endsWith("enc.wav"))
+                    Call.calls()[0].dumpfiles[0] = ev[1]
+                else
+                    Call.calls()[0].dumpfiles[1] = ev[1]
+            }
             return
         }
 
@@ -663,8 +679,8 @@ class BaresipService: Service() {
                         if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
                             toast(getString(R.string.no_calls))
                             if (ua.account.callHistory) {
-                                NewCallHistory.add(NewCallHistory(aor, peerUri, "in"))
-                                NewCallHistory.save()
+                                CallHistory.add(CallHistory(aor, peerUri, "in"))
+                                CallHistory.save()
                                 ua.account.missedCalls = true
                             }
                             if (!isMainVisible)
@@ -763,8 +779,8 @@ class BaresipService: Service() {
                     "call rejected" -> {
                         playUnInterrupted(R.raw.callwaiting, 1)
                         if (ua.account.callHistory) {
-                            NewCallHistory.add(NewCallHistory(aor, ev[1], "in"))
-                            NewCallHistory.save()
+                            CallHistory.add(CallHistory(aor, ev[1], "in"))
+                            CallHistory.save()
                             ua.account.missedCalls = true
                             if (!isMainVisible)
                                 return
@@ -885,7 +901,7 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
-                            if (Call.calls().size == 0) {
+                            if (!Call.inCall()) {
                                 resetCallVolume()
                                 abandonAudioFocus(am)
                                 Utils.clearCommunicationDevice(am)
@@ -893,11 +909,13 @@ class BaresipService: Service() {
                             }
                             val missed = call.startTime == null && call.dir == "in" && !call.rejected
                             if (ua.account.callHistory) {
-                                val history = NewCallHistory(aor, call.peerUri, call.dir)
+                                val history = CallHistory(aor, call.peerUri, call.dir)
                                 history.startTime = call.startTime
                                 history.stopTime = GregorianCalendar()
-                                NewCallHistory.add(history)
-                                NewCallHistory.save()
+                                if (call.startTime != null && call.dumpfiles[0] != "")
+                                    history.recording = call.dumpfiles
+                                CallHistory.add(history)
+                                CallHistory.save()
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {
@@ -1046,7 +1064,7 @@ class BaresipService: Service() {
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
         Log.d(TAG, "Battery optimizations are ignored: " +
-                    "${pm.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
+                    "${pm.isIgnoringBatteryOptimizations(packageName)}")
         Log.d(TAG, "Partial wake lock/wifi lock is held: " +
                 "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
         updateStatusNotification()
@@ -1502,15 +1520,17 @@ class BaresipService: Service() {
         var callVolume = 0
         var dynDns = false
         var filesPath = ""
+        var pName = ""
         var logLevel = 2
         var sipTrace = false
         var callActionUri = ""
         var isMainVisible = false
         var isMicMuted = false
+        var isRecOn = false
 
         val uas = ArrayList<UserAgent>()
         val calls = ArrayList<Call>()
-        var callHistory = ArrayList<NewCallHistory>()
+        var callHistory = ArrayList<CallHistory>()
         var messages = ArrayList<Message>()
         val messageUpdate = MutableLiveData<Long>()
         val contactUpdate = MutableLiveData<Long>()
@@ -1525,6 +1545,8 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
+        // <aor, password> of those accounts that have auth username without auth password
+        val aorPasswords = mutableMapOf<String, String>()
 
         private var audioFocusRequest: AudioFocusRequestCompat? = null
         private var btAdapter: BluetoothAdapter? = null

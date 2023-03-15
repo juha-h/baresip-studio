@@ -74,16 +74,21 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtra("peer", peerUri)
                         startActivity(i)
                     }
+
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
             }
             if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                 lastClick = SystemClock.elapsedRealtime()
-                with (MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)) {
+                with(MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_call_message_question),
-                            peerName))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_call_message_question),
+                            peerName
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
                     setNegativeButton(getString(R.string.call), dialogClickListener)
                     setPositiveButton(getString(R.string.send_message), dialogClickListener)
@@ -112,11 +117,13 @@ class CallsActivity : AppCompatActivity() {
                         i.putExtras(b)
                         contactRequest.launch(i)
                     }
+
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        NewCallHistory.save()
+                        CallHistory.save()
                         clAdapter.notifyDataSetChanged()
                     }
+
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
                 }
@@ -127,22 +134,36 @@ class CallsActivity : AppCompatActivity() {
                 getString(R.string.calls_call)
             val builder = MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)
             if (!Contact.nameExists(peerName, false))
-                with (builder) {
+                with(builder) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_add_delete_question),
-                            peerName, callText))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_add_delete_question),
+                            peerName, callText
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    setPositiveButton(
+                        String.format(getString(R.string.delete), callText),
+                        dialogClickListener
+                    )
                     setNegativeButton(getString(R.string.add_contact), dialogClickListener)
                     show()
                 }
             else
-                with (builder) {
+                with(builder) {
                     setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.calls_delete_question),
-                            peerName, callText))
+                    setMessage(
+                        String.format(
+                            getString(R.string.calls_delete_question),
+                            peerName, callText
+                        )
+                    )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(String.format(getString(R.string.delete), callText), dialogClickListener)
+                    setPositiveButton(
+                        String.format(getString(R.string.delete), callText),
+                        dialogClickListener
+                    )
                     show()
                 }
             true
@@ -168,8 +189,8 @@ class CallsActivity : AppCompatActivity() {
                     setMessage(String.format(getString(R.string.delete_history_alert),
                             aor.substringAfter(":")))
                     setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        NewCallHistory.clear(aor)
-                        NewCallHistory.save()
+                        CallHistory.clear(aor)
+                        CallHistory.save()
                         aorGenerateHistory(aor)
                         clAdapter.notifyDataSetChanged()
                         dialog.dismiss()
@@ -244,18 +265,24 @@ class CallsActivity : AppCompatActivity() {
                     else
                         R.drawable.arrow_up_red
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
-                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime, h.stopTime))
+                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime,
+                        h.stopTime, h.recording))
                 else
-                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime))
+                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime,
+                        h.stopTime, h.recording))
             }
         }
     }
 
     private fun removeUaHistoryAt(i: Int) {
-        for (details in uaHistory[i].details)
+        for (details in uaHistory[i].details) {
+            if (details.recording[0] != "")
+                CallHistory.deleteRecording(details.recording)
             BaresipService.callHistory.removeAll {
                 it.startTime == details.startTime && it.stopTime == details.stopTime
             }
+        }
+        CallHistory.deleteRecording(uaHistory[i].recording)
         uaHistory.removeAt(i)
     }
 

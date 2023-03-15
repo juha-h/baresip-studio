@@ -98,7 +98,7 @@ class Account(val accp: Long) {
 
         if (authUser != "") res += ";auth_user=\"${authUser}\""
 
-        if ((authPass != "") && !MainActivity.aorPasswords.containsKey(aor))
+        if ((authPass != "") && !BaresipService.aorPasswords.containsKey(aor))
             res += ";auth_pass=\"${authPass}\""
 
         if (outbound.size > 0) {
@@ -165,7 +165,8 @@ class Account(val accp: Long) {
         if (!callHistory)
             extra += ";call_history=no"
 
-        extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
+        if (telProvider != "")
+            extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
         if (countryCode != "")
             extra += ";country_code=$countryCode"
@@ -241,14 +242,6 @@ class Account(val accp: Long) {
                 res.add(ua.account)
             }
             return res
-        }
-
-        fun telProviderAccounts(): Array<String> {
-            val res = ArrayList<String>()
-            for (account in accounts())
-                if (account.telProvider != "")
-                    res.add(account.aor.substring(4))
-            return res.toTypedArray()
         }
 
         fun ofAor(aor: String): Account? {
