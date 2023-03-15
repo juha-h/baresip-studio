@@ -1643,7 +1643,6 @@ class MainActivity : AppCompatActivity() {
                 input.requestFocus()
                 with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setView(layout)
-
                     setPositiveButton(android.R.string.ok) { dialog, _ ->
                         imm.hideSoftInputFromWindow(input.windowToken, 0)
                         dialog.dismiss()
