@@ -1292,7 +1292,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.recIcon -> {
-                if (!Call.inCall()) {
+                if (Call.call("connected") == null) {
                     BaresipService.isRecOn = !BaresipService.isRecOn
                     if (BaresipService.isRecOn) {
                         item.setIcon(R.drawable.rec_on)
