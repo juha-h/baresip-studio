@@ -1,0 +1,4 @@
+- Added preliminary support for call recording
+- Many fixes related to asking of passwords
+- Prevent outside dismiss of some dialogs
+- New Spanish, Portuguese, and Brazil translations
