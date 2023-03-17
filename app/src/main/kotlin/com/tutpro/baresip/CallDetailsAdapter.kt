@@ -17,8 +17,9 @@ import java.text.SimpleDateFormat
 
 import java.util.*
 
-class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<CallRow.Details>) :
-        ArrayAdapter<CallRow.Details>(ctx, R.layout.call_detail_row, rows) {
+class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<CallRow.Details>,
+        private val decPlayer: MediaPlayer, private val encPlayer: MediaPlayer) :
+            ArrayAdapter<CallRow.Details>(ctx, R.layout.call_detail_row, rows) {
 
     private val layoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -78,14 +79,15 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 val recording = rows[position].recording
                 if (recording[0] != "") {
                     viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
-                    var players: Array<MediaPlayer>? = null
                     viewHolder.durationView.setOnClickListener {
-                        if (players == null || (!players!![0].isPlaying && !players!![1].isPlaying)) {
-                            players = Utils.playRecording(ctx, recording)
-                        } else {
-                            players!![0].stop()
-                            players!![1].stop()
-                            players = null
+                        if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
+                            decPlayer.reset()
+                            encPlayer.reset()
+                            Utils.playRecording(ctx, viewHolder.durationView, recording, decPlayer, encPlayer)
+                        } else if (decPlayer.isPlaying && encPlayer.isPlaying) {
+                            decPlayer.stop()
+                            encPlayer.stop()
+                            viewHolder.durationView.setTextColor(ContextCompat.getColor(ctx, R.color.colorItemText))
                         }
                     }
                 }

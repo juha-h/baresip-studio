@@ -995,10 +995,9 @@ object Utils {
         }
     }
 
-    fun playRecording(ctx: Context, recording: Array<String>): Array<MediaPlayer> {
-        Log.d(TAG, "Playing recording $recording")
-        val decPlayer = MediaPlayer()
-        val encPlayer = MediaPlayer()
+    fun playRecording(ctx: Context, textView: TextView, recording: Array<String>,
+                      decPlayer: MediaPlayer, encPlayer: MediaPlayer) {
+        Log.d(TAG, "Playing recordings ${recording[0]} and ${recording[1]}")
         decPlayer.apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -1017,12 +1016,13 @@ object Utils {
                     setOnPreparedListener {
                         it.start()
                         decPlayer.start()
+                        textView.setTextColor(ContextCompat.getColor(ctx, R.color.colorAccent))
                         Log.d(TAG, "Started players")
                     }
                     setOnCompletionListener {
                         Log.d(TAG, "Stopping encPlayer")
                         it.stop()
-                        it.release()
+                        textView.setTextColor(ContextCompat.getColor(ctx, R.color.colorItemText))
                     }
                     try {
                         val file = recording[0]
@@ -1042,7 +1042,6 @@ object Utils {
             setOnCompletionListener {
                 Log.d(TAG, "Stopping decPlayer")
                 it.stop()
-                it.release()
             }
             try {
                 val file = recording[1]
@@ -1058,7 +1057,7 @@ object Utils {
                 Log.e(TAG, "decPlayer Exception: $e")
             }
         }
-        return arrayOf(encPlayer, decPlayer)
+        return
     }
 
     @Suppress("unused")
