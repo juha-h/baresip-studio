@@ -995,9 +995,10 @@ object Utils {
         }
     }
 
-    fun playRecording(ctx: Context, recording: Array<String>) {
+    fun playRecording(ctx: Context, recording: Array<String>): Array<MediaPlayer> {
         Log.d(TAG, "Playing recording $recording")
         val decPlayer = MediaPlayer()
+        val encPlayer = MediaPlayer()
         decPlayer.apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -1006,7 +1007,6 @@ object Utils {
                     .build()
             )
             setOnPreparedListener {
-                val encPlayer = MediaPlayer()
                 encPlayer.apply {
                     setAudioAttributes(
                         AudioAttributes.Builder()
@@ -1058,6 +1058,7 @@ object Utils {
                 Log.e(TAG, "decPlayer Exception: $e")
             }
         }
+        return arrayOf(encPlayer, decPlayer)
     }
 
     @Suppress("unused")

@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
+import android.media.MediaPlayer
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -76,8 +78,15 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 val recording = rows[position].recording
                 if (recording[0] != "") {
                     viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
+                    var players: Array<MediaPlayer>? = null
                     viewHolder.durationView.setOnClickListener {
-                        Utils.playRecording(ctx, recording)
+                        if (players == null || (!players!![0].isPlaying && !players!![1].isPlaying)) {
+                            players = Utils.playRecording(ctx, recording)
+                        } else {
+                            players!![0].stop()
+                            players!![1].stop()
+                            players = null
+                        }
                     }
                 }
             }
