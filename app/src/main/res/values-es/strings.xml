@@ -343,5 +343,5 @@
     <string name="audio_focus_denied">¡Enfoque de audio denegado!</string>
     <string name="audio_and_video_permissions">baresip+ necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Cámara\" para las videollamadas, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>
     <string name="choose_destination_uri">Seleccione la URI de destino</string>
-    <string name="rec_in_call">La grabación puede activarse o desactivarse sólo cuando no se está en una llamada</string>
+    <string name="rec_in_call">La grabación puede activarse o desactivarse sólo cuando la llamada no está conectada</string>
 </resources>
