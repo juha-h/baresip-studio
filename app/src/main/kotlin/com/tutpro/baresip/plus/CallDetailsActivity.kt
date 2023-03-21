@@ -1,5 +1,6 @@
 package com.tutpro.baresip.plus
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
@@ -11,6 +12,8 @@ class CallDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCallDetailsBinding
     private lateinit var aor: String
     private lateinit var peer: String
+    private val decPlayer = MediaPlayer()
+    private val encPlayer = MediaPlayer()
     private var position = 0
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -38,7 +41,8 @@ class CallDetailsActivity : AppCompatActivity() {
         headerView.text = headerText
 
         val listView = binding.calls
-        listView.adapter = CallDetailsAdapter(this, CallsActivity.uaHistory[position].details)
+        listView.adapter = CallDetailsAdapter(this, CallsActivity.uaHistory[position].details,
+                decPlayer, encPlayer)
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
@@ -65,6 +69,10 @@ class CallDetailsActivity : AppCompatActivity() {
 
     private fun goBack() {
         BaresipService.activities.remove("call_details,$aor,$peer,$position")
+        decPlayer.stop()
+        decPlayer.release()
+        encPlayer.stop()
+        encPlayer.release()
         finish()
     }
 
