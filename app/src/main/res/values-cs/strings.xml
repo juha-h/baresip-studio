@@ -270,7 +270,7 @@
     <string name="no_cameras">Nemáte žádné podporované kamery.</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info_not_available">Žádné dostupné informace</string>
-    <string name="jitter">Jitter: %1$s (ms)</string>
+    <string name="jitter">Zpoždění paketů (Jitter:) %1$s (ms)</string>
     <string name="new_messages">nové zprávy</string>
     <string name="and">a</string>
     <string name="listen">Poslouchat</string>
