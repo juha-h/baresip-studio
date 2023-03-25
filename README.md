@@ -12,6 +12,6 @@ Then in latest stable version of Android Studio:
 
 - File -> Invalidate Caches / Restart -> Invalidate & Restart
 
-Ready to be installed baresip app is available from <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a> and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.  Signing certificate SHA-256 fingerprint to verify the GitHub APKs is 2c137d9f146e68213e3307c2d2842f86b2ab642c3d55554cc321960de960f817.
+Ready to be installed baresip app is available from <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a> and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.  Signing certificate SHA-256 fingerprint to verify the GitHub APKs is FECC79C20AB725B9B78BB16A75BA9A04092822CF52BA32E4A437170A68020602.
 
 Copyright (c) 2018 TutPro Inc. Distributed under BSD-3-Clause license.
