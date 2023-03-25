@@ -194,12 +194,17 @@ class BaresipService: Service() {
                                 hotSpotAddresses = Utils.hotSpotAddresses()
                                 Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
                                 if (hotSpotAddresses.isNotEmpty()) {
+                                    var reset = false
                                     for ((k, v) in hotSpotAddresses)
-                                        if (Api.net_add_address_ifname(k, v) != 0)
-                                            Log.e(TAG, "Failed to add $v address $k")
-                                    Timer().schedule(2000) {
-                                        Api.uag_reset_transp(register = true, reinvite = false)
-                                    }
+                                        if (afMatch(k))
+                                            if (Api.net_add_address_ifname(k, v) != 0)
+                                                Log.e(TAG, "Failed to add $v address $k")
+                                            else
+                                                reset = true
+                                    if (reset)
+                                        Timer().schedule(2000) {
+                                            Api.uag_reset_transp(register = true, reinvite = false)
+                                        }
                                 } else {
                                     Log.w(TAG, "Could not get hotspot addresses")
                                 }
@@ -1396,17 +1401,27 @@ class BaresipService: Service() {
                     val props = cm.getLinkProperties(n) ?: continue
                     for (la in props.linkAddresses)
                         if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
-                            props.interfaceName != null && la.address.hostAddress != null)
-                                addresses[la.address.hostAddress!!] = props.interfaceName!!
+                                props.interfaceName != null && la.address.hostAddress != null &&
+                                    afMatch(la.address.hostAddress!!))
+                            addresses[la.address.hostAddress!!] = props.interfaceName!!
             }
         }
         if (hotSpotIsEnabled) {
             hotSpotAddresses = Utils.hotSpotAddresses()
             Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
             for ((k, v) in hotSpotAddresses)
-                addresses[k] = v
+                if (afMatch(k))
+                    addresses[k] = v
         }
         return addresses
+    }
+
+    private fun afMatch(address: String): Boolean {
+        return when (addressFamily) {
+            "" -> true
+            "ipv4" -> address.contains(".")
+            else -> address.contains(":")
+        }
     }
 
     private fun updateDnsServers() {
@@ -1534,6 +1549,7 @@ class BaresipService: Service() {
         var contactsMode = "baresip"
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
+        var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()

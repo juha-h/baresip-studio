@@ -319,6 +319,11 @@
     osoitteilla.
     </string>
     <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
+    <string name="address_family">Osoiteperhe</string>
+    <string name="address_family_help">Valitsee, mitä IP-osoitteita baresip käyttää. Jos IPv4 tai IPv6
+        on valittu, baresip käyttää ainoastaan IPv4- tai IPv6-osoitteita. Jos kumpaakaan ei ole
+        valittu, baresip käyttää sekä IPv4- että IPv6-osoitteita.
+    </string>
     <string name="dns_servers">DNS-palvelimet</string>
     <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
         osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.

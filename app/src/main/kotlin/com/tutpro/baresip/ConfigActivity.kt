@@ -38,6 +38,9 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var autoStart: CheckBox
     private lateinit var batteryOptimizations: CheckBox
     private lateinit var listenAddr: EditText
+    private lateinit var netAfSpinner: Spinner
+    private lateinit var netAf: String
+    private lateinit var netAfKeys: ArrayList<String>
     private lateinit var dnsServers: EditText
     private lateinit var certificateFile: CheckBox
     private lateinit var verifyServer: CheckBox
@@ -61,6 +64,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
     private var oldContactsMode = ""
+    private var oldNetAf = ""
     private var save = false
     private var restart = false
     private var menu: Menu? = null
@@ -113,6 +117,28 @@ class ConfigActivity : AppCompatActivity() {
         val laCv = Config.variable("sip_listen")
         oldListenAddr = if (laCv.size == 0) "" else laCv[0]
         listenAddr.setText(oldListenAddr)
+
+        netAfSpinner = binding.NetAfSpinner
+        netAfKeys = arrayListOf("", "ipv4", "ipv6")
+        val netAfVals = arrayListOf("-", "IPv4", "IPv6")
+        val netAfCv = Config.variable("net_af")
+        oldNetAf = if (netAfCv.size == 0) "" else netAfCv[0].lowercase()
+        netAf = oldNetAf
+        val netAfIndex = netAfKeys.indexOf(oldNetAf)
+        val netAfValue = netAfVals.elementAt(netAfIndex)
+        netAfKeys.removeAt(netAfIndex)
+        netAfVals.removeAt(netAfIndex)
+        netAfKeys.add(0, oldNetAf)
+        netAfVals.add(0, netAfValue)
+        val netAfAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item, netAfVals)
+        netAfAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        netAfSpinner.adapter = netAfAdapter
+        netAfSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                netAf = netAfKeys[position]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         dnsServers = binding.DnsServers
         val ddCv = Config.variable("dyn_dns")
@@ -488,6 +514,15 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
+                if (oldNetAf != netAf) {
+                    if (netAf == "")
+                        Config.removeVariable("net_af")
+                    else
+                        Config.replaceVariable("net_af", netAf)
+                    save = true
+                    restart = true
+                }
+
                 val dnsServers = addMissingPorts(
                     dnsServers.text.toString().trim().lowercase(Locale.ROOT))
                 if (dnsServers != oldDnsServers) {
@@ -619,6 +654,10 @@ class ConfigActivity : AppCompatActivity() {
         binding.ListenAddressTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.listen_address),
                     getString(R.string.listen_address_help))
+        }
+        binding.NetAfTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.address_family),
+                    getString(R.string.address_family_help))
         }
         binding.DnsServersTitle .setOnClickListener {
             Utils.alertView(this, getString(R.string.dns_servers),

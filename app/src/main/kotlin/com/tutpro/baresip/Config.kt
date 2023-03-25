@@ -73,6 +73,9 @@ object Config {
             BaresipService.callVolume = variable("call_volume")[0].toInt()
         }
 
+        if (config.contains("net_af"))
+            BaresipService.addressFamily = variable("net_af")[0]
+
         if (!config.contains("dyn_dns")) {
             config = "${config}dyn_dns no\n"
         } else {
