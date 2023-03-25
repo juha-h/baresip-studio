@@ -344,4 +344,6 @@
     <string name="audio_and_video_permissions">baresip+ necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Cámara\" para las videollamadas, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>
     <string name="choose_destination_uri">Seleccione la URI de destino</string>
     <string name="rec_in_call">La grabación puede activarse o desactivarse sólo cuando la llamada no está conectada</string>
+    <string name="address_family_help">Elige qué direcciones IP usará Baresip. Si se elige entre IPv4 o IPv6, Barsip usará una solamente. Si no se elige entre ninguna, Baresip ambas (IPv4 e IPv6).</string>
+    <string name="address_family">Familia de direcciones</string>
 </resources>
