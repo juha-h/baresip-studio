@@ -508,7 +508,7 @@ class BaresipService: Service() {
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
-            "UpdateNotification" -> {
+            "Update Notification" -> {
                 updateStatusNotification()
             }
 
@@ -518,6 +518,10 @@ class BaresipService: Service() {
                     baresipStop(false)
                     quitTimer.start()
                 }
+            }
+
+            else -> {
+                Log.e(TAG, "Unknown start action $action")
             }
 
         }

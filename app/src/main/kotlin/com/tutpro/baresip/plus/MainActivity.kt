@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
             if (aorSpinner.tag != "")
                 updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
             if (BaresipService.isServiceRunning) {
-                baresipService.action = "UpdateNotification"
+                baresipService.action = "Update Notification"
                 startService(baresipService)
             }
         }
