@@ -1173,12 +1173,22 @@ class BaresipService: Service() {
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(pi)
                 .setOngoing(true)
-                .setContent(RemoteViews(packageName, R.layout.status_notification))
+                .setContent(RemoteViews(packageName,
+                        if (VERSION.SDK_INT >= 33)
+                            R.layout.status_notification_33
+                        else
+                            R.layout.status_notification)
+                )
         startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     private fun updateStatusNotification() {
-        val contentView = RemoteViews(packageName, R.layout.status_notification)
+        val contentView = RemoteViews(packageName,
+                if (VERSION.SDK_INT >= 33)
+                    R.layout.status_notification_33
+                else
+                    R.layout.status_notification
+        )
         for (i: Int in 0..3) {
             val resId = when (i) {
                 0-> R.id.status0
