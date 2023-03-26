@@ -310,4 +310,6 @@
     <string name="show_password">Zobrazit heslo</string>
     <string name="no_network">Bez připojení k síti!</string>
     <string name="audio_permissions">baresip potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth a oprávnění \"Oznámení\" pro odesílání oznámení.</string>
+    <string name="address_family_help">Vybírá, které IP adresy baresip používá. Pokud je vybráno IPv4 nebo IPv6, baresip používá pouze IPv4 nebo IPv6 adresy. Pokud není vybrána žádná z těchto možností, používá baresip jak IPv4, tak IPv6 adresy.</string>
+    <string name="address_family">Rodina adres</string>
 </resources>
