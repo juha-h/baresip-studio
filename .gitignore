@@ -5,6 +5,7 @@ local.properties
 *.iml
 *.orig
 *.rej
+java_*
 .gradle
 /local.properties
 build
