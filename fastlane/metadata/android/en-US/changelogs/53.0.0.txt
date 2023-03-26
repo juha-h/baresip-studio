@@ -1,0 +1,4 @@
+- Added setting to choose IP address family
+- Added monochrome launcher icon
+- Removed icon and text from status notification when Android version is 13+
+- New Spanish, Russian, Portuguese (Brazil), and Czech translations
