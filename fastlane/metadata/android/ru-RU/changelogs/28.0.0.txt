@@ -1,0 +1,1 @@
+- Добавлена возможность частичной автоконфигурации новой учётной записи с веб-страницы (подробнее см. https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration)
