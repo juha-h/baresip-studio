@@ -1,0 +1,4 @@
+- Launcher icon improvements
+- Do not try to register new account if Register has not been checked
+- Added Registration Interval help text
+- New Russian translations
