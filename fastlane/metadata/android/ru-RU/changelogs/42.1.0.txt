@@ -1,0 +1,1 @@
+- Тема AppCompat заменена на MaterialComponents
