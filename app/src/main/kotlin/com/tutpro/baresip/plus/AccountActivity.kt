@@ -417,7 +417,8 @@ class AccountActivity : AppCompatActivity() {
                             acc.authUser = Api.account_auth_user(acc.accp)
                             Log.d(TAG, "New auth user is ${acc.authUser}")
                             save = true
-                            reRegister = true
+                            if (acc.regint > 0)
+                                reRegister = true
                         } else {
                             Log.e(TAG, "Setting of auth user failed")
                         }
@@ -490,7 +491,8 @@ class AccountActivity : AppCompatActivity() {
                     else
                         Api.account_set_sipnat(acc.accp, "outbound")
                     save = true
-                    reRegister = true
+                    if (acc.regint > 0)
+                        reRegister = true
                 }
 
                 val newConfiguredRegInt = regInt.text.toString().trim().toInt()
@@ -740,6 +742,12 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.register),
                 getString(R.string.register_help)
+            )
+        }
+        binding.RegIntTitle.setOnClickListener {
+            Utils.alertView(
+                    this, getString(R.string.reg_int),
+                    getString(R.string.reg_int_help)
             )
         }
         binding.AudioCodecsTitle.setOnClickListener {
