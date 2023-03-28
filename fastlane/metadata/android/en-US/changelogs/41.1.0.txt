@@ -1,0 +1,2 @@
+- Launcher icon improvements
+- New Russian translations
