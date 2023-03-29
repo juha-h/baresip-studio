@@ -221,14 +221,6 @@ class Account(val accp: Long) {
             return res
         }
 
-        fun telProviderAccounts(): Array<String> {
-            val res = ArrayList<String>()
-            for (account in accounts())
-                if (account.telProvider != "")
-                    res.add(account.aor.substring(4))
-            return res.toTypedArray()
-        }
-
         fun ofAor(aor: String): Account? {
             for (ua in BaresipService.uas)
                 if (ua.account.aor == aor) return ua.account

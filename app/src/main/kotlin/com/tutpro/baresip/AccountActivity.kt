@@ -59,7 +59,6 @@ class AccountActivity : AppCompatActivity() {
     private val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
     private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
 
-    private var save = false
     private var reRegister = false
     private var uaIndex= -1
 
@@ -377,7 +376,6 @@ class AccountActivity : AppCompatActivity() {
                         if (nn == "" || Account.uniqueNickName(nn)) {
                             acc.nickName = nn
                             Log.d(TAG, "New nickname is ${acc.nickName}")
-                            save = true
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
                                     String.format(getString(R.string.non_unique_account_nickname), nn))
@@ -396,7 +394,6 @@ class AccountActivity : AppCompatActivity() {
                         if (Api.account_set_display_name(acc.accp, dn) == 0) {
                             acc.displayName = Api.account_display_name(acc.accp)
                             Log.d(TAG, "New display name is ${acc.displayName}")
-                            save = true
                         } else {
                             Log.e(TAG, "Setting of display name failed")
                         }
@@ -415,7 +412,6 @@ class AccountActivity : AppCompatActivity() {
                         if (Api.account_set_auth_user(acc.accp, au) == 0) {
                             acc.authUser = Api.account_auth_user(acc.accp)
                             Log.d(TAG, "New auth user is ${acc.authUser}")
-                            save = true
                             if (acc.regint > 0)
                                 reRegister = true
                         } else {
@@ -433,7 +429,6 @@ class AccountActivity : AppCompatActivity() {
                         if (Account.checkAuthPass(ap)) {
                             if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
                                 acc.authPass = Api.account_auth_pass(acc.accp)
-                                save = true
                                 if (acc.regint > 0)
                                     reRegister = true
                             } else {
@@ -454,7 +449,6 @@ class AccountActivity : AppCompatActivity() {
                         if (Api.account_set_auth_pass(acc.accp, "") == 0) {
                             acc.authPass = NO_AUTH_PASS
                             BaresipService.aorPasswords[aor] = NO_AUTH_PASS
-                            save = true
                         }
                 }
 
@@ -489,7 +483,6 @@ class AccountActivity : AppCompatActivity() {
                         Api.account_set_sipnat(acc.accp, "")
                     else
                         Api.account_set_sipnat(acc.accp, "outbound")
-                    save = true
                     if (acc.regint > 0)
                         reRegister = true
                 }
@@ -512,13 +505,11 @@ class AccountActivity : AppCompatActivity() {
                         acc.regint = Api.account_regint(acc.accp)
                         acc.configuredRegInt = newConfiguredRegInt
                         Log.d(TAG, "New regint is ${acc.regint}")
-                        save = true
                         reRegister = true
                     }
                 } else {
                     if (newConfiguredRegInt != acc.configuredRegInt) {
                         acc.configuredRegInt = newConfiguredRegInt
-                        save = true
                     }
                 }
 
@@ -526,7 +517,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
                         acc.mediaNat = Api.account_medianat(acc.accp)
                         Log.d(TAG, "New medianat is ${acc.mediaNat}")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of medianat failed")
                     }
@@ -549,7 +539,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
                         acc.stunServer = Api.account_stun_uri(acc.accp)
                         Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of STUN/TURN URI server failed")
                     }
@@ -561,7 +550,6 @@ class AccountActivity : AppCompatActivity() {
                         if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
                             acc.stunUser = Api.account_stun_user(acc.accp)
                             Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
-                            save = true
                         } else {
                             Log.e(TAG, "Setting of STUN/TURN user failed")
                         }
@@ -577,7 +565,6 @@ class AccountActivity : AppCompatActivity() {
                     if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
                         if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
                             acc.stunPass = Api.account_stun_pass(acc.accp)
-                            save = true
                         } else {
                             Log.e(TAG, "Setting of stun pass failed")
                         }
@@ -592,7 +579,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_mediaenc(acc.accp, mediaEnc) == 0) {
                         acc.mediaEnc = Api.account_mediaenc(acc.accp)
                         Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of mediaenc $mediaEnc failed")
                     }
@@ -602,7 +588,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_rtcp_mux(acc.accp, rtcpCheck.isChecked) == 0) {
                         acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
                         Log.d(TAG, "New rtcpMux is ${acc.rtcpMux}")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of account_rtc_mux failed")
                     }
@@ -611,7 +596,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
                         acc.dtmfMode = Api.account_dtmfmode(acc.accp)
                         Log.d(TAG, "New dtmfmode is ${acc.dtmfMode}")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of dtmfmode $dtmfMode failed")
                     }
@@ -621,7 +605,6 @@ class AccountActivity : AppCompatActivity() {
                     if (Api.account_set_answermode(acc.accp, answerMode) == 0) {
                         acc.answerMode = Api.account_answermode(acc.accp)
                         Log.d(TAG, "New answermode is ${acc.answerMode}")
-                        save = true
                     } else {
                         Log.e(TAG, "Setting of answermode $answerMode failed")
                     }
@@ -642,7 +625,6 @@ class AccountActivity : AppCompatActivity() {
                         Api.account_set_mwi(acc.accp, false)
                     }
                     acc.vmUri = tVmUri
-                    save = true
                 }
 
                 val newCountryCode = countryCode.text.toString().trim()
@@ -653,7 +635,6 @@ class AccountActivity : AppCompatActivity() {
                         return false
                     }
                     acc.countryCode = newCountryCode
-                    save = true
                 }
 
                 val hostPart = telProvider.text.toString().trim()
@@ -664,24 +645,21 @@ class AccountActivity : AppCompatActivity() {
                         return false
                     }
                     acc.telProvider = hostPart
-                    save = true
                 }
 
                 if (defaultCheck.isChecked && (uaIndex > 0)) {
                     BaresipService.uas.add(0, BaresipService.uas[uaIndex])
                     BaresipService.uas.removeAt(uaIndex + 1)
-                    save = true
                 }
 
-                if (save) {
-                    AccountsActivity.saveAccounts()
-                    if (reRegister) {
-                        ua.status = R.drawable.dot_yellow
-                        if (acc.regint == 0)
-                            Api.ua_unregister(ua.uap)
-                        else
-                            Api.ua_register(ua.uap)
-                    }
+                AccountsActivity.saveAccounts()
+
+                if (reRegister) {
+                    ua.status = R.drawable.dot_yellow
+                    if (acc.regint == 0)
+                        Api.ua_unregister(ua.uap)
+                    else
+                        Api.ua_register(ua.uap)
                 }
 
                 BaresipService.activities.remove("account,$aor")
