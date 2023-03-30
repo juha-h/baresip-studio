@@ -1179,6 +1179,8 @@ class BaresipService: Service() {
                         else
                             R.layout.status_notification)
                 )
+        if (VERSION.SDK_INT >= 31)
+            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
         startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
