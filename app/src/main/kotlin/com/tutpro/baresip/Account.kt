@@ -132,8 +132,6 @@ class Account(val accp: Long) {
         if (answerMode == Api.ANSWERMODE_AUTO)
             res += ";answermode=auto"
 
-        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes;100rel=no"
-
         var extra = ""
 
         if (nickName != "")
@@ -153,6 +151,8 @@ class Account(val accp: Long) {
 
         if (extra !="")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
+
+        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes;100rel=no"
 
         return res
     }
