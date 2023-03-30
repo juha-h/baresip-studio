@@ -121,6 +121,8 @@ class AccountActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
+        // Api.account_debug(acc.accp)
+
     }
 
     private fun initAccountFromConfig(ctx: AccountActivity) {
