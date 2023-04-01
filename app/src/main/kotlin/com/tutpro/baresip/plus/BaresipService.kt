@@ -1169,28 +1169,20 @@ class BaresipService: Service() {
                 .addCategory(Intent.CATEGORY_LAUNCHER)
         val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
             PendingIntent.FLAG_IMMUTABLE)
+        val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
                 .setContentIntent(pi)
                 .setOngoing(true)
-                .setContent(RemoteViews(packageName,
-                        if (VERSION.SDK_INT >= 33)
-                            R.layout.status_notification_33
-                        else
-                            R.layout.status_notification)
-                )
+                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(notificationLayout)
         if (VERSION.SDK_INT >= 31)
             snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
         startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     private fun updateStatusNotification() {
-        val contentView = RemoteViews(packageName,
-                if (VERSION.SDK_INT >= 33)
-                    R.layout.status_notification_33
-                else
-                    R.layout.status_notification
-        )
+        val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         for (i: Int in 0..3) {
             val resId = when (i) {
                 0-> R.id.status0
@@ -1199,17 +1191,17 @@ class BaresipService: Service() {
                 else -> R.id.status3
             }
             if (i < uas.size) {
-                contentView.setImageViewResource(resId, uas[i].status)
-                contentView.setViewVisibility(resId, View.VISIBLE)
+                notificationLayout.setImageViewResource(resId, uas[i].status)
+                notificationLayout.setViewVisibility(resId, View.VISIBLE)
             } else {
-                contentView.setViewVisibility(resId, View.INVISIBLE)
+                notificationLayout.setViewVisibility(resId, View.INVISIBLE)
             }
         }
         if (uas.size > 4)
-            contentView.setViewVisibility(R.id.etc, View.VISIBLE)
+            notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
         else
-            contentView.setViewVisibility(R.id.etc, View.INVISIBLE)
-        snb.setContent(contentView)
+            notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
+        snb.setCustomContentView(notificationLayout)
         // Don't know why, but without the delay the notification is not always updated
         Timer().schedule(250) {
             nm.notify(STATUS_NOTIFICATION_ID, snb.build())
