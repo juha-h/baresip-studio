@@ -657,7 +657,7 @@ class AccountActivity : AppCompatActivity() {
                 AccountsActivity.saveAccounts()
 
                 if (reRegister) {
-                    ua.status = R.drawable.dot_yellow
+                    ua.status = R.drawable.circle_yellow
                     if (acc.regint == 0)
                         Api.ua_unregister(ua.uap)
                     else

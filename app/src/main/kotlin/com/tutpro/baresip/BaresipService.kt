@@ -566,9 +566,9 @@ class BaresipService: Service() {
 
             val ua = UserAgent(uap)
             ua.status = if (ua.account.regint == 0)
-                R.drawable.dot_white
+                R.drawable.circle_white
             else
-                R.drawable.dot_yellow
+                R.drawable.circle_yellow
             uas.add(ua)
 
             val acc = ua.account
@@ -620,7 +620,7 @@ class BaresipService: Service() {
             if (uas[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
-                        ua.status = R.drawable.dot_yellow
+                        ua.status = R.drawable.circle_yellow
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -628,9 +628,9 @@ class BaresipService: Service() {
                     }
                     "registered" -> {
                         ua.status = if (Api.account_regint(ua.account.accp) == 0)
-                            R.drawable.dot_white
+                            R.drawable.circle_white
                         else
-                            R.drawable.dot_green
+                            R.drawable.circle_green
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -638,9 +638,9 @@ class BaresipService: Service() {
                     }
                     "registering failed" -> {
                         ua.status = if (Api.account_regint(ua.account.accp) == 0)
-                            R.drawable.dot_white
+                            R.drawable.circle_white
                         else
-                            R.drawable.dot_red
+                            R.drawable.circle_red
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
