@@ -6,7 +6,7 @@
         android:id="@+id/callIcon"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_call"
+        android:icon="@drawable/call_small"
         />
 
 </menu>
