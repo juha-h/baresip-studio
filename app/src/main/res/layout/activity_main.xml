@@ -233,9 +233,10 @@
 
                         <EditText
                             android:id="@+id/dtmf"
-                            android:layout_width="80dp"
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="120dp"
+                            android:layout_marginEnd="48dp"
                             android:singleLine="true"
                             android:scrollHorizontally="true"
                             android:hint="@string/dtmf"
