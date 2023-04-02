@@ -213,7 +213,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="0dp"
-                            android:src="@drawable/hold"
+                            android:src="@drawable/call_hold"
                             android:background="@null"
                             android:clickable="false"
                             android:contentDescription="@string/hold" >

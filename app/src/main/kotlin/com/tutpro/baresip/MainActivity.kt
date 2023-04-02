@@ -424,7 +424,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
                 call.resume()
                 call.onhold = false
-                holdButton.setImageResource(R.drawable.hold)
+                holdButton.setImageResource(R.drawable.call_hold)
             } else {
                 Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
                 call.hold()
@@ -2050,7 +2050,7 @@ class MainActivity : AppCompatActivity() {
                     if (call.onhold) {
                         holdButton.setImageResource(R.drawable.resume)
                     } else {
-                        holdButton.setImageResource(R.drawable.hold)
+                        holdButton.setImageResource(R.drawable.call_hold)
                     }
                     callUri.inputType = InputType.TYPE_CLASS_PHONE
                     dialpadButton.setImageResource(R.drawable.dialpad_on)
