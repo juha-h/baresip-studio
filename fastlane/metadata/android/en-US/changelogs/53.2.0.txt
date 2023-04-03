@@ -1,0 +1,2 @@
+- Registration status notification improvements
+- Replaced several icon images with material design vector drawables
