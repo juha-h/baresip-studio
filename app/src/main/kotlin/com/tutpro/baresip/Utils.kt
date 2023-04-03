@@ -387,7 +387,7 @@ object Utils {
             }
 
             null -> {
-                val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
+                val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person)
                 imageView.setImageBitmap(bitmap)
             }
 
