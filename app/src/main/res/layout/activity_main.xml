@@ -164,7 +164,7 @@
                             android:layout_height="wrap_content"
                             android:padding="0dp"
                             android:background="@null"
-                            android:src="@drawable/call_green"
+                            android:src="@drawable/call"
                             android:contentDescription="@string/call" >
                         </ImageButton>
 
@@ -199,7 +199,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="10dp"
                             android:background="@null"
-                            android:src="@drawable/call_green"
+                            android:src="@drawable/call"
                             android:clickable="false"
                             android:visibility="invisible"
                             android:contentDescription="@string/answer" >
@@ -255,7 +255,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="60dp"
                                 android:padding="0dp"
-                                android:src="@drawable/hold"
+                                android:src="@drawable/call_hold"
                                 android:background="@null"
                                 android:clickable="false"
                                 android:contentDescription="@string/hold" >
@@ -275,9 +275,10 @@
 
                             <EditText
                                 android:id="@+id/dtmf"
-                                android:layout_width="wrap_content"
+                                android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="180dp"
+                                android:layout_marginEnd="48dp"
                                 android:hint="@string/dtmf"
                                 android:textColorHint="@color/colorSecondaryDark"
                                 android:importantForAutofill="no"

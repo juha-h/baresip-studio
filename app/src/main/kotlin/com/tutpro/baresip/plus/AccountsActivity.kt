@@ -130,7 +130,7 @@ class AccountsActivity : AppCompatActivity() {
             accounts.clear()
             for (ua in BaresipService.uas)
                 accounts.add(AccountRow(ua.account.aor.replace("sip:", ""),
-                        R.drawable.action_remove))
+                        R.drawable.delete))
         }
 
         fun saveAccounts() {

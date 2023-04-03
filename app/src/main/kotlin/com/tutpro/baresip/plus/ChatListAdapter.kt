@@ -51,8 +51,7 @@ class ChatListAdapter(private val ctx: Context, private val account: Account, pr
             else
                 message.peerUri)
 
-        if ((message.direction == R.drawable.arrow_down_green) ||
-                (message.direction == R.drawable.arrow_down_red))
+        if (message.direction == MESSAGE_DOWN)
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_in_bg)
         else
             viewHolder.layoutView.setBackgroundResource(R.drawable.message_out_bg)
@@ -64,7 +63,7 @@ class ChatListAdapter(private val ctx: Context, private val account: Account, pr
         else
             DateFormat.getDateInstance(DateFormat.SHORT)
         viewHolder.infoView.text = fmt.format(cal.time)
-        if (message.direction == R.drawable.arrow_up_red) {
+        if (message.direction == MESSAGE_UP_FAIL) {
             val info: String = if (message.responseCode != 0)
                 "${viewHolder.infoView.text} - ${ctx.getString(R.string.message_failed)}: " +
                         "${message.responseCode} ${message.responseReason}"

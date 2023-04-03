@@ -118,8 +118,7 @@ class ChatActivity : AppCompatActivity() {
             if (msgText.isNotEmpty()) {
                 imm.hideSoftInputFromWindow(newMessage.windowToken, 0)
                 val time = System.currentTimeMillis()
-                val msg = Message(aor, peerUri, msgText, time, R.drawable.arrow_up_yellow,
-                        0, "", true)
+                val msg = Message(aor, peerUri, msgText, time, MESSAGE_UP_WAIT, 0, "", true)
                 msg.add()
                 var msgUri = ""
                 chatMessages.add(msg)
@@ -137,7 +136,7 @@ class ChatActivity : AppCompatActivity() {
                     if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
                         Toast.makeText(applicationContext, "${getString(R.string.message_failed)}!",
                                 Toast.LENGTH_SHORT).show()
-                        msg.direction = R.drawable.arrow_up_red
+                        msg.direction = MESSAGE_UP_FAIL
                         msg.responseReason = getString(R.string.message_failed)
                     } else {
                         newMessage.text.clear()

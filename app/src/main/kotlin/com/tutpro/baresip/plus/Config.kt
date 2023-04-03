@@ -20,6 +20,8 @@ object Config {
 
         config = config.replace("module zrtp.so", "module gzrtp.so")
 
+        removeLine("module_app contact.so")
+
         if (!config.contains("module gsm.so")) {
             config = "${config}module gsm.so\n"
         }

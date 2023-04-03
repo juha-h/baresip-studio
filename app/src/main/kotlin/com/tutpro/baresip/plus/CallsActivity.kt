@@ -256,14 +256,14 @@ class CallsActivity : AppCompatActivity() {
             if (h.aor == aor) {
                 val direction: Int = if (h.direction == "in")
                     if (h.startTime != null)
-                        R.drawable.arrow_down_green
+                        R.drawable.call_down_green
                     else
-                        R.drawable.arrow_down_red
+                        R.drawable.call_down_red
                 else
                     if (h.startTime != null)
-                        R.drawable.arrow_up_green
+                        R.drawable.call_up_green
                     else
-                        R.drawable.arrow_up_red
+                        R.drawable.call_up_red
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
                     uaHistory.last().details.add(CallRow.Details(direction, h.startTime,
                         h.stopTime, h.recording))

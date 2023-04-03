@@ -3,7 +3,7 @@ package com.tutpro.baresip.plus
 class UserAgent(val uap: Long) {
 
     val account = Account(Api.ua_account(uap))
-    var status = R.drawable.dot_white
+    var status = R.drawable.circle_white
 
     fun callAlloc(xCall: Long, videoMode: Int): Long {
         return Api.ua_call_alloc(uap, xCall, videoMode)
