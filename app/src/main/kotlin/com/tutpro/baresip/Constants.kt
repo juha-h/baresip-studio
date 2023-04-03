@@ -29,3 +29,12 @@ const val DELETE_REQ_CODE = 11
 
 const val REGISTRATION_INTERVAL = 900
 const val NO_AUTH_PASS = "t%Qa?~?J8,~6"
+
+const val MESSAGE_DOWN = 2131165304
+const val MESSAGE_UP = 2131165306
+const val MESSAGE_UP_FAIL = 2131165307
+const val MESSAGE_UP_WAIT = 2131165308
+
+
+
+

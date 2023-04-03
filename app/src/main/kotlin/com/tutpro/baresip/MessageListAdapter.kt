@@ -94,8 +94,7 @@ class MessageListAdapter(private val ctx: Context, private val peerUri: String,
 
         val message = rows[position]
 
-        val down = (message.direction == R.drawable.arrow_down_green) ||
-            (message.direction == R.drawable.arrow_down_red)
+        val down = message.direction == MESSAGE_DOWN
         val lp = viewHolder.layoutView.layoutParams as LinearLayout.LayoutParams
         val peer: String = if (down) {
             lp.setMargins(0, 10, 75, 10)
@@ -123,7 +122,7 @@ class MessageListAdapter(private val ctx: Context, private val peerUri: String,
         info = fmt.format(cal.time)
         if (info.length < 6) info = "${ctx.getString(R.string.today)} $info"
         info = "$info - $peer"
-        if (message.direction == R.drawable.arrow_up_red) {
+        if (message.direction == MESSAGE_UP_FAIL) {
             info = if (message.responseCode != 0)
                 "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
             else

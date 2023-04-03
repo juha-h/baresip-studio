@@ -997,8 +997,7 @@ class BaresipService: Service() {
         val timeStamp = System.currentTimeMillis()
         val timeStampString = timeStamp.toString()
         Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
-        Message(ua.account.aor, peerUri, text, timeStamp,
-                R.drawable.arrow_down_green, 0, "", true).add()
+        Message(ua.account.aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
         Message.save()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
@@ -1068,9 +1067,9 @@ class BaresipService: Service() {
         for (m in messages.reversed())
             if (m.timeStamp == timeStamp) {
                 if (responseCode < 300) {
-                    m.direction = R.drawable.arrow_up_green
+                    m.direction = MESSAGE_UP
                 } else {
-                    m.direction = R.drawable.arrow_up_red
+                    m.direction = MESSAGE_UP_FAIL
                     m.responseCode = responseCode
                     m.responseReason = responseReason
                 }
