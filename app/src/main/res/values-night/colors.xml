@@ -15,9 +15,9 @@
     <color name="colorStrong">@color/colorWhite</color>
     <color name="colorGreen">#01df01</color>
     <color name="colorRed">#df0101</color>
-    <color name="colorTrafficGreen">#008450</color>
-    <color name="colorTrafficYellow">#EFB700</color>
-    <color name="colorTrafficRed">#B81D13</color>
+    <color name="colorTrafficGreen">#2E7D32</color>
+    <color name="colorTrafficYellow">#F9A825</color>
+    <color name="colorTrafficRed">#C62828</color>
     <color name="colorLight">@color/colorGrayLight</color>
     <color name="colorDark">#383838</color>
     <color name="colorSpinnerText">@color/colorDark</color>
