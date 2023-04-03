@@ -38,7 +38,6 @@ module dtls_srtp.so
 module gzrtp.so
 module uuid.so
 module_app account.so
-module_app contact.so
 module_app debug_cmd.so
 module_app mwi.so
 evdev_device /dev/input/event0
