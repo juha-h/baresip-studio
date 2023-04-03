@@ -16,7 +16,7 @@
     <color name="colorStrong">@color/colorBlack</color>
     <color name="colorGreen">#01df01</color>
     <color name="colorRed">#ff0000</color>
-    <color name="colorTrafficGreen">#43A047</color>
+    <color name="colorTrafficGreen">#4CAF50</color>
     <color name="colorTrafficYellow">#FDD835</color>
     <color name="colorTrafficRed">#F44336</color>
     <color name="colorLight">@color/colorWhite</color>
