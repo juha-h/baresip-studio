@@ -1634,6 +1634,7 @@ class BaresipService: Service() {
         private fun startBluetoothSco(am: AudioManager, delay: Long, count: Int) {
             Log.d(TAG, "Starting Bluetooth SCO at count $count")
             Handler(Looper.getMainLooper()).postDelayed({
+                am.isBluetoothScoOn = true
                 if (VERSION.SDK_INT < 31) {
                     am.startBluetoothSco()
                 } else {
@@ -1651,6 +1652,7 @@ class BaresipService: Service() {
                     am.stopBluetoothSco()
                 else
                     am.clearCommunicationDevice()
+                am.isBluetoothScoOn = false
             }, 100)
         }
 
@@ -1663,4 +1665,5 @@ class BaresipService: Service() {
             libraryLoaded = true
         }
     }
+
 }
