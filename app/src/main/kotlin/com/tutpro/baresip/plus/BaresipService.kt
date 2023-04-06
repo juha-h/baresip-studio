@@ -1541,7 +1541,6 @@ class BaresipService: Service() {
 
         var isServiceRunning = false
         var isConfigInitialized = false
-        var isAudioFocused = false
         var libraryLoaded = false
         var supportedCameras = false
         var cameraFront = true
@@ -1576,8 +1575,8 @@ class BaresipService: Service() {
         val serviceEvents = mutableListOf<ServiceEvent>()
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
+        var audioFocusRequest: AudioFocusRequestCompat? = null
 
-        private var audioFocusRequest: AudioFocusRequestCompat? = null
         private var btAdapter: BluetoothAdapter? = null
 
         fun requestAudioFocus(ctx: Context): Boolean  {

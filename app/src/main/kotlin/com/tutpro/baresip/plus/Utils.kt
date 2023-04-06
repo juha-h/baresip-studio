@@ -989,7 +989,7 @@ object Utils {
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                    if (BaresipService.isAudioFocused && am.mode == AudioManager.MODE_NORMAL) {
+                    if (BaresipService.audioFocusRequest != null && am.mode == AudioManager.MODE_NORMAL) {
                         Log.d(TAG, "Setting mode to communication")
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                     }
