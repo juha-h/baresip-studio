@@ -986,7 +986,7 @@ object Utils {
         Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
     }
 
-    fun clearCommunicationDevice(am: AudioManager) {
+    private fun clearCommunicationDevice(am: AudioManager) {
         if (Build.VERSION.SDK_INT > 33) {
             am.clearCommunicationDevice()
         } else {

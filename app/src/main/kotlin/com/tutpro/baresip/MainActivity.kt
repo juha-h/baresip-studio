@@ -10,7 +10,6 @@ import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import android.media.AudioAttributes
 import android.media.AudioManager
 import android.net.Uri
 import android.os.*
@@ -169,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
         kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-        serviceEventObserver = Observer<Event<Long>> {
+        serviceEventObserver = Observer {
             val event = it.getContentIfNotHandled()
             Log.d(TAG, "Observed event $event")
             if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
@@ -352,7 +351,7 @@ class MainActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 if (Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
-                    makeCall()
+                        makeCall()
                 else
                     Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
             }
@@ -364,6 +363,7 @@ class MainActivity : AppCompatActivity() {
                 if (callRunnable != null) {
                     callHandler.removeCallbacks(callRunnable!!)
                     callRunnable = null
+                    BaresipService.abandonAudioFocus(applicationContext)
                     am.mode = AudioManager.MODE_NORMAL
                     showCall(ua)
                     return@setOnClickListener
@@ -372,6 +372,7 @@ class MainActivity : AppCompatActivity() {
                 if (audioModeChangedListener != null) {
                     am.removeOnModeChangedListener(audioModeChangedListener!!)
                     audioModeChangedListener = null
+                    BaresipService.abandonAudioFocus(applicationContext)
                     am.mode = AudioManager.MODE_NORMAL
                     showCall(ua)
                     return@setOnClickListener
@@ -972,12 +973,12 @@ class MainActivity : AppCompatActivity() {
             AudioManager.STREAM_MUSIC
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
-                Log.d(TAG, "Adjusting volume $keyCode of stream $stream")
                 am.adjustStreamVolume(stream,
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
                             AudioManager.ADJUST_LOWER else
                             AudioManager.ADJUST_RAISE,
                         AudioManager.FLAG_SHOW_UI)
+                Log.d(TAG, "Adjusted volume $keyCode of stream $stream to ${am.getStreamVolume(stream)}")
                 return true
             }
         }
@@ -1803,6 +1804,8 @@ class MainActivity : AppCompatActivity() {
                     onHoldCall.newCall = null
                 call.remove()
                 call.destroy()
+                if (!BaresipService.abandonAudioFocus(applicationContext))
+                    Log.e(TAG, "Failed to abandon audio focus")
                 showCall(ua)
                 false
             }
@@ -1863,7 +1866,7 @@ class MainActivity : AppCompatActivity() {
                 val uri = if (Utils.isTelUri(uriText)) {
                     if (ua.account.telProvider == "") {
                         Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.no_telephony_provider), aor))
+                                String.format(getString(R.string.no_telephony_provider), aor))
                         return
                     }
                     Utils.telToSip(uriText, ua.account)
@@ -1872,7 +1875,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (!Utils.checkUri(uri)) {
                     Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+                } else if (!BaresipService.requestAudioFocus(applicationContext)) {
+                    Toast.makeText(applicationContext, R.string.audio_focus_denied,
+                            Toast.LENGTH_SHORT).show()
                 } else {
                     callUri.isFocusable = false
                     uaAdapter.notifyDataSetChanged()
@@ -1881,24 +1887,16 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     if (Build.VERSION.SDK_INT < 31) {
-                        if (!BaresipService.requestAudioFocus(this, am, AudioAttributes.CONTENT_TYPE_SPEECH)) {
-                            Toast.makeText(
-                                applicationContext,
-                                R.string.audio_focus_denied,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            callRunnable = Runnable {
-                                callRunnable = null
-                                if (!call(ua, uri)) {
-                                    callButton.visibility = View.VISIBLE
-                                    callButton.isEnabled = true
-                                    hangupButton.visibility = View.INVISIBLE
-                                    hangupButton.isEnabled = false
-                                }
+                        callRunnable = Runnable {
+                            callRunnable = null
+                            if (!call(ua, uri)) {
+                                callButton.visibility = View.VISIBLE
+                                callButton.isEnabled = true
+                                hangupButton.visibility = View.INVISIBLE
+                                hangupButton.isEnabled = false
                             }
-                            callHandler.postDelayed(callRunnable!!, 1000)
                         }
+                        callHandler.postDelayed(callRunnable!!, 1000)
                     } else {
                         audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                             if (mode == AudioManager.MODE_IN_COMMUNICATION) {
@@ -1919,13 +1917,18 @@ class MainActivity : AppCompatActivity() {
                                     "device ${am.communicationDevice!!.type}")
                             }
                         }
-                        am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
-                        if (!BaresipService.requestAudioFocus(this, am, AudioAttributes.CONTENT_TYPE_SPEECH))
-                            Toast.makeText(
-                                applicationContext,
-                                R.string.audio_focus_denied,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
+                            if (!call(ua, uri)) {
+                                callButton.visibility = View.VISIBLE
+                                callButton.isEnabled = true
+                                hangupButton.visibility = View.INVISIBLE
+                                hangupButton.isEnabled = false
+                            }
+                        } else {
+                            am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
+                            Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        }
                     }
                 }
             } else {
