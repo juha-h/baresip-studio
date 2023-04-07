@@ -677,15 +677,14 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = ev[1]
-                        var missed = false
-                        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
-                            toast(getString(R.string.no_calls))
-                            missed = true
-                        } else if (!requestAudioFocus(applicationContext)) {
-                            toast(getString(R.string.audio_focus_denied))
-                            missed = true
-                        }
-                        if (missed) {
+                        val toast = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                            R.string.no_calls
+                        else if (!requestAudioFocus(applicationContext))
+                            R.string.audio_focus_denied
+                        else
+                            0
+                        if (toast != 0) {
+                            toast(getString(toast))
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in"))
                                 CallHistory.save()
