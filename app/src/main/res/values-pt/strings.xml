@@ -309,4 +309,7 @@
     <string name="permissions_rationale">Justificativa das permissões</string>
     <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Aparelhos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para postar notificações.</string>
     <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmara\" para realizar chamadas de vídeo. da permissão \"Aparelhos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal aparelho, assim como a permissão \"Notificações\" para postar notificações.</string>
+    <string name="address_family">Família de endereço</string>
+    <string name="address_family_help">Escolhe quais endereços IP o baresip usa. Se IPv4 ou IPv6 for escolhido, o baresip usa apenas endereços de IPv4 ou IPv6. Se nenhum for escolhido, o baresip usará endereços de IPv4 e IPv6.</string>
+    <string name="rec_in_call">A gravação só pode ser ativada ou desativada quando não estiver numa chamada</string>
 </resources>
