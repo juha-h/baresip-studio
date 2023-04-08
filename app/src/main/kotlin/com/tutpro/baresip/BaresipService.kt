@@ -51,6 +51,7 @@ class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     private lateinit var am: AudioManager
+    private lateinit var rt: Ringtone
     private lateinit var nt: Ringtone
     private lateinit var nm: NotificationManager
     private lateinit var snb: NotificationCompat.Builder
@@ -69,7 +70,6 @@ class BaresipService: Service() {
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
-    private var rt: Ringtone? = null
     private var rtTimer: Timer? = null
     private var vbTimer: Timer? = null
     private var origVolume = mutableMapOf<Int, Int>()
@@ -99,6 +99,10 @@ class BaresipService: Service() {
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_NOTIFICATION)
         nt = RingtoneManager.getRingtone(applicationContext, ntUri)
+
+        val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
+                RingtoneManager.TYPE_RINGTONE)
+        rt = RingtoneManager.getRingtone(applicationContext, rtUri)
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
@@ -1197,24 +1201,16 @@ class BaresipService: Service() {
     }
 
     private fun startRinging() {
-        if (rt == null) {
-            val rtUri = RingtoneManager.getActualDefaultRingtoneUri(
-                applicationContext,
-                RingtoneManager.TYPE_RINGTONE
-            )
-            rt = RingtoneManager.getRingtone(applicationContext, rtUri)
-        }
         if (VERSION.SDK_INT >= 28) {
-            rt!!.isLooping = true
-            rt!!.play()
+            rt.isLooping = true
+            rt.play()
         } else {
-            rt!!.play()
+            rt.play()
             rtTimer = Timer()
             rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    if (rt != null && !rt!!.isPlaying) {
-                        rt!!.play()
-                    }
+                    if (!rt.isPlaying)
+                        rt.play()
                 }
             }, 1000, 1000)
         }
@@ -1264,10 +1260,7 @@ class BaresipService: Service() {
             rtTimer!!.cancel()
             rtTimer = null
         }
-        if (rt != null) {
-            rt!!.stop()
-            rt = null
-        }
+        rt.stop()
         if (vbTimer != null) {
             vbTimer!!.cancel()
             vbTimer = null
