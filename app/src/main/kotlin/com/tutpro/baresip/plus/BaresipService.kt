@@ -628,7 +628,7 @@ class BaresipService: Service() {
 
         var newEvent: String? = null
 
-	    for (accountIndex in uas.indices) {
+        for (accountIndex in uas.indices) {
             if (uas[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
