@@ -701,13 +701,9 @@ class BaresipService: Service() {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
                             if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                                if (VERSION.SDK_INT >= 23) {
-                                    Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                                    if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                                        startRinging()
-                                } else {
+                                Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                                if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
                                     startRinging()
-                                }
                             } else {
                                 val newIntent = Intent(this, MainActivity::class.java)
                                 newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
@@ -719,10 +715,7 @@ class BaresipService: Service() {
                             }
                         }
                         if (!Utils.isVisible()) {
-                            val piFlags = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                            else
-                                PendingIntent.FLAG_UPDATE_CURRENT
+                            val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
@@ -827,10 +820,7 @@ class BaresipService: Service() {
                     }
                     "call transfer" -> {
                         if (!Utils.isVisible()) {
-                            val piFlags = if (VERSION.SDK_INT >= 23)
-                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                            else
-                                PendingIntent.FLAG_UPDATE_CURRENT
+                            val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -917,10 +907,7 @@ class BaresipService: Service() {
                             }
                             if (!Utils.isVisible()) {
                                 if (missed) {
-                                    val piFlags = if (VERSION.SDK_INT >= 23)
-                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                                    else
-                                        PendingIntent.FLAG_UPDATE_CURRENT
+                                    val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                                     val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
                                     val intent = Intent(applicationContext, MainActivity::class.java)
                                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
@@ -935,23 +922,18 @@ class BaresipService: Service() {
                                             .setContentIntent(pi)
                                             .setCategory(Notification.CATEGORY_CALL)
                                             .setAutoCancel(true)
-                                    if (VERSION.SDK_INT < 23) {
+                                    var missedCalls = 0
+                                    for (notification in nm.activeNotifications)
+                                        if (notification.id == CALL_MISSED_NOTIFICATION_ID)
+                                            missedCalls++
+                                    if (missedCalls == 0) {
                                         nb.setContentTitle(getString(R.string.missed_call_from))
                                         nb.setContentText(caller)
                                     } else {
-                                        var missedCalls = 0
-                                        for (notification in nm.activeNotifications)
-                                            if (notification.id == CALL_MISSED_NOTIFICATION_ID)
-                                                missedCalls++
-                                        if (missedCalls == 0) {
-                                            nb.setContentTitle(getString(R.string.missed_call_from))
-                                            nb.setContentText(caller)
-                                        } else {
-                                            nb.setContentTitle(getString(R.string.missed_calls))
-                                            nb.setContentText(
-                                                    String.format(getString(R.string.missed_calls_count),
-                                                            missedCalls + 1))
-                                        }
+                                        nb.setContentTitle(getString(R.string.missed_calls))
+                                        nb.setContentText(
+                                                String.format(getString(R.string.missed_calls_count),
+                                                        missedCalls + 1))
                                     }
                                     if (VERSION.SDK_INT < 26) {
                                         @Suppress("DEPRECATION")
@@ -1012,10 +994,7 @@ class BaresipService: Service() {
         Message.save()
         ua.account.unreadMessages = true
         if (!Utils.isVisible()) {
-            val piFlags = if (VERSION.SDK_INT >= 23)
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            else
-                PendingIntent.FLAG_UPDATE_CURRENT
+            val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val intent = Intent(applicationContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1062,10 +1041,7 @@ class BaresipService: Service() {
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
         }
-        if (VERSION.SDK_INT >= 23) {
-            if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                nt.play()
-        } else
+        if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
             nt.play()
         postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peerUri), System.nanoTime()))
     }
@@ -1098,9 +1074,8 @@ class BaresipService: Service() {
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
-        if (VERSION.SDK_INT >= 23)
-            Log.d(TAG, "Battery optimizations are ignored: " +
-                    "${pm.isIgnoringBatteryOptimizations(packageName)}")
+        Log.d(TAG, "Battery optimizations are ignored: " +
+                "${pm.isIgnoringBatteryOptimizations(packageName)}")
         Log.d(TAG, "Partial wake lock/wifi lock is held: " +
                 "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
         updateStatusNotification()
@@ -1140,11 +1115,8 @@ class BaresipService: Service() {
         val intent = Intent(applicationContext, MainActivity::class.java)
                 .setAction(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
-        val pi = if (VERSION.SDK_INT >= 23)
-            PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
-                PendingIntent.FLAG_IMMUTABLE)
-        else
-            PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent, 0)
+        val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
+            PendingIntent.FLAG_IMMUTABLE)
         val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_stat)
@@ -1240,12 +1212,8 @@ class BaresipService: Service() {
                 true
             } else {
                 if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
-                    if (VERSION.SDK_INT >= Build.VERSION_CODES.M) /* M == 23 */ {
-                        @Suppress("DEPRECATION")
-                        Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
-                    } else {
-                        true
-                    }
+                    @Suppress("DEPRECATION")
+                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
                 } else {
                     false
                 }
@@ -1370,7 +1338,7 @@ class BaresipService: Service() {
                     removed++
             }
 
-        val active = activeNetwork()
+        val active = cm.activeNetwork
         Log.d(TAG, "Added/Removed/Active = $added/$removed/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
@@ -1430,7 +1398,7 @@ class BaresipService: Service() {
             return
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
-        val activeNetwork = activeNetwork()
+        val activeNetwork = cm.activeNetwork
         if (activeNetwork != null) {
             val linkProps = cm.getLinkProperties(activeNetwork)
             if (linkProps != null)
@@ -1438,7 +1406,7 @@ class BaresipService: Service() {
         }
         // Then add DNS servers from the other networks
         for (n in allNetworks) {
-            if (isNetworkActive(n)) continue
+            if (n == cm.activeNetwork) continue
             val linkProps = cm.getLinkProperties(n)
             if (linkProps != null)
                 for (server in linkProps.dnsServers)
@@ -1453,25 +1421,6 @@ class BaresipService: Service() {
                 dnsServers = servers
             }
         }
-    }
-
-    private fun activeNetwork(): Network? {
-        return if (VERSION.SDK_INT >= 23)
-            cm.activeNetwork
-        else {
-            for (n in allNetworks)
-                if (isNetworkActive(n)) return n
-            return null
-        }
-    }
-
-    private fun isNetworkActive(network: Network): Boolean {
-        if (VERSION.SDK_INT >= 23)
-            return network == cm.activeNetwork
-        @Suppress("DEPRECATION")
-        if ((cm.activeNetworkInfo != null) && (cm.getNetworkInfo(network) != null))
-            return cm.activeNetworkInfo!!.toString() == cm.getNetworkInfo(network)!!.toString()
-        return false
     }
 
     private fun registerContentObserver() {

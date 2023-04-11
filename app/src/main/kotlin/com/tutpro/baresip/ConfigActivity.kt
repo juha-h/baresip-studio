@@ -93,24 +93,20 @@ class ConfigActivity : AppCompatActivity() {
         oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
         autoStart.isChecked = oldAutoStart == "yes"
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-            val androidSettingsRequest = registerForActivityResult(
-                    ActivityResultContracts.StartActivityForResult()
-            ) {
-                batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
-            }
-            batteryOptimizations = binding.BatteryOptimizations
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val androidSettingsRequest = registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+        ) {
             batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
-            batteryOptimizations.setOnCheckedChangeListener { _, _ ->
-                try {
-                    androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
-                } catch (e: ActivityNotFoundException) {
-                        Log.e(TAG, "ActivityNotFound exception: $e")
-                }
+        }
+        batteryOptimizations = binding.BatteryOptimizations
+        batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
+        batteryOptimizations.setOnCheckedChangeListener { _, _ ->
+            try {
+                androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
+            } catch (e: ActivityNotFoundException) {
+                    Log.e(TAG, "ActivityNotFound exception: $e")
             }
-        } else {
-            binding.Battery.visibility = View.GONE
         }
 
         listenAddr = binding.ListenAddress
@@ -352,8 +348,7 @@ class ConfigActivity : AppCompatActivity() {
         contactsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 contactsMode = contactsModeKeys[position]
-                if (contactsMode != "baresip" && Build.VERSION.SDK_INT >= 23 &&
-                        !Utils.checkPermissions(applicationContext, contactsPermissions))
+                if (contactsMode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions))
                     with(MaterialAlertDialogBuilder(this@ConfigActivity, R.style.AlertDialogTheme)) {
                         setTitle(getText(R.string.consent_request))
                         setMessage(getText(R.string.contacts_consent))

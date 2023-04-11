@@ -45,11 +45,8 @@ class BootCompletedReceiver : BroadcastReceiver() {
                 val channel = NotificationChannel("default", "default",
                         NotificationManager.IMPORTANCE_DEFAULT)
                 nm.createNotificationChannel(channel)
-                val pi = if (Build.VERSION.SDK_INT >= 23)
-                    PendingIntent.getActivity(context, 0, i,
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT)
-                else
-                    PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_ONE_SHOT)
+                val pi = PendingIntent.getActivity(context, 0, i,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT)
                 with(NotificationCompat.Builder(context, "default")) {
                     setSmallIcon(R.drawable.ic_stat)
                     setContentTitle(context.getString(R.string.app_name))

@@ -476,8 +476,6 @@ object Utils {
     }
 
     fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
-        if (Build.VERSION.SDK_INT < 23)
-            return true
         for (p in permissions) {
             if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Permission $p is denied")

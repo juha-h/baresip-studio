@@ -1215,8 +1215,7 @@ class MainActivity : AppCompatActivity() {
                     if (acc.missedCalls)
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
-                if ((Build.VERSION.SDK_INT >= 22 && kgm.isDeviceLocked) ||
-                        (Build.VERSION.SDK_INT < 22 && kgm.isKeyguardLocked && kgm.isKeyguardSecure))
+                if (kgm.isDeviceLocked)
                     Utils.setShowWhenLocked(this, false)
             }
             "message", "message show", "message reply" -> {
