@@ -1886,6 +1886,7 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     if (Build.VERSION.SDK_INT < 31) {
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
                         callRunnable = Runnable {
                             callRunnable = null
                             if (!call(ua, uri)) {
@@ -1895,7 +1896,7 @@ class MainActivity : AppCompatActivity() {
                                 hangupButton.isEnabled = false
                             }
                         }
-                        callHandler.postDelayed(callRunnable!!, 1000)
+                        callHandler.postDelayed(callRunnable!!, 1500)
                     } else {
                         audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                             if (mode == AudioManager.MODE_IN_COMMUNICATION) {
