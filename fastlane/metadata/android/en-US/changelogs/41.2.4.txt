@@ -1,0 +1,1 @@
+- In Android versions below 12, add 1.5 sec delay before making a call in order to avoid missing audio from callee
