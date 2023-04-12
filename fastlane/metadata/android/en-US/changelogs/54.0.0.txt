@@ -1,0 +1,3 @@
+- Requires at least Android version 6 (API level 23)
+- In Android versions below 12, add 1.5 sec delay before making a call
+in order to avoid missing audio from callee
