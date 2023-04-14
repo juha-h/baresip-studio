@@ -1549,14 +1549,13 @@ class BaresipService: Service() {
             return audioFocusRequest == null
         }
 
-        @SuppressLint("MissingPermission")
         private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {
-            return if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) ==
-                    PackageManager.PERMISSION_GRANTED)
-                btAdapter != null && btAdapter!!.isEnabled &&
-                        btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothAdapter.STATE_CONNECTED
-            else
-                true
+            if (VERSION.SDK_INT >= 31 &&
+                    ActivityCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) ==
+                        PackageManager.PERMISSION_DENIED)
+                return false
+            return btAdapter != null && btAdapter!!.isEnabled &&
+                    btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) == BluetoothAdapter.STATE_CONNECTED
         }
 
         private fun isBluetoothScoOn(am: AudioManager): Boolean {
