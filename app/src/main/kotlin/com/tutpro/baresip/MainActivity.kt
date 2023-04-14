@@ -1886,45 +1886,27 @@ class MainActivity : AppCompatActivity() {
                     hangupButton.visibility = View.VISIBLE
                     hangupButton.isEnabled = true
                     if (Build.VERSION.SDK_INT < 31) {
+                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        callRunnable = Runnable {
-                            callRunnable = null
-                            if (!call(ua, uri)) {
-                                callButton.visibility = View.VISIBLE
-                                callButton.isEnabled = true
-                                hangupButton.visibility = View.INVISIBLE
-                                hangupButton.isEnabled = false
-                            }
-                        }
-                        callHandler.postDelayed(callRunnable!!, 1500)
+                        runCall(ua, uri)
                     } else {
-                        audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
-                            if (mode == AudioManager.MODE_IN_COMMUNICATION) {
-                                Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
-                                        "device ${am.communicationDevice!!.type}")
-                                if (audioModeChangedListener != null) {
-                                    am.removeOnModeChangedListener(audioModeChangedListener!!)
-                                    audioModeChangedListener = null
-                                }
-                                if (!call(ua, uri)) {
-                                    callButton.visibility = View.VISIBLE
-                                    callButton.isEnabled = true
-                                    hangupButton.visibility = View.INVISIBLE
-                                    hangupButton.isEnabled = false
-                                }
-                            } else {
-                                Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
-                                    "device ${am.communicationDevice!!.type}")
-                            }
-                        }
                         if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
-                            if (!call(ua, uri)) {
-                                callButton.visibility = View.VISIBLE
-                                callButton.isEnabled = true
-                                hangupButton.visibility = View.INVISIBLE
-                                hangupButton.isEnabled = false
-                            }
+                            runCall(ua, uri)
                         } else {
+                            audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
+                                if (mode == AudioManager.MODE_IN_COMMUNICATION) {
+                                    Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
+                                            "device ${am.communicationDevice!!.type}")
+                                    if (audioModeChangedListener != null) {
+                                        am.removeOnModeChangedListener(audioModeChangedListener!!)
+                                        audioModeChangedListener = null
+                                    }
+                                    runCall(ua, uri)
+                                } else {
+                                    Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
+                                        "device ${am.communicationDevice!!.type}")
+                                }
+                            }
                             am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
                             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
                             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -1937,6 +1919,20 @@ class MainActivity : AppCompatActivity() {
                     callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }
         }
+    }
+
+    private fun runCall(ua: UserAgent, uri: String) {
+        callRunnable = Runnable {
+            callRunnable = null
+            if (!call(ua, uri)) {
+                am.mode = AudioManager.MODE_NORMAL
+                callButton.visibility = View.VISIBLE
+                callButton.isEnabled = true
+                hangupButton.visibility = View.INVISIBLE
+                hangupButton.isEnabled = false
+            }
+        }
+        callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
     private fun showCall(ua: UserAgent, showCall: Call? = null) {

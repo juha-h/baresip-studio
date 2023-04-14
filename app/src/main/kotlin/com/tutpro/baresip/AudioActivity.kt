@@ -18,6 +18,7 @@ class AudioActivity : AppCompatActivity() {
     private lateinit var opusBitRate: EditText
     private lateinit var opusPacketLoss: EditText
     private lateinit var aec: CheckBox
+    private lateinit var audioDelay: EditText
 
     private var save = false
     private var reload = false
@@ -26,6 +27,7 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
     private var oldAec = false
+    private var oldAudioDelay = BaresipService.audioDelay.toString()
     private val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -120,6 +122,9 @@ class AudioActivity : AppCompatActivity() {
         val aecCv = Config.variable("module")
         oldAec = aecCv.contains("webrtc_aecm.so")
         aec.isChecked = oldAec
+
+        audioDelay = binding.AudioDelay
+        audioDelay.setText(oldAudioDelay)
 
         bindTitles()
 
@@ -219,6 +224,19 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
+                val audioDelay = audioDelay.text.toString().trim()
+                if (audioDelay != oldAudioDelay) {
+                    if (!checkAudioDelay(audioDelay)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                                String.format(getString(R.string.invalid_audio_delay), audioDelay))
+                        return false
+                    }
+                    Config.removeVariable("audio_delay")
+                    Config.addLine("audio_delay $audioDelay")
+                    BaresipService.audioDelay = audioDelay.toLong()
+                    save = true
+                }
+
                 if (save) Config.save()
 
                 if (reload) Api.reload_config()
@@ -265,6 +283,10 @@ class AudioActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.aec),
                     getString(R.string.aec_help))
         }
+        binding.AudioDelayTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.audio_delay),
+                    getString(R.string.audio_delay_help))
+        }
     }
 
     private fun checkOpusBitRate(opusBitRate: String): Boolean {
@@ -277,4 +299,8 @@ class AudioActivity : AppCompatActivity() {
         return (number >= 0) && (number <= 100)
     }
 
+    private fun checkAudioDelay(audioDelay: String): Boolean {
+        val number = audioDelay.toIntOrNull() ?: return false
+        return (number >= 100) && (number <= 3000)
+    }
 }

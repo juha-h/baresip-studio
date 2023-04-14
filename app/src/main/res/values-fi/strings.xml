@@ -377,6 +377,10 @@
         ei ole käytössä.</string>
     <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
     <string name="invalid_opus_packet_loss">Virheellinen Opus-koodekin odotettu pakettihäviö</string>
+    <string name="audio_delay">Audioviive</string>
+    <string name="audio_delay_help">Audion odotusviive (millisekunneissa) soitetun puhelun alkaessa.
+        Aseta korkeampi arvo, jos et kuule vastaajan ääntä heti, kun puhelu alkaa.</string>
+    <string name="invalid_audio_delay">Virheellinen audioviive \'%1$s\'. Sallittu arvo on välillä 100–3000.</string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
     asteikolla 1–10.

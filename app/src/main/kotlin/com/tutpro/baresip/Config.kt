@@ -75,6 +75,10 @@ object Config {
             BaresipService.callVolume = variable("call_volume")[0].toInt()
         }
 
+        if (config.contains("audio_delay")) {
+            BaresipService.audioDelay = variable("audio_delay")[0].toLong()
+        }
+
         if (config.contains("net_af"))
             BaresipService.addressFamily = variable("net_af")[0]
 
