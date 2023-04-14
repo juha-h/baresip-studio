@@ -1474,7 +1474,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var callVolume = 0
-        var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 100L
+        var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
         var dynDns = false
         var filesPath = ""
         var pName = ""
