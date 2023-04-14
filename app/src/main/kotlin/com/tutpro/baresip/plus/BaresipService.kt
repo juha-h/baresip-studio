@@ -1538,6 +1538,7 @@ class BaresipService: Service() {
         var supportedCameras = false
         var cameraFront = true
         var callVolume = 0
+        var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
         var dynDns = false
         var filesPath = ""
         var pName = ""

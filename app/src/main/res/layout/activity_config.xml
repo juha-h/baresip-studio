@@ -256,7 +256,7 @@
             android:id="@+id/AudioSettingsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="18dp"
             android:textSize="18sp"
             android:textStyle="bold"
             android:text="@string/audio_settings" >

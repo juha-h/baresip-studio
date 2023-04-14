@@ -65,13 +65,17 @@ object Config {
             BaresipService.callVolume = variable("call_volume")[0].toInt()
         }
 
+        if (config.contains("audio_delay")) {
+            BaresipService.audioDelay = variable("audio_delay")[0].toLong()
+        }
+
         if (config.contains("net_af"))
             BaresipService.addressFamily = variable("net_af")[0]
 
         if (!config.contains("dyn_dns")) {
             config = "${config}dyn_dns no\n"
         } else {
-            if (config.contains(Regex("dyn_dns[ ]+yes"))) {
+            if (config.contains(Regex("dyn_dns' '+yes"))) {
                 removeVariable("dns_server")
                 for (dnsServer in BaresipService.dnsServers)
                     config = if (Utils.checkIpV4(dnsServer.hostAddress!!))

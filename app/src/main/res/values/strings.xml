@@ -354,6 +354,10 @@
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
+    <string name="audio_delay">Audio Delay</string>
+    <string name="audio_delay_help">Time (in milliseconds) to wait audio from callee when call is established.
+        Set to a higher value if you miss audio from callee at the beginning of the call.</string>
+    <string name="invalid_audio_delay">Invalid Audio Delay \'%1$s\'. Valid values are from 100 to 3000.</string>
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
     <string name="dark_theme">Dark Theme</string>
