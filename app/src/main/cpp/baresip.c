@@ -166,12 +166,12 @@ static const char *ua_event_reg_str(enum ua_event ev)
 
 static const char *translate_errorcode(uint16_t scode)
 {
-	switch (scode) {
-	    case 404: return ""; /* ignore */
-	    case 486: return "busy";
-	    case 487: return ""; /* ignore */
-	    default:  return "error";
-	}
+    switch (scode) {
+        case 404: return ""; /* ignore */
+        case 486: case 603: return "busy";
+        case 487: return ""; /* ignore */
+        default: return "error";
+    }
 }
 
 static void ua_event_handler(struct ua *ua, enum ua_event ev,
