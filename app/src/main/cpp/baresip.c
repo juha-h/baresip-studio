@@ -133,9 +133,9 @@ static const char *translate_errorcode(uint16_t scode)
 {
 	switch (scode) {
         case 404: return ""; /* ignore */
-	    case 486: return "busy";
+        case 486: case 603: return "busy";
 	    case 487: return ""; /* ignore */
-	    default:  return "error";
+	    default: return "error";
 	}
 }
 
