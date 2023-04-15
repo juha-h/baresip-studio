@@ -889,9 +889,7 @@ class BaresipService: Service() {
                             call.remove()
                             if (!Call.inCall()) {
                                 resetCallVolume()
-                                if (!abandonAudioFocus(applicationContext))
-                                    Log.e(TAG, "Failed to abandon audio focus")
-                                am.mode = MODE_NORMAL
+                                abandonAudioFocus(applicationContext)
                                 proximitySensing(false)
                             }
                             val missed = call.startTime == null && call.dir == "in" && !call.rejected
@@ -1446,8 +1444,8 @@ class BaresipService: Service() {
             this.unregisterReceiver(bluetoothReceiver)
             this.unregisterReceiver(hotSpotReceiver)
             stopRinging()
-            abandonAudioFocus(applicationContext)
             stopMediaPlayer()
+            abandonAudioFocus(applicationContext)
             uas.clear()
             callHistory.clear()
             messages.clear()
@@ -1535,18 +1533,20 @@ class BaresipService: Service() {
             return audioFocusRequest != null
         }
 
-        fun abandonAudioFocus(ctx: Context): Boolean {
+        fun abandonAudioFocus(ctx: Context) {
+            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             if (audioFocusRequest != null) {
                 Log.d(TAG, "Abandoning audio focus")
-                val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                 if (AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!) ==
                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     audioFocusRequest = null
                     if (isBluetoothHeadsetConnected(ctx))
                         stopBluetoothSco(ctx)
+                } else {
+                    Log.e(TAG, "Failed to abandon audio focus")
                 }
             }
-            return audioFocusRequest == null
+            am.mode = MODE_NORMAL
         }
 
         private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {

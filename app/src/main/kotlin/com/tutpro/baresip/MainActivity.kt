@@ -364,7 +364,6 @@ class MainActivity : AppCompatActivity() {
                     callHandler.removeCallbacks(callRunnable!!)
                     callRunnable = null
                     BaresipService.abandonAudioFocus(applicationContext)
-                    am.mode = AudioManager.MODE_NORMAL
                     showCall(ua)
                     return@setOnClickListener
                 }
@@ -373,7 +372,6 @@ class MainActivity : AppCompatActivity() {
                     am.removeOnModeChangedListener(audioModeChangedListener!!)
                     audioModeChangedListener = null
                     BaresipService.abandonAudioFocus(applicationContext)
-                    am.mode = AudioManager.MODE_NORMAL
                     showCall(ua)
                     return@setOnClickListener
                 }
@@ -1803,8 +1801,6 @@ class MainActivity : AppCompatActivity() {
                     onHoldCall.newCall = null
                 call.remove()
                 call.destroy()
-                if (!BaresipService.abandonAudioFocus(applicationContext))
-                    Log.e(TAG, "Failed to abandon audio focus")
                 showCall(ua)
                 false
             }
@@ -1925,7 +1921,7 @@ class MainActivity : AppCompatActivity() {
         callRunnable = Runnable {
             callRunnable = null
             if (!call(ua, uri)) {
-                am.mode = AudioManager.MODE_NORMAL
+                BaresipService.abandonAudioFocus(applicationContext)
                 callButton.visibility = View.VISIBLE
                 callButton.isEnabled = true
                 hangupButton.visibility = View.INVISIBLE
