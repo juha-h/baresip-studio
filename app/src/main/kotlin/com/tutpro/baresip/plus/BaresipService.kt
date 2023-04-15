@@ -427,8 +427,10 @@ class BaresipService: Service() {
                 var addresses = ""
                 for (la in linkAddresses)
                     addresses = "$addresses;${la.key};${la.value}"
-
                 Log.i(TAG, "Link addresses: $addresses")
+
+                activeNetwork = cm.activeNetwork
+                Log.i(TAG, "Active network: $activeNetwork")
 
                 Thread {
                     baresipStart(filesPath, addresses.removePrefix(";"), logLevel)
@@ -921,11 +923,11 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
-                            if (!Call.inCall()) {
+                            if (ev[2] == "busy") {
+                                playBusy()
+                            } else if (!Call.inCall()) {
                                 resetCallVolume()
-                                if (!abandonAudioFocus(applicationContext))
-                                    Log.e(TAG, "Failed to abandon audio focus")
-                                am.mode = MODE_NORMAL
+                                abandonAudioFocus(applicationContext)
                                 proximitySensing(false)
                             }
                             val missed = call.startTime == null && call.dir == "in" && !call.rejected
@@ -1306,13 +1308,16 @@ class BaresipService: Service() {
         }
     }
 
-    @Suppress("UNUSED")
-    private fun playMedia(raw: Int, count: Int) {
+    private fun playBusy() {
         if (mediaPlayer == null ) {
-            mediaPlayer = MediaPlayer.create(this, raw)
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.busy)
             mediaPlayer?.setOnCompletionListener {
                 stopMediaPlayer()
-                if (count > 1) playMedia(raw, count - 1)
+                if (!Call.inCall()) {
+                    resetCallVolume()
+                    abandonAudioFocus(applicationContext)
+                    proximitySensing(false)
+                }
             }
             mediaPlayer?.start()
         }
@@ -1402,7 +1407,7 @@ class BaresipService: Service() {
             }
 
         val active = cm.activeNetwork
-        Log.d(TAG, "Added/Removed/Active = $added/$removed/$active")
+        Log.d(TAG, "Added/Removed/Old/New Active = $added/$removed/$activeNetwork/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
             linkAddresses = addresses
@@ -1508,8 +1513,8 @@ class BaresipService: Service() {
             this.unregisterReceiver(bluetoothReceiver)
             this.unregisterReceiver(hotSpotReceiver)
             stopRinging()
-            abandonAudioFocus(applicationContext)
             stopMediaPlayer()
+            abandonAudioFocus(applicationContext)
             uas.clear()
             callHistory.clear()
             messages.clear()
@@ -1599,18 +1604,20 @@ class BaresipService: Service() {
             return audioFocusRequest != null
         }
 
-        fun abandonAudioFocus(ctx: Context): Boolean {
+        fun abandonAudioFocus(ctx: Context) {
+            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             if (audioFocusRequest != null) {
                 Log.d(TAG, "Abandoning audio focus")
-                val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                 if (AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!) ==
                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     audioFocusRequest = null
                     if (isBluetoothHeadsetConnected(ctx))
                         stopBluetoothSco(ctx)
+                } else {
+                    Log.e(TAG, "Failed to abandon audio focus")
                 }
             }
-            return audioFocusRequest == null
+            am.mode = MODE_NORMAL
         }
 
         private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {
