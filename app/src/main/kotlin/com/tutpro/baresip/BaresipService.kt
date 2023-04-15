@@ -425,8 +425,10 @@ class BaresipService: Service() {
                 var addresses = ""
                 for (la in linkAddresses)
                     addresses = "$addresses;${la.key};${la.value}"
-
                 Log.i(TAG, "Link addresses: $addresses")
+
+                activeNetwork = cm.activeNetwork
+                Log.i(TAG, "Active network: $activeNetwork")
 
                 Thread {
                     baresipStart(filesPath, addresses.removePrefix(";"), logLevel)
@@ -1342,7 +1344,7 @@ class BaresipService: Service() {
             }
 
         val active = cm.activeNetwork
-        Log.d(TAG, "Added/Removed/Active = $added/$removed/$active")
+        Log.d(TAG, "Added/Removed/Old/New Active = $added/$removed/$activeNetwork/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
             linkAddresses = addresses
