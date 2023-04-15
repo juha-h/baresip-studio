@@ -887,7 +887,9 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
-                            if (!Call.inCall()) {
+                            if (ev[2] == "busy") {
+                                playBusy()
+                            } else if (!Call.inCall()) {
                                 resetCallVolume()
                                 abandonAudioFocus(applicationContext)
                                 proximitySensing(false)
@@ -1241,13 +1243,16 @@ class BaresipService: Service() {
         }
     }
 
-    @Suppress("UNUSED")
-    private fun playMedia(raw: Int, count: Int) {
+    private fun playBusy() {
         if (mediaPlayer == null ) {
-            mediaPlayer = MediaPlayer.create(this, raw)
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.busy)
             mediaPlayer?.setOnCompletionListener {
                 stopMediaPlayer()
-                if (count > 1) playMedia(raw, count - 1)
+                if (!Call.inCall()) {
+                    resetCallVolume()
+                    abandonAudioFocus(applicationContext)
+                    proximitySensing(false)
+                }
             }
             mediaPlayer?.start()
         }
