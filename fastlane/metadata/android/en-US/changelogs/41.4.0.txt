@@ -1,0 +1,3 @@
+- Play busy tone when "486 Busy Here" or "603 Decline" response is received
+- Avoid unnecessary re-registration when network capabilities change
+- Simplified abandoning of audio focus
