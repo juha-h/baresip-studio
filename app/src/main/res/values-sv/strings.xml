@@ -301,4 +301,18 @@
     <string name="non_unique_account_nickname">Namnet \'%1$s\' används redan</string>
     <string name="audio_focus_denied">Ljudfokus nekad!</string>
     <string name="reg_int">Registreringsintervall</string>
+    <string name="invalid_reg_int">Ogiltigt registreringsintervall \'%1$s\'</string>
+    <string name="no_telephony_provider">Kontot \'%1$s\' har ingen telefonileverantör</string>
+    <string name="address_family_help">Väljer vilken eller vilka IP-adress baresip använder. Om IPv4 eller IPv6 väljs använder baresip enbart vald adresstyp. Om ingen adresstyp väljs använder baresip både IPv4- och IPv6-adresser.</string>
+    <string name="address_family">Adresstyp</string>
+    <string name="rec_in_call">Inspelning kan bara slås på/av när inget samtal pågår</string>
+    <string name="choose_destination_uri">Välj destinations-URI</string>
+    <string name="audio_permissions">baresip behöver behörigheten \"Mikrofon\" för röstsamtal, behörigheten \"Enheter i närheten\" för upptäckt av mikrofon/högtalare via blåtand och behörigheten \"Aviseringar\" för att skicka aviseringar.</string>
+    <string name="audio_delay">Fördröjt ljud</string>
+    <string name="invalid_audio_delay">Ogiltigt värde för fördröjt ljud \'%1$s\'. Giltiga värden är från 100 till 3000.</string>
+    <string name="no_bluetooth">baresip kan inte upptäcka blåtandsanslutningar utan behörigheten \"Enheter i närheten\".</string>
+    <string name="permissions_rationale">Behörigheters motivering</string>
+    <string name="reg_int_help">Avgör hur ofta (i sekunder) baresip skickar REGISTER-förfrågningar. Giltiga värden är från 60 till 3600.</string>
+    <string name="audio_delay_help">Tid (i millisekunder) att vänta på ljud från motparten när ett samtal upprättats. Sätt till ett högre värde om du saknar ljud från motparten i början av samtalet.</string>
+    <string name="audio_and_video_permissions">baresip+ behöver behörigheten \"Mikrofon\" för röstsamtal, behörigheten \"Kamera\" för videosamtal, behörigheten \"Enheter i närheten\" för upptäckt av mikrofon/högtalare via blåtand och behörigheten \"Aviseringar\" för att skicka aviseringar.</string>
 </resources>
