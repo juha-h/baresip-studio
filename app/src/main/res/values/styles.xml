@@ -16,6 +16,7 @@
 
     <style name="ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorSecondaryDark</item>
+        <item name="colorSurface">@color/colorPrimary</item>
         <item name="android:textColor">@color/colorLight</item>
         <item name="android:textColorPrimary">@color/colorLight</item>
         <item name="android:textColorSecondary">@color/colorLight</item>
