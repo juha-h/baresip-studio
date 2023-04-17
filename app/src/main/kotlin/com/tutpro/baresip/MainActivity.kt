@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
             val event = it.getContentIfNotHandled()
             Log.d(TAG, "Observed event $event")
             if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.first()
+                val first = BaresipService.serviceEvents.removeFirst()
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -989,11 +989,8 @@ class MainActivity : AppCompatActivity() {
             if (logMessage != null)
                 Log.w(TAG, logMessage)
             if (BaresipService.serviceEvents.isNotEmpty()) {
-                BaresipService.serviceEvents.removeFirst()
-                if (BaresipService.serviceEvents.isNotEmpty()) {
-                    val e = BaresipService.serviceEvents.first()
-                    handleServiceEvent(e.event, e.params)
-                }
+                val first = BaresipService.serviceEvents.removeFirst()
+                handleServiceEvent(first.event, first.params)
             }
         }
 
@@ -1679,10 +1676,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBaresip() {
-        baresipService.action = "Start"
-        startService(baresipService)
-        if (atStartup)
-            moveTaskToBack(true)
+        if (!BaresipService.isStartReceived) {
+            baresipService.action = "Start"
+            startService(baresipService)
+            if (atStartup)
+                moveTaskToBack(true)
+        }
     }
 
     private fun backup(password: String) {
