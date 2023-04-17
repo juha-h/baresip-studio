@@ -1,0 +1,3 @@
+- Prevent starting of baresip service more than once
+- Color improvements
+- New Spanish, Russian, Portuguese (Brazil), Swedish, and Czech translations
