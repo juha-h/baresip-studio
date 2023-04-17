@@ -365,6 +365,8 @@ class BaresipService: Service() {
 
             "Start" -> {
 
+                isStartReceived = true
+
                 if (VERSION.SDK_INT < 31) {
                     @Suppress("DEPRECATION")
                     allNetworks = cm.allNetworks.toMutableSet()
@@ -1538,6 +1540,7 @@ class BaresipService: Service() {
     companion object {
 
         var isServiceRunning = false
+        var isStartReceived = false
         var isConfigInitialized = false
         var libraryLoaded = false
         var supportedCameras = false

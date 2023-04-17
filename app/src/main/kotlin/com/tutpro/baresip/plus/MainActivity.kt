@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             val event = it.getContentIfNotHandled()
             Log.d(TAG, "Observed event $event")
             if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.first()
+                val first = BaresipService.serviceEvents.removeFirst()
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -802,48 +802,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        permissions = if (Build.VERSION.SDK_INT >= 33)
-            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
-        else if (Build.VERSION.SDK_INT >= 31)
-            arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
-        else
-            arrayOf(RECORD_AUDIO)
-
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-
-        requestPermissionsLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-                val denied = mutableListOf<String>()
-                val shouldShow = mutableListOf<String>()
-                it.forEach { permission ->
-                    if (!permission.value) {
-                        denied.add(permission.key)
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                                permission.key))
-                            shouldShow.add(permission.key)
-                    }
-                }
-                if (denied.contains(POST_NOTIFICATIONS) &&
-                        !shouldShow.contains(POST_NOTIFICATIONS)) {
-                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                        setTitle(getString(R.string.notice))
-                        setMessage(getString(R.string.no_notifications))
-                        setPositiveButton(getString(R.string.ok)) { _, _ ->
-                            quitRestart(false)
-                        }
-                        show()
-                    }
-                } else {
-                    if (shouldShow.isNotEmpty())
-                        Utils.alertView(this, getString(R.string.permissions_rationale),
-                            getString(R.string.audio_permissions)
-                        ) { requestPermissionsLauncher.launch(permissions) }
-                    else
-                        startBaresip()
-                }
-            }
-
         if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -1387,11 +1345,8 @@ class MainActivity : AppCompatActivity() {
             if (logMessage != null)
                 Log.w(TAG, logMessage)
             if (BaresipService.serviceEvents.isNotEmpty()) {
-                BaresipService.serviceEvents.removeFirst()
-                if (BaresipService.serviceEvents.isNotEmpty()) {
-                    val e = BaresipService.serviceEvents.first()
-                    handleServiceEvent(e.event, e.params)
-                }
+                val first = BaresipService.serviceEvents.removeFirst()
+                handleServiceEvent(first.event, first.params)
             }
         }
 
@@ -2125,10 +2080,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBaresip() {
-        baresipService.action = "Start"
-        startService(baresipService)
-        if (atStartup)
-            moveTaskToBack(true)
+        if (!BaresipService.isStartReceived) {
+            baresipService.action = "Start"
+            startService(baresipService)
+            if (atStartup)
+                moveTaskToBack(true)
+        }
     }
 
     private fun backup(password: String) {
