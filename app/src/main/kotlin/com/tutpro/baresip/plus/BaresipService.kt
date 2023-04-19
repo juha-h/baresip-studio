@@ -209,7 +209,7 @@ class BaresipService: Service() {
                                                 reset = true
                                     if (reset)
                                         Timer().schedule(2000) {
-                                            Api.uag_reset_transp(register = true, reinvite = false)
+                                            updateNetwork()
                                         }
                                 } else {
                                     Log.w(TAG, "Could not get hotspot addresses")
@@ -227,7 +227,7 @@ class BaresipService: Service() {
                                     if (Api.net_rm_address(k) != 0)
                                         Log.e(TAG, "Failed to remove address $k")
                                 hotSpotAddresses = mapOf()
-                                Api.uag_reset_transp(register = true, reinvite = false)
+                                updateNetwork()
                             }
                         }
                     }
@@ -1446,8 +1446,6 @@ class BaresipService: Service() {
             }
         }
         if (hotSpotIsEnabled) {
-            hotSpotAddresses = Utils.hotSpotAddresses()
-            Log.d(TAG, "HotSpot addresses $hotSpotAddresses")
             for ((k, v) in hotSpotAddresses)
                 if (afMatch(k))
                     addresses[k] = v
