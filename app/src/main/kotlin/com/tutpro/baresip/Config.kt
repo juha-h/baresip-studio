@@ -33,8 +33,8 @@ object Config {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aecm.so\n"
         }
 
-        if (config.contains(Regex("#module_app[ ]+mwi.so"))) {
-            config = config.replace(Regex("#module_app[ ]+mwi.so"),
+        if (config.contains(Regex("#module_app\\s+mwi.so"))) {
+            config = config.replace(Regex("#module_app\\s+mwi.so"),
                     "module_app mwi.so")
         }
 
@@ -85,7 +85,7 @@ object Config {
         if (!config.contains("dyn_dns")) {
             config = "${config}dyn_dns no\n"
         } else {
-            if (config.contains(Regex("dyn_dns[ ]+yes"))) {
+            if (config.contains(Regex("dyn_dns\\s+yes"))) {
                 removeVariable("dns_server")
                 for (dnsServer in BaresipService.dnsServers)
                     config = if (Utils.checkIpV4(dnsServer.hostAddress!!))
