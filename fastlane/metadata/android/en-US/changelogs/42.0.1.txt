@@ -1,0 +1,2 @@
+- Upstream fix of call remaining in active list even when closed
+- Better handling of WiFi hotspot enable/disable events
