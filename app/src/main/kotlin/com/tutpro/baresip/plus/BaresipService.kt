@@ -425,12 +425,12 @@ class BaresipService: Service() {
 
                 Message.restore()
 
+                hotSpotAddresses = Utils.hotSpotAddresses()
                 linkAddresses = linkAddresses()
                 var addresses = ""
                 for (la in linkAddresses)
                     addresses = "$addresses;${la.key};${la.value}"
                 Log.i(TAG, "Link addresses: $addresses")
-
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
