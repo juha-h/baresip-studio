@@ -39,7 +39,7 @@
     </style>
 
     <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/colorPrimary</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
