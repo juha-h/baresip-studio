@@ -1,0 +1,3 @@
+- Upstream fix of call remaining in active list even when closed
+- Better handling of WiFi hotspot enable/disable events
+- Improved alert dialog text button dark theme color contrast
