@@ -33,11 +33,6 @@ object Config {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aecm.so\n"
         }
 
-        if (config.contains(Regex("#module_app\\s+mwi.so"))) {
-            config = config.replace(Regex("#module_app\\s+mwi.so"),
-                    "module_app mwi.so")
-        }
-
         if (!config.contains("opus_application")) {
             config = "${config}opus_application voip\n"
         }
@@ -106,9 +101,7 @@ object Config {
         } else {
             removeVariable("jitter_buffer_wish")
         }
-
-        removeVariable("prefer_android_contacts")
-
+        
         if (config.contains("contacts_mode")) {
             BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
             if (BaresipService.contactsMode != "baresip" &&
