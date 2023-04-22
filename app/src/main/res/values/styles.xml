@@ -7,6 +7,7 @@
         <item name="actionBarTheme">@style/ActionBar</item>
         <item name="actionOverflowMenuStyle">@style/Spinner</item>
         <item name="android:dropDownListViewStyle">@style/Spinner</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
     </style>
 
     <style name="AppTheme.Main" parent="AppTheme">
@@ -22,7 +23,7 @@
     </style>
 
     <style name="Spinner" parent="Widget.AppCompat.ListView.DropDown">
-        <item name="android:popupBackground">@color/colorSecondaryDark</item>
+        <item name="android:popupBackground">@color/colorPopupBackground</item>
         <item name="android:textColor">@color/colorLight</item>
         <item name="android:dividerHeight">1dp</item>
         <item name="android:divider">@color/colorSpinnerDivider</item>
@@ -38,7 +39,7 @@
     </style>
 
     <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorAlert</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
@@ -52,7 +53,7 @@
     </style>
 
     <style name="Alert.Title" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorAlert</item>
         <item name="android:textSize">20sp</item>
     </style>
 
