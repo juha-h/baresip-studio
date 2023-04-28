@@ -23,6 +23,7 @@ import android.os.Build.VERSION
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -616,13 +617,10 @@ class BaresipService: Service() {
         Log.d(TAG, "got uaEvent $event/$aor/$callp")
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != 0L &&
-                !setOf("call incoming", "call rejected", "call closed").contains(ev[0])) {
+        if (call == null && callp != 0L && !setOf("call incoming", "call closed").contains(ev[0])) {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
-
-        var newEvent: String? = null
 
         for (accountIndex in uas.indices) {
             if (uas[accountIndex].account.aor == aor) {
@@ -685,22 +683,24 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = ev[1]
-                        val toast = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
-                            R.string.no_calls
+                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                            getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
-                            R.string.audio_focus_denied
+                            // request fails if there is an active telephony call
+                            getString(R.string.audio_focus_denied)
                         else
-                            0
-                        if (toast != 0) {
-                            toast(getString(toast))
+                            ""
+                        if (toastMsg != "") {
+                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                            Api.ua_hangup(uap, callp, 486, "Busy Here")
+                            toast(toastMsg)
+                            playUnInterrupted(R.raw.callwaiting, 1)
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in"))
                                 CallHistory.save()
                                 ua.account.missedCalls = true
                             }
-                            if (!isMainVisible)
-                                return
-                            newEvent = "call rejected"
+                            return
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
@@ -763,19 +763,6 @@ class BaresipService: Service() {
                             nb.addAction(R.drawable.ic_stat_call_end,
                                     getActionText(R.string.reject, R.color.colorRed), rpi)
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
-                            return
-                        }
-                    }
-                    "call rejected" -> {
-                        playUnInterrupted(R.raw.callwaiting, 1)
-                        if (ua.account.callHistory) {
-                            CallHistory.add(CallHistory(aor, ev[1], "in"))
-                            CallHistory.save()
-                            ua.account.missedCalls = true
-                            if (!isMainVisible)
-                                return
-                            newEvent = "call rejected"
-                        } else {
                             return
                         }
                     }
@@ -962,8 +949,7 @@ class BaresipService: Service() {
             }
         }
 
-        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                System.nanoTime()))
+        postServiceEvent(ServiceEvent(event, arrayListOf(uap, callp), System.nanoTime()))
 
     }
 
