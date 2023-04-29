@@ -688,6 +688,9 @@ class BaresipService: Service() {
                         else if (!requestAudioFocus(applicationContext))
                             // request fails if there is an active telephony call
                             getString(R.string.audio_focus_denied)
+                        else if (Call.inCall())
+                            String.format(getString(R.string.call_auto_rejected),
+                                    Utils.friendlyUri(this, peerUri, ua.account))
                         else
                             ""
                         if (toastMsg != "") {
