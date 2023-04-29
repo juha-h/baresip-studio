@@ -315,4 +315,5 @@
     <string name="audio_delay">Atraso do áudio</string>
     <string name="audio_delay_help">Tempo (em milissegundos) para esperar o áudio de quem chama quando a chamada for estabelecida. Defina um valor mais alto caso perca o áudio de quem chama no início da chamada.</string>
     <string name="invalid_audio_delay">Atraso inválido de áudio \'%1$s\'. Os valores válidos ficam entre 100 a 3000.</string>
+    <string name="call_auto_rejected">Chamada rejeitada automaticamente de %1$s</string>
 </resources>
