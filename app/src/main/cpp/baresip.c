@@ -1058,7 +1058,7 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz, jlong ua, jlon
 {
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    const int thread_check = re_thread_check();
+    const int thread_check = re_thread_check(false);
     LOGD("hanging up call %ld/%ld\n", (long)ua, (long)call);
     if (thread_check != 0)
         re_thread_enter();
