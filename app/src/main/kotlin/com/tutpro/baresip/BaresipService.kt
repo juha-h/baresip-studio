@@ -23,7 +23,6 @@ import android.os.Build.VERSION
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.telecom.TelecomManager
-import android.telephony.TelephonyManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
