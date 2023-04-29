@@ -1,0 +1,2 @@
+- Dark theme color improvements
+- Improved call auto-rejection
