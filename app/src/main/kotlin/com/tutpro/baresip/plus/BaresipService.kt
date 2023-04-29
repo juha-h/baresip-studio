@@ -624,8 +624,7 @@ class BaresipService: Service() {
         }
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != 0L &&
-                !setOf("call incoming", "call rejected", "call closed").contains(ev[0])) {
+        if (call == null && callp != 0L && !setOf("call incoming", "call closed").contains(ev[0])) {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -693,23 +692,27 @@ class BaresipService: Service() {
                     }
                     "call incoming" -> {
                         val peerUri = ev[1]
-                        var missed = false
-                        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO))) {
-                            toast(getString(R.string.no_calls))
-                            missed = true
-                        } else if (!requestAudioFocus(applicationContext)) {
-                            toast(getString(R.string.audio_focus_denied))
-                            missed = true
-                        }
-                        if (missed) {
+                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                            getString(R.string.no_calls)
+                        else if (!requestAudioFocus(applicationContext))
+                        // request fails if there is an active telephony call
+                            getString(R.string.audio_focus_denied)
+                        else if (Call.inCall())
+                            String.format(getString(R.string.call_auto_rejected),
+                                    Utils.friendlyUri(this, peerUri, ua.account))
+                        else
+                            ""
+                        if (toastMsg != "") {
+                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
+                            Api.ua_hangup(uap, callp, 486, "Busy Here")
+                            toast(toastMsg)
+                            playUnInterrupted(R.raw.callwaiting, 1)
                             if (ua.account.callHistory) {
                                 CallHistory.add(CallHistory(aor, peerUri, "in"))
                                 CallHistory.save()
                                 ua.account.missedCalls = true
                             }
-                            if (!isMainVisible)
-                                return
-                            newEvent = "call rejected"
+                            return
                         } else {
                             Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                             Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
@@ -799,19 +802,6 @@ class BaresipService: Service() {
                             return
                         }
                         newEvent = "call update"
-                    }
-                    "call rejected" -> {
-                        playUnInterrupted(R.raw.callwaiting, 1)
-                        if (ua.account.callHistory) {
-                            CallHistory.add(CallHistory(aor, ev[1], "in"))
-                            CallHistory.save()
-                            ua.account.missedCalls = true
-                            if (!isMainVisible)
-                                return
-                            newEvent = "call rejected"
-                        } else {
-                            return
-                        }
                     }
                     "call answered" -> {
                         stopMediaPlayer()
@@ -995,8 +985,7 @@ class BaresipService: Service() {
             }
         }
 
-        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp),
-                System.nanoTime()))
+        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), System.nanoTime()))
 
     }
 
