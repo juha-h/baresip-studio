@@ -554,7 +554,6 @@ out:
                                               "(Ljava/lang/String;)V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, stoppedId, javaError);
     (*env)->DeleteLocalRef(env, javaError);
-
 }
 
 JNIEXPORT void JNICALL
@@ -989,7 +988,9 @@ Java_com_tutpro_baresip_Api_ua_1alloc(JNIEnv *env, jobject thiz, jstring jUri)
     const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
+    re_thread_enter();
     int res = ua_alloc(&ua, uri);
+    re_thread_leave();
     if (res == 0) {
         LOGD("allocated ua '%ld'\n", (long)ua);
     } else {
@@ -1027,7 +1028,9 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobject thiz, jlong ua)
 {
     LOGD("destroying ua %ld\n", (long)ua);
+    re_thread_enter();
     (void)ua_destroy((struct ua *)ua);
+    re_thread_leave();
 }
 
 JNIEXPORT jlong JNICALL
