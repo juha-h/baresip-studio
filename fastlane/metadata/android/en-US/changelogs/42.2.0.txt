@@ -1,0 +1,2 @@
+- In addition to CALL, handle also DIAL actions from other applications
+- New Spanish and Portuguese (Brazil) translations
