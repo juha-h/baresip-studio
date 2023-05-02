@@ -61,9 +61,9 @@
                 <action android:name="android.intent.action.CALL" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="tel" />
                 <data android:scheme="sip" />
                 <data android:scheme="sips" />
-                <data android:scheme="tel" />
             </intent-filter>
         </activity>
         <activity
