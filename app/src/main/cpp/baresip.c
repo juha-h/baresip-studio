@@ -279,10 +279,10 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     jstring jPeer = (*env)->NewStringUTF(env, peer_buf);
     jbyteArray jMsg;
     size = mbuf_get_left(body);
-    jMsg = (*env)->NewByteArray(env, size);
+    jMsg = (*env)->NewByteArray(env, (jsize)size);
     if ((*env)->GetArrayLength(env, jMsg) != size) {
         (*env)->DeleteLocalRef(env, jMsg);
-        jMsg = (*env)->NewByteArray(env, size);
+        jMsg = (*env)->NewByteArray(env, (jsize)size);
     }
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)jMsg, 0);
     memcpy(temp, mbuf_buf(body), size);
@@ -744,7 +744,7 @@ JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_account_1regint(JNIEnv *env, jobject thiz, jlong acc)
 {
     if (acc)
-        return account_regint((struct account *)acc);
+        return (jint)account_regint((struct account *)acc);
     else
         return 0;
 }
@@ -1240,8 +1240,7 @@ Java_com_tutpro_baresip_Api_call_1audio_1codecs(JNIEnv *env, jobject thiz, jlong
 JNIEXPORT jint JNICALL
 Java_com_tutpro_baresip_Api_call_1duration(JNIEnv *env, jobject thiz, jlong call)
 {
-    int duration = call_duration((struct call *)call);
-    return duration;
+    return (jint)call_duration((struct call *)call);
 }
 
 JNIEXPORT jstring JNICALL
