@@ -8,6 +8,7 @@ import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.*
 import android.content.Intent.ACTION_CALL
+import android.content.Intent.ACTION_DIAL
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioDeviceInfo
@@ -741,7 +742,7 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-        if (intent?.action == ACTION_CALL) {
+        if (intent?.action == ACTION_CALL || intent?.action == ACTION_DIAL) {
             if (BaresipService.isServiceRunning)
                 callAction(intent)
             else
@@ -1179,15 +1180,19 @@ class MainActivity : AppCompatActivity() {
 
         resumeAction = ""
         resumeUri = ""
-        if (intent.action == ACTION_CALL) {
-            Log.d(TAG, "onNewIntent $ACTION_CALL ${intent.data}")
-            callAction(intent)
-        } else {
-            val action = intent.getStringExtra("action")
-            Log.d(TAG, "onNewIntent action `$action'")
-            if (action != null) {
-                intent.removeExtra("action")
-                handleIntent(intent, action)
+
+        Log.d(TAG, "onNewIntent with intent.action '${intent.action}'")
+
+        when (intent.action) {
+            ACTION_DIAL, ACTION_CALL -> {
+                callAction(intent)
+            }
+            else -> {
+                val action = intent.getStringExtra("action")
+                if (action != null) {
+                    intent.removeExtra("action")
+                    handleIntent(intent, action)
+                }
             }
         }
     }
@@ -1196,6 +1201,7 @@ class MainActivity : AppCompatActivity() {
         if (Call.inCall() || BaresipService.uas.size == 0)
             return
         val uri: Uri? = intent.data
+        Log.d(TAG, "callAction to $uri")
         if (uri != null) {
             when (uri.scheme) {
                 "sip" -> {
