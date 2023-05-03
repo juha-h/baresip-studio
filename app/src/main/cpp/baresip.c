@@ -238,6 +238,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
         return;
     }
 
+    re_thread_leave();
     JNIEnv *env;
     jint res = (*g_ctx.javaVM)->GetEnv(g_ctx.javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
@@ -250,7 +251,7 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
     LOGD("sending ua/call %ld/%ld event %s\n", (long)ua, (long)call, event_buf);
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
     (*env)->DeleteLocalRef(env, jEvent);
-
+    re_thread_enter();
 }
 
 static void message_handler(struct ua *ua, const struct pl *peer, const struct pl *ctype,
@@ -268,6 +269,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
         return;
     }
 
+    re_thread_leave();
     JNIEnv *env;
     jint res = (*g_ctx.javaVM)->GetEnv(g_ctx.javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
@@ -291,6 +293,7 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, (jlong)ua, jPeer, jMsg);
     (*env)->DeleteLocalRef(env, jPeer);
     (*env)->DeleteLocalRef(env, jMsg);
+    re_thread_enter();
 }
 
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
@@ -307,6 +310,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode,
             reason_buf, (char *)arg);
 
+    re_thread_leave();
     JNIEnv *env;
     jint res = (*g_ctx.javaVM)->GetEnv(g_ctx.javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
@@ -321,6 +325,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, msg->scode, javaReason, javaTime);
     (*env)->DeleteLocalRef(env, javaReason);
     (*env)->DeleteLocalRef(env, javaTime);
+    re_thread_enter();
 }
 
 enum {
@@ -511,6 +516,7 @@ Java_com_tutpro_baresip_BaresipService_baresipStart(JNIEnv *env, jobject instanc
         goto out;
     }
 
+    // no need to call re_leave/enter since main is not running yet
     jmethodID startedId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "started", "()V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, startedId);
 
@@ -1055,14 +1061,12 @@ Java_com_tutpro_baresip_Api_ua_1hangup(JNIEnv *env, jobject thiz, jlong ua, jlon
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     const int thread_check = re_thread_check(false);
     LOGD("hanging up call %ld/%ld\n", (long)ua, (long)call);
-    if (thread_check != 0)
-        re_thread_enter();
+    re_thread_enter();
     if (strlen(native_reason) == 0)
         ua_hangup((struct ua *)ua, (struct call *)call, native_code, NULL);
     else
         ua_hangup((struct ua *)ua, (struct call *)call, native_code, native_reason);
-    if (thread_check != 0)
-        re_thread_leave();
+    re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
