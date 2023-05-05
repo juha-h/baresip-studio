@@ -257,15 +257,13 @@ static void ua_event_handler(struct ua *ua, enum ua_event ev,
 static void message_handler(struct ua *ua, const struct pl *peer, const struct pl *ctype,
                             struct mbuf *body, void *arg)
 {
-    (void)ctype;
     (void)arg;
+    char ctype_buf[128];
     char peer_buf[256];
     size_t size;
 
-    LOGD("got message '%.*s' from peer '%.*s'", (int)mbuf_get_left(body), mbuf_buf(body),
-         (int)peer->l, peer->p);
     if (snprintf(peer_buf, 256, "%.*s", (int)peer->l, peer->p) >= 256) {
-        LOGE("message peer is too long (max 255 charcaters)\n");
+        LOGE("message peer is too long (max 255 characters)\n");
         return;
     }
 
@@ -277,8 +275,10 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
         return;
     }
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "messageEvent",
-                                             "(JLjava/lang/String;[B)V");
+                                             "(JLjava/lang/String;Ljava/lang/String;[B)V");
     jstring jPeer = (*env)->NewStringUTF(env, peer_buf);
+    pl_strcpy(ctype, ctype_buf, 256);
+    jstring jCtype = (*env)->NewStringUTF(env, ctype_buf);
     jbyteArray jMsg;
     size = mbuf_get_left(body);
     jMsg = (*env)->NewByteArray(env, (jsize)size);
@@ -289,8 +289,9 @@ static void message_handler(struct ua *ua, const struct pl *peer, const struct p
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)jMsg, 0);
     memcpy(temp, mbuf_buf(body), size);
     (*env)->ReleasePrimitiveArrayCritical(env, jMsg, temp, 0);
-    LOGD("sending message %ld/%s/%.*s\n", (long)ua, peer_buf, (int)size, mbuf_buf(body));
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, (jlong)ua, jPeer, jMsg);
+    LOGD("sending message %ld/%s/%s/%.*s\n", (long)ua, peer_buf, ctype_buf, (int)size, mbuf_buf(body));
+    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, (jlong)ua, jPeer, jCtype, jMsg);
+    (*env)->DeleteLocalRef(env, jCtype);
     (*env)->DeleteLocalRef(env, jPeer);
     (*env)->DeleteLocalRef(env, jMsg);
     re_thread_enter();

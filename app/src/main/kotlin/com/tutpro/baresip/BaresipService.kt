@@ -42,6 +42,7 @@ import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import java.io.File
 import java.net.InetAddress
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.concurrent.schedule
@@ -967,24 +968,35 @@ class BaresipService: Service() {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
-    fun messageEvent(uap: Long, peerUri: String, msg: ByteArray) {
-        var text = "Decoding of message failed!"
-        try {
-            text = String(msg, StandardCharsets.UTF_8)
-        } catch (e: Exception) {
-            Log.w(TAG, "UTF-8 decode failed")
-        }
+    fun messageEvent(uap: Long, peerUri: String, cType: String, msg: ByteArray) {
+
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w(TAG, "messageEvent did not find ua $uap")
             return
         }
+
+        val charsetString = Utils.paramValue(cType.replace(" ", ""), "charset")
+        val charset = try {
+            Charset.forName(charsetString)
+        } catch (e: Exception) {
+            StandardCharsets.UTF_8
+        }
+        val text = try {
+            String(msg, charset)
+        } catch (e: Exception) {
+            val error = "Decoding of message failed using charset $charset from $cType!"
+            Log.w(TAG, error)
+            error
+        }
+
         val timeStamp = System.currentTimeMillis()
         val timeStampString = timeStamp.toString()
         Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
         Message(ua.account.aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
         Message.save()
         ua.account.unreadMessages = true
+
         if (!Utils.isVisible()) {
             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val intent = Intent(applicationContext, MainActivity::class.java)
@@ -1033,8 +1045,10 @@ class BaresipService: Service() {
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
             return
         }
+
         if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
             nt.play()
+
         postServiceEvent(ServiceEvent("message show", arrayListOf(uap, peerUri), System.nanoTime()))
     }
 
