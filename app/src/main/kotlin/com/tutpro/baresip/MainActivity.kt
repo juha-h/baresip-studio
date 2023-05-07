@@ -38,9 +38,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
-import java.net.URLDecoder
 import kotlin.system.exitProcess
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -660,7 +658,8 @@ class MainActivity : AppCompatActivity() {
                 if (BaresipService.isServiceRunning)
                     callAction(intent, if (intent?.action == ACTION_CALL) "call" else "dial")
                 else
-                    BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+                    BaresipService.callActionUri = intent.data.toString()
+                            .replace("tel:%2B", "tel:+")
         }
 
         permissions = if (Build.VERSION.SDK_INT >= 33)
@@ -867,7 +866,8 @@ class MainActivity : AppCompatActivity() {
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
-                    val uriStr = uri.toString().filterNot{setOf('-', ' ', '(', ')').contains(it)}
+                    val uriStr = uri.toString().replace("%2B", "+")
+                            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
@@ -962,7 +962,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w(TAG, "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
