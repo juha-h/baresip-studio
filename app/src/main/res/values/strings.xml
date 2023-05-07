@@ -297,6 +297,10 @@
     <string name="battery_optimizations_help">Disable battery optimizations (recommended) if you want
         to reduce likelihood that Android restricts baresip\'s access to network or enters baresip
         to standby state.</string>
+    <string name="default_phone_app">Default Phone App</string>
+    <string name="dialer_role_not_available">Dialer role is not available</string>
+    <string name="default_phone_app_help">If checked, baresip is the default phone app.  Only choose
+        if your device never makes or receives calls or messages from telecom (cellular) network.</string>
     <string name="listen_address">Listen Address</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside

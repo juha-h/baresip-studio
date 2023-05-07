@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
@@ -15,8 +15,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -44,6 +43,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:remove="android:appComponentFactory" >
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -56,6 +56,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+                <action android:name="android.intent.action.CALL" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.DIAL" />
                 <action android:name="android.intent.action.CALL" />
@@ -63,26 +68,29 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tel" />
                 <data android:scheme="sip" />
-                <data android:scheme="sips" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts"
             android:parentActivityName=".MainActivity" >
         </activity>
+
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/account" >
         </activity>
+
         <activity
             android:name=".CodecsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/codecs"
             android:parentActivityName=".AccountActivity" >
         </activity>
+
         <activity
             android:name=".ContactsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -90,59 +98,69 @@
             android:parentActivityName=".MainActivity"
             android:windowSoftInputMode="adjustPan" >
         </activity>
+
         <activity
             android:name=".ContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
             android:parentActivityName=".ContactsActivity" >
         </activity>
+
         <activity
             android:name=".AndroidContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
             android:parentActivityName=".ContactsActivity" >
         </activity>
+
         <activity
             android:name=".ConfigActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/configuration"
             android:parentActivityName=".MainActivity" >
         </activity>
+
         <activity
             android:name=".AudioActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/audio_settings"
             android:parentActivityName=".ConfigActivity" >
         </activity>
+
         <activity
             android:name=".CallsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_history"
             android:parentActivityName=".MainActivity" >
         </activity>
+
         <activity
             android:name=".CallDetailsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_details"
             android:parentActivityName=".CallsActivity" >
         </activity>
+
         <activity
             android:name=".ChatsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chats"
             android:parentActivityName=".MainActivity" >
         </activity>
+
         <activity
             android:name=".ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chat" >
         </activity>
+
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_title"
             android:parentActivityName=".MainActivity" >
         </activity>
+
         <service
             android:name=".BaresipService"
             android:enabled="true"
@@ -150,6 +168,23 @@
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:stopWithTask="false" >
         </service>
+
+        <service
+            android:name=".InCallService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_INCALL_SERVICE" >
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
+                android:value="true" />
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_CAR_MODE_UI"
+                android:value="false" />
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".BootCompletedReceiver"
             android:enabled="true"
@@ -160,11 +195,12 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".TaskReceiver"
             android:enabled="true"
             android:exported="true"
-            tools:ignore="ExportedReceiver">
+            tools:ignore="ExportedReceiver" >
             <intent-filter>
                 <action android:name="com.tutpro.baresip.REGISTER" />
                 <action android:name="com.tutpro.baresip.UNREGISTER" />

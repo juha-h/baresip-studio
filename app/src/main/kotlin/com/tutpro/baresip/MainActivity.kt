@@ -9,6 +9,7 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
+import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
@@ -39,6 +40,7 @@ import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
 import java.net.URLDecoder
 import kotlin.system.exitProcess
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -653,11 +655,14 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-        if (intent?.action == ACTION_CALL || intent?.action == ACTION_DIAL) {
-            if (BaresipService.isServiceRunning)
-                callAction(intent)
-            else
-                BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+        when (intent?.action) {
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
+                if (BaresipService.isServiceRunning)
+                    callAction(intent)
+                else
+                    BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+            else ->
+                Log.d(TAG, "Unknown startup action ${intent?.action}")
         }
 
         permissions = if (Build.VERSION.SDK_INT >= 33)
@@ -824,10 +829,10 @@ class MainActivity : AppCompatActivity() {
         resumeAction = ""
         resumeUri = ""
 
-        Log.d(TAG, "onNewIntent with intent.action '${intent.action}'")
+        Log.d(TAG, "onNewIntent with action/data '${intent.action}/${intent.data}'")
 
         when (intent.action) {
-            ACTION_DIAL, ACTION_CALL -> {
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
                 callAction(intent)
             }
             else -> {
