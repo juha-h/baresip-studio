@@ -656,7 +656,7 @@ class MainActivity : AppCompatActivity() {
         when (intent?.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 if (BaresipService.isServiceRunning)
-                    callAction(intent, if (intent?.action == ACTION_CALL) "call" else "dial")
+                    callAction(intent.data, if (intent?.action == ACTION_CALL) "call" else "dial")
                 else
                     BaresipService.callActionUri = intent.data.toString()
                             .replace("tel:%2B", "tel:+")
@@ -833,7 +833,7 @@ class MainActivity : AppCompatActivity() {
 
         when (intent.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
-                callAction(intent, if (intent.action == ACTION_CALL) "call" else "dial")
+                callAction(intent.data, if (intent.action == ACTION_CALL) "call" else "dial")
             }
             else -> {
                 val action = intent.getStringExtra("action")
@@ -845,10 +845,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callAction(intent: Intent, action: String) {
+    private fun callAction(uri: Uri?, action: String) {
         if (Call.inCall() || BaresipService.uas.size == 0)
             return
-        val uri: Uri? = intent.data
         Log.d(TAG, "Action $action to $uri")
         if (uri != null) {
             when (uri.scheme) {
@@ -1010,27 +1009,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (event == "started") {
-            val callActionUri = params[0] as String
-            Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
+            val uriString = params[0] as String
+            Log.d(TAG, "Handling service event 'started' with URI '$uriString'")
             if (!this::uaAdapter.isInitialized) {
                 // Android has restarted baresip when permission has been denied in app settings
                 recreate()
                 return
             }
             uaAdapter.notifyDataSetChanged()
-            if (callActionUri != "") {
-                var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
-                if (ua == null)
-                    if (BaresipService.uas.size > 0) {
-                        ua = BaresipService.uas[0]
-                    } else {
-                        handleNextEvent("No UAs to make the call to '$callActionUri'")
-                        return
-                    }
-                spinToAor(ua.account.aor)
-                ua.account.resumeUri = callActionUri
-                callUri.setText(callActionUri)
-                callButton.performClick()
+            if (uriString != "") {
+                callAction(uriString.toUri(), "dial")
             } else {
                 if ((aorSpinner.selectedItemPosition == -1) && (BaresipService.uas.size > 0)) {
                     aorSpinner.setSelection(0)
