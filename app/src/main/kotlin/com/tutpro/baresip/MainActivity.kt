@@ -658,11 +658,9 @@ class MainActivity : AppCompatActivity() {
         when (intent?.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 if (BaresipService.isServiceRunning)
-                    callAction(intent)
+                    callAction(intent, if (intent?.action == ACTION_CALL) "call" else "dial")
                 else
                     BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
-            else ->
-                Log.d(TAG, "Unknown startup action ${intent?.action}")
         }
 
         permissions = if (Build.VERSION.SDK_INT >= 33)
@@ -761,6 +759,9 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
+            "dial" -> {
+                callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
+            }
             "call transfer", "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                     arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
@@ -833,7 +834,7 @@ class MainActivity : AppCompatActivity() {
 
         when (intent.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
-                callAction(intent)
+                callAction(intent, if (intent.action == ACTION_CALL) "call" else "dial")
             }
             else -> {
                 val action = intent.getStringExtra("action")
@@ -845,15 +846,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callAction(intent: Intent) {
+    private fun callAction(intent: Intent, action: String) {
         if (Call.inCall() || BaresipService.uas.size == 0)
             return
         val uri: Uri? = intent.data
-        Log.d(TAG, "callAction to $uri")
+        Log.d(TAG, "Action $action to $uri")
         if (uri != null) {
             when (uri.scheme) {
                 "sip" -> {
-                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                    val uriStr = uri.toString()
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
                     if (ua == null && BaresipService.uas.size > 0)
                         ua = BaresipService.uas[0]
@@ -862,12 +863,11 @@ class MainActivity : AppCompatActivity() {
                         return
                     }
                     spinToAor(ua.account.aor)
-                    resumeAction = "call"
+                    resumeAction = action
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
-                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
-                            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
+                    val uriStr = uri.toString().filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
@@ -879,7 +879,7 @@ class MainActivity : AppCompatActivity() {
                         return
                     }
                     spinToAor(account.aor)
-                    resumeAction = "call"
+                    resumeAction = action
                     account.resumeUri = uriStr
                 }
                 else -> {
@@ -902,7 +902,7 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.no_network))
                 return
             }
-            "call" -> {
+            "call", "dial" -> {
                 if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
