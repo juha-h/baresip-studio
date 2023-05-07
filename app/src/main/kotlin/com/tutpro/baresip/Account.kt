@@ -142,8 +142,7 @@ class Account(val accp: Long) {
         if (!callHistory)
             extra += ";call_history=no"
 
-        if (telProvider != "")
-            extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
+        extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
         if (countryCode != "")
             extra += ";country_code=$countryCode"
