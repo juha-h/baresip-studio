@@ -9,6 +9,7 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
+import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
@@ -37,7 +38,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
-import java.net.URLDecoder
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -653,11 +653,13 @@ class MainActivity : AppCompatActivity() {
 
         atStartup = intent.hasExtra("onStartup")
 
-        if (intent?.action == ACTION_CALL || intent?.action == ACTION_DIAL) {
-            if (BaresipService.isServiceRunning)
-                callAction(intent)
-            else
-                BaresipService.callActionUri = URLDecoder.decode(intent.data.toString(), "UTF-8")
+        when (intent?.action) {
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
+                if (BaresipService.isServiceRunning)
+                    callAction(intent.data, if (intent?.action == ACTION_CALL) "call" else "dial")
+                else
+                    BaresipService.callActionUri = intent.data.toString()
+                            .replace("tel:%2B", "tel:+")
         }
 
         permissions = if (Build.VERSION.SDK_INT >= 33)
@@ -756,6 +758,9 @@ class MainActivity : AppCompatActivity() {
                 callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
                 callButton.performClick()
             }
+            "dial" -> {
+                callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
+            }
             "call transfer", "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
                     arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
@@ -824,11 +829,11 @@ class MainActivity : AppCompatActivity() {
         resumeAction = ""
         resumeUri = ""
 
-        Log.d(TAG, "onNewIntent with intent.action '${intent.action}'")
+        Log.d(TAG, "onNewIntent with action/data '${intent.action}/${intent.data}'")
 
         when (intent.action) {
-            ACTION_DIAL, ACTION_CALL -> {
-                callAction(intent)
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
+                callAction(intent.data, if (intent.action == ACTION_CALL) "call" else "dial")
             }
             else -> {
                 val action = intent.getStringExtra("action")
@@ -840,15 +845,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callAction(intent: Intent) {
+    private fun callAction(uri: Uri?, action: String) {
         if (Call.inCall() || BaresipService.uas.size == 0)
             return
-        val uri: Uri? = intent.data
-        Log.d(TAG, "callAction to $uri")
+        Log.d(TAG, "Action $action to $uri")
         if (uri != null) {
             when (uri.scheme) {
                 "sip" -> {
-                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                    val uriStr = uri.toString()
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
                     if (ua == null && BaresipService.uas.size > 0)
                         ua = BaresipService.uas[0]
@@ -857,11 +861,11 @@ class MainActivity : AppCompatActivity() {
                         return
                     }
                     spinToAor(ua.account.aor)
-                    resumeAction = "call"
+                    resumeAction = action
                     ua.account.resumeUri = uriStr
                 }
                 "tel" -> {
-                    val uriStr = URLDecoder.decode(uri.toString(), "UTF-8")
+                    val uriStr = uri.toString().replace("%2B", "+")
                             .filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
@@ -874,7 +878,7 @@ class MainActivity : AppCompatActivity() {
                         return
                     }
                     spinToAor(account.aor)
-                    resumeAction = "call"
+                    resumeAction = action
                     account.resumeUri = uriStr
                 }
                 else -> {
@@ -897,7 +901,7 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.no_network))
                 return
             }
-            "call" -> {
+            "call", "dial" -> {
                 if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
                             Toast.LENGTH_SHORT).show()
@@ -957,7 +961,7 @@ class MainActivity : AppCompatActivity() {
                 val uap = intent.getLongExtra("uap", 0L)
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null) {
-                    Log.w(TAG, "onNewIntent did not find ua $uap")
+                    Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
                 if (ua.account.aor != aorSpinner.tag)
@@ -1005,27 +1009,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (event == "started") {
-            val callActionUri = params[0] as String
-            Log.d(TAG, "Handling service event 'started' with '$callActionUri'")
+            val uriString = params[0] as String
+            Log.d(TAG, "Handling service event 'started' with URI '$uriString'")
             if (!this::uaAdapter.isInitialized) {
                 // Android has restarted baresip when permission has been denied in app settings
                 recreate()
                 return
             }
             uaAdapter.notifyDataSetChanged()
-            if (callActionUri != "") {
-                var ua = UserAgent.ofDomain(Utils.uriHostPart(callActionUri))
-                if (ua == null)
-                    if (BaresipService.uas.size > 0) {
-                        ua = BaresipService.uas[0]
-                    } else {
-                        handleNextEvent("No UAs to make the call to '$callActionUri'")
-                        return
-                    }
-                spinToAor(ua.account.aor)
-                ua.account.resumeUri = callActionUri
-                callUri.setText(callActionUri)
-                callButton.performClick()
+            if (uriString != "") {
+                callAction(uriString.toUri(), "dial")
             } else {
                 if ((aorSpinner.selectedItemPosition == -1) && (BaresipService.uas.size > 0)) {
                     aorSpinner.setSelection(0)

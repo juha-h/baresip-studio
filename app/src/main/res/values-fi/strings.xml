@@ -310,6 +310,10 @@
     <string name="battery_optimizations_help">Ota akun käytön optimointi pois päältä (suositeltu),
         jos haluat vähentää todennäköisyyttä, että Android rajoittaa baresip-sovelluksen toimintaa
         ja pääsyä verkkoon.</string>
+    <string name="default_phone_app">Oletuspuhelinsovellus</string>
+    <string name="dialer_role_not_available">Puhelinrooli ei ole saatavana</string>
+    <string name="default_phone_app_help">Jos merkity, baresip on oletuspuhelinsovellus.  Älä
+        merkitse, jos laitteesi täytyy hallita myös muita kuin SIP-puheluita tai -viestejä.</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
     \'osoite:portti\', missä baresip kuuntelee sisään tulevia
