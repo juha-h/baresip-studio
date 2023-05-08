@@ -207,6 +207,7 @@
                 <action android:name="com.tutpro.baresip.QUIT" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
