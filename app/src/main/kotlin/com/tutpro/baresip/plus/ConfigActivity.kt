@@ -2,6 +2,7 @@ package com.tutpro.baresip.plus
 
 import android.Manifest
 import android.app.Activity
+import android.app.role.RoleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.transition.Visibility
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
@@ -36,7 +38,6 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var layout: ScrollView
     private lateinit var baresipService: Intent
     private lateinit var autoStart: CheckBox
-    private lateinit var batteryOptimizations: CheckBox
     private lateinit var listenAddr: EditText
     private lateinit var netAfSpinner: Spinner
     private lateinit var netAf: String
@@ -49,6 +50,8 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var contactsSpinner: Spinner
     private lateinit var contactsMode: String
     private lateinit var contactsModeKeys: ArrayList<String>
+    private lateinit var batteryOptimizations: CheckBox
+    private lateinit var defaultDialer: CheckBox
     private lateinit var debug: CheckBox
     private lateinit var sipTrace: CheckBox
     private lateinit var reset: CheckBox
@@ -77,6 +80,7 @@ class ConfigActivity : AppCompatActivity() {
             goBack()
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -110,6 +114,37 @@ class ConfigActivity : AppCompatActivity() {
             } catch (e: ActivityNotFoundException) {
                 Log.e(TAG, "ActivityNotFound exception: $e")
             }
+        }
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+            defaultDialer = binding.DefaultPhoneApp
+            defaultDialer.isChecked = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            val dialerRoleRequest = registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+            ) {
+                Log.d(TAG, "dialerRoleRequest succeeded: ${it.resultCode == Activity.RESULT_OK}")
+                defaultDialer.isChecked = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            }
+            defaultDialer.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER))
+                        Utils.alertView(this, getString(R.string.notice),
+                                getString(R.string.dialer_role_not_available))
+                    else
+                        if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
+                            dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
+                } else {
+                    try {
+                        dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                    } catch (e: ActivityNotFoundException) {
+                        Log.e(TAG, "ActivityNotFound exception: $e")
+
+                    }
+                }
+            }
+        } else {
+            binding.PhoneApp.visibility = View.GONE
         }
 
         listenAddr = binding.ListenAddress
@@ -671,10 +706,6 @@ class ConfigActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.start_automatically),
                     getString(R.string.start_automatically_help))
         }
-        binding.BatteryOptimizationsTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.battery_optimizations),
-                getString(R.string.battery_optimizations_help))
-        }
         binding.ListenAddressTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.listen_address),
                     getString(R.string.listen_address_help))
@@ -713,6 +744,14 @@ class ConfigActivity : AppCompatActivity() {
         binding.ContactsTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.contacts),
                     getString(R.string.contacts_help))
+        }
+        binding.BatteryOptimizationsTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.battery_optimizations),
+                    getString(R.string.battery_optimizations_help))
+        }
+        binding.DefaultPhoneAppTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.default_phone_app),
+                    getString(R.string.default_phone_app_help))
         }
         binding.DebugTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
