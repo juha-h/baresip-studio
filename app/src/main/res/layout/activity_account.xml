@@ -202,7 +202,7 @@
             android:id="@+id/MediaEncTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="16dp"
             android:textSize="18sp"
             android:text="@string/media_encryption" >
         </TextView>
