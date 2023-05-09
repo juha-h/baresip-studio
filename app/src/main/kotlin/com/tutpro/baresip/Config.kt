@@ -91,17 +91,16 @@ object Config {
             }
         }
 
-        if (!config.contains("audio_buffer_mode")) {
+        if (!config.contains("audio_buffer_mode"))
             config = "${config}audio_buffer_mode adaptive\n"
-            config = "${config}audio_buffer 40-200\n"
-        }
 
-        if (!config.contains("jitter_buffer_type")) {
+        removeVariable("audio_buffer")  // use default 20-160
+
+        if (!config.contains("jitter_buffer_type"))
             config = "${config}jitter_buffer_type adaptive\n"
-        } else {
-            removeVariable("jitter_buffer_wish")
-        }
-        
+
+        removeVariable("jitter_buffer_delay")  // use default 5-10
+
         if (config.contains("contacts_mode")) {
             BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
             if (BaresipService.contactsMode != "baresip" &&
