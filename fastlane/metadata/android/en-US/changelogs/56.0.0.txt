@@ -1,5 +1,4 @@
-- Allow selecting baresip as the default Phone app (do not select if
-also using telephony services)
+- Allow selecting baresip as the default Phone app (do not select if also using telephony services)
 - Support both CALL and DIAL actions from other apps
 - Fixed bug in setting account's Telephony Provider
 - In messages, support also other character sets than UTF-8
