@@ -350,4 +350,7 @@
     <string name="audio_delay_help">Tiempo (en milisegundos) para esperar el audio del destinatario cuando se establece la llamada. Ajústalo a un valor más alto si pierdes el audio del destinatario al principio de la llamada.</string>
     <string name="invalid_audio_delay">Retardo de audio no válido \'%1$s\'. Los valores válidos van de 100 a 3000.</string>
     <string name="call_auto_rejected">Llamada rechazada automáticamente de %1$s</string>
+    <string name="default_phone_app">Aplicación de teléfono predeterminada</string>
+    <string name="dialer_role_not_available">La función de teléfono no está disponible</string>
+    <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada. No marqués si tu dispositivo también necesita administrar llamadas o mensajes que no sean SIP.</string>
 </resources>
