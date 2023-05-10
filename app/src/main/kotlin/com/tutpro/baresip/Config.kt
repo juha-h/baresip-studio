@@ -94,12 +94,12 @@ object Config {
         if (!config.contains("audio_buffer_mode"))
             config = "${config}audio_buffer_mode adaptive\n"
 
-        removeVariable("audio_buffer")  // use default 20-160
+        replaceVariable("audio_buffer", "20-300")
 
         if (!config.contains("jitter_buffer_type"))
             config = "${config}jitter_buffer_type adaptive\n"
 
-        removeVariable("jitter_buffer_delay")  // use default 5-10
+        replaceVariable("jitter_buffer_delay", "0-20")
 
         if (config.contains("contacts_mode")) {
             BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
