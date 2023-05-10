@@ -446,7 +446,9 @@ object Utils {
                 }
             }
         } catch (ex: SocketException) {
-            Log.e(TAG, ex.toString())
+            Log.e(TAG, "hotSpotAddresses SocketException: $ex")
+        } catch (ex: NullPointerException) {
+            Log.e(TAG, "hotSpotAddresses NullPointerException: $ex")
         }
         return result
     }
