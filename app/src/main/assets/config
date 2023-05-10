@@ -9,6 +9,7 @@ audio_player opensles,nil
 audio_source opensles,nil
 audio_alert opensles,nil
 audio_level no
+audio_buffer 20-300
 audio_buffer_mode adaptive
 ausrc_format s16
 auenc_format s16
@@ -20,6 +21,7 @@ video_fps 15.0
 videoenc_format yuv420p
 rtp_tos 184
 jitter_buffer_type adaptive
+jitter_buffer_delay 0-20
 rtp_stats yes
 dyn_dns yes
 module opus.so
