@@ -384,8 +384,6 @@ class MainActivity : AppCompatActivity() {
                 val callp = call.callp
                 Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.text}")
                 hangupButton.isEnabled = false
-                if (call.status == "answered")
-                    call.rejected = true
                 Api.ua_hangup(ua.uap, callp, 0, "")
             }
         }
@@ -1907,7 +1905,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                val latestPeerUri = CallHistory.aorLatestPeerUri(aor)
+                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(aor)
                 if (latestPeerUri != null)
                     callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }

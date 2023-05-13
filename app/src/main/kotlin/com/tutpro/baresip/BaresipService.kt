@@ -409,17 +409,18 @@ class BaresipService: Service() {
                 }
                 Contact.contactsUpdate()
 
-                val history = NewCallHistory.get()
+                val history = CallHistory.get()
                 if (history.isEmpty()) {
-                    CallHistory.restore()
+                    CallHistoryNew.restore()
                 } else {
                     for (old in history) {
-                        val new = CallHistory(old.aor, old.peerUri, old.direction)
+                        val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
                         new.stopTime = old.stopTime
                         new.startTime = old.startTime
+                        new.recording = old.recording
                         callHistory.add(new)
                     }
-                    CallHistory.save()
+                    CallHistoryNew.save()
                 }
 
                 Message.restore()
@@ -699,8 +700,8 @@ class BaresipService: Service() {
                             toast(toastMsg)
                             playUnInterrupted(R.raw.callwaiting, 1)
                             if (ua.account.callHistory) {
-                                CallHistory.add(CallHistory(aor, peerUri, "in"))
-                                CallHistory.save()
+                                CallHistoryNew.add(CallHistoryNew(aor, peerUri, "in"))
+                                CallHistoryNew.save()
                                 ua.account.missedCalls = true
                             }
                             return
@@ -881,22 +882,30 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
-                            if (ev[2] == "busy") {
+                            val reason = ev[1]
+                            val tone = ev[2]
+                            if (tone == "busy") {
                                 playBusy()
                             } else if (!Call.inCall()) {
                                 resetCallVolume()
                                 abandonAudioFocus(applicationContext)
                                 proximitySensing(false)
                             }
-                            val missed = call.startTime == null && call.dir == "in" && !call.rejected
+                            if (call.dir == "out")
+                                call.rejected = call.startTime == null &&
+                                        !reason.startsWith("408") &&
+                                        !reason.startsWith("480") &&
+                                        !reason.startsWith("Connection reset by")
+                            val missed = call.dir == "in" && call.startTime == null && !call.rejected
                             if (ua.account.callHistory) {
-                                val history = CallHistory(aor, call.peerUri, call.dir)
+                                val history = CallHistoryNew(aor, call.peerUri, call.dir)
                                 history.startTime = call.startTime
                                 history.stopTime = GregorianCalendar()
+                                history.rejected = call.rejected
                                 if (call.startTime != null && call.dumpfiles[0] != "")
                                     history.recording = call.dumpfiles
-                                CallHistory.add(history)
-                                CallHistory.save()
+                                CallHistoryNew.add(history)
+                                CallHistoryNew.save()
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {
@@ -1495,7 +1504,7 @@ class BaresipService: Service() {
 
         val uas = ArrayList<UserAgent>()
         val calls = ArrayList<Call>()
-        var callHistory = ArrayList<CallHistory>()
+        var callHistory = ArrayList<CallHistoryNew>()
         var messages = ArrayList<Message>()
         val messageUpdate = MutableLiveData<Long>()
         val contactUpdate = MutableLiveData<Long>()
