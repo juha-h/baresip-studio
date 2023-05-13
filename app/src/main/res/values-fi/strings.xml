@@ -12,21 +12,17 @@
             <ul>
                 <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja
-                    <a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration> Wiki</a>-sivulta.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li> <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
-                <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
-                <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu puhepostin SIP URI),
-                    yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa näppäimistön tyylin vaihtamisen.</li>
                 <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.</li>
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
                 <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
+                <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tietosuoja</h2>
                 Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.
@@ -52,8 +48,6 @@
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Uusi tili voidaan myös konfiguida osittain automaattisesti. Katso lisätietoja
-                    <a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration> Wiki</a>-sivulta.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
@@ -61,13 +55,11 @@
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
-                <li>Näytön yläosassa olevan ikonin kosketuksella voit kytkeä kaiuttimen päälle/pois.</li>
-                <li>Näytön alaosasssa olevien ikonien kosketus johtaa puhepostiin (jos tilille on konfiguroitu puhepostin SIP URI),
-                    yhteystietoihin, viesteihin ja puheluhistoriaan sekä mahdollistaa näppäimistön tyylin vaihtamisen.</li>
                 <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.</li>
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
                 <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
+                <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tunnetut ongelmat</h2>
             <ul>
