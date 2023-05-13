@@ -120,7 +120,7 @@ class CallsActivity : AppCompatActivity() {
 
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeUaHistoryAt(pos)
-                        CallHistory.save()
+                        CallHistoryNew.save()
                         clAdapter.notifyDataSetChanged()
                     }
 
@@ -189,8 +189,8 @@ class CallsActivity : AppCompatActivity() {
                     setMessage(String.format(getString(R.string.delete_history_alert),
                             aor.substringAfter(":")))
                     setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        CallHistory.clear(aor)
-                        CallHistory.save()
+                        CallHistoryNew.clear(aor)
+                        CallHistoryNew.save()
                         aorGenerateHistory(aor)
                         clAdapter.notifyDataSetChanged()
                         dialog.dismiss()
@@ -254,21 +254,30 @@ class CallsActivity : AppCompatActivity() {
         for (i in BaresipService.callHistory.indices.reversed()) {
             val h = BaresipService.callHistory[i]
             if (h.aor == aor) {
-                val direction: Int = if (h.direction == "in")
-                    if (h.startTime != null)
+                val direction: Int = if (h.direction == "in") {
+                    if (h.startTime != null) {
                         R.drawable.call_down_green
-                    else
-                        R.drawable.call_down_red
-                else
-                    if (h.startTime != null)
+                    } else {
+                        if (h.rejected)
+                            R.drawable.call_down_red
+                        else
+                            R.drawable.call_missed_in
+                    }
+                } else {
+                    if (h.startTime != null) {
                         R.drawable.call_up_green
-                    else
-                        R.drawable.call_up_red
+                    } else {
+                        if (h.rejected)
+                            R.drawable.call_up_red
+                        else
+                            R.drawable.call_missed_out
+                    }
+                }
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
-                    uaHistory.last().details.add(CallRow.Details(direction, h.startTime,
-                        h.stopTime, h.recording))
+                    uaHistory.last().details.add(CallRow.Details(direction, h.rejected,
+                            h.startTime, h.stopTime, h.recording))
                 else
-                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.startTime,
+                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.rejected, h.startTime,
                         h.stopTime, h.recording))
             }
         }
@@ -277,12 +286,12 @@ class CallsActivity : AppCompatActivity() {
     private fun removeUaHistoryAt(i: Int) {
         for (details in uaHistory[i].details) {
             if (details.recording[0] != "")
-                CallHistory.deleteRecording(details.recording)
+                CallHistoryNew.deleteRecording(details.recording)
             BaresipService.callHistory.removeAll {
                 it.startTime == details.startTime && it.stopTime == details.stopTime
             }
         }
-        CallHistory.deleteRecording(uaHistory[i].recording)
+        CallHistoryNew.deleteRecording(uaHistory[i].recording)
         uaHistory.removeAt(i)
     }
 
