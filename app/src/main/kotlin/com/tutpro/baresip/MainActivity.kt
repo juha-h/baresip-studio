@@ -1907,7 +1907,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                val latestPeerUri = CallHistory.aorLatestPeerUri(aor)
+                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(aor)
                 if (latestPeerUri != null)
                     callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
             }
