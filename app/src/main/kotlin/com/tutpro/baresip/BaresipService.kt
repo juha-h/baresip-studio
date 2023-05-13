@@ -895,7 +895,7 @@ class BaresipService: Service() {
                                 call.rejected = call.startTime == null &&
                                         !reason.startsWith("408") &&
                                         !reason.startsWith("480") &&
-                                        !reason.startsWith("Connection reset by peer")
+                                        !reason.startsWith("Connection reset by")
                             val missed = call.dir == "in" && call.startTime == null && !call.rejected
                             if (ua.account.callHistory) {
                                 val history = CallHistoryNew(aor, call.peerUri, call.dir)
