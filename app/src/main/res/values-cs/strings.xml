@@ -316,4 +316,7 @@
     <string name="audio_delay_help">Doba (v milisekundách), po kterou se čeká na zvuk od volaného při navázání hovoru. Nastavte vyšší hodnotu, pokud na začátku hovoru zvuk volaného neslyšíte.</string>
     <string name="audio_delay">Zpoždění zvuku</string>
     <string name="call_auto_rejected">Automaticky odmítat volání od %1$s</string>
+    <string name="default_phone_app">Výchozí aplikace telefonu</string>
+    <string name="dialer_role_not_available">Role číselníku není k dispozici</string>
+    <string name="default_phone_app_help">Pokud je zaškrtnuto, je výchozí aplikací telefonu baresip. Nezaškrtávejte, pokud vaše zařízení může potřebovat zpracovávat i jiné než SIP hovory nebo zprávy.</string>
 </resources>
