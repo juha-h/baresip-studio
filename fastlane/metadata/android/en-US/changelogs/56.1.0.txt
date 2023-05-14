@@ -1,0 +1,5 @@
+- In call history, Show missed (not rejected) calls using yellow up/down arrows
+- Use audio_buffer size 20-300 (ms) and jitter_buffer delay 0-20 (frames)
+- Avoid potential getNetworkInterfaces() related crash
+- Simplified About text and added "more information" link to Wiki
+- New Spanish, Portuguese (Brazil), and Czech translations
