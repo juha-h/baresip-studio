@@ -451,9 +451,14 @@ class MainActivity : AppCompatActivity() {
             if (call != null) {
                 val stats = call.stats("audio")
                 if (stats != "") {
-                    val parts = stats.split(",")
-                val codecs = call.audioCodecs()
-                val duration = call.duration()
+                    val parts = stats.split(",") as java.util.ArrayList
+                    if (parts[2] == "0/0") {
+                        parts[2] = "?/?"
+                        parts[3] = "?/?"
+                        parts[4] = "?/?"
+                    }
+                    val codecs = call.audioCodecs()
+                    val duration = call.duration()
                     val txCodec = codecs.split(',')[0].split("/")
                     val rxCodec = codecs.split(',')[1].split("/")
                     Utils.alertView(this, getString(R.string.call_info),
@@ -462,9 +467,9 @@ class MainActivity : AppCompatActivity() {
                                     "${rxCodec[0]} ch ${rxCodec[2]}\n" +
                                     "${String.format(getString(R.string.rate), parts[0])}\n" +
                                     "${String.format(getString(R.string.average_rate), parts[1])}\n" +
-                                    "${String.format(getString(R.string.jitter), parts[4])}\n" +
                                     "${getString(R.string.packets)}: ${parts[2]}\n" +
-                                    "${getString(R.string.lost)}: ${parts[3]}")
+                                    "${getString(R.string.lost)}: ${parts[3]}\n" +
+                                    String.format(getString(R.string.jitter), parts[4]))
                 } else {
                     Utils.alertView(this, getString(R.string.call_info),
                             getString(R.string.call_info_not_available))
