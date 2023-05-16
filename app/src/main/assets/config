@@ -20,8 +20,10 @@ video_size 800x600
 video_fps 15.0
 videoenc_format yuv420p
 rtp_tos 184
-jitter_buffer_type adaptive
-jitter_buffer_delay 0-20
+audio_jitter_buffer_type adaptive
+audio_jitter_buffer_delay 0-20
+video_jitter_buffer_type adaptive
+video_jitter_buffer_delay 0-50
 rtp_stats yes
 dyn_dns yes
 module opus.so

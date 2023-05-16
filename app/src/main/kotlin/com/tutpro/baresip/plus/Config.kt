@@ -91,10 +91,17 @@ object Config {
 
         replaceVariable("audio_buffer", "20-300")
 
-        if (!config.contains("jitter_buffer_type"))
-            config = "${config}jitter_buffer_type adaptive\n"
+        removeVariable("jitter_buffer_type")
+        if (!config.contains("audio_jitter_buffer_type"))
+            config = "${config}audio_jitter_buffer_type adaptive\n"
+        if (!config.contains("video_jitter_buffer_type"))
+            config = "${config}video_jitter_buffer_type adaptive\n"
 
-        replaceVariable("jitter_buffer_delay", "0-20")
+        removeVariable("jitter_buffer_delay")
+        if (!config.contains("audio_jitter_buffer_delay"))
+            config = "${config}audio_jitter_buffer_delay 0-20\n"
+        if (!config.contains("video_jitter_buffer_delay"))
+            config = "${config}video_jitter_buffer_delay 0-50\n"
 
         removeLine("avcodec")
 
