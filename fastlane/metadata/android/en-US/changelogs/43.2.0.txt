@@ -1,0 +1,4 @@
+- Added separate jitter buffer delays for audio and video
+- In call info, show packets, lost, and jitter as ?/? if info is not available
+- Upstream fix that now allows escaped characters in account's <user> part
+- New Czech translations
