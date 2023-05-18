@@ -108,6 +108,9 @@ object Config {
         if (!config.contains("video_jitter_buffer_delay"))
             config = "${config}video_jitter_buffer_delay 0-50\n"
 
+        if (!config.contains("rtp_timeout"))
+            config = "${config}rtp_timeout 60\n"
+
         if (config.contains("contacts_mode")) {
             BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
             if (BaresipService.contactsMode != "baresip" &&
