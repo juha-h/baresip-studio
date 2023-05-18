@@ -33,26 +33,6 @@ object Config {
             config = "${config}ausrc_format s16\nauplay_format s16\nauenc_format s16\naudec_format s16\nmodule webrtc_aecm.so\n"
         }
 
-        if (!config.contains("opus_application")) {
-            config = "${config}opus_application voip\n"
-        }
-
-        if (!config.contains("opus_samplerate")) {
-            config = "${config}opus_samplerate 16000\n"
-            val accountsPath = BaresipService.filesPath + "/accounts"
-            var accounts = String(Utils.getFileContents(accountsPath)!!, StandardCharsets.ISO_8859_1)
-            accounts = accounts.replace("opus/48000/1", "opus/16000/1")
-            Utils.putFileContents(accountsPath, accounts.toByteArray())
-        }
-
-        if (!config.contains("opus_stereo")) {
-            config = "${config}opus_stereo no\n"
-        }
-
-        if (!config.contains("opus_sprop_stereo")) {
-            config = "${config}opus_sprop_stereo no\n"
-        }
-
         if (!config.contains("log_level")) {
             config = "${config}log_level 2\n"
             Log.logLevel = Log.LogLevel.WARN
