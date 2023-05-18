@@ -103,8 +103,6 @@ object Config {
         if (!config.contains("video_jitter_buffer_delay"))
             config = "${config}video_jitter_buffer_delay 0-50\n"
 
-        removeLine("avcodec")
-
         if (!config.contains("rtp_timeout"))
             config = "${config}rtp_timeout 60\n"
 
