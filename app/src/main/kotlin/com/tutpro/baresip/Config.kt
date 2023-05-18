@@ -13,11 +13,8 @@ object Config {
     fun initialize(ctx: Context) {
 
         config = config.replace("module_tmp uuid.so", "module uuid.so")
-
         config = config.replace("module_tmp account.so", "module_app account.so")
-
         config = config.replace("webrtc_aec.so", "webrtc_aecm.so")
-
         config = config.replace("module zrtp.so", "module gzrtp.so")
 
         removeLine("module_app contact.so")
@@ -77,16 +74,13 @@ object Config {
         replaceVariable("audio_buffer", "20-300")
 
         removeVariable("jitter_buffer_type")
-        if (!config.contains("audio_jitter_buffer_type"))
-            config = "${config}audio_jitter_buffer_type adaptive\n"
-        if (!config.contains("video_jitter_buffer_type"))
-            config = "${config}video_jitter_buffer_type adaptive\n"
-
         removeVariable("jitter_buffer_delay")
-        if (!config.contains("audio_jitter_buffer_delay"))
-            config = "${config}audio_jitter_buffer_delay 0-20\n"
-        if (!config.contains("video_jitter_buffer_delay"))
-            config = "${config}video_jitter_buffer_delay 0-50\n"
+
+        replaceVariable("audio_jitter_buffer_type", "adaptive")
+        replaceVariable("audio_jitter_buffer_delay", "5-20")
+
+        replaceVariable("video_jitter_buffer_type", "adaptive")
+        replaceVariable("video_jitter_buffer_delay", "5-50")
 
         if (!config.contains("rtp_timeout"))
             config = "${config}rtp_timeout 60\n"
