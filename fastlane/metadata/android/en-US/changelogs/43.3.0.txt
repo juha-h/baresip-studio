@@ -1,0 +1,3 @@
+- Fixed jitter buffer settings that prevented hearing of incoming audio
+- Terminate call if no media has been received within 60 seconds
+- New Spanish translations
