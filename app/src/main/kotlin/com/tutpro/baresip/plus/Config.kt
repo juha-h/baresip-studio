@@ -106,8 +106,6 @@ object Config {
         if (!config.contains("rtp_timeout"))
             config = "${config}rtp_timeout 60\n"
 
-        removeVariable("prefer_android_contacts")
-
         if (config.contains("contacts_mode")) {
             BaresipService.contactsMode = variable("contacts_mode")[0].lowercase()
             if (BaresipService.contactsMode != "baresip" &&
