@@ -5,14 +5,15 @@
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 
-struct vidisp_st {
+struct vidisp_st
+{
     const struct vidisp *vd;
     struct vidframe *vf;
 
     GLuint texture_id;
     GLfloat vertices[4 * 3];
 
-    ANativeWindow* window;
+    ANativeWindow *window;
 
     EGLDisplay display;
     EGLSurface surface;
@@ -26,7 +27,7 @@ extern struct vidisp *vid;
 extern int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidisp_prm *prm,
         const char *dev, vidisp_resize_h *resizeh, void *arg);
 
-extern int opengles_display(struct vidisp_st *st, const char *title, const struct vidframe *frame,
-                     uint64_t timestamp);
+extern int opengles_display(
+        struct vidisp_st *st, const char *title, const struct vidframe *frame, uint64_t timestamp);
 
 #endif //BARESIP_VIDISP_H

@@ -8,7 +8,8 @@
 #include "logger.h"
 #include "vidisp.h"
 
-const char *egl_error(EGLint const err) {
+const char *egl_error(EGLint const err)
+{
     switch (err) {
         case EGL_FALSE:
             return "EGL_FALSE";
@@ -44,7 +45,8 @@ struct vidisp *vid;
 
 struct vidisp_st *gst = NULL;
 
-static void renderer_destroy(struct vidisp_st *st) {
+static void renderer_destroy(struct vidisp_st *st)
+{
 
     LOGD("At renderer_destroy() on thread %li\n", (long)pthread_self());
 
@@ -75,13 +77,8 @@ static void destructor(void *arg)
 
 static int context_initialize(struct vidisp_st *st)
 {
-    const EGLint attribs[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-            EGL_BLUE_SIZE, 8,
-            EGL_GREEN_SIZE, 8,
-            EGL_RED_SIZE, 8,
-            EGL_NONE
-    };
+    const EGLint attribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8,
+            EGL_RED_SIZE, 8, EGL_NONE};
 
     EGLDisplay display;
     EGLConfig config;
@@ -137,8 +134,8 @@ static int context_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
-    if (!eglQuerySurface(display, surface, EGL_WIDTH, &st->width) ||
-        !eglQuerySurface(display, surface, EGL_HEIGHT, &st->height)) {
+    if (!eglQuerySurface(display, surface, EGL_WIDTH, &st->width)
+            || !eglQuerySurface(display, surface, EGL_HEIGHT, &st->height)) {
         LOGW("eglQuerySurface() returned error %d\n", eglGetError());
         renderer_destroy(st);
         return eglGetError();
@@ -210,8 +207,8 @@ static int texture_init(struct vidisp_st *st)
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
     glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, st->vf->size.w, st->vf->size.h, 0,
-                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, st->vf->data[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, st->vf->size.w, st->vf->size.h, 0, GL_RGB,
+            GL_UNSIGNED_SHORT_5_6_5, st->vf->data[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -223,12 +220,7 @@ static int texture_init(struct vidisp_st *st)
 
 static void texture_render(struct vidisp_st *st)
 {
-    static const GLfloat coords[4 * 2] = {
-            0.0, 1.0,
-            1.0, 1.0,
-            0.0, 0.0,
-            1.0, 0.0
-    };
+    static const GLfloat coords[4 * 2] = {0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0};
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
 
@@ -282,8 +274,7 @@ static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
     if (x < 0) {
         vp->x = 0;
         ortho->x = -x;
-    }
-    else {
+    } else {
         vp->x = x;
         ortho->x = 0;
     }
@@ -291,8 +282,7 @@ static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
     if (y < 0) {
         vp->y = 0;
         ortho->y = -y;
-    }
-    else {
+    } else {
         vp->y = y;
         ortho->y = 0;
     }
@@ -350,7 +340,7 @@ static int opengles_render(struct vidisp_st *st)
 
         setup_layout(&ortho, &vp);
 
-       // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
+        // LOGD("glViewport x/y/w/h = %d/%d/%d/%d\n", vp.x, vp.y, vp.w, vp.h);
         glViewport(vp.x, vp.y, vp.w, vp.h);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -370,7 +360,8 @@ static int opengles_render(struct vidisp_st *st)
 
     } else
 
-        if (resize) window_resize();
+            if (resize)
+        window_resize();
 
     texture_render(st);
 
@@ -386,8 +377,8 @@ static int opengles_render(struct vidisp_st *st)
     return 0;
 }
 
-int opengles_display(struct vidisp_st *st, const char *title, const struct vidframe *frame,
-        uint64_t timestamp)
+int opengles_display(
+        struct vidisp_st *st, const char *title, const struct vidframe *frame, uint64_t timestamp)
 {
     (void)title;
     (void)timestamp;
@@ -428,28 +419,29 @@ int opengles_display(struct vidisp_st *st, const char *title, const struct vidfr
     return err;
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_VideoView_on_1start(JNIEnv *env, jclass thiz) {
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1start(JNIEnv *env, jclass thiz)
+{
     LOGI("VideoView on_start");
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_VideoView_on_1resume(JNIEnv *env, jclass thiz) {
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1resume(JNIEnv *env, jclass thiz)
+{
     LOGI("VideoView on_resume");
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_VideoView_on_1pause(JNIEnv *env, jclass thiz) {
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1pause(JNIEnv *env, jclass thiz)
+{
     LOGI("VideoView on_pause");
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_VideoView_on_1stop(JNIEnv *env, jclass thiz) {
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1stop(JNIEnv *env, jclass thiz)
+{
     LOGI("VideoView on_stop");
 }
 
-JNIEXPORT void JNICALL
-Java_com_tutpro_baresip_plus_VideoView_set_1surface(JNIEnv *env, jclass thiz, jobject surface) {
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
+        JNIEnv *env, jclass thiz, jobject surface)
+{
 
     int w, h;
 
@@ -470,4 +462,3 @@ Java_com_tutpro_baresip_plus_VideoView_set_1surface(JNIEnv *env, jclass thiz, jo
         ANativeWindow_release(window);
     }
 }
-
