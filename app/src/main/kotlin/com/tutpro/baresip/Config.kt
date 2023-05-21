@@ -80,7 +80,7 @@ object Config {
         replaceVariable("audio_jitter_buffer_delay", "0-20")
 
         replaceVariable("video_jitter_buffer_type", "adaptive")
-        replaceVariable("video_jitter_buffer_delay", "0-50")
+        replaceVariable("video_jitter_buffer_delay", "1-50")
 
         if (!config.contains("rtp_timeout"))
             config = "${config}rtp_timeout 60\n"
