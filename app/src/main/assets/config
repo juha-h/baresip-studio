@@ -19,7 +19,7 @@ rtp_tos 184
 audio_jitter_buffer_type adaptive
 audio_jitter_buffer_delay 0-20
 video_jitter_buffer_type adaptive
-video_jitter_buffer_delay 0-50
+video_jitter_buffer_delay 1-50
 rtp_stats yes
 rtp_timeout 60
 dyn_dns yes
