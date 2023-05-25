@@ -385,7 +385,7 @@ class BaresipService: Service() {
                 }
                 for (a in assets) {
                     file = File("${filesPath}/$a")
-                    if (!file.exists()) {
+                    if (!file.exists() && a != "config") {
                         Log.i(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     } else {

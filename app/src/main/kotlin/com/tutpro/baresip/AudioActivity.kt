@@ -27,8 +27,6 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
     private var oldAec = false
-    private var oldAudioDelay = BaresipService.audioDelay.toString()
-    private val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -74,6 +72,8 @@ class AudioActivity : AppCompatActivity() {
             }
         }
 
+        val modules = Config.variables("module")
+
         val audioModulesList = binding.AudioModulesList
         var id = 1000
         for (module in audioModules) {
@@ -102,29 +102,26 @@ class AudioActivity : AppCompatActivity() {
             cbParams.addRule(RelativeLayout.CENTER_VERTICAL)
             cb.layoutParams = cbParams
             cb.gravity = Gravity.END
-            cb.isChecked = Config.variable("module $module.so").size > 0
+            cb.isChecked = modules.contains("${module}.so")
             oldAudioModules[module] = cb.isChecked
             rl.addView(cb)
             audioModulesList.addView(rl)
         }
 
         opusBitRate = binding.OpusBitRate
-        val obCv = Config.variable("opus_bitrate")
-        oldOpusBitrate = if (obCv.size == 0) "28000" else obCv[0]
+        oldOpusBitrate = Config.variable("opus_bitrate")
         opusBitRate.setText(oldOpusBitrate)
 
         opusPacketLoss = binding.OpusPacketLoss
-        val oplCv = Config.variable("opus_packet_loss")
-        oldOpusPacketLoss = if (oplCv.size == 0) "0" else oplCv[0]
+        oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.setText(oldOpusPacketLoss)
 
         aec = binding.Aec
-        val aecCv = Config.variable("module")
-        oldAec = aecCv.contains("webrtc_aecm.so")
+        oldAec = modules.contains("webrtc_aecm.so")
         aec.isChecked = oldAec
 
         audioDelay = binding.AudioDelay
-        audioDelay.setText(oldAudioDelay)
+        audioDelay.setText(BaresipService.audioDelay.toString())
 
         bindTitles()
 
@@ -160,18 +157,19 @@ class AudioActivity : AppCompatActivity() {
                 for (module in audioModules) {
                     val box = findViewById<CheckBox>(id++)
                     if (box.isChecked && !oldAudioModules[module]!!) {
-                        if (Api.module_load("$module.so") != 0) {
+                        if (Api.module_load("${module}.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
-                                    "${getString(R.string.failed_to_load_module)}: $module.so")
+                                    "${getString(R.string.failed_to_load_module)}: ${module}.so")
                             return false
                         }
-                        Config.addModuleLine("module $module.so")
+                        Config.addVariable("module", "${module}.so")
                         save = true
                     }
                     if (!box.isChecked && oldAudioModules[module]!!) {
-                        Api.module_unload("$module.so")
-                        Config.removeLine("module $module.so")
-                        for (ua in BaresipService.uas) ua.account.removeAudioCodecs(module)
+                        Api.module_unload("${module}.so")
+                        Config.removeVariableValue("module", "${module}.so")
+                        for (ua in BaresipService.uas)
+                            ua.account.removeAudioCodecs(module)
                         AccountsActivity.saveAccounts()
                         save = true
                     }
@@ -185,8 +183,7 @@ class AudioActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
                         return false
                     }
-                    Config.removeVariable("opus_bitrate")
-                    Config.addLine("opus_bitrate $opusBitRate")
+                    Config.replaceVariable("opus_bitrate", opusBitRate)
                     reload = true
                     save = true
                 }
@@ -198,20 +195,14 @@ class AudioActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
                         return false
                     }
-                    Config.removeVariable("opus_inbandfec")
-                    Config.removeVariable("opus_packet_loss")
-                    if (opusPacketLoss != "0") {
-                        Config.addLine("opus_inbandfec yes")
-                        Config.addLine("opus_packet_loss $opusPacketLoss")
-                    }
+                    Config.replaceVariable("opus_packet_loss", opusPacketLoss)
                     reload = true
                     save = true
                 }
 
                 if (aec.isChecked != oldAec) {
-                    Config.removeLine("module webrtc_aecm.so")
                     if (aec.isChecked) {
-                        Config.addModuleLine("module webrtc_aecm.so")
+                        Config.replaceVariable("module", "webrtc_aecm.so")
                         if (Api.module_load("webrtc_aecm.so") != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.failed_to_load_module))
@@ -220,19 +211,19 @@ class AudioActivity : AppCompatActivity() {
                         }
                     } else {
                         Api.module_unload("webrtc_aecm.so")
+                        Config.removeVariableValue("module", "webrtc_aecm.so")
                     }
                     save = true
                 }
 
                 val audioDelay = audioDelay.text.toString().trim()
-                if (audioDelay != oldAudioDelay) {
+                if (audioDelay != BaresipService.audioDelay.toString()) {
                     if (!checkAudioDelay(audioDelay)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 String.format(getString(R.string.invalid_audio_delay), audioDelay))
                         return false
                     }
-                    Config.removeVariable("audio_delay")
-                    Config.addLine("audio_delay $audioDelay")
+                    Config.replaceVariable("audio_delay", audioDelay)
                     BaresipService.audioDelay = audioDelay.toLong()
                     save = true
                 }
@@ -303,4 +294,9 @@ class AudioActivity : AppCompatActivity() {
         val number = audioDelay.toIntOrNull() ?: return false
         return (number >= 100) && (number <= 3000)
     }
+
+    companion object {
+        val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "g711")
+    }
+
 }

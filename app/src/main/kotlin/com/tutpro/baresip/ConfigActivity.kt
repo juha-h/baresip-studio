@@ -22,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.transition.Visibility
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
@@ -62,7 +61,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldListenAddr = ""
     private var oldDnsServers = ""
     private var oldCertificateFile = false
-    private var oldVerifyServer = ""
+    private var oldVerifyServer = false
     private var oldCAFile = false
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
@@ -93,8 +92,7 @@ class ConfigActivity : AppCompatActivity() {
         baresipService = Intent(this@ConfigActivity, BaresipService::class.java)
 
         autoStart = binding.AutoStart
-        val asCv = Config.variable("auto_start")
-        oldAutoStart = if (asCv.size == 0) "no" else asCv[0]
+        oldAutoStart = Config.variable("auto_start")
         autoStart.isChecked = oldAutoStart == "yes"
 
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -145,15 +143,13 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         listenAddr = binding.ListenAddress
-        val laCv = Config.variable("sip_listen")
-        oldListenAddr = if (laCv.size == 0) "" else laCv[0]
+        oldListenAddr = Config.variable("sip_listen")
         listenAddr.setText(oldListenAddr)
 
         netAfSpinner = binding.NetAfSpinner
         netAfKeys = arrayListOf("", "ipv4", "ipv6")
         val netAfVals = arrayListOf("-", "IPv4", "IPv6")
-        val netAfCv = Config.variable("net_af")
-        oldNetAf = if (netAfCv.size == 0) "" else netAfCv[0].lowercase()
+        oldNetAf = Config.variable("net_af").lowercase()
         netAf = oldNetAf
         val netAfIndex = netAfKeys.indexOf(oldNetAf)
         val netAfValue = netAfVals.elementAt(netAfIndex)
@@ -172,19 +168,20 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         dnsServers = binding.DnsServers
-        val ddCv = Config.variable("dyn_dns")
-        if (ddCv[0] == "yes") {
+        val dynamicDns = Config.variable("dyn_dns")
+        if (dynamicDns == "yes") {
             oldDnsServers = ""
         } else {
-            val dsCv = Config.variable("dns_server")
-            var dsTv = ""
-            for (ds in dsCv) dsTv += ", $ds"
-            oldDnsServers = dsTv.trimStart(',').trimStart(' ')
+            val servers = Config.variables("dns_server")
+            var serverList = ""
+            for (server in servers)
+                serverList += ", $server"
+            oldDnsServers = serverList.trimStart(',').trimStart(' ')
         }
         dnsServers.setText(oldDnsServers)
 
         certificateFile = binding.CertificateFile
-        oldCertificateFile = Config.variable("sip_certificate").isNotEmpty()
+        oldCertificateFile = Config.variable("sip_certificate") != ""
         certificateFile.isChecked = oldCertificateFile
 
         val certificateRequest =
@@ -195,11 +192,10 @@ class ConfigActivity : AppCompatActivity() {
                             val inputStream =
                                 applicationContext.contentResolver.openInputStream(uri)
                                         as FileInputStream
-                            File(BaresipService.filesPath + "/cert.pem")
-                                .copyInputStreamToFile(inputStream)
+                            val certPath = BaresipService.filesPath + "/cert.pem"
+                            File(certPath).copyInputStreamToFile(inputStream)
                             inputStream.close()
-                            Config.removeVariable("sip_certificate")
-                            Config.addLine("sip_certificate ${BaresipService.filesPath}/cert.pem")
+                            Config.replaceVariable("sip_certificate", certPath)
                             save = true
                             restart = true
                         } catch (e: Error) {
@@ -234,10 +230,9 @@ class ConfigActivity : AppCompatActivity() {
                                 )
                                 return@setOnCheckedChangeListener
                             }
-                            val filesPath = BaresipService.filesPath + "/cert.pem"
-                            Utils.putFileContents(filesPath, content)
-                            Config.removeVariable("sip_certificate")
-                            Config.addLine("sip_certificate $filesPath")
+                            val certPath = BaresipService.filesPath + "/cert.pem"
+                            Utils.putFileContents(certPath, content)
+                            Config.replaceVariable("sip_certificate", certPath)
                             certificateFile.isChecked = true
                             save = true
                             restart = true
@@ -270,12 +265,11 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         verifyServer = binding.VerifyServer
-        val vsCv = Config.variable("sip_verify_server")
-        oldVerifyServer = if (vsCv.size == 0) "no" else vsCv[0]
-        verifyServer.isChecked = oldVerifyServer == "yes"
+        oldVerifyServer = Config.variable("sip_verify_server") == "yes"
+        verifyServer.isChecked = oldVerifyServer
 
         caFile = binding.CAFile
-        oldCAFile = Config.variable("sip_cafile").isNotEmpty()
+        oldCAFile = Config.variable("sip_cafile") != ""
         caFile.isChecked = oldCAFile
 
         val certificatesRequest =
@@ -286,11 +280,10 @@ class ConfigActivity : AppCompatActivity() {
                             val inputStream =
                                 applicationContext.contentResolver.openInputStream(uri)
                                         as FileInputStream
-                            File(BaresipService.filesPath + "/ca_certs.crt")
-                                .copyInputStreamToFile(inputStream)
+                            val caCertsPath = BaresipService.filesPath + "/ca_certs.crt"
+                            File(caCertsPath).copyInputStreamToFile(inputStream)
                             inputStream.close()
-                            Config.removeVariable("sip_cafile")
-                            Config.addLine("sip_cafile ${BaresipService.filesPath}/ca_certs.crt")
+                            Config.replaceVariable("sip_cafile", caCertsPath)
                             save = true
                             restart = true
                         } catch (e: Error) {
@@ -324,10 +317,9 @@ class ConfigActivity : AppCompatActivity() {
                                 )
                                 return@setOnCheckedChangeListener
                             }
-                            val filesPath = BaresipService.filesPath + "/ca_certs.crt"
-                            Utils.putFileContents(filesPath, content)
-                            Config.removeVariable("sip_cafile")
-                            Config.addLine("sip_cafile $filesPath")
+                            val caCertsPath = BaresipService.filesPath + "/ca_certs.crt"
+                            Utils.putFileContents(caCertsPath, content)
+                            Config.replaceVariable("sip_cafile", caCertsPath)
                             caFile.isChecked = true
                             save = true
                             restart = true
@@ -367,8 +359,7 @@ class ConfigActivity : AppCompatActivity() {
         contactsModeKeys = arrayListOf("baresip", "android", "both")
         val contactsModeVals = arrayListOf(getString(R.string.baresip), getString(R.string.android),
                 getString(R.string.both))
-        val ctCv = Config.variable("contacts_mode")
-        oldContactsMode = if (ctCv.size == 0) "baresip" else ctCv[0].lowercase()
+        oldContactsMode = Config.variable("contacts_mode").lowercase()
         contactsMode = oldContactsMode
         val keyIndex = contactsModeKeys.indexOf(oldContactsMode)
         val keyValue = contactsModeVals.elementAt(keyIndex)
@@ -408,11 +399,7 @@ class ConfigActivity : AppCompatActivity() {
         }
 
         debug = binding.Debug
-        val dbCv = Config.variable("log_level")
-        oldLogLevel = if (dbCv.size == 0)
-            "2"
-        else
-            dbCv[0]
+        oldLogLevel = Config.variable("log_level")
         debug.isChecked = oldLogLevel == "0"
 
         sipTrace = binding.SipTrace
@@ -427,7 +414,7 @@ class ConfigActivity : AppCompatActivity() {
                     setTitle(R.string.confirmation)
                     setMessage(getString(R.string.reset_config_alert))
                     setPositiveButton(getText(R.string.reset)) { dialog, _ ->
-                        Config.reset(this@ConfigActivity)
+                        Config.reset()
                         save = false
                         restart = true
                         done()
@@ -523,12 +510,10 @@ class ConfigActivity : AppCompatActivity() {
 
             R.id.checkIcon -> {
 
-                var autoStartString = "no"
-                if (autoStart.isChecked) autoStartString = "yes"
+                val autoStartString = if (autoStart.isChecked) "yes" else "no"
                 if (oldAutoStart != autoStartString) {
                     Config.replaceVariable("auto_start", autoStartString)
                     save = true
-                    restart = false
                 }
 
                 val listenAddr = listenAddr.text.toString().trim()
@@ -538,17 +523,13 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_listen_address)}: $listenAddr")
                         return false
                     }
-                    Config.removeVariable("sip_listen")
-                    if (listenAddr != "") Config.addLine("sip_listen $listenAddr")
+                    Config.replaceVariable("sip_listen", listenAddr)
                     save = true
                     restart = true
                 }
 
                 if (oldNetAf != netAf) {
-                    if (netAf == "")
-                        Config.removeVariable("net_af")
-                    else
-                        Config.replaceVariable("net_af", netAf)
+                    Config.replaceVariable("net_af", netAf)
                     save = true
                     restart = true
                 }
@@ -561,19 +542,18 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_dns_servers)}: $dnsServers")
                         return false
                     }
-                    Config.removeVariable("dyn_dns")
                     Config.removeVariable("dns_server")
                     if (dnsServers.isNotEmpty()) {
                         for (server in dnsServers.split(","))
-                            Config.addLine("dns_server $server")
-                        Config.addLine("dyn_dns no")
+                            Config.addVariable("dns_server", server)
+                        Config.replaceVariable("dyn_dns", "no")
                         if (Api.net_use_nameserver(dnsServers) != 0) {
                             Utils.alertView(this, getString(R.string.error),
                                     "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
                             return false
                         }
                     } else {
-                        Config.addLine("dyn_dns yes")
+                        Config.replaceVariable("dyn_dns", "yes")
                         Config.updateDnsServers(BaresipService.dnsServers)
                     }
                     // Api.net_dns_debug()
@@ -587,9 +567,9 @@ class ConfigActivity : AppCompatActivity() {
                     return false
                 }
 
-                val verifyServerString = if (verifyServer.isChecked) "yes" else "no"
-                if (oldVerifyServer != verifyServerString) {
-                    Config.replaceVariable("sip_verify_server", verifyServerString)
+                if (oldVerifyServer != verifyServer.isChecked) {
+                    Config.replaceVariable("sip_verify_server",
+                            if (verifyServer.isChecked) "yes" else "no")
                     save = true
                     restart = true
                 }
@@ -626,8 +606,7 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var logLevelString = "2"
-                if (debug.isChecked) logLevelString = "0"
+                val logLevelString = if (debug.isChecked) "0" else "2"
                 if (oldLogLevel != logLevelString) {
                     Config.replaceVariable("log_level", logLevelString)
                     Api.log_level_set(logLevelString.toInt())
