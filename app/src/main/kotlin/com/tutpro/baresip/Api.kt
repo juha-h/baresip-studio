@@ -103,7 +103,6 @@ object Api {
 
     external fun cmd_exec(cmd: String): Int
 
-    external fun reload_config(): Int
     external fun module_load(module: String): Int
     external fun module_unload(module: String)
 
