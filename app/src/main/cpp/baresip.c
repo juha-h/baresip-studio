@@ -1526,20 +1526,6 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1destroy(
     re_thread_leave();
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_reload_1config(JNIEnv *env, jobject thiz)
-{
-    int err;
-    re_thread_enter();
-    err = conf_configure();
-    re_thread_leave();
-    if (err) {
-        LOGE("failed to reload config %d\n", err);
-    } else {
-        LOGD("config reload succeeded");
-    }
-    return err;
-}
-
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_cmd_1exec(
         JNIEnv *env, jobject thiz, jstring javaCmd)
 {
