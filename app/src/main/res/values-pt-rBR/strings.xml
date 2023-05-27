@@ -87,7 +87,7 @@
     <string name="default_call_volume">Volume de Chamadas Padrão</string>
     <string name="invalid_opus_packet_loss">Porcentagem de Perda de Pacotes do Opus inválida</string>
     <string name="invalid_opus_bitrate">Taxa de bits Opus inválida</string>
-    <string name="opus_packet_loss_help">Porcentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por padrão 0, desativando a Opus Forward Error Correction (FEC).</string>
+    <string name="opus_packet_loss_help">Esperada porcentagem de perda de pacotes do fluxo de áudio do Opus, de 0-100. Por padrão o valor é 1. O valor 0 desativa o Opus Forward Error Correction (FEC).</string>
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
     <string name="opus_bit_rate_help">Taxa de bits máxima média usada pelo fluxo de áudio do Opus. Os valores válidos são 6000-510000. O padrão de fábrica é 28000.</string>
     <string name="opus_bit_rate">Taxa de Bits Opus</string>

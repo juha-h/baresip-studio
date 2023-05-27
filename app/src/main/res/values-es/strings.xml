@@ -129,7 +129,7 @@
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
     <string name="opus_packet_loss">Pérdida de paquetes de Opus esperada</string>
-    <string name="opus_packet_loss_help">Porcentaje esperado de pérdida de paquetes de transmisión de audio Opus, de 0 a 100. Por defecto 0, desactiva Opus Forward Error Correction (FEC).</string>
+    <string name="opus_packet_loss_help">Porcentaje esperado de la pérdida de los paquetes del flujo de audio Opus, de 0 a 100. El valor predeterminado de fábrica es 1. El valor 0 también desactiva la corrección de errores hacia delante (FEC) de Opus. El valor predeterminado de fábrica es 1. El valor 0 también desactiva Corrección de errores de reenvío de Opus (FEC).</string>
     <string name="invalid_opus_bitrate">Tasa de bits de Opus no válida</string>
     <string name="invalid_opus_packet_loss">Porcentaje de pérdida de paquetes opus no válido</string>
     <string name="default_call_volume">Volumen de llamada predeterminado</string>
