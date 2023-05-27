@@ -1,0 +1,4 @@
+- Major rewrite of settings implementation by separating static and dynamic settings
+- Revert back to original jitter buffer delays now when libre bug is fixed
+- Configuration cannot be reloaded on the fly when opus settings are changed
+- New Spanish and Portuguese (Brazil) translations
