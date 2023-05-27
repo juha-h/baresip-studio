@@ -21,7 +21,7 @@ class AudioActivity : AppCompatActivity() {
     private lateinit var audioDelay: EditText
 
     private var save = false
-    private var reload = false
+    private var restart = false
     private var callVolume = BaresipService.callVolume
     private var oldAudioModules = mutableMapOf<String, Boolean>()
     private var oldOpusBitrate = ""
@@ -184,7 +184,7 @@ class AudioActivity : AppCompatActivity() {
                         return false
                     }
                     Config.replaceVariable("opus_bitrate", opusBitRate)
-                    reload = true
+                    restart = true
                     save = true
                 }
 
@@ -196,7 +196,7 @@ class AudioActivity : AppCompatActivity() {
                         return false
                     }
                     Config.replaceVariable("opus_packet_loss", opusPacketLoss)
-                    reload = true
+                    restart = true
                     save = true
                 }
 
@@ -228,9 +228,10 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (save) Config.save()
+                if (save)
+                    Config.save()
 
-                if (reload) Api.reload_config()
+                setResult(if (restart) RESULT_OK else RESULT_CANCELED)
 
                 BaresipService.activities.remove("audio")
                 finish()

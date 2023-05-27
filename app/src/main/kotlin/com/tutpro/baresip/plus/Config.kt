@@ -10,7 +10,6 @@ object Config {
 
     private val configPath = BaresipService.filesPath + "/config"
     private lateinit var config: String
-    private lateinit var lines: List<String>
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
 
@@ -118,9 +117,9 @@ object Config {
 
         val opusBitRate = previousVariable("opus_bitrate")
         config = if (opusBitRate == "")
-            "${config}opus_bit_rate 28000\n"
+            "${config}opus_bitrate 28000\n"
         else
-            "${config}opus_bit_rate $opusBitRate\n"
+            "${config}opus_bitrate $opusBitRate\n"
 
         val opusPacketLoss = previousVariable("opus_packet_loss")
         config = if (opusPacketLoss == "")
@@ -167,7 +166,7 @@ object Config {
     }
 
     fun variable(name: String): String {
-        for (line in lines) {
+        for (line in config.split("\n")) {
             val nameValue = line.split(" ")
             if (nameValue.size == 2 && nameValue[0] == name)
                 return nameValue[1].trim()
@@ -177,7 +176,7 @@ object Config {
 
     fun variables(name: String): ArrayList<String> {
         val result = ArrayList<String>()
-        for (line in lines) {
+        for (line in config.split("\n")) {
             val nameValue = line.split(" ")
             if (nameValue.size == 2 && nameValue[0] == name)
                 result.add(nameValue[1].trim())
@@ -209,7 +208,6 @@ object Config {
 
     fun save() {
         Utils.putFileContents(configPath, config.toByteArray())
-        lines = config.split("\n")
         Log.d(TAG, "Saved new config '$config'")
         // Api.reload_config()
     }
