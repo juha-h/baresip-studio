@@ -69,6 +69,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldNetAf = ""
     private var save = false
     private var restart = false
+    private var audioRestart = false
     private var menu: Menu? = null
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -636,7 +637,7 @@ class ConfigActivity : AppCompatActivity() {
             Config.save()
         BaresipService.activities.remove("config")
         val intent = Intent(this, MainActivity::class.java)
-        if (restart)
+        if (restart || audioRestart)
             intent.putExtra("restart", true)
         setResult(RESULT_OK, intent)
         finish()
@@ -646,12 +647,21 @@ class ConfigActivity : AppCompatActivity() {
     private fun goBack() {
 
         BaresipService.activities.remove("config")
-        setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
+        if (audioRestart) {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("restart", true)
+            setResult(RESULT_OK, intent)
+        } else {
+            setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
+        }
         finish()
 
     }
 
     private fun bindTitles() {
+        val audioRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            audioRestart = it.resultCode == Activity.RESULT_OK
+        }
         binding.AutoStartTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.start_automatically),
                     getString(R.string.start_automatically_help))
@@ -681,7 +691,7 @@ class ConfigActivity : AppCompatActivity() {
                     getString(R.string.tls_ca_file_help))
         }
         binding.AudioSettingsTitle.setOnClickListener {
-            startActivity(Intent(this, AudioActivity::class.java))
+            audioRequest.launch(Intent(this,  AudioActivity::class.java))
         }
         binding.DarkThemeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.dark_theme),
