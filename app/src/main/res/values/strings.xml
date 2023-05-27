@@ -345,7 +345,8 @@
     <string name="_28000" translatable="false">28000</string>
     <string name="opus_packet_loss">Expected Opus packet-loss</string>
     <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage,
-        from 0–100. By default 0, turning off Opus Forward Error Correction (FEC).</string>
+        from 0–100. Factory default value is 1. Value 0 also turns off Opus Forward Error
+        Correction (FEC).</string>
     <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>

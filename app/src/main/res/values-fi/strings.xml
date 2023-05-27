@@ -370,8 +370,8 @@
     </string>
     <string name="opus_packet_loss">Odotettu opus-pakettihäviö</string>
     <string name="opus_packet_loss_help">Odotettu opus audio virran pakettihäviö prosentteina.
-        Mahdolliset arvot ovat 0-100. Oletusarvo on 0, jolloin ennakoiva virheenkorjaus
-        ei ole käytössä.</string>
+        Mahdolliset arvot ovat 0-100. Oletusarvo on 1.  Arvo 0 poistaa käytöstä
+        ennakoivan virheenkorjauksen.</string>
     <string name="invalid_opus_bitrate">Virheellinen Opus-koodekin bittinopeus</string>
     <string name="invalid_opus_packet_loss">Virheellinen Opus-koodekin odotettu pakettihäviö</string>
     <string name="audio_delay">Audioviive</string>
