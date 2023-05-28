@@ -49,6 +49,7 @@
             android:id="@+id/DisplayNameTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:textSize="18sp"
             android:text="@string/display_name" >
         </TextView>
@@ -68,6 +69,7 @@
             android:id="@+id/AuthUserTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:textSize="18sp"
             android:text="@string/authentication_username" >
         </TextView>
@@ -87,6 +89,7 @@
             android:id="@+id/AuthPassTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:textSize="18sp"
             android:text="@string/authentication_password" >
         </TextView>
@@ -110,6 +113,7 @@
             android:id="@+id/OutboundProxyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="16dp"
             android:textSize="18sp"
             android:text="@string/outbound_proxies" >
         </TextView>
@@ -218,7 +222,7 @@
             android:id="@+id/MediaNatTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
+            android:paddingTop="12dp"
             android:textSize="18sp"
             android:text="@string/media_nat" >
         </TextView>
@@ -289,6 +293,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
                 app:hintEnabled="false"
                 app:endIconMode="password_toggle">
                 <androidx.appcompat.widget.AppCompatEditText
@@ -308,6 +313,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:orientation="horizontal" >
             <TextView
                 android:id="@+id/RtcpMuxTitle"
@@ -350,7 +356,7 @@
             android:id="@+id/AnswerModeTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="14dp"
             android:textSize="18sp"
             android:text="@string/answer_mode" >
         </TextView>
@@ -366,7 +372,7 @@
             android:id="@+id/VoicemailUriTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="14dp"
             android:textSize="18sp"
             android:text="@string/voicemail_uri" >
         </TextView>
