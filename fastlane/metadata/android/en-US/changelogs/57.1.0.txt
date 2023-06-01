@@ -1,0 +1,3 @@
+- Added more vertical padding to account configuration
+- Hack to fix wrongly escaped URI when call or dial request comes from outside
+- New Czech translations
