@@ -187,6 +187,13 @@ object Utils {
         return if (checkUriUser(uri)) "$res@${aorDomain(aor)}" else res
     }
 
+    private fun String.replace(vararg pairs: Pair<String, String>): String =
+            pairs.fold(this) { acc, (old, new) -> acc.replace(old, new, ignoreCase = true) }
+
+    fun uriUnescape(uri: String): String {
+        return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=")
+    }
+
     fun aorDomain(aor: String): String {
         return uriHostPart(aor)
     }

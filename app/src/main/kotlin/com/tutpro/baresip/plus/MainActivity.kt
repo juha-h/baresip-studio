@@ -1212,7 +1212,7 @@ class MainActivity : AppCompatActivity() {
         if (uri != null) {
             when (uri.scheme) {
                 "sip" -> {
-                    val uriStr = uri.toString()
+                    val uriStr = Utils.uriUnescape(uri.toString())
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
                     if (ua == null && BaresipService.uas.size > 0)
                         ua = BaresipService.uas[0]
