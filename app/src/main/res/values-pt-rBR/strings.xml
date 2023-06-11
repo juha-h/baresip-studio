@@ -318,5 +318,5 @@
     <string name="call_auto_rejected">Chamada rejeitada automaticamente de %1$s</string>
     <string name="default_phone_app">Aplicativo de telefone padrão</string>
     <string name="dialer_role_not_available">A função de discador não está disponível</string>
-    <string name="default_phone_app_help">Se marcado, baresip é o aplicativo de telefone padrão. Não marque se o seu dispositivo pode precisar lidar também com outras chamadas ou outras mensagens SIP.</string>
+    <string name="default_phone_app_help">Se marcado, o baresip será o aplicativo de telefone padrão. Não marque caso o seu dispositivo também precise lidar com outras chamadas ou mensagens SIP.</string>
 </resources>
