@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -123,7 +125,6 @@ class AccountsActivity : AppCompatActivity() {
     }
 
     companion object {
-
         var accounts = ArrayList<AccountRow>()
 
         fun generateAccounts() {

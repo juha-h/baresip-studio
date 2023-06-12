@@ -202,6 +202,11 @@
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
+    <string name="push_notification_service">UnifiedPush distributor</string>
+    <string name="push_notification_service_help">Detected list of UnifiedPush distributors
+        installed. Select any fully qualify named distributor to enable push notification triggered
+        device wake up and register binding refresh. Select "Disabled" to turn off the feature.
+        Note that this requires compatible SIP Proxy.</string>
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">New Account</string>

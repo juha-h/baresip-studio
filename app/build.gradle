@@ -74,4 +74,5 @@ dependencies {
     implementation "androidx.activity:activity-ktx:1.7.2"
     implementation "androidx.fragment:fragment-ktx:1.5.7"
     implementation 'androidx.media:media:1.6.0'
+    implementation "com.github.UnifiedPush:android-connector:2.1.1"
 }

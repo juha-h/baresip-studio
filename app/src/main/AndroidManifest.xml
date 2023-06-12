@@ -207,7 +207,17 @@
                 <action android:name="com.tutpro.baresip.QUIT" />
             </intent-filter>
         </receiver>
-
+        <receiver
+            android:name=".UnifiedPushReceiver"
+            android:exported="true"
+            android:enabled="true">
+          <intent-filter>
+              <action android:name="org.unifiedpush.android.connector.MESSAGE"/>
+              <action android:name="org.unifiedpush.android.connector.UNREGISTERED"/>
+              <action android:name="org.unifiedpush.android.connector.NEW_ENDPOINT"/>
+              <action android:name="org.unifiedpush.android.connector.REGISTRATION_REFUSED"/>
+          </intent-filter>
+      </receiver>
     </application>
 
 </manifest>

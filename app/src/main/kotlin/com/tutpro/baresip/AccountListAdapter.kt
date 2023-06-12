@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.TextView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.unifiedpush.android.connector.UnifiedPush.unregisterApp
 
 import java.util.*
 
@@ -62,6 +63,7 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
                     CallHistoryNew.clear(ua.account.aor)
                     Message.clear(ua.account.aor)
                     ua.remove()
+                    unregisterApp(this@AccountListAdapter.cxt, ua.account.aor)
                     AccountsActivity.generateAccounts()
                     AccountsActivity.saveAccounts()
                     this@AccountListAdapter.notifyDataSetChanged()

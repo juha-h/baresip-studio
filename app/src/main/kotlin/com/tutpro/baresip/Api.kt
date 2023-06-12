@@ -103,6 +103,7 @@ object Api {
 
     external fun cmd_exec(cmd: String): Int
 
+    external fun module_event(module: String, event: String, uap: Long, message: String)
     external fun module_load(module: String): Int
     external fun module_unload(module: String)
 

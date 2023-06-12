@@ -9,6 +9,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tutpro.baresip.databinding.ActivityAccountBinding
@@ -16,6 +17,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.unifiedpush.android.connector.UnifiedPush.getDistributor
+import org.unifiedpush.android.connector.UnifiedPush.getDistributors
+import org.unifiedpush.android.connector.UnifiedPush.registerApp
+import org.unifiedpush.android.connector.UnifiedPush.saveDistributor
+import org.unifiedpush.android.connector.UnifiedPush.unregisterApp
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
@@ -53,6 +59,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var countryCode: EditText
     private lateinit var telProvider: EditText
     private lateinit var defaultCheck: CheckBox
+    private lateinit var pnsProvider: Spinner
 
     private val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
     private val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
@@ -99,6 +106,7 @@ class AccountActivity : AppCompatActivity() {
         countryCode = binding.countryCode
         telProvider = binding.telephonyProvider
         defaultCheck = binding.Default
+        pnsProvider = binding.PushNotificationProvider
 
         aor = intent.getStringExtra("aor")!!
         ua = UserAgent.ofAor(aor)!!
@@ -116,6 +124,7 @@ class AccountActivity : AppCompatActivity() {
             aor.split(":")[1]
 
         initLayoutFromAccount(acc)
+        initPushLayoutFromUnifiedPush()
 
         bindTitles()
 
@@ -352,6 +361,38 @@ class AccountActivity : AppCompatActivity() {
         vmUri.setText(acc.vmUri)
 
         defaultCheck.isChecked = uaIndex == 0
+    }
+
+    private fun initPushLayoutFromUnifiedPush() {
+        val distributors = listOf(PNS_DISABLED) + getDistributors(this)
+        val selectedIndex = distributors.indexOf(
+           getDistributor(this).ifEmpty { PNS_DISABLED }
+        )
+
+        pnsProvider.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            distributors
+        )
+        pnsProvider.setSelection(selectedIndex)
+
+        pnsProvider.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, index: Int, id: Long) {
+                when (val selected = distributors[index]) {
+                    PNS_DISABLED -> {
+                        Log.d(TAG, "Unregistering unifiedPush for ${ua.account.aor}")
+                        unregisterApp(this@AccountActivity, ua.account.aor)
+                    }
+                    else -> {
+                        saveDistributor(this@AccountActivity, selected)
+                        registerApp(this@AccountActivity, ua.account.aor)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -809,6 +850,12 @@ class AccountActivity : AppCompatActivity() {
                 getString(R.string.default_account_help)
             )
         }
+        binding.PushNotificationServiceTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.push_notification_service),
+                getString(R.string.push_notification_service_help)
+            )
+        }
     }
 
     private fun returnResult(code: Int) {
@@ -824,4 +871,7 @@ class AccountActivity : AppCompatActivity() {
         return Utils.checkHostPortParams(uri.substring(4))
     }
 
+    companion object {
+        const val PNS_DISABLED = "Disabled"
+    }
 }

@@ -1565,3 +1565,16 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_module_1unload(
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_module_1event(JNIEnv *env, jobject thiz, jstring module,
+                                          jstring event, jlong uap, jstring message)
+{
+    const char *native_module = (*env)->GetStringUTFChars(env, module, 0);
+    const char *native_event = (*env)->GetStringUTFChars(env, event, 0);
+    const char *native_message = (*env)->GetStringUTFChars(env, message, 0);
+
+    LOGD("Sending %s event to %s module with payload %s targeting ua %ld\n",
+         native_event, native_module, native_message, (long)uap);
+    module_event(native_module, native_event, (struct ua *)uap, NULL, native_message);
+}

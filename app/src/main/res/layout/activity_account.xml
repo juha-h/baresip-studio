@@ -464,6 +464,23 @@
             </CheckBox>
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/PushNotificationServiceTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textSize="18sp"
+            android:text="@string/push_notification_service" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/PushNotificationProvider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown">
+        </Spinner>
+
     </LinearLayout>
 
 </ScrollView>

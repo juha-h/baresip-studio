@@ -26,6 +26,7 @@ module srtp.so
 module dtls_srtp.so
 module gzrtp.so
 module uuid.so
+module pns.so
 module_app account.so
 module_app debug_cmd.so
 module_app mwi.so
