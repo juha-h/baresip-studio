@@ -352,5 +352,5 @@
     <string name="call_auto_rejected">Llamada rechazada automáticamente de %1$s</string>
     <string name="default_phone_app">Aplicación de teléfono predeterminada</string>
     <string name="dialer_role_not_available">La función de teléfono no está disponible</string>
-    <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada. No marqués si tu dispositivo también necesita administrar llamadas o mensajes que no sean SIP.</string>
+    <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada. No verifiques si tu dispositivo puede necesitar manejar también llamadas o mensajes que no sean SIP.</string>
 </resources>
