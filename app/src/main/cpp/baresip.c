@@ -1689,7 +1689,9 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(
         JNIEnv *env, jobject thiz, jboolean reg, jboolean reinvite)
 {
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
+    re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
+    re_thread_leave();
 }
 
 
