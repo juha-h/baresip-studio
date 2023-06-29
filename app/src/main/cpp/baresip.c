@@ -7,6 +7,7 @@
 #include <baresip.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <libavcodec/jni.h>
 #include "logger.h"
 #include "vidisp.h"
 
@@ -447,6 +448,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
     g_ctx.javaVM = vm;
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
+
+    av_jni_set_java_vm(vm, NULL);
 
     return JNI_VERSION_1_6;
 }
