@@ -27,6 +27,7 @@ class Account(val accp: Long) {
     var rtcpMux = Api.account_rtcp_mux(accp)
     var dtmfMode = Api.account_dtmfmode(accp)
     var answerMode = Api.account_answermode(accp)
+    var autoRedirect = Api.account_sip_autoredirect(accp)
     var vmUri = Api.account_vm_uri(accp)
     var vmNew = 0
     var vmOld = 0
@@ -131,6 +132,9 @@ class Account(val accp: Long) {
 
         if (answerMode == Api.ANSWERMODE_AUTO)
             res += ";answermode=auto"
+
+        if (autoRedirect)
+            res += ";sip_autoredirect=yes"
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes;100rel=no"
 

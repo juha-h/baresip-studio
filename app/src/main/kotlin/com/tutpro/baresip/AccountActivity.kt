@@ -49,6 +49,8 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var dtmfModeSpinner: Spinner
     private var answerMode = Api.ANSWERMODE_MANUAL
     private lateinit var answerModeSpinner: Spinner
+    private var autoRedirect = false
+    private lateinit var redirectModeSpinner: Spinner
     private lateinit var vmUri: EditText
     private lateinit var countryCode: EditText
     private lateinit var telProvider: EditText
@@ -95,6 +97,7 @@ class AccountActivity : AppCompatActivity() {
         rtcpCheck = binding.RtcpMux
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
+        redirectModeSpinner = binding.redirectModeSpinner
         vmUri = binding.voicemailUri
         countryCode = binding.countryCode
         telProvider = binding.telephonyProvider
@@ -203,6 +206,8 @@ class AccountActivity : AppCompatActivity() {
                                         else
                                             Api.ANSWERMODE_AUTO
                                     }
+                                "redirect-mode" ->
+                                    acc.autoRedirect = text == "yes"
                                 "voicemail-uri" ->
                                     if (text.isNotEmpty())
                                         acc.vmUri = text
@@ -339,6 +344,27 @@ class AccountActivity : AppCompatActivity() {
         answerModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 answerMode = answerModeKeys[answerModeVals.indexOf(parent.selectedItem.toString())]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+
+        autoRedirect = acc.autoRedirect
+        val redirectModeKeys = arrayListOf(false, true)
+        val redirectModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
+        keyIx = redirectModeKeys.indexOf(acc.autoRedirect)
+        keyVal = redirectModeVals.elementAt(keyIx)
+        redirectModeKeys.removeAt(keyIx)
+        redirectModeVals.removeAt(keyIx)
+        redirectModeKeys.add(0, acc.autoRedirect)
+        redirectModeVals.add(0, keyVal)
+        val redirectModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
+            redirectModeVals)
+        redirectModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        redirectModeSpinner.adapter = redirectModeAdapter
+        redirectModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                autoRedirect = redirectModeKeys[redirectModeVals.indexOf(parent.selectedItem.toString())]
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
@@ -612,6 +638,12 @@ class AccountActivity : AppCompatActivity() {
                     }
                 }
 
+                if (autoRedirect != acc.autoRedirect) {
+                    Api.account_set_sip_autoredirect(acc.accp, autoRedirect)
+                    acc.autoRedirect = autoRedirect
+                    Log.d(TAG, "New autoRedirect is ${acc.autoRedirect}")
+                }
+
                 var tVmUri = vmUri.text.toString().trim()
                 if (tVmUri != acc.vmUri) {
                     if (tVmUri != "") {
@@ -783,6 +815,12 @@ class AccountActivity : AppCompatActivity() {
             Utils.alertView(
                 this, getString(R.string.answer_mode),
                 getString(R.string.answer_mode_help)
+            )
+        }
+        binding.RedirectModeTitle.setOnClickListener {
+            Utils.alertView(
+                this, getString(R.string.redirect_mode),
+                getString(R.string.redirect_mode_help)
             )
         }
         binding.VoicemailUriTitle.setOnClickListener {
