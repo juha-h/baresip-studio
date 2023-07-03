@@ -357,7 +357,6 @@ class ConfigActivity : AppCompatActivity() {
         val videoSizeSpinner = findViewById<Spinner>(R.id.VideoSizeSpinner)
         val sizes = arrayListOf("640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720",
             "1920x1080")
-        Log.d(TAG, "************ $oldVideoSize")
         sizes.removeIf{it == oldVideoSize}
         sizes.add(0, oldVideoSize)
         val videoSizeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
