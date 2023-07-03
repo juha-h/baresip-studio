@@ -353,4 +353,9 @@
     <string name="default_phone_app">Aplicación de teléfono predeterminada</string>
     <string name="dialer_role_not_available">La función de teléfono no está disponible</string>
     <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada. No verifiques si tu dispositivo puede necesitar manejar también llamadas o mensajes que no sean SIP.</string>
+    <string name="redirect_notice">Redirección automática a \'%1$s\'\\</string>
+    <string name="redirect_request">Solicitud de redirección</string>
+    <string name="redirect_request_query">¿Aceptas la redirección de llamadas a \'%1$s\'\?</string>
+    <string name="redirect_mode">Modo de redirección</string>
+    <string name="redirect_mode_help">Selecciona si la solicitud de redirección de las llamadas se realiza automáticamente o si se solicita confirmación.</string>
 </resources>
