@@ -380,6 +380,21 @@
         </Spinner>
 
         <TextView
+            android:id="@+id/RedirectModeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="14dp"
+            android:textSize="18sp"
+            android:text="@string/redirect_mode" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/redirectModeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp" >
+        </Spinner>
+        <TextView
             android:id="@+id/VoicemailUriTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

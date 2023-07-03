@@ -176,6 +176,9 @@
     <string name="dtmf_info">SIP INFO Requests</string>
     <string name="answer_mode">Answer Mode</string>
     <string name="answer_mode_help">Selects how incoming calls are answered.</string>
+    <string name="redirect_mode">Redirect Mode</string>
+    <string name="redirect_mode_help">Selects if call redirect request is followed automatically or
+        if confirmation is requested.</string>
     <string name="manual">Manual</string>
     <string name="auto">Automatic</string>
     <string name="voicemail_uri">Voicemail URI</string>
@@ -494,6 +497,9 @@
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Transfer Request</string>
     <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'\?</string>
+    <string name="redirect_notice">Automatic redirection to \'%1$s\'\</string>
+    <string name="redirect_request">Redirect Request</string>
+    <string name="redirect_request_query">Do you accept call redirection to \'%1$s\'\?</string>
     <string name="call_failed">Call failed</string>
     <string name="call_closed">Call is closed</string>
     <string name="call_not_secure">This call is NOT secure!</string>

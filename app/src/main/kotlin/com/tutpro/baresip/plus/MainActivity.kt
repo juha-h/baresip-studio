@@ -513,7 +513,7 @@ class MainActivity : AppCompatActivity() {
             if (call != null) {
                 val stats = call.stats("audio")
                 if (stats != "") {
-                    val parts = stats.split(",") as java.util.ArrayList
+                    val parts = stats.split(",") as ArrayList
                     if (parts[2] == "0/0") {
                         parts[2] = "?/?"
                         parts[3] = "?/?"
@@ -1446,6 +1446,31 @@ class MainActivity : AppCompatActivity() {
             "call answered" -> {
                 showCall(ua)
             }
+            "call redirect", "video call redirect" -> {
+                val redirectUri = ev[1]
+                val target = Utils.friendlyUri(this, redirectUri, acc)
+                if (acc.autoRedirect) {
+                    redirect(ev[0], ua, redirectUri)
+                    Toast.makeText(applicationContext,
+                        String.format(getString(R.string.redirect_notice), target),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                        setTitle(R.string.redirect_request)
+                        setMessage(String.format(getString(R.string.redirect_request_query), target))
+                        setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                            redirect(ev[0], ua, redirectUri)
+                            dialog.dismiss()
+                        }
+                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
+                }
+                showCall(ua)
+            }
             "call established" -> {
                 if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
                     Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
@@ -1648,6 +1673,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         handleNextEvent()
+    }
+
+    private fun redirect(event: String, ua: UserAgent, redirectUri: String) {
+        if (ua.account.aor != aorSpinner.tag)
+            spinToAor(ua.account.aor)
+        callUri.setText(redirectUri)
+        if (event == "call redirect")
+            callButton.performClick()
+        else
+            callVideoButton.performClick()
     }
 
     private fun reStart() {

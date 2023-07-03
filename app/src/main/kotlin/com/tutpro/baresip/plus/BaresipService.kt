@@ -812,6 +812,9 @@ class BaresipService: Service() {
                         else
                             return
                     }
+                    "call redirect", "video call redirect"-> {
+                        stopMediaPlayer()
+                    }
                     "call established" -> {
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established in mode ${am.mode}")
@@ -985,10 +988,12 @@ class BaresipService: Service() {
                         }
                         val reason = ev[1].trim()
                         if ((reason != "") && (ua.calls().isEmpty())) {
-                            if (reason[0].isDigit())
-                                toast("${getString(R.string.call_failed)}: $reason")
-                            else
+                            if (reason[0].isDigit()) {
+                                if (reason[0] != '3')
+                                    toast("${getString(R.string.call_failed)}: $reason")
+                            } else {
                                 toast("${getString(R.string.call_closed)}: ${Api.call_peer_uri(callp)}: $reason")
+                            }
                         }
                     }
                 }

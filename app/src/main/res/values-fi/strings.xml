@@ -186,6 +186,9 @@
     <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan.</string>
     <string name="manual">Manuaalinen</string>
     <string name="auto">Automaattinen</string>
+    <string name="redirect_mode">Uudelleenohjaustapa</string>
+    <string name="redirect_mode_help">Valitsee toteutetaanko puhelun uudelleenohjauspyyntö
+        automaattisesti vai kysytäänkö vahvistusta.</string>
     <string name="voicemail_uri">Puhepostin URI</string>
     <string name="voicemain_uri_help">SIP URI, jota käytetään
         puhepostiviestien kuunteluun.  Jos URI:a ei ole annettu, tietoa
@@ -521,6 +524,9 @@
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Siirtopyyntö</string>
     <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'\?</string>
+    <string name="redirect_notice">Automaattinen uudelleenohjaus kohteeseen \'%1$s\'\</string>
+    <string name="redirect_request">Uudelleenohjauspyyntö</string>
+    <string name="redirect_request_query">Hyväksytkö puhelun uudelleenohjauksen kohteeseen \'%1$s\'\?</string>
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
