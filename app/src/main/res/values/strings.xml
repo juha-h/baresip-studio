@@ -499,7 +499,7 @@
     <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'\?</string>
     <string name="redirect_notice">Automatic redirection to \'%1$s\'\</string>
     <string name="redirect_request">Redirect Request</string>
-    <string name="redirect_request_query">Do you accept to call redirection to \'%1$s\'\?</string>
+    <string name="redirect_request_query">Do you accept call redirection to \'%1$s\'\?</string>
     <string name="call_failed">Call failed</string>
     <string name="call_closed">Call is closed</string>
     <string name="call_not_secure">This call is NOT secure!</string>
