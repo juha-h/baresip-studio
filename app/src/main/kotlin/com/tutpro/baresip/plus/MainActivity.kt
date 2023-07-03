@@ -1446,15 +1446,11 @@ class MainActivity : AppCompatActivity() {
             "call answered" -> {
                 showCall(ua)
             }
-            "call redirect" -> {
+            "call redirect", "video call redirect" -> {
                 val redirectUri = ev[1]
                 val target = Utils.friendlyUri(this, redirectUri, acc)
-
                 if (acc.autoRedirect) {
-                    if (ua.account.aor != aorSpinner.tag)
-                        spinToAor(ua.account.aor)
-                    callUri.setText(redirectUri)
-                    callButton.performClick()
+                    redirect(ev[0], ua, redirectUri)
                     Toast.makeText(applicationContext,
                         String.format(getString(R.string.redirect_notice), target),
                         Toast.LENGTH_SHORT
@@ -1464,10 +1460,7 @@ class MainActivity : AppCompatActivity() {
                         setTitle(R.string.redirect_request)
                         setMessage(String.format(getString(R.string.redirect_request_query), target))
                         setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                            if (ua.account.aor != aorSpinner.tag)
-                                spinToAor(ua.account.aor)
-                            callUri.setText(redirectUri)
-                            callButton.performClick()
+                            redirect(ev[0], ua, redirectUri)
                             dialog.dismiss()
                         }
                         setNeutralButton(getString(R.string.no)) { dialog, _ ->
@@ -1680,6 +1673,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         handleNextEvent()
+    }
+
+    private fun redirect(event: String, ua: UserAgent, redirectUri: String) {
+        if (ua.account.aor != aorSpinner.tag)
+            spinToAor(ua.account.aor)
+        callUri.setText(redirectUri)
+        if (event == "call redirect")
+            callButton.performClick()
+        else
+            callVideoButton.performClick()
     }
 
     private fun reStart() {

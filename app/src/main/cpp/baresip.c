@@ -226,7 +226,10 @@ static void ua_event_handler(
             len = re_snprintf(event_buf, sizeof event_buf, "call answered");
             break;
         case UA_EVENT_CALL_REDIRECT:
-            len = re_snprintf(event_buf, sizeof event_buf, "call redirect,%s", prm + 4);
+            if (sdp_media_ldir(stream_sdpmedia(video_strm(call_video(call)))) != SDP_INACTIVE)
+                len = re_snprintf(event_buf, sizeof event_buf, "video call redirect,%s", prm + 4);
+            else
+                len = re_snprintf(event_buf, sizeof event_buf, "call redirect,%s", prm + 4);
             break;
         case UA_EVENT_CALL_LOCAL_SDP:
             if (strcmp(prm, "offer") == 0)

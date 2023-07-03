@@ -812,7 +812,7 @@ class BaresipService: Service() {
                         else
                             return
                     }
-                    "call redirect" -> {
+                    "call redirect", "video call redirect"-> {
                         stopMediaPlayer()
                     }
                     "call established" -> {
