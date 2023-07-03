@@ -319,4 +319,9 @@
     <string name="default_phone_app">Aplicativo de telefone padrão</string>
     <string name="dialer_role_not_available">A função de discador não está disponível</string>
     <string name="default_phone_app_help">Se marcado, o baresip será o aplicativo de telefone padrão. Não marque caso o seu dispositivo também precise lidar com outras chamadas ou mensagens SIP.</string>
+    <string name="redirect_mode">Modo de redirecionamento</string>
+    <string name="redirect_request">Solicitação de redirecionamento</string>
+    <string name="redirect_notice">Redirecionamento automático para \'%1$s\'\\</string>
+    <string name="redirect_request_query">Você aceita o redirecionamento de chamada para \'%1$s\'\?</string>
+    <string name="redirect_mode_help">Seleciona caso a solicitação de redirecionamento da chamada seja seguida automaticamente ou se caso uma confirmação seja solicitada.</string>
 </resources>
