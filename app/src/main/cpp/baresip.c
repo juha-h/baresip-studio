@@ -225,6 +225,9 @@ static void ua_event_handler(
         case UA_EVENT_CALL_ANSWERED:
             len = re_snprintf(event_buf, sizeof event_buf, "call answered");
             break;
+        case UA_EVENT_CALL_REDIRECT:
+            len = re_snprintf(event_buf, sizeof event_buf, "call redirect,%s", prm + 4);
+            break;
         case UA_EVENT_CALL_LOCAL_SDP:
             if (strcmp(prm, "offer") == 0)
                 return;
@@ -1044,6 +1047,18 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1answermode
 {
     const uint32_t mode = (uint32_t)jMode;
     return account_set_answermode((struct account *)acc, mode);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_account_1sip_1autoredirect(
+        JNIEnv *env, jobject thiz, jlong acc)
+{
+    return account_sip_autoredirect((struct account *)acc);
+}
+
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1sip_1autoredirect(
+        JNIEnv *env, jobject thiz, jlong acc, jboolean allow)
+{
+    return account_set_sip_autoredirect((struct account *)acc, allow);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_account_1rtcp_1mux(

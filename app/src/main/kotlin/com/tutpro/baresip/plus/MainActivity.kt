@@ -1446,6 +1446,38 @@ class MainActivity : AppCompatActivity() {
             "call answered" -> {
                 showCall(ua)
             }
+            "call redirect" -> {
+                val redirectUri = ev[1]
+                val target = Utils.friendlyUri(this, redirectUri, acc)
+
+                if (acc.autoRedirect) {
+                    if (ua.account.aor != aorSpinner.tag)
+                        spinToAor(ua.account.aor)
+                    callUri.setText(redirectUri)
+                    callButton.performClick()
+                    Toast.makeText(applicationContext,
+                        String.format(getString(R.string.redirect_notice), target),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
+                        setTitle(R.string.redirect_request)
+                        setMessage(String.format(getString(R.string.redirect_request_query), target))
+                        setPositiveButton(getString(R.string.yes)) { dialog, _ ->
+                            if (ua.account.aor != aorSpinner.tag)
+                                spinToAor(ua.account.aor)
+                            callUri.setText(redirectUri)
+                            callButton.performClick()
+                            dialog.dismiss()
+                        }
+                        setNeutralButton(getString(R.string.no)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
+                }
+                showCall(ua)
+            }
             "call established" -> {
                 if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
                     Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
