@@ -1,0 +1,4 @@
+- Added Redirect Mode account setting to choose if call redirect requests
+  (3xx responses) are be followed automatically or if confirmation needs
+  to be asked
+- New Spanish and Portuguese (Brazil) translations
