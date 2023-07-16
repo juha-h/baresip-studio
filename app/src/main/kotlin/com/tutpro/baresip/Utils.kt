@@ -899,14 +899,14 @@ object Utils {
     }
 
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
-        return if (Build.VERSION.SDK_INT > 33)
+        return if (Build.VERSION.SDK_INT >= 31)
              am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         else
             am.isSpeakerphoneOn
     }
 
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
-        if (Build.VERSION.SDK_INT > 33) {
+        if (Build.VERSION.SDK_INT >= 31) {
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
@@ -971,7 +971,7 @@ object Utils {
     }
 
     fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
-        if (Build.VERSION.SDK_INT > 33) {
+        if (Build.VERSION.SDK_INT >= 31) {
             if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
                 setSpeakerPhone(executor, am, true)
             else if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
@@ -994,7 +994,7 @@ object Utils {
     }
 
     private fun clearCommunicationDevice(am: AudioManager) {
-        if (Build.VERSION.SDK_INT > 33) {
+        if (Build.VERSION.SDK_INT >= 31) {
             am.clearCommunicationDevice()
         } else {
             if (am.isSpeakerphoneOn)
