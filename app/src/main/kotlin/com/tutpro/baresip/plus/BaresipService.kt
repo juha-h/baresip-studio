@@ -1604,7 +1604,7 @@ class BaresipService: Service() {
             }
             val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val attributes = AudioAttributesCompat.Builder()
-                .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+                .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributesCompat.CONTENT_TYPE_SPEECH)
                 .build()
             audioFocusRequest = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
