@@ -312,4 +312,7 @@
     <string name="address_family">Família de endereço</string>
     <string name="address_family_help">Escolhe quais endereços IP o baresip usa. Se IPv4 ou IPv6 for escolhido, o baresip usa apenas endereços de IPv4 ou IPv6. Se nenhum for escolhido, o baresip usará endereços de IPv4 e IPv6.</string>
     <string name="rec_in_call">A gravação só pode ser ativada ou desativada quando não estiver numa chamada</string>
+    <string name="redirect_mode">Modo de redirecionamento</string>
+    <string name="call_auto_rejected">Chamada rejeitada automaticamente de %1$s</string>
+    <string name="default_phone_app">Aplicação de telefone padrão</string>
 </resources>
