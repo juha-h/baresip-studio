@@ -7,10 +7,6 @@
 #include <baresip.h>
 #include "logger.h"
 
-#if defined(__ARM_ARCH_7A__)
-    #define long long long
-#endif
-
 enum
 {
     ASYNC_WORKERS = 4
