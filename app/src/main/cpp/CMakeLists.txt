@@ -16,10 +16,6 @@ add_library(lib_re STATIC IMPORTED)
 set_target_properties(lib_re PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/re/lib/${ANDROID_ABI}/libre.a)
 
-set(re_DIR ${distribution_DIR}/re/cmake)
-find_package(re CONFIG REQUIRED HINTS ${distribution_DIR}/re/cmake)
-add_definitions(${RE_DEFINITIONS})
-
 add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
