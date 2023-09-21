@@ -27,6 +27,7 @@ class AudioActivity : AppCompatActivity() {
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
     private var oldAec = false
+    private var toneCountry = BaresipService.toneCountry
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -122,6 +123,27 @@ class AudioActivity : AppCompatActivity() {
 
         audioDelay = binding.AudioDelay
         audioDelay.setText(BaresipService.audioDelay.toString())
+
+        val toneCountrySpinner = binding.ToneCountrySpinner
+        val toneCountryKeys = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
+        val toneCountryVals = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
+        val keyIx = toneCountryKeys.indexOf(toneCountry)
+        val keyVal = toneCountryVals.elementAt(keyIx)
+        toneCountryKeys.removeAt(keyIx)
+        toneCountryVals.removeAt(keyIx)
+        toneCountryKeys.add(0, toneCountry)
+        toneCountryVals.add(0, keyVal)
+        val toneCountryAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
+            toneCountryVals)
+        toneCountryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        toneCountrySpinner.adapter = toneCountryAdapter
+        toneCountrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                toneCountry = toneCountryKeys[toneCountryVals.indexOf(parent.selectedItem.toString())]
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
 
         bindTitles()
 
@@ -228,6 +250,12 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
+                if (BaresipService.toneCountry != toneCountry) {
+                    BaresipService.toneCountry = toneCountry
+                    Config.replaceVariable("tone_country", toneCountry)
+                    save = true
+                }
+
                 if (save)
                     Config.save()
 
@@ -278,6 +306,10 @@ class AudioActivity : AppCompatActivity() {
         binding.AudioDelayTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.audio_delay),
                     getString(R.string.audio_delay_help))
+        }
+        binding.ToneCountryTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.tone_country),
+                getString(R.string.tone_country_help))
         }
     }
 

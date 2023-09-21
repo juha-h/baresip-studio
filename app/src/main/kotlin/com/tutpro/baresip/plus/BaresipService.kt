@@ -556,6 +556,7 @@ class BaresipService: Service() {
             sendBroadcast(Intent("com.tutpro.baresip.plus.Restart"))
     }
 
+    @SuppressLint("DiscouragedApi")
     @Keep
     fun uaEvent(event: String, uap: Long, callp: Long) {
 
@@ -708,7 +709,16 @@ class BaresipService: Service() {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
                             Api.ua_hangup(uap, callp, 486, "Busy Here")
                             toast(toastMsg)
-                            playUnInterrupted(R.raw.callwaiting, 1)
+                            val name = "callwaiting_$toneCountry"
+                            val resourceId = applicationContext.resources.getIdentifier(
+                                name,
+                                "raw",
+                                applicationContext.packageName)
+                            if (resourceId != 0) {
+                                playUnInterrupted(resourceId, 1)
+                            } else {
+                                Log.e(TAG, "Callwaiting tone $name.wav not found\")")
+                            }
                             if (ua.account.callHistory) {
                                 CallHistoryNew.add(CallHistoryNew(aor, peerUri, "in"))
                                 CallHistoryNew.save()
@@ -1319,26 +1329,46 @@ class BaresipService: Service() {
         }
     }
 
+    @SuppressLint("DiscouragedApi")
     private fun playRingBack() {
         if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.ringback)
-            mediaPlayer?.isLooping = true
-            mediaPlayer?.start()
+            val name = "ringback_$toneCountry"
+            val resourceId = applicationContext.resources.getIdentifier(
+                name,
+                "raw",
+                applicationContext.packageName)
+            if (resourceId != 0) {
+                mediaPlayer = MediaPlayer.create(this, resourceId)
+                mediaPlayer?.isLooping = true
+                mediaPlayer?.start()
+            } else {
+                Log.e(TAG, "Ringback tone $name.wav not found")
+            }
         }
     }
 
+    @SuppressLint("DiscouragedApi")
     private fun playBusy() {
         if (mediaPlayer == null ) {
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.busy)
-            mediaPlayer?.setOnCompletionListener {
-                stopMediaPlayer()
-                if (!Call.inCall()) {
-                    resetCallVolume()
-                    abandonAudioFocus(applicationContext)
-                    proximitySensing(false)
+            val name = "busy_$toneCountry"
+            val resourceId = applicationContext.resources.getIdentifier(
+                name,
+                "raw",
+                applicationContext.packageName)
+            if (resourceId != 0) {
+                mediaPlayer = MediaPlayer.create(this, resourceId)
+                mediaPlayer?.setOnCompletionListener {
+                    stopMediaPlayer()
+                    if (!Call.inCall()) {
+                        resetCallVolume()
+                        abandonAudioFocus(applicationContext)
+                        proximitySensing(false)
+                    }
                 }
+                mediaPlayer?.start()
+            } else {
+                Log.e(TAG, "Busy tone $name.wav not found")
             }
-            mediaPlayer?.start()
         }
     }
 
@@ -1571,6 +1601,7 @@ class BaresipService: Service() {
         var isMainVisible = false
         var isMicMuted = false
         var isRecOn = false
+        var toneCountry = "us"
 
         val uas = ArrayList<UserAgent>()
         val calls = ArrayList<Call>()
