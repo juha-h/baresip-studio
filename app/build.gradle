@@ -8,6 +8,7 @@ android {
     defaultConfig {
         applicationId = 'com.tutpro.baresip.plus'
         minSdkVersion 24
+        //noinspection OldTargetApi becuase 34 has not been released yet
         targetSdkVersion 33
         versionCode = 157
         versionName = '44.2.0'
