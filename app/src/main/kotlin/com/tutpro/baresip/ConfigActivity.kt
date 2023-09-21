@@ -535,9 +535,10 @@ class ConfigActivity : AppCompatActivity() {
                     restart = true
                 }
 
-                val dnsServers = addMissingPorts(
-                    dnsServers.text.toString().trim().lowercase(Locale.ROOT))
-                if (dnsServers != oldDnsServers) {
+                var dnsServers = dnsServers.text.toString().lowercase(Locale.ROOT)
+                    .replace(" ", "")
+                dnsServers = addMissingPorts(dnsServers)
+                if (dnsServers != oldDnsServers.replace(" ", "")) {
                     if (!checkDnsServers(dnsServers)) {
                         Utils.alertView(this, getString(R.string.notice),
                                 "${getString(R.string.invalid_dns_servers)}: $dnsServers")

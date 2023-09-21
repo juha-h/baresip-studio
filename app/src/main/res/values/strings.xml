@@ -359,6 +359,8 @@
     <string name="invalid_audio_delay">Invalid Audio Delay \'%1$s\'. Valid values are from 100 to 3000.</string>
     <string name="default_call_volume">Default Call Volume</string>
     <string name="default_call_volume_help">If set, default call audio volume at scale 1–10.</string>
+    <string name="tone_country">Tone Country</string>
+    <string name="tone_country_help">Country of call ringing, waiting, and callee busy tones</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="dark_theme_help">Force dark display theme</string>
     <string name="video_size">Video Frame Size</string>

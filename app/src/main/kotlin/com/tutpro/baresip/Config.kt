@@ -129,6 +129,11 @@ object Config {
             config = "${config}audio_delay ${BaresipService.audioDelay}\n"
         }
 
+        val toneCountry = previousVariable("tone_country")
+        if (toneCountry != "")
+            BaresipService.toneCountry = toneCountry
+        config = "${config}tone_country ${BaresipService.toneCountry}\n"
+
         save()
         BaresipService.isConfigInitialized = true
 

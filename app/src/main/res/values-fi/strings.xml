@@ -383,8 +383,9 @@
     <string name="invalid_audio_delay">Virheellinen audioviive \'%1$s\'. Sallittu arvo on välillä 100–3000.</string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
-    asteikolla 1–10.
-    </string>
+        asteikolla 1–10.</string>
+    <string name="tone_country">Puheluäänien maa</string>
+    <string name="tone_country_help">Soitto-, odotus- ja varattuäänien maa</string>
     <string name="dark_theme">Tumma teema</string>
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
     <string name="video_size">Videon kehyskoko</string>
