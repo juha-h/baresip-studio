@@ -981,6 +981,19 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1set_1rtcp_1mux(
     return account_set_rtcp_mux((struct account *)acc, value);
 }
 
+JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1rel100_1mode(
+        JNIEnv *env, jobject thiz, jlong acc)
+{
+    return account_rel100_mode((struct account *)acc);
+}
+
+JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1set_1rel100_1mode(
+        JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+{
+    const uint32_t mode = (uint32_t)jMode;
+    return account_set_rel100_mode((struct account *)acc, mode);
+}
+
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1dtmfmode(
         JNIEnv *env, jobject thiz, jlong acc)
 {

@@ -8,6 +8,9 @@ object Api {
     const val ANSWERMODE_AUTO = 2
     const val DTMFMODE_RTP_EVENT = 0
     const val DTMFMODE_SIP_INFO = 1
+    const val REL100_DISABLED = 0
+    const val REL100_ENABLED = 1
+    // const cal REL100_REQUIRED = 2
 
     const val SDP_INACTIVE = 0
     const val SDP_RECVONLY = 1
@@ -48,6 +51,8 @@ object Api {
     external fun account_set_answermode(acc: Long, mode: Int): Int
     external fun account_sip_autoredirect(acc: Long): Boolean
     external fun account_set_sip_autoredirect(acc: Long, allow: Boolean)
+    external fun account_rel100_mode(acc: Long): Int
+    external fun account_set_rel100_mode(acc: Long, mode: Int): Int
     external fun account_rtcp_mux(acc: Long): Boolean
     external fun account_set_rtcp_mux(acc: Long, value: Boolean): Int
     external fun account_dtmfmode(acc: Long): Int
