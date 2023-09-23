@@ -171,7 +171,7 @@
     <string name="rtcp_mux">RTCP Multiplexing</string>
     <string name="rtcp_mux_help">If checked, RTP and RTCP packets are multiplexed on a single port (RFC 5761).</string>
     <string name="rel_100">Reliable Provisional Responses</string>
-    <string name="rel_100_help">If checked, indicate support for reliable provisional responses.</string>
+    <string name="rel_100_help">If checked, indicate support for reliable provisional responses (RFC 3262).</string>
     <string name="dtmf_mode">DTMF Mode</string>
     <string name="dtmf_mode_help">Selects how DTMF tones 0–9, #, *, and A-D are sent.</string>
     <string name="dtmf_inband">In-band RTP Events</string>

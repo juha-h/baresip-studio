@@ -178,6 +178,9 @@
     <string name="rtcp_mux_help">Jos merkitty, RTP- and RTCP-paketit multipleksataan samaan porttiin
         (RFC 5761).
     </string>
+    <string name="rel_100">Luotettavat alustavat vastaukset</string>
+    <string name="rel_100_help">Jos merkitty, kutsussa ilmoitetaan luotettavien alustavien vastausten
+        tukemisesta (RFC 3262).</string>
     <string name="dtmf_mode">DTMF-moodi</string>
     <string name="dtmf_mode_help">Valitsee tavan, miten DTMF-merkit 0–9, #, * ja A-D lähetetään.</string>
     <string name="dtmf_inband">RTP</string>
