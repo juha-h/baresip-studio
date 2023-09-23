@@ -193,7 +193,7 @@ class AccountActivity : AppCompatActivity() {
                                     if (text.isNotEmpty())
                                         acc.stunServer = text
                                 "rtcp-mux" ->
-                                    it cacc.rtcpMux = text == "yes"
+                                    acc.rtcpMux = text == "yes"
                                 "100rel-mode" ->
                                     acc.rel100Mode = if (text == "yes")
                                             Api.REL100_ENABLED
@@ -633,6 +633,7 @@ class AccountActivity : AppCompatActivity() {
                     val mode = if (rel100Check.isChecked) Api.REL100_ENABLED else Api.REL100_DISABLED
                     if (Api.account_set_rel100_mode(acc.accp, mode) == 0) {
                         acc.rel100Mode = Api.account_rel100_mode(acc.accp)
+                        Api.ua_update_account(ua.uap)
                         Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
                     } else {
                         Log.e(TAG, "Setting of account_rel100Mode failed")
