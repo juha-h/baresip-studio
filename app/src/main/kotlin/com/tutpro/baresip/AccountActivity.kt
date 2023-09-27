@@ -45,6 +45,7 @@ class AccountActivity : AppCompatActivity() {
     private lateinit var mediaEnc: String
     private lateinit var mediaEncSpinner: Spinner
     private lateinit var rtcpCheck: CheckBox
+    private lateinit var rel100Check: CheckBox
     private var dtmfMode = Api.DTMFMODE_RTP_EVENT
     private lateinit var dtmfModeSpinner: Spinner
     private var answerMode = Api.ANSWERMODE_MANUAL
@@ -95,6 +96,7 @@ class AccountActivity : AppCompatActivity() {
         stunPass = binding.StunPass
         mediaEncSpinner = binding.mediaEncSpinner
         rtcpCheck = binding.RtcpMux
+        rel100Check = binding.Rel100
         dtmfModeSpinner = binding.dtmfModeSpinner
         answerModeSpinner = binding.answerModeSpinner
         redirectModeSpinner = binding.redirectModeSpinner
@@ -192,6 +194,11 @@ class AccountActivity : AppCompatActivity() {
                                         acc.stunServer = text
                                 "rtcp-mux" ->
                                     acc.rtcpMux = text == "yes"
+                                "100rel-mode" ->
+                                    acc.rel100Mode = if (text == "yes")
+                                            Api.REL100_ENABLED
+                                        else
+                                            Api.REL100_DISABLED
                                 "dtmf-mode" ->
                                     if (text in arrayOf("rtp-event", "sip-info")) {
                                         acc.dtmfMode = if (text == "rtp-event")
@@ -306,6 +313,8 @@ class AccountActivity : AppCompatActivity() {
         }
 
         rtcpCheck.isChecked = acc.rtcpMux
+
+        rel100Check.isChecked = acc.rel100Mode == Api.REL100_ENABLED
 
         dtmfMode = acc.dtmfMode
         val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO)
@@ -620,6 +629,17 @@ class AccountActivity : AppCompatActivity() {
                         Log.e(TAG, "Setting of account_rtc_mux failed")
                     }
 
+                if (rel100Check.isChecked != (acc.rel100Mode == Api.REL100_ENABLED)) {
+                    val mode = if (rel100Check.isChecked) Api.REL100_ENABLED else Api.REL100_DISABLED
+                    if (Api.account_set_rel100_mode(acc.accp, mode) == 0) {
+                        acc.rel100Mode = Api.account_rel100_mode(acc.accp)
+                        Api.ua_update_account(ua.uap)
+                        Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
+                    } else {
+                        Log.e(TAG, "Setting of account_rel100Mode failed")
+                    }
+                }
+
                 if (dtmfMode != acc.dtmfMode) {
                     if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
                         acc.dtmfMode = Api.account_dtmfmode(acc.accp)
@@ -799,10 +819,10 @@ class AccountActivity : AppCompatActivity() {
                 getString(R.string.media_encryption_help)
             )
         }
-        binding.RtcpMuxTitle.setOnClickListener {
+        binding.Rel100Title.setOnClickListener {
             Utils.alertView(
-                this, getString(R.string.rtcp_mux),
-                getString(R.string.rtcp_mux_help)
+                this, getString(R.string.rel_100),
+                getString(R.string.rel_100_help)
             )
         }
         binding.DtmfModeTitle.setOnClickListener {

@@ -25,6 +25,7 @@ class Account(val accp: Long) {
     var configuredRegInt = REGISTRATION_INTERVAL
     var mediaEnc = Api.account_mediaenc(accp)
     var rtcpMux = Api.account_rtcp_mux(accp)
+    var rel100Mode = Api.account_rel100_mode(accp)
     var dtmfMode = Api.account_dtmfmode(accp)
     var answerMode = Api.account_answermode(accp)
     var autoRedirect = Api.account_sip_autoredirect(accp)
@@ -123,7 +124,12 @@ class Account(val accp: Long) {
         if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
 
         if (rtcpMux)
-             res += ";rtcp_mux=yes"
+            res += ";rtcp_mux=yes"
+
+        res += if (rel100Mode == Api.REL100_ENABLED)
+            ";100rel=yes"
+        else
+            ";100rel=no"
 
         res = if (vmUri == "")
             "$res;mwi=no"
@@ -136,7 +142,7 @@ class Account(val accp: Long) {
         if (autoRedirect)
             res += ";sip_autoredirect=yes"
 
-        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes;100rel=no"
+        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
 
         var extra = ""
 
