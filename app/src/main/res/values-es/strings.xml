@@ -358,4 +358,6 @@
     <string name="redirect_request_query">¿Aceptas la redirección de llamadas a \'%1$s\'\?</string>
     <string name="redirect_mode">Modo de redirección</string>
     <string name="redirect_mode_help">Selecciona si la solicitud de redirección de las llamadas se realiza automáticamente o si se solicita confirmación.</string>
+    <string name="tone_country">Tono para el país</string>
+    <string name="tone_country_help">Timbre de llamada, espera y tonos de ocupado de la llamada para un país</string>
 </resources>
