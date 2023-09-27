@@ -159,7 +159,7 @@
     <string name="info">Información</string>
     <string name="notice">Aviso</string>
     <string name="cancel">Cancelar</string>
-    <string name="ok">Aceptar</string>
+    <string name="ok">De acuerdo</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="accept">Aceptar</string>
@@ -245,7 +245,7 @@
     <string name="confirmation">Confirmación</string>
     <string name="help">Ayuda</string>
     <string name="android_contact_help">Si está marcada, este contacto se añade a los contactos de Android.</string>
-    <string name="reset">Reiniciar</string>
+    <string name="reset">Restablecer</string>
     <string name="reset_config_alert">¿Estás seguro de que quieres restablecer los valores de fábrica\?</string>
     <string name="sip_trace_help">Si está marcada y si Debug está marcada, los mensajes Logcat incluyen también la petición SIP y la traza de respuesta. Desmarcado automáticamente al iniciar baresip.</string>
     <string name="sip_trace">Seguimiento SIP</string>
@@ -360,4 +360,6 @@
     <string name="redirect_mode_help">Selecciona si la solicitud de redirección de las llamadas se realiza automáticamente o si se solicita confirmación.</string>
     <string name="tone_country">Tono para el país</string>
     <string name="tone_country_help">Timbre de llamada, espera y tonos de ocupado de la llamada para un país</string>
+    <string name="rel_100_help">Si está marcado, indica el soporte para las respuestas provisionales fiables (RFC 3262).</string>
+    <string name="rel_100">Respuestas provisionales fiables</string>
 </resources>
