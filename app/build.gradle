@@ -10,8 +10,8 @@ android {
         minSdkVersion 24
         //noinspection OldTargetApi becuase 34 has not been released yet
         targetSdkVersion 33
-        versionCode = 157
-        versionName = '44.2.0'
+        versionCode = 158
+        versionName = '45.0.0'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
