@@ -326,4 +326,6 @@
     <string name="redirect_mode_help">Seleciona caso a solicitação de redirecionamento da chamada seja seguida automaticamente ou se caso uma confirmação seja solicitada.</string>
     <string name="tone_country">Tom do país</string>
     <string name="tone_country_help">Toque da chamada do país, espera e tom de chamada ocupada</string>
+    <string name="rel_100_help">Se marcado, indica suporte para respostas provisórias confiáveis (RFC 3262).</string>
+    <string name="rel_100">Respostas provisórias confiáveis</string>
 </resources>
