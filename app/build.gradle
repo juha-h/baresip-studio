@@ -4,14 +4,14 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion = 33
-    ndkVersion '25.2.9519653'
+    ndkVersion '26.0.10792818'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 23
         //noinspection OldTargetApi becuase 34 has not been released yet
         targetSdkVersion 33
-        versionCode = 293
-        versionName = '58.0.1'
+        versionCode = 292
+        versionName = '58.0.0'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'

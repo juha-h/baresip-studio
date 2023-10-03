@@ -1,5 +1,0 @@
-- Added Reliable Provisional Responses Account Configuration option
-- Added Tone Country Audio Configuration option (credits to Robert Averbeck for providing the tone files)
-- Fixed AudioManager related SDK version test
-- New  Spanish, Portuguese and Portuguese (Brazil) translations
-- Upstream bug fixes and improvements
