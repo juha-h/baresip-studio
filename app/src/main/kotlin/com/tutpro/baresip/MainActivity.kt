@@ -720,11 +720,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
-            AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
-            delegate.applyDayNight()
-        }
-
     } // OnCreate
 
     override fun onStart() {
@@ -1027,6 +1022,10 @@ class MainActivity : AppCompatActivity() {
                     aorSpinner.setSelection(0)
                     aorSpinner.tag = BaresipService.uas[0].account.aor
                 }
+            }
+            if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+                AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
+                delegate.applyDayNight()
             }
             handleNextEvent()
             return
