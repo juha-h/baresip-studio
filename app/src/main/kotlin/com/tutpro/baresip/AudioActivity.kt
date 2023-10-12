@@ -329,7 +329,7 @@ class AudioActivity : AppCompatActivity() {
     }
 
     companion object {
-        val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "gsm", "g711")
+        val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "codec2", "g711")
     }
 
 }
