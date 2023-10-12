@@ -955,7 +955,7 @@ object Utils {
         }
     }
 
-    fun bitmapFromView(view: View): Bitmap? {
+    fun bitmapFromView(view: View): Bitmap {
         val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
@@ -967,6 +967,7 @@ object Utils {
         return if (Build.VERSION.SDK_INT >= 31)
             am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         else
+            @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
     }
 
@@ -1030,8 +1031,9 @@ object Utils {
                 Log.d(TAG, "New com device/mode is ${am.communicationDevice!!.type}/${am.mode}")
             }
         } else {
+            @Suppress("DEPRECATION")
             am.isSpeakerphoneOn = enable
-            Log.d(TAG, "Speakerphone is ${am.isSpeakerphoneOn}")
+            Log.d(TAG, "Speakerphone is $enable")
         }
     }
 
@@ -1042,6 +1044,7 @@ object Utils {
             else if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
                 setSpeakerPhone(executor, am, false)
         } else {
+            @Suppress("DEPRECATION")
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
         }
     }
@@ -1062,6 +1065,7 @@ object Utils {
         if (Build.VERSION.SDK_INT >= 31) {
             am.clearCommunicationDevice()
         } else {
+            @Suppress("DEPRECATION")
             if (am.isSpeakerphoneOn)
                 am.isSpeakerphoneOn = false
         }

@@ -1060,14 +1060,12 @@ class MainActivity : AppCompatActivity() {
         speakerButton.layoutParams = prm
         speakerButton.setOnClickListener {
             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-            if (Build.VERSION.SDK_INT < 31) {
-                if (am.isSpeakerphoneOn) {
-                    speakerButton.setImageResource(R.drawable.speaker_on_button)
-                    if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
-                } else {
-                    speakerButton.setImageResource(R.drawable.speaker_off_button)
-                    if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
-                }
+            if (Utils.isSpeakerPhoneOn(am)) {
+                speakerButton.setImageResource(R.drawable.speaker_on_button)
+                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+            } else {
+                speakerButton.setImageResource(R.drawable.speaker_off_button)
+                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
             }
         }
         videoLayout.addView(speakerButton)
