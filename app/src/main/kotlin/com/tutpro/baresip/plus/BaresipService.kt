@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.database.ContentObserver
 import android.graphics.BitmapFactory
 import android.media.*
@@ -247,7 +248,12 @@ class BaresipService: Service() {
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip.plus:proximity_wakelog")
 
-        wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
+        wifiLock = if (VERSION.SDK_INT < 29)
+            @Suppress("DEPRECATION")
+            wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip+")
+        else
+            wm.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, "Baresip+")
+
         wifiLock.setReferenceCounted(false)
 
         bluetoothReceiver = object : BroadcastReceiver() {
@@ -1220,7 +1226,10 @@ class BaresipService: Service() {
                 .setCustomContentView(notificationLayout)
         if (VERSION.SDK_INT >= 31)
             snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
-        startForeground(STATUS_NOTIFICATION_ID, snb.build())
+        if (VERSION.SDK_INT >= 29)
+            startForeground(STATUS_NOTIFICATION_ID, snb.build(), FOREGROUND_SERVICE_TYPE_PHONE_CALL)
+        else
+            startForeground(STATUS_NOTIFICATION_ID, snb.build())
     }
 
     private fun updateStatusNotification() {
@@ -1680,6 +1689,7 @@ class BaresipService: Service() {
 
         private fun isBluetoothScoOn(am: AudioManager): Boolean {
             return if (VERSION.SDK_INT < 31)
+                @Suppress("DEPRECATION")
                 am.isBluetoothScoOn
             else
                 if (am.communicationDevice != null)
@@ -1697,6 +1707,7 @@ class BaresipService: Service() {
             Log.d(TAG, "Starting Bluetooth SCO at count $count")
             Handler(Looper.getMainLooper()).postDelayed({
                 if (VERSION.SDK_INT < 31) {
+                    @Suppress("DEPRECATION")
                     am.startBluetoothSco()
                 } else {
                     Utils.setCommunicationDevice(am, AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
@@ -1717,6 +1728,7 @@ class BaresipService: Service() {
             }
             Handler(Looper.getMainLooper()).postDelayed({
                 if (VERSION.SDK_INT < 31)
+                    @Suppress("DEPRECATION")
                     am.stopBluetoothSco()
                 else
                     am.clearCommunicationDevice()
