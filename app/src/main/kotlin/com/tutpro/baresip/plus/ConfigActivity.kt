@@ -606,8 +606,12 @@ class ConfigActivity : AppCompatActivity() {
                     AppCompatDelegate.MODE_NIGHT_YES
                 else
                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                if (oldDisplayTheme != newDisplayTheme)
+                if (oldDisplayTheme != newDisplayTheme) {
                     Preferences(applicationContext).displayTheme = newDisplayTheme
+                    Config.replaceVariable("dark_theme",
+                        if (darkTheme.isChecked) "yes" else "no")
+                    save = true
+                }
 
                 if (oldContactsMode != contactsMode) {
                     Config.replaceVariable("contacts_mode", contactsMode)

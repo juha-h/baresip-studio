@@ -2,6 +2,7 @@ package com.tutpro.baresip.plus
 
 import android.Manifest
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
@@ -77,6 +78,14 @@ object Config {
                 else
                     "${config}dns_server [${dnsServer.hostAddress}]:53\n"
             BaresipService.dynDns = true
+        }
+
+        val darkTheme = previousVariable("dark_theme")
+        Preferences(ctx).displayTheme = if (darkTheme == "yes") {
+            config = "${config}dark_theme yes\n"
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
         var contactsMode = previousVariable("contacts_mode").lowercase()
