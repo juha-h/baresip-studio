@@ -554,7 +554,7 @@
         Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.</string>
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
-    <string name="no_bluetooth">baresip voi havaita Bluetooth-yhteyttä ilman
+    <string name="no_bluetooth">baresip ei voi havaita Bluetooth-yhteyttä ilman
         \"Lähellä olevat laitteet\" lupaa.</string>
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>
