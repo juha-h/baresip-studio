@@ -312,8 +312,7 @@
         ja pääsyä verkkoon.</string>
     <string name="default_phone_app">Oletuspuhelinsovellus</string>
     <string name="dialer_role_not_available">Puhelinrooli ei ole saatavana</string>
-    <string name="default_phone_app_help">Jos merkity, baresip on oletuspuhelinsovellus.  Älä
-        merkitse, jos laitteesi täytyy hallita myös muita kuin SIP-puheluita tai -viestejä.</string>
+    <string name="default_phone_app_help">Jos merkity, baresip on oletuspuhelinsovellus. Älä merkitse, jos laitteesi täytyy hallita myös muita kuin SIP-puheluita tai -viestejä.</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
     \'osoite:portti\', missä baresip kuuntelee sisään tulevia
@@ -566,11 +565,6 @@
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audio fokus evätty!</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
-    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja
-        Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja
-        Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
-    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten,
-        Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan
-        Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten
-        näyttämistä varten.</string>
+    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
+    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten, Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten näyttämistä varten.</string>
 </resources>
