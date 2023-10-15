@@ -274,11 +274,15 @@ class CallsActivity : AppCompatActivity() {
                     }
                 }
                 if (uaHistory.isNotEmpty() && (uaHistory.last().peerUri == h.peerUri))
-                    uaHistory.last().details.add(CallRow.Details(direction, h.rejected,
-                            h.startTime, h.stopTime, h.recording))
+                    uaHistory.last().details.add(CallRow.Details(
+                        direction, h.startTime,
+                        h.stopTime, h.recording
+                    ))
                 else
-                    uaHistory.add(CallRow(h.aor, h.peerUri, direction, h.rejected, h.startTime,
-                        h.stopTime, h.recording))
+                    uaHistory.add(CallRow(
+                        h.aor, h.peerUri, direction, h.startTime, h.stopTime,
+                        h.recording
+                    ))
             }
         }
     }
