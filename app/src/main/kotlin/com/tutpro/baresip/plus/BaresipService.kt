@@ -11,6 +11,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.database.ContentObserver
 import android.graphics.BitmapFactory
@@ -1226,10 +1228,21 @@ class BaresipService: Service() {
                 .setCustomContentView(notificationLayout)
         if (VERSION.SDK_INT >= 31)
             snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
-        if (VERSION.SDK_INT >= 29)
-            startForeground(STATUS_NOTIFICATION_ID, snb.build(), FOREGROUND_SERVICE_TYPE_PHONE_CALL)
-        else
-            startForeground(STATUS_NOTIFICATION_ID, snb.build())
+        try {
+            if (VERSION.SDK_INT >= 29)
+                startForeground(
+                    STATUS_NOTIFICATION_ID, snb.build(),
+                    if (VERSION.SDK_INT >= 30)
+                        FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE or
+                                FOREGROUND_SERVICE_TYPE_CAMERA
+                    else
+                        FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                )
+            else
+                startForeground(STATUS_NOTIFICATION_ID, snb.build())
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start foreground service")
+        }
     }
 
     private fun updateStatusNotification() {
