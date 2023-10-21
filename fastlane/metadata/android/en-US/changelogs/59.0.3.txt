@@ -1,0 +1,5 @@
+- Now targeting API level 34 (Android 14)
+- Added support for Codec2 audio codec
+- Recording of next call is not cleared when call is closed
+- Included also Dark Theme setting in backup file
+- Upstream fix of re-INVITE (call hold/resume)
