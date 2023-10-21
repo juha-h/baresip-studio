@@ -197,12 +197,7 @@ class MainActivity : AppCompatActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    if (speakerIcon != null) {
-                        if (Utils.isSpeakerPhoneOn(am))
-                            speakerIcon!!.setIcon(R.drawable.speaker_on)
-                        else
-                            speakerIcon!!.setIcon(R.drawable.speaker_off)
-                    }
+                    setSpeakerIcon()
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
@@ -721,6 +716,15 @@ class MainActivity : AppCompatActivity() {
         }
 
     } // OnCreate
+
+    private fun setSpeakerIcon() {
+        if (speakerIcon != null) {
+            if (Utils.isSpeakerPhoneOn(am))
+                speakerIcon!!.setIcon(R.drawable.speaker_on)
+            else
+                speakerIcon!!.setIcon(R.drawable.speaker_off)
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -1301,10 +1305,7 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.speaker_icon, menu)
         speakerIcon = menu.findItem(R.id.speakerIcon)
-        if (Utils.isSpeakerPhoneOn(am))
-            speakerIcon!!.setIcon(R.drawable.speaker_on)
-        else
-            speakerIcon!!.setIcon(R.drawable.speaker_off)
+        setSpeakerIcon()
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -1352,12 +1353,7 @@ class MainActivity : AppCompatActivity() {
                                 "${am.communicationDevice!!.type}/${am.mode}"
                     )
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                if (speakerIcon != null) {
-                    if (Utils.isSpeakerPhoneOn(am))
-                        speakerIcon!!.setIcon(R.drawable.speaker_on)
-                    else
-                        speakerIcon!!.setIcon(R.drawable.speaker_off)
-                }
+                setSpeakerIcon()
             }
 
             R.id.config -> {
