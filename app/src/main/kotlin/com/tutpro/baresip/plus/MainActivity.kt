@@ -12,7 +12,6 @@ import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
@@ -218,16 +217,7 @@ class MainActivity : AppCompatActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    if (speakerIcon != null) {
-                        if (Utils.isSpeakerPhoneOn(am))
-                            speakerIcon!!.setIcon(R.drawable.speaker_on)
-                        else
-                            speakerIcon!!.setIcon(R.drawable.speaker_off)
-                    }
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
-                    else
-                        speakerButton.setImageResource(R.drawable.speaker_off_button)
+                    setSpeakerButtonAndIcon()
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
@@ -650,9 +640,6 @@ class MainActivity : AppCompatActivity() {
                         else
                             call.setVideoDirection(Api.SDP_RECVONLY)
                     }
-                    Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
-                    if (Build.VERSION.SDK_INT < 31)
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
                     imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
                 }
             }, 250)
@@ -937,9 +924,6 @@ class MainActivity : AppCompatActivity() {
         vb.layoutParams = prm
         vb.setOnClickListener {
             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
-            Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, false)
-            if (Build.VERSION.SDK_INT < 31 && speakerIcon != null)
-                speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
         videoLayout.addView(vb)
 
@@ -1060,14 +1044,9 @@ class MainActivity : AppCompatActivity() {
         speakerButton.layoutParams = prm
         speakerButton.setOnClickListener {
             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-            if (Utils.isSpeakerPhoneOn(am)) {
-                speakerButton.setImageResource(R.drawable.speaker_on_button)
-                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
-            } else {
-                speakerButton.setImageResource(R.drawable.speaker_off_button)
-                if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
-            }
+            setSpeakerButtonAndIcon()
         }
+        setSpeakerButtonAndIcon()
         videoLayout.addView(speakerButton)
 
         // Mic Button
@@ -1112,9 +1091,6 @@ class MainActivity : AppCompatActivity() {
             if (!Utils.isCameraAvailable(this))
                 Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
             hangupButton.performClick()
-            Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, false)
-            if (Build.VERSION.SDK_INT < 31 && speakerIcon != null)
-                speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
         videoLayout.addView(hb)
 
@@ -1170,6 +1146,16 @@ class MainActivity : AppCompatActivity() {
         videoOnHoldNotice.visibility = View.GONE
         videoLayout.addView(videoOnHoldNotice)
 
+    }
+
+    private fun setSpeakerButtonAndIcon() {
+        if (Utils.isSpeakerPhoneOn(am)) {
+            speakerButton.setImageResource(R.drawable.speaker_on_button)
+            if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
+        } else {
+            speakerButton.setImageResource(R.drawable.speaker_off_button)
+            if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -1469,13 +1455,6 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
             }
             "call established" -> {
-                if (Call.ofCallp(params[1] as Long)!!.videoEnabled()) {
-                    Utils.setSpeakerPhone(ContextCompat.getMainExecutor(this), am, true)
-                    if (Build.VERSION.SDK_INT < 31) {
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_on)
-                    }
-                }
                 if (aor == aorSpinner.tag) {
                     dtmf.setText("")
                     dtmf.hint = getString(R.string.dtmf)
@@ -1754,15 +1733,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "Toggling speakerphone when dev/mode is " +
                             "${am.communicationDevice!!.type}/${am.mode}")
                 Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                if (speakerIcon != null) {
-                    if (Utils.isSpeakerPhoneOn(am)) {
-                        speakerButton.setImageResource(R.drawable.speaker_on_button)
-                        speakerIcon!!.setIcon(R.drawable.speaker_on)
-                    } else {
-                        speakerButton.setImageResource(R.drawable.speaker_off_button)
-                        speakerIcon!!.setIcon(R.drawable.speaker_off)
-                    }
-                }
+                setSpeakerButtonAndIcon()
             }
 
             R.id.config -> {
