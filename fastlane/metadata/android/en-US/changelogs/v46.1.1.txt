@@ -1,0 +1,1 @@
+- Upstream fix of crash related to handling of OPTIONS request
