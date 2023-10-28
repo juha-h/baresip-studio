@@ -9,8 +9,8 @@ android {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode = 296
-        versionName = '59.0.3'
+        versionCode = 297
+        versionName = '59.0.4'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
