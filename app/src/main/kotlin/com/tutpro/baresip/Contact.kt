@@ -16,7 +16,8 @@ sealed class Contact {
         var avatarImage: Bitmap? = null
     }
 
-    class AndroidContact(var name: String, var color: Int, var thumbnailUri: Uri?): Contact() {
+    class AndroidContact(var name: String, var color: Int, var thumbnailUri: Uri?,
+                         var favorite: Boolean): Contact() {
         val uris = ArrayList<String>()
     }
 
@@ -118,11 +119,12 @@ sealed class Contact {
             // If phone type is needed, add DATA2 to projection. Then phone type can be get from
             // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
-                    ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
-                    /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI)
+                ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
+                /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI,
+                ContactsContract.Contacts.STARRED)
             val selection =
-                    ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
-                            ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
+                ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
+                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
             BaresipService.androidContacts.clear()
@@ -133,10 +135,11 @@ sealed class Contact {
                 val mime = cur.getString(2)
                 val data = cur.getString(3)
                 val thumb = cur.getString(4)?.toUri()
+                val starred = cur.getInt(5)
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(name, Utils.randomColor(), thumb)
+                    AndroidContact(name, Utils.randomColor(), thumb, starred == 1)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
@@ -251,8 +254,8 @@ sealed class Contact {
 
         private fun sortContacts() {
             BaresipService.contacts.sortBy{ when (it) {
-                is BaresipContact -> it.name
-                is AndroidContact -> it.name
+                is BaresipContact -> "1" + it.name
+                is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
             }}
         }
 

@@ -153,7 +153,12 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                 }
             }
 
-            viewHolder.actionView.visibility = View.GONE
+            if (contact.favorite) {
+                viewHolder.actionView.setImageResource(R.drawable.star)
+                viewHolder.actionView.visibility = View.VISIBLE
+            } else {
+                viewHolder.actionView.visibility = View.GONE
+            }
 
         }
 
