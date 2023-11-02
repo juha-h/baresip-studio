@@ -429,6 +429,7 @@
     <string name="contact_name">Nimi</string>
     <string name="sip_or_tel_uri">SIP tai tel URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
+    <string name="favorite">Suosikki</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>

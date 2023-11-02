@@ -36,6 +36,7 @@ class ContactActivity : AppCompatActivity() {
     private lateinit var cardImageAvatarView: ImageView
     private lateinit var nameView: EditText
     private lateinit var uriView: EditText
+    private lateinit var favoriteCheck: CheckBox
     private lateinit var androidCheck: CheckBox
     private lateinit var menu: Menu
 
@@ -65,6 +66,7 @@ class ContactActivity : AppCompatActivity() {
         cardImageAvatarView = binding.ImageAvatar
         nameView = binding.Name
         uriView = binding.Uri
+        favoriteCheck = binding.Favorite
         androidCheck = binding.Android
 
         newContact = intent.getBooleanExtra("new", false)
@@ -87,6 +89,7 @@ class ContactActivity : AppCompatActivity() {
             else
                 uriView.setText(uri)
             uOrI = uri
+            favoriteCheck.isChecked = false
             if ((BaresipService.contactsMode == "android")) {
                 androidCheck.isChecked = true
                 androidCheck.isClickable = false
@@ -109,6 +112,7 @@ class ContactActivity : AppCompatActivity() {
             title = name
             nameView.setText(name)
             uriView.setText(contact.uri)
+            favoriteCheck.isChecked = contact.favorite
             uOrI = index.toString()
         }
 
@@ -250,13 +254,14 @@ class ContactActivity : AppCompatActivity() {
                         BaresipService.activities.removeAt(0)
                         return true
                     } else {
-                        contact = Contact.BaresipContact(newName, newUri, color, id)
+                        contact = Contact.BaresipContact(newName, newUri, color, id, favoriteCheck.isChecked)
                     }
                 } else {
                     contact = Contact.contacts()[index] as Contact.BaresipContact
                     contact.uri = newUri
                     contact.name = newName
                     contact.color = color
+                    contact.favorite = favoriteCheck.isChecked
                 }
 
                 when (newAvatar) {
@@ -286,7 +291,8 @@ class ContactActivity : AppCompatActivity() {
                 BaresipService.activities.remove("contact,$newContact,$uOrI")
 
                 val i = Intent(this, MainActivity::class.java)
-                i.putExtra("name", newName)
+                if (androidCheck.isChecked && contact.favorite)
+                    i.putExtra("name", newName)
                 setResult(Activity.RESULT_OK, i)
                 finish()
             }
@@ -384,6 +390,7 @@ class ContactActivity : AppCompatActivity() {
                 .withValue(Data.MIMETYPE, mimeType)
                 .withValue(Data.DATA1, contact.uri.substringAfter(":"))
                 .build())
+
         if (contact.avatarImage != null) {
             val photoData: ByteArray? = bitmapToPNGByteArray(contact.avatarImage!!)
             if (photoData != null) {
@@ -443,7 +450,7 @@ class ContactActivity : AppCompatActivity() {
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e(TAG, "Adding of SIP URI $uri failed")
+            Log.e(TAG, "Update of Android URI $uri failed")
             0
         }
     }

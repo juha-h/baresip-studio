@@ -12,7 +12,8 @@ import java.util.ArrayList
 
 sealed class Contact {
 
-    class BaresipContact(var name: String, var uri: String, var color: Int, val id: Long): Contact() {
+    class BaresipContact(var name: String, var uri: String, var color: Int, val id: Long,
+                         var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
     }
 
@@ -110,7 +111,8 @@ sealed class Contact {
         fun saveBaresipContacts() {
             var contents = ""
             for (c in BaresipService.baresipContacts)
-                contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}\n"
+                contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}" +
+                        ";favorite=${if (c.favorite) "yes" else "no"}\n"
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
                     contents.toByteArray())
         }
@@ -196,8 +198,9 @@ sealed class Contact {
                         idValue.toLong()
                     else
                         baseId + contactNo
+                    val  favorite = Utils.paramValue(params, "favorite" ) == "yes"
                     Log.d(TAG, "Restoring contact $name, $uri, $color, $id")
-                    val contact = BaresipContact(name, uri, color, id)
+                    val contact = BaresipContact(name, uri, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {
@@ -254,7 +257,7 @@ sealed class Contact {
 
         private fun sortContacts() {
             BaresipService.contacts.sortBy{ when (it) {
-                is BaresipContact -> "1" + it.name
+                is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
                 is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
             }}
         }

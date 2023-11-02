@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.ContactsContract
@@ -65,6 +66,10 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
 
             viewHolder.nameView.text = contact.name
             viewHolder.nameView.textSize = 20f
+            if (contact.favorite)
+                viewHolder.nameView.setTypeface(null, Typeface.ITALIC)
+            else
+                viewHolder.nameView.setTypeface(null, Typeface.NORMAL)
             viewHolder.nameView.setPadding(6, 6, 0, 6)
 
             if (aor != "") {
@@ -139,6 +144,10 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
 
             viewHolder.nameView.text = contact.name
             viewHolder.nameView.textSize = 20f
+            if (contact.favorite)
+                viewHolder.nameView.setTypeface(null, Typeface.ITALIC)
+            else
+                viewHolder.nameView.setTypeface(null, Typeface.NORMAL)
             viewHolder.nameView.setPadding(6, 6, 0, 6)
 
             viewHolder.nameView.setOnClickListener {
@@ -153,13 +162,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                 }
             }
 
-            if (contact.favorite) {
-                viewHolder.actionView.setImageResource(R.drawable.star)
-                viewHolder.actionView.visibility = View.VISIBLE
-            } else {
-                viewHolder.actionView.visibility = View.GONE
-            }
-
+            viewHolder.actionView.visibility = View.GONE
         }
 
         viewHolder.nameView.setOnLongClickListener {

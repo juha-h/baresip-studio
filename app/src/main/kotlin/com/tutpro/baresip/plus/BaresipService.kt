@@ -72,7 +72,7 @@ class BaresipService: Service() {
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
-    private lateinit var contentObserver: ContentObserver
+    private lateinit var androidContactsObserver: ContentObserver
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
@@ -85,7 +85,7 @@ class BaresipService: Service() {
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
-    private var contentObserverRegistered = false
+    private var androidContactsObserverRegistered = false
     private var isServiceClean = false
 
     @SuppressLint("WakelockTimeout")
@@ -321,9 +321,9 @@ class BaresipService: Service() {
             this.registerReceiver(bluetoothReceiver, filter)
         }
 
-        contentObserver = object : ContentObserver(null) {
+        androidContactsObserver = object : ContentObserver(null) {
             override fun onChange(self: Boolean) {
-                Log.d(TAG, "Contacts change")
+                Log.d(TAG, "Android contacts change")
                 if (contactsMode != "baresip") {
                     Contact.loadAndroidContacts(this@BaresipService.applicationContext)
                     Contact.contactsUpdate()
@@ -415,7 +415,7 @@ class BaresipService: Service() {
                     Contact.restoreBaresipContacts()
                 if (contactsMode != "baresip") {
                     Contact.loadAndroidContacts(applicationContext)
-                    registerContentObserver()
+                    registerAndroidContactsObserver()
                 }
                 Contact.contactsUpdate()
 
@@ -464,11 +464,11 @@ class BaresipService: Service() {
             }
 
             "Start Content Observer" -> {
-                registerContentObserver()
+                registerAndroidContactsObserver()
             }
 
             "Stop Content Observer" -> {
-                unRegisterContentObserver()
+                unRegisterAndroidContactsObserver()
             }
 
             "Call Answer" -> {
@@ -1559,21 +1559,21 @@ class BaresipService: Service() {
         }
     }
 
-    private fun registerContentObserver() {
-        if (!contentObserverRegistered)
+    private fun registerAndroidContactsObserver() {
+        if (!androidContactsObserverRegistered)
             try {
                 contentResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
-                        true, contentObserver)
-                contentObserverRegistered = true
+                        true, androidContactsObserver)
+                androidContactsObserverRegistered = true
             } catch (e: SecurityException) {
                 Log.i(TAG, "No Contacts permission")
             }
     }
 
-    private fun unRegisterContentObserver() {
-        if (contentObserverRegistered) {
-            contentResolver.unregisterContentObserver(contentObserver)
-            contentObserverRegistered = false
+    private fun unRegisterAndroidContactsObserver() {
+        if (androidContactsObserverRegistered) {
+            contentResolver.unregisterContentObserver(androidContactsObserver)
+            androidContactsObserverRegistered = false
         }
     }
 
@@ -1595,8 +1595,8 @@ class BaresipService: Service() {
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
                 wifiLock.release()
-            if (this::contentObserver.isInitialized)
-                contentResolver.unregisterContentObserver(contentObserver)
+            if (this::androidContactsObserver.isInitialized)
+                contentResolver.unregisterContentObserver(androidContactsObserver)
             isServiceClean = true
         }
     }
