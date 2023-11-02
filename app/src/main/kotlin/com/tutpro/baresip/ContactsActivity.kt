@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.SystemClock
+import android.provider.ContactsContract
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
@@ -16,6 +17,7 @@ class ContactsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactsBinding
     private lateinit var clAdapter: ContactListAdapter
     private lateinit var aor: String
+    private var newAndroidName: String? = null
     private var lastClick: Long = 0
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -38,15 +40,31 @@ class ContactsActivity : AppCompatActivity() {
         listView.adapter = clAdapter
         listView.isLongClickable = true
 
-        val contactObserver = Observer<Long> {
+        val androidContactsObserver = Observer<Long> {
+            if (newAndroidName != null) {
+                val contentValues = ContentValues()
+                contentValues.put(ContactsContract.Contacts.STARRED, 1)
+                try {
+                    this.contentResolver.update(
+                        ContactsContract.RawContacts.CONTENT_URI, contentValues,
+                        ContactsContract.Contacts.DISPLAY_NAME + "='" + newAndroidName + "'", null
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Update of Android favorite failed")
+                }
+                newAndroidName = null
+            }
             clAdapter.notifyDataSetChanged()
         }
-        BaresipService.contactUpdate.observe(this, contactObserver)
+        BaresipService.contactUpdate.observe(this, androidContactsObserver)
 
         val contactRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == RESULT_OK)
-                    clAdapter.notifyDataSetChanged()
+                if (it.resultCode == RESULT_OK) {
+                    if (it.data != null && it.data!!.hasExtra("name"))
+                        newAndroidName = it.data!!.getStringExtra("name")
+                }
+                clAdapter.notifyDataSetChanged()
             }
 
         val plusButton = binding.plusButton
