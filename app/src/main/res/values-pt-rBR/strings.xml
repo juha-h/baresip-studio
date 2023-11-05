@@ -328,4 +328,5 @@
     <string name="tone_country_help">Toque da chamada do país, espera e tom de chamada ocupada</string>
     <string name="rel_100_help">Se marcado, indica suporte para respostas provisórias confiáveis (RFC 3262).</string>
     <string name="rel_100">Respostas provisórias confiáveis</string>
+    <string name="favorite">Favorito</string>
 </resources>

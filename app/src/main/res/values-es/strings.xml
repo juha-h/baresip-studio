@@ -362,4 +362,5 @@
     <string name="tone_country_help">Timbre de llamada, espera y tonos de ocupado de la llamada para un país</string>
     <string name="rel_100_help">Si está marcado, indica el soporte para las respuestas provisionales fiables (RFC 3262).</string>
     <string name="rel_100">Respuestas provisionales fiables</string>
+    <string name="favorite">Favoritos</string>
 </resources>
