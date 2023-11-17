@@ -10,11 +10,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ScrollView
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,7 +36,7 @@ import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityConfigBinding
 import java.io.File
 import java.io.FileInputStream
-import java.util.*
+import java.util.Locale
 
 class ConfigActivity : AppCompatActivity() {
 
@@ -59,6 +66,7 @@ class ConfigActivity : AppCompatActivity() {
 
     private var oldAutoStart = ""
     private var oldListenAddr = ""
+    private var managingOverlayPermission = false
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldVerifyServer = false
@@ -95,6 +103,41 @@ class ConfigActivity : AppCompatActivity() {
         autoStart = binding.AutoStart
         oldAutoStart = Config.variable("auto_start")
         autoStart.isChecked = oldAutoStart == "yes"
+        if (autoStart.isChecked && !isAppearOnTopPermissionGranted(this)) {
+            Config.replaceVariable("auto_start", "no")
+            oldAutoStart = "no"
+            save = true
+            autoStart.isChecked = false
+        }
+        autoStart.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (!isAppearOnTopPermissionGranted(this)) {
+                    with(
+                        MaterialAlertDialogBuilder(
+                            this@ConfigActivity,
+                            R.style.AlertDialogTheme
+                        )
+                    ) {
+                        setTitle(getText(R.string.notice))
+                        setMessage(getText(R.string.appear_on_top_permission))
+                        setPositiveButton(getText(R.string.ok)) { dialog, _ ->
+                            dialog.dismiss()
+                            managingOverlayPermission = true
+                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                            startActivity(intent)
+                        }
+                        setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        val dialog = this.create()
+                        dialog.setCancelable(false)
+                        dialog.setCanceledOnTouchOutside(false)
+                        dialog.show()
+                    }
+                    autoStart.isChecked = false
+                }
+            }
+        }
 
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         val androidSettingsRequest = registerForActivityResult(
@@ -436,6 +479,14 @@ class ConfigActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (managingOverlayPermission) {
+            managingOverlayPermission = false
+            autoStart.isChecked = isAppearOnTopPermissionGranted(this)
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         requestPermissionLauncher =
@@ -634,6 +685,10 @@ class ConfigActivity : AppCompatActivity() {
 
         return true
 
+    }
+
+    private fun isAppearOnTopPermissionGranted(ctx: Context): Boolean {
+        return Settings.canDrawOverlays(ctx)
     }
 
     private fun done() {
