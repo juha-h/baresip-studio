@@ -6,7 +6,7 @@
     <string name="about_text">
         <![CDATA[
             <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
-            <p>Juha Heinanen <jh@tutpro.com></p>
+            <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
             <h2>Käyttövihjeitä</h2>
             <ul>
@@ -43,7 +43,7 @@
     <string name="about_text_plus">
         <![CDATA[
             <h1>Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
-            <p>Juha Heinanen <jh@tutpro.com></p>
+            <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
             <h2>Käyttövihjeitä</h2>
             <ul>
