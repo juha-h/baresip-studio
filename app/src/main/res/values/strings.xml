@@ -8,7 +8,7 @@
     <string name="about_text">
         <![CDATA[
         <h1>Baresip library based SIP User Agent</h1>
-        <p>Juha Heinanen <jh@tutpro.com></p>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
         <h2>Usage Hints</h2>
         <ul>
