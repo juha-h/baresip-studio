@@ -248,8 +248,6 @@
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="message_from">Viesti lähettäjältä</string>
     <string name="call_auto_rejected">Automaattisesti hylätty puhelu soittajalta \`%1$s\`</string>
-    <!-- Boot Completed Receiver -->
-    <string name="tap_to_start">Kosketa käynnistääksesi sovelluksen</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
