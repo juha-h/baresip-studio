@@ -1,0 +1,2 @@
+- Start Automatically setting now starts the app rather than notifying about it
+- New Spanish, Portuguese (Brazil), and Russian translations
