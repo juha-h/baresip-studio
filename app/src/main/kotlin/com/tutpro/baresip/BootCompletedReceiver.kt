@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,7 +9,6 @@ import java.nio.charset.StandardCharsets
 
 class BootCompletedReceiver : BroadcastReceiver() {
 
-    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onReceive(context: Context, intent: Intent) {
 
         Log.i(TAG, "BootCompletedReceiver received intent ${intent.action}")
