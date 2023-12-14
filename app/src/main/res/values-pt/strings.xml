@@ -16,7 +16,6 @@
 \n • sip:example.com:5061;transport=tls
 \n • sip:[2001:67c:223:777::10];transport=tcp
 \n • sip:192.168.43.50:443;transport=wss</string>
-    <string name="tap_to_start">Toque para iniciar a aplicação</string>
     <string name="send_message">Enviar Mensagem</string>
     <string name="account_allocation_failure">Falha ao alocar nova conta.</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>

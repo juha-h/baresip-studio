@@ -259,7 +259,6 @@
     <string name="verify_server_help">Si se marca, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS. Si se marca, también se debe cargar el archivo TLS CA.</string>
     <string name="verify_server_error">Los certificados del servidor no pueden ser verificados sin el archivo TLS CA.</string>
     <string name="verify_server">Verificar los certificados del servidor</string>
-    <string name="tap_to_start">Pulse para iniciar la aplicación</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>
     <string name="missed_call_from">Llamada perdida de</string>
     <string name="accounts_help">Cuando se crea una nueva cuenta, el número de puerto de la cuenta y el protocolo de transporte pueden ser dados opcionalmente: &lt;usuario&gt;@&lt;dominio&gt;[:&lt;puerto&gt;][;transporte=udp|tcp|tls]. Si se indica &lt;puerto&gt; y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da &lt;puerto&gt; y se da el protocolo de transporte, &lt;puerto&gt; es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>

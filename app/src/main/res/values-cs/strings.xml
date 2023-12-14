@@ -154,7 +154,6 @@
     <string name="message_from">Zpráva od</string>
     <string name="call_history">Historie volání</string>
     <string name="calls_calls">volání</string>
-    <string name="tap_to_start">Klepnutím spustíte aplikaci</string>
     <string name="call_details">Podrobnosti o volání</string>
     <string name="calls_call">volání</string>
     <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS potřebných certifikačních autorit. Ve verzích systému Android 9 a nižších se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>

@@ -33,7 +33,6 @@
     <string name="calls_calls">samtal</string>
     <string name="call">Ring</string>
     <string name="call_history">Samtalshistorik</string>
-    <string name="tap_to_start">Tryck för att starta applikationen</string>
     <string name="message_from">Meddelande från</string>
     <string name="missed_call_from">Missat samtal från</string>
     <string name="incoming_call_from">Inkommande samtal från</string>
