@@ -234,7 +234,6 @@
     <string name="calls_calls">通話</string>
     <string name="call">着信中</string>
     <string name="call_history">通話履歴</string>
-    <string name="tap_to_start">アプリを起動するにはタップしてください</string>
     <string name="message_from">メッセージ着信</string>
     <string name="transfer_request_to">転送リクエスト</string>
     <string name="incoming_call_from">着信</string>

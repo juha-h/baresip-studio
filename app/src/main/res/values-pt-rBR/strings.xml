@@ -215,7 +215,6 @@
     <string name="aec_extended_filter_help">Caso esteja marcado, o cancelamento do eco estará utilizando um filtro estendido.</string>
     <string name="aec_extended_filter">Filtro Estendido do AEC</string>
     <string name="audio">Áudio</string>
-    <string name="tap_to_start">Toque para iniciar o aplicativo</string>
     <string name="invalid_stun_password">Senha inválida \'%1$s\'</string>
     <string name="stun_password_help">Senha, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="stun_password">Senha STUN/TURN</string>

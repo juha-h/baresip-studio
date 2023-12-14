@@ -234,8 +234,6 @@
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="message_from">Message from</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
-    <!-- Boot Completed Receiver -->
-    <string name="tap_to_start">Tap to start application</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call_details">Call Details</string>

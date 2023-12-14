@@ -54,7 +54,6 @@
     <string name="calls_calls">appels</string>
     <string name="call">Appel</string>
     <string name="call_history">Historique des appels</string>
-    <string name="tap_to_start">Appuyez pour démarrer l’application</string>
     <string name="message_from">Message de</string>
     <string name="transfer_request_to">Demande de transfert d’appel vers</string>
     <string name="incoming_call_from">Appel entrant de</string>
