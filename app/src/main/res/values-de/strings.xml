@@ -5,4 +5,9 @@
     <string name="account">Konto</string>
     <string name="display_name">Anzeigename</string>
     <string name="your_name">Ihr Name</string>
+    <string name="non_unique_account_nickname">Der Nickname \'%1$s\' existiert bereits</string>
+    <string name="account_nickname_help">Der Nickname (falls vorhanden), der zur Identifikation des Kontos innerhalb der baresip App genutzt wird.</string>
+    <string name="nickname">Nickname</string>
+    <string name="account_nickname">Nickname des Kontos</string>
+    <string name="invalid_account_nickname">Ungültiger Kontoname \'%1$s\'</string>
 </resources>
