@@ -96,8 +96,8 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         Api.call_set_video_direction(callp, vdir)
     }
 
-    fun setMediaDirection(adir: Int, vdir: Int): Int {
-        return Api.call_set_media_direction(callp, adir, vdir)
+    fun setMediaDirection(adir: Int, vdir: Int) {
+        Api.call_set_media_direction(callp, adir, vdir)
     }
 
     fun duration(): Int {

@@ -1496,15 +1496,13 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1direct
     re_thread_leave();
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1media_1direction(
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1media_1direction(
         JNIEnv *env, jobject thiz, jlong call, jint adir, jint vdir)
 {
-    int err;
     LOGD("call set audio/video media direction of call %ld to %d/%d\n", call, adir, vdir);
     re_thread_enter();
-    err = call_set_media_direction((struct call *)call, (enum sdp_dir)adir, (enum sdp_dir)vdir);
+    call_set_media_direction((struct call *)call, (enum sdp_dir)adir, (enum sdp_dir)vdir);
     re_thread_leave();
-    return err;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1enabled(

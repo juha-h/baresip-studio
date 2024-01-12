@@ -2284,25 +2284,20 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Adding outgoing $kind call ${ua.uap}/$callp/$uri")
             val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
             call.onHoldCall = onHoldCall
-            if (call.setMediaDirection(Api.SDP_SENDRECV, videoDir) == 0) {
-                call.add()
-                if (onHoldCall != null)
-                    onHoldCall.newCall = call
-                if (call.connect(uri)) {
-                    showCall(ua)
-                    true
-                } else {
-                    Log.w(TAG, "call_connect $callp failed")
-                    if (onHoldCall != null)
-                        onHoldCall.newCall = null
-                    call.remove()
-                    call.destroy()
-                    showCall(ua)
-                    false
-                }
+            call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
+            call.add()
+            if (onHoldCall != null)
+                onHoldCall.newCall = call
+            if (call.connect(uri)) {
+                showCall(ua)
+                true
             } else {
-                Log.w(TAG, "Call $callp setMedia[Answer]Direction failed")
+                Log.w(TAG, "call_connect $callp failed")
+                if (onHoldCall != null)
+                    onHoldCall.newCall = null
+                call.remove()
                 call.destroy()
+                showCall(ua)
                 false
             }
         } else {

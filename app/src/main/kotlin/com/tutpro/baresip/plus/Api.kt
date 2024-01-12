@@ -93,7 +93,7 @@ object Api {
     external fun call_has_video(callp: Long): Boolean
     external fun call_set_video_source(callp: Long, front: Boolean): Int
     external fun call_set_video_direction(callp: Long, dir: Int)
-    external fun call_set_media_direction(callp: Long, adir: Int, vdir: Int): Int
+    external fun call_set_media_direction(callp: Long, adir: Int, vdir: Int)
     external fun call_disable_video_stream(callp: Long, disable: Boolean)
     external fun call_video_enabled(callp: Long): Boolean
     external fun call_replaces(callp: Long): Boolean
