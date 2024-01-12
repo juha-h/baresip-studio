@@ -9,7 +9,7 @@
     <string name="tls_ca_file_help">Se marcado, um ficheiro contendo certificados TLS necessário para as Autoridades de Certificação foi ou será carregado. Na versão do Android 9 e anteriores, um ficheiro chamado \'ca_certs.crt\' será lido a partir da pasta Download.</string>
     <string name="debug_help">Se selecionado, disponibiliza mensagens de depuração no registo log e informações para o Logcat.</string>
     <string name="answer">Atender</string>
-    <string name="opus_packet_loss_help">Percentagem de perda de pacotes de fluxo de áudio do Opus esperada, de 0-100. Por predefinição 0, a desactivar a Opus Forward Error Correction (FEC).</string>
+    <string name="opus_packet_loss_help">Esperada percentagem de perda de pacotes do fluxo de áudio do Opus, de 0-100. Por padrão o valor é 1. O valor 0 desativa o Opus Forward Error Correction (FEC).</string>
     <string name="reject">Rejeitar</string>
     <string name="outbound_proxies_help">URI SIP de um ou dois proxies que precisam ser usados para enviar solicitações. Se dois forem informados, requisições de REGISTO serão enviados para ambos e as outras requisições serão enviadas para aquele que respondeu. Se nenhum proxy foi informado, requisições serão enviadas baseadas em DNS NAPTR/SRV/A pesquisa de registo da URI do host do destinatário. Se o host da URI SIP for um endereço IPv6, o endereço precisa ser escrito dentro de colchetes [].
 \nExemplos:
@@ -314,4 +314,17 @@
     <string name="redirect_mode">Modo de redirecionamento</string>
     <string name="call_auto_rejected">Chamada rejeitada automaticamente de %1$s</string>
     <string name="default_phone_app">Aplicação de telefone padrão</string>
+    <string name="default_phone_app_help">Se for marcado, o baresip será a aplicaöäao de telefone padrão. Não marque caso o seu dispositivo também precise lidar com outras chamadas ou mensagens SIP.</string>
+    <string name="favorite">Favorito</string>
+    <string name="redirect_notice">Redirecionamento automático para \'%1$s\'\\</string>
+    <string name="audio_delay_help">Tempo (em milissegundos) para o áudio esperar de quem chama quando a chamada for estabelecida. Defina um valor mais alto se perde o áudio de quem chama no início da chamada.</string>
+    <string name="audio_delay">Atraso do áudio</string>
+    <string name="invalid_audio_delay">Atraso inválido de áudio \'%1$s\'. Os valores válidos são entre 100 a 3000.</string>
+    <string name="appear_on_top_permission">A inicialização automática precisa aparecer no topo das permissões.</string>
+    <string name="redirect_request">Solicitação de redirecionamento</string>
+    <string name="redirect_request_query">Aceita o redirecionamento de chamadas para \'%1$s\'?</string>
+    <string name="tone_country">Tom do país</string>
+    <string name="tone_country_help">Toque da chamada do país, espera e tom de chamada ocupada</string>
+    <string name="rel_100">Respostas provisórias confiáveis</string>
+    <string name="rel_100_help">Se for marcado, indica suporte para respostas provisórias confiáveis (RFC 3262).</string>
 </resources>
