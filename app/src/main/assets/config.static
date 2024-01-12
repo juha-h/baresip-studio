@@ -18,6 +18,7 @@ audio_jitter_buffer_type adaptive
 audio_jitter_buffer_delay 0-20
 rtp_stats yes
 rtp_timeout 60
+rtp_rxmode thread
 module opensles.so
 module stun.so
 module turn.so
