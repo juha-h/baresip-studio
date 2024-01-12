@@ -115,6 +115,9 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
+        if ("webrtc_aecm.so" in previousModules)
+            config = "${config}module webrtc_aecm.so\n"
+
         val opusBitRate = previousVariable("opus_bitrate")
         config = if (opusBitRate == "")
             "${config}opus_bitrate 28000\n"

@@ -20,7 +20,6 @@ rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
 module opensles.so
-module webrtc_aecm.so
 module stun.so
 module turn.so
 module ice.so
