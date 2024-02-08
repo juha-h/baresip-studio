@@ -1,0 +1,1 @@
+- Updated libbaresip-android submodule (all modules are now found)
