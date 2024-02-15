@@ -1,0 +1,2 @@
+- Upstream, by default, denied incoming messages.  Can be allowed again
+  by making any change in configuration of an account.
