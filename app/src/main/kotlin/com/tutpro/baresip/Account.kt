@@ -142,7 +142,7 @@ class Account(val accp: Long) {
         if (autoRedirect)
             res += ";sip_autoredirect=yes"
 
-        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes"
+        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;call_transfer=yes;inreq_allowed=yes"
 
         var extra = ""
 
