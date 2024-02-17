@@ -895,9 +895,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Handling intent '$action'")
         val ev = action.split(",")
         when (ev[0]) {
-            "accounts" -> {
-                resumeAction = "accounts"
-            }
             "no network" -> {
                 Utils.alertView(this, getString(R.string.notice),
                     getString(R.string.no_network))

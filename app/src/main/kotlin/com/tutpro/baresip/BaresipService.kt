@@ -450,14 +450,7 @@ class BaresipService: Service() {
                 showStatusNotification()
 
                 val accounts = Utils.getFileContents("$filesPath/accounts")
-                if ((accounts == null) || accounts.isEmpty()) {
-                    val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags =
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "accounts")
-                    startActivity(newIntent)
-                } else {
+                if ((accounts != null) && accounts.isNotEmpty()) {
                     Utils.putFileContents("$filesPath/accounts",
                         accounts.toString(Charsets.UTF_8).replace(
                             "pubint=0;call_transfer",
