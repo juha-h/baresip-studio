@@ -61,9 +61,36 @@ object Config {
         if (sipVerifyServer != "")
             config = "${config}sip_verify_server $sipVerifyServer\n"
 
-        val sipCaFile = previousVariable("sip_cafile")
-        if (sipCaFile != "")
-            config = "${config}sip_cafile $sipCaFile\n"
+        val caBundlePath = "${BaresipService.filesPath}/ca_bundle.crt"
+        val caBundleFile = File(caBundlePath)
+        val caFilePath = "${BaresipService.filesPath}/ca_certs.crt"
+        val caFile = File(caFilePath)
+        if (caFile.exists())
+            caFile.copyTo(caBundleFile, true)
+        else
+            caBundleFile.writeBytes(byteArrayOf())
+        Log.d(TAG, "Size of caFile = ${caBundleFile.length()}")
+        val cacertsPath = "/system/etc/security/cacerts"
+        val cacertsDir = File(cacertsPath)
+        var caCount = 0
+        if (cacertsDir.exists()) {
+            cacertsDir.walk().forEach {
+                if (it.isFile) {
+                    caBundleFile.appendBytes(
+                        it.readBytes()
+                            .toString(Charsets.UTF_8)
+                            .substringBefore("Certificate:")
+                            .toByteArray(Charsets.UTF_8)
+                    )
+                    caCount++
+                }
+            }
+            Log.d(TAG, "Added $caCount ca certificates from $cacertsPath")
+        } else {
+            Log.w(TAG, "Directory $cacertsDir does not exist!")
+        }
+        Log.d(TAG, "Size of caBundleFile = ${caBundleFile.length()}")
+        config = "${config}sip_cafile $caBundlePath\n"
 
         val dynamicDns = previousVariable("dyn_dns")
         if (dynamicDns == "no") {

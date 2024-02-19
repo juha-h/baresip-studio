@@ -240,7 +240,6 @@
     <string name="dark_theme">Tema Escuro</string>
     <string name="android_contact_help">Se for marcado, este contato será adicionado nos contatos do Android.</string>
     <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado. Se estiver marcado, o arquivo TLS CA também deve ser carregado.</string>
-    <string name="verify_server_error">Os certificados do servidor não podem ser aferidos sem o arquivo CA TLS.</string>
     <string name="verify_server">Verifique os certificados do servidor</string>
     <string name="dtmf_info">Solicitações INFO SIP</string>
     <string name="dtmf_inband">Eventos na Banda RTP</string>

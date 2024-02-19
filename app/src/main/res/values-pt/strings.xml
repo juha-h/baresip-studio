@@ -235,7 +235,6 @@
     <string name="dark_theme_help">Impor o uso do tema escuro no ecrã</string>
     <string name="dark_theme">Tema Escuro</string>
     <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado. Se estiver marcado, o ficheiro TLS CA também deve ser carregado.</string>
-    <string name="verify_server_error">Os certificados do servidor não podem ser aferidos sem o ficheiro CA TLS.</string>
     <string name="verify_server">Verifique os certificados do servidor</string>
     <string name="transfer_request_to">Chamada de solicitação de transferência para</string>
     <string name="missed_call_from">Ligação perdida de</string>

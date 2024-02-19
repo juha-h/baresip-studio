@@ -324,15 +324,13 @@
         below, a file called \'cert.pem\' is loaded from Download folder. For security reasons,
         delete the file after loading.</string>
     <string name="verify_server">Verify Server Certificates</string>
-    <string name="verify_server_error">Server Certificates cannot be verified without
-        TLS CA file.</string>
     <string name="verify_server_help">If checked, baresip verifies TLS certificates of SIP User
-        Agent and SIP Proxy Servers when TLS transport is used.  If checked, also TLS CA File has
-        to be loaded.</string>
+        Agent and SIP Proxy Servers when TLS transport is used.</string>
     <string name="tls_ca_file">TLS CA File</string>
-    <string name="tls_ca_file_help">If checked, a file containing TLS certificates
-        of needed Certificate Authorities has been or will be loaded. In Android versions 9 and
-        below, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
+    <string name="tls_ca_file_help">If checked, a file has been or will be loaded that contains
+        TLS certificates of such Certificate Authorities that are not included in Android OS.
+        In Android versions 9 and below, a file called \'ca_certs.crt\' is loaded from
+        Download folder.</string>
     <string name="audio">Audio</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="audio_modules_title">Audio Modules</string>

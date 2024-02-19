@@ -257,7 +257,6 @@
     <string name="aec_extended_filter">Filtro extendido AEC</string>
     <string name="audio">Audio</string>
     <string name="verify_server_help">Si se marca, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS. Si se marca, también se debe cargar el archivo TLS CA.</string>
-    <string name="verify_server_error">Los certificados del servidor no pueden ser verificados sin el archivo TLS CA.</string>
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>
     <string name="missed_call_from">Llamada perdida de</string>

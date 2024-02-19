@@ -232,7 +232,6 @@
     <string name="about_title_plus">О baresip+</string>
     <string name="stun_server_uri">URI-адрес сервера STUN/TURN</string>
     <string name="dark_theme">Темная тема</string>
-    <string name="verify_server_error">Сертификаты сервера не могут быть проверены без файла TLS CA.</string>
     <string name="verify_server">Проверка сертификатов сервера</string>
     <string name="peer">Пир</string>
     <string name="direction">Направление</string>
