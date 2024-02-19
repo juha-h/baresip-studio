@@ -147,9 +147,7 @@
         TLS certificate and private key of this baresip instance has been or will be loaded from
         Download directory. For security reasons, delete the file after loading.
     </string>
-    <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates
-        of Certificate Authorities has been or will be loaded from Download directory.
-    </string>
+    <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates of Certificate Authorities has been or will be loaded from Download directory.</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.
     </string>
