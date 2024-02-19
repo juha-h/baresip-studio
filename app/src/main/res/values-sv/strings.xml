@@ -172,7 +172,6 @@
     <string name="failed_to_load_module">Kunde inte ladda modul.</string>
     <string name="audio_modules_help">Ljudkodekar som tillhandahålls av de förkryssade modulerna är tillgängliga för konton.</string>
     <string name="tls_ca_file">TLS CA-fil</string>
-    <string name="verify_server_error">Servercertifikat kan inte verifieras utan TLS CA-fil.</string>
     <string name="verify_server">Verifiera servercertifikat</string>
     <string name="chat_with">Chatta med %1$s</string>
     <string name="chat">Chattmeddelanden</string>

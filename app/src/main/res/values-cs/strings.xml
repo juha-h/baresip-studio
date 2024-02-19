@@ -107,7 +107,6 @@
     <string name="tls_ca_file">Soubor TLS CA</string>
     <string name="failed_to_set_dns_servers">Nepodařilo se nastavit servery DNS</string>
     <string name="verify_server">Ověřit certifikáty serveru</string>
-    <string name="verify_server_error">Certifikáty serveru nelze ověřit bez souboru certifikační autority TLS.</string>
     <string name="verify_server_help">Pokud je tato možnost zaškrtnuta, ověřuje baresip certifikáty TLS uživatelského agenta SIP a proxy serverů SIP, pokud se používá přenos TLS. Pokud je zaškrtnuto, musí být načten také soubor TLS CA.</string>
     <string name="dtmf_inband">Události v pásmu RTP</string>
     <string name="dtmf_info">Žádosti SIP INFO</string>

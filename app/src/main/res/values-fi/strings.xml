@@ -342,18 +342,14 @@
         ladataan Download-kansiosta. Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
     </string>
     <string name="verify_server">Tarkista palvelinten sertifikaatit</string>
-    <string name="verify_server_error">Palvelinten sertifikaatteja ei voi tarkistaa ilman TLS
-        CA-tiedostoa.
-    </string>
     <string name="verify_server_help">Jos merkitty, baresip tarkistaa SIP-palvelinten
-        sertifikaatit, kun TLS-tiedonsiirto on käytössä.  Tällöin myös TLS CA-tiedoston on oltava
-        ladattuna.
+        sertifikaatit, kun TLS-tiedonsiirto on käytössä.
     </string>
     <string name="tls_ca_file">TLS CA-tiedosto</string>
-    <string name="tls_ca_file_help">Jos merkitty, tiedosto joka sisältää
-        sertifikaattiauktoriteettien (CA) julkiset sertifikaatit, on joko jo ladattu tai tullaan
-        lataamaan. Android versioon 9 saakka tiedosto nimeltään \'ca_certs.crt\' ladataan
-        Download-kansiosta.
+    <string name="tls_ca_file_help">Jos merkitty, tiedosto on joko jo ladattu tai tullaan
+        lataamaan, joka sisältää sellaisten sertifikaattiauktoriteettien (CA) julkiset sertifikaatit,
+        jotka eivät sisälly Android-käyttöjärjestelmään. Android versioon 9 saakka tiedosto
+        nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="audio">Audio</string>
     <string name="audio_settings">Audio-asetukset</string>

@@ -62,7 +62,6 @@ class ConfigActivity : AppCompatActivity() {
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldVerifyServer = false
-    private var oldCAFile = false
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
     private var oldContactsMode = ""
@@ -272,8 +271,8 @@ class ConfigActivity : AppCompatActivity() {
         verifyServer.isChecked = oldVerifyServer
 
         caFile = binding.CAFile
-        oldCAFile = Config.variable("sip_cafile") != ""
-        caFile.isChecked = oldCAFile
+        val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
+        caFile.isChecked = caCertsFile.exists()
 
         val certificatesRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -283,11 +282,8 @@ class ConfigActivity : AppCompatActivity() {
                             val inputStream =
                                 applicationContext.contentResolver.openInputStream(uri)
                                         as FileInputStream
-                            val caCertsPath = BaresipService.filesPath + "/ca_certs.crt"
-                            File(caCertsPath).copyInputStreamToFile(inputStream)
+                            caCertsFile.copyInputStreamToFile(inputStream)
                             inputStream.close()
-                            Config.replaceVariable("sip_cafile", caCertsPath)
-                            save = true
                             restart = true
                         } catch (e: Error) {
                             Utils.alertView(
@@ -299,6 +295,8 @@ class ConfigActivity : AppCompatActivity() {
                     }
                 else
                     caFile.isChecked = false
+                if (!caFile.isChecked && caCertsFile.exists())
+                    caCertsFile.delete()
             }
 
         caFile.setOnCheckedChangeListener { _, isChecked ->
@@ -320,11 +318,8 @@ class ConfigActivity : AppCompatActivity() {
                                 )
                                 return@setOnCheckedChangeListener
                             }
-                            val caCertsPath = BaresipService.filesPath + "/ca_certs.crt"
-                            Utils.putFileContents(caCertsPath, content)
-                            Config.replaceVariable("sip_cafile", caCertsPath)
+                            caCertsFile.writeBytes(content)
                             caFile.isChecked = true
-                            save = true
                             restart = true
                         }
                         ActivityCompat.shouldShowRequestPermissionRationale(
@@ -348,8 +343,8 @@ class ConfigActivity : AppCompatActivity() {
                     Utils.selectInputFile(certificatesRequest)
                 }
             } else {
-                Config.removeVariable("sip_cafile")
-                save = true
+                if (caCertsFile.exists())
+                    caCertsFile.delete()
                 restart = true
             }
         }
@@ -580,13 +575,6 @@ class ConfigActivity : AppCompatActivity() {
                     }
                     Api.net_debug()
                     save = true
-                }
-
-                if (verifyServer.isChecked && !caFile.isChecked) {
-                    Utils.alertView(this, getString(R.string.error),
-                            getString(R.string.verify_server_error))
-                    verifyServer.isChecked = false
-                    return false
                 }
 
                 if (oldVerifyServer != verifyServer.isChecked) {
