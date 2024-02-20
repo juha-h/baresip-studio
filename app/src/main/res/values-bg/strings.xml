@@ -152,9 +152,7 @@
 		съображения за сигурност изтрийте файла след зареждането му.
 	</string>
     <string name="tls_ca_file">TLS CA File</string>
-    <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на 
-		Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.
-	</string>
+    <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.</string>
     <string name="aec">Акустично отменяне на ехото</string>
     <string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
