@@ -14,5 +14,4 @@ build
 /app/release
 /app/.cxx
 gradle/wrapper/gradle-wrapper.jar
-/distribution/*
 /distribution.video/*
