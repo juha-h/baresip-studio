@@ -122,7 +122,7 @@
     <string name="tls_certificate_file">Archivo de certificado TLS</string>
     <string name="tls_certificate_file_help">Si se marca, se ha cargado o se cargará un archivo que contiene el certificado TLS y la clave privada de esta instancia de baresip. En las versiones de Android 9 e inferiores, se carga un archivo llamado \'cert.pem\' desde la carpeta Download. Por razones de seguridad, elimine el archivo después de cargarlo.</string>
     <string name="tls_ca_file">Archivo de CA de TLS</string>
-    <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene los certificados TLS de las autoridades de certificación necesarias. En las versiones de Android 9 e inferiores, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
+    <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene certificados TLS de dichas Autoridades de Certificación que no están incluidas en el SO Android. En las versiones de Android 9 e inferiores, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
     <string name="aec">Cancelación de eco acústico</string>
     <string name="aec_help">Si está marcada, se intenta la cancelación del eco en el audio de la llamada.</string>
     <string name="opus_bit_rate">Tasa de bits de Opus</string>
@@ -256,7 +256,7 @@
     <string name="aec_extended_filter_help">Si está marcada, la cancelación de eco está utilizando el filtro extendido.</string>
     <string name="aec_extended_filter">Filtro extendido AEC</string>
     <string name="audio">Audio</string>
-    <string name="verify_server_help">Si se marca, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS. Si se marca, también se debe cargar el archivo TLS CA.</string>
+    <string name="verify_server_help">Si está marcada, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS.</string>
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>
     <string name="missed_call_from">Llamada perdida de</string>
@@ -335,7 +335,7 @@
     <string name="diverted_by_dots">Desviada por …</string>
     <string name="no_notifications">No podrá utilizar esta aplicación sin el permiso de \"Notificaciones\".</string>
     <string name="battery_optimizations_help">Desactive las optimizaciones de batería (recomendado) si desea reducir la probabilidad de que Android restrinja el acceso de baresip a la red o lo ponga en estado de espera.</string>
-    <string name="contacts_consent">Si se eligen los contactos de Android, se pueden usar en llamadas y mensajes como referencias a SIP y tel URI. La aplicación baresip no almacena contactos de Android ni los comparte con nadie. Para que los contactos de Android estén disponibles en baresip, Google requiere que acepte su uso como se describe aquí y en la <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Política de Privacidad</a>. </string>
+    <string name="contacts_consent">Si se eligen los contactos de Android, se pueden usar en llamadas y mensajes como referencias a URI SIP y tel. La aplicación baresip no almacena los contactos de Android ni los comparte con nadie. Para que los contactos de Android estén disponibles en baresip, Google requiere que aceptes su uso como se describe aquí y en la Política de privacidad de la aplicación <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Privacidad</a>. \u0020</string>
     <string name="no_bluetooth">baresip no es capaz de detectar la conectividad Bluetooth sin el permiso \"Dispositivos cercanos\".</string>
     <string name="no_android_contacts">No se puede acceder a los contactos de Android sin el permiso \"Contactos\".</string>
     <string name="audio_focus_denied">¡Enfoque de audio denegado!</string>

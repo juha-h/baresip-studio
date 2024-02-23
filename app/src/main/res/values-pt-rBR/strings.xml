@@ -96,7 +96,7 @@
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
     <string name="audio_modules_help">Codecs de áudio providos pelos módulos selecionados estão disponíveis para uso das contas.</string>
     <string name="audio_modules_title">Módulos de Áudio</string>
-    <string name="tls_ca_file_help">Se marcado, um arquivo contendo certificados TLS necessário para as Autoridades de Certificação foi ou será carregado. Na versão do Android 9 e anteriores, um arquivo chamado \'ca_certs.crt\' será lido a partir da pasta Download.</string>
+    <string name="tls_ca_file_help">Se estiver marcado, foi ou será carregado um arquivo que contém certificados TLS de tais autoridades de certificação que não estão incluídas no sistema operacional Android. Nas versões 9 e posteriores do Android, um arquivo chamado \"ca_certs.crt\" é carregado a partir da pasta Download.</string>
     <string name="tls_ca_file">Arquivo TLS CA</string>
     <string name="tls_certificate_file_help">Se marcado, o arquivo que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9 e anteriores, um arquivo chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, exclua o arquivo após o carregamento.</string>
     <string name="tls_certificate_file">Arquivo de Certificado TLS</string>
@@ -239,7 +239,7 @@
     <string name="dark_theme_help">Impor o uso do tema escuro na tela</string>
     <string name="dark_theme">Tema Escuro</string>
     <string name="android_contact_help">Se for marcado, este contato será adicionado nos contatos do Android.</string>
-    <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado. Se estiver marcado, o arquivo TLS CA também deve ser carregado.</string>
+    <string name="verify_server_help">Se estiver marcado, o baresip verifica os certificados TLS do SIP User Agent e o SIP Proxy Servers quando o transporte TLS for usado.</string>
     <string name="verify_server">Verifique os certificados do servidor</string>
     <string name="dtmf_info">Solicitações INFO SIP</string>
     <string name="dtmf_inband">Eventos na Banda RTP</string>
@@ -283,7 +283,7 @@
     <string name="unknown">Desconhecido</string>
     <string name="diverted_by_dots">Desviado por …</string>
     <string name="consent_request">Solicitação de consentimento</string>
-    <string name="contacts_consent">Se os contatos so android forem escolhidos, eles podem ser usados nas chamadas e nas mensagens como referências ao SIP e so tel das URIs. o aplicativo baresip não armazena os contatos do Android nem os compartilha com ninguém. Para disponibilizar os contatos android no baresip, o Google exige que você aceite seu uso como descrito aqui e na <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Política de Privacidade</a>. </string>
+    <string name="contacts_consent">Se os contatos so android forem escolhidos, eles podem ser usados nas chamadas e nas mensagens como referências ao SIP e so tel das URIs. \u0020O aplicativo baresip não armazena os contatos do Android nem os compartilha com ninguém. \u0020Para disponibilizar os contatos android no baresip, o Google exige que você aceite seu uso como descrito aqui e na \u0020<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Política de Privacidade</a>. \u0020</string>
     <string name="country_code">Código do país</string>
     <string name="country_code_hint">+código</string>
     <string name="country_code_help">O código do país E.164 desta conta. Se durante o recebimento da chamada ou mensagem do usuário a parte URI recebida tiver um número de telefone que não começa com o sinal \'+\' e se a busca de contato falhar, o número será prefixado com este código do país e a busca pelo contato será testada novamente. Se o número de telefone começar com um único dígito \'0\', o dígito \'0\' será removido antes que o número seja prefixado.</string>
