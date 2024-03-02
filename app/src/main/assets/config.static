@@ -20,7 +20,7 @@ videoenc_format yuv420p
 audio_jitter_buffer_type adaptive
 audio_jitter_buffer_delay 0-20
 video_jitter_buffer_type adaptive
-video_jitter_buffer_delay 0-30
+video_jitter_buffer_delay 1-100
 rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
