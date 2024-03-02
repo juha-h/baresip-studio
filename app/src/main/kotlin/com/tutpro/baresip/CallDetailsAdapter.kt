@@ -81,7 +81,7 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
                 viewHolder.durationView.text = DateUtils.formatElapsedTime(duration)
                 val recording = rows[position].recording
                 if (recording[0] != "") {
-                    viewHolder.durationView.typeface = Typeface.DEFAULT_BOLD
+                    viewHolder.durationView.setTextColor(ContextCompat.getColor(context, R.color.colorAccent))
                     viewHolder.durationView.setOnClickListener {
                         if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
                             decPlayer.reset()
