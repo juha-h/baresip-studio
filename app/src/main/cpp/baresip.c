@@ -457,7 +457,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
-        JNIEnv *env, jobject instance, jstring jPath, jstring jAddrs, jint jLogLevel)
+        JNIEnv *env, jobject instance, jstring jPath, jstring jAddrs, jint jLogLevel,
+        jstring jSoftware)
 {
     LOGI("starting baresip\n");
 
@@ -472,6 +473,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
     int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
     const char *addrs = (*env)->GetStringUTFChars(env, jAddrs, 0);
+    const char *software = (*env)->GetStringUTFChars(env, jSoftware, 0);
     struct le *le;
 
     runLoggingThread();
@@ -539,7 +541,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
 
     // net_debug_log();
 
-    err = ua_init("baresip v" BARESIP_VERSION " (" ARCH "/" OS ")", true, true, true);
+    err = ua_init(software, true, true, true);
     if (err) {
         LOGE("ua_init() failed (%d)\n", err);
         strcpy(start_error, "ua_init");
@@ -628,6 +630,10 @@ out:
             (*env)->GetMethodID(env, g_ctx.mainActivityClz, "stopped", "(Ljava/lang/String;)V");
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, stoppedId, javaError);
     (*env)->DeleteLocalRef(env, javaError);
+
+    (*env)->ReleaseStringUTFChars(env, jPath, path);
+    (*env)->ReleaseStringUTFChars(env, jAddrs, addrs);
+    (*env)->ReleaseStringUTFChars(env, jSoftware, software);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStop(
