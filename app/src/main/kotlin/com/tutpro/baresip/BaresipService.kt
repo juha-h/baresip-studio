@@ -442,7 +442,13 @@ class BaresipService: Service() {
                 Log.i(TAG, "Active network: $activeNetwork")
 
                 Thread {
-                    baresipStart(filesPath, addresses.removePrefix(";"), logLevel)
+                    baresipStart(
+                        filesPath,
+                        addresses.removePrefix(";"),
+                        logLevel,
+                        "baresip v${BuildConfig.VERSION_NAME} " +
+                                "(${System.getProperty("os.arch") ?: "?"}/Android${VERSION.RELEASE})"
+                    )
                 }.start()
 
                 isServiceRunning = true
@@ -1536,7 +1542,13 @@ class BaresipService: Service() {
         }
     }
 
-    private external fun baresipStart(path: String, addresses: String, logLevel: Int)
+    private external fun baresipStart(
+        path: String,
+        addresses: String,
+        logLevel: Int,
+        software: String
+    )
+
     private external fun baresipStop(force: Boolean)
 
     companion object {
