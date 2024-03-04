@@ -450,7 +450,7 @@ class BaresipService: Service() {
                         addresses.removePrefix(";"),
                         logLevel,
                         "baresip+ v${BuildConfig.VERSION_NAME} " +
-                                "(${System.getProperty("os.arch") ?: "?"}/Android${VERSION.RELEASE})"
+                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
                     )
                 }.start()
 
