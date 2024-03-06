@@ -42,7 +42,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
-import com.tutpro.baresip.plus.BuildConfig
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.Charset
