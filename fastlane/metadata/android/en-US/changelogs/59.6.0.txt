@@ -1,0 +1,2 @@
+- Added baresip, CPU, and Android information in User-Agent header
+- Time of recorded call is now shown in accent color
