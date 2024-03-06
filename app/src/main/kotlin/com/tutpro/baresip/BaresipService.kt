@@ -42,6 +42,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import com.tutpro.baresip.plus.BuildConfig
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.Charset
@@ -447,7 +448,7 @@ class BaresipService: Service() {
                         addresses.removePrefix(";"),
                         logLevel,
                         "baresip v${BuildConfig.VERSION_NAME} " +
-                                "(${System.getProperty("os.arch") ?: "?"}/Android${VERSION.RELEASE})"
+                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
                     )
                 }.start()
 
