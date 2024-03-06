@@ -1,0 +1,4 @@
+- Upstream revert that made audio only calls work again
+- Added baresip, CPU, and Android information in User-Agent header
+- Time of recorded call is now shown in accent color
+- Increased video jitter buffer_delay from 50 to 100
