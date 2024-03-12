@@ -107,7 +107,7 @@
     <string name="tls_ca_file">Soubor TLS CA</string>
     <string name="failed_to_set_dns_servers">Nepodařilo se nastavit servery DNS</string>
     <string name="verify_server">Ověřit certifikáty serveru</string>
-    <string name="verify_server_help">Pokud je tato možnost zaškrtnuta, ověřuje baresip certifikáty TLS uživatelského agenta SIP a proxy serverů SIP, pokud se používá přenos TLS. Pokud je zaškrtnuto, musí být načten také soubor TLS CA.</string>
+    <string name="verify_server_help">Pokud je tato možnost zaškrtnuta, ověřuje baresip certifikáty TLS uživatelského agenta SIP a proxy serverů SIP, pokud se používá přenos TLS.</string>
     <string name="dtmf_inband">Události v pásmu RTP</string>
     <string name="dtmf_info">Žádosti SIP INFO</string>
     <string name="media_encryption_help">Vybere protokol šifrování přenosu média (pokud existuje).
@@ -155,7 +155,7 @@
     <string name="calls_calls">volání</string>
     <string name="call_details">Podrobnosti o volání</string>
     <string name="calls_call">volání</string>
-    <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS potřebných certifikačních autorit. Ve verzích systému Android 9 a nižších se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
+    <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzích systému Android 9 a nižších se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
     <string name="audio_settings">Nastavení zvuku</string>
     <string name="aec_extended_filter_help">Pokud je zaškrtnuto, používá se rozšířený filtr pro potlačení ozvěny.</string>
     <string name="opus_bit_rate_help">Průměrná maximální přenosová rychlost používaná zvukovým tokem Opus. Platné hodnoty jsou 6000-510000. Výchozí hodnota je 28000.</string>
@@ -193,7 +193,7 @@
     <string name="contact">Kontakt</string>
     <string name="consent_request">Žádost o souhlas</string>
     <string name="sip_or_tel_uri">SIP nebo tel. URI</string>
-    <string name="contacts_consent">Pokud jsou vybrány kontakty Android, lze je použít při volání a zasílání zpráv jako odkazy na SIP a tel. URI. Aplikace baresip neukládá kontakty Android ani je s nikým nesdílí. Aby byly kontakty pro Android dostupné v baresip, Google vyžaduje, abyste souhlasili s jejich používáním, jak je popsáno zde v <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy aplikace. txt">Zásadách ochrany osobních údajů</a>. </string>
+    <string name="contacts_consent">Pokud jsou vybrány kontakty Android, lze je použít při volání a zasílání zpráv jako odkazy na SIP a tel. URI. Aplikace baresip neukládá kontakty Android ani je s nikým nesdílí. Aby byly kontakty pro Android dostupné v baresip, Google vyžaduje, abyste souhlasili s jejich používáním, jak je popsáno zde v <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy aplikace. txt">Zásadách ochrany osobních údajů</a>. \u0020</string>
     <string name="contact_name">Jméno</string>
     <string name="user_domain_or_number">uživatel@doména nebo telefonní číslo</string>
     <string name="contact_already_exists">Kontakt \'%1$s\' již existuje.</string>
