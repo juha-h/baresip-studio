@@ -548,6 +548,9 @@
         annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
         Android versioon 9 saakka tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
         Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.</string>
+    <string name="restore_unzip_failed">Sovelluksen tietojen palauttaminen epäonnistui. Android
+        versiosta 14 alkaen ei salli tietojen palauttamista, jos ne on tallettu ennen %1$s versioa
+        %2$s.</string>
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
     <string name="no_bluetooth">baresip ei voi havaita Bluetooth-yhteyttä ilman

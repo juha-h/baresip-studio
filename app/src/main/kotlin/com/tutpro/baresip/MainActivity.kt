@@ -1764,8 +1764,7 @@ class MainActivity : AppCompatActivity() {
         if (!Utils.unZip(zipFilePath)) {
             Log.w(TAG, "Failed to unzip file '$zipFile'")
             Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed),
-                            Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
+                    String.format(getString(R.string.restore_unzip_failed), "baresip", "60.0.0"))
             return
         }
         Utils.deleteFile(File(zipFilePath))

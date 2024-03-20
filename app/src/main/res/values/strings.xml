@@ -523,6 +523,9 @@
         also check Apps → baresip → Permissions → Storage and that file \'%1$s\' exists
         in Download folder.
     </string>
+    <string name="restore_unzip_failed">Failed to restore application data. Android version 14 and
+        above does not allow restoring data that was backed up before %1$s version %2$s.
+    </string>
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
     <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
