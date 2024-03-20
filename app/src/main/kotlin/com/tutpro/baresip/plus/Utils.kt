@@ -781,12 +781,12 @@ object Utils {
         try {
             ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFilePath))).use { out ->
                 val data = ByteArray(1024)
-                for (file in fileNames) {
-                    val filePath = BaresipService.filesPath + "/" + file
+                for (fileName in fileNames) {
+                    val filePath = BaresipService.filesPath + "/" + fileName
                     if (File(filePath).exists()) {
                         FileInputStream(filePath).use { fi ->
                             BufferedInputStream(fi).use { origin ->
-                                val entry = ZipEntry(filePath)
+                                val entry = ZipEntry(fileName)
                                 out.putNextEntry(entry)
                                 while (true) {
                                     val readBytes = origin.read(data)
@@ -810,15 +810,15 @@ object Utils {
                 "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val zipFiles = mutableListOf<String>()
         try {
-            ZipFile(zipFilePath).use { zip ->
+            ZipFile(File(zipFilePath)).use { zip ->
                 zip.entries().asSequence().forEach { entry ->
-                    if (!entry.name.contains("/${BaresipService.pName}/")) {
-                        Log.e(TAG, "Backup file is not from this application")
-                        return false
-                    }
-                    zipFiles.add(entry.name.substringAfter("/files/"))
+                    val entryName = if (entry.name.startsWith("/"))
+                        entry.name.substringAfterLast("/")
+                    else
+                        entry.name
+                    zipFiles.add(entryName)
                     zip.getInputStream(entry).use { input ->
-                        File(entry.name).outputStream().use { output ->
+                        File(BaresipService.filesPath + "/" + entryName).outputStream().use { output ->
                             input.copyTo(output)
                         }
                     }
