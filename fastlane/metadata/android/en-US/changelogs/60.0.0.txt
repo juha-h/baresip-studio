@@ -1,0 +1,5 @@
+- Use Android 14 compatible backup file format. Backup again before upgrading Android to version 14.
+- Improved thread handling
+- New German translations
+
+
