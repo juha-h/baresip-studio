@@ -172,12 +172,12 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                         when (contact) {
                             is Contact.BaresipContact -> {
                                 val id = contact.id
-                                val avatarFile = File(BaresipService.filesPath, "$id.img")
+                                val avatarFile = File(BaresipService.filesPath, "$id.png")
                                 if (avatarFile.exists()) {
                                     try {
                                         avatarFile.delete()
                                     } catch (e: IOException) {
-                                        Log.e(TAG, "Could not delete file '$id.img")
+                                        Log.e(TAG, "Could not delete file '$id.png")
                                     }
                                 }
                                 Contact.removeBaresipContact(contact)

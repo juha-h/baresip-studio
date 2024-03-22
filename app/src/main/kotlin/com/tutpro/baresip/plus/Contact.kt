@@ -209,7 +209,7 @@ sealed class Contact {
                             if (contact.avatarImage == null)
                                 Log.d(TAG, "Contact $id avatarImage is null")
                         } catch (e: Exception) {
-                            Log.e(TAG, "Could not read avatar image from '$id.img")
+                            Log.e(TAG, "Could not read avatar image from '$id.png")
                         }
                     }
                     BaresipService.baresipContacts.add(contact)
