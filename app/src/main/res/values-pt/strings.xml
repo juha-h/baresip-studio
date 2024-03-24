@@ -221,7 +221,7 @@
     <string name="backed_up">Os dados as aplicações foram armazenados num backup no ficheiro \'%1$s\'. Nas versões do Android 9 e anteriores, o ficheiro está na pasta Download.</string>
     <string name="quit">Sair</string>
     <string name="unverify">Desverificar</string>
-    <string name="tls_certificate_file_help">Se marcado, o ficheiro que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9 e anteriores, um ficheiro chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, exclua o ficheiro após o carregamento.</string>
+    <string name="tls_certificate_file_help">Se marcado, o ficheiro que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9 e anteriores, um ficheiro chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, apage o ficheiro após o carregamento.</string>
     <string name="invalid_stun_username">Nome do utilizador inválido \'%1$s\'</string>
     <string name="calls_delete_question">Quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
     <string name="transfer_failed">A transferência falhou</string>
