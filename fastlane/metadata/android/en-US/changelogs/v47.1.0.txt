@@ -1,0 +1,3 @@
+- Fixed deleting of avatar file when avatar is removed from contact or when contact with avatar is removed
+- Fixed saving of account's DTMF Mode
+- New Spanish, Portuguese, and Portuguese (Brazil) translations
