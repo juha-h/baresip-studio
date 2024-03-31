@@ -185,8 +185,9 @@
         tukemisesta (RFC 3262).</string>
     <string name="dtmf_mode">DTMF-moodi</string>
     <string name="dtmf_mode_help">Valitsee tavan, miten DTMF-merkit 0–9, #, * ja A-D lähetetään.</string>
-    <string name="dtmf_inband">RTP</string>
-    <string name="dtmf_info">SIP INFO</string>
+    <string name="dtmf_inband">RTP-tapahtuma</string>
+    <string name="dtmf_info">SIP INFO -pyyntö</string>
+    <string name="dtmf_auto">RTP tai SIP INFO</string>
     <string name="answer_mode">Vastaustapa</string>
     <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan.</string>
     <string name="manual">Manuaalinen</string>

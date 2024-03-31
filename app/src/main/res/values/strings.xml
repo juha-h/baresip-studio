@@ -176,6 +176,7 @@
     <string name="dtmf_mode_help">Selects how DTMF tones 0–9, #, *, and A-D are sent.</string>
     <string name="dtmf_inband">In-band RTP Events</string>
     <string name="dtmf_info">SIP INFO Requests</string>
+    <string name="dtmf_auto">In-band RTP or SIP INFO</string>
     <string name="answer_mode">Answer Mode</string>
     <string name="answer_mode_help">Selects how incoming calls are answered.</string>
     <string name="redirect_mode">Redirect Mode</string>

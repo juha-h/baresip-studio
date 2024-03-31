@@ -200,19 +200,18 @@ class AccountActivity : AppCompatActivity() {
                                         else
                                             Api.REL100_DISABLED
                                 "dtmf-mode" ->
-                                    if (text in arrayOf("rtp-event", "sip-info")) {
-                                        acc.dtmfMode = if (text == "rtp-event")
-                                            Api.DTMFMODE_RTP_EVENT
-                                        else
-                                            Api.DTMFMODE_SIP_INFO
-                                    }
+                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
+                                        acc.dtmfMode = when (text) {
+                                            "rtp-event" -> Api.DTMFMODE_RTP_EVENT
+                                            "sip-info" -> Api.DTMFMODE_SIP_INFO
+                                            else -> Api.DTMFMODE_AUTO
+                                        }
                                 "answer-mode" ->
-                                    if (text in arrayOf("manual", "auto")) {
+                                    if (text in arrayOf("manual", "auto"))
                                         acc.answerMode = if (text == "manual")
                                             Api.ANSWERMODE_MANUAL
                                         else
                                             Api.ANSWERMODE_AUTO
-                                    }
                                 "redirect-mode" ->
                                     acc.autoRedirect = text == "yes"
                                 "voicemail-uri" ->
@@ -317,8 +316,8 @@ class AccountActivity : AppCompatActivity() {
         rel100Check.isChecked = acc.rel100Mode == Api.REL100_ENABLED
 
         dtmfMode = acc.dtmfMode
-        val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO)
-        val dtmfModeVals = arrayListOf(getString(R.string.dtmf_inband), getString(R.string.dtmf_info))
+        val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO, Api.DTMFMODE_AUTO)
+        val dtmfModeVals = arrayListOf(getString(R.string.dtmf_inband), getString(R.string.dtmf_info), getString(R.string.dtmf_auto))
         keyIx = dtmfModeKeys.indexOf(acc.dtmfMode)
         keyVal = dtmfModeVals.elementAt(keyIx)
         dtmfModeKeys.removeAt(keyIx)
