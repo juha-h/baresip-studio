@@ -329,4 +329,5 @@
     <string name="favorite">Favorito</string>
     <string name="appear_on_top_permission">A inicialização automática precisa aparecer no top das permissões.</string>
     <string name="restore_unzip_failed">Falha ao restaurar os dados do aplicativo. A versão 14 e superior do Android não permite a restauração de dados cujo backup foi feito %1$s antes da versão %2$s.</string>
+    <string name="dtmf_auto">INFO RTP ou SIP em banda</string>
 </resources>
