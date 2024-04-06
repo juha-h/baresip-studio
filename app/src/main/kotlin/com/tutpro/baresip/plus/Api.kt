@@ -8,6 +8,7 @@ object Api {
     const val ANSWERMODE_AUTO = 2
     const val DTMFMODE_RTP_EVENT = 0
     const val DTMFMODE_SIP_INFO = 1
+    const val DTMFMODE_AUTO = 2
     const val REL100_DISABLED = 0
     const val REL100_ENABLED = 1
     // const cal REL100_REQUIRED = 2

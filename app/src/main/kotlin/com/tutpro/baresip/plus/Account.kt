@@ -156,6 +156,8 @@ class Account(val accp: Long) {
 
         if (dtmfMode == Api.DTMFMODE_SIP_INFO)
             res += ";dtmfmode=info"
+        else if (dtmfMode == Api.DTMFMODE_AUTO)
+            res += ";dtmfmode=auto"
 
         res = if (vmUri == "")
             "$res;mwi=no"
