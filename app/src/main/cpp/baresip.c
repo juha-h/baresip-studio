@@ -200,7 +200,7 @@ static void ua_event_handler(
 
     switch (ev) {
         case UA_EVENT_CREATE:
-            len = re_snprintf(event_buf, sizeof event_buf, "create");
+            len = re_snprintf(event_buf, sizeof event_buf, "create", "");
             break;
         case UA_EVENT_REGISTERING:
         case UA_EVENT_UNREGISTERING:
@@ -216,10 +216,10 @@ static void ua_event_handler(
             len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
             break;
         case UA_EVENT_CALL_OUTGOING:
-            len = re_snprintf(event_buf, sizeof event_buf, "call outgoing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call outgoing", "");
             break;
         case UA_EVENT_CALL_ANSWERED:
-            len = re_snprintf(event_buf, sizeof event_buf, "call answered");
+            len = re_snprintf(event_buf, sizeof event_buf, "call answered", "");
             break;
         case UA_EVENT_CALL_REDIRECT:
             if (sdp_media_ldir(stream_sdpmedia(video_strm(call_video(call)))) != SDP_INACTIVE)
@@ -246,24 +246,24 @@ static void ua_event_handler(
                     call_has_video(call), remote_has_video, ldir, rdir, ardir);
             break;
         case UA_EVENT_CALL_RINGING:
-            len = re_snprintf(event_buf, sizeof event_buf, "call ringing");
+            len = re_snprintf(event_buf, sizeof event_buf, "call ringing", "");
             break;
         case UA_EVENT_CALL_PROGRESS:
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
             len = re_snprintf(event_buf, sizeof event_buf, "call progress,%d", ardir);
             break;
         case UA_EVENT_CALL_ESTABLISHED:
-            len = re_snprintf(event_buf, sizeof event_buf, "call established");
+            len = re_snprintf(event_buf, sizeof event_buf, "call established", "");
             break;
         case UA_EVENT_CALL_MENC:
             if (prm[0] == '0')
-                len = re_snprintf(event_buf, sizeof event_buf, "call secure");
+                len = re_snprintf(event_buf, sizeof event_buf, "call secure", "");
             else if (prm[0] == '1')
                 len = re_snprintf(event_buf, sizeof event_buf, "call verify,%s", prm + 2);
             else if (prm[0] == '2')
                 len = re_snprintf(event_buf, sizeof event_buf, "call verified,%s", prm + 2);
             else
-                len = re_snprintf(event_buf, sizeof event_buf, "unknown menc event");
+                len = re_snprintf(event_buf, sizeof event_buf, "unknown menc event", "");
             break;
         case UA_EVENT_CALL_TRANSFER:
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
