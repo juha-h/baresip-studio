@@ -19,7 +19,6 @@ enum
 typedef struct baresip_context
 {
     JavaVM *javaVM;
-    JNIEnv *env;
     jclass mainActivityClz;
     jobject mainActivityObj;
 
