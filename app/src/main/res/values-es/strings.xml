@@ -362,4 +362,7 @@
     <string name="favorite">Favoritos</string>
     <string name="appear_on_top_permission">El inicio automático necesita el permiso mostrar en la parte superior.</string>
     <string name="restore_unzip_failed">Error al restaurar los datos de la aplicación. Android versión 14 y superiores no permiten restaurar datos de los que se hizo una copia de seguridad antes de %1$s la versión %2$s.</string>
+    <string name="speaker_phone">Altavoz del teléfono</string>
+    <string name="speaker_phone_help">Si está marcada, el altavoz se enciende automáticamente al iniciar la llamada.</string>
+    <string name="dtmf_auto">RTP en la banda o imformación SIP</string>
 </resources>
