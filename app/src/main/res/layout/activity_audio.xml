@@ -43,6 +43,31 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" >
+            <TextView
+                android:id="@+id/SpeakerPhoneTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/SpeakerPhone"
+                android:textSize="18sp"
+                android:text="@string/speaker_phone" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/SpeakerPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:orientation="vertical" >
             <TextView

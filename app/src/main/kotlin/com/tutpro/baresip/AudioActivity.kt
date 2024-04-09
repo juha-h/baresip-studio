@@ -18,6 +18,7 @@ class AudioActivity : AppCompatActivity() {
     private lateinit var opusBitRate: EditText
     private lateinit var opusPacketLoss: EditText
     private lateinit var aec: CheckBox
+    private lateinit var speakerPhone: CheckBox
     private lateinit var audioDelay: EditText
 
     private var save = false
@@ -72,6 +73,9 @@ class AudioActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        speakerPhone = binding.SpeakerPhone
+        speakerPhone.isChecked = BaresipService.speakerPhone
 
         val modules = Config.variables("module")
 
@@ -172,6 +176,13 @@ class AudioActivity : AppCompatActivity() {
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
                     Config.replaceVariable("call_volume", callVolume.toString())
+                    save = true
+                }
+
+                if (speakerPhone.isChecked != BaresipService.speakerPhone) {
+                    BaresipService.speakerPhone = speakerPhone.isChecked
+                    Config.replaceVariable("speaker_phone",
+                        if (BaresipService.speakerPhone) "yes" else "no")
                     save = true
                 }
 
@@ -286,6 +297,10 @@ class AudioActivity : AppCompatActivity() {
         binding.VolumeTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.default_call_volume),
                     getString(R.string.default_call_volume_help))
+        }
+        binding.SpeakerPhoneTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.speaker_phone),
+                getString(R.string.speaker_phone_help))
         }
         binding.AudioModulesTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.audio_modules_title),
