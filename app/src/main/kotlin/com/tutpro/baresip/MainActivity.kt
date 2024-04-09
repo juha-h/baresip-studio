@@ -1479,10 +1479,10 @@ class MainActivity : AppCompatActivity() {
 
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content), false)
-        val blind = layout.findViewById(R.id.blind) as CheckBox
-        val attended = layout.findViewById(R.id.attended) as CheckBox
+        val blind: CheckBox = layout.findViewById(R.id.blind)
+        val attended: CheckBox = layout.findViewById(R.id.attended)
 
-        val transferUri = layout.findViewById(R.id.transferUri) as AutoCompleteTextView
+        val transferUri: AutoCompleteTextView = layout.findViewById(R.id.transferUri)
         transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
                 Contact.contactNames()))
         transferUri.threshold = 2
@@ -1531,7 +1531,7 @@ class MainActivity : AppCompatActivity() {
         val alertDialog = builder.create()
 
         val call = ua.currentCall() ?: return
-        val blindOrAttended = layout.findViewById(R.id.blindOrAttended) as RelativeLayout
+        val blindOrAttended: RelativeLayout = layout.findViewById(R.id.blindOrAttended)
         if (call.replaces()) {
             blind.setOnClickListener {
                 if (blind.isChecked) {
@@ -1585,14 +1585,14 @@ class MainActivity : AppCompatActivity() {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                         false)
-        val titleView = layout.findViewById(R.id.title) as TextView
+        val titleView: TextView = layout.findViewById(R.id.title)
         titleView.text = title
         if (ua != null) {
-            val messageView = layout.findViewById(R.id.message) as TextView
+            val messageView: TextView = layout.findViewById(R.id.message)
             val message = getString(R.string.account) + " " + Utils.plainAor(activityAor)
             messageView.text = message
         }
-        val input = layout.findViewById(R.id.password) as EditText
+        val input: EditText = layout.findViewById(R.id.password)
         input.requestFocus()
         with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setView(layout)
@@ -1649,12 +1649,12 @@ class MainActivity : AppCompatActivity() {
                 val layout = LayoutInflater.from(this)
                         .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
                                 false)
-                val titleView = layout.findViewById(R.id.title) as TextView
+                val titleView: TextView = layout.findViewById(R.id.title)
                 titleView.text = getString(R.string.authentication_password)
-                val messageView = layout.findViewById(R.id.message) as TextView
+                val messageView: TextView = layout.findViewById(R.id.message)
                 val message = getString(R.string.account) + " " + Utils.plainAor(aor)
                 messageView.text = message
-                val input = layout.findViewById(R.id.password) as EditText
+                val input: EditText = layout.findViewById(R.id.password)
                 input.requestFocus()
                 with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
                     setView(layout)
