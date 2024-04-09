@@ -207,7 +207,6 @@
     <string name="video_request">Videoforespørsel</string>
     <string name="video_call">Videosamtale</string>
     <string name="confirmation">Bekreftelse</string>
-    <string name="audio">Lyd</string>
     <string name="invalid_stun_password">«%1$s» er et ugyldig passord</string>
     <string name="stun_password_help">Passord hvis påkrevd av STUN/TURN-tjener</string>
     <string name="stun_password">STUN/TURN-passord</string>

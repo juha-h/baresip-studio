@@ -332,7 +332,6 @@
         TLS certificates of such Certificate Authorities that are not included in Android OS.
         In Android versions 9 and below, a file called \'ca_certs.crt\' is loaded from
         Download folder.</string>
-    <string name="audio">Audio</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="speaker_phone">Speaker Phone</string>
     <string name="speaker_phone_help">If checked, speaker phone is turned automatically on

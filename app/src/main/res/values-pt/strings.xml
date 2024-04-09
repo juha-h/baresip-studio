@@ -140,7 +140,6 @@
     <string name="opus_bit_rate">Taxa de Bits Opus</string>
     <string name="stun_username">Nome do Utilizador STUN/TURN</string>
     <string name="default_account">Conta Predefinida</string>
-    <string name="audio">Áudio</string>
     <string name="ok">OK</string>
     <string name="message_failed">Falhou</string>
     <string name="call_closed">A chamada está terminada</string>
