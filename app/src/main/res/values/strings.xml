@@ -334,6 +334,9 @@
         Download folder.</string>
     <string name="audio">Audio</string>
     <string name="audio_settings">Audio Settings</string>
+    <string name="speaker_phone">Speaker Phone</string>
+    <string name="speaker_phone_help">If checked, speaker phone is turned automatically on
+        when call starts.</string>
     <string name="audio_modules_title">Audio Modules</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.</string>

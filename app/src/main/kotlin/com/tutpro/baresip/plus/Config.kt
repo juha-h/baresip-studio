@@ -137,6 +137,14 @@ object Config {
             config = "${config}call_volume ${BaresipService.callVolume}\n"
         }
 
+        val speakerPhone = previousVariable("speaker_phone")
+        if (speakerPhone != "") {
+            config = "${config}speaker_phone $speakerPhone\n"
+            BaresipService.speakerPhone = speakerPhone == "yes"
+        } else {
+            config = "${config}speaker_phone no\n"
+        }
+
         val previousModules = previousVariables("module")
         for (module in AudioActivity.audioModules)
             if ("${module}.so" in previousModules)

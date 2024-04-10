@@ -703,6 +703,8 @@ class BaresipService: Service() {
                             break
                         stopMediaPlayer()
                         setCallVolume()
+                        if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                         proximitySensing(true)
                         return
                     }
@@ -749,22 +751,23 @@ class BaresipService: Service() {
                                 ua.account.missedCalls = true
                             }
                             return
+                        }
+                        Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
+                        Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
+                        if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
+                        if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
+                            Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
+                            if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
+                                startRinging()
                         } else {
-                            Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
-                            Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
-                            if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                                Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                                if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                                    startRinging()
-                            } else {
-                                val newIntent = Intent(this, MainActivity::class.java)
-                                newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                        Intent.FLAG_ACTIVITY_NEW_TASK
-                                newIntent.putExtra("action", "call answer")
-                                newIntent.putExtra("callp", callp)
-                                startActivity(newIntent)
-                                return
-                            }
+                            val newIntent = Intent(this, MainActivity::class.java)
+                            newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                            newIntent.putExtra("action", "call answer")
+                            newIntent.putExtra("callp", callp)
+                            startActivity(newIntent)
+                            return
                         }
                         if (!Utils.isVisible()) {
                             val intent = Intent(applicationContext, MainActivity::class.java)
@@ -1635,6 +1638,7 @@ class BaresipService: Service() {
         var supportedCameras = false
         var cameraFront = true
         var callVolume = 0
+        var speakerPhone = false
         var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
         var dynDns = false
         var filesPath = ""

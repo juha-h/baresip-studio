@@ -354,6 +354,10 @@
     </string>
     <string name="audio">Audio</string>
     <string name="audio_settings">Audio-asetukset</string>
+    <string name="speaker_phone">Kaiutin</string>
+    <string name="speaker_phone_help">Jos merkitty, kaiutin kytketään sutomaattisesti päälle
+        kun puhelu alkaa.
+    </string>
     <string name="audio_modules_title">Audio-modulit</string>
     <string name="audio_modules_help">Merkittyjen modulien tarjoamat audio-koodekit ovat tilien
         käytettävissä.
