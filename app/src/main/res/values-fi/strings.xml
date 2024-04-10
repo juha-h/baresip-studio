@@ -352,7 +352,6 @@
         jotka eivät sisälly Android-käyttöjärjestelmään. Android versioon 9 saakka tiedosto
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
-    <string name="audio">Audio</string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>
     <string name="speaker_phone_help">Jos merkitty, kaiutin kytketään sutomaattisesti päälle

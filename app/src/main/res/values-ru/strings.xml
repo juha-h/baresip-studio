@@ -184,7 +184,6 @@
     <string name="aec_extended_filter_help">Если этот флажок установлен, для подавления эха используется расширенный фильтр.</string>
     <string name="aec_extended_filter">Расширенный фильтр AEC</string>
     <string name="audio_modules_help">Аудиокодеки, предоставленные выбранными модулями, доступны для использования в аккаунтах.</string>
-    <string name="audio">Аудио</string>
     <string name="tls_ca_file_help">При отметке файл с TLS-сертификатами необходимых центров сертификации был или будет загружен. В Android версии 9 и ниже файл называется \'ca_certs.crt\' и берётся из каталога загрузок.</string>
     <string name="tls_ca_file">Файл TLS CA</string>
     <string name="tls_certificate_file_help">При отметке файл с TLS-сертификатом и закрытым ключом этого экземпляра baresip, был или будет загружен. В Android версии 9 и ниже файл называется \'cert.pem\' и берётся из каталога загрузок. В целях безопасности удалите файл после загрузки.</string>

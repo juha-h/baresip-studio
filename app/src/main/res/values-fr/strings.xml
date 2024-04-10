@@ -119,7 +119,6 @@
     <string name="unverify">Annuler la vérification</string>
     <string name="chat">Messages des conversations</string>
     <string name="listen_address">Adresse d\'écoute</string>
-    <string name="audio">Audio</string>
     <string name="reset">Restaurer</string>
     <string name="audio_modules_title">Modules audio</string>
 </resources>

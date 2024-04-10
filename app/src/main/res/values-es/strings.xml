@@ -255,7 +255,6 @@
     <string name="dark_theme">Tema oscuro</string>
     <string name="aec_extended_filter_help">Si está marcada, la cancelación de eco está utilizando el filtro extendido.</string>
     <string name="aec_extended_filter">Filtro extendido AEC</string>
-    <string name="audio">Audio</string>
     <string name="verify_server_help">Si está marcada, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS.</string>
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>

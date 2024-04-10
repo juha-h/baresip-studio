@@ -299,7 +299,6 @@
     <string name="failed_to_set_dns_servers">DNSサーバーの設定に失敗しました</string>
     <string name="tls_certificate_file">TLS証明書ファイル</string>
     <string name="tls_ca_file">TLS CA証明書ファイル</string>
-    <string name="audio">オーディオ</string>
     <string name="audio_modules_title">オーディオモジュール</string>
     <string name="failed_to_load_module">モジュールの読み込みに失敗しました</string>
     <string name="aec_help">チェックを入れると、通話音声のエコーキャンセルを試みます</string>

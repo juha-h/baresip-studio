@@ -10,7 +10,6 @@
     <string name="new_contact">Ny kontakt</string>
     <string name="contact">Kontakt</string>
     <string name="dark_theme">Mörkt tema</string>
-    <string name="audio">Ljud</string>
     <string name="invalid_dns_servers">Ogiltiga DNS-servrar</string>
     <string name="dns_servers">DNS-servrar</string>
     <string name="start_automatically">Starta automatiskt</string>

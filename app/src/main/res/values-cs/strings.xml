@@ -161,7 +161,6 @@
     <string name="opus_bit_rate_help">Průměrná maximální přenosová rychlost používaná zvukovým tokem Opus. Platné hodnoty jsou 6000-510000. Výchozí hodnota je 28000.</string>
     <string name="opus_packet_loss">Očekávaná ztráta paketů Opus</string>
     <string name="opus_packet_loss_help">Očekávaná procentuální ztráta paketů zvukového toku Opus od 0 do 100. Výchozí hodnota je 1. Hodnota 0 také vypíná funkci Opus Forward Error Correction (FEC).</string>
-    <string name="audio">Zvuk</string>
     <string name="audio_modules_title">Zvukové moduly</string>
     <string name="aec">Potlačení akustické ozvěny</string>
     <string name="default_call_volume">Výchozí hlasitost volání</string>
