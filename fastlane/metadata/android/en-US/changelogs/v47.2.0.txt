@@ -1,0 +1,4 @@
+- Added 'In-band RTP or SIP INFO' account DTMF Mode
+- Added Speaker Phone audio setting
+- Fixed loading of baresip lib
+- New German, Portuguese (Brazil), and Spanish translations
