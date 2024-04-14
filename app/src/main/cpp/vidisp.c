@@ -203,6 +203,7 @@ static int texture_init(struct vidisp_st *st)
     glGenTextures(1, &st->texture_id);
     if (st->texture_id == 0) {
         LOGW("glGenTextures generated texture_id 0 and error %d\n", glGetError());
+        return 1;
     }
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
@@ -442,7 +443,6 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1stop(JNIEnv *e
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
         JNIEnv *env, jclass thiz, jobject surface)
 {
-
     int w, h;
 
     LOGD("At set_surface() on thread %li\n", (long)pthread_self());
