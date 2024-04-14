@@ -2324,17 +2324,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setVideoSecurityButton(security: Int) {
-        when (security) {
-            R.drawable.unlocked -> {
-                videoSecurityButton.setImageResource(R.drawable.unlocked_video)
+        if (this::videoSecurityButton.isInitialized)
+            when (security) {
+                R.drawable.unlocked -> {
+                    videoSecurityButton.setImageResource(R.drawable.unlocked_video)
+                }
+                R.drawable.locked_yellow -> {
+                    videoSecurityButton.setImageResource(R.drawable.locked_video_yellow)
+                }
+                R.drawable.locked_green -> {
+                    videoSecurityButton.setImageResource(R.drawable.locked_video_green)
+                }
             }
-            R.drawable.locked_yellow -> {
-                videoSecurityButton.setImageResource(R.drawable.locked_video_yellow)
-            }
-            R.drawable.locked_green -> {
-                videoSecurityButton.setImageResource(R.drawable.locked_video_green)
-            }
-        }
     }
 
     private fun runCall(ua: UserAgent, uri: String, kind: String) {
