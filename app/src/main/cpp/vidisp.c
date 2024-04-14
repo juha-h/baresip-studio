@@ -47,7 +47,6 @@ struct vidisp_st *gst = NULL;
 
 static void renderer_destroy(struct vidisp_st *st)
 {
-
     LOGD("At renderer_destroy() on thread %li\n", (long)pthread_self());
 
     if (st->display != EGL_NO_DISPLAY) {

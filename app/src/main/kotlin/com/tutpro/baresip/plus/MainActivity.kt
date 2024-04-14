@@ -795,6 +795,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        addVideoLayoutViews()
+
         if (!BaresipService.isServiceRunning) {
             if (File(filesDir.absolutePath + "/accounts").exists()) {
                 val accounts = String(
@@ -1352,9 +1354,6 @@ class MainActivity : AppCompatActivity() {
                 recreate()
                 return
             }
-            // For some reason baresip crashes it permissions or passwords are asked after
-            // video layout views have been added
-            addVideoLayoutViews()
             uaAdapter.notifyDataSetChanged()
             if (uriString != "") {
                 callAction(uriString.toUri(), "dial")
@@ -2679,6 +2678,14 @@ class MainActivity : AppCompatActivity() {
         var accountRequest: ActivityResultLauncher<Intent>? = null
         var activityAor = ""
 
+    }
+
+    init {
+        if (!BaresipService.libraryLoaded) {
+            Log.i(TAG, "Loading baresip library")
+            System.loadLibrary("baresip")
+            BaresipService.libraryLoaded = true
+        }
     }
 
 }
