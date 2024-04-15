@@ -237,7 +237,7 @@
     <string name="contacts_exceeded">Maximalt antal kontakter %1$d har överskridits.</string>
     <string name="sip_trace">SIP-trafik</string>
     <string name="debug">Felsökning</string>
-    <string name="video_size_help">Storlek på bildrutorna i skickad video (bredd x höjd). Förvald storlek är 800x600.</string>
+    <string name="video_size_help">Storlek på bildrutorna i skickad video (bredd x höjd)</string>
     <string name="video_size">Storlek på bildrutor</string>
     <string name="no_cameras">Du har ingen videokamera som stöds.</string>
     <string name="no_video_calls">Aktivera behörigheten \"Kamera\" för att ringa eller ta emot samtal.</string>

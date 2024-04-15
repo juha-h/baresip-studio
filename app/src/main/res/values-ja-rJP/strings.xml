@@ -157,7 +157,7 @@
     <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage,
         from 0–100. By default 0, turning off Opus Forward Error Correction (FEC).
     </string>
-    <string name="video_size_help">Size of transmitted video frames (width x height). Factory default is 800x600.
+    <string name="video_size_help">Size of transmitted video frames (width x height)
     </string>
     <string name="sip_trace_help">If checked and if Debug is checked, provides also SIP
         request and response trace to Logcat. Unchecked automatically at baresip start.

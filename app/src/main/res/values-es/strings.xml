@@ -249,7 +249,7 @@
     <string name="reset_config_alert">¿Estás seguro de que quieres restablecer los valores de fábrica\?</string>
     <string name="sip_trace_help">Si está marcada y si Debug está marcada, los mensajes Logcat incluyen también la petición SIP y la traza de respuesta. Desmarcado automáticamente al iniciar baresip.</string>
     <string name="sip_trace">Seguimiento SIP</string>
-    <string name="video_size_help">Tamaño de los cuadros de vídeo transmitidos (ancho x alto). El valor predeterminado de fábrica es 800x600.</string>
+    <string name="video_size_help">Tamaño de los cuadros de vídeo transmitidos (ancho x alto)</string>
     <string name="video_size">Tamaño del fotograma de vídeo</string>
     <string name="dark_theme_help">Forzar el tema de la pantalla oscura</string>
     <string name="dark_theme">Tema oscuro</string>

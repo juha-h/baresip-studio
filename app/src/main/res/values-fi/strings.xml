@@ -391,8 +391,7 @@
     <string name="dark_theme">Tumma teema</string>
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
     <string name="video_size">Videon kehyskoko</string>
-    <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus).
-        Tehdasasetus on 800x600.</string>
+    <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus)</string>
     <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
         yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
         baresip-sovelluksen yhteystietoa.</string>

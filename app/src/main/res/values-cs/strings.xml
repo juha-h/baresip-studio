@@ -176,7 +176,7 @@
     <string name="dark_theme">Tmavé téma</string>
     <string name="both">Obojí</string>
     <string name="video_size">Rozlišení videa</string>
-    <string name="video_size_help">Rozlišení videa (šířka x výška). Výchozí hodnota je 800x600.</string>
+    <string name="video_size_help">Rozlišení videa (šířka x výška)</string>
     <string name="contacts_help">Vybírá, zda se použijí kontakty baresip, kontakty Android nebo obojí. Pokud se použijí oba a kontakt se stejným jménem existuje v obou, zvolí se kontakt baresip.</string>
     <string name="debug_help">Pokud je zaškrtnuto, poskytuje zprávy protokolu Logcat na úrovni ladění a informací.</string>
     <string name="sip_trace_help">Pokud je zaškrtnuto a pokud je zaškrtnuta volba Debug, zprávy Logcat obsahují také trasování požadavků a odpovědí SIP. Zruší se automaticky při spuštění baresipu.</string>
