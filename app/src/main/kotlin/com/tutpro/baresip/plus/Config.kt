@@ -197,6 +197,12 @@ object Config {
                     videoSizes.add(size.toString())
         }
 
+        val videoFps = previousVariable("video_fps")
+        config = if (videoFps != "" && videoFps != "15.0")
+            "${config}video_fps $videoFps\n"
+        else
+            "${config}video_fps 15\n"
+
         val videoSize = previousVariable("video_size")
         config = if (videoSize !in videoSizes) {
             if ("1280x720" in videoSizes)

@@ -46,6 +46,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var verifyServer: CheckBox
     private lateinit var caFile: CheckBox
     private lateinit var darkTheme: CheckBox
+    private lateinit var videoFps: EditText
     private lateinit var contactsSpinner: Spinner
     private lateinit var contactsMode: String
     private lateinit var contactsModeKeys: ArrayList<String>
@@ -68,6 +69,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldNetAf = ""
     private var videoSize = ""
     private var oldVideoSize = Config.variable("video_size")
+    private var oldVideoFps = Config.variable("video_fps")
     private var save = false
     private var restart = false
     private var audioRestart = false
@@ -349,6 +351,9 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
+        videoFps = binding.VideoFps
+        videoFps.setText(oldVideoFps)
+
         val videoSizeSpinner = findViewById<Spinner>(R.id.VideoSizeSpinner)
         val sizes = mutableListOf<String>()
         sizes.addAll(Config.videoSizes)
@@ -586,6 +591,20 @@ class ConfigActivity : AppCompatActivity() {
 
                 if (oldVideoSize != videoSize) {
                     Config.replaceVariable("video_size", videoSize)
+                    save = true
+                    restart = true
+                }
+
+                val newFps = videoFps.text.toString().trim().toInt()
+                if (oldVideoFps.toInt() != newFps) {
+                    if (newFps < 10 || newFps > 30) {
+                        Utils.alertView(
+                            this, getString(R.string.notice),
+                            String.format(getString(R.string.invalid_fps), newFps)
+                        )
+                        return false
+                    }
+                    Config.replaceVariable("video_fps", newFps.toString())
                     save = true
                     restart = true
                 }
