@@ -190,7 +190,8 @@ object Config {
             if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) != CameraCharacteristics.LENS_FACING_FRONT)
                 continue
             val streamConfigurationMap = cameraCharacteristics[CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP]
-            val sizes = streamConfigurationMap!!.getOutputSizes(ImageFormat.YUV_420_888)
+                ?: continue
+            val sizes = streamConfigurationMap.getOutputSizes(ImageFormat.YUV_420_888)
             for (size in sizes)
                 if (size.toString() in defaultSizes)
                     videoSizes.add(size.toString())
