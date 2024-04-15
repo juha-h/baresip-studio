@@ -366,8 +366,7 @@
     <string name="dark_theme">Dark Theme</string>
     <string name="dark_theme_help">Force dark display theme</string>
     <string name="video_size">Video Frame Size</string>
-    <string name="video_size_help">Size of transmitted video frames (width x height).
-        Factory default is 800x600.</string>
+    <string name="video_size_help">Size of transmitted video frames (width x height)</string>
     <string name="contacts_help">Chooses if baresip contacts, Android contacts, or both are used.
         If both and contact with the same name exists in both, baresip contact is chosen.</string>
     <string name="both">Both</string>

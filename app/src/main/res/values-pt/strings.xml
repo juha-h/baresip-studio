@@ -215,7 +215,7 @@
     <string name="configuration">Ajustes</string>
     <string name="answer_mode_help">Selecione como chamadas recebidas são respondidas.</string>
     <string name="contacts_exceeded">A sua quantidade máxima de %1$d contatos foi excedida.</string>
-    <string name="video_size_help">Tamanho dos quadros de vídeo que foram transmitidos (largura x altura). A configuração de fábrica é 800x600.</string>
+    <string name="video_size_help">Tamanho dos quadros de vídeo que foram transmitidos (largura x altura)</string>
     <string name="voicemail_uri">URI do Correio de Voz</string>
     <string name="backed_up">Os dados as aplicações foram armazenados num backup no ficheiro \'%1$s\'. Nas versões do Android 9 e anteriores, o ficheiro está na pasta Download.</string>
     <string name="quit">Sair</string>
