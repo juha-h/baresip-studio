@@ -16,7 +16,7 @@ audio_silence -35.0
 audio_telev_pt 10
 video_source avformat,android_camera,1
 video_fps 15.0
-videoenc_format yuv420p
+videnc_format yuv420p
 audio_jitter_buffer_type adaptive
 audio_jitter_buffer_delay 0-20
 video_jitter_buffer_type adaptive
