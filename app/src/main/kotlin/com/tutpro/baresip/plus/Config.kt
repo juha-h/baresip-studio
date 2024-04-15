@@ -2,6 +2,9 @@ package com.tutpro.baresip.plus
 
 import android.Manifest
 import android.content.Context
+import android.graphics.ImageFormat
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import androidx.appcompat.app.AppCompatDelegate
 import java.io.File
 import java.net.InetAddress
@@ -13,6 +16,7 @@ object Config {
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
+    var videoSizes = mutableListOf<String>()
 
     fun initialize(ctx: Context) {
 
@@ -179,11 +183,28 @@ object Config {
             config = "${config}audio_delay ${BaresipService.audioDelay}\n"
         }
 
+        val cameraManager: CameraManager = ctx.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        val defaultSizes = arrayListOf("320x240", "640x480", "720x480", "960x720", "1280x720",  "1920x1080")
+        for (id in cameraManager.cameraIdList) {
+            val cameraCharacteristics = cameraManager.getCameraCharacteristics(id)
+            if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) != CameraCharacteristics.LENS_FACING_FRONT)
+                continue
+            val streamConfigurationMap = cameraCharacteristics[CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP]
+            val sizes = streamConfigurationMap!!.getOutputSizes(ImageFormat.YUV_420_888)
+            for (size in sizes)
+                if (size.toString() in defaultSizes)
+                    videoSizes.add(size.toString())
+        }
+
         val videoSize = previousVariable("video_size")
-        config = if (videoSize == "")
-            "${config}video_size 800x600\n"
-        else
+        config = if (videoSize !in videoSizes) {
+            if ("1280x720" in videoSizes)
+                "${config}video_size 1280x720\n"
+            else
+                "${config}video_size 640x480\n"
+        } else {
             "${config}video_size $videoSize\n"
+        }
 
         val toneCountry = previousVariable("tone_country")
         if (toneCountry != "")
