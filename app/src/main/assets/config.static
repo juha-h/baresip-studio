@@ -25,9 +25,9 @@ rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
 module opensles.so
-module avcodec.so
-module vp8.so
 module vp9.so
+module vp8.so
+module avcodec.so
 module av1.so
 module snapshot.so
 module stun.so
