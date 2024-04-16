@@ -1759,6 +1759,15 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1enable_1sip_1trace(
     uag_enable_sip_trace(enable);
 }
 
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1frame_1size_1set(
+        JNIEnv *env, jobject thiz, jint width, jint height)
+{
+    struct config *conf = conf_config();
+    LOGD("setting video_frame_size (%dx%d)\n", width, height);
+    conf->video.width = width;
+    conf->video.height = height;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1fps_1set(
         JNIEnv *env, jobject thiz, jint fps)
 {

@@ -591,8 +591,9 @@ class ConfigActivity : AppCompatActivity() {
 
                 if (oldVideoSize != videoSize) {
                     Config.replaceVariable("video_size", videoSize)
+                    Api.config_video_frame_size_set(videoSize.substringBefore("x").toInt(),
+                        videoSize.substringAfter("x").toInt())
                     save = true
-                    restart = true
                 }
 
                 val newFps = videoFps.text.toString().trim().toInt()
