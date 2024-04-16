@@ -605,8 +605,8 @@ class ConfigActivity : AppCompatActivity() {
                         return false
                     }
                     Config.replaceVariable("video_fps", newFps.toString())
+                    Api.config_video_fps_set(newFps)
                     save = true
-                    restart = true
                 }
 
                 val newDisplayTheme = if (darkTheme.isChecked)

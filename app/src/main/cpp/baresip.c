@@ -1759,6 +1759,14 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1enable_1sip_1trace(
     uag_enable_sip_trace(enable);
 }
 
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1fps_1set(
+        JNIEnv *env, jobject thiz, jint fps)
+{
+    struct config *conf = conf_config();
+    LOGD("setting video_fps (%d)\n", fps);
+    conf->video.fps = (double)fps;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1debug(JNIEnv *env, jobject thiz)
 {
     re_thread_enter();

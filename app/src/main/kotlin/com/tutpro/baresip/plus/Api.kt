@@ -118,6 +118,8 @@ object Api {
     external fun net_debug()
     external fun net_dns_debug()
 
+    external fun config_video_fps_set(fps: Int)
+
     external fun cmd_exec(cmd: String): Int
 
     external fun module_load(module: String): Int
