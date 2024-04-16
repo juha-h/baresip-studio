@@ -611,8 +611,8 @@ class ConfigActivity : AppCompatActivity() {
                 if (oldVerifyServer != verifyServer.isChecked) {
                     Config.replaceVariable("sip_verify_server",
                             if (verifyServer.isChecked) "yes" else "no")
+                    Api.config_verify_server_set(verifyServer.isChecked)
                     save = true
-                    restart = true
                 }
 
                 val newDisplayTheme = if (darkTheme.isChecked)

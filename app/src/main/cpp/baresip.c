@@ -1588,6 +1588,14 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_uag_1enable_1sip_1trace(
     uag_enable_sip_trace(enable);
 }
 
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_config_1verify_1server_1set(
+        JNIEnv *env, jobject thiz, jboolean verify)
+{
+    struct config *conf = conf_config();
+    LOGD("setting verify_server (%d)\n", verify);
+    conf->sip.verify_server = verify;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobject thiz)
 {
     re_thread_enter();

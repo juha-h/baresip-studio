@@ -109,6 +109,8 @@ object Api {
     external fun net_debug()
     external fun net_dns_debug()
 
+    external fun config_verify_server_set(verify: Boolean)
+
     external fun cmd_exec(cmd: String): Int
 
     external fun module_load(module: String): Int
