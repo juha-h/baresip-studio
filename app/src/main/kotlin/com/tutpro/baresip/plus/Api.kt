@@ -120,6 +120,7 @@ object Api {
 
     external fun config_video_fps_set(fps: Int)
     external fun config_video_frame_size_set(width: Int, height: Int)
+    external fun config_verify_server_set(verify: Boolean)
 
     external fun cmd_exec(cmd: String): Int
 

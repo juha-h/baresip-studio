@@ -1776,6 +1776,14 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1fps_1set(
     conf->video.fps = (double)fps;
 }
 
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1verify_1server_1set(
+        JNIEnv *env, jobject thiz, jboolean verify)
+{
+    struct config *conf = conf_config();
+    LOGD("setting verify_server (%d)\n", verify);
+    conf->sip.verify_server = verify;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1debug(JNIEnv *env, jobject thiz)
 {
     re_thread_enter();
