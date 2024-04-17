@@ -1700,12 +1700,4 @@ class BaresipService: Service() {
 
     }
 
-    init {
-        if (!libraryLoaded) {
-            Log.d(TAG, "Loading baresip library")
-            System.loadLibrary("baresip")
-            libraryLoaded = true
-        }
-    }
-
 }
