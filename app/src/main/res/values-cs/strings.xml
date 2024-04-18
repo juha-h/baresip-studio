@@ -327,4 +327,8 @@
     <string name="rel_100_help">Pokud je zaškrtnuto, tak avizovat podporu spolehlivých předběžných odpovědí (RFC 3262).</string>
     <string name="tone_country_help">Země vyzvánění, čekajícího hovoru a obsazených tónů volajícího</string>
     <string name="rel_100">Spolehlivé předběžné odpovědi</string>
+    <string name="restore_unzip_failed">Nepodařilo se obnovit data aplikace. Systém Android verze 14 a vyšší neumožňuje obnovení dat, která byla zálohována před verzí %1$s %2$s.</string>
+    <string name="speaker_phone">Hlasitý poslech</string>
+    <string name="speaker_phone_help">Pokud je zatrženo, hlasitý poslech se zapne automaticky při zahájení hovoru.</string>
+    <string name="dtmf_auto">In-band RTP nebo SIP INFO</string>
 </resources>
