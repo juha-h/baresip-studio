@@ -44,10 +44,6 @@ add_library(lib_ndk_compat STATIC IMPORTED)
 set_target_properties(lib_ndk_compat PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/cpu_features/lib/${ANDROID_ABI}/libndk_compat.a)
 
-add_library(lib_x265 STATIC IMPORTED)
-set_target_properties(lib_x265 PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/x265/lib/${ANDROID_ABI}/libx265.a)
-
 add_library(lib_avcodec SHARED IMPORTED)
 set_target_properties(lib_avcodec PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavcodec.so)
@@ -150,7 +146,6 @@ target_link_libraries(baresip
         lib_avformat
         lib_avcodec
         lib_x264
-        lib_x265
         lib_aom
         lib_png
         lib_vpx

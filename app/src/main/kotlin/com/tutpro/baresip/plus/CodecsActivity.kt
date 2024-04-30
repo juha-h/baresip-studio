@@ -61,6 +61,7 @@ class CodecsActivity : AppCompatActivity() {
         } else {
             codecsTitle.text = getString(R.string.video_codecs)
             allCodecs = ArrayList(Api.video_codecs().split(",").distinct())
+            allCodecs.remove("H265")
             accCodecs = acc.videoCodec
         }
 
