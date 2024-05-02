@@ -242,33 +242,26 @@
 \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is usedif offered in incoming call.</string>
     <string name="start_failed">Baresip konnte nicht gestartet werden. Das kann wegen eines ungültigen Einstellungswertes sein. Überprüfen Sie die Hören (Listen) Adresse, TLS Zertifikat, TLS CA File. Starten Sie dann baresip neu.</string>
     <string name="audio_permissions">baresip benötigt \"Mikrofon\"-Berechtigung für Sprachanrufe, \"Geräte in der Nähe\"-Berechtigung für Bluetooth-Mikrofon/Hörer-Erkennung und \"Benachrichtigungen\"-Berechtigung für die Benachrichtigungen.</string>
-    <string name="about_text">
-&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt;
-&lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt;
-&lt;p&gt;Version %1$s&lt;/p&gt;
-&lt;h2&gt;Benutzerhinweise&lt;/h2&gt;
-&lt;ul&gt;&lt;li&gt;Überprüfen Sie dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt;
-&lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt;
-&lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt;
-&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt;
-&lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt;
-&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt;
-&lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt;
-&lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt;
-&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt;
-&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt;
-&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt;
-&lt;li&gt;See &lt;a href="https://github.com/juha-h/baresip-studio/wiki"&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt;
-&lt;h2&gt;Privacy Policy&lt;/h2&gt;
-Privacy policy is available &lt;a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt"&gt;here&lt;/a&gt;.
-&lt;h2&gt;Source code&lt;/h2&gt;
-Source code is available at &lt;a href="https://github.com/juha-h/baresip-studio"&gt;GitHub&lt;/a&gt;,where also issues can be reported.
-&lt;h2&gt;Lizenzen&lt;/h2&gt;
-&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
+    <string name="about_text">&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt;
+\n &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; 
+\n&lt;h2&gt;Benutzerhinweise&lt;/h2&gt;
+\n &lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt;
+\n &lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt;
+\n &lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt; 
+\n&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt;
+\n &lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt; 
+\n&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt;
+\n &lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt;
+\n &lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt; 
+\n&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt; 
+\n&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt; 
+\n&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt; 
+\n&lt;li&gt;See &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt; 
+\n&lt;h2&gt;Privacy Policy&lt;/h2&gt;
+\n Privacy policy is available &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;here&lt;/a&gt;. 
+\n&lt;h2&gt;Source code&lt;/h2&gt; Source code is available at &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;,where also issues can be reported. 
+\n&lt;h2&gt;Lizenzen&lt;/h2&gt; 
+\n&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
     <string name="about_text_plus">&lt;h1&gt;SIP Endgerät mit Videoanrufen, basierend auf der Baresip Bibliothek &lt;/h1&gt;&lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt;&lt;p&gt;Version %1$s&lt;/p&gt;&lt;h2&gt;Benutzerhinweise&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip+ Ihren Bedürfnissen entsprechen (tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt;&lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt;&lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt;&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt;&lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt;&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt;&lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt;&lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt;&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt;&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt;&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt;&lt;li&gt;See &lt;a href="https://github.com/juha-h/baresip-studio/wiki"&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Bekannte Probleme&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Bei Videoanrufen muß das Gerät quer gehalten werden, um 90 Grad nach links geneigt, von der Hochkantposition betrachtet.&lt;/li&gt; &lt;li&gt;Das eigene Bild wird nicht richtig gezeigt, wenn Video auf Nursenden eingestellt ist.&lt;/li&gt; &lt;/ul&gt;&lt;h2&gt;Privacy Policy&lt;/h2&gt;Privacy policy is available &lt;a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt"&gt;here&lt;/a&gt;.&lt;h2&gt;Source code&lt;/h2&gt;Source code is available at &lt;a href="https://github.com/juha-h/baresip-studio"&gt;GitHub&lt;/a&gt;,where also issues can be reported.&lt;h2&gt;Lizenzen&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt;&lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt;&lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt;&lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt;&lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;li&gt;&lt;b&gt;GNU GPLv2&lt;/b&gt; H.264 and H.265 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;AOMedia&lt;/b&gt; AV1 codec&lt;/li&gt; &lt;/ul&gt;</string>
     <string name="country_code_help">E.164 Ländercode dieses Kontos. Wenn der Benutzerteil der Von-URI des eingehenden Anrufs oder der Nachricht eine Telefonnummer enthält, die nicht mit \'+\'-Zeichen beginnt und wenn der Kontakt nicht bekannt ist, wird der Nummer dieser Ländercode vorangestellt und die Kontaktsuche beginnt erneut. Wenn die Telefonnummer mit einer einzigen Ziffer \'0\' beginnt, wird die Zahl \'0\' entfernt, bevor der Ländercode vorangestellt wird.</string>
     <string name="accounts_help">Wenn ein neues Konto erstellt wird, kann die Portnummer und das Transportprotokoll des Kontos optional angegeben werden: &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Wird &lt;port&gt; angegeben und das Transportprotokoll nicht angegeben, wird das Transportprotokoll standardmäßig auf udp gesetzt. Wenn &lt;port&gt; nicht und das Transportprotokoll schon angegeben ist, wird &lt;port&gt; 5060 oder 5061 eingestellt (TLS). Wenn weder noch angegeben wird und kein Proxy für ausgehende Verbindungen angegeben wird, wird der Registrar (falls vorhanden) des Kontos ausschließlich auf Basis der DNS-Informationen der Domain ermittelt.</string>
