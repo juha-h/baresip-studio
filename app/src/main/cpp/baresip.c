@@ -1527,7 +1527,7 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(
 {
     const char *addr = (*env)->GetStringUTFChars(env, jAddr, 0);
     const char *name = (*env)->GetStringUTFChars(env, jIfName, 0);
-    int res = 0;
+    int res;
     struct sa temp_sa;
     char buf[256];
     LOGD("adding address/ifname '%s/%s'\n", addr, name);
@@ -1549,7 +1549,7 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1rm_1address(
         JNIEnv *env, jobject thiz, jstring jIp)
 {
     const char *native_ip = (*env)->GetStringUTFChars(env, jIp, 0);
-    int res = 0;
+    int res;
     struct sa temp_sa;
     char buf[256];
     LOGD("removing address '%s'\n", native_ip);
