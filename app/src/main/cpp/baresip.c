@@ -433,6 +433,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
 {
     LOGI("starting baresip\n");
 
+    int err;
     char start_error[64] = "";
 
     JavaVM *javaVM = g_ctx.javaVM;
@@ -441,11 +442,9 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
     g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
     g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
 
-    int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
     const char *addrs = (*env)->GetStringUTFChars(env, jAddrs, 0);
     const char *software = (*env)->GetStringUTFChars(env, jSoftware, 0);
-    struct le *le;
 
     runLoggingThread();
 
