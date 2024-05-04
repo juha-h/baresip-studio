@@ -94,7 +94,7 @@
     <string name="new_messages">nouveaux messages</string>
     <string name="one_new_message">un nouveau message</string>
     <string name="you_have">Vous avez</string>
-    <string name="rate">Débit</string>
+    <string name="rate">Débit: %1$s</string>
     <string name="call_info">Infos de l\'appel</string>
     <string name="duration">Durée %1$d</string>
     <string name="call_info_not_available">Aucune information disponible</string>

@@ -149,7 +149,7 @@
     <string name="hold">Sett på vent</string>
     <string name="dtmf">Tonesignalering</string>
     <string name="call_info">Samtaleinfo</string>
-    <string name="rate">Takt</string>
+    <string name="rate">Takt: %1$s</string>
     <string name="voicemail">Telefonsvarer</string>
     <string name="voicemail_messages">Telefonsvarermeldinger</string>
     <string name="dialpad">Nummerskive</string>

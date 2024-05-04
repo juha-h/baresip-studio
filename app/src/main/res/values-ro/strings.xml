@@ -111,7 +111,7 @@
     <string name="call_info">Informații apel</string>
     <string name="duration">Durată %1$d</string>
     <string name="codecs">Codec-uri</string>
-    <string name="rate">Rată</string>
+    <string name="rate">Rată: %1$s</string>
     <string name="voicemail">Căsuță vocală</string>
     <string name="voicemail_messages">Mesaje căsuță vocală</string>
     <string name="you_have">Aveți</string>

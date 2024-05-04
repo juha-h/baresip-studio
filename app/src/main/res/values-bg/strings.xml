@@ -224,7 +224,7 @@
     <string name="call_info">Информация за обаждане</string>
     <string name="duration">Продължителност %1$d (s)</string>
     <string name="codecs">Кодеци</string>
-    <string name="rate">Скорост</string>
+    <string name="rate">Скорост: %1$s</string>
     <string name="voicemail">Гласова поща</string>
     <string name="voicemail_messages">Съобщения за гласова поща</string>
     <string name="you_have">Ти имаш</string>
