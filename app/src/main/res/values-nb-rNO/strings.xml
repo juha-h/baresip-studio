@@ -83,7 +83,7 @@
     <string name="outgoing_call_to_dots">Utgående anrop til …</string>
     <string name="incoming_call_from_dots">Innkommende anrop fra …</string>
     <string name="transferring_call_to_dots">Overfører anrop til …</string>
-    <string name="duration">Varighet</string>
+    <string name="duration">Varighet %1$d (sek)</string>
     <string name="codecs">Kodeker</string>
     <string name="you_have">Du har</string>
     <string name="one_new_message">én ny melding</string>
@@ -149,7 +149,7 @@
     <string name="hold">Sett på vent</string>
     <string name="dtmf">Tonesignalering</string>
     <string name="call_info">Samtaleinfo</string>
-    <string name="rate">Takt</string>
+    <string name="rate">Takt: %1$s</string>
     <string name="voicemail">Telefonsvarer</string>
     <string name="voicemail_messages">Telefonsvarermeldinger</string>
     <string name="dialpad">Nummerskive</string>
@@ -182,10 +182,10 @@
     <string name="config_restart">Ønsker du å starte baresip på ny for å aktivere de nye innstillingene nå\?</string>
     <string name="backup">Sikkerhetskopier</string>
     <string name="restore">Gjenopprett</string>
-    <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \"baresip.bs\".</string>
-    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'baresip.bs\'. Sjekk \"Programmer → baresip → Tilganger → Lagring.</string>
+    <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \'%1$s\'.</string>
+    <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'%1$s\'. Sjekk \"Programmer → baresip → Tilganger → Lagring.</string>
     <string name="restored">Programdata gjenopprettet. Start baresip på ny nå\?</string>
-    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \"baresip.bs\" finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
+    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \'%1$s\' finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
     <string name="audio_modules_title">Lydmoduler</string>
     <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
     <string name="help">Hjelp</string>

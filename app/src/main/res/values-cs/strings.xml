@@ -253,7 +253,7 @@
     <string name="choose_destination_uri">Zvolit cílové URI</string>
     <string name="transfer">Přepojit</string>
     <string name="call_info">Informace o volání</string>
-    <string name="duration">Doba trvání: %1$s (secs)</string>
+    <string name="duration">Doba trvání: %1$d (secs)</string>
     <string name="codecs">Kodeky</string>
     <string name="rate">Aktuální rychlost: %1$s (Kbits/s)</string>
     <string name="average_rate">Průměrná rychlost: %1$s (Kbits/s)</string>

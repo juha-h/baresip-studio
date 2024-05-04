@@ -305,6 +305,8 @@
     <string name="start_automatically">Käynnistä automaattisesti</string>
     <string name="start_automatically_help">Jos merkitty, baresip
     käynnistyy automaattisesti, kun laite käynnistyy.</string>
+    <string name="appear_on_top_permission">Automaattinen käynnistys vaatii "Näytä päällimmäisenä"
+        käyttöoikeuden.</string>
     <string name="battery_optimizations">Akun käytön optimointi</string>
     <string name="battery_optimizations_help">Ota akun käytön optimointi pois päältä (suositeltu),
         jos haluat vähentää todennäköisyyttä, että Android rajoittaa baresip-sovelluksen toimintaa
@@ -392,10 +394,6 @@
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
     <string name="video_size">Videon kehyskoko</string>
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus)</string>
-    <string name="video_fps">Videokehysten lähetystaajuus</string>
-    <string name="video_fps_help">Videokehysten lähetystaajuus per sekuntti, jota tarjotaan SDP-
-        neuvottelun aikana. Arvon on oltava välillä 10-30.</string>
-    <string name="invalid_fps">Virheellinen videokehysten lähetystaajuus \'%1$s\'</string>
     <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
         yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
         baresip-sovelluksen yhteystietoa.</string>
@@ -503,7 +501,7 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
     <string name="call_info_not_available">Ei saatavilla</string>
-    <string name="duration">Kesto: %1$s (sek)</string>
+    <string name="duration">Kesto: %1$d (sek)</string>
     <string name="codecs">Koodekit</string>
     <string name="rate">Nykyinen nopeus: %1$s (Kbit/s)</string>
     <string name="average_rate">Keskinopeus: %1$s (Kbit/s)</string>
@@ -544,7 +542,8 @@
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
         versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
-    <string name="backup_failed">Sovelluksen tietojen talletus epäonnistui. Android versioon 9 saakka
+    <string name="backup_failed">Sovelluksen tietojen talletus
+        tiedostoon \'%1$s\' epäonnistui. Android versioon 9 saakka
         Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
