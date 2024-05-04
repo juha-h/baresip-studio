@@ -80,7 +80,7 @@
     <string name="contact_action_question">Doriți să apelați sau să trimiteți un mesaj către \'%1$s\'\?</string>
     <string name="send_message">Trimite mesaj</string>
     <string name="contact_delete_question">Doriți să ștergeți contactul \'%1$s\'\?</string>
-    <string name="contacts_exceeded">Numărul maxim de contacte %1%d a fost depășit.</string>
+    <string name="contacts_exceeded">Numărul maxim de contacte %1$d a fost depășit.</string>
     <string name="alert">Alertă</string>
     <string name="info">Informații</string>
     <string name="notice">Notificări</string>
