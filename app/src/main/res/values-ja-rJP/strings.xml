@@ -364,7 +364,7 @@
     <string name="reset_config_help">チェックを入れると、設定は工場出荷時のデフォルト値にリセットされます。</string>
     <string name="contact_action_question"> %1$s に電話をかけるか、メッセージを送信しますか？</string>
     <string name="contact_delete_question">連絡先 %1$s を削除しますか?</string>
-    <string name="contacts_exceeded">連絡先の最大数 %1$s を超えました</string>
+    <string name="contacts_exceeded">連絡先の最大数 %1$d を超えました</string>
     <string name="allow_video"> %1$s でテレビ通話の送受信を許可しますか?</string>
     <string name="allow_video_send"> %1$s へのテレビ通話を許可しますか?</string>
     <string name="allow_video_recv"> %1$s からのテレビ通話を許可しますか?</string>
