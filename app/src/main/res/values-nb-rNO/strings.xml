@@ -185,7 +185,7 @@
     <string name="backed_up">Programdata sikkerhetskopiert til nedlastingsmappen som \'%1$s\'.</string>
     <string name="backup_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe som \'%1$s\'. Sjekk \"Programmer → baresip → Tilganger → Lagring.</string>
     <string name="restored">Programdata gjenopprettet. Start baresip på ny nå\?</string>
-    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \"baresip.bs\" finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
+    <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \'%1$s\' finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
     <string name="audio_modules_title">Lydmoduler</string>
     <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
     <string name="help">Hjelp</string>
