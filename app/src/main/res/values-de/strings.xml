@@ -97,7 +97,6 @@
     <string name="unknown">Unbekannt</string>
     <string name="no_telephony_provider">Konto \'%1$s\' hat keinen Telefonanbieter</string>
     <string name="lost">Verloren</string>
-    <string name="jitter"/>
     <string name="peer_not_verified">Dieser Anruf ist SICHER, aber die Gegenstelle ist NICHT verifiziert!</string>
     <string name="calls_calls">Anrufe</string>
     <string name="calls_call">Anruf</string>
