@@ -193,7 +193,6 @@ static void ua_event_handler(
     struct pl module, module_event, data;
     struct sdp_media *media;
     int remote_has_video;
-    ANativeWindow **win;
 
     LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
 
@@ -421,6 +420,7 @@ static struct mqueue *mq;
 
 static void mqueue_handler(int id, void *data, void *arg)
 {
+    (void)arg;
     if (id == ID_UA_STOP_ALL) {
         LOGD("calling ua_stop_all with force %u\n", (unsigned)(uintptr_t)data);
         ua_stop_all((bool)(uintptr_t)data);
@@ -432,6 +432,7 @@ static pthread_t loggingThread;
 
 static void *loggingFunction(void *arg)
 {
+    (void)arg;
     ssize_t readSize;
     char buf[128];
 
@@ -466,6 +467,8 @@ static int runLoggingThread()
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
+    (void)reserved;
+
     LOGW("JNI_OnLoad on thread %li\n", (long)pthread_self());
 
     memset(&g_ctx, 0, sizeof(g_ctx));
@@ -497,7 +500,6 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
     const char *addrs = (*env)->GetStringUTFChars(env, jAddrs, 0);
     const char *software = (*env)->GetStringUTFChars(env, jSoftware, 0);
-    struct le *le;
 
     runLoggingThread();
 
@@ -660,15 +662,18 @@ out:
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStop(
-        JNIEnv *env, jobject thiz, jboolean force)
+        JNIEnv *env, jobject obj, jboolean force)
 {
+    (void)env;
+    (void)obj;
     LOGD("ua_stop_all upon baresipStop");
     mqueue_push(mq, ID_UA_STOP_ALL, (void *)((long)force));
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1display_1name(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *dn = account_display_name((struct account *)acc);
         if (dn)
@@ -680,8 +685,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1display_1nam
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1display_1name(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jDn)
+        JNIEnv *env, jobject obj, jlong acc, jstring jDn)
 {
+    (void)obj;
     const char *dn = (*env)->GetStringUTFChars(env, jDn, 0);
     int res;
     if (strlen(dn) > 0)
@@ -693,8 +699,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1display_1n
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1aor(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc)
         return (*env)->NewStringUTF(env, account_aor((struct account *)acc));
     else
@@ -702,8 +709,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1aor(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1luri(
-        JNIEnv *env, jclass clazz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     const struct uri *uri = account_luri((struct account *)acc);
     char uri_buf[512];
     int l;
@@ -716,8 +724,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1luri(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1auth_1user(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *au = account_auth_user((struct account *)acc);
         if (au)
@@ -729,8 +738,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1auth_1user(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1auth_1user(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jUser)
+        JNIEnv *env, jobject obj, jlong acc, jstring jUser)
 {
+    (void)obj;
     const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
     int res;
     if (strlen(user) > 0)
@@ -742,8 +752,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1auth_1user
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1auth_1pass(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *ap = account_auth_pass((struct account *)acc);
         if (ap)
@@ -755,8 +766,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1auth_1pass(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1auth_1pass(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jPass)
+        JNIEnv *env, jobject obj, jlong acc, jstring jPass)
 {
+    (void)obj;
     const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
     int res;
     if (strlen(pass) > 0)
@@ -768,8 +780,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1auth_1pass
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1outbound(
-        JNIEnv *env, jobject thiz, jlong acc, jint jIx)
+        JNIEnv *env, jobject obj, jlong acc, jint jIx)
 {
+    (void)obj;
     const uint16_t native_ix = jIx;
     const char *outbound;
     if (acc) {
@@ -784,8 +797,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1outbound(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1outbound(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jOb, jint jIx)
+        JNIEnv *env, jobject obj, jlong acc, jstring jOb, jint jIx)
 {
+    (void)obj;
     const char *ob = (*env)->GetStringUTFChars(env, jOb, 0);
     const uint16_t ix = jIx;
     int res;
@@ -798,8 +812,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1outbound(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1audio_1codec(
-        JNIEnv *env, jobject thiz, jlong acc, jint ix)
+        JNIEnv *env, jobject obj, jlong acc, jint ix)
 {
+    (void)obj;
     const struct list *codecl;
     char codec_buf[32];
     int len;
@@ -828,8 +843,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1audio_1codec
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1audio_1codecs(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jCodecs)
+        JNIEnv *env, jobject obj, jlong acc, jstring jCodecs)
 {
+    (void)obj;
     const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
     int res = account_set_audio_codecs((struct account *)acc, codecs);
     (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
@@ -837,8 +853,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1audio_1cod
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1video_1codec(
-        JNIEnv *env, jobject thiz, jlong acc, jint ix)
+        JNIEnv *env, jobject obj, jlong acc, jint ix)
 {
+    (void)obj;
     const struct list *codecl;
     char codec_buf[32];
     int len;
@@ -866,8 +883,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1video_1codec
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1video_1codecs(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jCodecs)
+        JNIEnv *env, jobject obj, jlong acc, jstring jCodecs)
 {
+    (void)obj;
     const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
     int res = account_set_video_codecs((struct account *)acc, codecs);
     (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
@@ -875,8 +893,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1video_1cod
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1regint(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     if (acc)
         return (jint)account_regint((struct account *)acc);
     else
@@ -884,15 +904,18 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1regint(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1regint(
-        JNIEnv *env, jobject thiz, jlong acc, jint jRegint)
+        JNIEnv *env, jobject obj, jlong acc, jint jRegint)
 {
+    (void)env;
+    (void)obj;
     const uint32_t regint = (uint32_t)jRegint;
     return account_set_regint((struct account *)acc, regint);
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1mediaenc(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *mediaenc = account_mediaenc((struct account *)acc);
         if (mediaenc)
@@ -902,8 +925,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1mediaenc(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1mediaenc(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jMencid)
+        JNIEnv *env, jobject obj, jlong acc, jstring jMencid)
 {
+    (void)obj;
     const char *mencid = (*env)->GetStringUTFChars(env, jMencid, 0);
     int res;
     if (strlen(mencid) > 0)
@@ -915,8 +939,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1mediaenc(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1medianat(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *medianat = account_medianat((struct account *)acc);
         if (medianat)
@@ -926,8 +951,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1medianat(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1medianat(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jMedNat)
+        JNIEnv *env, jobject obj, jlong acc, jstring jMedNat)
 {
+    (void)obj;
     const char *mednat = (*env)->GetStringUTFChars(env, jMedNat, 0);
     int res;
     if (strlen(mednat) > 0)
@@ -939,8 +965,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1medianat(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1sipnat(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jSipNat)
+        JNIEnv *env, jobject obj, jlong acc, jstring jSipNat)
 {
+    (void)obj;
     const char *sipnat = (*env)->GetStringUTFChars(env, jSipNat, 0);
     int res;
     if (strlen(sipnat) > 0)
@@ -952,8 +979,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1sipnat(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1uri(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const struct stun_uri *stun_uri = account_stun_uri((struct account *)acc);
         if (stun_uri) {
@@ -980,8 +1008,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1uri(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1uri(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jUri)
+        JNIEnv *env, jobject obj, jlong acc, jstring jUri)
 {
+    (void)obj;
     const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     int res;
     if (strlen(uri) > 0)
@@ -993,8 +1022,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1uri(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1user(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *stun_user = account_stun_user((struct account *)acc);
         if (stun_user)
@@ -1004,8 +1034,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1user(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1user(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jUser)
+        JNIEnv *env, jobject obj, jlong acc, jstring jUser)
 {
+    (void)obj;
     const char *user = (*env)->GetStringUTFChars(env, jUser, 0);
     int res;
     if (strlen(user) > 0)
@@ -1017,8 +1048,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1user
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1pass(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *stun_pass = account_stun_pass((struct account *)acc);
         if (stun_pass)
@@ -1028,8 +1060,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1stun_1pass(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1pass(
-        JNIEnv *env, jobject thiz, jlong acc, jstring jPass)
+        JNIEnv *env, jobject obj, jlong acc, jstring jPass)
 {
+    (void)obj;
     const char *pass = (*env)->GetStringUTFChars(env, jPass, 0);
     int res;
     if (strlen(pass) > 0)
@@ -1041,14 +1074,17 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1stun_1pass
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1mwi(
-        JNIEnv *env, jobject thiz, jlong acc, jboolean value)
+        JNIEnv *env, jobject obj, jlong acc, jboolean value)
 {
+    (void)env;
+    (void)obj;
     return account_set_mwi((struct account *)acc, value);
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1vm_1uri(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     char uri_buf[256];
     if (acc) {
         struct pl pl;
@@ -1065,71 +1101,92 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1vm_1uri(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1answermode(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     return account_answermode((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1answermode(
-        JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+        JNIEnv *env, jobject obj, jlong acc, jint jMode)
 {
+    (void)env;
+    (void)obj;
     const uint32_t mode = (uint32_t)jMode;
     return account_set_answermode((struct account *)acc, mode);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_account_1sip_1autoredirect(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     return account_sip_autoredirect((struct account *)acc);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1sip_1autoredirect(
-        JNIEnv *env, jobject thiz, jlong acc, jboolean allow)
+        JNIEnv *env, jobject obj, jlong acc, jboolean allow)
 {
+    (void)env;
+    (void)obj;
     return account_set_sip_autoredirect((struct account *)acc, allow);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_account_1rtcp_1mux(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     return account_rtcp_mux((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1rtcp_1mux(
-        JNIEnv *env, jobject thiz, jlong acc, jboolean value)
+        JNIEnv *env, jobject obj, jlong acc, jboolean value)
 {
+    (void)env;
+    (void)obj;
     return account_set_rtcp_mux((struct account *)acc, value);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1rel100_1mode(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     return account_rel100_mode((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1rel100_1mode(
-        JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+        JNIEnv *env, jobject obj, jlong acc, jint jMode)
 {
+    (void)env;
+    (void)obj;
     const uint32_t mode = (uint32_t)jMode;
     return account_set_rel100_mode((struct account *)acc, mode);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1dtmfmode(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     return account_dtmfmode((struct account *)acc);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_account_1set_1dtmfmode(
-        JNIEnv *env, jobject thiz, jlong acc, jint jMode)
+        JNIEnv *env, jobject obj, jlong acc, jint jMode)
 {
+    (void)env;
+    (void)obj;
     const uint32_t mode = (uint32_t)jMode;
     return account_set_dtmfmode((struct account *)acc, mode);
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1extra(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)obj;
     if (acc) {
         const char *extra = account_extra((struct account *)acc);
         if (extra)
@@ -1138,14 +1195,17 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_account_1extra(
     return (*env)->NewStringUTF(env, "");
 }
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_account_1debug(
-        JNIEnv *env, jobject thiz, jlong acc)
+        JNIEnv *env, jobject obj, jlong acc)
 {
+    (void)env;
+    (void)obj;
     account_debug_log((struct account *)acc);
 }
 
 JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1alloc(
-        JNIEnv *env, jobject thiz, jstring jUri)
+        JNIEnv *env, jobject obj, jstring jUri)
 {
+    (void)obj;
     const char *uri = (*env)->GetStringUTFChars(env, jUri, 0);
     struct ua *ua;
     LOGD("allocating UA '%s'\n", uri);
@@ -1162,8 +1222,10 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1alloc(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_ua_1register(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     LOGD("registering UA '%ld'\n", (long)ua);
     re_thread_enter();
     int res = ua_register((struct ua *)ua);
@@ -1172,22 +1234,28 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_ua_1register(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1unregister(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     ua_unregister((struct ua *)ua);
     re_thread_leave();
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_ua_1isregistered(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     return ua_isregistered((struct ua *)ua) ? true : false;
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1destroy(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     LOGD("destroying ua %ld\n", (long)ua);
     re_thread_enter();
     (void)ua_destroy((struct ua *)ua);
@@ -1195,8 +1263,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1destroy(
 }
 
 JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1account(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     struct account *acc = 0;
     if (ua)
         acc = ua_account((struct ua *)ua);
@@ -1204,18 +1274,20 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1account(
 }
 
 JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1update_1account(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     LOGD("updating account of ua %ld\n", (long)ua);
     return ua_update_account((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1hangup(
-        JNIEnv *env, jobject thiz, jlong ua, jlong call, jint code, jstring reason)
+        JNIEnv *env, jobject obj, jlong ua, jlong call, jint code, jstring reason)
 {
+    (void)obj;
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
-    const int thread_check = re_thread_check(false);
     LOGD("hanging up call %ld/%ld\n", (long)ua, (long)call);
     re_thread_enter();
     if (strlen(native_reason) == 0)
@@ -1227,8 +1299,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1hangup(
 }
 
 JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1call_1alloc(
-        JNIEnv *env, jobject thiz, jlong ua, jlong xCall, jint vidMode)
+        JNIEnv *env, jobject obj, jlong ua, jlong xCall, jint vidMode)
 {
+    (void)env;
+    (void)obj;
     struct call *call = NULL;
     int err;
     LOGD("allocating new call for ua %ld xcall %ld\n", (long)ua, (long)xCall);
@@ -1242,8 +1316,10 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1call_1alloc(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1answer(
-        JNIEnv *env, jobject thiz, jlong ua, jlong call, jint vidMode)
+        JNIEnv *env, jobject obj, jlong ua, jlong call, jint vidMode)
 {
+    (void)env;
+    (void)obj;
     LOGD("answering ua/call %ld/%ld with video mode %d\n", (long)ua, (long)call, vidMode);
     re_thread_enter();
     ua_answer((struct ua *)ua, (struct call *)call, (enum vidmode)vidMode);
@@ -1251,8 +1327,9 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1answer(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1add_1custom_1header(
-        JNIEnv *env, jobject thiz, jlong ua, jstring jname, jstring jbody)
+        JNIEnv *env, jobject obj, jlong ua, jstring jname, jstring jbody)
 {
+    (void)obj;
     const char *name = (*env)->GetStringUTFChars(env, jname, 0);
     const char *body = (*env)->GetStringUTFChars(env, jbody, 0);
     LOGD("adding header to %ld with name/body %s/%s\n", (long)ua, name, body);
@@ -1269,14 +1346,18 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1add_1custom_1header(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1debug(
-        JNIEnv *env, jobject thiz, jlong ua)
+        JNIEnv *env, jobject obj, jlong ua)
 {
+    (void)env;
+    (void)obj;
     ua_debug_log((struct ua *)ua);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_calls_1mute(
-        JNIEnv *env, jobject thiz, jboolean mute)
+        JNIEnv *env, jobject obj, jboolean mute)
 {
+    (void)env;
+    (void)obj;
     struct le *ua_le;
     struct le *call_le;
     LOGD("muting calls %d\n", mute);
@@ -1292,8 +1373,9 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_calls_1mute(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1connect(
-        JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+        JNIEnv *env, jobject obj, jlong call, jstring jPeer)
 {
+    (void)obj;
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("connecting call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
@@ -1308,8 +1390,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1connect(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1notify_1sipfrag(
-        JNIEnv *env, jobject thiz, jlong call, jint code, jstring reason)
+        JNIEnv *env, jobject obj, jlong call, jint code, jstring reason)
 {
+    (void)obj;
     const uint16_t native_code = code;
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     LOGD("notifying call %ld/%s\n", (long)call, native_reason);
@@ -1320,8 +1403,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1notify_1sipfrag(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
-        JNIEnv *env, jobject thiz, jlong call, jboolean hold)
+        JNIEnv *env, jobject obj, jlong call, jboolean hold)
 {
+    (void)env;
+    (void)obj;
     int err;
     if (hold) {
         LOGD("holding call %ld\n", (long)call);
@@ -1340,14 +1425,17 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1ismuted(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     return audio_ismuted(call_audio((struct call *)call));
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1transfer(
-        JNIEnv *env, jobject thiz, jlong call, jstring jPeer)
+        JNIEnv *env, jobject obj, jlong call, jstring jPeer)
 {
+    (void)obj;
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("transfering call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
@@ -1360,8 +1448,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1transfer(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1send_1digit(
-        JNIEnv *env, jobject thiz, jlong call, jchar digit)
+        JNIEnv *env, jobject obj, jlong call, jchar digit)
 {
+    (void)env;
+    (void)obj;
     const uint16_t native_digit = digit;
     LOGD("sending DTMF digit '%c' to call %ld\n", (char)native_digit, (long)call);
     re_thread_enter();
@@ -1373,8 +1463,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1send_1digit(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1audio_1codecs(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)obj;
     const struct aucodec *tx = audio_codec(call_audio((struct call *)call), true);
     const struct aucodec *rx = audio_codec(call_audio((struct call *)call), false);
     char codec_buf[256];
@@ -1392,8 +1483,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1audio_1codecs(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1codecs(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)obj;
     const struct vidcodec *tx = video_codec(call_video((struct call *)call), true);
     const struct vidcodec *rx = video_codec(call_video((struct call *)call), false);
     char codec_buf[256];
@@ -1410,14 +1502,17 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1codecs(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1duration(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     return (jint)call_duration((struct call *)call);
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1stats(
-        JNIEnv *env, jobject thiz, jlong call, jstring jStream)
+        JNIEnv *env, jobject obj, jlong call, jstring jStream)
 {
+    (void)obj;
     const char *native_stream = (*env)->GetStringUTFChars(env, jStream, 0);
     const struct stream *s;
     if (strcmp(native_stream, "audio") == 0)
@@ -1446,26 +1541,34 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1stats(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1state(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     return call_state((struct call *)call);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1has_1video(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     return call_has_video((struct call *)call) ? true : false;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1replaces(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     return call_supported((struct call *)call, REPLACES) ? true : false;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1replace_1transfer(
-        JNIEnv *env, jobject thiz, jlong xferCall, jlong call)
+        JNIEnv *env, jobject obj, jlong xferCall, jlong call)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     int res = call_replace_transfer((struct call *)xferCall, (struct call *)call);
     re_thread_leave();
@@ -1473,8 +1576,9 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1replace_1trans
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1peer_1uri(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)obj;
     const char *uri = call_peeruri((struct call *)call);
     if (uri)
         return (*env)->NewStringUTF(env, uri);
@@ -1482,8 +1586,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1peer_1uri(
 }
 
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1diverter_1uri(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)obj;
     const char *uri = call_diverteruri((struct call *)call);
     if (uri)
         return (*env)->NewStringUTF(env, uri);
@@ -1491,8 +1596,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1diverter_1uri(
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_message_1send(
-        JNIEnv *env, jobject thiz, jlong ua, jstring jPeer, jstring jMsg, jstring jTime)
+        JNIEnv *env, jobject obj, jlong ua, jstring jPeer, jstring jMsg, jstring jTime)
 {
+    (void)obj;
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     const char *native_msg = (*env)->GetStringUTFChars(env, jMsg, 0);
     const char *native_time = (*env)->GetStringUTFChars(env, jTime, 0);
@@ -1510,24 +1616,30 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_message_1send(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1disable_1video_1stream(
-        JNIEnv *env, jobject thiz, jlong call, jboolean disable)
+        JNIEnv *env, jobject obj, jlong call, jboolean disable)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     sdp_media_set_disabled(stream_sdpmedia(video_strm(call_video((struct call *)call))), disable);
     re_thread_leave();
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1direction(
-        JNIEnv *env, jobject thiz, jlong call, jint dir)
+        JNIEnv *env, jobject obj, jlong call, jint dir)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     call_set_video_dir((struct call *)call, (enum sdp_dir)dir);
     re_thread_leave();
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1media_1direction(
-        JNIEnv *env, jobject thiz, jlong call, jint adir, jint vdir)
+        JNIEnv *env, jobject obj, jlong call, jint adir, jint vdir)
 {
+    (void)env;
+    (void)obj;
     LOGD("call set audio/video media direction of call %ld to %d/%d\n", call, adir, vdir);
     re_thread_enter();
     call_set_media_direction((struct call *)call, (enum sdp_dir)adir, (enum sdp_dir)vdir);
@@ -1535,8 +1647,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1media_1direct
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1enabled(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     int res;
     re_thread_enter();
     res = call_has_video((struct call *)call)
@@ -1547,8 +1661,10 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1enabled
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1start_1video_1display(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     int err;
     re_thread_enter();
     err = video_start_display(call_video((struct call *)call), NULL);
@@ -1557,16 +1673,20 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1start_1video_1disp
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1stop_1video_1display(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     video_stop_display(call_video((struct call *)call));
     re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1source(
-        JNIEnv *env, jobject thiz, jlong call, jboolean front)
+        JNIEnv *env, jobject obj, jlong call, jboolean front)
 {
+    (void)env;
+    (void)obj;
     int err;
     re_thread_enter();
     char *dev = front ? "android_camera,1" : "android_camera,0";
@@ -1576,16 +1696,19 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1source
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1destroy(
-        JNIEnv *env, jobject thiz, jlong call)
+        JNIEnv *env, jobject obj, jlong call)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     mem_deref((struct call *)call);
     re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_cmd_1exec(
-        JNIEnv *env, jobject thiz, jstring javaCmd)
+        JNIEnv *env, jobject obj, jstring javaCmd)
 {
+    (void)obj;
     const char *native_cmd = (*env)->GetStringUTFChars(env, javaCmd, 0);
     LOGD("processing command '%s'\n", native_cmd);
     re_thread_enter();
@@ -1595,8 +1718,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_cmd_1exec(
     return res;
 }
 
-JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_audio_1codecs(JNIEnv *env, jobject thiz)
+JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_audio_1codecs(JNIEnv *env, jobject obj)
 {
+    (void)obj;
     struct list *aucodecl = baresip_aucodecl();
     struct le *le;
     char codec_buf[256];
@@ -1621,8 +1745,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_audio_1codecs(JNIEnv 
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
-JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_video_1codecs(JNIEnv *env, jobject thiz)
+JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_video_1codecs(JNIEnv *env, jobject obj)
 {
+    (void)obj;
     struct list *vidcodecl = baresip_vidcodecl();
     struct le *le;
     char codec_buf[256];
@@ -1648,11 +1773,12 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_video_1codecs(JNIEnv 
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1add_1address_1ifname(
-        JNIEnv *env, jobject thiz, jstring jAddr, jstring jIfName)
+        JNIEnv *env, jobject obj, jstring jAddr, jstring jIfName)
 {
+    (void)obj;
     const char *addr = (*env)->GetStringUTFChars(env, jAddr, 0);
     const char *name = (*env)->GetStringUTFChars(env, jIfName, 0);
-    int res = 0;
+    int res;
     struct sa temp_sa;
     char buf[256];
     LOGD("adding address/ifname '%s/%s'\n", addr, name);
@@ -1671,10 +1797,11 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1add_1address_1ifnam
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1rm_1address(
-        JNIEnv *env, jobject thiz, jstring jIp)
+        JNIEnv *env, jobject obj, jstring jIp)
 {
+    (void)obj;
     const char *native_ip = (*env)->GetStringUTFChars(env, jIp, 0);
-    int res = 0;
+    int res;
     struct sa temp_sa;
     char buf[256];
     LOGD("removing address '%s'\n", native_ip);
@@ -1696,16 +1823,19 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1rm_1address(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_log_1level_1set(
-        JNIEnv *env, jobject thiz, jint level)
+        JNIEnv *env, jobject obj, jint level)
 {
+    (void)env;
+    (void)obj;
     const enum log_level native_level = (enum log_level)level;
     LOGD("setting log level to '%u'\n", native_level);
     log_level_set(native_level);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1use_1nameserver(
-        JNIEnv *env, jobject thiz, jstring javaServers)
+        JNIEnv *env, jobject obj, jstring javaServers)
 {
+    (void)obj;
     const char *native_servers = (*env)->GetStringUTFChars(env, javaServers, 0);
     char servers[256];
     char *server;
@@ -1743,8 +1873,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1use_1nameserver(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(
-        JNIEnv *env, jobject thiz, jboolean reg, jboolean reinvite)
+        JNIEnv *env, jobject obj, jboolean reg, jboolean reinvite)
 {
+    (void)env;
+    (void)obj;
     LOGD("reseting transports (%d, %d)\n", reg, reinvite);
     re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
@@ -1753,15 +1885,19 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(
 
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1enable_1sip_1trace(
-        JNIEnv *env, jobject thiz, jboolean enable)
+        JNIEnv *env, jobject obj, jboolean enable)
 {
+    (void)env;
+    (void)obj;
     LOGD("enabling sip trace (%d)\n", enable);
     uag_enable_sip_trace(enable);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1frame_1size_1set(
-        JNIEnv *env, jobject thiz, jint width, jint height)
+        JNIEnv *env, jobject obj, jint width, jint height)
 {
+    (void)env;
+    (void)obj;
     struct config *conf = conf_config();
     LOGD("setting video_frame_size (%dx%d)\n", width, height);
     conf->video.width = width;
@@ -1769,38 +1905,47 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1frame_1si
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1video_1fps_1set(
-        JNIEnv *env, jobject thiz, jint fps)
+        JNIEnv *env, jobject obj, jint fps)
 {
+    (void)env;
+    (void)obj;
     struct config *conf = conf_config();
     LOGD("setting video_fps (%d)\n", fps);
     conf->video.fps = (double)fps;
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_config_1verify_1server_1set(
-        JNIEnv *env, jobject thiz, jboolean verify)
+        JNIEnv *env, jobject obj, jboolean verify)
 {
+    (void)env;
+    (void)obj;
     struct config *conf = conf_config();
     LOGD("setting verify_server (%d)\n", verify);
     conf->sip.verify_server = verify;
 }
 
-JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1debug(JNIEnv *env, jobject thiz)
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1debug(JNIEnv *env, jobject obj)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     net_debug_log();
     re_thread_leave();
 }
 
-JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1dns_1debug(JNIEnv *env, jobject thiz)
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_net_1dns_1debug(JNIEnv *env, jobject obj)
 {
+    (void)env;
+    (void)obj;
     re_thread_enter();
     net_dns_debug_log();
     re_thread_leave();
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_module_1load(
-        JNIEnv *env, jobject thiz, jstring javaModule)
+        JNIEnv *env, jobject obj, jstring javaModule)
 {
+    (void)obj;
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
     int result = module_load(".", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
@@ -1808,8 +1953,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_module_1load(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_module_1unload(
-        JNIEnv *env, jobject thiz, jstring javaModule)
+        JNIEnv *env, jobject obj, jstring javaModule)
 {
+    (void)obj;
     const char *native_module = (*env)->GetStringUTFChars(env, javaModule, 0);
     module_unload(native_module);
     LOGD("unloaded module %s\n", native_module);
