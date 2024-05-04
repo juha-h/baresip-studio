@@ -327,7 +327,7 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info_not_available">情報はありません</string>
     <string name="call_info">電話情報</string>
-    <string name="duration">通話時間</string>
+    <string name="duration">通話時間 %1$d</string>
     <string name="codecs">コーデック</string>
     <string name="rate">レート</string>
     <string name="you_have">あなたは</string>

@@ -501,7 +501,7 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
     <string name="call_info_not_available">Ei saatavilla</string>
-    <string name="duration">Kesto: %1$s (sek)</string>
+    <string name="duration">Kesto: %1$d (sek)</string>
     <string name="codecs">Koodekit</string>
     <string name="rate">Nykyinen nopeus: %1$s (Kbit/s)</string>
     <string name="average_rate">Keskinopeus: %1$s (Kbit/s)</string>

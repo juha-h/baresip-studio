@@ -187,7 +187,7 @@
     <string name="hold">Retención/desconexión de llamadas</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Información de llamada</string>
-    <string name="duration">Duración: %1$s (segs)</string>
+    <string name="duration">Duración: %1$d (segs)</string>
     <string name="codecs">Códecs</string>
     <string name="rate">Velocidad actual: %1$s (Kbits/s)</string>
     <string name="voicemail">Mensaje de voz</string>

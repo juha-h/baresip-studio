@@ -34,7 +34,7 @@
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
     <string name="voicemail">Correio de Voz</string>
     <string name="rate">Taxa atual: %1$s (Kbits/s)</string>
-    <string name="duration">Duração: %1$s (segs)</string>
+    <string name="duration">Duração: %1$d (segs)</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>
     <string name="call_info">Informações da Chamada</string>
     <string name="hold">Chamada em espera/liberar</string>

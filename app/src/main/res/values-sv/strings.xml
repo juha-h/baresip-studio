@@ -145,7 +145,7 @@
     <string name="rate">Nuvarande hastighet: %1$s (kbits/s)</string>
     <string name="call_info_not_available">Ingen information tillgänglig</string>
     <string name="call_info">Samtalsinformation</string>
-    <string name="duration">Längd: %1$s (sekunder)</string>
+    <string name="duration">Längd: %1$d (sekunder)</string>
     <string name="hold">Parkera/återuppta samtal</string>
     <string name="allow_video_recv">Acceptera att ta emot video från \'%1$s\'\?</string>
     <string name="allow_video_send">Acceptera att skicka video till \'%1$s\'\?</string>

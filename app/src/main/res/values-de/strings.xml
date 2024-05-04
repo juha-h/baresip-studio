@@ -46,7 +46,7 @@
     <string name="short_chat_question">Möchten Sie den Chat mit \'%1$s\' löschen?</string>
     <string name="start_automatically">Autostart</string>
     <string name="call_info_not_available">Keine Informationen verfügbar</string>
-    <string name="duration">Dauer: %1$s (sek)</string>
+    <string name="duration">Dauer: %1$d (sek)</string>
     <string name="rate">Aktuelle Übertragungsrate: %1$s (Kbits/s)</string>
     <string name="average_rate">Mittlere Rate: %1$s (Kbits/s)</string>
     <string name="packets">Pakete</string>

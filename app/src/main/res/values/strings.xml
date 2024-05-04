@@ -473,7 +473,7 @@
     <string name="dtmf">DTMF</string>
     <string name="call_info">Call Info</string>
     <string name="call_info_not_available">No info available</string>
-    <string name="duration">Duration: %1$s (secs)</string>
+    <string name="duration">Duration: %1$d (secs)</string>
     <string name="codecs">Codecs</string>
     <string name="rate">Current Rate: %1$s (Kbits/s)</string>
     <string name="average_rate">Average Rate: %1$s (Kbits/s)</string>

@@ -120,7 +120,7 @@
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="you_have">Tem</string>
     <string name="no_messages">Não tem mensagens</string>
-    <string name="duration">Duração: %1$s (segs)</string>
+    <string name="duration">Duração: %1$d (segs)</string>
     <string name="transferring_call_to_dots">Transferindo chamada para …</string>
     <string name="aec_help">Se marcado, cancelamento de eco é tentado no áudio da chamada.</string>
     <string name="call_info">Informações da Chamada</string>

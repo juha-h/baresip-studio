@@ -55,7 +55,7 @@
     <string name="display_name_help">Имя используемое в From URI исходящих вызовов.</string>
     <string name="dns_servers">ДНС сервера</string>
     <string name="dns_servers_help">Список адресов DNS-серверов, разделенных запятыми. Если не указан, адреса DNS-серверов получаются из системы динамически. Каждый DNS-адрес имеет форму «ip:порт» или «ip». Если порт не указан, по умолчанию используется значение 53. Если ip является адресом IPv6 и также указан порт, ip должен быть записан в квадратных скобках []. Например, список «8.8.8.8:53,[2001:4860:4860::8888]:53» указывает на IPv4- и IPv6-адреса общедоступных DNS-серверов Google.</string>
-    <string name="duration">Длительность: %1$s (с)</string>
+    <string name="duration">Длительность: %1$d (с)</string>
     <string name="edit">Редактировать</string>
     <string name="enable_history">Включить</string>
     <string name="encrypt_password">Шифровать пароль</string>
