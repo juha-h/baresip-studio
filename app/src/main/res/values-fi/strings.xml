@@ -542,7 +542,8 @@
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
         versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
-    <string name="backup_failed">Sovelluksen tietojen talletus epäonnistui. Android versioon 9 saakka
+    <string name="backup_failed">Sovelluksen tietojen talletus
+        tiedostoon \'%1$s\' epäonnistui. Android versioon 9 saakka
         Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
