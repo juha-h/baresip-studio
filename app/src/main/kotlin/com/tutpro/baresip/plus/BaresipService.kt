@@ -1314,7 +1314,7 @@ class BaresipService: Service() {
         } else {
             rt.play()
             rtTimer = Timer()
-            rtTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            rtTimer!!.schedule(object : TimerTask() {
                 override fun run() {
                     if (!rt.isPlaying)
                         rt.play()
@@ -1323,7 +1323,7 @@ class BaresipService: Service() {
         }
         if (shouldVibrate()) {
             vbTimer = Timer()
-            vbTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            vbTimer!!.schedule(object : TimerTask() {
                 override fun run() {
                     if (VERSION.SDK_INT < 26) {
                         @Suppress("DEPRECATION")
@@ -1448,7 +1448,7 @@ class BaresipService: Service() {
             }
     }
 
-    @SuppressLint("WakelockTimeout")
+    @SuppressLint("WakelockTimeout", "Wakelock")
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
             if (!proximityWakeLock.isHeld) {
