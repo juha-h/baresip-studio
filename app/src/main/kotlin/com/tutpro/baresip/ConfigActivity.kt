@@ -512,11 +512,11 @@ class ConfigActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grandResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grandResults)
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             CONTACTS_PERMISSION_REQUEST_CODE -> {
-                if (grandResults.contains(PackageManager.PERMISSION_DENIED)) {
+                if (grantResults.contains(PackageManager.PERMISSION_DENIED)) {
                     when {
                         ActivityCompat.shouldShowRequestPermissionRationale(this,
                                 Manifest.permission.READ_CONTACTS) -> {
