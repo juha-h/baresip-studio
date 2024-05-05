@@ -1,7 +1,12 @@
 package com.tutpro.baresip
 
-import java.io.*
-import java.util.ArrayList
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.util.GregorianCalendar
 
 class CallHistoryNew(val aor: String, val peerUri: String, val direction: String) : Serializable {
