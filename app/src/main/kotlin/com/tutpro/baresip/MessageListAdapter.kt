@@ -24,9 +24,9 @@ class MessageListAdapter(private val ctx: Context, private val peerUri: String,
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val layoutView = view?.findViewById(R.id.message) as LinearLayout
-        val infoView = view?.findViewById(R.id.info) as TextView
-        val textView = view?.findViewById(R.id.text) as TextView
+        val layoutView: LinearLayout = view?.findViewById(R.id.message)!!
+        val infoView: TextView = view?.findViewById(R.id.info)!!
+        val textView: TextView = view?.findViewById(R.id.text)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {

@@ -16,9 +16,9 @@ class AndroidUriListAdapter(private val ctx: Context, private val rows: ArrayLis
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val uriView = view?.findViewById(R.id.uri) as TextView
-        val messageView = view?.findViewById(R.id.message) as ImageButton
-        val callView = view?.findViewById(R.id.call) as ImageButton
+        val uriView: TextView = view?.findViewById(R.id.uri)!!
+        val messageView: ImageButton = view?.findViewById(R.id.message)!!
+        val callView: ImageButton = view?.findViewById(R.id.call)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {

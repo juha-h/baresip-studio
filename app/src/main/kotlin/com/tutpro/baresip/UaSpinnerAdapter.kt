@@ -15,8 +15,8 @@ class UaSpinnerAdapter(cxt: Context, private val uas: ArrayList<UserAgent>) :
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val textView = view?.findViewById(R.id.spinnerText) as TextView
-        val imageView = view?.findViewById(R.id.spinnerImage) as ImageView
+        val textView: TextView = view?.findViewById(R.id.spinnerText)!!
+        val imageView: ImageView = view?.findViewById(R.id.spinnerImage)!!
     }
 
     override fun getDropDownView(position: Int, view: View?, parent: ViewGroup): View {

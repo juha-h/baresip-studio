@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Typeface
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.format.DateUtils
@@ -28,9 +27,9 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     private class ViewHolder(view: View?) {
-        val directionView = view?.findViewById(R.id.direction) as ImageView
-        val timeView = view?.findViewById(R.id.time) as TextView
-        val durationView = view?.findViewById(R.id.duration) as TextView
+        val directionView: ImageView = view?.findViewById(R.id.direction)!!
+        val timeView: TextView = view?.findViewById(R.id.time)!!
+        val durationView: TextView = view?.findViewById(R.id.duration)!!
     }
 
     @SuppressLint("SimpleDateFormat")

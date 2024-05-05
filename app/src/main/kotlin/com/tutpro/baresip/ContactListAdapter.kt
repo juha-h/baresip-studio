@@ -28,10 +28,10 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
     private var lastClick: Long = 0
 
     private class ViewHolder(view: View?) {
-        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
-        val nameView = view?.findViewById(R.id.contactName) as TextView
-        val actionView = view?.findViewById(R.id.edit) as ImageButton
+        val textAvatarView: TextView = view?.findViewById(R.id.TextAvatar)!!
+        val imageAvatarView: ImageView = view?.findViewById(R.id.ImageAvatar)!!
+        val nameView: TextView = view?.findViewById(R.id.contactName)!!
+        val actionView: ImageButton = view?.findViewById(R.id.edit)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
