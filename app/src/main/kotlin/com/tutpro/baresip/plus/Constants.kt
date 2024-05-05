@@ -6,9 +6,7 @@ const val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.plus.default"
 const val MEDIUM_CHANNEL_ID = "com.tutpro.baresip.plus.medium"
 const val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
-const val MIC_PERMISSION_REQUEST_CODE = 1
-const val CONTACTS_PERMISSION_REQUEST_CODE = 2
-const val CAMERA_PERMISSION_REQUEST_CODE = 3
+const val CONTACTS_PERMISSION_REQUEST_CODE = 1
 
 const val STATUS_NOTIFICATION_ID = 101
 const val CALL_NOTIFICATION_ID = 102
