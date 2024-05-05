@@ -20,12 +20,12 @@ class ChatListAdapter(private val ctx: Context, private val account: Account, pr
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
-        val layoutView = view?.findViewById(R.id.chat) as LinearLayout
-        val peerView = view?.findViewById(R.id.peer) as TextView
-        val infoView = view?.findViewById(R.id.info) as TextView
-        val textView = view?.findViewById(R.id.text) as TextView
+        val textAvatarView: TextView = view?.findViewById(R.id.TextAvatar)!!
+        val imageAvatarView: ImageView = view?.findViewById(R.id.ImageAvatar)!!
+        val layoutView: LinearLayout = view?.findViewById(R.id.chat)!!
+        val peerView: TextView = view?.findViewById(R.id.peer)!!
+        val infoView: TextView = view?.findViewById(R.id.info)!!
+        val textView: TextView = view?.findViewById(R.id.text)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {

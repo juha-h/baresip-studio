@@ -17,8 +17,8 @@ class AccountListAdapter(private val cxt: Context, private val rows: ArrayList<A
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val aorView = view?.findViewById(R.id.aor) as TextView
-        val actionView = view?.findViewById(R.id.action) as ImageButton
+        val aorView: TextView = view?.findViewById(R.id.aor)!!
+        val actionView: ImageButton = view?.findViewById(R.id.action)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {

@@ -19,12 +19,12 @@ class CallListAdapter(private val ctx: Context, private val account: Account,
     private val layoutInflater = LayoutInflater.from(context)
 
     private class ViewHolder(view: View?) {
-        val textAvatarView = view?.findViewById(R.id.TextAvatar) as TextView
-        val imageAvatarView = view?.findViewById(R.id.ImageAvatar) as ImageView
-        val directionsView = view?.findViewById(R.id.directions) as LinearLayout
-        val etcView = view?.findViewById(R.id.etc) as TextView
-        val peerURIView = view?.findViewById(R.id.peer_uri) as TextView
-        val timeView = view?.findViewById(R.id.time) as TextView
+        val textAvatarView: TextView = view?.findViewById(R.id.TextAvatar)!!
+        val imageAvatarView: ImageView = view?.findViewById(R.id.ImageAvatar)!!
+        val directionsView: LinearLayout = view?.findViewById(R.id.directions)!!
+        val etcView: TextView = view?.findViewById(R.id.etc)!!
+        val peerURIView: TextView = view?.findViewById(R.id.peer_uri)!!
+        val timeView: TextView = view?.findViewById(R.id.time)!!
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {

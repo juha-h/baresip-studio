@@ -27,9 +27,9 @@ class CallDetailsAdapter(private val ctx: Context, private val rows: ArrayList<C
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     private class ViewHolder(view: View?) {
-        val directionView = view?.findViewById(R.id.direction) as ImageView
-        val timeView = view?.findViewById(R.id.time) as TextView
-        val durationView = view?.findViewById(R.id.duration) as TextView
+        val directionView: ImageView = view?.findViewById(R.id.direction)!!
+        val timeView: TextView = view?.findViewById(R.id.time)!!
+        val durationView: TextView = view?.findViewById(R.id.duration)!!
     }
 
     @SuppressLint("SimpleDateFormat")
