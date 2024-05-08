@@ -331,4 +331,7 @@
     <string name="dtmf_auto">INFO RTP ou SIP em banda</string>
     <string name="speaker_phone">Alto-falante do telefone</string>
     <string name="speaker_phone_help">Se marcada, o viva-voz do telefone é ligado automaticamente quando a chamada for iniciada.</string>
+    <string name="invalid_fps">Quadros inválidos por segundo \'%1$s\'</string>
+    <string name="video_fps">Quadros de vídeo por segundo</string>
+    <string name="video_fps_help">Taxa de quadros de vídeo que será oferecida durante o handshake SDP. Os valores válidos são de 10 a 30.</string>
 </resources>
