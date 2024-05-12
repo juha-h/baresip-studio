@@ -1,3 +1,4 @@
+- Added support for SHA-256 digest authentication
 - Verify Server Certificates settings can now be changed without restart
 - New Czech, German, Spanish, and Portuguese (Brazil) translations
 - Fixed formats of some strings in some languages
