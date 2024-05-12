@@ -1,3 +1,4 @@
+- Added support for SHA-256 digest authentication
 - Removed support for H265 video codec (did not work properly)
 - Verify Server Certificates, Video Frame Size, and Video Frames per Second settings can now be changed without restart
 - New Czech, German, Spanish, and Portuguese (Brazil) translations
