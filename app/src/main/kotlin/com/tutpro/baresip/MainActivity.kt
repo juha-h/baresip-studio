@@ -1182,20 +1182,38 @@ class MainActivity : AppCompatActivity() {
                     startActivity(i)
                     return
                 }
-                val call = Call.ofCallp(callp)!!
+                val call = Call.ofCallp(callp)
                 val target = Utils.friendlyUri(this, ev[1], acc)
                 with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                    setTitle(R.string.transfer_request)
-                    setMessage(String.format(getString(R.string.transfer_request_query),
-                            target))
+                    if (call != null) {
+                        setTitle(R.string.transfer_request)
+                        setMessage(
+                            String.format(
+                                getString(R.string.transfer_request_query),
+                                target
+                            )
+                        )
+                    } else {
+                        setTitle(R.string.call_request)
+                        setMessage(
+                            String.format(
+                                getString(R.string.call_request_query),
+                                target
+                            )
+                        )
+                    }
                     setPositiveButton(getString(R.string.yes)) { dialog, _ ->
                         if (call in Call.calls())
-                            acceptTransfer(ua, call, ev[1])
+                            acceptTransfer(ua, call!!, ev[1])
+                        else {
+                            callUri.setText(ev[1])
+                            makeCall()
+                        }
                         dialog.dismiss()
                     }
                     setNeutralButton(getString(R.string.no)) { dialog, _ ->
                         if (call in Call.calls())
-                            call.notifySipfrag(603, "Decline")
+                            call!!.notifySipfrag(603, "Decline")
                         dialog.dismiss()
                     }
                     show()
