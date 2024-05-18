@@ -368,4 +368,6 @@
     <string name="invalid_fps">\'%1$s\' Fps</string>
     <string name="video_fps">Fotogramas de vídeo por segundo (fps)</string>
     <string name="video_fps_help">Velocidad de fotogramas de vídeo que se ofrecerá durante el protocolo de enlace SDP. Los valores válidos son del 10 al 30.</string>
+    <string name="call_request">Requerimiento</string>
+    <string name="call_request_query">¿Aceptas el requerimiento \'%1$s\'?</string>
 </resources>
