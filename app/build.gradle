@@ -4,7 +4,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion = 34
-    ndkVersion '26.2.11394342'
+    ndkVersion '26.3.11579264'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 23
@@ -71,6 +71,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.activity:activity-ktx:1.9.0"
-    implementation "androidx.fragment:fragment-ktx:1.7.0"
+    implementation "androidx.fragment:fragment-ktx:1.7.1"
     implementation 'androidx.media:media:1.7.0'
 }
