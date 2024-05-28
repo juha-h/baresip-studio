@@ -94,7 +94,7 @@
     <string name="new_messages">nouveaux messages</string>
     <string name="one_new_message">un nouveau message</string>
     <string name="you_have">Vous avez</string>
-    <string name="rate">Débit: %1$s</string>
+    <string name="rate">Débit : %1$s (kbit/s)</string>
     <string name="call_info">Infos de l\'appel</string>
     <string name="duration">Durée %1$d</string>
     <string name="call_info_not_available">Aucune information disponible</string>
@@ -121,4 +121,9 @@
     <string name="listen_address">Adresse d\'écoute</string>
     <string name="reset">Restaurer</string>
     <string name="audio_modules_title">Modules audio</string>
+    <string name="invalid_account_nickname">Surnom de compte invalide « %1$s »</string>
+    <string name="non_unique_account_nickname">Le surnom « %1$s » existe déjà</string>
+    <string name="account_nickname">Surnom du compte</string>
+    <string name="account_nickname_help">Surnom (le cas échéant) utilisé pour identifier ce compte dans l\'application baresip.</string>
+    <string name="nickname">Surnom</string>
 </resources>
