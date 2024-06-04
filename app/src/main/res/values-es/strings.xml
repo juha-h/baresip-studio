@@ -307,7 +307,7 @@
     <string name="invalid_country_code">Código del país \"%1$s\" no válido</string>
     <string name="invalid_sip_uri_hostpart">Parte del host SIP URI \'%1$s\' no válida</string>
     <string name="codec_action">Reordenar</string>
-    <string name="contacts_help">Elige si se utilizan contactos baresip, contactos Android o ambos. Si ambos y el contacto con el mismo nombre existe en ambos, se elige el contacto baresip.</string>
+    <string name="contacts_help">Elige si se utilizan contactos de Baresip, contactos de Android o ambos. Si se utilizan ambos y existe un contacto con el mismo nombre en ambos contactos, se elegirá el contacto bareip.</string>
     <string name="consent_request">Solicitud de autorización</string>
     <string name="sip_or_tel_uri">SIP o teléfono URI</string>
     <string name="call_is_on_hold">Llamada en espera</string>
