@@ -533,6 +533,8 @@
     <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Siirtopyyntö</string>
     <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'\?</string>
+    <string name="call_request">Soittopyyntö</string>
+    <string name="call_request_query">Hyväksytkö pyynnön soittaa kohteeseen \'%1$s\'\?</string>
     <string name="redirect_notice">Automaattinen uudelleenohjaus kohteeseen \'%1$s\'\</string>
     <string name="redirect_request">Uudelleenohjauspyyntö</string>
     <string name="redirect_request_query">Hyväksytkö puhelun uudelleenohjauksen kohteeseen \'%1$s\'\?</string>
