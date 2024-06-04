@@ -372,7 +372,8 @@
         Valid values are from 10 to 30.</string>
     <string name="invalid_fps">Invalid Frames Per Second \'%1$d\'</string>
     <string name="contacts_help">Chooses if baresip contacts, Android contacts, or both are used.
-        If both and contact with the same name exists in both, baresip contact is chosen.</string>
+        If both are used and a contact with the same name exists in both contacts,
+        the baresip contact will be chosen.</string>
     <string name="both">Both</string>
     <string name="debug">Debug</string>
     <string name="debug_help">If checked, provides debug and info level log messages to Logcat.</string>
@@ -442,7 +443,6 @@
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
-
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -505,6 +505,8 @@
     <string name="verify_sas">Do you want to verify SAS &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Transfer Request</string>
     <string name="transfer_request_query">Do you accept to transfer this call to \'%1$s\'\?</string>
+    <string name="call_request">Call Request</string>
+    <string name="call_request_query">Do you accept request to call \'%1$s\'\?</string>
     <string name="redirect_notice">Automatic redirection to \'%1$s\'\</string>
     <string name="redirect_request">Redirect Request</string>
     <string name="redirect_request_query">Do you accept call redirection to \'%1$s\'\?</string>
