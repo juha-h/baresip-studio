@@ -281,7 +281,7 @@
     <string name="audio_codecs">Audio Codecs</string>
     <string name="tls_ca_file">TLS CA Datei</string>
     <string name="contacts_consent">Wenn Android Kontakte gewählt ist, können diese beim Telefonieren und Verschicken von Direktnachrichten als Referenzen für SIP und tel URIs genutzt werden. Die baresip App speichert keine Android Kontakte und teilt diese auch nicht. Um Android Kontakte in baresip verfügbar zu machen, erfordert Google Ihre Zustimmung zur Nutzung der Kontakte nach den Angaben in der<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Datenschutzerklärung</a> der App. \u0020</string>
-    <string name="attended">Teilgenommen</string>
+    <string name="attended">Mit Rückfrage (attended)</string>
     <string name="choose_destination_uri">Ziel-URI auswählen</string>
     <string name="transfer">Transfer</string>
     <string name="transfer_request_query">Diesen Anruf zu \'%1$s\' übertragen?</string>
@@ -314,7 +314,7 @@
     <string name="allow_video">Zustimmen, dass Video mit \'%1$s\' gesendet und empfangen wird?</string>
     <string name="allow_video_recv">Zustimmen, dass Video von \'%1$s\' empfangen wird?</string>
     <string name="call_transfer">Anruftransfer</string>
-    <string name="blind">Blind</string>
+    <string name="blind">Ohne Rückfrage (blind)</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="redirect_notice">Automatische Weiterleitung zu \'%1$s\'\\</string>
     <string name="redirect_request">Umleitungsanfrage</string>
@@ -344,4 +344,14 @@
     <string name="dark_theme">Dunkles Farbschema</string>
     <string name="dtmf_auto">RTP oder SIP INFO im Frequenzband</string>
     <string name="tls_ca_file_help">Falls angekreuzt, wurde/ wird eine Datei geladen werden, die ein TLS Zertifikat einer Zertifikatsauthorität beinhaltet, die nicht in Android vorhanden ist. Bis Android Version 9 einschließlich wird die Datei \'ca_certs.crt\' aus dem Download-Verzeichnis geladen.</string>
+    <string name="address_family">Adressenfamilie</string>
+    <string name="media_nat">NAT Durchquerung von Medien</string>
+    <string name="default_call_volume_help">Falls aktiviert, liegt die standardmäßige Anruflautstärke auf einer Skala von 1-10.</string>
+    <string name="video_size">Größe der Videoframes</string>
+    <string name="country_code_hint">+code</string>
+    <string name="video_fps">Videoframes pro Sekunde</string>
+    <string name="video_fps_help">Bildwiederholungsrate, die während einem SDP-Handshake angeboten werden wird. Gültige Werte von 10 bis 30.</string>
+    <string name="video_size_help">Größe der gesendeten Videoframes (Breite x Höhe)</string>
+    <string name="tone_country">Herkunftsland der Töne</string>
+    <string name="tone_country_help">Herkunftsland des Freitons, Halttons und Besetzttons</string>
 </resources>
