@@ -397,8 +397,10 @@
     <string name="video_fps">Videokehysten lähetystaajuus</string>
     <string name="video_fps_help">Videokehysten lähetystaajuus per sekuntti, jota tarjotaan
         SDP-neuvottelun aikana. Arvon on oltava välillä 10-30.</string>
-    <string name="invalid_fps">Virheellinen videokehysten lähetystaajuus \'%1$s\'</string>
-    <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin yhteystietoja vai molempia. Jos molempia ja sama yhteystieto on molemmissa, käytetään baresip-sovelluksen yhteystietoa.</string>
+    <string name="invalid_fps">Virheellinen videokehysten lähetystaajuus \'%1$d\'</string>
+    <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
+        yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
+        baresip-sovelluksen yhteystietoa.</string>
     <string name="both">Molemmat</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
