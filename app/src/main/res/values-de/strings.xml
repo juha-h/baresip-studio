@@ -322,7 +322,7 @@
     <string name="call_request">Anrufsanfrage</string>
     <string name="audio_focus_denied">Audio Fokus nicht gewährt!</string>
     <string name="permissions_rationale">Gründe für die Berechtigungen</string>
-    <string name="invalid_fps">Ungültige Bilder pro Sekunde: \'%1$s\'</string>
+    <string name="invalid_fps">Ungültige Bilder pro Sekunde: \'%1$d\'</string>
     <string name="reset_config_alert">Wollen Sie wirklich die Einstellungen auf die Werkseinstellungen zurücksetzen?</string>
     <string name="status">Status</string>
     <string name="verify_sas">SAS &lt;%1$s&gt; verifizieren?</string>
