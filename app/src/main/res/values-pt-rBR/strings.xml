@@ -273,7 +273,7 @@
     <string name="user_domain_or_number">usuário@domínio ou o número de telefone</string>
     <string name="telephony_provider_help">SIP URI host é parcialmente usado nas chamadas para números de telefone. O padrão de fábrica é domínio da conta. Caso não seja informada, essa conta não pode ser usada para ligar para os números de telefone.</string>
     <string name="invalid_sip_or_tel_uri">SIP ou tel. URI inválido \'%1$s\'</string>
-    <string name="contacts_help">Escolha se ambos os contatos do baresip e do Android serão usados. Caso use ambos, o contato do baresip será usado se houver um contato repetido no Android.</string>
+    <string name="contacts_help">Escolhe se serão usados os contatos do baresip, os contatos do Android ou ambos. Se ambos forem usados e houver um contato com o mesmo nome em ambos os contatos, o contato baresip será escolhido.</string>
     <string name="both">Ambos</string>
     <string name="no_android_contacts">Você não pode acessar os contatos do Android sem a permissão \"Contatos\".</string>
     <string name="blind">Cego</string>
@@ -331,7 +331,7 @@
     <string name="dtmf_auto">INFO RTP ou SIP em banda</string>
     <string name="speaker_phone">Alto-falante do telefone</string>
     <string name="speaker_phone_help">Se marcada, o viva-voz do telefone é ligado automaticamente quando a chamada for iniciada.</string>
-    <string name="invalid_fps">Quadros inválidos por segundo \'%1$s\'</string>
+    <string name="invalid_fps">Quadros por segundo inválidos \'%1$d\'</string>
     <string name="video_fps">Quadros de vídeo por segundo</string>
     <string name="video_fps_help">Taxa de quadros de vídeo que será oferecida durante o handshake SDP. Os valores válidos são de 10 a 30.</string>
     <string name="call_request">Pedido de chamada</string>
