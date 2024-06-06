@@ -365,7 +365,7 @@
     <string name="speaker_phone">Altavoz del teléfono</string>
     <string name="speaker_phone_help">Si está marcada, el altavoz se enciende automáticamente al iniciar la llamada.</string>
     <string name="dtmf_auto">RTP en la banda o imformación SIP</string>
-    <string name="invalid_fps">\'%1$s\' Fps</string>
+    <string name="invalid_fps">\'%1$s\' Fps no válido(s)</string>
     <string name="video_fps">Fotogramas de vídeo por segundo (fps)</string>
     <string name="video_fps_help">Velocidad de fotogramas de vídeo que se ofrecerá durante el protocolo de enlace SDP. Los valores válidos son del 10 al 30.</string>
     <string name="call_request">Requerimiento</string>
