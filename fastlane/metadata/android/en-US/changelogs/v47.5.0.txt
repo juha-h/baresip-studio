@@ -1,0 +1,3 @@
+- Properly handle transfer request when original call is already closed
+- Fixed handling of stateless TLS SIP requests
+- New Portuguese, Portuguese (Brazil), Spanish, French, Russian, English, Finnish, Swedish, German, and Czech translations
