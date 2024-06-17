@@ -177,7 +177,7 @@
     <string name="both">Obojí</string>
     <string name="video_size">Rozlišení videa</string>
     <string name="video_size_help">Rozlišení videa (šířka x výška)</string>
-    <string name="contacts_help">Vybírá, zda se použijí kontakty baresip, kontakty Android nebo obojí. Pokud se použijí oba a kontakt se stejným jménem existuje v obou, zvolí se kontakt baresip.</string>
+    <string name="contacts_help">Vybírá, zda se použijí kontakty baresip, kontakty Android nebo obojí. Pokud jsou použita volba obojí a v obou kontaktech existuje kontakt se stejným jménem, bude vybrán kontakt baresip.</string>
     <string name="debug_help">Pokud je zaškrtnuto, poskytuje zprávy protokolu Logcat na úrovni ladění a informací.</string>
     <string name="sip_trace_help">Pokud je zaškrtnuto a pokud je zaškrtnuta volba Debug, zprávy Logcat obsahují také trasování požadavků a odpovědí SIP. Zruší se automaticky při spuštění baresipu.</string>
     <string name="reset_config">Obnovit výchozí nastavení</string>
@@ -331,4 +331,9 @@
     <string name="speaker_phone">Hlasitý poslech</string>
     <string name="speaker_phone_help">Pokud je zatrženo, hlasitý poslech se zapne automaticky při zahájení hovoru.</string>
     <string name="dtmf_auto">In-band RTP nebo SIP INFO</string>
+    <string name="call_request">Žádost o volání</string>
+    <string name="call_request_query">Přijímáte požadavek na volání \'%1$s\'?</string>
+    <string name="video_fps">Snímky za sekundu</string>
+    <string name="video_fps_help">Snímková frekvence videa, která bude nabídnuta během vyjednávání SDP. Platné hodnoty jsou od 10 do 30.</string>
+    <string name="invalid_fps">Neplatný počet snímků za sekundu \'%1$d\'</string>
 </resources>
