@@ -1114,7 +1114,7 @@ class MainActivity : AppCompatActivity() {
             }
             "call established" -> {
                 if (aor == aorSpinner.tag) {
-                    dtmf.setText("")
+                    dtmf.text = null
                     dtmf.hint = getString(R.string.dtmf)
                     showCall(ua)
                 }
