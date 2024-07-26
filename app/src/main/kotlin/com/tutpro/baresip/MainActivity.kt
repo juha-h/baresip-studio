@@ -868,7 +868,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 "tel" -> {
                     val uriStr = uri.toString().replace("%2B", "+")
-                            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
+                        .replace("%20", "")
+                        .filterNot{setOf('-', ' ', '(', ')').contains(it)}
                     var account: Account? = null
                     for (a in Account.accounts())
                         if (a.telProvider != "") {
