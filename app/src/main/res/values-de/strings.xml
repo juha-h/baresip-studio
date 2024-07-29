@@ -354,4 +354,5 @@
     <string name="video_size_help">Größe der gesendeten Videoframes (Breite x Höhe)</string>
     <string name="tone_country">Herkunftsland der Töne</string>
     <string name="tone_country_help">Herkunftsland des Freitons, Halttons und Besetzttons</string>
+    <string name="consent_request">Zustimmungsanfrage</string>
 </resources>
