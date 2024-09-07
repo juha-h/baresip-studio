@@ -145,10 +145,14 @@ static const char *translate_errorcode(uint16_t scode)
     }
 }
 
-static void ua_event_handler(
-        struct ua *ua, enum ua_event ev, struct call *call, const char *prm, void *arg)
+static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
 {
     (void)arg;
+    const char *prm  = bevent_get_text(event);
+    struct call *call = bevent_get_call(event);
+    struct ua *ua = bevent_get_ua(event);
+    const struct sip_msg *msg = bevent_get_msg(event);
+    struct account *acc = ua_account(bevent_get_ua(event));
     const char *tone;
     char event_buf[256];
     enum sdp_dir ardir;
@@ -170,6 +174,12 @@ static void ua_event_handler(
         case UA_EVENT_REGISTER_FAIL:
         case UA_EVENT_FALLBACK_FAIL:
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
+            break;
+        case UA_EVENT_SIPSESS_CONN:
+            ua = uag_find_msg(msg);
+            // There is no call yet and call is thus used to hold SIP message
+            call = (struct call *)msg;
+            len = re_snprintf(event_buf, sizeof event_buf, "%s,%r", prm, &msg->from.auri);
             break;
         case UA_EVENT_CALL_INCOMING:
             len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
@@ -245,16 +255,14 @@ static void ua_event_handler(
         return;
     }
 
-    re_thread_leave();
-
     JavaVM *javaVM = g_ctx.javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
+        LOGW("failed to get javaVM environment, ErrorCode = %d\n", res);
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            re_thread_enter();
             return;
         }
     }
@@ -266,7 +274,6 @@ static void ua_event_handler(
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
     (*env)->DeleteLocalRef(env, jEvent);
 
-    re_thread_enter();
 }
 
 static void message_handler(
@@ -282,8 +289,6 @@ static void message_handler(
         return;
     }
 
-    re_thread_leave();
-
     JavaVM *javaVM = g_ctx.javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void **)&env, JNI_VERSION_1_6);
@@ -291,7 +296,6 @@ static void message_handler(
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            re_thread_enter();
             return;
         }
     }
@@ -318,7 +322,6 @@ static void message_handler(
     (*env)->DeleteLocalRef(env, jPeer);
     (*env)->DeleteLocalRef(env, jMsg);
 
-    re_thread_enter();
 }
 
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
@@ -335,8 +338,6 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode, reason_buf,
             (char *)arg);
 
-    re_thread_leave();
-
     JavaVM *javaVM = g_ctx.javaVM;
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void **)&env, JNI_VERSION_1_6);
@@ -344,7 +345,6 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            re_thread_enter();
             return;
         }
     }
@@ -357,7 +357,6 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     (*env)->DeleteLocalRef(env, javaReason);
     (*env)->DeleteLocalRef(env, javaTime);
 
-    re_thread_enter();
 }
 
 enum
@@ -524,10 +523,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
 
     uag_set_exit_handler(ua_exit_handler, NULL);
 
-    err = uag_event_register(ua_event_handler, NULL);
+    err = bevent_register(event_handler, NULL);
     if (err) {
-        LOGE("uag_event_register() failed (%d)\n", err);
-        strcpy(start_error, "uag_event_register");
+        LOGE("bevent_register() failed (%d)\n", err);
+        strcpy(start_error, "bevent_register");
         goto out;
     }
 
@@ -575,7 +574,7 @@ out:
     conf_close();
     baresip_close();
 
-    uag_event_unregister(ua_event_handler);
+    bevent_unregister(event_handler);
 
     LOGD("unloading modules ...");
     mod_close();
@@ -1206,6 +1205,23 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1hangup(
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1accept(
+        JNIEnv *env, jobject obj, jlong ua, jlong msg)
+{
+    (void)env;
+    (void)obj;
+    int err;
+    char *from_uri;
+    pl_strdup(&from_uri, &((struct sip_msg *)msg)->from.auri);
+    LOGD("accepting incoming call for ua %ld from %s\n", (long)ua, from_uri);
+    mem_deref(from_uri);
+    re_thread_enter();
+    err = ua_accept((struct ua *)ua, (struct sip_msg *)msg);
+    re_thread_leave();
+    if (err)
+        LOGW("accepting incoming call for ua %ld failed with error %d\n", (long)ua, err);
+}
+
 JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_Api_ua_1call_1alloc(
         JNIEnv *env, jobject obj, jlong ua, jlong xCall, jint vidMode)
 {
@@ -1258,6 +1274,20 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1debug(JNIEnv *env, jobjec
     (void)env;
     (void)obj;
     ua_debug_log((struct ua *)ua);
+}
+
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_sip_1treply(
+        JNIEnv *env, jobject obj, jlong msg, jint code, jstring reason)
+{
+    (void)obj;
+    const uint16_t native_code = code;
+    const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
+    LOGD("replying with %d/%s\n", native_code, native_reason);
+    re_thread_enter();
+    (void)sip_treply(NULL, uag_sip(), (const struct sip_msg *)(struct msg *)msg,
+            native_code, native_reason);
+    re_thread_leave();
+    (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_calls_1mute(

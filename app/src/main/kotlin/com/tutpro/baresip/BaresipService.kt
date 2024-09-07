@@ -632,7 +632,8 @@ class BaresipService: Service() {
         Log.d(TAG, "got uaEvent $event/$aor/$callp")
 
         val call = Call.ofCallp(callp)
-        if (call == null && callp != 0L && !setOf("call incoming", "call closed").contains(ev[0])) {
+        if (call == null && callp != 0L &&
+            !setOf("incoming call", "call incoming", "call closed").contains(ev[0])) {
             Log.w(TAG, "uaEvent $event did not find call $callp")
             return
         }
@@ -698,7 +699,7 @@ class BaresipService: Service() {
                             playRingBack()
                         return
                     }
-                    "call incoming" -> {
+                    "incoming call" -> {
                         val peerUri = ev[1]
                         val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
                             getString(R.string.no_calls)
@@ -707,12 +708,12 @@ class BaresipService: Service() {
                             getString(R.string.audio_focus_denied)
                         else if (Call.inCall())
                             String.format(getString(R.string.call_auto_rejected),
-                                    Utils.friendlyUri(this, peerUri, ua.account))
+                                Utils.friendlyUri(this, peerUri, ua.account))
                         else
                             ""
                         if (toastMsg != "") {
-                            Log.d(TAG, "Auto-rejecting incoming call $uap/$callp/$peerUri")
-                            Api.ua_hangup(uap, callp, 486, "Busy Here")
+                            Log.d(TAG, "Auto-rejecting incoming call $uap/$peerUri")
+                            Api.sip_treply(callp, 486, "Busy Here")
                             toast(toastMsg)
                             val name = "callwaiting_$toneCountry"
                             val resourceId = applicationContext.resources.getIdentifier(
@@ -731,6 +732,12 @@ class BaresipService: Service() {
                             }
                             return
                         }
+                        // callp holds SIP message pointer
+                        Api.ua_accept(uap, callp)
+                        return
+                    }
+                    "call incoming" -> {
+                        val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
