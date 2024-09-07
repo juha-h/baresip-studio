@@ -1,0 +1,4 @@
+- Fixed call recording
+- Do not send '180 Ringing' response if incoming call is auto-rejected
+- Remove also %20 (space) from call tel URI
+- New German translations
