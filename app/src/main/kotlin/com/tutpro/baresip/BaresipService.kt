@@ -714,6 +714,7 @@ class BaresipService: Service() {
                         if (toastMsg != "") {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$peerUri")
                             Api.sip_treply(callp, 486, "Busy Here")
+                            Api.bevent_stop(ev[2].toLong())
                             toast(toastMsg)
                             val name = "callwaiting_$toneCountry"
                             val resourceId = applicationContext.resources.getIdentifier(

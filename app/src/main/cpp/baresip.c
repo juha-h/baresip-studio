@@ -179,7 +179,7 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
             ua = uag_find_msg(msg);
             // There is no call yet and call is thus used to hold SIP message
             call = (struct call *)msg;
-            len = re_snprintf(event_buf, sizeof event_buf, "%s,%r", prm, &msg->from.auri);
+            len = re_snprintf(event_buf, sizeof event_buf, "%s,%r,%ld", prm, &msg->from.auri, (long)event);
             break;
         case UA_EVENT_CALL_INCOMING:
             len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
@@ -1288,6 +1288,16 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_sip_1treply(
             native_code, native_reason);
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
+}
+
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_bevent_1stop(
+        JNIEnv *env, jobject obj, jlong event)
+{
+    (void)env;
+    (void)obj;
+    re_thread_enter();
+    bevent_stop((struct bevent *)event);
+    re_thread_leave();
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_calls_1mute(
