@@ -347,7 +347,9 @@ object Utils {
             account.telProvider
         else
             aorDomain(account.aor)
-        return "sip:" + telUri.substring(4).filterNot{setOf('-', ' ', '(', ')').contains(it)} +
+        return "sip:" + telUri.substring(4)
+            .filterNot{setOf('-', ' ', '(', ')').contains(it)}
+            .replace("#", "%23") +
                 "@" + hostPart + ";user=phone"
     }
 
