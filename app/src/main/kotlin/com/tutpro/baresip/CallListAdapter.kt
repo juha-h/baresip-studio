@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 
 class CallListAdapter(private val ctx: Context, private val account: Account,
                       private val rows: ArrayList<CallRow>) :
@@ -49,7 +49,7 @@ class CallListAdapter(private val ctx: Context, private val account: Account,
         var count = 1
         for (d in callRow.details) {
             if (d.recording[0] != "")
-                viewHolder.timeView.typeface = Typeface.DEFAULT_BOLD
+                viewHolder.timeView.setTextColor(ContextCompat.getColor(context, R.color.colorAccent))
             if (count > 3) {
                 viewHolder.etcView.text = "..."
                 continue
