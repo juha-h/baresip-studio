@@ -444,12 +444,16 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
+                val userAgent = Config.variable("user_agent")
                 Thread {
                     baresipStart(
                         filesPath,
                         addresses.removePrefix(";"),
                         logLevel,
-                        "baresip+ v${BuildConfig.VERSION_NAME} " +
+                        if (userAgent != "")
+                            userAgent
+                        else
+                            "baresip+ v${BuildConfig.VERSION_NAME} " +
                                 "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
                     )
                 }.start()

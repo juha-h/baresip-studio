@@ -398,6 +398,9 @@
     <string name="video_fps_help">Videokehysten lähetystaajuus per sekuntti, jota tarjotaan
         SDP-neuvottelun aikana. Arvon on oltava välillä 10-30.</string>
     <string name="invalid_fps">Virheellinen videokehysten lähetystaajuus \'%1$d\'</string>
+    <string name="user_agent">User Agent</string>
+    <string name="user_agent_help">Räätälöity SIP sanoman User-Agent otsikkokentän arvo</string>
+    <string name="invalid_user_agent">Virheellinen User-Agent otsikkokentän arvo</string>
     <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
         yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
         baresip-sovelluksen yhteystietoa.</string>

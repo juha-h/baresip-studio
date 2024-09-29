@@ -371,6 +371,27 @@ object Utils {
                 cc.substring(1).isDigitsOnly() && cc[1] != '0'
     }
 
+    fun checkServerVal(server: String): Boolean {
+        val parts = server.replace(Regex("[(][^()\\\\]+[)]"), "")
+            .trim().split("\\s+".toRegex())
+        for (part in parts)
+            if (!checkProduct(part))
+                return false
+        return true
+    }
+
+    private fun checkProduct(product: String): Boolean {
+        val parts = product.split("/", limit = 2)
+        return if (parts.count() == 2)
+            checkToken(parts[0]) && checkToken(parts[1])
+        else
+            checkToken(parts[0])
+    }
+
+    private fun checkToken(token: String): Boolean {
+        return Regex("^[-a-zA-Z0-9.!%*_+`'~]+\$").matches(token)
+    }
+
     fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
 
         when (val contact = Contact.findContact(uri)) {

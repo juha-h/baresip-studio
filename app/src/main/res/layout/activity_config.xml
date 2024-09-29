@@ -175,31 +175,25 @@
             </CheckBox>
         </RelativeLayout>
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/UserAgentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/user_agent"
+            android:textSize="18sp" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/UserAgent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal" >
-            <TextView
-                android:id="@+id/DarkThemeTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/DarkTheme"
-                android:textSize="18sp"
-                android:text="@string/dark_theme" >
-            </TextView>
-            <CheckBox
-                android:id="@+id/DarkTheme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:checked="false" >
-            </CheckBox>
-        </RelativeLayout>
+            android:textSize="18sp"
+            android:inputType="text"
+            android:importantForAutofill="no" >
+        </EditText>
+
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -279,6 +273,32 @@
             android:layout_marginBottom="12dp"
             android:paddingTop="8dp" >
         </Spinner>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/DarkThemeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/DarkTheme"
+                android:textSize="18sp"
+                android:text="@string/dark_theme" >
+            </TextView>
+            <CheckBox
+                android:id="@+id/DarkTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="false" >
+            </CheckBox>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/Battery"
