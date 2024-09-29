@@ -52,6 +52,7 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var certificateFile: CheckBox
     private lateinit var verifyServer: CheckBox
     private lateinit var caFile: CheckBox
+    private lateinit var userAgent: EditText
     private lateinit var darkTheme: CheckBox
     private lateinit var contactsSpinner: Spinner
     private lateinit var contactsMode: String
@@ -70,6 +71,7 @@ class ConfigActivity : AppCompatActivity() {
     private var oldDnsServers = ""
     private var oldCertificateFile = false
     private var oldVerifyServer = false
+    private var oldUserAgent = ""
     private var oldLogLevel = ""
     private var oldDisplayTheme = -1
     private var oldContactsMode = ""
@@ -390,6 +392,10 @@ class ConfigActivity : AppCompatActivity() {
             }
         }
 
+        userAgent = binding.UserAgent
+        oldUserAgent = Config.variable("user_agent")
+        userAgent.setText(oldUserAgent)
+
         darkTheme = binding.DarkTheme
         oldDisplayTheme = Preferences(applicationContext).displayTheme
         darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
@@ -615,6 +621,21 @@ class ConfigActivity : AppCompatActivity() {
                     save = true
                 }
 
+                val userAgent = userAgent.text.toString().trim()
+                if (userAgent != oldUserAgent) {
+                    if ((userAgent != "") && !Utils.checkServerVal(userAgent)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_user_agent)}: $userAgent")
+                        return false
+                    }
+                    if (userAgent != "")
+                        Config.replaceVariable("user_agent", userAgent)
+                    else
+                        Config.removeVariable("user_agent")
+                    save = true
+                    restart = true
+                }
+
                 val newDisplayTheme = if (darkTheme.isChecked)
                     AppCompatDelegate.MODE_NIGHT_YES
                 else
@@ -737,6 +758,10 @@ class ConfigActivity : AppCompatActivity() {
         binding.CAFileTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.tls_ca_file),
                     getString(R.string.tls_ca_file_help))
+        }
+        binding.UserAgentTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.user_agent),
+                getString(R.string.user_agent_help))
         }
         binding.AudioSettingsTitle.setOnClickListener {
             audioRequest.launch(Intent(this,  AudioActivity::class.java))

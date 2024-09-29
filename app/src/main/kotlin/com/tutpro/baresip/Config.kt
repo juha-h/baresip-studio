@@ -107,6 +107,10 @@ object Config {
             BaresipService.dynDns = true
         }
 
+        val userAgent = previousVariable("user_agent")
+        if (userAgent != "")
+            config = "${config}user_agent $userAgent\n"
+
         val darkTheme = previousVariable("dark_theme")
         Preferences(ctx).displayTheme = if (darkTheme == "yes") {
             config = "${config}dark_theme yes\n"
@@ -185,7 +189,7 @@ object Config {
 
     private fun previousVariable(name: String): String {
         for (line in previousLines) {
-            val nameValue = line.split(" ")
+            val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
                 return nameValue[1].trim()
         }
@@ -195,7 +199,7 @@ object Config {
     private fun previousVariables(name: String): ArrayList<String> {
         val result = ArrayList<String>()
         for (line in previousLines) {
-            val nameValue = line.split(" ")
+            val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
                 result.add(nameValue[1].trim())
         }
@@ -204,7 +208,7 @@ object Config {
 
     fun variable(name: String): String {
         for (line in config.split("\n")) {
-            val nameValue = line.split(" ")
+            val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
                 return nameValue[1].trim()
         }
@@ -214,7 +218,7 @@ object Config {
     fun variables(name: String): ArrayList<String> {
         val result = ArrayList<String>()
         for (line in config.split("\n")) {
-            val nameValue = line.split(" ")
+            val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
                 result.add(nameValue[1].trim())
         }
