@@ -336,4 +336,7 @@
     <string name="video_fps_help">Taxa de quadros de vídeo que será oferecida durante o handshake SDP. Os valores válidos são de 10 a 30.</string>
     <string name="call_request">Pedido de chamada</string>
     <string name="call_request_query">Aceita o pedido de chamada para \'%1$s\'?</string>
+    <string name="user_agent">Agente do usuário</string>
+    <string name="user_agent_help">Valor do campo de cabeçalho User-Agent personalizado da solicitação/resposta SIP</string>
+    <string name="invalid_user_agent">Valor do campo do cabeçalho User-Agent inválido</string>
 </resources>
