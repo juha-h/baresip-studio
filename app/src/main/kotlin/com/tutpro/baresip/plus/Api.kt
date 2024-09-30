@@ -81,6 +81,8 @@ object Api {
 
     external fun sip_treply(msg: Long, code: Int, reason: String)
 
+    external fun bevent_stop(event: Long)
+
     external fun call_connect(callp: Long, peer_uri: String): Int
     external fun call_hold(callp: Long, hold: Boolean): Int
     external fun call_ismuted(callp: Long): Boolean
