@@ -372,4 +372,5 @@
     <string name="call_request_query">¿Aceptas el requerimiento \'%1$s\'?</string>
     <string name="user_agent">Agente de usuario</string>
     <string name="user_agent_help">Valor del campo de encabezado de agente de usuario de solicitud/respuesta SIP personalizado</string>
+    <string name="invalid_user_agent">Valor de campo de encabezado del agente de usuario no válido</string>
 </resources>
