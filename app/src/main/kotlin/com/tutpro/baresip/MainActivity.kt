@@ -38,6 +38,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.tutpro.baresip.Utils.showSnackBar
 import com.tutpro.baresip.databinding.ActivityMainBinding
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -173,7 +176,7 @@ class MainActivity : AppCompatActivity() {
             val event = it.getContentIfNotHandled()
             Log.d(TAG, "Observed event $event")
             if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.removeFirst()
+                val first = BaresipService.serviceEvents.removeAt(0)
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -998,7 +1001,7 @@ class MainActivity : AppCompatActivity() {
             if (logMessage != null)
                 Log.w(TAG, logMessage)
             if (BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.removeFirst()
+                val first = BaresipService.serviceEvents.removeAt(0)
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -1463,7 +1466,9 @@ class MainActivity : AppCompatActivity() {
                 backupRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
-                    putExtra(Intent.EXTRA_TITLE, "baresip.bs")
+                    putExtra(Intent.EXTRA_TITLE, "baresip_" +
+                            SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()) +
+                            ".bs")
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
             }
