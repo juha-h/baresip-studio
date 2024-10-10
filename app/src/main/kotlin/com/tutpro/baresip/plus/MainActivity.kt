@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             val event = it.getContentIfNotHandled()
             Log.d(TAG, "Observed event $event")
             if (event != null && BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.removeFirst()
+                val first = BaresipService.serviceEvents.removeAt(0)
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -1337,7 +1337,7 @@ class MainActivity : AppCompatActivity() {
             if (logMessage != null)
                 Log.w(TAG, logMessage)
             if (BaresipService.serviceEvents.isNotEmpty()) {
-                val first = BaresipService.serviceEvents.removeFirst()
+                val first = BaresipService.serviceEvents.removeAt(0)
                 handleServiceEvent(first.event, first.params)
             }
         }
@@ -1753,7 +1753,7 @@ class MainActivity : AppCompatActivity() {
                         WRITE_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Write External Storage permission granted")
-                        val path = Utils.downloadsPath("baresip.bs")
+                        val path = Utils.downloadsPath("baresip+.bs")
                         downloadsOutputUri = File(path).toUri()
                         askPassword(getString(R.string.encrypt_password))
                     }
@@ -1784,7 +1784,7 @@ class MainActivity : AppCompatActivity() {
                         READ_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED -> {
                         Log.d(TAG, "Read External Storage permission granted")
-                        val path = Utils.downloadsPath("baresip.bs")
+                        val path = Utils.downloadsPath("baresip+.bs")
                         downloadsInputUri = File(path).toUri()
                         askPassword(getString(R.string.decrypt_password))
                     }
@@ -1922,7 +1922,9 @@ class MainActivity : AppCompatActivity() {
                 backupRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
-                    putExtra(Intent.EXTRA_TITLE, "baresip+.bs")
+                    putExtra(Intent.EXTRA_TITLE, "baresip+_" +
+                            SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()) +
+                            ".bs")
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
             }
