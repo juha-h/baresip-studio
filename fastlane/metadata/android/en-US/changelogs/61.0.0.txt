@@ -1,0 +1,5 @@
+- Allow , and # characters in tel number (for example when calling Teams)
+- Use accent color intead of bold in Call History time column if a call in that call row has been recorded
+- Do not include uuid in backup file (prevents having many baresip UAs with same identity)
+- By default, include date and time in backup file name
+- New Spanish and Portuguese (Brazil) translations
