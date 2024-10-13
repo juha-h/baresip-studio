@@ -327,5 +327,5 @@
     <string name="tone_country_help">Страна для определения тонов вызова, ожидания и занятости</string>
     <string name="rel_100">Надёжные предварительные ответы</string>
     <string name="appear_on_top_permission">Для автоматического запуска требуется разрешение отображения поверх других приложений.</string>
-    <string name="video_fps">Кадровая частотаКадровая частота</string>
+    <string name="video_fps">Кадровая частота</string>
 </resources>
