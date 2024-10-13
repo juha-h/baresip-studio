@@ -1923,8 +1923,7 @@ class MainActivity : AppCompatActivity() {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
                     putExtra(Intent.EXTRA_TITLE, "baresip+_" +
-                            SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()) +
-                            ".bs")
+                            SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()))
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
             }
