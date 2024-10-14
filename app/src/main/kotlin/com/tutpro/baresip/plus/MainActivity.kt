@@ -529,6 +529,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        dtmf.setOnFocusChangeListener { _, hasFocus ->
+            if (dtmf.isEnabled && !hasFocus)
+                dtmf.requestFocus()
+        }
+
         voicemailButton.setOnClickListener {
             if (aorSpinner.selectedItemPosition >= 0) {
                 val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
