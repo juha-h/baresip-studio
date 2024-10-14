@@ -148,7 +148,7 @@ object Utils {
         if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
-            val params = uriParams(u)
+            val params = uriParams(u).filter{it != "transport=udp"}
             return if (host == aorDomain(account.aor) || params.contains("user=phone"))
                 user
             else if (host == "anonymous.invalid")
@@ -156,7 +156,10 @@ object Utils {
             else if (host == "unknown.invalid")
                 ctx.getString(R.string.unknown)
             else
-                "$user@$host"
+                if (params.isEmpty())
+                    "$user@$host"
+                else
+                    "$user@$host;" + params.joinToString(";")
         }
         if (uri.startsWith("<") && (uri.endsWith(">")))
             u = uri.substring(1).substringBeforeLast(">")
