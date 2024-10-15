@@ -11,6 +11,7 @@ import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.media.MediaActionSound
@@ -1167,6 +1168,12 @@ class MainActivity : AppCompatActivity() {
             speakerButton.setImageResource(R.drawable.speaker_off_button)
             if (speakerIcon != null) speakerIcon!!.setIcon(R.drawable.speaker_off)
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (dtmf.isEnabled)
+            dtmf.requestFocus()
     }
 
     override fun onNewIntent(intent: Intent) {
