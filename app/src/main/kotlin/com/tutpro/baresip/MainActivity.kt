@@ -11,6 +11,7 @@ import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.net.Uri
@@ -831,6 +832,12 @@ class MainActivity : AppCompatActivity() {
         BaresipService.serviceEvent.removeObserver(serviceEventObserver)
         BaresipService.serviceEvents.clear()
         BaresipService.activities.clear()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (dtmf.isEnabled)
+            dtmf.requestFocus()
     }
 
     override fun onNewIntent(intent: Intent) {
