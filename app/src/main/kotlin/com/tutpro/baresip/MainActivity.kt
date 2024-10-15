@@ -475,9 +475,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        dtmf.setOnFocusChangeListener { _, hasFocus ->
-            if (dtmf.isEnabled && !hasFocus)
-                dtmf.requestFocus()
+        dtmf.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+        dtmf.setOnClickListener { view ->
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
 
         voicemailButton.setOnClickListener {
