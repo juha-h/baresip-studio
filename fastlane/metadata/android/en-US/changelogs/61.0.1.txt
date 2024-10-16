@@ -1,5 +1,5 @@
 - If DTMF is enabled, keep focus at screen orientation changes
-- Changed 'The Test Call' contact's to 'sip:thetestcall@sip2sip.info'
+- Changed 'The Test Call' contact's URI to 'sip:thetestcall@sip2sip.info'
 - When showing URI in friendly form, show URI parameters except ';transport=udp'
 - Removed '.bs' suffix from backup file name
 - New translations (Russian)
