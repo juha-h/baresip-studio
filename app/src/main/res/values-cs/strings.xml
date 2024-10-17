@@ -336,4 +336,7 @@
     <string name="video_fps">Snímky za sekundu</string>
     <string name="video_fps_help">Snímková frekvence videa, která bude nabídnuta během vyjednávání SDP. Platné hodnoty jsou od 10 do 30.</string>
     <string name="invalid_fps">Neplatný počet snímků za sekundu \'%1$d\'</string>
+    <string name="user_agent">User Agent</string>
+    <string name="user_agent_help">Vlastní hodnota pole hlavičky User-Agent pro SIP požadavek/odpověď</string>
+    <string name="invalid_user_agent">Neplatná hodnota pole hlavičky User-Agent</string>
 </resources>
