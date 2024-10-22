@@ -15,6 +15,7 @@ import com.tutpro.baresip.databinding.ActivityAudioBinding
 class AudioActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAudioBinding
+    private lateinit var micGain: EditText
     private lateinit var opusBitRate: EditText
     private lateinit var opusPacketLoss: EditText
     private lateinit var aec: CheckBox
@@ -24,6 +25,7 @@ class AudioActivity : AppCompatActivity() {
     private var save = false
     private var restart = false
     private var callVolume = BaresipService.callVolume
+    private var oldMicGain = ""
     private var oldAudioModules = mutableMapOf<String, Boolean>()
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
@@ -73,6 +75,10 @@ class AudioActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
+
+        micGain = binding.MicGain
+        oldMicGain = Config.variable("augain")
+        micGain.setText(oldMicGain)
 
         speakerPhone = binding.SpeakerPhone
         speakerPhone.isChecked = BaresipService.speakerPhone
@@ -126,7 +132,7 @@ class AudioActivity : AppCompatActivity() {
         aec.isChecked = oldAec
 
         audioDelay = binding.AudioDelay
-        audioDelay.setText(BaresipService.audioDelay.toString())
+        audioDelay.setText("${BaresipService.audioDelay}")
 
         val toneCountrySpinner = binding.ToneCountrySpinner
         val toneCountryKeys = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
@@ -176,6 +182,36 @@ class AudioActivity : AppCompatActivity() {
                 if (BaresipService.callVolume != callVolume) {
                     BaresipService.callVolume = callVolume
                     Config.replaceVariable("call_volume", callVolume.toString())
+                    save = true
+                }
+
+                var gain = micGain.text.toString().trim()
+                if (!gain.contains("."))
+                    gain = "$gain.0"
+                if (gain != oldMicGain) {
+                    if (!checkMicGain(gain)) {
+                        Utils.alertView(this, getString(R.string.notice),
+                            "${getString(R.string.invalid_microphone_gain)}: $gain.")
+                        micGain.setText(oldMicGain)
+                        return false
+                    }
+                    if (gain == "1.0") {
+                        Api.module_unload("augain")
+                        Config.removeVariableValue("module", "augain.so")
+                        Config.replaceVariable("augain", "1.0")
+                    } else {
+                        if (oldMicGain == "1.0") {
+                            if (Api.module_load("augain") != 0) {
+                                Utils.alertView(this, getString(R.string.error),
+                                    getString(R.string.failed_to_load_module))
+                                micGain.setText(oldMicGain)
+                                return false
+                            }
+                            Config.addVariable("module", "augain.so")
+                        }
+                        Config.replaceVariable("augain", gain)
+                        Api.cmd_exec("augain $gain")
+                    }
                     save = true
                 }
 
@@ -235,12 +271,16 @@ class AudioActivity : AppCompatActivity() {
 
                 if (aec.isChecked != oldAec) {
                     if (aec.isChecked) {
-                        Config.replaceVariable("module", "webrtc_aecm.so")
-                        if (Api.module_load("webrtc_aecm.so") != 0) {
-                            Utils.alertView(this, getString(R.string.error),
+                        Config.addVariable("module", "webrtc_aecm.so")
+                        if (gain != "1.0") {
+                            restart = true
+                        } else {
+                            if (Api.module_load("webrtc_aecm.so") != 0) {
+                                Utils.alertView(this, getString(R.string.error),
                                     getString(R.string.failed_to_load_module))
-                            aec.isChecked = false
-                            return false
+                                aec.isChecked = false
+                                return false
+                            }
                         }
                     } else {
                         Api.module_unload("webrtc_aecm.so")
@@ -298,6 +338,11 @@ class AudioActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.default_call_volume),
                     getString(R.string.default_call_volume_help))
         }
+        binding.MicGainTitle.setOnClickListener {
+            Utils.alertView(this, getString(R.string.microphone_gain),
+                getString(R.string.microphone_gain_help)
+            )
+        }
         binding.SpeakerPhoneTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.speaker_phone),
                 getString(R.string.speaker_phone_help))
@@ -326,6 +371,16 @@ class AudioActivity : AppCompatActivity() {
             Utils.alertView(this, getString(R.string.tone_country),
                 getString(R.string.tone_country_help))
         }
+    }
+
+    private fun checkMicGain(micGain: String): Boolean {
+        val number =
+            try {
+                micGain.toDouble()
+            } catch (e: NumberFormatException) {
+                return false
+            }
+        return number >= 1.0
     }
 
     private fun checkOpusBitRate(opusBitRate: String): Boolean {

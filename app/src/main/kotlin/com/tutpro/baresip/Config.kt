@@ -157,6 +157,12 @@ object Config {
         if ("webrtc_aecm.so" in previousModules)
             config = "${config}module webrtc_aecm.so\n"
 
+        val micGain = previousVariable("augain")
+        config = if (micGain == ""  || micGain == "1.0")
+            "${config}augain 1.0\n"
+        else
+            "${config}module augain.so\naugain $micGain\n"
+
         val opusBitRate = previousVariable("opus_bitrate")
         config = if (opusBitRate == "")
             "${config}opus_bitrate 28000\n"

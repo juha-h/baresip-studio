@@ -370,6 +370,12 @@
     <string name="aec_extended_filter_help">Jos merkitty, kaiun poistossa käytetään laajennettua
         suodatinta.
     </string>
+    <string name="microphone_gain">Mikrofonin äänikerroin</string>
+    <string name="microphone_gain_help">Kertoo mikrofonin äänen voimakkuuden tällä desimaaliluvulla.
+        Minimikerroin on 1.0 (tehdasasetus), mikä ei muuta mikrofonin äänen voimakkuutta.  Suuremmat
+        arvot voivat vaikuttaa negatiivisesti äänen laatuun.</string>
+    <string name="invalid_microphone_gain">Virheellinen mikrofonin äänikerroin</string>
+    <string name="_1.0" translatable="false">1.0</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat

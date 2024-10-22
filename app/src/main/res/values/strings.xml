@@ -344,6 +344,12 @@
     <string name="aec_help">If checked, echo cancellation is attempted on call audio.</string>
     <string name="aec_extended_filter">AEC Extended Filter</string>
     <string name="aec_extended_filter_help">If checked, echo cancellation is using extended filter.</string>
+    <string name="microphone_gain">Microphone Gain</string>
+    <string name="microphone_gain_help">Multiply microphone volume by this decimal number.  Minimum
+        value is 1.0 (factory default) that disables microphone gain. Larger values may negatively
+        affect audio quality.</string>
+    <string name="invalid_microphone_gain">Invalid Microphone Gain value</string>
+    <string name="_1.0" translatable="false">1.0</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
