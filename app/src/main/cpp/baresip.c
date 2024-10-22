@@ -259,7 +259,7 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
     JNIEnv *env;
     jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
     if (res != JNI_OK) {
-        LOGW("failed to get javaVM environment, ErrorCode = %d\n", res);
+        LOGD("failed to get javaVM environment, ErrorCode = %d\n", res);
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
