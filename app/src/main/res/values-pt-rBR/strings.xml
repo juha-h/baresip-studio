@@ -200,7 +200,44 @@
     <string name="your_name">Seu Nome</string>
     <string name="display_name">Nome de Exibição</string>
     <string name="account">Conta</string>
-    <string name="about_text">&lt;h1&gt;Biblioteca Baresip baseado em agente de usuário SIP&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Dicas de Uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Verifique se os valores predefinidos nas Configurações atendem as suas necessidades (clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).&lt;/li&gt; &lt;li&gt;O estado de uma conta é mostrado com um ponto colorido: verde (registro bem sucedido), amarelo (registro em progresso), vermelho (registro falhou), branco (registro não foi ativado).&lt;/li&gt; &lt;li&gt;Toque nos três pontos para ir direto para a configuração da conta.&lt;/li&gt; &lt;li&gt;O toque longo na conta atual, ativa ou não o registro da conta.&lt;/li&gt; &lt;li&gt;Gestos para esquerda/direita alternam as contas.&lt;/li&gt; &lt;li&gt;O interlocutor anterior pode ser re-lacionado tocando no ícone da chamada quando o \"calee\" estiver vazio&lt;/li&gt; &lt;li&gt;O gesto de passar o dedo para baixo na tela faz com que a tela de registro da conta seja exibida novamente.&lt;/li&gt; &lt;li&gt;Peers de chamada e mensagens podem ser adicionadas aos contatos com toque longo.&lt;/li&gt; &lt;li&gt;Toques longos também podem ser usados para remover chamadas, chats, mensagens e contatos.&lt;/li&gt; &lt;li&gt;Toque/toque longo em ícones de contato podem ser usados para adicionar/remover avatar.&lt;/li&gt; &lt;li&gt;Consulte &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; para obter mais informações.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Política de privacidade&lt;/h2&gt; A política de privacidade está disponível &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;aqui&lt;/a&gt;. &lt;h2&gt;Código Fonte&lt;/h2&gt; Código fonte disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também falhas podem ser reportadas. &lt;h2&gt;Licenças&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; exceto o seguinte&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs e TLS security&lt;/li&gt; e criptografia de mídia &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G722, G726, e Codec2 codecs&lt;/li&gt; &lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="about_text"><![CDATA[
+        <h1>Biblioteca Baresip baseado em agente de usuário SIP</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Versão %1$s</p>
+        <h2>Dicas de Uso</h2>
+        <ul>
+            <li>Verifique se os valores predefinidos nas Configurações atendem as suas necessidades
+                (clique nos títulos para ajuda).</li>
+            <li>Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).</li>
+            <li>O estado de uma conta é mostrado com um ponto colorido: verde (registro
+                bem sucedido), amarelo (registro em progresso), vermelho (registro falhou), branco
+                (registro não foi ativado).</li>
+            <li>Toque nos três pontos para ir direto para a configuração da conta.</li>
+            <li>O gesto de deslizar para baixo causa o novo registro da conta exibida no momento.</li>
+            <li>Um toque longo na conta exibida no momento ativa ou desativa o registro da conta.</li>
+            <li>Gestos para a esquerda/direita alternam as contas.</li>
+            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone
+                de chamada quando o "Callee" estiver vazio.</li>
+            <li>Os pares de chamadas e mensagens podem ser adicionados aos contatos por meio de toques longos.</li>
+            <li>Os toques longos também podem ser usados para remover chamadas, bate-papos, mensagens e contatos.</li>
+            <li>Toque/toque longo no ícone do contato pode ser usado para instalar/remover o avatar da imagem.</li>
+            <li>Consulte a <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obter
+                mais informações.</li>
+        </ul>
+        <h2>Política de privacidade</h2>
+            A política de privacidade está disponível <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">aqui</a>.
+        <h2>Código fonte</h2>
+            O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            onde os problemas encontrados também podem ser reportados.
+        <h2>Licenças</h2>
+        <ul>
+            <li><b>Cláusula BSD-3</b> exceto os seguintes:</li>
+            <li><b>Apache 2.0</b>, codecs AMR e segurança TLS</li>
+            <li><b>AGPLv4</b>, criptografia de mídia ZRTP</li>
+            <li><b>GNU LGPL 2.1</b> G.722, G.726, e codecs Codec2</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]></string>
     <string name="about_title">Sobre o baresip</string>
     <string name="no_cameras">Você não possui câmeras de vídeo compatíveis.</string>
     <string name="no_video_calls">Conceda permissão à \"Câmera\" para fazer ou atender chamadas de vídeo.</string>
@@ -227,7 +264,53 @@
     <string name="transfer_destination">Destino da transferência</string>
     <string name="call_transfer">Transferência de chamada</string>
     <string name="transfer_request_to">Chamada de solicitação de transferência para</string>
-    <string name="about_text_plus">&lt;h1&gt;Agente de usuário SIP baseado na biblioteca baresip com chamadas&lt;/h1&gt; de vídeo &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Versão %1$s&lt;/p&gt; Dicas de &lt;h2&gt;uso&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Verifique se os valores predefinidos nas Configurações do baresip+ atendem às suas necessidades (toque nos títulos dos itens para ver a ajuda).&lt;/li&gt; &lt;li&gt;Em Contas, crie uma ou mais contas (toque novamente nos títulos dos itens para receber ajuda).&lt;/li&gt; &lt;li&gt;A condição geral do registro de uma conta é exibido com um ponto colorido: verde (registro bem sucedido, amarelo (o registro está em andamento), vermelho (falha no registro), branco (o registro ainda não foi ativado).&lt;/li&gt; &lt;li&gt;Toque nos três pontos para ir direto para a configuração da conta.&lt;/li&gt; &lt;li&gt;O toque longo na conta atual, ativa ou não o registro da conta.&lt;/li&gt; &lt;li&gt;Gestos para esquerda/direita alternam as contas.&lt;/li&gt; &lt;li&gt;O interlocutor anterior pode ser re-lacionado tocando no ícone da chamada quando o \"calee\" estiver vazio&lt;/li&gt; &lt;li&gt;O gesto para baixo causa o recadastramento da conta que está atualmente sendo mostrada.&lt;/li&gt; &lt;li&gt;Os peers das chamadas e das mensagens podem ser adicionados aos contatos através de toques longos.&lt;/li&gt; &lt;li&gt;Os toques também podem ser utilizados para remover chamadas, chats, mensagens e os contatos.&lt;/li&gt; &lt;li&gt;O toque ou toque longo no ícone de contato pode ser usado para instalar/remover a imagem do avatar.&lt;/li&gt; &lt;li&gt;Consulte &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; para obter mais informações.&lt;/li&gt; &lt;/ul&gt; &lt;li&gt;Nas chamadas de vídeo, o dispositivo precisa ser mantido no modo paisagem com a tela na horizontal.&lt;/li&gt; &lt;li&gt;O Selfview não é mostrado adequadamente quando a transmissão do vídeo está como sendonly.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Política de privacidade&lt;/h2&gt; A política de privacidade está disponível &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;aqui&lt;/a&gt;. &lt;h2&gt;O Código Fonte&lt;/h2&gt; está disponível em &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, onde também qualquer problema poderá ser relatado. &lt;h2&gt;Licenças&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; exceto as seguintes:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codec e segurança TLS&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; criptografia de mídia ZRTP&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPLv2.1&lt;/b&gt; G.722, G.726 e Code2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; codec G.729&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv2&lt;/b&gt; H.264 and H.265 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;AOMedia&lt;/b&gt; AV1 codec&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>Biblioteca Baresip baseado em agente de usuário SIP com vídeo chamadas</h1>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Versão %1$s</p>
+        <h2>Dicas de uso</h2>
+        <ul>
+            <li>Verifique se os valores padrão nas configurações do baresip+\ atendem às suas necessidades
+                (toque nos títulos dos itens para obter ajuda).</li>
+            <li>Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).</li>
+            <li>O estado de uma conta é mostrado com um ponto colorido: verde (registro
+                bem sucedido), amarelo (registro em progresso), vermelho (registro falhou), branco
+                (registro não foi ativado).</li>
+            <li>Toque nos três pontos para ir direto para a configuração da conta.</li>
+            <li>O gesto de deslizar para baixo causa o novo registro da conta exibida no momento.</li>
+            <li>Um toque longo na conta exibida no momento ativa ou desativa o registro da conta.</li>
+            <li>Gestos para a esquerda/direita alternam as contas.</li>
+            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone
+                de chamada quando o "Callee" estiver vazio.</li>
+            <li>Os pares de chamadas e mensagens podem ser adicionados aos contatos por meio de toques longos.</li>
+            <li>Os toques longos também podem ser usados para remover chamadas, bate-papos, mensagens e contatos.</li>
+            <li>Toque/toque longo no ícone do contato pode ser usado para instalar/remover o avatar da imagem.</li>
+            <li>Consulte a <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obter
+                mais informações.</li>
+        </ul>
+        <h2>Problemas conhecidos</h2>
+        <ul>
+            <li>Nas chamadas com vídeo, o dispositivo precisa ser mantido no modo paisagem,
+                girado 90 graus para a esquerda em relação à orientação retrato.</li>
+            <li>A própia visualização automática não é exibida corretamente quando o
+                fluxo de vídeo é somente envio.</li>
+        </ul>
+        <h2>Política de privacidade</h2>
+            A política de privacidade está disponível <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">aqui</a>.
+        <h2>Código fonte</h2>
+        O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        onde os problemas encontrados também podem ser reportados.
+        <h2>Licenças</h2>
+        <ul>
+            <li><b>Cláusula BSD-3</b> exceto os seguintes:</li>
+            <li><b>Apache 2.0</b>, codecs AMR e segurança TLS</li>
+            <li><b>AGPLv4</b>, criptografia de mídia ZRTP</li>
+            <li><b>GNU LGPL 2.1</b> G.722, G.726, e codecs Codec2</li>
+            <li><b>GNU GPLv3</b> codec G.729</li>
+            <li><b>GNU GPLv2</b> codecs H.264 e H.265</li>
+            <li><b>AOMedia</b> codec AV1</li>
+        </ul>
+        ]]></string>
     <string name="about_title_plus">Sobre o baresip+</string>
     <string name="stun_server_uri">Servidor URI STUN/TURN</string>
     <string name="sip_trace_help">Se selecionado em conjunto com Debug, as mensagens Logcat incluem também o pedido SIP e o rastreamento da resposta. A opção não é ativada automaticamente durante a inicialização do baresip.</string>
@@ -282,7 +365,7 @@
     <string name="unknown">Desconhecido</string>
     <string name="diverted_by_dots">Desviado por …</string>
     <string name="consent_request">Solicitação de consentimento</string>
-    <string name="contacts_consent">Se os contatos so android forem escolhidos, eles podem ser usados nas chamadas e nas mensagens como referências ao SIP e so tel das URIs. \u0020O aplicativo baresip não armazena os contatos do Android nem os compartilha com ninguém. \u0020Para disponibilizar os contatos android no baresip, o Google exige que você aceite seu uso como descrito aqui e na \u0020<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Política de Privacidade</a>. \u0020</string>
+    <string name="contacts_consent">Se os contatos do Android forem escolhidos, eles podem ser usados em chamadas e mensagens como referências a URIs SIP e tel. O aplicativo baresip não armazena contatos do Android nem os compartilha com ninguém. Para tornar os contatos do Android disponíveis no baresip, o Google exige que você aceite seu uso conforme descrito aqui e na <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">política de privacidade</a>.</string>
     <string name="country_code">Código do país</string>
     <string name="country_code_hint">+código</string>
     <string name="country_code_help">O código do país E.164 desta conta. Se durante o recebimento da chamada ou mensagem do usuário a parte URI recebida tiver um número de telefone que não começa com o sinal \'+\' e se a busca de contato falhar, o número será prefixado com este código do país e a busca pelo contato será testada novamente. Se o número de telefone começar com um único dígito \'0\', o dígito \'0\' será removido antes que o número seja prefixado.</string>
@@ -339,4 +422,7 @@
     <string name="user_agent">Agente do usuário</string>
     <string name="user_agent_help">Valor do campo de cabeçalho User-Agent personalizado da solicitação/resposta SIP</string>
     <string name="invalid_user_agent">Valor do campo do cabeçalho User-Agent inválido</string>
+    <string name="invalid_microphone_gain">Valor inválido do ganho do microfone</string>
+    <string name="microphone_gain">Ganho do microfone</string>
+    <string name="microphone_gain_help">Multiplique o volume do microfone por esse número decimal. O valor mínimo é 1,0 (padrão de fábrica), que desativa o ganho do microfone. Valores maiores podem afetar negativamente a qualidade do áudio.</string>
 </resources>
