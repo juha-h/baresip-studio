@@ -167,6 +167,12 @@ object Config {
             config = "${config}video_selfview pip\n"
         }
 
+        val micGain = previousVariable("augain")
+        config = if (micGain == ""  || micGain == "1.0")
+            "${config}augain 1.0\n"
+        else
+            "${config}module augain.so\naugain $micGain\n"
+
         val opusBitRate = previousVariable("opus_bitrate")
         config = if (opusBitRate == "")
             "${config}opus_bitrate 28000\n"
