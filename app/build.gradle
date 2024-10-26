@@ -4,7 +4,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion = 34
-    ndkVersion '26.2.11394342'
+    ndkVersion '27.2.12479018'
     defaultConfig {
         applicationId = 'com.tutpro.baresip.plus'
         minSdkVersion 24
