@@ -139,7 +139,7 @@ class ChatActivity : AppCompatActivity() {
                         msg.direction = MESSAGE_UP_FAIL
                         msg.responseReason = getString(R.string.message_failed)
                     } else {
-                        newMessage.text.clear()
+                        newMessage.setText("")
                         BaresipService.chatTexts.remove("$aor::$peerUri")
                     }
                 mlAdapter.notifyDataSetChanged()
