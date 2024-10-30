@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var configRequest: ActivityResultLauncher<Intent>
     private lateinit var backupRequest: ActivityResultLauncher<Intent>
     private lateinit var restoreRequest: ActivityResultLauncher<Intent>
+    private lateinit var logcatRequest: ActivityResultLauncher<Intent>
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
     private lateinit var comDevChangedListener: AudioManager.OnCommunicationDeviceChangedListener
@@ -612,6 +613,24 @@ class MainActivity : AppCompatActivity() {
                 it.data?.data?.also { uri ->
                     downloadsInputUri = uri
                     askPassword(getString(R.string.decrypt_password))
+                }
+        }
+
+        logcatRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK)
+                it.data?.data?.also { uri ->
+                    try {
+                        val out = contentResolver.openOutputStream(uri)
+                        val process = Runtime.getRuntime().exec("logcat -d --pid=${Process.myPid()}")
+                        val bufferedReader = process.inputStream.bufferedReader()
+                        bufferedReader.forEachLine { line ->
+                            out!!.write(line.toByteArray())
+                            out.write('\n'.code.toByte().toInt())
+                        }
+                        out!!.close()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to write logcat to file")
+                    }
                 }
         }
 
@@ -1320,6 +1339,12 @@ class MainActivity : AppCompatActivity() {
         exitProcess(0)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        if (Build.VERSION.SDK_INT >= 29)
+            menu.findItem(R.id.logcat).setVisible(true)
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -1464,6 +1489,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            R.id.logcat -> {
+                if (Build.VERSION.SDK_INT >= 29)
+                    pickupFileFromDownloads("logcat")
+            }
+
             R.id.about -> {
                 startActivity(Intent(this, AboutActivity::class.java))
             }
@@ -1491,6 +1521,15 @@ class MainActivity : AppCompatActivity() {
                 restoreRequest.launch(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
+                    putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+                })
+            }
+            "logcat" -> {
+                logcatRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TITLE, "baresip_logcat_" +
+                            SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()))
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
             }

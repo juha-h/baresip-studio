@@ -62,7 +62,7 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "onFling exception $e")
-                e.printStackTrace()
+                // e.printStackTrace()
             }
             return result
         }

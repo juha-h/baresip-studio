@@ -15,6 +15,10 @@
   <item android:id="@+id/restore"
       android:title="@string/restore" />
 
+  <item android:id="@+id/logcat"
+      android:visible="false"
+      android:title="@string/logcat" />
+
   <item android:id="@+id/restart"
       android:title="@string/restart" />
 

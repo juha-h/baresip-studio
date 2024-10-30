@@ -455,6 +455,7 @@
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
+    <string name="logcat" translatable="false">Logcat</string>
     <string name="about">About</string>
     <string name="restart">Restart</string>
     <string name="quit">Quit</string>
