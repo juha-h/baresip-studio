@@ -1,0 +1,3 @@
+- Added Microphone Gain audio setting
+- Added Logcat main menu item
+- New Czech, Norwegian (Bokmål), German, Portuguese (Brazil), and Spanish translations
