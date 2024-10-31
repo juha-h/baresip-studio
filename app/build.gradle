@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion = 34
+    compileSdk 35
     ndkVersion '27.2.12479018'
     defaultConfig {
         applicationId = 'com.tutpro.baresip'
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode = 405
         versionName = '61.1.0'
         externalNativeBuild {
