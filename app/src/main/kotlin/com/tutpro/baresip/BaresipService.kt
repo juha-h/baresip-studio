@@ -1557,7 +1557,7 @@ class BaresipService: Service() {
         }
     }
 
-    external fun baresipStart(
+    private external fun baresipStart(
         path: String,
         addresses: String,
         logLevel: Int,
