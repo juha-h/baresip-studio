@@ -1732,7 +1732,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_uag_1reset_1transp(
 {
     (void)env;
     (void)obj;
-    LOGD("reseting transports (%d, %d)\n", reg, reinvite);
+    LOGD("resetting transports (%d, %d)\n", reg, reinvite);
     re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
     re_thread_leave();
