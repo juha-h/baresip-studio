@@ -1557,14 +1557,14 @@ class BaresipService: Service() {
         }
     }
 
-    private external fun baresipStart(
+    external fun baresipStart(
         path: String,
         addresses: String,
         logLevel: Int,
         software: String
     )
 
-    private external fun baresipStop(force: Boolean)
+    external fun baresipStop(force: Boolean)
 
     companion object {
 
