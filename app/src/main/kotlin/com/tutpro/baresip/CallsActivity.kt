@@ -143,10 +143,7 @@ class CallsActivity : AppCompatActivity() {
                         )
                     )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(
-                        String.format(getString(R.string.delete), callText),
-                        dialogClickListener
-                    )
+                    setPositiveButton(getString(R.string.delete), dialogClickListener)
                     setNegativeButton(getString(R.string.add_contact), dialogClickListener)
                     show()
                 }
@@ -160,10 +157,7 @@ class CallsActivity : AppCompatActivity() {
                         )
                     )
                     setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                    setPositiveButton(
-                        String.format(getString(R.string.delete), callText),
-                        dialogClickListener
-                    )
+                    setPositiveButton(getString(R.string.delete), dialogClickListener)
                     show()
                 }
             true
