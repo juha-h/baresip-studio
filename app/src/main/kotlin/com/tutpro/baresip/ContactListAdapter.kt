@@ -122,7 +122,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                     b.putBoolean("new", false)
                     b.putInt("index", position)
                     i.putExtras(b)
-                    startActivity(ctx, i, null)
+                    ctx.startActivity(i, null)
                 }
             }
 
@@ -158,7 +158,7 @@ class ContactListAdapter(private val ctx: Context, private val rows: ArrayList<C
                     b.putString("aor", aor)
                     b.putInt("index", position)
                     i.putExtras(b)
-                    startActivity(ctx, i, null)
+                    ctx.startActivity(i, null)
                 }
             }
 
