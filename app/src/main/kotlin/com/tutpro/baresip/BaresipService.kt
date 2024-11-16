@@ -638,24 +638,12 @@ class BaresipService: Service() {
         if (ev[0] == "recorder sessionid") {
             val sessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $sessionId")
-            if (AcousticEchoCanceler.isAvailable()) {
-                Log.i(TAG, "AcousticEchoCanceler IS available")
+            if (aec)
                 AcousticEchoCanceler.create(sessionId)
-            } else {
-                Log.i(TAG, "AcousticEchoCanceler IS NOT available")
-            }
-            if (AutomaticGainControl.isAvailable()) {
-                Log.i(TAG, "AutomaticGainControl IS available")
-                AutomaticGainControl.create(sessionId)
-            } else {
-                Log.i(TAG, "AutomaticGainControl IS NOT available")
-            }
-            if (NoiseSuppressor.isAvailable()) {
-                Log.i(TAG, "NoiseSuppressor IS available")
+            if (agc)
+                 AutomaticGainControl.create(sessionId)
+            if (ns)
                 NoiseSuppressor.create(sessionId)
-            } else {
-                Log.i(TAG, "NoiseSuppressor IS NOT available")
-            }
             return
         }
 
@@ -1641,7 +1629,9 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
-
+        var aec = AcousticEchoCanceler.isAvailable()
+        var agc = AutomaticGainControl.isAvailable()
+        private var ns = NoiseSuppressor.isAvailable()
         private var btAdapter: BluetoothAdapter? = null
 
         fun requestAudioFocus(ctx: Context): Boolean  {
