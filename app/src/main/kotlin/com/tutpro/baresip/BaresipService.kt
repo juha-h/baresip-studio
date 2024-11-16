@@ -18,6 +18,9 @@ import android.media.*
 import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
 import android.media.AudioManager.RINGER_MODE_SILENT
+import android.media.audiofx.AcousticEchoCanceler
+import android.media.audiofx.AutomaticGainControl
+import android.media.audiofx.NoiseSuppressor
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.*
@@ -70,6 +73,7 @@ class BaresipService: Service() {
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var androidContactsObserver: ContentObserver
+
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
@@ -621,6 +625,36 @@ class BaresipService: Service() {
                     Call.calls()[0].dumpfiles[0] = ev[1]
                 else
                     Call.calls()[0].dumpfiles[1] = ev[1]
+            }
+            return
+        }
+
+        if (ev[0] == "player sessionid") {
+            val sessionId = ev[1].toInt()
+            Log.d(TAG, "got player sessionid $sessionId")
+            return
+        }
+
+        if (ev[0] == "recorder sessionid") {
+            val sessionId = ev[1].toInt()
+            Log.d(TAG, "got recorder sessionid $sessionId")
+            if (AcousticEchoCanceler.isAvailable()) {
+                Log.i(TAG, "AcousticEchoCanceler IS available")
+                AcousticEchoCanceler.create(sessionId)
+            } else {
+                Log.i(TAG, "AcousticEchoCanceler IS NOT available")
+            }
+            if (AutomaticGainControl.isAvailable()) {
+                Log.i(TAG, "AutomaticGainControl IS available")
+                AutomaticGainControl.create(sessionId)
+            } else {
+                Log.i(TAG, "AutomaticGainControl IS NOT available")
+            }
+            if (NoiseSuppressor.isAvailable()) {
+                Log.i(TAG, "NoiseSuppressor IS available")
+                NoiseSuppressor.create(sessionId)
+            } else {
+                Log.i(TAG, "NoiseSuppressor IS NOT available")
             }
             return
         }

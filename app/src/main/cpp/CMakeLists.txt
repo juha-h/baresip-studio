@@ -75,7 +75,7 @@ add_definitions(-DHAVE_PTHREAD)
 
 target_link_libraries(baresip
         android
-        OpenSLES
+        aaudio
         lib_baresip
         lib_re
         lib_ssl

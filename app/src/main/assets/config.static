@@ -2,9 +2,9 @@ poll_method epoll
 call_local_timeout 120
 call_max_calls 4
 call_hold_other_calls yes
-audio_player opensles,nil
-audio_source opensles,nil
-audio_alert opensles,nil
+audio_player aaudio,nil
+audio_source aaudio,nil
+audio_alert aaudio,nil
 audio_level no
 ausrc_format s16
 auplay_format s16
@@ -19,7 +19,7 @@ audio_jitter_buffer_delay 0-20
 rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
-module opensles.so
+module aaudio.so
 module stun.so
 module turn.so
 module ice.so
