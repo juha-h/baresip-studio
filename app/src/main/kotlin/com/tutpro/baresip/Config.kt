@@ -158,7 +158,7 @@ object Config {
             config = "${config}module webrtc_aecm.so\n"
 
         val micGain = previousVariable("augain")
-        config = if (!BaresipService.agc && (micGain == ""  || micGain == "1.0"))
+        config = if (BaresipService.agc || micGain == ""  || micGain == "1.0")
             "${config}augain 1.0\n"
         else
             "${config}module augain.so\naugain $micGain\n"

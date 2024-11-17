@@ -1631,7 +1631,7 @@ class BaresipService: Service() {
         var audioFocusRequest: AudioFocusRequestCompat? = null
         var aec = AcousticEchoCanceler.isAvailable()
         var agc = AutomaticGainControl.isAvailable()
-        private var ns = NoiseSuppressor.isAvailable()
+        private val ns = NoiseSuppressor.isAvailable()
         private var btAdapter: BluetoothAdapter? = null
 
         fun requestAudioFocus(ctx: Context): Boolean  {
