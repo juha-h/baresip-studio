@@ -20,7 +20,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.media.AudioDeviceInfo
@@ -869,35 +868,10 @@ object Utils {
             BaresipService.activities.add(0, activity)
     }
 
-    @Suppress("DEPRECATION")
-    fun setShowWhenLocked(activity: Activity, show: Boolean) {
-        when {
-            Build.VERSION.SDK_INT >= 27 -> activity.setShowWhenLocked(show)
-            show -> activity.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
-            else -> activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
-        }
-    }
-
-    fun setTurnScreenOn(activity: Activity, turn: Boolean) {
-        if (Build.VERSION.SDK_INT >= 27) {
-            activity.setTurnScreenOn(turn)
-        } else
-            @Suppress("DEPRECATION")
-            if (turn) {
-                activity.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-            } else {
-                activity.window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-            }
-    }
-
-    @Suppress("DEPRECATION")
     fun requestDismissKeyguard(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            kgm.requestDismissKeyguard(activity, null)
-        } else {
-            activity.window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
-        }
+        val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        kgm.requestDismissKeyguard(activity, null)
+
     }
 
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {

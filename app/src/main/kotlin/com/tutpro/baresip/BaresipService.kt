@@ -77,7 +77,6 @@ class BaresipService: Service() {
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
-    private var rtTimer: Timer? = null
     private var vbTimer: Timer? = null
     private var origVolume = mutableMapOf<Int, Int>()
     private var linkAddresses = mutableMapOf<String, String>()
@@ -129,7 +128,7 @@ class BaresipService: Service() {
         partialWakeLock = pm.run {
             newWakeLock(
                 PowerManager.PARTIAL_WAKE_LOCK,
-                "com.tutpro.baresip:partial_wakelog"
+                "com.tutpro.baresip:partial_wakelock"
             ).apply {
                 acquire()
             }
@@ -147,9 +146,6 @@ class BaresipService: Service() {
                         Log.d(TAG, "Network $network is available")
                         if (network !in allNetworks)
                             allNetworks.add(network)
-                        // If API >= 26, this will be followed by onCapabilitiesChanged
-                        if (isServiceRunning && VERSION.SDK_INT < 26)
-                            updateNetwork()
                     }
 
                     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -249,7 +245,7 @@ class BaresipService: Service() {
         btAdapter = btm.adapter
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                "com.tutpro.baresip:proximity_wakelog")
+                "com.tutpro.baresip:proximity_wakelock")
 
         wifiLock = if (VERSION.SDK_INT < 29)
             @Suppress("DEPRECATION")
@@ -445,6 +441,8 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
+                Log.d(TAG, "AEC/AGC/NS available = $aec/$agc/$ns")
+
                 val userAgent = Config.variable("user_agent")
                 Thread {
                     baresipStart(
@@ -635,6 +633,14 @@ class BaresipService: Service() {
             return
         }
 
+        if (ev[0] == "player sessionid") {
+            val sessionId = ev[1].toInt()
+            Log.d(TAG, "got recorder sessionid $sessionId")
+            if (aec)
+                AcousticEchoCanceler.create(sessionId)
+            return
+        }
+
         if (ev[0] == "recorder sessionid") {
             val sessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $sessionId")
@@ -807,11 +813,6 @@ class BaresipService: Service() {
                                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                                     .setFullScreenIntent(pi, true)
-                            if (VERSION.SDK_INT < 26) {
-                                @Suppress("DEPRECATION")
-                                nb.setVibrate(LongArray(0))
-                                    .priority = Notification.PRIORITY_HIGH
-                            }
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                             answerIntent.putExtra("action", "call answer")
                                 .putExtra("callp", callp)
@@ -895,11 +896,6 @@ class BaresipService: Service() {
                                 .setAutoCancel(true)
                                 .setContentTitle(getString(R.string.transfer_request_to))
                                 .setContentText(target)
-                            if (VERSION.SDK_INT < 26)
-                                @Suppress("DEPRECATION")
-                                nb.setVibrate(LongArray(0))
-                                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                    .priority = Notification.PRIORITY_HIGH
                             val acceptIntent = Intent(applicationContext, MainActivity::class.java)
                             acceptIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1001,12 +997,6 @@ class BaresipService: Service() {
                                                 String.format(getString(R.string.missed_calls_count),
                                                         missedCalls + 1))
                                     }
-                                    if (VERSION.SDK_INT < 26) {
-                                        @Suppress("DEPRECATION")
-                                        nb.setVibrate(LongArray(0))
-                                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                                .priority = Notification.PRIORITY_HIGH
-                                    }
                                     nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
                                 }
                                 return
@@ -1088,12 +1078,6 @@ class BaresipService: Service() {
                 .setAutoCancel(true)
                 .setContentTitle(getString(R.string.message_from) + " " + sender)
                 .setContentText(text)
-            if (VERSION.SDK_INT < 26) {
-                @Suppress("DEPRECATION")
-                nb.setVibrate(LongArray(0))
-                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                    .priority = Notification.PRIORITY_HIGH
-            }
             val replyIntent = Intent(applicationContext, MainActivity::class.java)
             replyIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1172,22 +1156,20 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        if (VERSION.SDK_INT >= 26) {
-            val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
-                    NotificationManager.IMPORTANCE_LOW)
-            defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            nm.createNotificationChannel(defaultChannel)
-            val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
-                    NotificationManager.IMPORTANCE_HIGH)
-            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            highChannel.enableVibration(true)
-            nm.createNotificationChannel(highChannel)
-            val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Medium",
-                NotificationManager.IMPORTANCE_HIGH)
-            highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            highChannel.enableVibration(false)
-            nm.createNotificationChannel(mediumChannel)
-        }
+        val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
+            NotificationManager.IMPORTANCE_LOW)
+        defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        nm.createNotificationChannel(defaultChannel)
+        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
+            NotificationManager.IMPORTANCE_HIGH)
+        highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        highChannel.enableVibration(true)
+        nm.createNotificationChannel(highChannel)
+        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Medium",
+            NotificationManager.IMPORTANCE_HIGH)
+        highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        highChannel.enableVibration(false)
+        nm.createNotificationChannel(mediumChannel)
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -1257,43 +1239,25 @@ class BaresipService: Service() {
 
     private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
         val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
-        if (VERSION.SDK_INT >= 25) {
             spannable.setSpan(
                     ForegroundColorSpan(applicationContext.getColor(colorRes)),
                     0, spannable.length, 0)
-        }
         return spannable
     }
 
     private fun startRinging() {
-        if (VERSION.SDK_INT >= 28) {
-            rt.isLooping = true
-            rt.play()
-        } else {
-            rt.play()
-            rtTimer = Timer()
-            rtTimer!!.schedule(object : TimerTask() {
-                override fun run() {
-                    if (!rt.isPlaying)
-                        rt.play()
-                }
-            }, 1000, 1000)
-        }
+        rt.isLooping = true
+        rt.play()
         if (shouldVibrate()) {
             vbTimer = Timer()
             vbTimer!!.schedule(object : TimerTask() {
                 override fun run() {
-                    if (VERSION.SDK_INT < 26) {
-                        @Suppress("DEPRECATION")
-                        vibrator.vibrate(500)
-                    } else {
-                        vibrator.vibrate(
-                            VibrationEffect.createOneShot(
-                                500,
-                                VibrationEffect.DEFAULT_AMPLITUDE
-                            )
+                    vibrator.vibrate(
+                        VibrationEffect.createOneShot(
+                            500,
+                            VibrationEffect.DEFAULT_AMPLITUDE
                         )
-                    }
+                    )
                 }
             }, 500L, 2000L)
         }
@@ -1317,10 +1281,6 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        if (VERSION.SDK_INT < 28 && rtTimer != null) {
-            rtTimer!!.cancel()
-            rtTimer = null
-        }
         rt.stop()
         if (vbTimer != null) {
             vbTimer!!.cancel()
@@ -1481,14 +1441,13 @@ class BaresipService: Service() {
         val addresses = mutableMapOf<String, String>()
         for (n in allNetworks) {
             val caps = cm.getNetworkCapabilities(n) ?: continue
-            if (VERSION.SDK_INT < 28 ||
-                caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
-                    val props = cm.getLinkProperties(n) ?: continue
-                    for (la in props.linkAddresses)
-                        if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
-                                props.interfaceName != null && la.address.hostAddress != null &&
-                                    afMatch(la.address.hostAddress!!))
-                            addresses[la.address.hostAddress!!] = props.interfaceName!!
+            if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
+                val props = cm.getLinkProperties(n) ?: continue
+                for (la in props.linkAddresses)
+                    if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
+                            props.interfaceName != null && la.address.hostAddress != null &&
+                            afMatch(la.address.hostAddress!!))
+                        addresses[la.address.hostAddress!!] = props.interfaceName!!
             }
         }
         if (hotSpotIsEnabled) {

@@ -341,7 +341,7 @@
     <string name="tls_certificate_file">TLS-sertifikaattitiedosto</string>
     <string name="tls_certificate_file_help">Jos merkitty, tiedosto joka sisältää
         tämän baresip-sovelluksen julkisen ja yksityisen TLS-sertifikaatin, on joko jo ladattu
-        tai tullaan lataamaan.  Android versioon 9 saakka tiedosto nimeltään \'cert.pem\'
+        tai tullaan lataamaan.  Android versiossa 9 tiedosto nimeltään \'cert.pem\'
         ladataan Download-kansiosta. Turvallisuusyistä tuhoa tiedosto heti lataamisen jälkeen.
     </string>
     <string name="verify_server">Tarkista palvelinten sertifikaatit</string>
@@ -351,7 +351,7 @@
     <string name="tls_ca_file">TLS CA-tiedosto</string>
     <string name="tls_ca_file_help">Jos merkitty, tiedosto on joko jo ladattu tai tullaan
         lataamaan, joka sisältää sellaisten sertifikaattiauktoriteettien (CA) julkiset sertifikaatit,
-        jotka eivät sisälly Android-käyttöjärjestelmään. Android versioon 9 saakka tiedosto
+        jotka eivät sisälly Android-käyttöjärjestelmään. Android versiossa 9 tiedosto
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="audio_settings">Audio-asetukset</string>
@@ -558,14 +558,14 @@
     <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
         versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
     <string name="backup_failed">Sovelluksen tietojen talletus
-        tiedostoon \'%1$s\' epäonnistui. Android versioon 9 saakka
-        Tarkista Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
+        tiedostoon \'%1$s\' epäonnistui. Android versiossa 9 tarkista
+        Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
         uudelleen. Käynnistä uudelleen nyt\?</string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
         annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
-        Android versioon 9 saakka tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
+        Android versiossa 9 tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
         Tallennustila ja että tiedosto \'%1$s\' on Download-kansiossa.</string>
     <string name="restore_unzip_failed">Sovelluksen tietojen palauttaminen epäonnistui. Android
         versiosta 14 alkaen ei salli tietojen palauttamista, jos ne on tallettu ennen %1$s versioa
