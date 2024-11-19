@@ -635,7 +635,7 @@ class BaresipService: Service() {
 
         if (ev[0] == "player sessionid") {
             val sessionId = ev[1].toInt()
-            Log.d(TAG, "got recorder sessionid $sessionId")
+            Log.d(TAG, "got player sessionid $sessionId")
             if (aec)
                 AcousticEchoCanceler.create(sessionId)
             return
@@ -1239,9 +1239,8 @@ class BaresipService: Service() {
 
     private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
         val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
-            spannable.setSpan(
-                    ForegroundColorSpan(applicationContext.getColor(colorRes)),
-                    0, spannable.length, 0)
+        spannable.setSpan(
+            ForegroundColorSpan(applicationContext.getColor(colorRes)), 0, spannable.length, 0)
         return spannable
     }
 
