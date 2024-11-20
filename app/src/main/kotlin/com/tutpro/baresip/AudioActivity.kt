@@ -76,9 +76,13 @@ class AudioActivity : AppCompatActivity() {
             }
         }
 
-        micGain = binding.MicGain
-        oldMicGain = Config.variable("augain")
-        micGain.setText(oldMicGain)
+        if (!BaresipService.agc) {
+            micGain = binding.MicGain
+            oldMicGain = Config.variable("augain")
+            micGain.setText(oldMicGain)
+        } else {
+            binding.MicGainLayout.visibility = View.GONE
+        }
 
         speakerPhone = binding.SpeakerPhone
         speakerPhone.isChecked = BaresipService.speakerPhone
@@ -127,9 +131,13 @@ class AudioActivity : AppCompatActivity() {
         oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.setText(oldOpusPacketLoss)
 
-        aec = binding.Aec
-        oldAec = modules.contains("webrtc_aecm.so")
-        aec.isChecked = oldAec
+        if (!BaresipService.aec) {
+            aec = binding.Aec
+            oldAec = modules.contains("webrtc_aecm.so")
+            aec.isChecked = oldAec
+        } else {
+            binding.AecLayout.visibility = View.GONE
+        }
 
         audioDelay = binding.AudioDelay
         audioDelay.setText("${BaresipService.audioDelay}")
