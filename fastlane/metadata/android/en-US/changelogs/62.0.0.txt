@@ -1,0 +1,4 @@
+- If available, use Acoustic Echo Canceler, Automatic Gain Control, and
+  Noise Suppressor provided by the device
+
+- Android 9 (API level 28) is now the minimum supported version

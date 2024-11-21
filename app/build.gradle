@@ -10,7 +10,7 @@ android {
         minSdkVersion 28
         targetSdkVersion 35
         versionCode = 405
-        versionName = '61.1.0'
+        versionName = '62.0.0'
         externalNativeBuild {
             cmake {
                 cFlags '-DHAVE_INTTYPES_H -lstdc++'
