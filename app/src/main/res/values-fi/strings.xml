@@ -555,8 +555,7 @@
     <string name="call_is_secure">Tämä pulelu on turvallinen ja kohde on
     todennettu! Haluatko poistaa todennuksen\?</string>
     <string name="unverify">Poista todennus</string>
-    <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android
-        versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
+    <string name="backed_up">Sovelluksen tiedot talletettiin tiedostoon \'%1$s\'. Android versioon 9 saakka tiedosto löytyy Download-kansiosta.</string>
     <string name="backup_failed">Sovelluksen tietojen talletus
         tiedostoon \'%1$s\' epäonnistui. Android versiossa 9 tarkista
         Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
