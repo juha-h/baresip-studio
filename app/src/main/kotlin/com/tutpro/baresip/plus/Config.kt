@@ -158,7 +158,7 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
-        if ("webrtc_aecm.so" in previousModules)
+        if (!BaresipService.aec && "webrtc_aecm.so" in previousModules)
             config = "${config}module webrtc_aecm.so\n"
 
         if (Utils.supportedCameras(ctx).isNotEmpty()) {
@@ -168,7 +168,7 @@ object Config {
         }
 
         val micGain = previousVariable("augain")
-        config = if (micGain == ""  || micGain == "1.0")
+        config = if (BaresipService.agc || micGain == ""  || micGain == "1.0")
             "${config}augain 1.0\n"
         else
             "${config}module augain.so\naugain $micGain\n"

@@ -134,7 +134,7 @@ target_link_libraries(baresip
         EGL
         GLESv2
         GLESv1_CM
-        OpenSLES
+        aaudio
         lib_baresip
         lib_re
         lib_ssl

@@ -321,8 +321,8 @@
     <string name="failed_to_set_dns_servers">Failed to set DNS servers</string>
     <string name="tls_certificate_file">TLS Certificate File</string>
     <string name="tls_certificate_file_help">If checked, a file containing TLS certificate and
-        private key of this baresip instance has been or will be loaded. In Android versions 9 and
-        below, a file called \'cert.pem\' is loaded from Download folder. For security reasons,
+        private key of this baresip instance has been or will be loaded. In Android version 9,
+        a file called \'cert.pem\' is loaded from Download folder. For security reasons,
         delete the file after loading.</string>
     <string name="verify_server">Verify Server Certificates</string>
     <string name="verify_server_help">If checked, baresip verifies TLS certificates of SIP User
@@ -330,8 +330,7 @@
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">If checked, a file has been or will be loaded that contains
         TLS certificates of such Certificate Authorities that are not included in Android OS.
-        In Android versions 9 and below, a file called \'ca_certs.crt\' is loaded from
-        Download folder.</string>
+        In Android version 9, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="speaker_phone">Speaker Phone</string>
     <string name="speaker_phone_help">If checked, speaker phone is turned automatically on
@@ -529,7 +528,7 @@
     </string>
     <string name="unverify">Unverify</string>
     <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
-        versions 9 and below, the file is in Download folder.</string>
+        version 9, the file is in Download folder.</string>
     <string name="backup_failed">Failed to back up application data to file
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.</string>
     <string name="restart_request">Restart Request</string>
@@ -537,7 +536,7 @@
         Restart now\?
     </string>
     <string name="restore_failed">Failed to restore application data. Check that you gave correct
-        password and that the backup file is from this application. In Android versions 9 and below,
+        password and that the backup file is from this application. In Android versions 9,
         also check Apps → baresip → Permissions → Storage and that file \'%1$s\' exists
         in Download folder.
     </string>

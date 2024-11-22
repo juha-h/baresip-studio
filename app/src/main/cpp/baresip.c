@@ -297,6 +297,14 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
             } else {
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
             }
+            if (!pl_strcmp(&module_event, "player sessionid")) {
+                len = re_snprintf(event_buf, sizeof event_buf, "player sessionid,%r", &data);
+                break;
+            }
+            if (!pl_strcmp(&module_event, "recorder sessionid")) {
+                len = re_snprintf(event_buf, sizeof event_buf, "recorder sessionid,%r", &data);
+                break;
+            }
         default:
             return;
     }
@@ -1917,7 +1925,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(
 {
     (void)env;
     (void)obj;
-    LOGD("reseting transports (%d, %d)\n", reg, reinvite);
+    LOGD("resetting transports (%d, %d)\n", reg, reinvite);
     re_thread_enter();
     (void)uag_reset_transp(reg, reinvite);
     re_thread_leave();

@@ -147,8 +147,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Must be done after view has been created
-        Utils.setShowWhenLocked(this, true)
-        Utils.setTurnScreenOn(this, true)
+        this.setShowWhenLocked(true)
+        this.setTurnScreenOn( true)
         Utils.requestDismissKeyguard(this)
 
         setSupportActionBar(binding.toolbar)
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(contxt: Context, intent: Intent) {
                 if (kgm.isKeyguardLocked) {
                     Log.d(TAG, "Screen on when locked")
-                    Utils.setShowWhenLocked(this@MainActivity, Call.inCall())
+                    this@MainActivity.setShowWhenLocked(Call.inCall())
                 }
             }
         }
@@ -1199,8 +1199,8 @@ class MainActivity : AppCompatActivity() {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
 
-        Utils.setShowWhenLocked(this, true)
-        Utils.setTurnScreenOn(this, true)
+        this.setShowWhenLocked(true)
+        this.setTurnScreenOn(true)
 
         resumeAction = ""
         resumeUri = ""
@@ -1643,7 +1643,7 @@ class MainActivity : AppCompatActivity() {
                         callsButton.setImageResource(R.drawable.calls_missed)
                 }
                 if (kgm.isDeviceLocked)
-                    Utils.setShowWhenLocked(this, false)
+                    this.setShowWhenLocked(false)
             }
             "message", "message show", "message reply" -> {
                 val i = Intent(applicationContext, ChatActivity::class.java)
