@@ -143,10 +143,7 @@
         be written inside brackets []. As an example, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\'
         points to IPv4 and IPv6 addresses of public Google DNS servers.
     </string>
-    <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing
-        TLS certificate and private key of this baresip instance has been or will be loaded from
-        Download directory. For security reasons, delete the file after loading.
-    </string>
+    <string name="tls_certificate_file_help">If checked, file \'cert.pem\' containing TLS certificate and private key of this baresip instance has been or will be loaded from Download directory. For security reasons, delete the file after loading.</string>
     <string name="tls_ca_file_help">If checked, file \'ca_certs.crt\' containing TLS certificates of Certificate Authorities has been or will be loaded from Download directory.</string>
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.
@@ -171,10 +168,7 @@
     <string name="backup_failed">Failed to back up application data to Download folder file
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.
     </string>
-    <string name="restore_failed">Failed to restore application data from Download folder. Check Apps →
-        baresip → Permissions → Storage and that backup file \'%1$s\' exists in the folder
-        and, if so, you gave correct Decrypt Password.
-    </string>
+    <string name="restore_failed">Failed to restore application data from Download folder. Check Apps → baresip → Permissions → Storage and that backup file \'%1$s\' exists in the folder and, if so, you gave correct Decrypt Password.</string>
     <string name="restored">Application data restored. baresip needs to be restarted. Restart now?</string>
     <string name="calls_delete_question"> %1$s  %2$s を通話履歴から削除してもよいですか?</string>
     <string name="long_message_question"> %1$s のメッセージと連絡先を削除してもよいですか?</string>
