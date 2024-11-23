@@ -147,10 +147,7 @@
     <string name="invalid_dns_servers">Невалидни DNS сървъри</string>
     <string name="failed_to_set_dns_servers">Неуспешно задаване на DNS сървъри</string>
     <string name="tls_certificate_file">Файл за сертификати TLS</string>
-    <string name="tls_certificate_file_help">Ако е поставена отметка, файл \'cert.pem\' съдържащ TLS сертификатът и 
-		личният ключ на този екземпляр baresip е бил или ще бъде зареден от директорията за Изтегляне. От 
-		съображения за сигурност изтрийте файла след зареждането му.
-	</string>
+    <string name="tls_certificate_file_help">Ако е поставена отметка, файл \'cert.pem\' съдържащ TLS сертификатът и личният ключ на този екземпляр baresip е бил или ще бъде зареден от директорията за Изтегляне. От съображения за сигурност изтрийте файла след зареждането му.</string>
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.</string>
     <string name="aec">Акустично отменяне на ехото</string>
