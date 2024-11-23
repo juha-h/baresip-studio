@@ -6,10 +6,10 @@
     <string name="backup">Cópia de Segurança</string>
     <string name="show_password">Mostrar Senha</string>
     <string name="no_calls">O baresip precisa de permissão do \"Microfone\" para realizar chamadas de voz.</string>
-    <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Nas versões do Android 9 e anteriores, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
+    <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Na versão 9 do Android, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
     <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
     <string name="backup_failed">Falha ao fazer o backup dos dados do aplicativo no arquivo \'%1$s\'. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
-    <string name="backed_up">Os dados do aplicativo foram armazenados em um backup no arquivo \'%1$s\'. Nas versões do Android 9 e anteriores, o arquivo está na pasta Download.</string>
+    <string name="backed_up">Os dados do aplicativo foram armazenados em um backup no arquivo \'%1$s\'. Na versão do 9 Android, o arquivo está na pasta Download.</string>
     <string name="unverify">Desverificar</string>
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
@@ -96,9 +96,9 @@
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
     <string name="audio_modules_help">Codecs de áudio providos pelos módulos selecionados estão disponíveis para uso das contas.</string>
     <string name="audio_modules_title">Módulos de Áudio</string>
-    <string name="tls_ca_file_help">Se estiver marcado, foi ou será carregado um arquivo que contém certificados TLS de tais autoridades de certificação que não estão incluídas no sistema operacional Android. Nas versões 9 e posteriores do Android, um arquivo chamado \"ca_certs.crt\" é carregado a partir da pasta Download.</string>
+    <string name="tls_ca_file_help">Se estiver marcada, foi ou será carregado um arquivo que contém certificados TLS de tais autoridades de certificação que não estão incluídas no sistema operacional Android. Na versão 9 do Android, um arquivo chamado “ca_certs.crt” é carregado da pasta Download.</string>
     <string name="tls_ca_file">Arquivo TLS CA</string>
-    <string name="tls_certificate_file_help">Se marcado, o arquivo que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9 e anteriores, um arquivo chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, exclua o arquivo após o carregamento.</string>
+    <string name="tls_certificate_file_help">Se marcado, o arquivo que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9, um arquivo chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, exclua o arquivo após o carregamento.</string>
     <string name="tls_certificate_file">Arquivo de Certificado TLS</string>
     <string name="failed_to_set_dns_servers">Falha ao definir servidores DNS</string>
     <string name="invalid_dns_servers">Servidores de DNS inválidos</string>

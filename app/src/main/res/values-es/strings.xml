@@ -156,9 +156,9 @@
     <string name="invalid_dns_servers">Servidores DNS no válidos</string>
     <string name="failed_to_set_dns_servers">Error al establecer servidores DNS</string>
     <string name="tls_certificate_file">Archivo de certificado TLS</string>
-    <string name="tls_certificate_file_help">Si se marca, se ha cargado o se cargará un archivo que contiene el certificado TLS y la clave privada de esta instancia de baresip. En las versiones de Android 9 e inferiores, se carga un archivo llamado \'cert.pem\' desde la carpeta Download. Por razones de seguridad, elimine el archivo después de cargarlo.</string>
+    <string name="tls_certificate_file_help">Si se marca, se ha cargado o se cargará un archivo que contiene el certificado TLS y la clave privada de esta instancia de baresip. En las versiones Android 9, se carga un archivo llamado \'cert.pem\' desde la carpeta Download. Por razones de seguridad, elimine el archivo después de cargarlo.</string>
     <string name="tls_ca_file">Archivo de CA de TLS</string>
-    <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene certificados TLS de dichas Autoridades de Certificación que no están incluidas en el SO Android. En las versiones de Android 9 e inferiores, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
+    <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene certificados TLS de dichas Autoridades de Certificación que no están incluidas en el SO Android. En las versión de Android 9, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
     <string name="aec">Cancelación de eco acústico</string>
     <string name="aec_help">Si está marcada, se intenta la cancelación del eco en el audio de la llamada.</string>
     <string name="opus_bit_rate">Tasa de bits de Opus</string>
@@ -251,10 +251,10 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-    <string name="backed_up">Los datos de la aplicación han sido respaldados en el archivo \'%1$s\'. En las versiones de Android 9 e inferiores, el archivo está en la carpeta Download.</string>
+    <string name="backed_up">Los datos de la aplicación han sido respaldados en el archivo \'%1$s\'. En las versión de Android 9, el archivo está en la carpeta Download.</string>
     <string name="backup_failed">Ha fallado la copia de seguridad de los datos de la aplicación en el archivo \'%1$s\'. Compruebe Apps → baresip → Permisos → Almacenamiento.</string>
     <string name="restored">Se restauraron los datos de la aplicación. Baresip necesita reiniciarse. ¿Quiere reiniciar ahora\?</string>
-    <string name="restore_failed">No se han podido restaurar los datos de la aplicación. Compruebe que ha dado la contraseña correcta y que el archivo de copia de seguridad es de esta aplicación. En las versiones de Android 9 e inferiores, compruebe también Aplicaciones → baresip → Permisos → Almacenamiento y que el archivo \'%1$s\' existe en la carpeta Download.</string>
+    <string name="restore_failed">No se han podido restaurar los datos de la aplicación. Compruebe que ha dado la contraseña correcta y que el archivo de copia de seguridad es de esta aplicación. En las versión de Android 9, compruebe también Aplicaciones → baresip → Permisos → Almacenamiento y que el archivo \'%1$s\' existe en la carpeta Download.</string>
     <string name="config_restart">Es necesario reiniciar Baresip para que surta efecto la configuración nueva. ¿Quiere reiniciar ahora\?</string>
     <string name="audio_modules_title">Módulos de audio</string>
     <string name="audio_modules_help">Las cuentas pueden utiilzar códecs de audio provistos por los módulos comprobados.</string>
