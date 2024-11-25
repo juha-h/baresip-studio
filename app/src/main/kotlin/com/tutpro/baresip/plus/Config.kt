@@ -203,8 +203,6 @@ object Config {
         }
 
         val videoSize = previousVariable("video_size")
-        Log.d(TAG, "********** videoSize = $videoSize")
-        Log.d(TAG, "********** videoSizes = $videoSizes")
         BaresipService.videoSize = if (videoSize !in videoSizes) {
             if ("1280x720" in videoSizes)
                 Size(1280, 720)
