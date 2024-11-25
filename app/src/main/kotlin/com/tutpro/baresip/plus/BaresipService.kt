@@ -33,6 +33,7 @@ import android.telecom.TelecomManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Size
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
@@ -1636,6 +1637,7 @@ class BaresipService: Service() {
         var isMicMuted = false
         var isRecOn = false
         var toneCountry = "us"
+        var videoSize = Size(0, 0)
 
         val uas = ArrayList<UserAgent>()
         val calls = ArrayList<Call>()

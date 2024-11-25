@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.ImageFormat
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.util.Size
 import androidx.appcompat.app.AppCompatDelegate
 import java.io.File
 import java.net.InetAddress
@@ -161,18 +162,6 @@ object Config {
         if (!BaresipService.aec && "webrtc_aecm.so" in previousModules)
             config = "${config}module webrtc_aecm.so\n"
 
-        if (Utils.supportedCameras(ctx).isNotEmpty()) {
-            config = "${config}module avformat.so\n"
-            config = "${config}module selfview.so\n"
-            config = "${config}video_selfview pip\n"
-            val width = ScreenMetrics.getScreenSize(ctx).width
-            val heigth = ScreenMetrics.getScreenSize(ctx).height
-            if (width > heigth)
-                config = "${config}selfview_size ${width/7}x${heigth/5}\n"
-            else
-                config = "${config}selfview_size ${heigth/7}x${width/5}\n"
-        }
-
         val micGain = previousVariable("augain")
         config = if (BaresipService.agc || micGain == ""  || micGain == "1.0")
             "${config}augain 1.0\n"
@@ -213,21 +202,35 @@ object Config {
                     videoSizes.add(size.toString())
         }
 
+        val videoSize = previousVariable("video_size")
+        Log.d(TAG, "********** videoSize = $videoSize")
+        Log.d(TAG, "********** videoSizes = $videoSizes")
+        BaresipService.videoSize = if (videoSize !in videoSizes) {
+            if ("1280x720" in videoSizes)
+                Size(1280, 720)
+            else
+                Size(640, 480)
+        } else {
+            Size(videoSize.substringBefore("x").toInt(),
+                videoSize.substringAfter("x").toInt())
+        }
+        config = "${config}video_size " +
+                "${BaresipService.videoSize.width}x${BaresipService.videoSize.height}\n"
+
+        if (Utils.supportedCameras(ctx).isNotEmpty()) {
+            config = "${config}module avformat.so\n"
+            config = "${config}module selfview.so\n"
+            config = "${config}video_selfview pip\n"
+            config = "${config}selfview_size " +
+                    "${BaresipService.videoSize.width/5}" + "x" +
+                    "${BaresipService.videoSize.height/5}\n"
+        }
+
         val videoFps = previousVariable("video_fps")
         config = if (videoFps != "" && videoFps != "15.0")
             "${config}video_fps $videoFps\n"
         else
             "${config}video_fps 15\n"
-
-        val videoSize = previousVariable("video_size")
-        config = if (videoSize !in videoSizes) {
-            if ("1280x720" in videoSizes)
-                "${config}video_size 1280x720\n"
-            else
-                "${config}video_size 640x480\n"
-        } else {
-            "${config}video_size $videoSize\n"
-        }
 
         val toneCountry = previousVariable("tone_country")
         if (toneCountry != "")
