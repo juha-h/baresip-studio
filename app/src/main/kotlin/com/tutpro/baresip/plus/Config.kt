@@ -165,6 +165,12 @@ object Config {
             config = "${config}module avformat.so\n"
             config = "${config}module selfview.so\n"
             config = "${config}video_selfview pip\n"
+            val width = ScreenMetrics.getScreenSize(ctx).width
+            val heigth = ScreenMetrics.getScreenSize(ctx).height
+            if (width > heigth)
+                config = "${config}selfview_size ${width/7}x${heigth/5}\n"
+            else
+                config = "${config}selfview_size ${heigth/7}x${width/5}\n"
         }
 
         val micGain = previousVariable("augain")
