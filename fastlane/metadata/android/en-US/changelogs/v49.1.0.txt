@@ -1,0 +1,2 @@
+- Use Video Frame Size based selfview size
+- New Bulgarian, Japanese, Portuguese (Brazil), and Spanish translations
