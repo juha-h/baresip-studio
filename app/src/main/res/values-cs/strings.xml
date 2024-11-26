@@ -122,7 +122,7 @@
     <string name="invalid_chat_peer_uri">Neplatné URI účastníka chatu</string>
     <string name="delete_chats_alert">Chcete odstranit historii chatu účtu \'%1$s\'\?</string>
     <string name="audio_codecs">Zvukové kodeky</string>
-    <string name="tls_certificate_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzích systému Android 9 a nižších se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
+    <string name="tls_certificate_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzi systému Android 9 se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
     <string name="video_codecs_help">Seznam kodeků videa v prioritním pořadí. Přetažením změníte pořadí, přejetím doprava je povolíte nebo zakážete.</string>
     <string name="invalid_listen_address">Neplatná naslouchací adresa</string>
     <string name="codec_action">Uspořádat</string>
@@ -186,7 +186,7 @@
     <string name="calls_calls">volání</string>
     <string name="call_details">Podrobnosti o volání</string>
     <string name="calls_call">volání</string>
-    <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzích systému Android 9 a nižších se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
+    <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzi systému Android 9 se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
     <string name="audio_settings">Nastavení zvuku</string>
     <string name="aec_extended_filter_help">Pokud je zaškrtnuto, používá se rozšířený filtr pro potlačení ozvěny.</string>
     <string name="opus_bit_rate_help">Průměrná maximální přenosová rychlost používaná zvukovým tokem Opus. Platné hodnoty jsou 6000-510000. Výchozí hodnota je 28000.</string>
@@ -317,7 +317,7 @@
     <string name="transfer_request">Požadavek na přepojení</string>
     <string name="transfer_request_query">Souhlasíte s přepojením tohoto hovoru na \'%1$s\'\?</string>
     <string name="call_is_secure">Toto volání je BEZPEČNÉ a účastník je OVĚŘENÝ! Chcete zrušit ověření účastníka\?</string>
-    <string name="backed_up">Data aplikace byla zálohována do souboru \'%1$s\'. Ve verzích systému Android 9 a nižších se soubor nachází ve složce Download.</string>
+    <string name="backed_up">Data aplikace byla zálohována do souboru \'%1$s\'. Ve verzi systému Android 9 se soubor nachází ve složce Download.</string>
     <string name="no_bluetooth">baresip není schopen zjistit připojení Bluetooth bez povolení oprávnění \"Blízká zařízení\".</string>
     <string name="call_failed">Volání se nezdařilo</string>
     <string name="peer_not_verified">Toto volání je BEZPEČNÉ, ale účastník není ověřen!</string>
@@ -328,7 +328,7 @@
     <string name="call_not_secure">Tento hovor NENÍ zabezpečený!</string>
     <string name="backup_failed">Nepodařilo se zálohovat data aplikace do souboru \'%1$s\'. Zkontrolujte Aplikace → baresip → Oprávnění → Úložiště.</string>
     <string name="restored">Data aplikace jsou obnovena. baresip je třeba restartovat. Restartovat nyní\?</string>
-    <string name="restore_failed">Nepodařilo se obnovit data aplikace. Zkontrolujte, zda jste zadali správné heslo a zda záložní soubor pochází z této aplikace. Ve verzích systému Android 9 a nižších také zkontrolujte Aplikace → baresip → Oprávnění → Úložiště a zda soubor \'%1$s\' existuje ve složce Download.</string>
+    <string name="restore_failed">Nepodařilo se obnovit data aplikace. Zkontrolujte, zda jste zadali správné heslo a zda záložní soubor pochází z této aplikace. Ve verzi systému Android 9 také zkontrolujte Aplikace → baresip → Oprávnění → Úložiště a zda soubor \'%1$s\' existuje ve složce Download.</string>
     <string name="no_calls">baresip pro hlasové hovory potřebuje oprávnění \"Mikrofon\".</string>
     <string name="no_video_calls">Pro uskutečňování nebo přijímání videohovorů udělte oprávnění pro přístup \"Kameře\".</string>
     <string name="no_backup">Zálohu nelze vytvořit bez oprávnění pro přístup k \"Úložišti\".</string>
