@@ -407,9 +407,7 @@
     <string name="user_agent">User Agent</string>
     <string name="user_agent_help">Räätälöity SIP sanoman User-Agent otsikkokentän arvo</string>
     <string name="invalid_user_agent">Virheellinen User-Agent otsikkokentän arvo</string>
-    <string name="contacts_help">Valitsee käytetäänkö baresip-sovelluksen yhteystietoja, Androidin
-        yhteystietoja vai molempia.  Jos molempia ja sama yhteystieto on molemmissa, käytetään
-        baresip-sovelluksen yhteystietoa.</string>
+    <string name="contacts_help">Valitsee, käytetäänkö Baresip-yhteystietoja, Android-yhteystietoja vai molempia. Jos molempia käytetään ja molemmissa yhteystiedoissa on samanniminen yhteystieto, valitaan baresip-yhteystieto.</string>
     <string name="both">Molemmat</string>
     <string name="debug">Lokiviestit</string>
     <string name="debug_help">Jos merkitty, baresip tuottaa debug- ja info-tason Logcat-viestejä.</string>
