@@ -1,0 +1,1 @@
+- Alkutoteutus äänen käyttöönotosta Bluetooth-kuulokkeiden kautta.

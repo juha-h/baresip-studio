@@ -1,0 +1,6 @@
+- Salli tilin pikakeskusteluhistorian poistaminen pikakeskustelutoimintavalikkokohdan kautta.
+- Pyydä vahvistus ennen pikakeskustelun ja puheluhistorian poistamista.
+- Parannettu päätoimintojen puhepostin, pikakeskustelun ja puhelukuvakkeiden päivitys.
+- Siirry suoraan Tilitoimintaan, kun baresip käynnistetään ilman tilejä.
+- Vaihdettu puhelun hyväksymis- ja hylkäämispainikkeiden paikkoja.
+- Älä salli lähtevän puhelun lopettamista ennen kuin soittoyritys on alkanut.

@@ -1,0 +1,4 @@
+- Lisätty Puheluhistoria-valikko, joka mahdollistaa tilin puheluhistorian poistamisen,
+poistamisen käytöstä ja käyttöönoton.
+- Lisätty espanjankieliset merkkijonot (hyvityksiä Javier Falbolle).
+- Baresipin automaattinen käynnistys on nyt oletuksena uusissa asennuksissa.

@@ -1,0 +1,6 @@
+- Lisätty 'Bind Address' -kokoonpanomuuttuja, jonka avulla voit valita, mitä
+verkkoliitäntää tai IP-osoitetta Baresip käyttää.
+- Päivitä aina tilien tilakuvake, kun palaat päätoimintaan.
+- Korjattu kaatuminen, kun palataan aiemmin tuhoutuneeseen päätoimintaan.
+- Näytä aktiiviset saapuvat puhelut oikein, kun palaat päätoimintaan.
+- Päivitetyt espanjankieliset merkkijonot.

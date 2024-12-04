@@ -1,0 +1,3 @@
+- Salli portin numero tilin tietueosoitteessa (AoR).
+- Korjattu tarkistus, onko tili jo olemassa.
+- Päivitetty NO- ja BG-kieliset merkkijonot.
