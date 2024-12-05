@@ -1,0 +1,3 @@
+- Käytettiin uusia API-funktioita 'net_set_address' ja 'net_set_af' Prefer IPv6 
+-toiminnallisuuden toteuttamiseen.
+- Sidososoite poistettiin asetuksista (se ei toiminut odotetulla tavalla).

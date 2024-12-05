@@ -1,0 +1,2 @@
+- Lisätty tuki G722-koodekille.
+- korjattu tilien tallentaminen.

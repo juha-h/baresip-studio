@@ -1,0 +1,2 @@
+- Lisätty tuki G.726-koodekille.
+- Parannettu koodekin oletusetusijajärjestys.

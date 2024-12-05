@@ -1,0 +1,1 @@
+VoIP-käyttäjäagenttisovellus Androidille, joka perustuu Baresip SIP -kirjastoon

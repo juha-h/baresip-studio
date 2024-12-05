@@ -1,0 +1,3 @@
+- Lisätty tuki AMR-kapeakaistaiselle koodekille.
+- Lisätty bulgarialaiset merkkijonot.
+- Päävalikon Kokoonpanokohde nimettiin uudelleen Asetuksiksi.
