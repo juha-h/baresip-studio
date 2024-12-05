@@ -1,0 +1,10 @@
+- Toista ilmoitusääni myös kun viesti saapuu ja baresip on näkyvissä.
+- Jos yhteyshenkilön nimi on tyhjä, käytä yhteyshenkilön nimenä yhteyshenkilön
+SIP URI AoR :ta.
+- Yhteyshenkilön nimen tarkistaminen tehtiin rennommaksi.
+- Vältä satunnaista kaatumista valitessasi tiliä spinnerissä.
+- Pyydä äänitallentamisen (mikrofonin) lupa, kun Baresip alkaa (jos sitä ei ole jo
+myönnetty tai evätty pysyvästi).
+- Ulkoisen tallennustilan (tallennustilan) kirjoitus-/lukulupien parannettu käsittely
+varmuuskopioinnin/palautuksen yhteydessä.
+- Puhelimen tilan (Puhelin) -lupaa ei tarvita.

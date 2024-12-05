@@ -1,0 +1,3 @@
+- Lisätty Asetuksiin mahdollisuus valita ladattavat äänimoduulit. Ladattujen
+moduulien toimittamat äänikoodekit ovat saatavilla tilien käyttöön.
+- Pienet koodin parannukset.

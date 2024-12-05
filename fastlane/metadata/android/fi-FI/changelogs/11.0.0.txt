@@ -1,0 +1,7 @@
+- Tilien ja yhteystietojen vienti ja tuonti korvattu kaikkien sovellustietojen
+varmuuskopioinnilla ja palautuksella.
+- Parannettu suojaus estämällä Android-pohjaisten sovellusten varmuuskopiointi
+ja sovelluksen asentaminen ulkoiseen tallennustilaan.
+- Kun tili poistetaan, poista myös tilin puhelu- ja pikakeskusteluhistoria.
+- Korjattu viestien ja pikakeskustelujen poistaminen.
+- Pienet käyttöliittymä- ja merkkijonoparannukset.
