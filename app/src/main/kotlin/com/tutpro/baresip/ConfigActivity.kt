@@ -89,6 +89,8 @@ class ConfigActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
+
         super.onCreate(savedInstanceState)
 
         val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)

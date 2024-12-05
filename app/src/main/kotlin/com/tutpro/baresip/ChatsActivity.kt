@@ -35,7 +35,10 @@ class ChatsActivity: AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
+
         super.onCreate(savedInstanceState)
+
         binding = ActivityChatsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

@@ -24,7 +24,10 @@ class CallDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_call_details)
 
         binding = ActivityCallDetailsBinding.inflate(layoutInflater)

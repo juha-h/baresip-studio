@@ -28,7 +28,10 @@ class ContactsActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
+
         super.onCreate(savedInstanceState)
+
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

@@ -40,6 +40,8 @@ class AudioActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
+
         super.onCreate(savedInstanceState)
         binding = ActivityAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
