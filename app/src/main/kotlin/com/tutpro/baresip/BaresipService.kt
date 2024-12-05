@@ -727,6 +727,7 @@ class BaresipService: Service() {
                     }
                     "incoming call" -> {
                         val peerUri = ev[1]
+                        val bevent = ev[2].toLong()
                         val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
@@ -740,7 +741,7 @@ class BaresipService: Service() {
                         if (toastMsg != "") {
                             Log.d(TAG, "Auto-rejecting incoming call $uap/$peerUri")
                             Api.sip_treply(callp, 486, "Busy Here")
-                            Api.bevent_stop(ev[2].toLong())
+                            Api.bevent_stop(bevent)
                             toast(toastMsg)
                             val name = "callwaiting_$toneCountry"
                             val resourceId = applicationContext.resources.getIdentifier(
