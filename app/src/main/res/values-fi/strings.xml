@@ -104,14 +104,14 @@
     käyttäjätunnus, jos välityspalvelin vaatii sellaisen. Oletusarvo on
     tilin käyttäjätunnus.
     </string>
-    <string name="invalid_authentication_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
-    <string name="authentication_password">Salasana</string>
+    <string name="invalid_authentication_username">Virheellinen todennuskäyttäjänimi \'%1$s\'</string>
+    <string name="authentication_password">Todennuksen salasana</string>
     <string name="authentication_password_help">Todentamiseen käytettävä
     salasana, jonka pituus on enintään 64 ASCII merkkiä. Jos
     käyttäjätunnus on annettu, mutta salasanaa ei ole annettu, se
     kysytään, kun baresip käynnistetään.
     </string>
-    <string name="invalid_authentication_password">Virheellinen salasana \'%1$s\'</string>
+    <string name="invalid_authentication_password">Virheellinen todennussalasana \'%1$s\'</string>
     <string name="outbound_proxies">Välityspalvelimet</string>
     <string name="outbound_proxies_help">Yhden tai kahden
         välityspalvelimen SIP URI, joille SIP-sanomat lähetetään. Jos
@@ -153,7 +153,7 @@
     <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
     <string name="stun_username">STUN/TURN-käyttäjätunnus</string>
     <string name="stun_username_help">Käyttäjätunnus jos STUN/TURN-palvelin vaatii sellaisen</string>
-    <string name="invalid_stun_username">Virheellinen käyttäjätunnus \'%1$s\'</string>
+    <string name="invalid_stun_username">Virheellinen käyttäjänimi %1$s</string>
     <string name="stun_password">STUN/TURN-salasana</string>
     <string name="stun_password_help">Salasana jos STUN/TURN-palvelin vaatii sellaisen</string>
     <string name="invalid_stun_password">Virheellinen salasana \'%1$s\'</string>
@@ -427,12 +427,7 @@
         käyttöön. Käynnistä nyt\?
     </string>
     <string name="consent_request">Suostumuspyyntö</string>
-    <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä
-        puheluissa ja viesteissä SIP ja tel URI:en ohella. baresip ei talleta Androidin yhteystietoja
-        eikä jaa niitä kenellekään. Jotta baresip saisi käyttöönsä Androidin yhteystiedot,
-        Google vaatii, että annat siihen siihen suostumuksen hyväksymällä baresip-sovelluksen
-        <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">yksityisyyskäytännöt</a>.
-    </string>
+    <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä puheluissa ja viesteissä SIP ja tel URI:en ohella. Baresip ei talleta Androidin yhteystietoja eikä jaa niitä kenellekään. Jotta Baresip saisi käyttöönsä Androidin yhteystiedot, Google vaatii, että annat siihen suostumuksen hyväksymällä Baresip-sovelluksen <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">yksityisyyskäytännöt</a>.</string>
     <!-- Contact Activity -->
     <string name="contact">Yhteystieto</string>
     <string name="new_contact">Uusi yhteystieto</string>
@@ -442,7 +437,7 @@
     <string name="favorite">Suosikki</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
-    <string name="invalid_contact_uri">Virheellinen SIP URI \'%1$s\'</string>
+    <string name="invalid_contact_uri">Virheellinen SIP:n URI</string>
     <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
@@ -461,7 +456,7 @@
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>
     <string name="accept">Hyväksy</string>
-    <string name="deny">Hylkää</string>
+    <string name="deny">Estä</string>
     <string name="user_id">Käyttäjätunnus</string>
     <string name="password">Salasana</string>
     <string name="add">Lisää</string>
@@ -474,7 +469,7 @@
     <string name="confirmation">Vahvistus</string>
     <string name="anonymous">Anonyymi</string>
     <string name="unknown">Tuntematon</string>
-    <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
+    <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai puh. URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
     <!-- Main Activity -->
