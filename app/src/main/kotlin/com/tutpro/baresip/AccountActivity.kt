@@ -76,6 +76,7 @@ class AccountActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         binding = ActivityAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -499,7 +500,7 @@ class AccountActivity : AppCompatActivity() {
                             ob.add(uri)
                         } else {
                             Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_proxy_server_uri), ob[i]))
+                                    String.format(getString(R.string.invalid_proxy_server_uri), uri))
                             return false
                         }
                     }
