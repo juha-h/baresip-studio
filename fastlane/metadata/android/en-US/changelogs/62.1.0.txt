@@ -1,0 +1,4 @@
+- Opt out edge-to-edge enforcement for Android 15 compatibility
+- Avoid crashes in BootCompletedReceiver and when checking outbound proxy URI
+- New Finnish, Bulgarian, Japanese, Portuguese (Brazil), Spanish, Czech,
+and Polish translations
