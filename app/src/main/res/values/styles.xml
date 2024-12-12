@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -15,7 +15,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="ActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorSecondaryDark</item>
         <item name="colorSurface">@color/colorPrimary</item>
         <item name="android:textColor">@color/colorLight</item>
