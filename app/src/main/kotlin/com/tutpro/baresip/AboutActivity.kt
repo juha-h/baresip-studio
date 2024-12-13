@@ -42,10 +42,10 @@ class AboutActivity : AppCompatActivity() {
         if (!Utils.isDarkTheme(this))
             WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
 
-        Utils.addActivity("about")
-
         if (Build.VERSION.SDK_INT >= 35)
             binding.aboutText.updatePadding(top = 172)
+
+        Utils.addActivity("about")
 
         val text = String.format(getString(R.string.about_text),
                 BuildConfig.VERSION_NAME)
