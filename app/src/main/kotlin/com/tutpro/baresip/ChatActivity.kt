@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.Menu
@@ -16,6 +17,11 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.databinding.ActivityChatBinding
 
@@ -43,12 +49,21 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
 
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
+            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            if (Build.VERSION.SDK_INT >= 35)
+                binding.ChatView.updatePadding(top = systemBars.top + 56)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        if (!Utils.isDarkTheme(this))
+            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

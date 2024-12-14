@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -10,6 +11,11 @@ import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import com.tutpro.baresip.databinding.ActivityAudioBinding
 
 class AudioActivity : AppCompatActivity() {
@@ -40,11 +46,20 @@ class AudioActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
         binding = ActivityAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
+            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            if (Build.VERSION.SDK_INT >= 35)
+                binding.AudioView.updatePadding(top = systemBars.top + 56)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        if (!Utils.isDarkTheme(this))
+            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Utils.addActivity("audio")

@@ -1,10 +1,17 @@
 package com.tutpro.baresip
 
 import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import com.tutpro.baresip.databinding.ActivityCallDetailsBinding
 
 class CallDetailsActivity : AppCompatActivity() {
@@ -24,8 +31,6 @@ class CallDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_call_details)
@@ -33,6 +38,16 @@ class CallDetailsActivity : AppCompatActivity() {
         binding = ActivityCallDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
+            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            if (Build.VERSION.SDK_INT >= 35)
+                binding.CallDetailsView.updatePadding(top = systemBars.top + 56)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        if (!Utils.isDarkTheme(this))
+            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         aor = intent.getStringExtra("aor")!!
         peer = intent.getStringExtra("peer")!!
         position = intent.getIntExtra("position", 0)
