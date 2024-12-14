@@ -2,12 +2,19 @@ package com.tutpro.baresip.plus
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import com.tutpro.baresip.plus.databinding.ActivityAccountsBinding
 
 class AccountsActivity : AppCompatActivity() {
@@ -24,11 +31,21 @@ class AccountsActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
-        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
         binding = ActivityAccountsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
+            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        if (!Utils.isDarkTheme(this))
+            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
+
+        if (Build.VERSION.SDK_INT >= 35)
+            binding.AccountsView.updatePadding(top = 172)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("accounts,$aor")

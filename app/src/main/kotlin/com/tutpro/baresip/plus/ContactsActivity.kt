@@ -2,13 +2,20 @@ package com.tutpro.baresip.plus
 
 import android.app.Activity
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.ContactsContract
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.plus.databinding.ActivityContactsBinding
 
@@ -28,12 +35,21 @@ class ContactsActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
-        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
 
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
+            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            if (Build.VERSION.SDK_INT >= 35)
+                binding.ContactsView.updatePadding(top = systemBars.top + 56)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        if (!Utils.isDarkTheme(this))
+            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("contacts,$aor")

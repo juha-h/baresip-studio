@@ -8,6 +8,7 @@
         <item name="actionOverflowMenuStyle">@style/Spinner</item>
         <item name="android:dropDownListViewStyle">@style/Spinner</item>
         <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
     </style>
 
     <style name="AppTheme.Main" parent="AppTheme">
@@ -35,29 +36,35 @@
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
         <item name="materialAlertDialogBodyTextStyle">@style/Alert.Message</item>
         <item name="materialAlertDialogTitleTextStyle">@style/Alert.Title</item>
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="Alert.Button.Positive" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/colorAlert</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="Alert.Button.Neutral" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Alert.Button.Neutral" parent="Widget.Material3.Button.TextButton">
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textColor">@color/colorGray</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Alert.Title" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+    <style name="Alert.Title" parent="@style/MaterialAlertDialog.Material3.Title.Text">
         <item name="android:textColor">@color/colorAlert</item>
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="Alert.Message" parent="@style/MaterialAlertDialog.MaterialComponents.Body.Text">
+    <style name="Alert.Message" parent="@style/MaterialAlertDialog.Material3.Body.Text">
         <item name="android:textColor">@color/colorStrong</item>
         <item name="android:textSize">16sp</item>
     </style>

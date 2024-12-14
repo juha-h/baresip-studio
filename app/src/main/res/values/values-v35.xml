@@ -1,6 +1,0 @@
-<resources>
-    <!-- TODO: Remove once activities handle insets. -->
-    <style name="OptOutEdgeToEdgeEnforcement">
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
-    </style>
-</resources>
