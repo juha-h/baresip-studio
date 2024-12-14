@@ -547,7 +547,7 @@ class AccountActivity : AppCompatActivity() {
                 if (newConfiguredRegInt < 60 || newConfiguredRegInt > 3600) {
                     Utils.alertView(
                         this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_reg_int), newConfiguredRegInt)
+                        String.format(getString(R.string.invalid_reg_int), "$newConfiguredRegInt")
                     )
                     return false
                 }
