@@ -70,7 +70,7 @@ class ContactActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
             val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             if (Build.VERSION.SDK_INT >= 35)
                 binding.ContactView.updatePadding(top = systemBars.top + 56)
             WindowInsetsCompat.CONSUMED
