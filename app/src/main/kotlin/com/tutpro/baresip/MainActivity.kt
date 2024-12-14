@@ -867,12 +867,6 @@ class MainActivity : AppCompatActivity() {
         BaresipService.activities.clear()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (dtmf.isEnabled)
-            dtmf.requestFocus()
-    }
-
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
