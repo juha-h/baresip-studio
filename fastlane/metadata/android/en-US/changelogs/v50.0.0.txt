@@ -1,0 +1,4 @@
+- Added support for edge-to-edge content display for Android 15 compatibility
+- Rounded alert dialog corners
+- Don't automatically show soft keyboard when configuration changes
+- Added new language (Tamil)
