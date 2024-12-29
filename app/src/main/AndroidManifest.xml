@@ -77,6 +77,7 @@
         <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/accounts"
             android:parentActivityName=".MainActivity" >
         </activity>
@@ -84,6 +85,7 @@
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/account" >
         </activity>
 
@@ -98,8 +100,7 @@
             android:name=".ContactsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contacts"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan" >
+            android:parentActivityName=".MainActivity" >
         </activity>
 
         <activity
@@ -147,6 +148,7 @@
         <activity
             android:name=".ChatsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/chats"
             android:parentActivityName=".MainActivity" >
         </activity>
