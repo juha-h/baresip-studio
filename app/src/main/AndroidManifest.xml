@@ -84,6 +84,7 @@
         <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/accounts"
             android:parentActivityName=".MainActivity" >
         </activity>
@@ -154,6 +155,7 @@
         <activity
             android:name=".ChatsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/chats"
             android:parentActivityName=".MainActivity" >
         </activity>
