@@ -13,7 +13,7 @@ audec_format s16
 audio_buffer 20-300
 audio_buffer_mode adaptive
 audio_silence -35.0
-audio_telev_pt 10
+audio_telev_pt 101
 video_source avformat,android_camera,1
 videnc_format yuv420p
 audio_jitter_buffer_type adaptive
