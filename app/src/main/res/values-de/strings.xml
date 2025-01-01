@@ -174,7 +174,7 @@
     <string name="one_old_message">eine alte Nachricht</string>
     <string name="call_is_secure">Dieser Anruf ist SICHER, und die Gegenstelle ist VERIFIZIERT! Wollen Sie die Gegenstelle unsicher erklären?</string>
     <string name="unverify">Unsicher erklären</string>
-    <string name="backed_up">Anwendungsdaten wurden gesichert nach \'%1$s\'. In Android Versionen 9 und darunter ist die Datei im Download Ordner.</string>
+    <string name="backed_up">Anwendungsdaten wurden gesichert in \'%1$s\'. In Android Version 9 ist die Datei im Download-Ordner.</string>
     <string name="restart_request">Neustarten</string>
     <string name="anonymous">Anonym</string>
     <string name="send_message">Nachricht senden</string>
@@ -204,7 +204,7 @@
     <string name="voicemail">Sprachnachrichten</string>
     <string name="backup_failed">Sicherung nach \'%1$s\' fehlgeschlagen. Überprüfen Sie Apps → baresip → Berechtigungen → Speicher.</string>
     <string name="restored">Anwendungsdaten wurden wiederhergestellt und baresip muß neugestartet werden. Neustarten?</string>
-    <string name="restore_failed">Wiederherstellung der Anwendungsdaten fehlgeschlagen. Überprüfen Sie das korrekte Passwort und dass die Wiederherstellungsdatei von dieser Anwendung stammt. In Android Versinen 9 und darunter: Überprüfen Sie Apps → baresip → Berechtigungen → Speicher, sowie, dass \'%1$s\' im Download Ordner existiert.</string>
+    <string name="restore_failed">Wiederherstellung der Anwendungsdaten fehlgeschlagen. Überprüfen Sie das eingegebene Passwort und dass die Wiederherstellungsdatei von dieser Anwendung stammt. In Android Version 9: Überprüfen Sie Apps → baresip → Berechtigungen → Speicher, sowie, dass \'%1$s\' im Download Ordner existiert.</string>
     <string name="no_calls">baresip braucht \"Mikrofon\" Berechtigung für Telefonanrufe.</string>
     <string name="no_cameras">Sie haben keine unterstützten Videokameras.</string>
     <string name="no_backup">Eine Sicherungskopie kann nicht ohne die \"Speicher\"-Berechtigung erstellt werden.</string>
@@ -267,7 +267,7 @@
     <string name="listen_address_help">IP-Adresse und Port in der Form \'address:port\', an der Baresip für eingehende SIP-Anfragen lauscht. Wenn die IP-Adresse eine IPv6-Adresse ist, muss sie innerhalb von Klammern geschrieben werden []. IPv4 Adresse 0.0.0.0 oder IPv6 Adresse [:] läßt Baresip an allen verfügbaren Adressen lauschen. Wenn leer gelassen (Standard), hört Baresip auf Port 5060 aller verfügbaren Adressen.</string>
     <string name="address_family_help">Wählt, welche IP-Adressen Baresip verwendet. Wird IPv4 oder IPv6 gewählt, verwendet Baresip nur IPv4 oder IPv6 Adressen. Wird nichts gewählt, verwendet Baresip sowohl IPv4 als auch IPv6 Adressen.</string>
     <string name="dns_servers_help">Kommagetrennte Liste von Adressen von DNS-Servern. Wenn nicht angegeben, werden DNS-Serveradressen dynamisch aus dem System gewonnen. Jede DNS-Adresse ist in der Form \'ip:port\' oder \'ip\'. Wenn der Port weggelassen ist, wird dieser auf 53 gesetzt. Wenn ip eine IPv6-Adresse ist und auch Port angegeben ist, muss ip in Klammern geschrieben werden []. Als Beispiel zeigt die Liste \'8.8.8.8.8:53,[2001:4860:4860:::888888]:53\' auf IPv4 und IPv6 Adressen öffentlicher Google DNS-Server.</string>
-    <string name="tls_certificate_file_help">Falls angeklickt, wurde oder wird eine Datei mit TLS-Zertifikat und privatem Schlüssel dieser Baresip-Instanz geladen. In Android-Versionen 9 und darunter wird eine Datei namens \'cert.pem\' aus dem Download-Ordner geladen. Löschen Sie aus Sicherheitsgründen diese Datei nach dem Laden.</string>
+    <string name="tls_certificate_file_help">Falls angeklickt, wurde oder wird eine Datei mit TLS-Zertifikat und privatem Schlüssel dieser Baresip-Instanz geladen. In Android-Version 9 wird eine Datei namens \'cert.pem\' aus dem Download-Ordner geladen. Löschen Sie aus Sicherheitsgründen diese Datei nach dem Laden.</string>
     <string name="video_codecs">Video Codecs</string>
     <string name="audio_settings">Audioeinstellungen</string>
     <string name="backup">Sicherungskopie</string>
@@ -280,7 +280,7 @@
     <string name="dtmf_inband">RTP Ergeignisse im Frequenzband</string>
     <string name="audio_codecs">Audio Codecs</string>
     <string name="tls_ca_file">TLS CA Datei</string>
-    <string name="contacts_consent">Wenn Android Kontakte gewählt ist, können diese beim Telefonieren und Verschicken von Direktnachrichten als Referenzen für SIP und tel URIs genutzt werden. Die baresip App speichert keine Android Kontakte und teilt diese auch nicht. Um Android Kontakte in baresip verfügbar zu machen, erfordert Google Ihre Zustimmung zur Nutzung der Kontakte nach den Angaben in der<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Datenschutzerklärung</a> der App. \u0020</string>
+    <string name="contacts_consent">Wenn Android Kontakte gewählt ist, können diese beim Telefonieren und Verschicken von Direktnachrichten als Referenzen für SIP und tel URIs genutzt werden. Die baresip App speichert keine Android Kontakte und teilt diese auch nicht. Um Android Kontakte in baresip verfügbar zu machen, erfordert Google Ihre Zustimmung zur Nutzung der Kontakte nach den Angaben in der <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Datenschutzerklärung</a> der App.</string>
     <string name="attended">Mit Rückfrage (attended)</string>
     <string name="choose_destination_uri">Ziel-URI auswählen</string>
     <string name="transfer">Transfer</string>
@@ -343,7 +343,7 @@
     <string name="codecs">Codecs</string>
     <string name="dark_theme">Dunkles Farbschema</string>
     <string name="dtmf_auto">RTP oder SIP INFO im Frequenzband</string>
-    <string name="tls_ca_file_help">Falls angekreuzt, wurde/ wird eine Datei geladen werden, die ein TLS Zertifikat einer Zertifikatsauthorität beinhaltet, die nicht in Android vorhanden ist. Bis Android Version 9 einschließlich wird die Datei \'ca_certs.crt\' aus dem Download-Verzeichnis geladen.</string>
+    <string name="tls_ca_file_help">Falls angekreuzt, wurde/ wird eine Datei geladen werden, die ein TLS Zertifikat einer Zertifikatsauthorität beinhaltet, die nicht in Android vorhanden ist. In der Android Version 9 wird die Datei \'ca_certs.crt\' aus dem Download-Verzeichnis geladen.</string>
     <string name="address_family">Adressenfamilie</string>
     <string name="media_nat">NAT Durchquerung von Medien</string>
     <string name="default_call_volume_help">Falls aktiviert, liegt die standardmäßige Anruflautstärke auf einer Skala von 1-10.</string>
@@ -355,4 +355,10 @@
     <string name="tone_country">Herkunftsland der Töne</string>
     <string name="tone_country_help">Herkunftsland des Freitons, Halttons und Besetzttons</string>
     <string name="consent_request">Zustimmungsanfrage</string>
+    <string name="microphone_gain">Mikrofonverstärkung</string>
+    <string name="microphone_gain_help">Die Mikrofonlautstärke wird mit dieser Dezimalzahl multipliziert. Der Minimalwert ist 1.0 (Werkseinstellung) und deaktiviert die Mikrofonverstärkung. Größere Werte können die Tonqualität negativ beeinflussen.</string>
+    <string name="invalid_microphone_gain">Ungültiger Wert für die Mikrofonverstärkung</string>
+    <string name="user_agent">User Agent</string>
+    <string name="user_agent_help">Benutzerdefinierter Wert für das SIP request/response User-Agent header-Feld</string>
+    <string name="invalid_user_agent">Ungültiger Wert für das User-Agent header-Feld</string>
 </resources>
