@@ -210,34 +210,41 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var gain = micGain.text.toString().trim()
-                if (!gain.contains("."))
-                    gain = "$gain.0"
-                if (gain != oldMicGain) {
-                    if (!checkMicGain(gain)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_microphone_gain)}: $gain.")
-                        micGain.setText(oldMicGain)
-                        return false
-                    }
-                    if (gain == "1.0") {
-                        Api.module_unload("augain")
-                        Config.removeVariableValue("module", "augain.so")
-                        Config.replaceVariable("augain", "1.0")
-                    } else {
-                        if (oldMicGain == "1.0") {
-                            if (Api.module_load("augain") != 0) {
-                                Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.failed_to_load_module))
-                                micGain.setText(oldMicGain)
-                                return false
-                            }
-                            Config.addVariable("module", "augain.so")
+                var gain = "1.0"
+                if (!BaresipService.agc) {
+                    gain = micGain.text.toString().trim()
+                    if (!gain.contains("."))
+                        gain = "$gain.0"
+                    if (gain != oldMicGain) {
+                        if (!checkMicGain(gain)) {
+                            Utils.alertView(
+                                this, getString(R.string.notice),
+                                "${getString(R.string.invalid_microphone_gain)}: $gain."
+                            )
+                            micGain.setText(oldMicGain)
+                            return false
                         }
-                        Config.replaceVariable("augain", gain)
-                        Api.cmd_exec("augain $gain")
+                        if (gain == "1.0") {
+                            Api.module_unload("augain")
+                            Config.removeVariableValue("module", "augain.so")
+                            Config.replaceVariable("augain", "1.0")
+                        } else {
+                            if (oldMicGain == "1.0") {
+                                if (Api.module_load("augain") != 0) {
+                                    Utils.alertView(
+                                        this, getString(R.string.error),
+                                        getString(R.string.failed_to_load_module)
+                                    )
+                                    micGain.setText(oldMicGain)
+                                    return false
+                                }
+                                Config.addVariable("module", "augain.so")
+                            }
+                            Config.replaceVariable("augain", gain)
+                            Api.cmd_exec("augain $gain")
+                        }
+                        save = true
                     }
-                    save = true
                 }
 
                 if (speakerPhone.isChecked != BaresipService.speakerPhone) {
@@ -294,24 +301,28 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (aec.isChecked != oldAec) {
-                    if (aec.isChecked) {
-                        Config.addVariable("module", "webrtc_aecm.so")
-                        if (gain != "1.0") {
-                            restart = true
-                        } else {
-                            if (Api.module_load("webrtc_aecm.so") != 0) {
-                                Utils.alertView(this, getString(R.string.error),
-                                    getString(R.string.failed_to_load_module))
-                                aec.isChecked = false
-                                return false
+                if (!BaresipService.aec) {
+                    if (aec.isChecked != oldAec) {
+                        if (aec.isChecked) {
+                            Config.addVariable("module", "webrtc_aecm.so")
+                            if (gain != "1.0") {
+                                restart = true
+                            } else {
+                                if (Api.module_load("webrtc_aecm.so") != 0) {
+                                    Utils.alertView(
+                                        this, getString(R.string.error),
+                                        getString(R.string.failed_to_load_module)
+                                    )
+                                    aec.isChecked = false
+                                    return false
+                                }
                             }
+                        } else {
+                            Api.module_unload("webrtc_aecm.so")
+                            Config.removeVariableValue("module", "webrtc_aecm.so")
                         }
-                    } else {
-                        Api.module_unload("webrtc_aecm.so")
-                        Config.removeVariableValue("module", "webrtc_aecm.so")
+                        save = true
                     }
-                    save = true
                 }
 
                 val audioDelay = audioDelay.text.toString().trim()
