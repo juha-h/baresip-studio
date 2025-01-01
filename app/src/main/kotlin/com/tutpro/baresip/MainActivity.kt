@@ -11,7 +11,6 @@ import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.net.Uri
