@@ -20,6 +20,7 @@ object Config {
         if (!File(configPath).exists()) {
             for (module in AudioActivity.audioModules)
                 config = "${config}module ${module}.so\n"
+            if (!BaresipService.aec)
                 config = "${config}module webrtc_aecm.so\n"
             previousConfig = config
         } else {
