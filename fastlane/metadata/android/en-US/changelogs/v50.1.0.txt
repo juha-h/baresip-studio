@@ -1,0 +1,4 @@
+- Prevent soft keyboard from hiding input text field in some activities
+- Fixed telephone-event payload type number
+- Prevent crash when backup file is large
+- New translations (German)
