@@ -527,8 +527,8 @@
         Do you want to unverify the peer\?
     </string>
     <string name="unverify">Unverify</string>
-    <string name="backed_up">Application data has been backed up to file \'%1$s\'. In Android
-        version 9, the file is in Download folder.</string>
+    <string name="backed_up">Application data (excluding recordings) backed up
+        to file \'%1$s\'. In Android version 9, the file is in Download folder.</string>
     <string name="backup_failed">Failed to back up application data to file
         \'%1$s\'. Check Apps → baresip → Permissions → Storage.</string>
     <string name="restart_request">Restart Request</string>
