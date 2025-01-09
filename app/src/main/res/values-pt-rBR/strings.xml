@@ -9,7 +9,7 @@
     <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Na versão 9 do Android, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
     <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
     <string name="backup_failed">Falha ao fazer o backup dos dados do aplicativo no arquivo \'%1$s\'. Verifique Aplicativos → baresip → Permissões → Armazenamento.</string>
-    <string name="backed_up">Os dados do aplicativo foram armazenados em um backup no arquivo \'%1$s\'. Na versão do 9 Android, o arquivo está na pasta Download.</string>
+    <string name="backed_up">Os dados do aplicativo (excluindo gravações) em um backup no arquivo \'%1$s\'. Na versão do 9 Android, o arquivo está na pasta Download.</string>
     <string name="unverify">Desverificar</string>
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
@@ -146,7 +146,7 @@
     <string name="delete_account">Você quer excluir a conta \'%1$s\'\?</string>
     <string name="decrypt_password">Descriptografar Senha</string>
     <string name="encrypt_password">Criptografar Senha</string>
-    <string name="account_allocation_failure">Falha ao alocar nova conta.</string>
+    <string name="account_allocation_failure">Falha ao alocar nova conta</string>
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="invalid_aor">usuario@dominio[:porta][;transport=udp|tcp|tls] inválido \'%1$s\'</string>
     <string name="user_domain">usuario@dominio</string>

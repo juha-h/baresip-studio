@@ -21,30 +21,79 @@
     <string name="invalid_account_nickname">Neplatná přezdívka účtu \'%1$s\'</string>
     <string name="non_unique_account_nickname">Přezdívka \'%1$s\' již existuje</string>
     <string name="your_name">Vaše jméno</string>
-    <string name="about_text_plus"><![CDATA[<h1>SIP klient založený na knihovně Baresip s podporou video hovorů</h1> <p>Juha Heinanen <jh@tutpro.com></p> <p>Verze %1$s</p> <h2>Nápověda k používání</h2> <ul> <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám (nápovědu získáte ťuknutím na názvy položek).</li> <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li> <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace nezačala).</li> <li>Ťuknutí na tečku spustí konfiguraci účtu.</li> <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li> <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li> <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li> <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Volaný prázdné.</li> <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li> <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li> <li>See <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> for more information.</li> </ul> <h2>Známé problémy</h2> <ul> <li>Při videohovorech je třeba držet zařízení v režimu na šířku otočeném o 90 stupňů doleva oproti orientaci na výšku.</li> <li>Vlastní náhled volajícího se nezobrazuje správně, když je videoproud pouze v režimu odesílání (sendonly).</li></ul> <h2>Zásady ochrany osobních údajů</h2> Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt>zde</a>. <h2>Zdrojový kód</h2> Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, kde lze také hlásit problémy. <h2>Licence</h2> <ul> <li><b>BSD-3-Clause</b> kromě následujících:</li> <li><b>Apache 2.0</b> kodeky AMR a zabezpečení TLS</li> <li><b>LGPL 2.1</b> kodeky G.722 a G.726</li> <li><b>AGPLv4</b> šifrování médií ZRTP</li> <li><b>GNU LGP 2.1</b> G.722, G.726, a Codec2 kodeky</li> <li><b>GNU GPLv3</b> kodek G.729</li> <li><b>GNU GPLv2</b> H.264 a H.265 kodeky</li><li><b>AOMedia</b> AV1 kodek</li> </ul>]]></string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>SIP klient založený na knihovně Baresip s podporou video hovorů</h1> 
+        <p>Juha Heinanen <jh@tutpro.com></p>
+        <p>Verze %1$s</p>
+        <h2>Nápověda k používání</h2> 
+        <ul>
+                 <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám 
+                        (nápovědu získáte ťuknutím na názvy položek).</li>
+                 <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li> 
+                 <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace 
+                        proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
+                        nezačala).</li> 
+                 <li>Ťuknutí na tečku spustí konfiguraci účtu.</li> 
+                 <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
+                 <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>
+                 <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li> 
+                 <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Číslo nebo adresa prázdné.</li>
+                 <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li>
+                 <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> 
+                 <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
+                 <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> pro více 
+                        informací.</li>
+         </ul> 
+        <h2>Známé problémy</h2> 
+        <ul>
+                <li>Při videohovorech je třeba držet zařízení v režimu na šířku 
+                otočeném o 90 stupňů doleva oproti orientaci na výšku.</li> 
+                <li>Vlastní náhled volajícího se nezobrazuje správně, když je videoproud pouze v režimu odesílání (sendonly).</li>
+        </ul>
+        <h2>Zásady ochrany osobních údajů</h2>
+                Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt>zde</a>. 
+        <h2>Zdrojový kód</h2>
+                Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, 
+                kde lze také hlásit problémy.
+        <h2>Licence</h2>
+         <ul>
+                <li><b>BSD-3-Clause</b> kromě následujících:</li>
+                <li><b>Apache 2.0</b> kodeky AMR a zabezpečení TLS</li>
+                <li><b>AGPLv4</b> šifrování médií ZRTP</li>
+                <li><b>GNU LGP 2.1</b> G.722, G.726, a Codec2 kodeky</li>
+                <li><b>GNU GPLv3</b> kodek G.729</li>
+                <li><b>GNU GPLv2</b> H.264 a H.265 kodeky</li>
+                <li><b>AOMedia</b> AV1 kodek</li>
+        </ul>
+        ]]></string>
     <string name="about_text"><![CDATA[
         <h1>SIP klient založený na knihovně Baresip</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Verze %1$s</p>
         <h2>Nápověda</h2>
         <ul>
-            <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám (nápovědu získáte ťuknutím na názvy položek).</li>
+            <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám 
+                (nápovědu získáte ťuknutím na názvy položek).</li>
             <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li>
-            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace nezačala).</li>
+            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace 
+                proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
+                nezačala).</li>
             <li>Ťuknutí na tečku spustí konfiguraci účtu.</li>
             <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
             <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>
             <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li>
-            <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Volaný prázdné.</li>
+            <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Číslo nebo adresa prázdné.</li>
             <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li>
             <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> 
             <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
-            <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> pro více informací.</li>
+            <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> 
+                pro více informací.</li>
         </ul>
         <h2>Zásady ochrany osobních údajů</h2>
            Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt>zde</a>.
         <h2>Zdrojový kód</h2>
-            Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, kde lze také hlásit problémy.
+            Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, 
+            kde lze také hlásit problémy.
         <h2>Licence</h2>
         <ul>
             <li><b>BSD-3-Clause</b> kromě následujících:</li>
@@ -260,9 +309,9 @@
     <string name="restore">Obnovení</string>
     <string name="restart">Restartovat</string>
     <string name="backup">Záloha</string>
-    <string name="about">Informace o</string>
+    <string name="about">O aplikaci</string>
     <string name="quit">Ukončit</string>
-    <string name="outgoing_call_to_dots">Zavolat …</string>
+    <string name="outgoing_call_to_dots">Zavolat na …</string>
     <string name="diverted_by_dots">Přesměrováno …</string>
     <string name="incoming_call_from_dots">Volání z …</string>
     <string name="lost">Ztracené</string>
@@ -270,7 +319,7 @@
     <string name="call_transfer">Přepojení hovoru</string>
     <string name="transferring_call_to_dots">Přesměrování hovoru na …</string>
     <string name="no_telephony_provider">Účet \'%1$s\' nemá žádného poskytovatele telefonních služeb</string>
-    <string name="callee">Volaný</string>
+    <string name="callee">Číslo nebo adresu</string>
     <string name="video_request">Žádost o video</string>
     <string name="allow_video">Akceptovat odesílání a příjem videa s \'%1$s\'\?</string>
     <string name="allow_video_send">Přijmout odeslání videa na \'%1$s\'\?</string>
@@ -367,7 +416,7 @@
     <string name="video_fps">Snímky za sekundu</string>
     <string name="video_fps_help">Snímková frekvence videa, která bude nabídnuta během vyjednávání SDP. Platné hodnoty jsou od 10 do 30.</string>
     <string name="invalid_fps">Neplatný počet snímků za sekundu \'%1$d\'</string>
-    <string name="user_agent">User Agent</string>
+    <string name="user_agent">Uživatelský agent</string>
     <string name="user_agent_help">Vlastní hodnota pole hlavičky User-Agent pro SIP požadavek/odpověď</string>
     <string name="invalid_user_agent">Neplatná hodnota pole hlavičky User-Agent</string>
     <string name="microphone_gain">Zesílení mikrofonu</string>
