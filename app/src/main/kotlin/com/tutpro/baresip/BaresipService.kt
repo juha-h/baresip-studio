@@ -627,14 +627,6 @@ class BaresipService: Service() {
             return
         }
 
-        if (ev[0] == "player sessionid") {
-            val sessionId = ev[1].toInt()
-            Log.d(TAG, "got player sessionid $sessionId")
-            if (aec)
-                AcousticEchoCanceler.create(sessionId)
-            return
-        }
-
         if (ev[0] == "recorder sessionid") {
             val sessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $sessionId")
