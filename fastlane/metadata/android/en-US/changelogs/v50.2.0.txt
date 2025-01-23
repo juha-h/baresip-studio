@@ -1,0 +1,3 @@
+ Apply Acoustic Echo Cancellation only to recorder session
+- Do not backup recordings
+- New Romanian, Portuguese (Brazil), German and Czech translations
