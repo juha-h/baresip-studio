@@ -2156,15 +2156,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun backup(password: String) {
-        val files = arrayListOf("accounts", "history", "config", "contacts", "messages",
-                "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        val files = arrayListOf("accounts", "config", "contacts", "call_history",
+            "messages", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         File(BaresipService.filesPath).walk().forEach {
             if (it.name.endsWith(".png"))
                 files.add(it.name)
-        }
-        File("${BaresipService.filesPath}/recordings").walk().forEach {
-            if (it.name.startsWith("dump"))
-                files.add("recordings/${it.name}")
         }
         val zipFile = getString(R.string.app_name_plus) + ".zip"
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
@@ -2219,6 +2215,17 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Utils.deleteFile(File(zipFilePath))
+
+        File("${BaresipService.filesPath}/recordings").walk().forEach {
+            if (it.name.startsWith("dump"))
+                Utils.deleteFile(it)
+        }
+
+        CallHistoryNew.restore()
+        for (h in BaresipService.callHistory)
+            h.recording = arrayOf("", "")
+        CallHistoryNew.save()
+
         with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
             setTitle(getString(R.string.info))
             setMessage(getString(R.string.restored))
