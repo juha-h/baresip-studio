@@ -629,6 +629,12 @@ class BaresipService: Service() {
             return
         }
 
+        if (ev[0] == "player sessionid") {
+            playerSessionId = ev[1].toInt()
+            Log.d(TAG, "got player sessionid $playerSessionId")
+            return
+        }
+
         if (ev[0] == "recorder sessionid") {
             recorderSessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $recorderSessionId")
@@ -875,15 +881,37 @@ class BaresipService: Service() {
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
-                        if (recorderSessionId != 0) {
+                        if (playerSessionId != 0) {
                             if (aecAvailable) {
-                                val aec = AcousticEchoCanceler.create(recorderSessionId)
-                                if (aec != null)
+                                val aec = AcousticEchoCanceler.create(playerSessionId)
+                                if (aec != null) {
                                     if (!aec.getEnabled()) {
                                         aec.setEnabled(true)
                                         if (aec.getEnabled())
                                             Log.d(TAG, "aec is enabled")
+                                        else
+                                            Log.w(TAG, "Failed to enable AEC")
                                     }
+                                }
+                                else
+                                    Log.w(TAG, "Failed to create AEC")
+                            }
+                            playerSessionId = 0
+                        }
+                        if (recorderSessionId != 0) {
+                            if (aecAvailable) {
+                                val aec = AcousticEchoCanceler.create(recorderSessionId)
+                                if (aec != null) {
+                                    if (!aec.getEnabled()) {
+                                        aec.setEnabled(true)
+                                        if (aec.getEnabled())
+                                            Log.d(TAG, "aec is enabled")
+                                        else
+                                            Log.w(TAG, "Failed to enable AEC")
+                                    }
+                                }
+                                else
+                                    Log.w(TAG, "Failed to create AEC")
                             }
                             if (agcAvailable) {
                                 val agc = AutomaticGainControl.create(recorderSessionId)
@@ -1683,6 +1711,7 @@ class BaresipService: Service() {
         var agcAvailable = AutomaticGainControl.isAvailable()
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var btAdapter: BluetoothAdapter? = null
+        private var playerSessionId = 0
         private var recorderSessionId = 0
 
         fun requestAudioFocus(ctx: Context): Boolean  {
