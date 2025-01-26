@@ -246,7 +246,7 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
                 len = re_snprintf(event_buf, sizeof event_buf, "sndfile dump,%r", &data);
                 break;
             }
-            if (!pl_strcmp(&module_event, "player sessionid")) {
+            if (!pl_strcmp(&module_event, "player: sessionid")) {
                 len = re_snprintf(event_buf, sizeof event_buf, "player sessionid,%r", &data);
                 break;
             }
