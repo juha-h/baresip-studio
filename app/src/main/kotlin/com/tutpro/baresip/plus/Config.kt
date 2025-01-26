@@ -25,7 +25,7 @@ object Config {
         if (!File(configPath).exists()) {
             for (module in AudioActivity.audioModules)
                 config = "${config}module ${module}.so\n"
-            if (!BaresipService.aec)
+            if (!BaresipService.aecAvailable)
                 config = "${config}module webrtc_aecm.so\n"
             previousConfig = config
         } else {
@@ -160,11 +160,11 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
-        if (!BaresipService.aec && "webrtc_aecm.so" in previousModules)
+        if (!BaresipService.aecAvailable && "webrtc_aecm.so" in previousModules)
             config = "${config}module webrtc_aecm.so\n"
 
         val micGain = previousVariable("augain")
-        config = if (BaresipService.agc || micGain == ""  || micGain == "1.0")
+        config = if (BaresipService.agcAvailable || micGain == ""  || micGain == "1.0")
             "${config}augain 1.0\n"
         else
             "${config}module augain.so\naugain $micGain\n"

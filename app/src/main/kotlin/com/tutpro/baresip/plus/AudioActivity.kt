@@ -93,7 +93,7 @@ class AudioActivity : AppCompatActivity() {
             }
         }
 
-        if (!BaresipService.agc) {
+        if (!BaresipService.agcAvailable) {
             micGain = binding.MicGain
             oldMicGain = Config.variable("augain")
             micGain.setText(oldMicGain)
@@ -148,7 +148,7 @@ class AudioActivity : AppCompatActivity() {
         oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.setText(oldOpusPacketLoss)
 
-        if (!BaresipService.aec) {
+        if (!BaresipService.aecAvailable) {
             aec = binding.Aec
             oldAec = modules.contains("webrtc_aecm.so")
             aec.isChecked = oldAec
@@ -211,7 +211,7 @@ class AudioActivity : AppCompatActivity() {
                 }
 
                 var gain = "1.0"
-                if (!BaresipService.agc) {
+                if (!BaresipService.agcAvailable) {
                     gain = micGain.text.toString().trim()
                     if (!gain.contains("."))
                         gain = "$gain.0"
@@ -301,7 +301,7 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (!BaresipService.aec) {
+                if (!BaresipService.aecAvailable) {
                     if (aec.isChecked != oldAec) {
                         if (aec.isChecked) {
                             Config.addVariable("module", "webrtc_aecm.so")
