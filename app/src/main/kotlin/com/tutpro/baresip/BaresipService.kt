@@ -441,7 +441,8 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                Log.d(TAG, "AEC/AGC/NS available = $aec/$agc/$ns")
+                Log.d(TAG, "AEC/AGC/NS available = " +
+                        "$aecAvailable/$agcAvailable/$nsAvailable")
 
                 val userAgent = Config.variable("user_agent")
                 Thread {
@@ -628,14 +629,8 @@ class BaresipService: Service() {
         }
 
         if (ev[0] == "recorder sessionid") {
-            val sessionId = ev[1].toInt()
-            Log.d(TAG, "got recorder sessionid $sessionId")
-            if (aec)
-                AcousticEchoCanceler.create(sessionId)
-            if (agc)
-                 AutomaticGainControl.create(sessionId)
-            if (ns)
-                NoiseSuppressor.create(sessionId)
+            recorderSessionId = ev[1].toInt()
+            Log.d(TAG, "got recorder sessionid $recorderSessionId")
             return
         }
 
@@ -834,6 +829,37 @@ class BaresipService: Service() {
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
+                        if (recorderSessionId != 0) {
+                            if (aecAvailable) {
+                                val aec = AcousticEchoCanceler.create(recorderSessionId)
+                                if (aec != null)
+                                    if (!aec.getEnabled()) {
+                                        aec.setEnabled(true)
+                                        if (aec.getEnabled())
+                                            Log.d(TAG, "aec is enabled")
+                                    }
+                            }
+                            if (agcAvailable) {
+                                val agc = AutomaticGainControl.create(recorderSessionId)
+                                if (agc != null)
+                                    if (!agc.getEnabled()) {
+                                        agc.setEnabled(true)
+                                        if (agc.getEnabled())
+                                            Log.d(TAG, "agc is enabled")
+                                    }
+                            }
+                            if (nsAvailable) {
+                                val ns = NoiseSuppressor.create(recorderSessionId)
+                                if (ns != null) {
+                                    if (!ns.getEnabled()) {
+                                        ns.setEnabled(true)
+                                        if (ns.getEnabled())
+                                            Log.d(TAG, "ns is enabled")
+                                    }
+                                }
+                            }
+                            recorderSessionId = 0
+                        }
                         call.onhold = false
                         if (ua.account.callHistory)
                             call.startTime = GregorianCalendar()
@@ -1574,10 +1600,11 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
-        var aec = AcousticEchoCanceler.isAvailable()
-        var agc = AutomaticGainControl.isAvailable()
-        private val ns = NoiseSuppressor.isAvailable()
+        var aecAvailable = AcousticEchoCanceler.isAvailable()
+        var agcAvailable = AutomaticGainControl.isAvailable()
+        private val nsAvailable = NoiseSuppressor.isAvailable()
         private var btAdapter: BluetoothAdapter? = null
+        private var recorderSessionId = 0
 
         fun requestAudioFocus(ctx: Context): Boolean  {
             Log.d(TAG, "Requesting audio focus")
