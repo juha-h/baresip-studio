@@ -25,8 +25,6 @@ object Config {
         if (!File(configPath).exists()) {
             for (module in AudioActivity.audioModules)
                 config = "${config}module ${module}.so\n"
-            if (!BaresipService.aecAvailable)
-                config = "${config}module webrtc_aecm.so\n"
             previousConfig = config
         } else {
             previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
@@ -160,8 +158,10 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
-        if (!BaresipService.aecAvailable && "webrtc_aecm.so" in previousModules)
+        if ("webrtc_aecm.so" in previousModules || !File(configPath).exists()) {
             config = "${config}module webrtc_aecm.so\n"
+            BaresipService.webrtcAec = true
+        }
 
         val micGain = previousVariable("augain")
         config = if (BaresipService.agcAvailable || micGain == ""  || micGain == "1.0")

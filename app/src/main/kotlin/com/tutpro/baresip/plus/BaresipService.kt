@@ -881,31 +881,14 @@ class BaresipService: Service() {
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
-                        if (playerSessionId != 0) {
-                            if (aecAvailable) {
-                                val aec = AcousticEchoCanceler.create(playerSessionId)
-                                if (aec != null) {
-                                    if (!aec.getEnabled()) {
-                                        aec.setEnabled(true)
-                                        if (aec.getEnabled())
-                                            Log.d(TAG, "aec is enabled")
-                                        else
-                                            Log.w(TAG, "Failed to enable AEC")
-                                    }
-                                }
-                                else
-                                    Log.w(TAG, "Failed to create AEC")
-                            }
-                            playerSessionId = 0
-                        }
                         if (recorderSessionId != 0) {
-                            if (aecAvailable) {
-                                val aec = AcousticEchoCanceler.create(recorderSessionId)
+                            if (aecAvailable && !webrtcAec) {
+                                aec = AcousticEchoCanceler.create(recorderSessionId)
                                 if (aec != null) {
-                                    if (!aec.getEnabled()) {
-                                        aec.setEnabled(true)
-                                        if (aec.getEnabled())
-                                            Log.d(TAG, "aec is enabled")
+                                    if (!aec!!.getEnabled()) {
+                                        aec!!.setEnabled(true)
+                                        if (aec!!.getEnabled())
+                                            Log.d(TAG, "AEC is enabled")
                                         else
                                             Log.w(TAG, "Failed to enable AEC")
                                     }
@@ -914,23 +897,28 @@ class BaresipService: Service() {
                                     Log.w(TAG, "Failed to create AEC")
                             }
                             if (agcAvailable) {
-                                val agc = AutomaticGainControl.create(recorderSessionId)
-                                if (agc != null)
-                                    if (!agc.getEnabled()) {
-                                        agc.setEnabled(true)
-                                        if (agc.getEnabled())
-                                            Log.d(TAG, "agc is enabled")
+                                agc = AutomaticGainControl.create(recorderSessionId)
+                                if (agc != null) {
+                                    if (!agc!!.getEnabled()) {
+                                        agc!!.setEnabled(true)
+                                        if (agc!!.getEnabled())
+                                            Log.d(TAG, "AGC is enabled")
                                     }
+                                }
+                                else
+                                    Log.w(TAG, "Failed to create AGC")
                             }
                             if (nsAvailable) {
-                                val ns = NoiseSuppressor.create(recorderSessionId)
+                                ns = NoiseSuppressor.create(recorderSessionId)
                                 if (ns != null) {
-                                    if (!ns.getEnabled()) {
-                                        ns.setEnabled(true)
-                                        if (ns.getEnabled())
+                                    if (!ns!!.getEnabled()) {
+                                        ns!!.setEnabled(true)
+                                        if (ns!!.getEnabled())
                                             Log.d(TAG, "ns is enabled")
                                     }
                                 }
+                                else
+                                    Log.w(TAG, "Failed to create NS")
                             }
                             recorderSessionId = 0
                         }
@@ -1016,6 +1004,9 @@ class BaresipService: Service() {
                             nm.cancel(CALL_NOTIFICATION_ID)
                             stopRinging()
                             stopMediaPlayer()
+                            aec?.release()
+                            agc?.release()
+                            ns?.release()
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1710,6 +1701,10 @@ class BaresipService: Service() {
         var aecAvailable = AcousticEchoCanceler.isAvailable()
         var agcAvailable = AutomaticGainControl.isAvailable()
         private val nsAvailable = NoiseSuppressor.isAvailable()
+        private var aec: AcousticEchoCanceler? = null
+        private var ns: NoiseSuppressor? = null
+        private var agc: AutomaticGainControl? = null
+        var webrtcAec = false
         private var btAdapter: BluetoothAdapter? = null
         private var playerSessionId = 0
         private var recorderSessionId = 0
