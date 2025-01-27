@@ -148,13 +148,9 @@ class AudioActivity : AppCompatActivity() {
         oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.setText(oldOpusPacketLoss)
 
-        if (!BaresipService.aecAvailable) {
-            aec = binding.Aec
-            oldAec = modules.contains("webrtc_aecm.so")
-            aec.isChecked = oldAec
-        } else {
-            binding.AecLayout.visibility = View.GONE
-        }
+        aec = binding.Aec
+        oldAec = modules.contains("webrtc_aecm.so")
+        aec.isChecked = oldAec
 
         audioDelay = binding.AudioDelay
         audioDelay.setText("${BaresipService.audioDelay}")
@@ -301,28 +297,28 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (!BaresipService.aecAvailable) {
-                    if (aec.isChecked != oldAec) {
-                        if (aec.isChecked) {
-                            Config.addVariable("module", "webrtc_aecm.so")
-                            if (gain != "1.0") {
-                                restart = true
-                            } else {
-                                if (Api.module_load("webrtc_aecm.so") != 0) {
-                                    Utils.alertView(
-                                        this, getString(R.string.error),
-                                        getString(R.string.failed_to_load_module)
-                                    )
-                                    aec.isChecked = false
-                                    return false
-                                }
-                            }
+                if (aec.isChecked != oldAec) {
+                    if (aec.isChecked) {
+                        Config.addVariable("module", "webrtc_aecm.so")
+                        if (gain != "1.0") {
+                            restart = true
                         } else {
-                            Api.module_unload("webrtc_aecm.so")
-                            Config.removeVariableValue("module", "webrtc_aecm.so")
+                            if (Api.module_load("webrtc_aecm.so") != 0) {
+                                Utils.alertView(
+                                    this, getString(R.string.error),
+                                    getString(R.string.failed_to_load_module)
+                                )
+                                aec.isChecked = false
+                                return false
+                            }
                         }
-                        save = true
+                        BaresipService.webrtcAec = true
+                    } else {
+                        Api.module_unload("webrtc_aecm.so")
+                        Config.removeVariableValue("module", "webrtc_aecm.so")
+                        BaresipService.webrtcAec = false
                     }
+                    save = true
                 }
 
                 val audioDelay = audioDelay.text.toString().trim()
