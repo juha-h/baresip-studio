@@ -1,0 +1,1 @@
+- Allow use of software AEC even when hardware one would be available
