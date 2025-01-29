@@ -1,0 +1,2 @@
+- Added check if hardware AEC is available and used it to alert user if AEC is disabled and hardware AEC is not available
+- New translations (Portuguese (Brazil))
