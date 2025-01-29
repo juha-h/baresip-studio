@@ -440,8 +440,7 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                Log.d(TAG, "AEC/AGC/NS available = " +
-                        "$aecAvailable/$agcAvailable/$nsAvailable")
+                Log.d(TAG, "AGC/NS available = $agcAvailable/$nsAvailable")
 
                 val userAgent = Config.variable("user_agent")
                 Thread {
@@ -835,7 +834,7 @@ class BaresipService: Service() {
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
                         if (recorderSessionId != 0) {
-                            if (aecAvailable && !webrtcAec) {
+                            if (Utils.isAecSupported() && !webrtcAec) {
                                 aec = AcousticEchoCanceler.create(recorderSessionId)
                                 if (aec != null) {
                                     if (!aec!!.getEnabled()) {
@@ -845,9 +844,11 @@ class BaresipService: Service() {
                                         else
                                             Log.w(TAG, "Failed to enable AEC")
                                     }
-                                }
-                                else
-                                    Log.w(TAG, "Failed to create AEC")
+                                } else
+                                    Log.w(
+                                        TAG, "Failed to create AEC for session " +
+                                                "$recorderSessionId"
+                                    )
                             }
                             if (agcAvailable) {
                                 agc = AutomaticGainControl.create(recorderSessionId)
@@ -857,8 +858,7 @@ class BaresipService: Service() {
                                         if (agc!!.getEnabled())
                                             Log.d(TAG, "AGC is enabled")
                                     }
-                                }
-                                else
+                                } else
                                     Log.w(TAG, "Failed to create AGC")
                             }
                             if (nsAvailable) {
@@ -869,8 +869,7 @@ class BaresipService: Service() {
                                         if (ns!!.getEnabled())
                                             Log.d(TAG, "ns is enabled")
                                     }
-                                }
-                                else
+                                } else
                                     Log.w(TAG, "Failed to create NS")
                             }
                             recorderSessionId = 0
@@ -1618,7 +1617,6 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
-        var aecAvailable = AcousticEchoCanceler.isAvailable()
         var agcAvailable = AutomaticGainControl.isAvailable()
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var aec: AcousticEchoCanceler? = null
@@ -1646,6 +1644,7 @@ class BaresipService: Service() {
                 .build()
             if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "requestAudioFocus granted")
+                am.mode = MODE_IN_COMMUNICATION
                 if (isBluetoothHeadsetConnected(ctx))
                     startBluetoothSco(ctx, 250L, 3)
             } else {

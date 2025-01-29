@@ -340,7 +340,8 @@
         available for use by the accounts.</string>
     <string name="failed_to_load_module">Failed to load module.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
-    <string name="aec_help">If checked, software echo cancellation is attempted on call audio.</string>
+    <string name="aec_help">If checked, software based echo cancellation is in use.</string>
+    <string name="no_hw_aec">Hardware based echo canceller cannot be used on you device.</string>
     <string name="aec_extended_filter">AEC Extended Filter</string>
     <string name="aec_extended_filter_help">If checked, echo cancellation is using extended filter.</string>
     <string name="microphone_gain">Microphone Gain</string>

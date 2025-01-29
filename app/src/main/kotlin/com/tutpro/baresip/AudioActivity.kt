@@ -151,6 +151,12 @@ class AudioActivity : AppCompatActivity() {
         aec = binding.Aec
         oldAec = modules.contains("webrtc_aecm.so")
         aec.isChecked = oldAec
+        aec.setOnClickListener {
+            if (!aec.isChecked)
+                if (!Utils.isAecSupported())
+                    Utils.alertView(this, getString(R.string.notice),
+                        getString(R.string.no_hw_aec))
+        }
 
         audioDelay = binding.AudioDelay
         audioDelay.setText("${BaresipService.audioDelay}")
