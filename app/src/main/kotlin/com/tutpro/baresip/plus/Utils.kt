@@ -21,6 +21,7 @@ import android.hardware.camera2.CameraManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.audiofx.AcousticEchoCanceler
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -1109,6 +1110,29 @@ object Utils {
     fun isDarkTheme(ctx: Context): Boolean {
         return ctx.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    fun isAecSupported(): Boolean {
+        if (!AcousticEchoCanceler.isAvailable()) {
+            Log.i(TAG, "Hardware AEC is NOT available")
+            return false
+        }
+
+        val sessionId = Api.create_AAudio_SessionId()
+        if (sessionId == -1) {
+            Log.e(TAG, "Failed to create AAudio stream for session ID")
+            return false
+        }
+
+        val aec = AcousticEchoCanceler.create(sessionId)
+        return if (aec != null) {
+            aec.release()
+            Log.i(TAG, "Hardware AEC is supported")
+            true
+        } else {
+            Log.w(TAG, "Hardware AEC is NOT supported")
+            false
+        }
     }
 
 }

@@ -365,8 +365,8 @@
     </string>
     <string name="failed_to_load_module">Modulin lataaminen epäonnistui.</string>
     <string name="aec">Akustinen kaiun poisto (AKP)</string>
-    <string name="aec_help">Jos merkitty, kaikua yritetään poistaa ohjelmiston avulla
-        puheluiden aikana.</string>
+    <string name="aec_help">Jos merkitty, kaikua yritetään poistaa ohjelmiston avulla.</string>
+    <string name="no_hw_aec">Laitteellasi ei voida poistaa kaikua laitteiston avulla.</string>
     <string name="aec_extended_filter">AKP laajennettu suodatin</string>
     <string name="microphone_gain">Mikrofonin äänikerroin</string>
     <string name="microphone_gain_help">Kertoo mikrofonin äänen voimakkuuden tällä desimaaliluvulla.

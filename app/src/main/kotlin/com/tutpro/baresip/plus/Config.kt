@@ -158,7 +158,8 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
-        if ("webrtc_aecm.so" in previousModules || !File(configPath).exists()) {
+        if ((!Utils.isAecSupported() && !File(configPath).exists()) ||
+                "webrtc_aecm.so" in previousModules) {
             config = "${config}module webrtc_aecm.so\n"
             BaresipService.webrtcAec = true
         }
