@@ -1,6 +1,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <jni.h>
+#include <aaudio/AAudio.h>
 #include <android/log.h>
 #include <stdlib.h>
 #include <re.h>
@@ -1801,4 +1802,33 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_module_1unload(
     module_unload(native_module);
     LOGD("unloaded module %s\n", native_module);
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tutpro_baresip_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) {
+    AAudioStreamBuilder *builder = NULL;
+    AAudioStream *stream = NULL;
+    jint sessionId = -1;
+
+    if (AAudio_createStreamBuilder(&builder) != AAUDIO_OK) {
+        return -1;
+    }
+
+    AAudioStreamBuilder_setDirection(builder, AAUDIO_DIRECTION_INPUT);
+    AAudioStreamBuilder_setSharingMode(builder, AAUDIO_SHARING_MODE_SHARED);
+    AAudioStreamBuilder_setPerformanceMode(builder, AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
+    AAudioStreamBuilder_setUsage(builder,AAUDIO_USAGE_VOICE_COMMUNICATION);
+    AAudioStreamBuilder_setInputPreset(builder, AAUDIO_INPUT_PRESET_VOICE_RECOGNITION);
+    AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
+    AAudioStreamBuilder_setSampleRate(builder, 16000);
+    AAudioStreamBuilder_setChannelCount(builder, 1);
+    AAudioStreamBuilder_setSessionId(builder, AAUDIO_SESSION_ID_ALLOCATE);
+
+    if (AAudioStreamBuilder_openStream(builder, &stream) == AAUDIO_OK) {
+        sessionId = AAudioStream_getSessionId(stream);
+        AAudioStream_close(stream);
+    }
+
+    AAudioStreamBuilder_delete(builder);
+    return sessionId;
 }
