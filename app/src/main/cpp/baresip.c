@@ -1826,6 +1826,10 @@ Java_com_tutpro_baresip_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) 
 
     if (AAudioStreamBuilder_openStream(builder, &stream) == AAUDIO_OK) {
         sessionId = AAudioStream_getSessionId(stream);
+        struct timespec td = {
+                .tv_nsec = 100*1000*1000 /* 100ms */
+        };
+        nanosleep(&td, NULL);
         AAudioStream_close(stream);
     }
 

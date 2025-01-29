@@ -1062,7 +1062,7 @@ object Utils {
 
         val aec = AcousticEchoCanceler.create(sessionId)
         return if (aec != null) {
-            aec.release() // Clean up the AEC instance
+            aec.release()
             Log.i(TAG, "Hardware AEC is supported")
             true
         } else {
