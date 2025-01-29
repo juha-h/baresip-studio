@@ -1,1 +1,2 @@
 - Alert if hardware AEC is not available when software AEC is disabled in audio settings
+- New translations (Portuguese Brazil)
