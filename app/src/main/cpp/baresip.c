@@ -298,10 +298,6 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
             } else {
                 len = re_snprintf(event_buf, sizeof event_buf, "%s", prm);
             }
-            if (!pl_strcmp(&module_event, "player: sessionid")) {
-                len = re_snprintf(event_buf, sizeof event_buf, "player sessionid,%r", &data);
-                break;
-            }
             if (!pl_strcmp(&module_event, "recorder sessionid")) {
                 len = re_snprintf(event_buf, sizeof event_buf, "recorder sessionid,%r", &data);
                 break;
@@ -2012,7 +2008,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_module_1unload(
 }
 
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip__plus_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) {
+Java_com_tutpro_baresip_plus_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) {
     AAudioStreamBuilder *builder = NULL;
     AAudioStream *stream = NULL;
     jint sessionId = -1;

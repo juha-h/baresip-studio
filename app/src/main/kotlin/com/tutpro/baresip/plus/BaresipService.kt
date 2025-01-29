@@ -628,12 +628,6 @@ class BaresipService: Service() {
             return
         }
 
-        if (ev[0] == "player sessionid") {
-            playerSessionId = ev[1].toInt()
-            Log.d(TAG, "got player sessionid $playerSessionId")
-            return
-        }
-
         if (ev[0] == "recorder sessionid") {
             recorderSessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $recorderSessionId")
@@ -1704,7 +1698,6 @@ class BaresipService: Service() {
         private var agc: AutomaticGainControl? = null
         var webrtcAec = false
         private var btAdapter: BluetoothAdapter? = null
-        private var playerSessionId = 0
         private var recorderSessionId = 0
 
         fun requestAudioFocus(ctx: Context): Boolean  {
