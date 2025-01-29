@@ -91,7 +91,7 @@
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
     <string name="opus_bit_rate_help">Taxa de bits máxima média usada pelo fluxo de áudio do Opus. Os valores válidos são 6000-510000. O padrão de fábrica é 28000.</string>
     <string name="opus_bit_rate">Taxa de Bits Opus</string>
-    <string name="aec_help">Se marcado, cancelamento de eco é tentado no áudio da chamada.</string>
+    <string name="aec_help">Se marcada, o cancelamento de eco do software será tentado no áudio da chamada.</string>
     <string name="aec">Cancelamento de Eco Acústico</string>
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
     <string name="audio_modules_help">Codecs de áudio providos pelos módulos selecionados estão disponíveis para uso das contas.</string>
@@ -146,7 +146,7 @@
     <string name="delete_account">Você quer excluir a conta \'%1$s\'\?</string>
     <string name="decrypt_password">Descriptografar Senha</string>
     <string name="encrypt_password">Criptografar Senha</string>
-    <string name="account_allocation_failure">Falha ao alocar nova conta</string>
+    <string name="account_allocation_failure">Houve uma falha ao alocar a nova conta.</string>
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="invalid_aor">usuario@dominio[:porta][;transport=udp|tcp|tls] inválido \'%1$s\'</string>
     <string name="user_domain">usuario@dominio</string>
