@@ -1717,7 +1717,6 @@ class BaresipService: Service() {
                 .build()
             if (AudioManagerCompat.requestAudioFocus(am, audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "requestAudioFocus granted")
-                am.mode = MODE_IN_COMMUNICATION
                 if (isBluetoothHeadsetConnected(ctx))
                     startBluetoothSco(ctx, 250L, 3)
             } else {
