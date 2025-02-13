@@ -345,7 +345,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),#]{0,24}\$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}\$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
