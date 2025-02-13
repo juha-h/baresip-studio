@@ -146,6 +146,7 @@ object Utils {
             if (u != e164Uri)
                 return u
         }
+        u = u.replace("%23", "#")
         if (u.contains("@")) {
             val user = uriUserPart(u)
             val host = uriHostPart(u)
