@@ -139,12 +139,7 @@
     <string name="start_automatically">Comenzar automáticamente</string>
     <string name="start_automatically_help">Si está marcado, baresip se inicia automáticamente después de que el dispositivo se (re)inicia.</string>
     <string name="listen_address">Dirección de escucha</string>
-    <string name="listen_address_help">Dirección IP y puerto de formulario \'address:port\' en el que escucha baresip
-        para solicitudes SIP entrantes. Si la dirección IP es una dirección IPv6, debe escribirse dentro
-        soportes []. La dirección IPv4 0.0.0.0 o la dirección IPv6 [::] hace que la escucha de baresip sea
-        Direcciones disponibles. Si se deja vacío (predeterminado de fábrica), baresip escucha en el puerto 5060 de
-        todas las direcciones disponibles.
-    </string>
+    <string name="listen_address_help">Dirección IP y puerto de formulario \'address:port\' en el que escucha baresip para solicitudes SIP entrantes. Si la dirección IP es una dirección IPv6, debe escribirse dentro soportes []. La dirección IPv4 0.0.0.0 o la dirección IPv6 [::] hace que la escucha de baresip sea Direcciones disponibles. Si se deja vacío (predeterminado de fábrica), baresip escucha en el puerto 5060 de todas las direcciones disponibles.</string>
     <string name="invalid_listen_address">Dirección de escucha no válida</string>
     <string name="dns_servers">Servidores DNS</string>
     <string name="dns_servers_help">Lista separada por comas de direcciones de servidores DNS. Si no se da,
