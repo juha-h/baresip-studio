@@ -566,7 +566,10 @@ class ConfigActivity : AppCompatActivity() {
                                 "${getString(R.string.invalid_listen_address)}: $listenAddr")
                         return false
                     }
-                    Config.replaceVariable("sip_listen", listenAddr)
+                    if (listenAddr != "")
+                        Config.replaceVariable("sip_listen", listenAddr)
+                    else
+                         Config.removeVariable("sip_listen")
                     save = true
                     restart = true
                 }

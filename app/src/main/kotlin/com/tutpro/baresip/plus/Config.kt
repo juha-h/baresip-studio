@@ -50,6 +50,8 @@ object Config {
         val sipListen = previousVariable("sip_listen")
         if (sipListen != "")
             config = "${config}sip_listen $sipListen\n"
+        else
+            config = "${config}sip_listen 0.0.0.0:5060\n"
 
         val addressFamily = previousVariable("net_af")
         if (addressFamily != "") {
