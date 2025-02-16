@@ -300,7 +300,7 @@
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside
         brackets [].  IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all
-        available addresses. If left empty (factory default), baresip listens at port 5060 of
+        available addresses. If left empty (factory default), baresip listens at an arbitrary port at
         all available addresses.
     </string>
     <string name="invalid_listen_address">Invalid Listen Address</string>

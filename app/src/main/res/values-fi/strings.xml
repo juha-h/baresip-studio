@@ -320,7 +320,7 @@
     SIP-sanomia. Jos IP-osoite on IPv6-osoite, se täytyy kirjoittaa
     sulkujen [] sisään. IPv4-osoite 0.0.0.0 tai IPv6-osoite [::]
     tarkoittaa kaikkia käytössä olevia osoitteita.  Oletusarvo on tyhjä,
-    jolloin baresip kuuntelee porttia 5060 kaikilla käytössä olevilla
+    jolloin baresip kuuntelee satunnaisesti valittua porttia kaikilla
     osoitteilla.
     </string>
     <string name="invalid_listen_address">Virheellinen kuunteluosoite</string>
