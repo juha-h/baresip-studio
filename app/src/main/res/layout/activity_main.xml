@@ -85,6 +85,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/callTitleRow"
                     android:layout_marginTop="14dp"
+                    android:layout_marginStart="2dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.textfield.TextInputLayout
