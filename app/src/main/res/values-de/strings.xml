@@ -359,7 +359,6 @@
     <string name="video_codecs">Video Codecs</string>
     <string name="audio_settings">Audioeinstellungen</string>
     <string name="backup">Sicherungskopie</string>
-    <string name="aec_help">Falls angekreuzt, wird versucht, Echounterdrückung auf den Anruf anzuwenden.</string>
     <string name="rtcp_mux">RTCP Multiplexverfahren</string>
     <string name="invalid_opus_packet_loss">Ungültiger Opus Paketverlustprozentsatz</string>
     <string name="default_call_volume">Standardmäßige Anruflautstärke</string>
@@ -381,8 +380,6 @@
     <string name="speaker_phone_help">Falls angekreuzt, wird die Lautsprecherfunktion automatisch aktiviert, wenn der Anruf beginnt.</string>
     <string name="audio_modules_title">Audiomodule</string>
     <string name="audio_modules_help">Audio Codecs, die von den ausgewählten Modulen bereitgestellt werden, sind für die Benutzer verfügbar.</string>
-    <string name="aec_extended_filter">AEC Erweiterter Filter</string>
-    <string name="aec_extended_filter_help">Falls angekreuzt, nutzt die Echounterdrückung den erweiterten Filter.</string>
     <string name="opus_bit_rate">Opus Bitrate</string>
     <string name="opus_bit_rate_help">Durchschnittliche maximale Bitrate, die vom Opus Audiostream genutzt wird. Gültige Werte sind 6000-510000. Die Werkseinstellung beträgt 28000.</string>
     <string name="opus_packet_loss">Erwarteter Paketverlust von Opus</string>

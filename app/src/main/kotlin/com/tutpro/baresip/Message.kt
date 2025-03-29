@@ -8,32 +8,76 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
               var new: Boolean): Serializable {
 
     fun add() {
-        BaresipService.messages.add(this)
+        val updatedMessages = BaresipService.messages.toMutableList()
+        updatedMessages.add(this)
+        BaresipService.messages = updatedMessages.toList()
         var count = 0
-        var firstIndex = -1
-        for (i in BaresipService.messages.indices)
-            if (BaresipService.messages[i].aor == this.aor) {
-                if (count == 0) firstIndex = i
+        var remove: Message? = null
+        for (message in BaresipService.messages)
+            if (message.aor == this.aor) {
                 count++
                 if (count > MESSAGE_HISTORY_SIZE) {
+                    remove = message
                     break
                 }
             }
-        if (count > MESSAGE_HISTORY_SIZE)
-            BaresipService.messages.removeAt(firstIndex)
+        if (remove != null)
+            updatedMessages.remove(remove)
+        BaresipService.messages = updatedMessages.toList()
+        save()
+    }
+
+    fun delete() {
+        val updatedMessages = BaresipService.messages.toMutableList()
+        updatedMessages.remove(this)
+        BaresipService.messages = updatedMessages.toList()
+        save()
     }
 
     companion object {
 
         const val MESSAGE_HISTORY_SIZE = 100
 
-        fun messages(): ArrayList<Message> {
+        fun messages(): List<Message> {
             return BaresipService.messages
         }
 
-        fun clear(aor: String) {
-            val it = BaresipService.messages.iterator()
+        fun clearMessagesOfAor(aor: String) {
+            val updatedMessages = BaresipService.messages.toMutableList()
+            val it = updatedMessages.iterator()
             while (it.hasNext()) if (it.next().aor == aor) it.remove()
+            BaresipService.messages = updatedMessages.toList()
+        }
+
+        fun deleteAorMessage(aor: String, time: Long) {
+            val updatedMessages = BaresipService.messages.toMutableList()
+            for (message in updatedMessages)
+                if (message.aor == aor && message.timeStamp == time) {
+                    updatedMessages.remove(message)
+                    BaresipService.messages = updatedMessages.toList()
+                    save()
+                    return
+                }
+        }
+
+        fun deleteAorPeerMessages(aor: String, peerUri: String) {
+            val updatedMessages = BaresipService.messages.toMutableList()
+            for (message in updatedMessages)
+                if (message.aor == aor && message.peerUri == peerUri)
+                    updatedMessages.remove(message)
+            BaresipService.messages = updatedMessages.toList()
+            save()
+        }
+
+        fun updateAorMessage(aor: String, time: Long) {
+            val updatedMessages = BaresipService.messages.toMutableList()
+            for (message in updatedMessages)
+                if (message.aor == aor && message.timeStamp == time) {
+                    message.new = false
+                    BaresipService.messages = updatedMessages.toList()
+                    save()
+                    return
+                }
         }
 
         fun save() {

@@ -1,91 +1,162 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.tutpro.baresip
 
-import android.Manifest.permission.*
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.RECORD_AUDIO
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
 import android.app.KeyguardManager
 import android.app.NotificationManager
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.media.AudioManager
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
+import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.text.InputType
-import android.text.TextWatcher
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Chronometer
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.Insets
 import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import com.tutpro.baresip.Utils.showSnackBar
-import com.tutpro.baresip.databinding.ActivityMainBinding
+import com.tutpro.baresip.BaresipService.Companion.contactNames
+import com.tutpro.baresip.BaresipService.Companion.uas
+import com.tutpro.baresip.BaresipService.Companion.uasStatus
+import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.DropdownMenu
+import com.tutpro.baresip.CustomElements.PullToRefreshBox
+import com.tutpro.baresip.CustomElements.Text
+import com.tutpro.baresip.CustomElements.verticalScrollbar
+import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var layout: RelativeLayout
-    private lateinit var callTitle: TextView
-    private lateinit var callTimer: Chronometer
-    private lateinit var callUri: AutoCompleteTextView
-    private lateinit var securityButton: ImageButton
-    private lateinit var diverter: LinearLayout
-    private lateinit var diverterUri: TextView
-    private lateinit var callButton: ImageButton
-    private lateinit var hangupButton: ImageButton
-    private lateinit var answerButton: ImageButton
-    private lateinit var rejectButton: ImageButton
-    private lateinit var callControl: RelativeLayout
-    private lateinit var holdButton: ImageButton
-    private lateinit var transferButton: ImageButton
-    private lateinit var voicemailButton: ImageButton
-    private lateinit var voicemailButtonSpace: Space
-    private lateinit var contactsButton: ImageButton
-    private lateinit var messagesButton: ImageButton
-    private lateinit var callsButton: ImageButton
-    private lateinit var dialpadButton: ImageButton
-    private lateinit var dtmf: EditText
-    private var dtmfWatcher: TextWatcher? = null
-    private lateinit var infoButton: ImageButton
-    private lateinit var onHoldNotice: TextView
-    private lateinit var uaAdapter: UaSpinnerAdapter
-    private lateinit var aorSpinner: Spinner
     private lateinit var imm: InputMethodManager
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
     private lateinit var screenEventReceiver: BroadcastReceiver
     private lateinit var serviceEventObserver: Observer<Event<Long>>
-    private var recIcon: MenuItem? = null
-    private var micIcon: MenuItem? = null
-    private var speakerIcon: MenuItem? = null
-    private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var accountsRequest: ActivityResultLauncher<Intent>
@@ -96,24 +167,55 @@ class MainActivity : AppCompatActivity() {
     private lateinit var logcatRequest: ActivityResultLauncher<Intent>
     private lateinit var contactsRequest: ActivityResultLauncher<Intent>
     private lateinit var callsRequest: ActivityResultLauncher<Intent>
+    private lateinit var accountRequest: ActivityResultLauncher<Intent>
     private lateinit var comDevChangedListener: AudioManager.OnCommunicationDeviceChangedListener
     private lateinit var permissions: Array<String>
+
+    private lateinit var baresipService: Intent
 
     private var callHandler: Handler = Handler(Looper.getMainLooper())
     private var callRunnable: Runnable? = null
     private var downloadsInputUri: Uri? = null
     private var downloadsOutputUri: Uri? = null
     private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
-
-    private lateinit var baresipService: Intent
+    private var keyboardController: SoftwareKeyboardController? = null
 
     private var restart = false
     private var atStartup = false
+    private var initialized = false
 
     private var resumeUri = ""
     private var resumeUap = 0L
     private var resumeCall: Call? = null
     private var resumeAction = ""
+
+    private val viewModel: ViewModel by viewModels()
+
+    private var callUri = mutableStateOf("")
+    private var callUriEnabled = mutableStateOf(true)
+    private var callUriLabel = mutableStateOf("")
+    private var securityIcon = mutableIntStateOf(-1)
+    private var callTimer: Chronometer? = null
+    private var showCallTimer = mutableStateOf(false)
+    private var showCallButton = mutableStateOf(true)
+    private var showAnswerRejectButtons = mutableStateOf(false)
+    private var showHangupButton = mutableStateOf(false)
+    private var showOnHoldNotice = mutableStateOf(false)
+    private var holdIcon = mutableIntStateOf(R.drawable.call_hold)
+    private var transferButtonEnabled = mutableStateOf(false)
+    private var transferIcon = mutableIntStateOf(R.drawable.call_transfer)
+    private var dtmfText = mutableStateOf("")
+    private var dtmfEnabled = mutableStateOf(false)
+    private var focusDtmf = mutableStateOf(false)
+    private var showVmIcon by mutableStateOf(false)
+    private var vmIcon = mutableIntStateOf(R.drawable.voicemail)
+    private var messagesIcon = mutableIntStateOf(R.drawable.messages)
+    private var callsIcon = mutableIntStateOf(R.drawable.calls)
+    private var micIcon by mutableIntStateOf(R.drawable.mic_on)
+    private var speakerIcon by mutableIntStateOf(R.drawable.speaker_off)
+    private var dialpad by mutableStateOf(false)
+    private var dialpadButtonEnabled by mutableStateOf(true)
+    private var pullToRefreshEnabled by mutableStateOf(true)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -124,68 +226,28 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement,false)
-
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
 
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
 
         val extraAction = intent.getStringExtra("action")
         Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
+        BaresipService.darkTheme.value = Utils.isThemeDark(this)
 
         // Must be done after view has been created
         this.setShowWhenLocked(true)
         this.setTurnScreenOn( true)
         Utils.requestDismissKeyguard(this)
 
-        setSupportActionBar(binding.toolbar)
-
-        layout = binding.mainActivityLayout
-        aorSpinner = binding.aorSpinner
-        callTitle = binding.callTitle
-        callTimer = binding.callTimer
-        callUri = binding.callUri
-        securityButton = binding.securityButton
-        diverter = binding.diverter
-        diverterUri = binding.diverterUri
-        callButton = binding.callButton
-        hangupButton = binding.hangupButton
-        answerButton = binding.answerButton
-        rejectButton = binding.rejectButton
-        callControl = binding.callControl
-        holdButton = binding.holdButton
-        transferButton = binding.transferButton
-        dtmf = binding.dtmf
-        infoButton = binding.info
-        onHoldNotice = binding.onHoldNotice
-        voicemailButton = binding.voicemailButton
-        voicemailButtonSpace = binding.voicemailButtonSpace
-        contactsButton = binding.contactsButton
-        messagesButton = binding.messagesButton
-        callsButton = binding.callsButton
-        dialpadButton = binding.dialpadButton
-        swipeRefresh = binding.swipeRefresh
-
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
-        kgm = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        kgm = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
         serviceEventObserver = Observer {
             val event = it.getContentIfNotHandled()
@@ -215,42 +277,29 @@ class MainActivity : AppCompatActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    setSpeakerIcon()
+                    speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                        R.drawable.speaker_on
+                    else
+                        R.drawable.speaker_off
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
         }
 
-        uaAdapter = UaSpinnerAdapter(applicationContext, BaresipService.uas)
-        aorSpinner.adapter = uaAdapter
-        aorSpinner.setSelection(-1)
-        aorSpinner.tag = ""
-        aorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            // Have to allow NULL view, since sometimes when onItemSelected is called, view is NULL.
-            // Haven't found any explanation why this can happen.
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                Log.d(TAG, "aorSpinner selecting $position")
-                if (position < BaresipService.uas.size) {
-                    val ua = BaresipService.uas[position]
-                    val acc = ua.account
-                    aorSpinner.tag = acc.aor
-                    showCall(ua)
-                    updateIcons(acc)
-                }
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Log.d(TAG, "Nothing selected")
-            }
-        }
-
-        val registrationObserver = Observer<Long> { uaAdapter.notifyDataSetChanged() }
-        BaresipService.registrationUpdate.observe(this, registrationObserver)
+        initialized = true
 
         accountsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            uaAdapter.notifyDataSetChanged()
-            spinToAor(activityAor)
-            if (aorSpinner.tag != "")
-                updateIcons(Account.ofAor(aorSpinner.tag.toString())!!)
+            if (Account.ofAor(activityAor) != null)
+                spinToAor(activityAor)
+            else {
+                if (Account.ofAor(viewModel.selectedAor.value) == null) {
+                    if (uas.value.isNotEmpty())
+                        viewModel.updateSelectedAor(uas.value.first().account.aor)
+                    else
+                        viewModel.updateSelectedAor("")
+                }
+                updateIcons(Account.ofAor(viewModel.selectedAor.value))
+            }
             if (BaresipService.isServiceRunning) {
                 baresipService.action = "Update Notification"
                 startService(baresipService)
@@ -259,291 +308,14 @@ class MainActivity : AppCompatActivity() {
 
         accountRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             spinToAor(activityAor)
-            val ua = UserAgent.ofAor(activityAor)!!
+            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
             updateIcons(ua.account)
-            if (it.resultCode == Activity.RESULT_OK)
+            if (it.resultCode == RESULT_OK)
                 if (BaresipService.aorPasswords[activityAor] == NO_AUTH_PASS)
                     askPassword(getString(R.string.authentication_password), ua)
         }
 
-        aorSpinner.setOnTouchListener { view, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                if (aorSpinner.selectedItemPosition == -1) {
-                    val i = Intent(this@MainActivity, AccountsActivity::class.java)
-                    val b = Bundle()
-                    b.putString("aor", "")
-                    i.putExtras(b)
-                    accountsRequest.launch(i)
-                    true
-                } else {
-                    if ((event.x - view.left) < 100) {
-                        val i = Intent(this@MainActivity, AccountActivity::class.java)
-                        val b = Bundle()
-                        b.putString("aor", aorSpinner.tag.toString())
-                        i.putExtras(b)
-                        accountRequest!!.launch(i)
-                        true
-                    } else {
-                        BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri =
-                                callUri.text.toString()
-                        false
-                    }
-                }
-            } else {
-                // view.performClick()
-                false
-            }
-        }
-
-        aorSpinner.setOnLongClickListener {
-            if (aorSpinner.selectedItemPosition != -1) {
-                val ua = UserAgent.ofAor(aorSpinner.tag.toString())
-                if (ua != null) {
-                    val acc = ua.account
-                    if (Api.account_regint(acc.accp) > 0) {
-                        Api.account_set_regint(acc.accp, 0)
-                        Api.ua_unregister(ua.uap)
-                    } else {
-                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
-                        Api.ua_register(ua.uap)
-                    }
-                    acc.regint = Api.account_regint(acc.accp)
-                    AccountsActivity.saveAccounts()
-                }
-            }
-            true
-        }
-
-        callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contactNames()))
-        callUri.threshold = 2
-        callUri.setOnFocusChangeListener { view, b ->
-            if (b) {
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-        callUri.setOnClickListener { view ->
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        securityButton.setOnClickListener {
-            when (securityButton.tag) {
-                R.drawable.unlocked -> {
-                    Utils.alertView(this, getString(R.string.alert),
-                            getString(R.string.call_not_secure))
-                }
-                R.drawable.locked_yellow -> {
-                    Utils.alertView(this, getString(R.string.alert),
-                            getString(R.string.peer_not_verified))
-                }
-                R.drawable.locked_green -> {
-                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                        setTitle(R.string.info)
-                        setMessage(getString(R.string.call_is_secure))
-                        setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
-                            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-                            val call = ua.currentCall()
-                            if (call != null) {
-                                if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0) {
-                                    Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
-                                } else {
-                                    securityButton.setImageResource(R.drawable.locked_yellow)
-                                    securityButton.tag = R.drawable.locked_yellow
-                                }
-                            }
-                            dialog.dismiss()
-                        }
-                        setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        show()
-                    }
-                }
-            }
-        }
-
-        callButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition >= 0) {
-                if (Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
-                        makeCall()
-                else
-                    Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        hangupButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            if (Build.VERSION.SDK_INT < 31) {
-                if (callRunnable != null) {
-                    callHandler.removeCallbacks(callRunnable!!)
-                    callRunnable = null
-                    BaresipService.abandonAudioFocus(applicationContext)
-                    showCall(ua)
-                    return@setOnClickListener
-                }
-            } else {
-                if (audioModeChangedListener != null) {
-                    am.removeOnModeChangedListener(audioModeChangedListener!!)
-                    audioModeChangedListener = null
-                    BaresipService.abandonAudioFocus(applicationContext)
-                    showCall(ua)
-                    return@setOnClickListener
-                }
-            }
-            val aor = ua.account.aor
-            val uaCalls = ua.calls()
-            if (uaCalls.size > 0) {
-                val call = uaCalls[uaCalls.size - 1]
-                val callp = call.callp
-                Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.text}")
-                hangupButton.isEnabled = false
-                Api.ua_hangup(ua.uap, callp, 0, "")
-            }
-        }
-
-        answerButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val call = ua.currentCall() ?: return@setOnClickListener
-            Log.d(TAG, "AoR ${ua.account.aor} answering call from ${callUri.text}")
-            answerButton.isEnabled = false
-            rejectButton.isEnabled = false
-            val intent = Intent(this@MainActivity, BaresipService::class.java)
-            intent.action = "Call Answer"
-            intent.putExtra("uap", ua.uap)
-            intent.putExtra("callp", call.callp)
-            intent.putExtra("video", Api.VIDMODE_OFF)
-            startService(intent)
-        }
-
-        rejectButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            val call = ua.currentCall()!!
-            val callp = call.callp
-            Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.text}")
-            answerButton.isEnabled = false
-            rejectButton.isEnabled = false
-            call.rejected = true
-            Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
-        }
-
-        holdButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val aor = ua.account.aor
-            val call = ua.currentCall()!!
-            if (call.onhold) {
-                Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.text}")
-                call.resume()
-                call.onhold = false
-                holdButton.setImageResource(R.drawable.call_hold)
-            } else {
-                Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.text}")
-                call.hold()
-                call.onhold = true
-                holdButton.setImageResource(R.drawable.resume)
-            }
-        }
-
-        transferButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val call = ua.currentCall()
-            if (call != null ) {
-                if (call.onHoldCall != null) {
-                    if (!call.executeTransfer())
-                        Utils.alertView(this@MainActivity, getString(R.string.notice),
-                                String.format(getString(R.string.transfer_failed)))
-                } else {
-                    makeTransfer(ua)
-                }
-            }
-        }
-
-        infoButton.setOnClickListener {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-            val call = ua.currentCall()
-            if (call != null) {
-                val stats = call.stats("audio")
-                if (stats != "") {
-                    val parts = stats.split(",") as java.util.ArrayList
-                    if (parts[2] == "0/0") {
-                        parts[2] = "?/?"
-                        parts[3] = "?/?"
-                        parts[4] = "?/?"
-                    }
-                    val codecs = call.audioCodecs()
-                    val duration = call.duration()
-                    val txCodec = codecs.split(',')[0].split("/")
-                    val rxCodec = codecs.split(',')[1].split("/")
-                    Utils.alertView(this, getString(R.string.call_info),
-                            "${String.format(getString(R.string.duration), duration)}\n" +
-                                    "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
-                                    "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "${String.format(getString(R.string.rate), parts[0])}\n" +
-                                    "${String.format(getString(R.string.average_rate), parts[1])}\n" +
-                                    "${getString(R.string.packets)}: ${parts[2]}\n" +
-                                    "${getString(R.string.lost)}: ${parts[3]}\n" +
-                                    String.format(getString(R.string.jitter), parts[4]))
-                } else {
-                    Utils.alertView(this, getString(R.string.call_info),
-                            getString(R.string.call_info_not_available))
-                }
-            }
-        }
-
-        dtmf.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-        dtmf.setOnClickListener { view ->
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        voicemailButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition >= 0) {
-                val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-                val acc = ua.account
-                if (acc.vmUri != "") {
-                    val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                        when (which) {
-                            DialogInterface.BUTTON_POSITIVE -> {
-                                val i = Intent(this, MainActivity::class.java)
-                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                i.putExtra("action", "call")
-                                i.putExtra("uap", ua.uap)
-                                i.putExtra("peer", acc.vmUri)
-                                startActivity(i)
-                            }
-                            DialogInterface.BUTTON_NEGATIVE -> {
-                            }
-                        }
-                    }
-                    with(MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                        setTitle(R.string.voicemail_messages)
-                        setMessage(acc.vmMessages(this@MainActivity))
-                        setPositiveButton(getString(R.string.listen), dialogClickListener)
-                        setNeutralButton(getString(R.string.cancel), dialogClickListener)
-                        show()
-                    }
-                }
-            }
-        }
-
         contactsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Contact.contactNames()))
-            }
-
-        contactsButton.setOnClickListener {
-            val i = Intent(this@MainActivity, ContactsActivity::class.java)
-            val b = Bundle()
-            if (aorSpinner.selectedItemPosition >= 0)
-                b.putString("aor", aorSpinner.tag.toString())
-            else
-                b.putString("aor", "")
-            i.putExtras(b)
-            contactsRequest.launch(i)
         }
 
         chatRequests = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -551,44 +323,9 @@ class MainActivity : AppCompatActivity() {
             updateIcons(Account.ofAor(activityAor)!!)
         }
 
-        messagesButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition >= 0) {
-                val i = Intent(this@MainActivity, ChatsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", aorSpinner.tag.toString())
-                b.putString("peer", resumeUri)
-                i.putExtras(b)
-                chatRequests.launch(i)
-            }
-        }
-
         callsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             spinToAor(activityAor)
-            callsButton.setImageResource(R.drawable.calls)
-        }
-
-        callsButton.setOnClickListener {
-            if (aorSpinner.selectedItemPosition >= 0) {
-                val i = Intent(this@MainActivity, CallsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", aorSpinner.tag.toString())
-                i.putExtras(b)
-                callsRequest.launch(i)
-            }
-        }
-
-        dialpadButton.tag = "off"
-        dialpadButton.setOnClickListener {
-            if (dialpadButton.tag == "off") {
-                callUri.inputType = InputType.TYPE_CLASS_PHONE
-                dialpadButton.setImageResource(R.drawable.dialpad_on)
-                dialpadButton.tag = "on"
-            } else {
-                callUri.inputType = InputType.TYPE_CLASS_TEXT +
-                        InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                dialpadButton.setImageResource(R.drawable.dialpad_off)
-                dialpadButton.tag = "off"
-            }
+            updateIcons(Account.ofAor(viewModel.selectedAor.value))
         }
 
         configRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -609,12 +346,11 @@ class MainActivity : AppCompatActivity() {
             val displayTheme = Preferences(applicationContext).displayTheme
             if (displayTheme != AppCompatDelegate.getDefaultNightMode()) {
                 AppCompatDelegate.setDefaultNightMode(displayTheme)
-                delegate.applyDayNight()
             }
         }
 
         backupRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK)
+            if (it.resultCode == RESULT_OK)
                 it.data?.data?.also { uri ->
                     downloadsOutputUri = uri
                     askPassword(getString(R.string.encrypt_password))
@@ -622,7 +358,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         restoreRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK)
+            if (it.resultCode == RESULT_OK)
                 it.data?.data?.also { uri ->
                     downloadsInputUri = uri
                     askPassword(getString(R.string.decrypt_password))
@@ -630,7 +366,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         logcatRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK)
+            if (it.resultCode == RESULT_OK)
                 it.data?.data?.also { uri ->
                     try {
                         val out = contentResolver.openOutputStream(uri)
@@ -647,49 +383,21 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
-        swipeRefresh.setOnTouchListener(object : OnSwipeTouchListener(this@MainActivity) {
+        micIcon = if (BaresipService.isMicMuted)
+            R.drawable.mic_off
+        else
+            R.drawable.mic_on
 
-            override fun onSwipeLeft() {
-                super.onSwipeLeft()
-                if (BaresipService.uas.size > 0) {
-                    val curPos = aorSpinner.selectedItemPosition
-                    val newPos = if (curPos == -1)
-                        0
-                    else
-                        (curPos + 1) % BaresipService.uas.size
-                    if (curPos != newPos) {
-                        aorSpinner.setSelection(newPos)
-                        showCall(BaresipService.uas[newPos])
-                    }
+        setContent {
+            AppTheme {
+                keyboardController = LocalSoftwareKeyboardController.current
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalCustomColors.current.background
+                ) {
+                    MainContent(this)
                 }
             }
-
-            override fun onSwipeRight() {
-                super.onSwipeRight()
-                if (BaresipService.uas.size > 0) {
-                    val curPos = aorSpinner.selectedItemPosition
-                    val newPos = when (curPos) {
-                        -1 -> 0
-                        0 -> BaresipService.uas.size - 1
-                        else -> curPos - 1
-                    }
-                    if (curPos != newPos) {
-                        aorSpinner.setSelection(newPos)
-                        showCall(BaresipService.uas[newPos])
-                    }
-                }
-            }
-        })
-
-        swipeRefresh.setOnRefreshListener {
-            if (BaresipService.uas.size > 0) {
-                if (aorSpinner.selectedItemPosition == -1)
-                    aorSpinner.setSelection(0)
-                val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-                if (ua.account.regint > 0)
-                    Api.ua_register(ua.uap)
-            }
-            swipeRefresh.isRefreshing = false
         }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
@@ -722,8 +430,7 @@ class MainActivity : AppCompatActivity() {
                 it.forEach { permission ->
                     if (!permission.value) {
                         denied.add(permission.key)
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                                permission.key))
+                        if (shouldShowRequestPermissionRationale(permission.key))
                             shouldShow.add(permission.key)
                     }
                 }
@@ -762,12 +469,1335 @@ class MainActivity : AppCompatActivity() {
 
     } // OnCreate
 
-    private fun setSpeakerIcon() {
-        if (speakerIcon != null) {
-            if (Utils.isSpeakerPhoneOn(am))
-                speakerIcon!!.setIcon(R.drawable.speaker_on)
+    @Composable
+    private fun MainContent(ctx: Context) {
+        Scaffold(
+            modifier = Modifier.safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = { TopAppBar(ctx, String.format(getString(R.string.baresip))) },
+            bottomBar = { Buttons(ctx) },
+            content = { contentPadding ->
+                var isRefreshing by remember { mutableStateOf(false) }
+                LaunchedEffect(isRefreshing) {
+                    if (isRefreshing) {
+                        delay(1000)
+                        isRefreshing = false
+                    }
+                }
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.fillMaxSize(),
+                    enabled = pullToRefreshEnabled,
+                    onRefresh = {
+                        isRefreshing = true
+                        if (uas.value.isNotEmpty()) {
+                            if (viewModel.selectedAor.value == "")
+                                spinToAor(uas.value.first().account.aor)
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                            if (ua.account.regint > 0)
+                                Api.ua_register(ua.uap)
+                        }
+                    }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .consumeWindowInsets(contentPadding)
+                            .padding(
+                                PaddingValues(
+                                    top = 76.dp, bottom = 6.dp,
+                                    start = 16.dp, end = 16.dp
+                                )
+                            )
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        AccountSpinner(this@MainActivity)
+                        CallUriRow(this@MainActivity)
+                        CallRow(this@MainActivity)
+                        OnHoldNotice()
+                    }
+                }
+            }
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TopAppBar(ctx: Context, title: String) {
+
+        val recOffImage = ImageVector.vectorResource(R.drawable.rec_off)
+        val recOnImage = ImageVector.vectorResource(R.drawable.rec_on)
+
+        var recImage by remember { mutableStateOf(recOffImage) }
+        var menuExpanded by remember { mutableStateOf(false) }
+
+        val about = String.format(getString(R.string.about))
+        val settings = String.format(getString(R.string.configuration))
+        val accounts = String.format(getString(R.string.accounts))
+        val backup = String.format(getString(R.string.backup))
+        val restore = String.format(getString(R.string.restore))
+        val logcat = String.format(getString(R.string.logcat))
+        val restart = String.format(getString(R.string.restart))
+        val quit = String.format(getString(R.string.quit))
+
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    color = LocalCustomColors.current.light,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(
+                containerColor = LocalCustomColors.current.primary
+            ),
+            actions = {
+                IconButton(
+                    modifier = Modifier.padding(end=12.dp),
+                    onClick = {
+                        if (Call.call("connected") == null) {
+                            BaresipService.isRecOn = !BaresipService.isRecOn
+                            recImage = if (BaresipService.isRecOn) {
+                                Api.module_load("sndfile")
+                                recOnImage
+                            }
+                            else {
+                                Api.module_unload("sndfile")
+                                recOffImage
+                            }
+                        }
+                        else
+                            Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Icon(imageVector = recImage,
+                        tint = Color.Unspecified,
+                        contentDescription = null)
+                }
+                IconButton(
+                    modifier = Modifier.padding(end=12.dp),
+                    onClick = {
+                        if (Call.call("connected") != null) {
+                            BaresipService.isMicMuted = !BaresipService.isMicMuted
+                            if (BaresipService.isMicMuted) {
+                                micIcon = R.drawable.mic_off
+                                Api.calls_mute(true)
+                            } else {
+                                micIcon = R.drawable.mic_on
+                                Api.calls_mute(false)
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(micIcon),
+                        tint = Color.Unspecified,
+                        contentDescription = null)
+                }
+                IconButton(
+                    modifier = Modifier.padding(end=6.dp),
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= 31)
+                            Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                    "${am.communicationDevice!!.type}/${am.mode}"
+                            )
+                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                        speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                            R.drawable.speaker_on
+                        else
+                            R.drawable.speaker_off
+                    }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(speakerIcon),
+                        tint = Color.Unspecified,
+                        contentDescription = null)
+                }
+                IconButton(
+                    onClick = { menuExpanded = !menuExpanded }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Menu",
+                        tint = LocalCustomColors.current.light
+                    )
+                }
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                    items = if (Build.VERSION.SDK_INT >= 29)
+                        listOf(about, settings, accounts, backup, restore, logcat, restart, quit)
+                    else
+                        listOf(about, settings, accounts, backup, restore, restart, quit),
+                    onItemClick = { selectedItem ->
+                        menuExpanded = false
+                        when (selectedItem) {
+                            about -> {
+                                startActivity(Intent(ctx, AboutActivity::class.java))
+                            }
+                            settings -> {
+                                startActivity(Intent(ctx, ConfigActivity::class.java))
+                            }
+                            accounts -> {
+                                val i = Intent(ctx, AccountsActivity::class.java)
+                                val b = Bundle()
+                                b.putString("aor", viewModel.selectedAor.value)
+                                i.putExtras(b)
+                                accountsRequest.launch(i)
+                            }
+                            backup -> {
+                                when {
+                                    Build.VERSION.SDK_INT >= 29 ->
+                                        pickupFileFromDownloads("backup")
+                                    ContextCompat.checkSelfPermission(ctx, WRITE_EXTERNAL_STORAGE) ==
+                                            PackageManager.PERMISSION_GRANTED -> {
+                                        Log.d(TAG, "Write External Storage permission granted")
+                                        val path = Utils.downloadsPath("baresip.bs")
+                                        downloadsOutputUri = File(path).toUri()
+                                        askPassword(getString(R.string.encrypt_password))
+                                    }
+                                    shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE) ->
+                                        Utils.alertView(ctx, getString(R.string.notice), getString(R.string.no_backup)) {
+                                            requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
+                                        }
+                                    else ->
+                                        requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
+                                }
+                            }
+                            restore -> {
+                                when {
+                                    Build.VERSION.SDK_INT >= 29 ->
+                                        pickupFileFromDownloads("restore")
+                                    ContextCompat.checkSelfPermission(ctx, READ_EXTERNAL_STORAGE) ==
+                                            PackageManager.PERMISSION_GRANTED -> {
+                                        Log.d(TAG, "Read External Storage permission granted")
+                                        val path = Utils.downloadsPath("baresip.bs")
+                                        downloadsInputUri = File(path).toUri()
+                                        askPassword(getString(R.string.decrypt_password))
+                                    }
+                                    shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE) ->
+                                        Utils.alertView(ctx, getString(R.string.notice), getString(R.string.no_restore)) {
+                                            requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
+                                        }
+                                    else ->
+                                        requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
+                                }
+                            }
+                            logcat -> {
+                                if (Build.VERSION.SDK_INT >= 29)
+                                    pickupFileFromDownloads("logcat")
+                            }
+                            restart -> {
+                                quitRestart(true)
+                            }
+                            quit -> {
+                                quitRestart(false)
+                            }
+                        }
+                    }
+                )
+            }
+        )
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun AccountSpinner(ctx: Context) {
+
+        var expanded by rememberSaveable { mutableStateOf(false) }
+        val selected: String by viewModel.selectedAor.collectAsState()
+
+        if (uas.value.isEmpty())
+            viewModel.updateSelectedAor("")
+        else
+            if (selected == "" || UserAgent.ofAor(selected) == null) {
+                viewModel.updateSelectedAor(uas.value.first().account.aor)
+            }
+
+        showCall(UserAgent.ofAor(selected))
+        updateIcons(Account.ofAor(selected))
+
+        if (selected == "") {
+            OutlinedButton(
+                onClick = {
+                    val i = Intent(this@MainActivity, AccountsActivity::class.java)
+                    val b = Bundle()
+                    b.putString("aor", selected)
+                    i.putExtras(b)
+                    accountsRequest.launch(i)
+                },
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                colors = ButtonColors(
+                    containerColor = LocalCustomColors.current.grayLight,
+                    contentColor = LocalCustomColors.current.dark,
+                    disabledContainerColor = LocalCustomColors.current.grayLight,
+                    disabledContentColor = LocalCustomColors.current.dark
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp)
+            ) {
+                Text(text = "")
+            }
+        }
+        else
+            OutlinedButton(
+                onClick = {
+                    expanded = !expanded
+                },
+                enabled = true,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .height(50.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                expanded = true
+                            },
+                            onLongPress = {
+                                val ua = UserAgent.ofAor(selected)
+                                if (ua != null) {
+                                    val acc = ua.account
+                                    if (Api.account_regint(acc.accp) > 0) {
+                                        Api.account_set_regint(acc.accp, 0)
+                                        Api.ua_unregister(ua.uap)
+                                    } else {
+                                        Api.account_set_regint(
+                                            acc.accp,
+                                            acc.configuredRegInt
+                                        )
+                                        Api.ua_register(ua.uap)
+                                    }
+                                    acc.regint = Api.account_regint(acc.accp)
+                                    AccountsActivity.saveAccounts()
+                                }
+                            }
+                        )
+                    },
+                colors = ButtonColors(
+                    containerColor = LocalCustomColors.current.grayLight,
+                    contentColor = LocalCustomColors.current.dark,
+                    disabledContainerColor = LocalCustomColors.current.grayLight,
+                    disabledContentColor = LocalCustomColors.current.dark
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(
+                        uasStatus.value[selected] ?:
+                        R.drawable.locked_yellow),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .clickable(onClick = {
+                            val i = Intent(ctx, AccountActivity::class.java)
+                            val b = Bundle()
+                            b.putString("aor", selected)
+                            i.putExtras(b)
+                            accountRequest.launch(i)
+                        })
+                )
+                Text(
+                    text = Account.ofAor(selected)?.text() ?: "",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .weight(1f)
+                        .combinedClickable(
+                            onClick = { expanded = true },
+                            onLongClick = {
+                                val ua = UserAgent.ofAor(selected)
+                                if (ua != null) {
+                                    val acc = ua.account
+                                    if (Api.account_regint(acc.accp) > 0) {
+                                        Api.account_set_regint(acc.accp, 0)
+                                        Api.ua_unregister(ua.uap)
+                                    } else {
+                                        Api.account_set_regint(
+                                            acc.accp,
+                                            acc.configuredRegInt
+                                        )
+                                        Api.ua_register(ua.uap)
+                                    }
+                                    acc.regint = Api.account_regint(acc.accp)
+                                    AccountsActivity.saveAccounts()
+                                }
+                            }
+                        )
+                )
+                Icon(
+                    imageVector = if (expanded)
+                        Icons.Default.KeyboardArrowUp
+                    else
+                        Icons.Default.KeyboardArrowDown,
+                    contentDescription = null
+                )
+                androidx.compose.material3.DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    uas.value.forEachIndexed { _, ua ->
+                        val acc = ua.account
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                run {
+                                    viewModel.updateSelectedAor(acc.aor)
+                                }
+                                showCall(ua)
+                                updateIcons(acc)
+                            },
+                            text = { Text(
+                                text = acc.text(),
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold
+                            ) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(uasStatus.value[acc.aor]!!),
+                                    contentDescription = null,
+                                    tint = Color.Unspecified,
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+    }
+
+    @Composable
+    fun CallUriRow(ctx: Context) {
+        val suggestions by remember { contactNames }
+        var filteredSuggestions by remember { mutableStateOf(suggestions) }
+        var showSuggestions by remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
+        val lazyListState = rememberLazyListState()
+
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = callUri.value,
+                    enabled = callUriEnabled.value,
+                    singleLine = true,
+                    onValueChange = {
+                        val newValue = it
+                        if (it != callUri.value) {
+                            callUri.value = newValue
+                            showSuggestions = newValue.length > 2
+                            filteredSuggestions = suggestions.filter { suggestion ->
+                                newValue.length > 2 && suggestion.startsWith(newValue, ignoreCase = true)
+                            }
+                        }
+                    },
+                    trailingIcon = {
+                        if (callUriEnabled.value && callUri.value.isNotEmpty())
+                            Icon(Icons.Outlined.Clear,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        callUri.value = ""
+                                        showSuggestions = false
+                                    }
+                            )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
+                        .focusRequester(focusRequester),
+                    label = {
+                        Text(
+                            text = callUriLabel.value,
+                            fontSize = 18.sp,
+                        )
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp,
+                        color = LocalCustomColors.current.itemText
+                    ),
+                    keyboardOptions = if (dialpad)
+                        KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    else
+                        KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(8.dp, RoundedCornerShape(8.dp))
+                        .background(LocalCustomColors.current.grayLight,
+                            shape = RoundedCornerShape(8.dp))
+                        .animateContentSize()
+                ) {
+                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                        Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .verticalScrollbar(
+                                        state = lazyListState,
+                                        color = LocalCustomColors.current.gray
+                                    ),
+                                horizontalAlignment = Alignment.Start,
+                                state = lazyListState
+                            ) {
+                                items(
+                                    items = filteredSuggestions,
+                                    key = { suggestion -> suggestion }
+                                ) { suggestion ->
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                callUri.value = suggestion
+                                                showSuggestions = false
+                                            }
+                                            .padding(12.dp)
+                                    ) {
+                                        Text(
+                                            text = suggestion,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = LocalCustomColors.current.grayDark,
+                                            fontSize = 18.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (showCallTimer.value) {
+                val textColor = LocalCustomColors.current.itemText.toArgb()
+                AndroidView(
+                    factory = { context ->
+                        Chronometer(context).also { callTimer = it
+                            callTimer?.textSize = 16F
+                            callTimer?.setTextColor(textColor)
+                        }
+                    },
+                    modifier = Modifier.padding(start = 6.dp,
+                        top = 4.dp,
+                        end = if (securityIcon.intValue != -1) 6.dp else 0.dp),
+                )
+            }
+            if (securityIcon.intValue != -1) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(securityIcon.intValue),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp).padding(top = 4.dp)
+                        .clickable {
+                            when (securityIcon.intValue) {
+                                R.drawable.unlocked -> {
+                                    Utils.alertView(ctx, getString(R.string.alert),
+                                        getString(R.string.call_not_secure)
+                                    )
+                                }
+                                R.drawable.locked_yellow -> {
+                                    Utils.alertView(ctx, getString(R.string.alert),
+                                        getString(R.string.peer_not_verified)
+                                    )
+                                }
+                                R.drawable.locked_green -> {
+                                    with(MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)) {
+                                        setTitle(R.string.info)
+                                        setMessage(getString(R.string.call_is_secure))
+                                        setPositiveButton(getString(R.string.unverify)) { dialog, _ ->
+                                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                                            val call = ua.currentCall()
+                                            if (call != null) {
+                                                if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
+                                                    Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
+                                                else
+                                                    securityIcon.intValue = R.drawable.locked_yellow
+                                            }
+                                            dialog.dismiss()
+                                        }
+                                        setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
+                                            dialog.dismiss()
+                                        }
+                                        show()
+                                    }
+                                }
+                            }
+                        },
+                    tint = Color.Unspecified,
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun CallRow(ctx: Context) {
+
+        Row( modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        ) {
+            if (showCallButton.value)
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        callClick(ctx)
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+
+            if (showHangupButton.value) {
+
+                var ua: UserAgent = userAgentofSelectedAor()
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        if (Build.VERSION.SDK_INT < 31) {
+                            if (callRunnable != null) {
+                                callHandler.removeCallbacks(callRunnable!!)
+                                callRunnable = null
+                                BaresipService.abandonAudioFocus(applicationContext)
+                                showCall(ua)
+                            }
+                        } else {
+                            if (audioModeChangedListener != null) {
+                                am.removeOnModeChangedListener(audioModeChangedListener!!)
+                                audioModeChangedListener = null
+                                BaresipService.abandonAudioFocus(applicationContext)
+                                showCall(ua)
+                            }
+                        }
+                        val aor = ua.account.aor
+                        val uaCalls = ua.calls()
+                        if (uaCalls.size > 0) {
+                            val call = uaCalls[uaCalls.size - 1]
+                            val callp = call.callp
+                            Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.value}")
+                            showHangupButton.value = false
+                            Api.ua_hangup(ua.uap, callp, 0, "")
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        val aor = ua.account.aor
+                        val call = ua.currentCall()!!
+                        if (call.onhold) {
+                            Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.value}")
+                            call.resume()
+                            call.onhold = false
+                            holdIcon.intValue = R.drawable.call_hold
+                        } else {
+                            Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.value}")
+                            call.hold()
+                            call.onhold = true
+                            holdIcon.intValue = R.drawable.resume
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = holdIcon.intValue),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+
+                var showTransferDialog by remember { mutableStateOf(false) }
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = transferButtonEnabled.value,
+                    onClick = {
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            if (call.onHoldCall != null) {
+                                if (!call.executeTransfer())
+                                    Utils.alertView(
+                                        ctx, getString(R.string.notice),
+                                        String.format(getString(R.string.transfer_failed))
+                                    )
+                            }
+                            else
+                                showTransferDialog = true
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(transferIcon.intValue),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+
+                if (showTransferDialog) {
+                    val call = ua.currentCall()
+                    val showDialog = remember { mutableStateOf(call != null) }
+                    val blindChecked = remember { mutableStateOf(true) }
+                    if (showDialog.value)
+                        BasicAlertDialog(
+                            onDismissRequest = {
+                                keyboardController?.hide()
+                                showDialog.value = false
+                                showTransferDialog = false
+                            }
+                        ) {
+                            Surface(
+                                modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                                color = LocalCustomColors.current.grayLight,
+                                shape = MaterialTheme.shapes.large,
+                                tonalElevation = AlertDialogDefaults.TonalElevation
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = ContextCompat.getString(ctx, R.string.call_transfer),
+                                        fontSize = 20.sp,
+                                        modifier = Modifier.padding(16.dp),
+                                        color = LocalCustomColors.current.primary,
+                                    )
+                                    var uri by remember { mutableStateOf("") }
+                                    val suggestions by remember { contactNames }
+                                    var filteredSuggestions by remember { mutableStateOf(suggestions) }
+                                    var showSuggestions by remember { mutableStateOf(false) }
+                                    val focusRequester = remember { FocusRequester() }
+                                    val lazyListState = rememberLazyListState()
+                                    OutlinedTextField(
+                                        value = uri,
+                                        singleLine = true,
+                                        onValueChange = {
+                                            uri = it
+                                            showSuggestions = uri.isNotEmpty()
+                                            filteredSuggestions = if (uri.isEmpty())
+                                                suggestions
+                                            else
+                                                suggestions.filter { suggestion ->
+                                                    uri.length > 2 && suggestion.startsWith(uri,
+                                                        ignoreCase = true)
+                                                }
+                                        },
+                                        trailingIcon = {
+                                            if (uri.isNotEmpty())
+                                                Icon(
+                                                    Icons.Outlined.Clear,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.clickable {
+                                                        uri = ""
+                                                        showSuggestions = false
+                                                    }
+                                                )
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 4.dp,
+                                                end = 4.dp,
+                                                top = 12.dp,
+                                                bottom = 2.dp
+                                            )
+                                            .focusRequester(focusRequester),
+                                        label = {
+                                            Text(
+                                                text = stringResource(R.string.transfer_destination),
+                                                fontSize = 18.sp,
+                                                color = LocalCustomColors.current.dark
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = LocalCustomColors.current.dark
+                                        ),
+                                        keyboardOptions = if (dialpad)
+                                            KeyboardOptions(keyboardType = KeyboardType.Phone)
+                                        else
+                                            KeyboardOptions(keyboardType = KeyboardType.Text)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .shadow(8.dp, RoundedCornerShape(8.dp))
+                                            .background(LocalCustomColors.current.grayLight,
+                                                shape = RoundedCornerShape(8.dp))
+                                            .animateContentSize()
+                                    ) {
+                                        if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                                            Box(modifier = Modifier.fillMaxWidth().heightIn(150.dp)) {
+                                                LazyColumn(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .verticalScrollbar(
+                                                            state = lazyListState,
+                                                            color = LocalCustomColors.current.gray
+                                                        ),
+                                                    horizontalAlignment = Alignment.Start,
+                                                    state = lazyListState,
+                                                ) {
+                                                    items(
+                                                        items = filteredSuggestions,
+                                                        key = { suggestion -> suggestion }
+                                                    ) { suggestion ->
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .clickable {
+                                                                    callUri.value = suggestion
+                                                                    showSuggestions = false
+                                                                }
+                                                                .padding(12.dp)
+                                                        ) {
+                                                            Text(
+                                                                text = suggestion,
+                                                                modifier = Modifier.fillMaxWidth(),
+                                                                color = LocalCustomColors.current.grayDark,
+                                                                fontSize = 18.sp
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (call!!.replaces())
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Center,
+                                        ) {
+                                            Text(
+                                                text = ContextCompat.getString(ctx, R.string.blind),
+                                                color = LocalCustomColors.current.dark,
+                                                modifier = Modifier.padding(16.dp),
+                                            )
+                                            Checkbox(
+                                                checked = blindChecked.value
+                                            ) {
+                                                blindChecked.value = true
+                                            }
+                                            Text(
+                                                text = ContextCompat.getString(ctx, R.string.attended),
+                                                color = LocalCustomColors.current.dark,
+                                                modifier = Modifier.padding(16.dp),
+                                            )
+                                            Checkbox(
+                                                checked = !blindChecked.value
+                                            ) {
+                                                blindChecked.value = false
+                                            }
+                                        }
+                                    Row(
+                                        horizontalArrangement = Arrangement.Absolute.SpaceEvenly
+                                    ) {
+                                        TextButton(
+                                            onClick = {
+                                                keyboardController?.hide()
+                                                showDialog.value = false
+                                                showTransferDialog = false
+                                            },
+                                            modifier = Modifier.padding(8.dp),
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.cancel),
+                                                color = LocalCustomColors.current.gray
+                                            )
+                                        }
+                                        TextButton(
+                                            onClick = {
+                                                var uriText = uri.trim()
+                                                if (uriText.isNotEmpty()) {
+                                                    val uris = Contact.contactUris(uriText)
+                                                    if (uris.size > 1) {
+                                                        val destinationBuilder =
+                                                            MaterialAlertDialogBuilder(
+                                                                ctx,
+                                                                R.style.AlertDialogTheme
+                                                            )
+                                                        with(destinationBuilder) {
+                                                            setTitle(R.string.choose_destination_uri)
+                                                            setItems(uris.toTypedArray()) { _, which ->
+                                                                uriText = uris[which]
+                                                                transfer(
+                                                                    ua,
+                                                                    if (Utils.isTelNumber(uriText))
+                                                                        "tel:$uriText"
+                                                                    else
+                                                                        uriText,
+                                                                    !blindChecked.value
+                                                                )
+                                                            }
+                                                        }
+                                                    } else {
+                                                        if (uris.size == 1)
+                                                            uriText = uris[0]
+                                                    }
+                                                    transfer(
+                                                        ua,
+                                                        if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                        !blindChecked.value
+                                                    )
+                                                    keyboardController?.hide()
+                                                    showDialog.value = false
+                                                    showTransferDialog = false
+                                                }
+                                            },
+                                            modifier = Modifier.padding(8.dp),
+                                        ) {
+                                            Text(
+                                                text = stringResource(
+                                                    if (blindChecked.value)
+                                                        R.string.transfer
+                                                    else
+                                                        R.string.call
+                                                ).uppercase(),
+                                                color = LocalCustomColors.current.primary
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                }
+
+                val focusRequester = remember { FocusRequester() }
+                val shouldRequestFocus by focusDtmf
+                TextField(
+                    value = dtmfText.value,
+                    onValueChange = { newText ->
+                        if (newText.length > dtmfText.value.length) {
+                            val char = newText.last()
+                            Log.d(TAG, "Got DTMF digit '$char'")
+                            if (char.isDigit() || char == '*' || char == '#') {
+                                dtmfText.value = newText
+                                ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                                ua.currentCall()!!.sendDigit(char)
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    modifier = Modifier
+                        .width(80.dp)
+                        .focusRequester(focusRequester),
+                    enabled = dtmfEnabled.value,
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    label = { Text(getString(R.string.dtmf), fontSize = 16.sp) },
+                    singleLine = true
+                )
+                LaunchedEffect(shouldRequestFocus) {
+                    if (shouldRequestFocus) {
+                        focusRequester.requestFocus()
+                        focusDtmf.value = false
+                    }
+                }
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                        val call = ua.currentCall()!!
+                        val stats = call.stats("audio")
+                        if (stats != "") {
+                            val parts = stats.split(",") as java.util.ArrayList
+                            if (parts[2] == "0/0") {
+                                parts[2] = "?/?"
+                                parts[3] = "?/?"
+                                parts[4] = "?/?"
+                            }
+                            val codecs = call.audioCodecs()
+                            val duration = call.duration()
+                            val txCodec = codecs.split(',')[0].split("/")
+                            val rxCodec = codecs.split(',')[1].split("/")
+                            Utils.alertView(
+                                ctx, getString(R.string.call_info),
+                                "${String.format(getString(R.string.duration), duration)}\n" +
+                                        "${getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
+                                        "${rxCodec[0]} ch ${rxCodec[2]}\n" +
+                                        "${String.format(getString(R.string.rate), parts[0])}\n" +
+                                        "${
+                                            String.format(
+                                                getString(R.string.average_rate),
+                                                parts[1]
+                                            )
+                                        }\n" +
+                                        "${getString(R.string.packets)}: ${parts[2]}\n" +
+                                        "${getString(R.string.lost)}: ${parts[3]}\n" +
+                                        String.format(getString(R.string.jitter), parts[4])
+                            )
+                        } else {
+                            Utils.alertView(
+                                ctx, getString(R.string.call_info),
+                                getString(R.string.call_info_not_available)
+                            )
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+            }
+
+            if (showAnswerRejectButtons.value) {
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        answer(ctx)
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        reject()
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+            }
+        }
+
+    }
+
+    private fun callClick(ctx: Context) {
+        if (viewModel.selectedAor.value != "") {
+            if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO)))
+                makeCall()
             else
-                speakerIcon!!.setIcon(R.drawable.speaker_off)
+                Toast.makeText(applicationContext, R.string.no_calls, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun makeCall(lookForContact: Boolean = true) {
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+        val aor = ua!!.account.aor
+        if (!Call.inCall()) {
+            var uriText = callUri.value.trim()
+            if (uriText.isNotEmpty()) {
+                if (lookForContact) {
+                    val uris = Contact.contactUris(uriText)
+                    if (uris.size == 1)
+                        uriText = uris[0]
+                    else if (uris.size > 1) {
+                        val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
+                        with(builder) {
+                            setTitle(R.string.choose_destination_uri)
+                            setItems(uris.toTypedArray()) { _, which ->
+                                callUri.value = uris[which]
+                                makeCall(false)
+                            }
+                            setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
+                            show()
+                        }
+                        return
+                    }
+                }
+                if (Utils.isTelNumber(uriText))
+                    uriText = "tel:$uriText"
+                val uri = if (Utils.isTelUri(uriText)) {
+                    if (ua.account.telProvider == "") {
+                        Utils.alertView(this, getString(R.string.notice),
+                            String.format(getString(R.string.no_telephony_provider), aor))
+                        return
+                    }
+                    Utils.telToSip(uriText, ua.account)
+                } else {
+                    Utils.uriComplete(uriText, aor)
+                }
+                if (!Utils.checkUri(uri)) {
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
+                } else if (!BaresipService.requestAudioFocus(applicationContext)) {
+                    Toast.makeText(applicationContext, R.string.audio_focus_denied,
+                        Toast.LENGTH_SHORT).show()
+                } else {
+                    callUriEnabled.value = false
+                    showCallButton.value = false
+                    showHangupButton.value = true
+                    if (Build.VERSION.SDK_INT < 31) {
+                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
+                        am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        runCall(ua, uri)
+                    } else {
+                        if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
+                            runCall(ua, uri)
+                        } else {
+                            audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
+                                if (mode == AudioManager.MODE_IN_COMMUNICATION) {
+                                    Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
+                                            "device ${am.communicationDevice!!.type}")
+                                    if (audioModeChangedListener != null) {
+                                        am.removeOnModeChangedListener(audioModeChangedListener!!)
+                                        audioModeChangedListener = null
+                                    }
+                                    runCall(ua, uri)
+                                } else {
+                                    Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
+                                            "device ${am.communicationDevice!!.type}")
+                                }
+                            }
+                            am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
+                            Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
+                            am.mode = AudioManager.MODE_IN_COMMUNICATION
+                        }
+                    }
+                }
+            } else {
+                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(aor)
+                if (latestPeerUri != null)
+                    callUri.value = Utils.friendlyUri(this, latestPeerUri, ua.account)
+            }
+        }
+    }
+
+    private fun answer(ctx: Context) {
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+        val call = ua.currentCall()
+        if (call != null) {
+            Log.d(TAG, "AoR ${ua.account.aor} answering call from ${callUri.value}")
+            val intent = Intent(ctx, BaresipService::class.java)
+            intent.action = "Call Answer"
+            intent.putExtra("uap", ua.uap)
+            intent.putExtra("callp", call.callp)
+            intent.putExtra("video", Api.VIDMODE_OFF)
+            startService(intent)
+        }
+    }
+
+    private fun reject() {
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+        val aor = ua.account.aor
+        val call = ua.currentCall()!!
+        val callp = call.callp
+        Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.value}")
+        call.rejected = true
+        Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
+    }
+
+    @Composable
+    fun Buttons(ctx: Context) {
+        val buttonSize = 48.dp
+        Row( modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (showVmIcon)
+                IconButton(
+                    onClick = {
+                        if (viewModel.selectedAor.value != "") {
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                            val acc = ua.account
+                            if (acc.vmUri != "") {
+                                val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                                    when (which) {
+                                        DialogInterface.BUTTON_POSITIVE -> {
+                                            val i = Intent(ctx, MainActivity::class.java)
+                                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                            i.putExtra("action", "call")
+                                            i.putExtra("uap", ua.uap)
+                                            i.putExtra("peer", acc.vmUri)
+                                            startActivity(i)
+                                        }
+                                        DialogInterface.BUTTON_NEGATIVE -> {
+                                        }
+                                    }
+                                }
+                                with(MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)) {
+                                    setTitle(R.string.voicemail_messages)
+                                    setMessage(acc.vmMessages(ctx))
+                                    setPositiveButton(getString(R.string.listen), dialogClickListener)
+                                    setNeutralButton(getString(R.string.cancel), dialogClickListener)
+                                    show()
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .size(buttonSize)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(vmIcon.intValue),
+                        contentDescription = null,
+                        Modifier.size(buttonSize),
+                        tint = Color.Unspecified
+                    )
+                }
+
+            IconButton(
+                onClick = {
+                    if (viewModel.selectedAor.value != "") {
+                        val i = Intent(ctx, ContactsActivity::class.java)
+                        val b = Bundle()
+                        b.putString("aor", viewModel.selectedAor.value)
+                        i.putExtras(b)
+                        contactsRequest.launch(i)
+                    }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.contacts),
+                    contentDescription = null,
+                    Modifier.size(buttonSize),
+                    tint = LocalCustomColors.current.secondary
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    if (viewModel.selectedAor.value != "") {
+                        val i = Intent(this@MainActivity, ChatsActivity::class.java)
+                        val b = Bundle()
+                        b.putString("aor", viewModel.selectedAor.value)
+                        b.putString("peer", resumeUri)
+                        i.putExtras(b)
+                        chatRequests.launch(i)
+                    }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(messagesIcon.intValue),
+                    contentDescription = null,
+                    Modifier.size(buttonSize),
+                    tint = Color.Unspecified
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    calls(ctx)
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.calls),
+                    contentDescription = null,
+                    Modifier.size(buttonSize),
+                    tint = Color.Unspecified
+                )
+            }
+
+            IconButton(
+                onClick = { dialpad = !dialpad },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize),
+                enabled = dialpadButtonEnabled
+            ) {
+                Icon(
+                    imageVector = if (dialpad)
+                        ImageVector.vectorResource(R.drawable.dialpad_on)
+                    else
+                        ImageVector.vectorResource(R.drawable.dialpad_off),
+                    contentDescription = null,
+                    modifier = Modifier.size(buttonSize),
+                    tint = Color.Unspecified
+                )
+            }
+        }
+
+    }
+
+    @Composable
+    fun OnHoldNotice() {
+        if (showOnHoldNotice.value)
+            OutlinedButton(
+                onClick = {},
+                border = BorderStroke(1.dp, LocalCustomColors.current.accent),
+                modifier = Modifier.padding(16.dp),
+                shape = RoundedCornerShape(20)
+           ) {
+                Text(text = getString(R.string.call_is_on_hold),
+                    fontSize = 18.sp,
+                    color = LocalCustomColors.current.itemText,
+                )
+            }
+
+    }
+
+    private fun calls(ctx: Context) {
+        if (viewModel.selectedAor.value != "") {
+            val i = Intent(ctx, CallsActivity::class.java)
+            val b = Bundle()
+            b.putString("aor", viewModel.selectedAor.value)
+            i.putExtras(b)
+            callsRequest.launch(i)
+        }
+    }
+
+    private fun updateIcons(acc: Account?) {
+        if (acc == null) {
+            showVmIcon = false
+            messagesIcon.intValue = R.drawable.messages
+            callsIcon.intValue = R.drawable.calls
+        }
+        else {
+            if (acc.vmUri != "") {
+                showVmIcon = true
+                vmIcon.intValue = if (acc.vmNew > 0)
+                    R.drawable.voicemail_new
+                else
+                    R.drawable.voicemail
+            } else
+                showVmIcon = false
+            messagesIcon.intValue= if (acc.unreadMessages)
+                R.drawable.messages_unread
+            else
+                R.drawable.messages
+            callsIcon.intValue = if (acc.missedCalls)
+                R.drawable.calls_missed
+            else
+                R.drawable.calls
         }
     }
 
@@ -793,20 +1823,20 @@ class MainActivity : AppCompatActivity() {
                     arrayListOf(resumeCall!!.ua.uap, resumeCall!!.callp))
             }
             "call answer" -> {
-                answerButton.performClick()
+                answer(this@MainActivity)
                 showCall(resumeCall!!.ua)
             }
             "call missed" -> {
-                callsButton.performClick()
+                calls(this@MainActivity)
             }
             "call reject" ->
-                rejectButton.performClick()
+                reject()
             "call" -> {
-                callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
-                callButton.performClick()
+                callUri.value = Account.ofAor(viewModel.selectedAor.value)!!.resumeUri
+                callClick(this@MainActivity)
             }
             "dial" -> {
-                callUri.setText(BaresipService.uas[aorSpinner.selectedItemPosition].account.resumeUri)
+                callUri.value = Account.ofAor(viewModel.selectedAor.value)!!.resumeUri
             }
             "call transfer", "transfer show", "transfer accept" ->
                 handleServiceEvent("$resumeAction,$resumeUri",
@@ -819,20 +1849,17 @@ class MainActivity : AppCompatActivity() {
                     spinToAor(incomingCall.ua.account.aor)
                 } else {
                     restoreActivities()
-                    if (BaresipService.uas.size > 0) {
-                        if (aorSpinner.selectedItemPosition == -1) {
+                    if (uas.value.isNotEmpty()) {
+                        if (viewModel.selectedAor.value == "") {
                             if (Call.inCall())
                                 spinToAor(Call.calls()[0].ua.account.aor)
-                            else {
-                                aorSpinner.setSelection(0)
-                                aorSpinner.tag = BaresipService.uas[0].account.aor
-                            }
+                            else
+                                spinToAor(uas.value.first().account.aor)
                         }
                     }
                 }
-                uaAdapter.notifyDataSetChanged()
-                if (BaresipService.uas.size > 0) {
-                    val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+                val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+                if (ua != null) {
                     showCall(ua)
                     updateIcons(ua.account)
                 }
@@ -846,7 +1873,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Main onPause")
         Utils.addActivity("main")
         BaresipService.isMainVisible = false
-        callTimer.stop()
+        callTimer?.stop()
         saveCallUri()
     }
 
@@ -866,6 +1893,12 @@ class MainActivity : AppCompatActivity() {
         BaresipService.activities.clear()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (dtmfEnabled.value)
+            focusDtmf.value = true
+    }
+
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
@@ -879,9 +1912,8 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onNewIntent with action/data '${intent.action}/${intent.data}'")
 
         when (intent.action) {
-            ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 callAction(intent.data, if (intent.action == ACTION_CALL) "call" else "dial")
-            }
             else -> {
                 val action = intent.getStringExtra("action")
                 if (action != null) {
@@ -892,8 +1924,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun callAction(uri: Uri?, action: String) {
-        if (Call.inCall() || BaresipService.uas.size == 0)
+   private fun callAction(uri: Uri?, action: String) {
+        if (Call.inCall() || uas.value.isEmpty())
             return
         Log.d(TAG, "Action $action to $uri")
         if (uri != null) {
@@ -901,8 +1933,8 @@ class MainActivity : AppCompatActivity() {
                 "sip" -> {
                     val uriStr = Utils.uriUnescape(uri.toString())
                     var ua = UserAgent.ofDomain(Utils.uriHostPart(uriStr))
-                    if (ua == null && BaresipService.uas.size > 0)
-                        ua = BaresipService.uas[0]
+                    if (ua == null && uas.value.isNotEmpty())
+                        ua = uas.value[0]
                     if (ua == null) {
                         Log.w(TAG, "No accounts for '$uriStr'")
                         return
@@ -958,8 +1990,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                     return
                 }
-                if (ua.account.aor != aorSpinner.tag)
-                    spinToAor(ua.account.aor)
+                spinToAor(ua.account.aor)
                 resumeAction = action
                 ua.account.resumeUri = intent.getStringExtra("peer")!!
             }
@@ -971,8 +2002,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val ua = call.ua
-                if (ua.account.aor != aorSpinner.tag)
-                    spinToAor(ua.account.aor)
+                spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeCall = call
             }
@@ -983,8 +2013,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
-                if (ua.account.aor != aorSpinner.tag)
-                    spinToAor(ua.account.aor)
+                spinToAor(ua.account.aor)
                 resumeAction = action
             }
             "call transfer", "transfer show", "transfer accept" -> {
@@ -1009,8 +2038,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w(TAG, "handleIntent did not find ua $uap")
                     return
                 }
-                if (ua.account.aor != aorSpinner.tag)
-                    spinToAor(ua.account.aor)
+                spinToAor(ua.account.aor)
                 resumeAction = action
                 resumeUap = uap
                 resumeUri = intent.getStringExtra("peer")!!
@@ -1056,23 +2084,19 @@ class MainActivity : AppCompatActivity() {
         if (event == "started") {
             val uriString = params[0] as String
             Log.d(TAG, "Handling service event 'started' with URI '$uriString'")
-            if (!this::uaAdapter.isInitialized) {
+            if (!initialized) {
                 // Android has restarted baresip when permission has been denied in app settings
                 recreate()
                 return
             }
-            uaAdapter.notifyDataSetChanged()
-            if (uriString != "") {
+            if (uriString != "")
                 callAction(uriString.toUri(), "dial")
-            } else {
-                if ((aorSpinner.selectedItemPosition == -1) && (BaresipService.uas.size > 0)) {
-                    aorSpinner.setSelection(0)
-                    aorSpinner.tag = BaresipService.uas[0].account.aor
-                }
+            else {
+                if (viewModel.selectedAor.value == "" && uas.value.isNotEmpty())
+                    viewModel.updateSelectedAor(uas.value.first().account.aor)
             }
             if (Preferences(applicationContext).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
                 AppCompatDelegate.setDefaultNightMode(Preferences(applicationContext).displayTheme)
-                delegate.applyDayNight()
             }
             handleNextEvent()
             return
@@ -1106,16 +2130,13 @@ class MainActivity : AppCompatActivity() {
 
         when (ev[0]) {
             "call rejected" -> {
-                if (aor == aorSpinner.tag) {
-                    callsButton.setImageResource(R.drawable.calls_missed)
-                }
+                if (aor == viewModel.selectedAor.value)
+                    callsIcon.intValue = R.drawable.calls_missed
             }
             "call incoming", "call outgoing" -> {
                 val callp = params[1] as Long
                 if (BaresipService.isMainVisible) {
-                    uaAdapter.notifyDataSetChanged()
-                    if (aor != aorSpinner.tag)
-                        spinToAor(aor)
+                    spinToAor(aor)
                     showCall(ua, Call.ofCallp(callp))
                 } else {
                     Log.d(TAG, "Reordering to front")
@@ -1158,9 +2179,8 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
             }
             "call established" -> {
-                if (aor == aorSpinner.tag) {
-                    dtmf.text = null
-                    dtmf.hint = getString(R.string.dtmf)
+                if (aor == viewModel.selectedAor.value) {
+                    dtmfText.value = ""
                     showCall(ua)
                 }
             }
@@ -1185,19 +2205,15 @@ class MainActivity : AppCompatActivity() {
                             R.drawable.locked_green
                         }
                         call.zid = ev[2]
-                        if (aor == aorSpinner.tag) {
-                            securityButton.tag = call.security
-                            securityButton.setImageResource(call.security)
-                        }
+                        if (aor == viewModel.selectedAor.value)
+                            securityIcon.intValue = call.security
                         dialog.dismiss()
                     }
                     setNeutralButton(getString(R.string.no)) { dialog, _ ->
                         call.security = R.drawable.locked_yellow
                         call.zid = ev[2]
-                        if (aor == aorSpinner.tag) {
-                            securityButton.tag = R.drawable.locked_yellow
-                            securityButton.setImageResource(R.drawable.locked_yellow)
-                        }
+                        if (aor == viewModel.selectedAor.value)
+                            securityIcon.intValue = R.drawable.locked_yellow
                         dialog.dismiss()
                     }
                     show()
@@ -1210,10 +2226,8 @@ class MainActivity : AppCompatActivity() {
                     handleNextEvent("Call $callp that is verified is not found")
                     return
                 }
-                if (aor == aorSpinner.tag) {
-                    securityButton.setImageResource(call.security)
-                    securityButton.tag = call.security
-                }
+                if (aor == viewModel.selectedAor.value)
+                    securityIcon.intValue = call.security
             }
             "call transfer", "transfer show" -> {
                 val callp = params[1] as Long
@@ -1252,7 +2266,7 @@ class MainActivity : AppCompatActivity() {
                         if (call in Call.calls())
                             acceptTransfer(ua, call!!, ev[1])
                         else {
-                            callUri.setText(ev[1])
+                            callUri.value = ev[1]
                             makeCall()
                         }
                         dialog.dismiss()
@@ -1277,23 +2291,18 @@ class MainActivity : AppCompatActivity() {
                 showCall(ua)
             }
             "call closed" -> {
-                uaAdapter.notifyDataSetChanged()
                 val call = ua.currentCall()
                 if (call != null) {
                     call.resume()
                     startCallTimer(call)
-                } else {
-                    callTimer.stop()
                 }
-                if (aor == aorSpinner.tag) {
-                    callUri.inputType = InputType.TYPE_CLASS_TEXT +
-                            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                    dialpadButton.setImageResource(R.drawable.dialpad_off)
-                    dialpadButton.tag = "off"
+                else
+                    callTimer?.stop()
+                if (aor == viewModel.selectedAor.value) {
                     ua.account.resumeUri = ""
                     showCall(ua)
                     if (acc.missedCalls)
-                        callsButton.setImageResource(R.drawable.calls_missed)
+                        callsIcon.intValue = R.drawable.calls_missed
                 }
                 if (kgm.isDeviceLocked)
                     this.setShowWhenLocked(false)
@@ -1318,11 +2327,11 @@ class MainActivity : AppCompatActivity() {
                         break
                     }
                 }
-                if (aor == aorSpinner.tag) {
-                    if (acc.vmNew > 0)
-                        voicemailButton.setImageResource(R.drawable.voicemail_new)
+                if (aor == viewModel.selectedAor.value) {
+                    vmIcon.intValue = if (acc.vmNew > 0)
+                        R.drawable.voicemail_new
                     else
-                        voicemailButton.setImageResource(R.drawable.voicemail)
+                        R.drawable.voicemail
                 }
             }
             else -> Log.e(TAG, "Unknown event '${ev[0]}'")
@@ -1332,10 +2341,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun redirect(ua: UserAgent, redirectUri: String) {
-        if (ua.account.aor != aorSpinner.tag)
+        if (ua.account.aor != viewModel.selectedAor.value)
             spinToAor(ua.account.aor)
-        callUri.setText(redirectUri)
-        callButton.performClick()
+        callUri.value = redirectUri
+        callClick(this@MainActivity)
     }
 
     private fun reStart() {
@@ -1344,172 +2353,6 @@ class MainActivity : AppCompatActivity() {
         val intent = pm.getLaunchIntentForPackage(this.packageName)
         this.startActivity(intent)
         exitProcess(0)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        if (Build.VERSION.SDK_INT >= 29)
-            menu.findItem(R.id.logcat).setVisible(true)
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        menuInflater.inflate(R.menu.main_menu, menu)
-
-        menuInflater.inflate(R.menu.rec_icon, menu)
-        recIcon = menu.findItem(R.id.recIcon)
-        if (BaresipService.isRecOn)
-            recIcon!!.setIcon(R.drawable.rec_on)
-        else
-            recIcon!!.setIcon(R.drawable.rec_off)
-
-        menuInflater.inflate(R.menu.mic_icon, menu)
-        micIcon = menu.findItem(R.id.micIcon)
-        if (BaresipService.isMicMuted)
-            micIcon!!.setIcon(R.drawable.mic_off)
-        else
-            micIcon!!.setIcon(R.drawable.mic_on)
-
-        menuInflater.inflate(R.menu.speaker_icon, menu)
-        speakerIcon = menu.findItem(R.id.speakerIcon)
-        setSpeakerIcon()
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-
-            R.id.recIcon -> {
-                if (Call.call("connected") == null) {
-                    BaresipService.isRecOn = !BaresipService.isRecOn
-                    if (BaresipService.isRecOn) {
-                        item.setIcon(R.drawable.rec_on)
-                        Api.module_load("sndfile")
-                    } else {
-                        item.setIcon(R.drawable.rec_off)
-                        Api.module_unload("sndfile")
-                    }
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        R.string.rec_in_call,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            R.id.micIcon -> {
-                if (Call.call("connected") != null) {
-                    BaresipService.isMicMuted = !BaresipService.isMicMuted
-                    if (BaresipService.isMicMuted) {
-                        item.setIcon(R.drawable.mic_off)
-                        Api.calls_mute(true)
-                    } else {
-                        item.setIcon(R.drawable.mic_on)
-                        Api.calls_mute(false)
-                    }
-                }
-            }
-
-            R.id.speakerIcon -> {
-                if (Build.VERSION.SDK_INT >= 31)
-                    Log.d(
-                        TAG, "Toggling speakerphone when dev/mode is " +
-                                "${am.communicationDevice!!.type}/${am.mode}"
-                    )
-                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                setSpeakerIcon()
-            }
-
-            R.id.config -> {
-                configRequest.launch(Intent(this, ConfigActivity::class.java))
-            }
-
-            R.id.accounts -> {
-                val i = Intent(this, AccountsActivity::class.java)
-                val b = Bundle()
-                b.putString("aor", aorSpinner.tag.toString())
-                i.putExtras(b)
-                accountsRequest.launch(i)
-            }
-
-            R.id.backup -> {
-                when {
-                    Build.VERSION.SDK_INT >= 29 -> pickupFileFromDownloads("backup")
-                    ContextCompat.checkSelfPermission(
-                        this,
-                        WRITE_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED -> {
-                        Log.d(TAG, "Write External Storage permission granted")
-                        val path = Utils.downloadsPath("baresip.bs")
-                        downloadsOutputUri = File(path).toUri()
-                        askPassword(getString(R.string.encrypt_password))
-                    }
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        WRITE_EXTERNAL_STORAGE) -> {
-                        layout.showSnackBar(
-                            binding.root,
-                            getString(R.string.no_backup),
-                            Snackbar.LENGTH_INDEFINITE,
-                            getString(R.string.ok)
-                        ) {
-                            requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
-                        }
-                    }
-                    else -> {
-                        requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
-                    }
-                }
-            }
-
-            R.id.restore -> {
-                when {
-                    Build.VERSION.SDK_INT >= 29 ->
-                        pickupFileFromDownloads("restore")
-                    ContextCompat.checkSelfPermission(
-                        this,
-                        READ_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED -> {
-                        Log.d(TAG, "Read External Storage permission granted")
-                        val path = Utils.downloadsPath("baresip.bs")
-                        downloadsInputUri = File(path).toUri()
-                        askPassword(getString(R.string.decrypt_password))
-                    }
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        READ_EXTERNAL_STORAGE) -> {
-                        layout.showSnackBar(
-                            binding.root,
-                            getString(R.string.no_restore),
-                            Snackbar.LENGTH_INDEFINITE,
-                            getString(R.string.ok)
-                        ) {
-                            requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
-                        }
-                    }
-                    else -> {
-                        requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
-                    }
-                }
-            }
-
-            R.id.logcat -> {
-                if (Build.VERSION.SDK_INT >= 29)
-                    pickupFileFromDownloads("logcat")
-            }
-
-            R.id.about -> {
-                startActivity(Intent(this, AboutActivity::class.java))
-            }
-
-            R.id.restart, R.id.quit -> {
-                quitRestart(item.itemId == R.id.restart)
-            }
-        }
-        return true
     }
 
     @RequiresApi(29)
@@ -1544,7 +2387,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun quitRestart(reStart: Boolean) {
-        Log.d(TAG, "quitRestart Restart = $reStart")
+        Log.i(TAG, "quitRestart Restart = $reStart")
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         if (BaresipService.isServiceRunning) {
@@ -1558,86 +2401,6 @@ class MainActivity : AppCompatActivity() {
             else
                 exitProcess(0)
         }
-    }
-
-    private fun makeTransfer(ua: UserAgent) {
-
-        val layout = LayoutInflater.from(this)
-                .inflate(R.layout.call_transfer_dialog, findViewById(android.R.id.content), false)
-        val blind: CheckBox = layout.findViewById(R.id.blind)
-        val attended: CheckBox = layout.findViewById(R.id.attended)
-
-        val transferUri: AutoCompleteTextView = layout.findViewById(R.id.transferUri)
-        transferUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contactNames()))
-        transferUri.threshold = 2
-        transferUri.requestFocus()
-
-        val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-        with(builder) {
-            setView(layout)
-            setPositiveButton(R.string.transfer) { dialog, _ ->
-                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
-                dialog.dismiss()
-                var uriText = transferUri.text.toString().trim()
-                if (uriText.isNotEmpty()) {
-                    val uris = Contact.contactUris(uriText)
-                    if (uris.size > 1) {
-                        val destinationBuilder = MaterialAlertDialogBuilder(
-                            this@MainActivity,
-                            R.style.AlertDialogTheme
-                        )
-                        with(destinationBuilder) {
-                            setTitle(R.string.choose_destination_uri)
-                            setItems(uris.toTypedArray()) { _, which ->
-                                uriText = uris[which]
-                                transfer(
-                                    ua,
-                                    if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
-                                    attended.isChecked
-                                )
-                            }
-                            setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
-                            show()
-                        }
-                    } else {
-                        if (uris.size == 1)
-                            uriText = uris[0]
-                    }
-                    transfer(ua, if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
-                        attended.isChecked)
-                }
-            }
-            setNeutralButton(android.R.string.cancel) { dialog, _ ->
-                imm.hideSoftInputFromWindow(transferUri.windowToken, 0)
-                dialog.cancel()
-            }
-        }
-        val alertDialog = builder.create()
-
-        val call = ua.currentCall() ?: return
-        val blindOrAttended: RelativeLayout = layout.findViewById(R.id.blindOrAttended)
-        if (call.replaces()) {
-            blind.setOnClickListener {
-                if (blind.isChecked) {
-                    attended.isChecked = false
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.transfer)
-                }
-            }
-            attended.setOnClickListener {
-                if (attended.isChecked) {
-                    blind.isChecked = false
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.call)
-                }
-            }
-            blindOrAttended.visibility = View.VISIBLE
-        } else {
-            blindOrAttended.visibility = View.GONE
-        }
-
-        // This needs to be done after dialog has been created and before it is shown
-        alertDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        alertDialog.show()
     }
 
     private fun transfer(ua: UserAgent, uriText: String, attended: Boolean) {
@@ -1666,6 +2429,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun askPassword(title: String, ua: UserAgent? = null) {
         val layout = LayoutInflater.from(this)
                 .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
@@ -1781,7 +2545,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBaresip() {
-        if (!BaresipService.isStartReceived) {
+       if (!BaresipService.isStartReceived) {
             baresipService.action = "Start"
             startService(baresipService)
             if (atStartup)
@@ -1830,22 +2594,32 @@ class MainActivity : AppCompatActivity() {
         val zipFilePath = BaresipService.filesPath + "/$zipFile"
         val zipData = Utils.decryptFromUri(applicationContext, downloadsInputUri!!, password)
         if (zipData == null) {
-            Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed),
-                            Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
+            Utils.alertView(
+                this, getString(R.string.error),
+                String.format(
+                    getString(R.string.restore_failed),
+                    Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)
+                )
+            )
             return
         }
         if (!Utils.putFileContents(zipFilePath, zipData)) {
             Log.w(TAG, "Failed to write zip file '$zipFile'")
-            Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_failed),
-                            Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)))
+            Utils.alertView(
+                this, getString(R.string.error),
+                String.format(
+                    getString(R.string.restore_failed),
+                    Utils.fileNameOfUri(applicationContext, downloadsInputUri!!)
+                )
+            )
             return
         }
         if (!Utils.unZip(zipFilePath)) {
             Log.w(TAG, "Failed to unzip file '$zipFile'")
-            Utils.alertView(this, getString(R.string.error),
-                    String.format(getString(R.string.restore_unzip_failed), "baresip", "60.0.0"))
+            Utils.alertView(
+                this, getString(R.string.error),
+                String.format(getString(R.string.restore_unzip_failed), "baresip", "60.0.0")
+            )
             return
         }
         Utils.deleteFile(File(zipFilePath))
@@ -1875,29 +2649,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun spinToAor(aor: String) {
-        for (accountIndex in BaresipService.uas.indices)
-            if (BaresipService.uas[accountIndex].account.aor == aor) {
-                aorSpinner.setSelection(accountIndex)
-                aorSpinner.tag = aor
-                return
-            }
-        if (BaresipService.uas.isNotEmpty()) {
-            aorSpinner.setSelection(0)
-            aorSpinner.tag = BaresipService.uas[0].account.aor
-        } else {
-            aorSpinner.setSelection(-1)
-            aorSpinner.tag = ""
-        }
+        if (aor != viewModel.selectedAor.value)
+            viewModel.updateSelectedAor(aor)
+        updateIcons(Account.ofAor(aor))
+    }
 
+    private fun userAgentofSelectedAor(): UserAgent {
+        return UserAgent.ofAor(viewModel.selectedAor.value)!!
     }
 
     private fun call(ua: UserAgent, uri: String, onHoldCall: Call? = null): Boolean {
-        if (ua.account.aor != aorSpinner.tag)
-            spinToAor(ua.account.aor)
+        spinToAor(ua.account.aor)
         val callp = ua.callAlloc(0L, Api.VIDMODE_OFF)
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", "outgoing", Utils.dtmfWatcher(callp))
+            val call = Call(callp, ua, uri, "out", "outgoing", null)
             call.onHoldCall = onHoldCall
             call.add()
             if (onHoldCall != null)
@@ -1924,11 +2690,10 @@ class MainActivity : AppCompatActivity() {
         val newCallp = ua.callAlloc(call.callp, Api.VIDMODE_OFF)
         if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
-            val newCall = Call(newCallp, ua, uri, "out", "transferring",
-                    Utils.dtmfWatcher(newCallp))
+            val newCall = Call(newCallp, ua, uri, "out", "transferring", null)
             newCall.add()
             if (newCall.connect(uri)) {
-                if (ua.account.aor != aorSpinner.tag)
+                if (ua.account.aor != viewModel.selectedAor.value)
                     spinToAor(ua.account.aor)
                 showCall(ua)
             } else {
@@ -1941,267 +2706,128 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeCall(lookForContact: Boolean = true) {
-        callUri.setAdapter(null)
-        val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
-        val aor = ua.account.aor
-        if (!Call.inCall()) {
-            var uriText = callUri.text.toString().trim()
-            if (uriText.isNotEmpty()) {
-                if (lookForContact) {
-                    val uris = Contact.contactUris(uriText)
-                    if (uris.size == 1)
-                        uriText = uris[0]
-                    else if (uris.size > 1) {
-                        val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                        with(builder) {
-                            setTitle(R.string.choose_destination_uri)
-                            setItems(uris.toTypedArray()) { _, which ->
-                                callUri.setText(uris[which])
-                                makeCall(false)
-                            }
-                            setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
-                            show()
-                        }
-                        return
-                    }
-                }
-                if (Utils.isTelNumber(uriText))
-                    uriText = "tel:$uriText"
-                val uri = if (Utils.isTelUri(uriText)) {
-                    if (ua.account.telProvider == "") {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.no_telephony_provider), aor))
-                        return
-                    }
-                    Utils.telToSip(uriText, ua.account)
-                } else {
-                    Utils.uriComplete(uriText, aor)
-                }
-                if (!Utils.checkUri(uri)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
-                } else if (!BaresipService.requestAudioFocus(applicationContext)) {
-                    Toast.makeText(applicationContext, R.string.audio_focus_denied,
-                            Toast.LENGTH_SHORT).show()
-                } else {
-                    callUri.isFocusable = false
-                    uaAdapter.notifyDataSetChanged()
-                    callButton.visibility = View.INVISIBLE
-                    callButton.isEnabled = false
-                    hangupButton.visibility = View.VISIBLE
-                    hangupButton.isEnabled = true
-                    if (Build.VERSION.SDK_INT < 31) {
-                        Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        runCall(ua, uri)
-                    } else {
-                        if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
-                            runCall(ua, uri)
-                        } else {
-                            audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
-                                if (mode == AudioManager.MODE_IN_COMMUNICATION) {
-                                    Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
-                                            "device ${am.communicationDevice!!.type}")
-                                    if (audioModeChangedListener != null) {
-                                        am.removeOnModeChangedListener(audioModeChangedListener!!)
-                                        audioModeChangedListener = null
-                                    }
-                                    runCall(ua, uri)
-                                } else {
-                                    Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
-                                        "device ${am.communicationDevice!!.type}")
-                                }
-                            }
-                            am.addOnModeChangedListener(mainExecutor, audioModeChangedListener!!)
-                            Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
-                            am.mode = AudioManager.MODE_IN_COMMUNICATION
-                        }
-                    }
-                }
-            } else {
-                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(aor)
-                if (latestPeerUri != null)
-                    callUri.setText(Utils.friendlyUri(this, latestPeerUri, ua.account))
-            }
-        }
-    }
-
     private fun runCall(ua: UserAgent, uri: String) {
         callRunnable = Runnable {
             callRunnable = null
             if (!call(ua, uri)) {
                 BaresipService.abandonAudioFocus(applicationContext)
-                callButton.visibility = View.VISIBLE
-                callButton.isEnabled = true
-                hangupButton.visibility = View.INVISIBLE
-                hangupButton.isEnabled = false
+                showCallButton.value = true
+                showHangupButton.value = false
             }
         }
         callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
-    private fun showCall(ua: UserAgent, showCall: Call? = null) {
+    private fun showCall(ua: UserAgent?, showCall: Call? = null) {
+        if (ua == null)
+            return
         val call = showCall ?: ua.currentCall()
         if (call == null) {
-            swipeRefresh.isEnabled = true
-            callTitle.text = getString(R.string.outgoing_call_to_dots)
-            callTimer.visibility = View.INVISIBLE
+            pullToRefreshEnabled = true
             if (ua.account.resumeUri != "")
-                callUri.setText(ua.account.resumeUri)
+                callUri.value = ua.account.resumeUri
             else
-                callUri.text.clear()
-            callUri.hint = getString(R.string.callee)
-            callUri.isFocusable = true
-            callUri.isFocusableInTouchMode = true
-            imm.hideSoftInputFromWindow(callUri.windowToken, 0)
-            callUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                    Contact.contactNames()))
-            securityButton.visibility = View.INVISIBLE
-            diverter.visibility = View.GONE
-            callButton.visibility = View.VISIBLE
-            callButton.isEnabled = true
-            hangupButton.visibility = View.INVISIBLE
-            answerButton.visibility = View.INVISIBLE
-            rejectButton.visibility = View.INVISIBLE
-            callControl.visibility = View.INVISIBLE
-            dialpadButton.isEnabled = true
+                callUri.value = ""
+            callUriLabel.value = getString(R.string.outgoing_call_to_dots)
+            callUriEnabled.value = true
+            keyboardController?.hide()
+            showCallTimer.value = false
+            securityIcon.intValue = -1
+            showHangupButton.value = false
+            transferIcon.intValue = R.drawable.call_transfer
+            dtmfEnabled.value = false
+            focusDtmf.value = false
+            showCallButton.value = true
+            showAnswerRejectButtons.value = false
+            showOnHoldNotice.value = false
+            dialpadButtonEnabled = true
             if (BaresipService.isMicMuted) {
                 BaresipService.isMicMuted = false
-                micIcon!!.setIcon(R.drawable.mic_on)
+                micIcon = R.drawable.mic_on
             }
-            onHoldNotice.visibility = View.GONE
         } else {
-            swipeRefresh.isEnabled = false
-            callUri.isFocusable = false
+            pullToRefreshEnabled = false
+            callUriEnabled.value = false
             when (call.status) {
                 "outgoing", "transferring", "answered" -> {
-                    callTitle.text = if (call.status == "answered")
+                    callUriLabel.value = if (call.status == "answered")
                         getString(R.string.incoming_call_from_dots)
                     else
                         getString(R.string.outgoing_call_to_dots)
-                    callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
-                    securityButton.visibility = View.INVISIBLE
-                    diverter.visibility = View.GONE
-                    callButton.visibility = View.INVISIBLE
-                    hangupButton.visibility = View.VISIBLE
-                    hangupButton.isEnabled = true
-                    answerButton.visibility = View.INVISIBLE
-                    rejectButton.visibility = View.INVISIBLE
-                    callControl.visibility = View.INVISIBLE
-                    onHoldNotice.visibility = View.GONE
-                    dialpadButton.isEnabled = false
+                    callUri.value = Utils.friendlyUri(this, call.peerUri, ua.account)
+                    showCallTimer.value = false
+                    securityIcon.intValue = -1
+                    showCallButton.value = false
+                    showHangupButton.value = true
+                    showAnswerRejectButtons.value = false
+                    showOnHoldNotice.value = false
+                    dialpadButtonEnabled = false
                 }
                 "incoming" -> {
-                    callTitle.text = getString(R.string.incoming_call_from_dots)
-                    callTimer.visibility = View.INVISIBLE
-                    callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
-                    callUri.setAdapter(null)
-                    securityButton.visibility = View.INVISIBLE
+                    showCallTimer.value = false
+                    securityIcon.intValue = -1
                     val uri = call.diverterUri()
                     if (uri != "") {
-                        diverterUri.text = Utils.friendlyUri(this, uri, ua.account)
-                        diverter.visibility = View.VISIBLE
-                    } else {
-                        diverter.visibility = View.GONE
+                        callUriLabel.value = getString(R.string.diverted_by_dots)
+                        callUri.value = Utils.friendlyUri(this, uri, ua.account)
                     }
-                    callButton.visibility = View.INVISIBLE
-                    hangupButton.visibility = View.INVISIBLE
-                    answerButton.visibility = View.VISIBLE
-                    answerButton.isEnabled = true
-                    rejectButton.visibility = View.VISIBLE
-                    rejectButton.isEnabled = true
-                    callControl.visibility = View.INVISIBLE
-                    onHoldNotice.visibility = View.GONE
-                    dialpadButton.isEnabled = false
+                    else {
+                        callUriLabel.value = getString(R.string.incoming_call_from_dots)
+                        callUri.value = Utils.friendlyUri(this, call.peerUri, ua.account)
+                    }
+                    showCallButton.value = false
+                    showHangupButton.value = false
+                    showAnswerRejectButtons.value = true
+                    showOnHoldNotice.value = false
+                    dialpadButtonEnabled = false
                 }
                 "connected" -> {
-                    callControl.post {
-                        callControl.scrollTo(holdButton.left, holdButton.top)
-                    }
                     if (call.referTo != "") {
-                        callTitle.text = getString(R.string.transferring_call_to_dots)
-                        callUri.setText(Utils.friendlyUri(this, call.referTo, ua.account))
-                        transferButton.isEnabled = false
+                        callUriLabel.value = getString(R.string.outgoing_call_to_dots)
+                        callUri.value = Utils.friendlyUri(this, call.referTo, ua.account)
+                        transferButtonEnabled.value = false
                     } else {
                         if (call.dir == "out") {
-                            callTitle.text = getString(R.string.outgoing_call_to_dots)
-                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
+                            callUriLabel.value = getString(R.string.outgoing_call_to_dots)
+                            callUri.value = Utils.friendlyUri(this, call.peerUri, ua.account)
                         } else {
-                            callTitle.text = getString(R.string.incoming_call_from_dots)
-                            callUri.setText(Utils.friendlyUri(this, call.peerUri, ua.account))
+                            callUriLabel.value = getString(R.string.incoming_call_from_dots)
+                            callUri.value = Utils.friendlyUri(this, call.peerUri, ua.account)
                         }
-                        transferButton.isEnabled = true
+                        transferButtonEnabled.value = true
                     }
-                    if (call.onHoldCall == null)
-                        transferButton.setImageResource(R.drawable.call_transfer)
+                    transferIcon.intValue = if (call.onHoldCall == null)
+                        R.drawable.call_transfer
                     else
-                        transferButton.setImageResource(R.drawable.call_transfer_execute)
+                        R.drawable.call_transfer_execute
+                    showCallTimer.value = true
                     startCallTimer(call)
-                    callTimer.visibility = View.VISIBLE
-                    if (ua.account.mediaEnc == "") {
-                        securityButton.visibility = View.INVISIBLE
-                    } else {
-                        securityButton.tag = call.security
-                        securityButton.setImageResource(call.security)
-                        securityButton.visibility = View.VISIBLE
-                    }
-                    callButton.visibility = View.INVISIBLE
-                    hangupButton.visibility = View.VISIBLE
-                    hangupButton.isEnabled = true
-                    answerButton.visibility = View.INVISIBLE
-                    rejectButton.visibility = View.INVISIBLE
-                    if (call.onhold) {
-                        holdButton.setImageResource(R.drawable.resume)
-                    } else {
-                        holdButton.setImageResource(R.drawable.call_hold)
-                    }
-                    callUri.inputType = InputType.TYPE_CLASS_PHONE
-                    dialpadButton.setImageResource(R.drawable.dialpad_on)
-                    dialpadButton.tag = "on"
-                    dialpadButton.isEnabled = false
-                    infoButton.isEnabled = true
-                    callControl.visibility = View.VISIBLE
+                    if (ua.account.mediaEnc == "")
+                        securityIcon.intValue = -1
+                    else
+                       securityIcon.intValue = call.security
+                    showCallButton.value = false
+                    showHangupButton.value = true
+                    showAnswerRejectButtons.value = false
+                    if (call.onhold)
+                        holdIcon.intValue = R.drawable.resume
+                    else
+                        holdIcon.intValue = R.drawable.call_hold
                     Handler(Looper.getMainLooper()).postDelayed({
-                        onHoldNotice.visibility = if (call.held) View.VISIBLE else View.GONE
+                        showOnHoldNotice.value = call.held
                     }, 100)
                     if (call.held) {
-                        imm.hideSoftInputFromWindow(dtmf.windowToken, 0)
-                        dtmf.isEnabled = false
+                        keyboardController?.hide()
+                        dtmfEnabled.value = false
+                        focusDtmf.value = false
                     } else {
-                        dtmf.isEnabled = true
-                        dtmf.requestFocus()
+                        dtmfEnabled.value = true
+                        focusDtmf.value = true
                         if (resources.configuration.orientation == ORIENTATION_PORTRAIT)
-                            imm.showSoftInput(dtmf, InputMethodManager.SHOW_IMPLICIT)
-                        if (dtmfWatcher != null) dtmf.removeTextChangedListener(dtmfWatcher)
-                        dtmfWatcher = call.dtmfWatcher
-                        dtmf.addTextChangedListener(dtmfWatcher)
+                            keyboardController?.show()
                     }
                 }
             }
-        }
-    }
-
-    private fun updateIcons(acc: Account) {
-        if (acc.missedCalls)
-            callsButton.setImageResource(R.drawable.calls_missed)
-        else
-            callsButton.setImageResource(R.drawable.calls)
-        if (acc.unreadMessages)
-            messagesButton.setImageResource(R.drawable.messages_unread)
-        else
-            messagesButton.setImageResource(R.drawable.messages)
-        if (acc.vmUri != "") {
-            if (acc.vmNew > 0)
-                voicemailButton.setImageResource(R.drawable.voicemail_new)
-            else
-                voicemailButton.setImageResource(R.drawable.voicemail)
-            voicemailButton.visibility = View.VISIBLE
-            voicemailButtonSpace.visibility = View.VISIBLE
-        } else {
-            voicemailButton.visibility = View.GONE
-            voicemailButtonSpace.visibility =View.GONE
         }
     }
 
@@ -2252,10 +2878,9 @@ class MainActivity : AppCompatActivity() {
                 b.putString("aor", activity[1])
                 i.putExtras(b)
                 contactsRequest.launch(i)
-
             }
             "contact" -> {
-                val i = Intent(this, ContactActivity::class.java)
+                val i = Intent(this, BaresipContactActivity::class.java)
                 val b = Bundle()
                 if (activity[1] == "true") {
                     b.putBoolean("new", true)
@@ -2304,26 +2929,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveCallUri() {
-        if (BaresipService.uas.isNotEmpty() && aorSpinner.selectedItemPosition >= 0) {
-            val ua = BaresipService.uas[aorSpinner.selectedItemPosition]
+        if (uas.value.isNotEmpty() && viewModel.selectedAor.value != "") {
+            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
             if (ua.calls().isEmpty())
-                ua.account.resumeUri = callUri.text.toString()
+                ua.account.resumeUri = callUri.value
             else
                 ua.account.resumeUri = ""
         }
     }
 
     private fun startCallTimer(call: Call) {
-        callTimer.stop()
-        callTimer.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
-        callTimer.start()
+        Handler(Looper.getMainLooper()).postDelayed({
+            callTimer?.stop()
+            callTimer?.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
+            callTimer?.start()
+        }, 100)
     }
 
     companion object {
-
-        var accountRequest: ActivityResultLauncher<Intent>? = null
         var activityAor = ""
-
     }
 
     init {

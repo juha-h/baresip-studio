@@ -1799,10 +1799,11 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_module_1unload(
     (*env)->ReleaseStringUTFChars(env, javaModule, native_module);
 }
 
+AAudioStream *AAudio_stream = NULL;
+
 JNIEXPORT jint JNICALL
-Java_com_tutpro_baresip_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) {
+Java_com_tutpro_baresip_Api_AAudio_1open_1stream(JNIEnv *env, jobject obj) {
     AAudioStreamBuilder *builder = NULL;
-    AAudioStream *stream = NULL;
     jint sessionId = -1;
 
     if (AAudio_createStreamBuilder(&builder) != AAUDIO_OK) {
@@ -1819,15 +1820,22 @@ Java_com_tutpro_baresip_Api_create_1AAudio_1SessionId(JNIEnv *env, jobject obj) 
     AAudioStreamBuilder_setChannelCount(builder, 1);
     AAudioStreamBuilder_setSessionId(builder, AAUDIO_SESSION_ID_ALLOCATE);
 
-    if (AAudioStreamBuilder_openStream(builder, &stream) == AAUDIO_OK) {
-        sessionId = AAudioStream_getSessionId(stream);
-        struct timespec td = {
-                .tv_nsec = 100*1000*1000 /* 100ms */
-        };
-        nanosleep(&td, NULL);
-        AAudioStream_close(stream);
+    if (AAudioStreamBuilder_openStream(builder, &AAudio_stream) == AAUDIO_OK)
+        sessionId = AAudioStream_getSessionId(AAudio_stream);
+    else {
+        LOGE("Failed to open AAudio stream\n");
+        AAudio_stream = NULL;
     }
-
     AAudioStreamBuilder_delete(builder);
+
     return sessionId;
+}
+
+JNIEXPORT void JNICALL
+Java_com_tutpro_baresip_Api_AAudio_1close_1stream(JNIEnv *env, jobject obj)
+{
+    if (AAudio_stream != NULL) {
+        AAudioStream_close(AAudio_stream);
+        AAudio_stream = NULL;
+    }
 }

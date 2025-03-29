@@ -7,32 +7,60 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.net.toUri
+import com.tutpro.baresip.BaresipService.Companion.contactNames
 import java.io.File
 import java.util.ArrayList
 
 sealed class Contact {
 
-    class BaresipContact(var name: String, var uri: String, var color: Int, val id: Long,
+    class BaresipContact(var name: String, var uri: String, var color: Int, var id: Long,
                          var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
     }
 
     class AndroidContact(var name: String, var color: Int, var thumbnailUri: Uri?,
-                         var favorite: Boolean): Contact() {
+                         var id: Long, var favorite: Boolean): Contact() {
         val uris = ArrayList<String>()
     }
 
+    fun name(): String {
+        return when (this) {
+            is AndroidContact -> name
+            is BaresipContact -> name
+        }
+    }
+
+    fun id(): Long {
+        return when (this) {
+            is AndroidContact -> id
+            is BaresipContact -> id
+        }
+    }
+
+    fun favorite(): Boolean {
+        return when (this) {
+            is AndroidContact -> favorite
+            is BaresipContact -> favorite
+        }
+    }
+
+    fun copy(): Contact {
+        val copy = when (this) {
+            is BaresipContact ->
+                BaresipContact(name, uri, color, id, favorite)
+            is AndroidContact ->
+                AndroidContact(name, color, thumbnailUri, id, favorite)
+        }
+        when (this) {
+            is BaresipContact ->
+                (copy as BaresipContact).avatarImage = avatarImage
+            is AndroidContact ->
+                (copy as AndroidContact).uris.addAll(uris)
+        }
+        return copy
+    }
+
     companion object {
-
-        const val CONTACTS_SIZE = 256
-
-        fun contacts(): ArrayList<Contact> {
-            return BaresipService.contacts
-        }
-
-        fun contactNames(): ArrayList<String> {
-            return BaresipService.contactNames
-        }
 
         // Return contact name of uri or uri itself if contact with uri is not found
         fun contactName(uri: String): String {
@@ -42,21 +70,29 @@ sealed class Contact {
                 if (Utils.isTelNumber(userPart))
                     contact = findContact("tel:$userPart")
             }
-            if (contact != null) {
-                return when (contact) {
-                    is BaresipContact ->
-                        contact.name
-                    is AndroidContact ->
-                        contact.name
-                }
-            }
+            if (contact != null)
+                return contact.name()
             return uri
+        }
+
+        fun baresipContact(name: String): BaresipContact? {
+            for (c in BaresipService.baresipContacts.value)
+                if (c.name == name)
+                    return c
+            return null
+        }
+
+        fun androidContact(name: String): AndroidContact? {
+            for (c in BaresipService.androidContacts.value)
+                if (c.name == name)
+                    return c
+            return null
         }
 
         // Return URIs of contact name
         fun contactUris(name: String): ArrayList<String> {
             val uris = ArrayList<String>()
-            for (c in contacts())
+            for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
                         if (c.name.equals(name, ignoreCase = true)) {
@@ -78,7 +114,7 @@ sealed class Contact {
         }
 
         fun findContact(uri: String): Contact? {
-            for (c in contacts())
+            for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
                         if (Utils.uriMatch(c.uri, uri))
@@ -95,22 +131,16 @@ sealed class Contact {
             return null
         }
 
-        fun nameExists(name: String, ignoreCase: Boolean): Boolean {
-            for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact ->
-                        if (c.name.equals(name, ignoreCase = ignoreCase))
-                            return true
-                    is AndroidContact ->
-                        if (c.name.equals(name, ignoreCase = ignoreCase))
-                            return true
-                }
+        fun nameExists(name: String, list: List<Contact>, ignoreCase: Boolean): Boolean {
+            for (c in list)
+                if (c.name().equals(name, ignoreCase = ignoreCase))
+                    return true
             return false
         }
 
         fun saveBaresipContacts() {
             var contents = ""
-            for (c in BaresipService.baresipContacts)
+            for (c in BaresipService.baresipContacts.value)
                 contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}" +
                         ";favorite=${if (c.favorite) "yes" else "no"}\n"
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
@@ -129,7 +159,7 @@ sealed class Contact {
                         ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
-            BaresipService.androidContacts.clear()
+            BaresipService.androidContacts.value = listOf()
             val contacts = HashMap<Long, AndroidContact>()
             while (cur != null && cur.moveToNext()) {
                 val id = cur.getLong(0)
@@ -141,7 +171,7 @@ sealed class Contact {
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(name, Utils.randomColor(), thumb, starred == 1)
+                    AndroidContact(name, Utils.randomColor(), thumb, id, starred == 1)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
@@ -158,9 +188,11 @@ sealed class Contact {
                     contacts[id] = contact
             }
             cur?.close()
+            val newList = mutableListOf<AndroidContact>()
             for ((_, value) in contacts)
                 if (value.name != "" && value.uris.isNotEmpty())
-                    BaresipService.androidContacts.add(value)
+                    newList.add(value)
+            BaresipService.androidContacts.value = newList.toList()
         }
 
         @Suppress("unused")
@@ -179,7 +211,8 @@ sealed class Contact {
             val contacts = String(content)
             var contactNo = 0
             val baseId = System.currentTimeMillis()
-            BaresipService.baresipContacts.clear()
+            val restored = mutableListOf<BaresipContact>()
+            BaresipService.baresipContacts.value = listOf()
             contacts.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
@@ -212,55 +245,62 @@ sealed class Contact {
                             Log.e(TAG, "Could not read avatar image from '$id.png")
                         }
                     }
-                    BaresipService.baresipContacts.add(contact)
+                    restored.add(contact)
                 }
             }
+            BaresipService.baresipContacts.value = restored.toList()
             return true
         }
 
         fun contactsUpdate() {
-            BaresipService.contacts.clear()
+            val newList = mutableListOf<Contact>()
             if (BaresipService.contactsMode != "android")
-                BaresipService.contacts.addAll(BaresipService.baresipContacts)
+                for (c in BaresipService.baresipContacts.value)
+                    newList.add(c.copy())
             if (BaresipService.contactsMode != "baresip")
-                addAndroidContacts()
-            sortContacts()
+                for (c in BaresipService.androidContacts.value)
+                    if (!nameExists(c.name, newList, true))
+                        newList.add(c.copy())
+            newList.sortBy{ when (it) {
+                is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
+                is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
+            }}
+            BaresipService.contacts = newList.toList()
             generateContactNames()
-            BaresipService.contactUpdate.postValue(System.nanoTime())
+            //BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
         fun addBaresipContact(contact: BaresipContact) {
-            BaresipService.baresipContacts.add(contact)
+            val updatedList = BaresipService.baresipContacts.value.toMutableList()
+            updatedList.add(contact)
+            BaresipService.baresipContacts.value = updatedList.toList()
+        }
+
+        fun updateBaresipContact(contact: BaresipContact) {
+            val updatedList = BaresipService.baresipContacts.value.toMutableList()
+            val contactCopy = contact.copy()
+            updatedList.removeIf { it.id == contact.id }
+            updatedList.add(contactCopy as BaresipContact)
+            BaresipService.baresipContacts.value = updatedList.toList()
         }
 
         fun removeBaresipContact(contact: BaresipContact) {
-            BaresipService.baresipContacts.remove(contact)
+            val updatedList = BaresipService.baresipContacts.value.toMutableList()
+            updatedList.removeIf { it.id == contact.id }
+            BaresipService.baresipContacts.value = updatedList.toList()
             saveBaresipContacts()
         }
 
         private fun generateContactNames () {
-            BaresipService.contactNames.clear()
+            val newList = mutableListOf<String>()
             for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact ->
-                        BaresipService.contactNames.add(c.name)
+                        newList.add(c.name)
                     is AndroidContact ->
-                        BaresipService.contactNames.add(c.name)
+                        newList.add(c.name)
                 }
+            contactNames.value = newList.toList()
         }
-
-        private fun addAndroidContacts() {
-            for (c in BaresipService.androidContacts)
-                if (!nameExists(c.name, true))
-                    BaresipService.contacts.add(c)
-        }
-
-        private fun sortContacts() {
-            BaresipService.contacts.sortBy{ when (it) {
-                is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
-                is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
-            }}
-        }
-
     }
 }

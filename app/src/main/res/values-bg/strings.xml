@@ -131,7 +131,11 @@
     <string name="start_automatically">Стартирайте автоматично</string>
     <string name="start_automatically_help">Ако е отметнато, baresip се стартира автоматично след включване на устройството.</string>
     <string name="listen_address">Слушане на адрес</string>
-    <string name="listen_address_help">IP адрес и порт на формата \'адрес: порт\', на който baresip слуша за входящи SIP заявки. Ако IP адресът е IPv6 адрес, той трябва да бъде написан вътре в скоби []. IPv4 адрес 0.0.0.0 или IPv6 адрес [::] позволява на baresip да слуша всички налични адреси. Ако се остави празно (фабрично по подразбиране), baresip ще слуша на порт 5060 от всички налични адреси.</string>
+    <string name="listen_address_help">IP адрес и порт на формата \'адрес: порт\', на който baresip слуша 
+		за входящи SIP заявки. Ако IP адресът е IPv6 адрес, той трябва да бъде написан вътре в скоби []. 
+		IPv4 адрес 0.0.0.0 или IPv6 адрес [::] позволява на baresip да слуша всички налични адреси. 
+		Ако се остави празно (фабрично по подразбиране), baresip ще слуша на порт 5060 от всички налични адреси. 
+	</string>
     <string name="invalid_listen_address">Невалиден адрес за слушане</string>
     <string name="dns_servers">DNS сървъри</string>
     <string name="dns_servers_help">Списък разделен със запетая на адреси на DNS сървъри. Ако не е зададено, 
@@ -147,7 +151,6 @@
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.</string>
     <string name="aec">Акустично отменяне на ехото</string>
-    <string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.

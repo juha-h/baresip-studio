@@ -134,7 +134,6 @@
     <string name="account_exists">Профиль \'%1$s\' уже существует.</string>
     <string name="accounts">Профили</string>
     <string name="aec">Подавление акустического эха</string>
-    <string name="aec_help">Если выбрано - работает подавление эха.</string>
     <string name="and">и</string>
     <string name="answer_mode">Режим ответа</string>
     <string name="answer_mode_help">Выберите как отвечать на входящие вызовы.</string>
@@ -181,8 +180,6 @@
     <string name="opus_packet_loss">Ожидаемая потеря пакетов Opus</string>
     <string name="opus_bit_rate_help">Средняя максимальная скорость передачи данных, используемая в аудиопотоке Opus. Допустимые значения: 6000-510000. Значение по умолчанию - 28000.</string>
     <string name="opus_bit_rate">Скорость передачи данных Opus</string>
-    <string name="aec_extended_filter_help">Если этот флажок установлен, для подавления эха используется расширенный фильтр.</string>
-    <string name="aec_extended_filter">Расширенный фильтр AEC</string>
     <string name="audio_modules_help">Аудиокодеки, предоставленные выбранными модулями, доступны для использования в аккаунтах.</string>
     <string name="tls_ca_file_help">При отметке файл с TLS-сертификатами необходимых центров сертификации был или будет загружен. В Android версии 9 и ниже файл называется \'ca_certs.crt\' и берётся из каталога загрузок.</string>
     <string name="tls_ca_file">Файл TLS CA</string>

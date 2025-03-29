@@ -43,7 +43,6 @@
     <string name="chat">Mensagem do Chat</string>
     <string name="contact_action_question">Quer ligar ou enviar mensagem para \'%1$s\'\?</string>
     <string name="tls_ca_file">Ficheiro TLS CA</string>
-    <string name="aec_extended_filter_help">Caso esteja marcado, o cancelamento do eco estará utilizando um filtro estendido.</string>
     <string name="sip_uri_of_another_proxy_server">URI SIP de outro Servidor Proxy</string>
     <string name="contact_already_exists">Contato \'%1$s\' já existe.</string>
     <string name="sip_uri_of_proxy_server">URI SIP do Servidor Proxy</string>
@@ -122,14 +121,12 @@
     <string name="no_messages">Não tem mensagens</string>
     <string name="duration">Duração: %1$d (segs)</string>
     <string name="transferring_call_to_dots">Transferindo chamada para …</string>
-    <string name="aec_help">Se marcado, cancelamento de eco é tentado no áudio da chamada.</string>
     <string name="call_info">Informações da Chamada</string>
     <string name="chats">Histórico de Mensagens</string>
     <string name="call_is_secure">A chamada é SEGURA e o par é VERIFICADO! Deseja desverificar o par\?</string>
     <string name="opus_bit_rate_help">Taxa de bits máxima média usada pelo fluxo de áudio do Opus. Os valores válidos são 6000-510000. A predefinição de fábrica é 28000.</string>
     <string name="restart_request">Solicitação para Reinicialização</string>
     <string name="register">Registo</string>
-    <string name="aec_extended_filter">Filtro Estendido do AEC</string>
     <string name="restore">Restaurar</string>
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
     <string name="transfer_request_query">Aceita transferir esta chamada para \'%1$s\'\?</string>

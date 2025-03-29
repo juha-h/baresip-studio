@@ -2,7 +2,11 @@ package com.tutpro.baresip
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
@@ -13,20 +17,37 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+import android.content.res.Configuration
 import android.database.ContentObserver
-import android.media.*
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
 import android.media.AudioManager.RINGER_MODE_SILENT
+import android.media.MediaPlayer
+import android.media.Ringtone
+import android.media.RingtoneManager
 import android.media.audiofx.AcousticEchoCanceler
 import android.media.audiofx.AutomaticGainControl
 import android.media.audiofx.NoiseSuppressor
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.WifiManager
-import android.os.*
 import android.os.Build.VERSION
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.PowerManager
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.ContactsContract
 import android.provider.Settings
+import android.system.OsConstants
 import android.telecom.TelecomManager
 import android.text.Spannable
 import android.text.SpannableString
@@ -37,7 +58,10 @@ import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -49,7 +73,9 @@ import java.io.File
 import java.net.InetAddress
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.GregorianCalendar
+import java.util.Timer
+import java.util.TimerTask
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
@@ -99,7 +125,7 @@ class BaresipService: Service() {
         filesPath = filesDir.absolutePath
         pName = packageName
 
-        am = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        am = applicationContext.getSystemService(AUDIO_SERVICE) as AudioManager
 
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
                 RingtoneManager.TYPE_NOTIFICATION)
@@ -113,14 +139,14 @@ class BaresipService: Service() {
         createNotificationChannels()
         snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
 
-        pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        pm = getSystemService(POWER_SERVICE) as PowerManager
 
         vibrator = if (VERSION.SDK_INT >= 31) {
-            val vibratorManager = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            val vibratorManager = applicationContext.getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
-            applicationContext.getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+            applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
 
         // This is needed to keep service running also in Doze Mode
@@ -133,7 +159,7 @@ class BaresipService: Service() {
             }
         }
 
-        cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val builder = NetworkRequest.Builder()
             .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         cm.registerNetworkCallback(
@@ -182,7 +208,7 @@ class BaresipService: Service() {
                 }
         )
 
-        wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wm = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
         hotSpotIsEnabled = Utils.isHotSpotOn(wm)
 
         hotSpotReceiver = object : BroadcastReceiver() {
@@ -238,9 +264,9 @@ class BaresipService: Service() {
         this.registerReceiver(hotSpotReceiver,
             IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
 
-        tm = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        tm = getSystemService(TELECOM_SERVICE) as TelecomManager
 
-        btm = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        btm = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         btAdapter = btm.adapter
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
@@ -530,10 +556,7 @@ class BaresipService: Service() {
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
-                    ChatsActivity.saveUaMessage(
-                        ua.account.aor,
-                        intent.getStringExtra("time")!!.toLong()
-                    )
+                    Message.updateAorMessage(ua.account.aor, intent.getStringExtra("time")!!.toLong())
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -543,10 +566,8 @@ class BaresipService: Service() {
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
                 else
-                    ChatsActivity.deleteUaMessage(
-                        ua.account.aor,
-                        intent.getStringExtra("time")!!.toLong()
-                    )
+                    Message.deleteAorMessage(ua.account.aor, intent.getStringExtra("time")!!.toLong())
+
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -569,6 +590,20 @@ class BaresipService: Service() {
         }
 
         return START_STICKY
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val currentNightMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        when (currentNightMode) {
+            Configuration.UI_MODE_NIGHT_NO -> {
+                darkTheme.value = Preferences(applicationContext).displayTheme ==
+                    AppCompatDelegate.MODE_NIGHT_YES
+            }
+            Configuration.UI_MODE_NIGHT_YES -> {
+                darkTheme.value = true
+            }
+        }
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -598,7 +633,7 @@ class BaresipService: Service() {
                 R.drawable.circle_white
             else
                 R.drawable.circle_yellow
-            uas.add(ua)
+            ua.add()
 
             val acc = ua.account
             if (acc.authUser != "" && acc.authPass == NO_AUTH_PASS) {
@@ -629,6 +664,47 @@ class BaresipService: Service() {
         if (ev[0] == "recorder sessionid") {
             recorderSessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $recorderSessionId")
+            if (recorderSessionId != 0) {
+                if (!webrtcAec) {
+                    aec = AcousticEchoCanceler.create(recorderSessionId)
+                    if (aec != null) {
+                        if (!aec!!.getEnabled()) {
+                            aec!!.setEnabled(true)
+                            if (aec!!.getEnabled())
+                                Log.d(TAG, "AEC is enabled")
+                            else
+                                Log.w(TAG, "Failed to enable AEC")
+                        }
+                    } else
+                        Log.w(
+                            TAG, "Failed to create AEC for session " +
+                                    "$recorderSessionId"
+                        )
+                }
+                if (agcAvailable) {
+                    agc = AutomaticGainControl.create(recorderSessionId)
+                    if (agc != null) {
+                        if (!agc!!.getEnabled()) {
+                            agc!!.setEnabled(true)
+                            if (agc!!.getEnabled())
+                                Log.d(TAG, "AGC is enabled")
+                        }
+                    } else
+                        Log.w(TAG, "Failed to create AGC")
+                }
+                if (nsAvailable) {
+                    ns = NoiseSuppressor.create(recorderSessionId)
+                    if (ns != null) {
+                        if (!ns!!.getEnabled()) {
+                            ns!!.setEnabled(true)
+                            if (ns!!.getEnabled())
+                                Log.d(TAG, "NS is enabled")
+                        }
+                    } else
+                        Log.w(TAG, "Failed to create NS")
+                }
+                recorderSessionId = 0
+            }
             return
         }
 
@@ -649,31 +725,32 @@ class BaresipService: Service() {
             return
         }
 
-        for (accountIndex in uas.indices) {
-            if (uas[accountIndex].account.aor == aor) {
+        for (accountIndex in uas.value.indices) {
+            if (uas.value[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
-                        ua.status = R.drawable.circle_yellow
                         updateStatusNotification()
+                        ua.uaUpdateStatus(R.drawable.circle_yellow)
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "registered" -> {
-                        ua.status = if (Api.account_regint(ua.account.accp) == 0)
-                            R.drawable.circle_white
-                        else
-                            R.drawable.circle_green
+                        ua.uaUpdateStatus(
+                            if (Api.account_regint(ua.account.accp) == 0)
+                                R.drawable.circle_white
+                            else
+                                R.drawable.circle_green)
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "registering failed" -> {
-                        ua.status = if (Api.account_regint(ua.account.accp) == 0)
+                        ua.uaUpdateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
-                            R.drawable.circle_red
+                            R.drawable.circle_red)
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -752,7 +829,7 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
-                        Call(callp, ua, peerUri, "in", "incoming", Utils.dtmfWatcher(callp)).add()
+                        Call(callp, ua, peerUri, "in", "incoming", null).add()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                         if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
@@ -827,47 +904,6 @@ class BaresipService: Service() {
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
-                        if (recorderSessionId != 0) {
-                            if (Utils.isAecSupported() && !webrtcAec) {
-                                aec = AcousticEchoCanceler.create(recorderSessionId)
-                                if (aec != null) {
-                                    if (!aec!!.getEnabled()) {
-                                        aec!!.setEnabled(true)
-                                        if (aec!!.getEnabled())
-                                            Log.d(TAG, "AEC is enabled")
-                                        else
-                                            Log.w(TAG, "Failed to enable AEC")
-                                    }
-                                } else
-                                    Log.w(
-                                        TAG, "Failed to create AEC for session " +
-                                                "$recorderSessionId"
-                                    )
-                            }
-                            if (agcAvailable) {
-                                agc = AutomaticGainControl.create(recorderSessionId)
-                                if (agc != null) {
-                                    if (!agc!!.getEnabled()) {
-                                        agc!!.setEnabled(true)
-                                        if (agc!!.getEnabled())
-                                            Log.d(TAG, "AGC is enabled")
-                                    }
-                                } else
-                                    Log.w(TAG, "Failed to create AGC")
-                            }
-                            if (nsAvailable) {
-                                ns = NoiseSuppressor.create(recorderSessionId)
-                                if (ns != null) {
-                                    if (!ns!!.getEnabled()) {
-                                        ns!!.setEnabled(true)
-                                        if (ns!!.getEnabled())
-                                            Log.d(TAG, "ns is enabled")
-                                    }
-                                } else
-                                    Log.w(TAG, "Failed to create NS")
-                            }
-                            recorderSessionId = 0
-                        }
                         call.onhold = false
                         if (ua.account.callHistory)
                             call.startTime = GregorianCalendar()
@@ -951,8 +987,11 @@ class BaresipService: Service() {
                             stopRinging()
                             stopMediaPlayer()
                             aec?.release()
+                            aec = null
                             agc?.release()
+                            agc = null
                             ns?.release()
+                            ns = null
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1237,14 +1276,14 @@ class BaresipService: Service() {
                 2-> R.id.status2
                 else -> R.id.status3
             }
-            if (i < uas.size) {
-                notificationLayout.setImageViewResource(resId, uas[i].status)
+            if (i < uas.value.size) {
+                notificationLayout.setImageViewResource(resId, uas.value[i].status)
                 notificationLayout.setViewVisibility(resId, View.VISIBLE)
             } else {
                 notificationLayout.setViewVisibility(resId, View.INVISIBLE)
             }
         }
-        if (uas.size > 4)
+        if (uas.value.size > 4)
             notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
         else
             notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
@@ -1467,7 +1506,7 @@ class BaresipService: Service() {
             if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
                 val props = cm.getLinkProperties(n) ?: continue
                 for (la in props.linkAddresses)
-                    if (la.scope == android.system.OsConstants.RT_SCOPE_UNIVERSE &&
+                    if (la.scope == OsConstants.RT_SCOPE_UNIVERSE &&
                             props.interfaceName != null && la.address.hostAddress != null &&
                             afMatch(la.address.hostAddress!!))
                         addresses[la.address.hostAddress!!] = props.interfaceName!!
@@ -1544,9 +1583,10 @@ class BaresipService: Service() {
             stopRinging()
             stopMediaPlayer()
             abandonAudioFocus(applicationContext)
-            uas.clear()
+            uas.value = emptyList()
+            uasStatus.value = emptyMap()
             callHistory.clear()
-            messages.clear()
+            messages = emptyList()
             if (this::nm.isInitialized)
                 nm.cancelAll()
             if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
@@ -1590,17 +1630,20 @@ class BaresipService: Service() {
         var isRecOn = false
         var toneCountry = "us"
 
-        val uas = ArrayList<UserAgent>()
+        val uas = mutableStateOf(emptyList<UserAgent>())
+        val uasStatus = mutableStateOf(emptyMap<String, Int>())
+        var contacts by mutableStateOf(emptyList<Contact>())
+        val darkTheme = mutableStateOf(false)
+        var messages by mutableStateOf(emptyList<Message>())
+
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistoryNew>()
-        var messages = ArrayList<Message>()
         val messageUpdate = MutableLiveData<Long>()
         val contactUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
-        val baresipContacts = ArrayList<Contact.BaresipContact>()
-        val androidContacts = ArrayList<Contact.AndroidContact>()
-        val contacts = ArrayList<Contact>()
-        val contactNames = ArrayList<String>()
+        val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
+        val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
+        val contactNames = mutableStateOf(emptyList<String>())
         var contactsMode = "baresip"
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
@@ -1611,11 +1654,12 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
-        var agcAvailable = AutomaticGainControl.isAvailable()
-        private val nsAvailable = NoiseSuppressor.isAvailable()
+        var aecAvailable = false
         private var aec: AcousticEchoCanceler? = null
-        private var ns: NoiseSuppressor? = null
+        var agcAvailable = false
         private var agc: AutomaticGainControl? = null
+        private val nsAvailable = NoiseSuppressor.isAvailable()
+        private var ns: NoiseSuppressor? = null
         var webrtcAec = false
         private var btAdapter: BluetoothAdapter? = null
         private var recorderSessionId = 0
@@ -1626,7 +1670,7 @@ class BaresipService: Service() {
                 Log.d(TAG, "Already focused")
                 return true
             }
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
             val attributes = AudioAttributesCompat.Builder()
                 .setUsage(AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributesCompat.CONTENT_TYPE_SPEECH)
@@ -1647,7 +1691,7 @@ class BaresipService: Service() {
         }
 
         fun abandonAudioFocus(ctx: Context) {
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
             if (audioFocusRequest != null) {
                 Log.d(TAG, "Abandoning audio focus")
                 if (AudioManagerCompat.abandonAudioFocusRequest(am, audioFocusRequest!!) ==
@@ -1683,7 +1727,7 @@ class BaresipService: Service() {
         }
 
         private fun startBluetoothSco(ctx: Context, delay: Long, count: Int) {
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
             if (isBluetoothScoOn(am)) {
                 Log.d(TAG, "Bluetooth SCO is already on")
                 return
@@ -1705,7 +1749,7 @@ class BaresipService: Service() {
 
         private fun stopBluetoothSco(ctx: Context) {
             Log.d(TAG, "Stopping Bluetooth SCO")
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
             if (!isBluetoothScoOn(am)) {
                 Log.d(TAG, "Bluetooth SCO is already off")
                 return
@@ -1719,7 +1763,5 @@ class BaresipService: Service() {
                 am.isBluetoothScoOn = false
             }, 100)
         }
-
     }
-
 }

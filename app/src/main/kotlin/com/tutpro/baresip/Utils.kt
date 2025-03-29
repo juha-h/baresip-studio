@@ -7,44 +7,60 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Color
 import android.media.AudioAttributes
-import android.net.Uri
-import android.net.wifi.WifiManager
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.provider.OpenableColumns
-import android.text.Editable
-import android.text.TextWatcher
-import android.text.format.DateUtils
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.AcousticEchoCanceler
-import android.os.*
+import android.media.audiofx.AutomaticGainControl
+import android.net.Uri
+import android.net.wifi.WifiManager
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.provider.DocumentsContract
+import android.provider.MediaStore
+import android.provider.OpenableColumns
+import android.text.format.DateUtils
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.security.SecureRandom
 import java.text.DateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Enumeration
+import java.util.GregorianCalendar
+import java.util.Locale
+import java.util.Random
 import java.util.concurrent.Executor
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -54,6 +70,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+import androidx.core.graphics.scale
 
 object Utils {
 
@@ -161,7 +178,7 @@ object Utils {
         return u
     }
 
-    fun e164Uri(uri: String, countryCode: String): String {
+    private fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
         val scheme = uri.substring(0, 4)
         val userPart = uriUserPart(uri)
@@ -488,30 +505,6 @@ object Utils {
         return result
     }
 
-    fun dtmfWatcher(callp: Long): TextWatcher {
-        return object : TextWatcher {
-            override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
-                val text = sequence.subSequence(start, start + count).toString()
-                if (text.isNotEmpty()) {
-                    val digit = text[0]
-                    val call = Call.ofCallp(callp)
-                    if (call == null) {
-                        Log.w(TAG, "dtmfWatcher did not find call $callp")
-                    } else {
-                        Log.d(TAG, "Got DTMF digit '$digit'")
-                        if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
-                            call.sendDigit(digit)
-                    }
-                }
-            }
-            override fun afterTextChanged(sequence: Editable) {
-                // KEYCODE_REL
-                // call_send_digit(callp, 4.toChar())
-            }
-        }
-    }
-
     fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
         for (p in permissions) {
             if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
@@ -522,23 +515,6 @@ object Utils {
             }
         }
         return true
-    }
-
-    fun View.showSnackBar(
-        view: View,
-        msg: String,
-        length: Int,
-        actionMessage: CharSequence?,
-        action: (View) -> Unit
-    ) {
-        val snackBar = Snackbar.make(view, msg, length)
-        if (actionMessage != null) {
-            snackBar.setAction(actionMessage) {
-                action(this)
-            }.show()
-        } else {
-            snackBar.show()
-        }
     }
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
@@ -649,7 +625,7 @@ object Utils {
         if (file.exists()) file.delete()
         try {
             val out = FileOutputStream(file)
-            val scaledBitmap = createScaledBitmap(bitmap, 96, 96, true)
+            val scaledBitmap = bitmap.scale(96, 96)
             scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
@@ -663,7 +639,6 @@ object Utils {
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
-            @Suppress("ConstPropertyName")
             private const val serialVersionUID: Long = -29238082928391L
         }
     }
@@ -862,7 +837,7 @@ object Utils {
 
     fun randomColor(): Int {
         val rnd = Random()
-        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
+        return android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
                 rnd.nextInt(256))
     }
 
@@ -875,6 +850,19 @@ object Utils {
         val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         kgm.requestDismissKeyguard(activity, null)
 
+    }
+
+    fun isThemeDark(ctx: Context) : Boolean {
+        return Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES ||
+                ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
+                        Configuration.UI_MODE_NIGHT_YES
+    }
+
+    @Composable
+    fun isNightMode() = when (AppCompatDelegate.getDefaultNightMode()) {
+        AppCompatDelegate.MODE_NIGHT_NO -> false
+        AppCompatDelegate.MODE_NIGHT_YES -> true
+        else -> isSystemInDarkTheme()
     }
 
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {
@@ -894,8 +882,8 @@ object Utils {
         }
     }
 
-    fun bitmapFromView(view: View): Bitmap {
-        val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
+    private fun bitmapFromView(view: View): Bitmap {
+        val bitmap = createBitmap(view.layoutParams.width, view.layoutParams.height)
         val canvas = Canvas(bitmap)
         view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
         view.draw(canvas)
@@ -1044,32 +1032,41 @@ object Utils {
         }
     }
 
-    fun isDarkTheme(ctx: Context): Boolean {
-        return ctx.resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
+    fun aecAgcCheck() {
 
-    fun isAecSupported(): Boolean {
-        if (!AcousticEchoCanceler.isAvailable()) {
-            Log.i(TAG, "Hardware AEC is NOT available")
-            return false
-        }
-
-        val sessionId = Api.create_AAudio_SessionId()
+        val sessionId = Api.AAudio_open_stream()
         if (sessionId == -1) {
-            Log.e(TAG, "Failed to create AAudio stream for session ID")
-            return false
+            Log.e(TAG, "Failed to open AAudio stream")
+            return
         }
 
-        val aec = AcousticEchoCanceler.create(sessionId)
-        return if (aec != null) {
-            aec.release()
-            Log.i(TAG, "Hardware AEC is supported")
-            true
-        } else {
-            Log.w(TAG, "Hardware AEC is NOT supported")
-            false
+        if (AcousticEchoCanceler.isAvailable()) {
+            val aec = AcousticEchoCanceler.create(sessionId)
+            if (aec != null) {
+                BaresipService.aecAvailable = true
+                aec.release()
+                Log.d(TAG, "Creation of hardware AEC for $sessionId succeeded")
+            } else {
+                Log.w(TAG, "Creation of hardware AEC for $sessionId failed")
+            }
         }
+        else
+            Log.i(TAG, "Hardware AEC is NOT available")
+
+        if (AutomaticGainControl.isAvailable()) {
+            val agc = AcousticEchoCanceler.create(sessionId)
+            if (agc != null) {
+                BaresipService.agcAvailable = true
+                agc.release()
+                Log.d(TAG, "Creation of hardware AGC for $sessionId succeeded")
+            } else {
+                Log.w(TAG, "Creation of hardware AGC for $sessionId failed")
+            }
+        }
+        else
+            Log.i(TAG, "Hardware AGC is NOT available")
+
+        Api.AAudio_close_stream()
+
     }
-
 }

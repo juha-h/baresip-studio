@@ -1,5 +1,8 @@
 package com.tutpro.baresip
 
+import com.tutpro.baresip.BaresipService.Companion.uas
+import com.tutpro.baresip.BaresipService.Companion.uasStatus
+
 class UserAgent(val uap: Long) {
 
     val account = Account(Api.ua_account(uap))
@@ -10,11 +13,22 @@ class UserAgent(val uap: Long) {
     }
 
     fun add() {
-        BaresipService.uas.add(this)
+        val updatedUas = uas.value.toMutableList()
+        updatedUas.add(this)
+        uas.value = updatedUas.toList()
+        uasStatus.value = statusMap()
     }
 
     fun remove() {
-        BaresipService.uas.remove(this)
+        val updatedUas = uas.value.toMutableList()
+        updatedUas.remove(this)
+        uas.value = updatedUas.toList()
+        uasStatus.value = statusMap()
+    }
+
+    fun uaUpdateStatus(status: Int) {
+        uas.value.find { it.uap == this.uap }?.status = status
+        uasStatus.value = statusMap()
     }
 
     fun calls(dir: String = ""): ArrayList<Call> {
@@ -34,19 +48,19 @@ class UserAgent(val uap: Long) {
     companion object {
 
         fun ofAor(aor: String): UserAgent? {
-            for (ua in BaresipService.uas)
+            for (ua in uas.value)
                 if (ua.account.aor == aor) return ua
             return null
         }
 
         fun ofDomain(domain: String): UserAgent? {
-            for (ua in BaresipService.uas)
+            for (ua in uas.value)
                 if (Utils.aorDomain(ua.account.aor) == domain) return ua
             return null
         }
 
         fun ofUap(uap: Long): UserAgent? {
-            for (ua in BaresipService.uas)
+            for (ua in uas.value)
                 if (ua.uap == uap) return ua
             return null
         }
@@ -59,19 +73,26 @@ class UserAgent(val uap: Long) {
         }
 
         fun findAorIndex(aor: String): Int? {
-            for (i in BaresipService.uas.indices) {
-                if (BaresipService.uas[i].account.aor == aor) return i
+            for (i in uas.value.indices) {
+                if (uas.value[i].account.aor == aor) return i
             }
             return null
         }
 
         fun register() {
-            for (ua in BaresipService.uas) {
+            for (ua in uas.value) {
                 if (ua.account.regint > 0) {
                     if (Api.ua_register(ua.uap) != 0)
                         Log.d(TAG, "Failed to register ${ua.account.aor}")
                 }
             }
+        }
+
+        fun statusMap(): Map<String, Int> {
+            val result = emptyMap<String, Int>().toMutableMap()
+            for (ua in uas.value)
+                result[ua.account.aor] = ua.status
+            return result
         }
     }
 }

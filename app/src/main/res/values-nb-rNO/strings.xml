@@ -130,7 +130,6 @@
     <string name="dns_servers_help">Kommainndelt liste over adresser til DNS-tjenere. Hvis ikke angitt, vil DNS-tjeneradresser hentes dynamisk fra systemet. Hver DNS-adresse er utførelsen \"ip:port\" eller \"ip\". Hvis porten utelates, brukes forvalget 53. Hvis IP-en er en IPv6-adresse, og port også angis, må IP-en skrives i hakeparenteser []. Som etksempel, list \'8.8.8.8:53,[2001:4860:4860::8888]:53\' peker til en IPv4-adresser og IPv6-adresser for offentlige Google DNS-tjenere.</string>
     <string name="failed_to_load_module">Klarte ikke å laste inn modul.</string>
     <string name="aec">Kansellering av akustisk ekko</string>
-    <string name="aec_help">Prøver å unngå ekko under samtaler.</string>
     <string name="opus_bit_rate_help">Gjennomsnittlig maksimal bitrate ved bruk av Opus-lydstrøm. Gyldig verdi er 6000-510000. Fabrikksforvalg er 28000.</string>
     <string name="opus_packet_loss">Forventet Opus-pakketap</string>
     <string name="opus_packet_loss_help">Forventet prosentvis pakketap for Opus-lydstrøm. Gyldige verdier fra 0–100. Fabrikksforvalg er 0, som skrur av Opus-fremtidsfeilkorrigering (FEC).</string>

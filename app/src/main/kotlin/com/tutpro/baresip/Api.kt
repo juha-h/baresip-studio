@@ -121,6 +121,6 @@ object Api {
     external fun module_load(module: String): Int
     external fun module_unload(module: String)
 
-    external fun create_AAudio_SessionId(): Int
-
+    external fun AAudio_open_stream(): Int
+    external fun AAudio_close_stream()
 }

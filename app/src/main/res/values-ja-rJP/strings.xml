@@ -130,7 +130,12 @@
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete %2$s from call history?
     </string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or add peer to contacts?</string>
-    <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens for incoming SIP requests. If IP address is an IPv6 address, it must be written inside brackets []. IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all available addresses. If left empty (factory default), baresip listens at port 5060 of all available addresses.</string>
+    <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
+        for incoming SIP requests. If IP address is an IPv6 address, it must be written inside
+        brackets []. IPv4 address 0.0.0.0 or IPv6 address [::] makes baresip listen at all
+        available addresses. If left empty (factory default), baresip listens at port 5060 of
+        all available addresses.
+    </string>
     <string name="dns_servers_help">Comma separated list of addresses of DNS servers. If not given,
         DNS server addresses are obtained dynamically from the system. Each DNS address is of form
         \'ip:port\' or \'ip\'. If port is omitted, it defaults to 53. If ip is an IPv6 address and
@@ -290,8 +295,6 @@
     <string name="tls_ca_file">TLS CA証明書ファイル</string>
     <string name="audio_modules_title">オーディオモジュール</string>
     <string name="failed_to_load_module">モジュールの読み込みに失敗しました</string>
-    <string name="aec_help">チェックを入れると、通話音声のエコーキャンセルを試みます</string>
-    <string name="aec_extended_filter">音響エコーキャンセル拡張フィルタ</string>
     <string name="opus_bit_rate">Opusのビットレート</string>
     <string name="opus_packet_loss">期待されるOpusのパケットロス</string>
     <string name="invalid_opus_bitrate">Opusのビットレートが無効です</string>
@@ -346,7 +349,6 @@
     <string name="answer_mode_help">着信した電話にどのように応答するかを選択します。</string>
     <string name="start_automatically_help">チェックを入れると、デバイスの再起動後に自動的にbaresipが起動します</string>
     <string name="aec">音響エコーキャンセル</string>
-    <string name="aec_extended_filter_help">チェックを入れると、エコーキャンセルは拡張フィルタを使用しています。</string>
     <string name="default_call_volume_help">設定されている場合、デフォルトの通話音声の音量は1～10段階です</string>
     <string name="dark_theme_help">ダークテーマを強制する</string>
     <string name="debug_help">チェックを入れると、デバッグおよび情報レベルのログメッセージをLogcatに提供します。</string>

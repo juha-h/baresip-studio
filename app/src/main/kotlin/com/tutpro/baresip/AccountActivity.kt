@@ -1,77 +1,121 @@
 package com.tutpro.baresip
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.*
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.tutpro.baresip.databinding.ActivityAccountBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
-import java.io.StringReader
-import java.net.URL
-import java.util.*
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tutpro.baresip.BaresipService.Companion.uas
+import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.verticalScrollbar
 
-class AccountActivity : AppCompatActivity() {
+class AccountActivity : ComponentActivity() {
 
-    private lateinit var binding: ActivityAccountBinding
+    private lateinit var mediaEncMap: Map<String, String>
+    private lateinit var mediaNatMap: Map<String, String>
+    private lateinit var dtmfModeMap: Map<Int, String>
+    private lateinit var answerModeMap: Map<Int, String>
+    private lateinit var redirectModeMap: Map<Boolean, String>
     private lateinit var acc: Account
     private lateinit var ua: UserAgent
-    private lateinit var uri: TextView
-    private lateinit var nickName: EditText
-    private lateinit var displayName: EditText
     private lateinit var aor: String
-    private lateinit var authUser: EditText
-    private lateinit var authPass: EditText
-    private lateinit var outbound: Array<EditText>
-    private lateinit var mediaNat: String
-    private lateinit var stun: LinearLayout
-    private lateinit var stunServer: EditText
-    private lateinit var stunUser: EditText
-    private lateinit var stunPass: EditText
-    private lateinit var regCheck: CheckBox
-    private lateinit var regInt: EditText
-    private lateinit var mediaNatSpinner: Spinner
-    private lateinit var mediaEnc: String
-    private lateinit var mediaEncSpinner: Spinner
-    private lateinit var rtcpCheck: CheckBox
-    private lateinit var rel100Check: CheckBox
-    private var dtmfMode = Api.DTMFMODE_RTP_EVENT
-    private lateinit var dtmfModeSpinner: Spinner
-    private var answerMode = Api.ANSWERMODE_MANUAL
-    private lateinit var answerModeSpinner: Spinner
-    private var autoRedirect = false
-    private lateinit var redirectModeSpinner: Spinner
-    private lateinit var vmUri: EditText
-    private lateinit var countryCode: EditText
-    private lateinit var telProvider: EditText
-    private lateinit var defaultCheck: CheckBox
-
-    private val mediaEncKeys = arrayListOf("zrtp", "dtls_srtp", "srtp-mandf", "srtp-mand", "srtp", "")
-    private val mediaEncVals = arrayListOf("ZRTP", "DTLS-SRTPF", "SRTP-MANDF", "SRTP-MAND", "SRTP", "-")
-    private val mediaNatKeys = arrayListOf("stun", "turn", "ice", "")
-    private val mediaNatVals = arrayListOf("STUN", "TURN", "ICE", "-")
 
     private var reRegister = false
-    private var uaIndex= -1
-
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private var oldNickname = ""
+    private var newNickname = ""
+    private var oldDisplayname = ""
+    private var newDisplayname = ""
+    private var oldAuthUser = ""
+    private var newAuthUser = ""
+    private var oldAuthPass = ""
+    private var newAuthPass = ""
+    private var oldOutbound1 = ""
+    private var newOutbound1 = ""
+    private var oldOutbound2 = ""
+    private var newOutbound2 = ""
+    private var oldRegister = false
+    private var newRegister = false
+    private var oldRegInt = ""
+    private var newRegInt = ""
+    private var oldMediaEnc = ""
+    private var newMediaEnc = ""
+    private var oldMediaNat = ""
+    private var newMediaNat = ""
+    private var oldStunServer = ""
+    private var newStunServer = ""
+    private var oldStunUser = ""
+    private var newStunUser = ""
+    private var oldStunPass = ""
+    private var newStunPass = ""
+    private var oldRtcpMux = false
+    private var newRtcpMux = false
+    private var old100Rel = false
+    private var new100Rel = false
+    private var oldDtmfMode = 0
+    private var newDtmfMode = 0
+    private var oldAnswerMode = 0
+    private var newAnswerMode = 0
+    private var oldAutoRedirect = false
+    private var newAutoRedirect = false
+    private var oldVmUri = ""
+    private var newVmUri = ""
+    private var oldCountryCode = ""
+    private var newCountryCode = ""
+    private var oldTelProvider = ""
+    private var newTelProvider = ""
+    private var oldDefaultAccount = false
+    private var newDefaultAccount = false
+    private var arrowTint = Color.Unspecified
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -83,64 +127,40 @@ class AccountActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAccountBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            if (Build.VERSION.SDK_INT >= 35)
-                binding.AccountView.updatePadding(top = 172)
-            WindowInsetsCompat.CONSUMED
-        }
-
-        if (!Utils.isDarkTheme(this))
-            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        uri = binding.Uri
-        nickName = binding.NickName
-        displayName = binding.DisplayName
-        authUser = binding.AuthUser
-        authPass = binding.AuthPass
-        outbound = arrayOf(binding.Outbound1, binding.Outbound2)
-        regCheck = binding.Register
-        regInt = binding.RegInt
-        mediaNatSpinner = binding.mediaNatSpinner
-        stun = binding.Stun
-        stunServer = binding.StunServer
-        stunUser = binding.StunUser
-        stunPass = binding.StunPass
-        mediaEncSpinner = binding.mediaEncSpinner
-        rtcpCheck = binding.RtcpMux
-        rel100Check = binding.Rel100
-        dtmfModeSpinner = binding.dtmfModeSpinner
-        answerModeSpinner = binding.answerModeSpinner
-        redirectModeSpinner = binding.redirectModeSpinner
-        vmUri = binding.voicemailUri
-        countryCode = binding.countryCode
-        telProvider = binding.telephonyProvider
-        defaultCheck = binding.Default
+        enableEdgeToEdge()
 
         aor = intent.getStringExtra("aor")!!
-        ua = UserAgent.ofAor(aor)!!
-        acc = ua.account
-        uaIndex = UserAgent.findAorIndex(aor)!!
 
         Utils.addActivity("account,$aor")
 
-        if (intent.getBooleanExtra("new", false))
-            initAccountFromConfig(this)
+        ua = UserAgent.ofAor(aor)!!
+        acc = ua.account
 
-        title = if (acc.nickName != "")
-            acc.nickName
-        else
-            aor.split(":")[1]
+        mediaEncMap = mapOf("zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF",
+            "srtp-mand" to "SRTP-MAND", "srtp" to "SRTP", "" to "--")
 
-        initLayoutFromAccount(acc)
+        mediaNatMap = mapOf("stun" to "STUN", "turn" to "TURN", "ice" to "ICE", "" to "--")
 
-        bindTitles()
+        dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to getString(R.string.dtmf_inband),
+            Api.DTMFMODE_SIP_INFO to getString(R.string.dtmf_info),
+            Api.DTMFMODE_AUTO to getString(R.string.dtmf_auto))
+
+        answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to getString(R.string.manual),
+            Api.ANSWERMODE_AUTO to getString(R.string.auto))
+
+        redirectModeMap = mapOf(false to getString(R.string.manual),
+            true to getString(R.string.auto))
+
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalCustomColors.current.background
+                ) {
+                    AccountScreen { goBack() }
+                }
+            }
+        }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
@@ -148,610 +168,1329 @@ class AccountActivity : AppCompatActivity() {
 
     }
 
-    private fun initAccountFromConfig(ctx: AccountActivity) {
-        scope.launch(Dispatchers.IO) {
-            val url = "https://${Utils.uriHostPart(aor)}/baresip/account_config.xml"
-            val config = try {
-                URL(url).readText()
-            } catch (e: java.lang.Exception) {
-                Log.d(TAG, "Failed to get account configuration from network")
-                null
-            }
-            if (config != null && !ctx.isFinishing) {
-                Log.d(TAG, "Got account config '$config'")
-                val acc = Account(acc.accp)
-                val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
-                val parser: XmlPullParser = parserFactory.newPullParser()
-                parser.setInput(StringReader(config))
-                var tag: String?
-                var text = ""
-                var event = parser.eventType
-                val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-                val videoCodecs = ArrayList(Api.video_codecs().split(","))
-                while (event != XmlPullParser.END_DOCUMENT) {
-                    tag = parser.name
-                    when (event) {
-                        XmlPullParser.TEXT ->
-                            text = parser.text
-                        XmlPullParser.START_TAG -> {
-                            if (tag == "audio-codecs")
-                                acc.audioCodec.clear()
-                            if (tag == "video-codecs")
-                                acc.videoCodec.clear()
-                        }
-                        XmlPullParser.END_TAG ->
-                            when (tag) {
-                                "outbound-proxy-1" ->
-                                    if (text.isNotEmpty())
-                                        acc.outbound.add(text)
-                                "outbound-proxy-2" ->
-                                    if (text.isNotEmpty())
-                                        acc.outbound.add(text)
-                                "registration-interval" ->
-                                    acc.configuredRegInt = text.toInt()
-                                "register" ->
-                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
-                                "audio-codec" ->
-                                    if (text in audioCodecs)
-                                        acc.audioCodec.add(text)
-                                "video-codec" ->
-                                    if (text in videoCodecs)
-                                        acc.videoCodec.add(text)
-                                "media-encoding" -> {
-                                    val enc = text.lowercase(Locale.ROOT)
-                                    if (enc in mediaEncKeys && enc.isNotEmpty())
-                                        acc.mediaEnc = enc
-                                }
-                                "media-nat" -> {
-                                    val nat = text.lowercase(Locale.ROOT)
-                                    if (nat in mediaNatKeys && nat.isNotEmpty())
-                                        acc.mediaNat = nat
-                                }
-                                "stun-turn-server" ->
-                                    if (text.isNotEmpty())
-                                        acc.stunServer = text
-                                "rtcp-mux" ->
-                                    acc.rtcpMux = text == "yes"
-                                "100rel-mode" ->
-                                    acc.rel100Mode = if (text == "yes")
-                                            Api.REL100_ENABLED
-                                        else
-                                            Api.REL100_DISABLED
-                                "dtmf-mode" ->
-                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
-                                        acc.dtmfMode = when (text) {
-                                            "rtp-event" -> Api.DTMFMODE_RTP_EVENT
-                                            "sip-info" -> Api.DTMFMODE_SIP_INFO
-                                            else -> Api.DTMFMODE_AUTO
-                                        }
-                                "answer-mode" ->
-                                    if (text in arrayOf("manual", "auto"))
-                                        acc.answerMode = if (text == "manual")
-                                            Api.ANSWERMODE_MANUAL
-                                        else
-                                            Api.ANSWERMODE_AUTO
-                                "redirect-mode" ->
-                                    acc.autoRedirect = text == "yes"
-                                "voicemail-uri" ->
-                                    if (text.isNotEmpty())
-                                        acc.vmUri = text
-                                "country-code" ->
-                                    acc.countryCode = text
-                                "tel-provider" ->
-                                    acc.telProvider = text
-                            }
-                    }
-                    event = parser.next()
-                }
-                runOnUiThread {
-                    initLayoutFromAccount(acc)
-                }
-            }
-        }
-    }
-
-    private fun initLayoutFromAccount(acc: Account) {
-
-        uri.text = acc.luri
-        nickName.setText(acc.nickName)
-        displayName.setText(acc.displayName)
-        authUser.setText(acc.authUser)
-
-        if (BaresipService.aorPasswords[aor] != null || acc.authPass == NO_AUTH_PASS)
-            authPass.setText("")
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AccountScreen(navigateBack: () -> Unit) {
+        val title = if (acc.nickName.value != "")
+            acc.nickName.value
         else
-            authPass.setText(acc.authPass)
-
-        if (acc.outbound.size > 0) {
-            outbound[0].setText(acc.outbound[0])
-            if (acc.outbound.size > 1)
-                outbound[1].setText(acc.outbound[1])
-        }
-
-        regCheck.isChecked = acc.regint > 0
-        regInt.setText(acc.configuredRegInt.toString())
-
-        this.acc.audioCodec = acc.audioCodec
-
-        mediaNat = acc.mediaNat
-        var keyIx = mediaNatKeys.indexOf(acc.mediaNat)
-        var keyVal = mediaNatVals.elementAt(keyIx)
-        mediaNatKeys.removeAt(keyIx)
-        mediaNatVals.removeAt(keyIx)
-        mediaNatKeys.add(0, acc.mediaNat)
-        mediaNatVals.add(0, keyVal)
-        val mediaNatAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item,
-                mediaNatVals)
-        mediaNatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        mediaNatSpinner.adapter = mediaNatAdapter
-        mediaNatSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                mediaNat = mediaNatKeys[mediaNatVals.indexOf(parent.selectedItem.toString())]
-                if ((mediaNat == "turn") && stunServer.text.startsWith("stun"))
-                    stunServer.setText("")
-                else if ((mediaNat == "stun") &&
-                        (stunServer.text.startsWith("turn") || (stunServer.text.toString() == "")))
-                    stunServer.setText(resources.getString(R.string.stun_server_default))
-                else if ((mediaNat == "ice") && (stunServer.text.toString() == ""))
-                    stunServer.setText(resources.getString(R.string.stun_server_default))
-                if (mediaNat == "") {
-                    stun.visibility = GONE
-                    stunServer.setText("")
-                    stunUser.setText("")
-                    stunPass.setText("")
-                } else
-                    stun.visibility = VISIBLE
+            acc.aor.substringAfter(":")
+        Scaffold(
+            modifier = Modifier.safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = title,
+                            color = LocalCustomColors.current.light,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                        containerColor = LocalCustomColors.current.primary
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = navigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = LocalCustomColors.current.light
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            updateAccount()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                tint = LocalCustomColors.current.light,
+                                contentDescription = "Check"
+                            )
+                        }
+                    }
+                )
+            },
+            content = { contentPadding ->
+                AccountContent(this, contentPadding)
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        stunServer.setText(acc.stunServer)
-        stunUser.setText(acc.stunUser)
-        stunPass.setText(acc.stunPass)
-
-        mediaEnc = acc.mediaEnc
-        keyIx = mediaEncKeys.indexOf(mediaEnc)
-        keyVal = mediaEncVals.elementAt(keyIx)
-        mediaEncKeys.removeAt(keyIx)
-        mediaEncVals.removeAt(keyIx)
-        mediaEncKeys.add(0, mediaEnc)
-        mediaEncVals.add(0, keyVal)
-        val mediaEncAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                mediaEncVals)
-        mediaEncAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        mediaEncSpinner.adapter = mediaEncAdapter
-        mediaEncSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                mediaEnc = mediaEncKeys[mediaEncVals.indexOf(parent.selectedItem.toString())]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        rtcpCheck.isChecked = acc.rtcpMux
-
-        rel100Check.isChecked = acc.rel100Mode == Api.REL100_ENABLED
-
-        dtmfMode = acc.dtmfMode
-        val dtmfModeKeys = arrayListOf(Api.DTMFMODE_RTP_EVENT, Api.DTMFMODE_SIP_INFO, Api.DTMFMODE_AUTO)
-        val dtmfModeVals = arrayListOf(getString(R.string.dtmf_inband), getString(R.string.dtmf_info), getString(R.string.dtmf_auto))
-        keyIx = dtmfModeKeys.indexOf(acc.dtmfMode)
-        keyVal = dtmfModeVals.elementAt(keyIx)
-        dtmfModeKeys.removeAt(keyIx)
-        dtmfModeVals.removeAt(keyIx)
-        dtmfModeKeys.add(0, acc.dtmfMode)
-        dtmfModeVals.add(0, keyVal)
-        val dtmfModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                dtmfModeVals)
-        dtmfModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        dtmfModeSpinner.adapter = dtmfModeAdapter
-        dtmfModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                dtmfMode = dtmfModeKeys[dtmfModeVals.indexOf(parent.selectedItem.toString())]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        answerMode = acc.answerMode
-        val answerModeKeys = arrayListOf(Api.ANSWERMODE_MANUAL, Api.ANSWERMODE_AUTO)
-        val answerModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
-        keyIx = answerModeKeys.indexOf(acc.answerMode)
-        keyVal = answerModeVals.elementAt(keyIx)
-        answerModeKeys.removeAt(keyIx)
-        answerModeVals.removeAt(keyIx)
-        answerModeKeys.add(0, acc.answerMode)
-        answerModeVals.add(0, keyVal)
-        val answerModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                answerModeVals)
-        answerModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        answerModeSpinner.adapter = answerModeAdapter
-        answerModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                answerMode = answerModeKeys[answerModeVals.indexOf(parent.selectedItem.toString())]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        autoRedirect = acc.autoRedirect
-        val redirectModeKeys = arrayListOf(false, true)
-        val redirectModeVals = arrayListOf(getString(R.string.manual), getString(R.string.auto))
-        keyIx = redirectModeKeys.indexOf(acc.autoRedirect)
-        keyVal = redirectModeVals.elementAt(keyIx)
-        redirectModeKeys.removeAt(keyIx)
-        redirectModeVals.removeAt(keyIx)
-        redirectModeKeys.add(0, acc.autoRedirect)
-        redirectModeVals.add(0, keyVal)
-        val redirectModeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-            redirectModeVals)
-        redirectModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        redirectModeSpinner.adapter = redirectModeAdapter
-        redirectModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                autoRedirect = redirectModeKeys[redirectModeVals.indexOf(parent.selectedItem.toString())]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        if (acc.countryCode != "")
-            countryCode.setText(acc.countryCode)
-
-        telProvider.setText(acc.telProvider)
-
-        vmUri.setText(acc.vmUri)
-
-        defaultCheck.isChecked = uaIndex == 0
+        )
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    @Composable
+    fun AccountContent(ctx: Context, contentPadding: PaddingValues) {
+        arrowTint = if (BaresipService.darkTheme.value)
+            LocalCustomColors.current.grayLight
+        else
+            LocalCustomColors.current.black
+        val lazyListState = rememberLazyListState()
+        LazyColumn(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
+                .verticalScrollbar(
+                    state = lazyListState,
+                    width = 4.dp,
+                    color = LocalCustomColors.current.gray
+                ),
+            state = lazyListState,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            oldNickname = acc.nickName.value
+            oldDisplayname = acc.displayName
+            oldAuthUser = acc.authUser
+            if (BaresipService.aorPasswords[aor] == null &&  // check if OK
+                acc.authPass != NO_AUTH_PASS)
+                oldAuthPass = acc.authPass
+            if (acc.outbound.size > 0) {
+                oldOutbound1 = acc.outbound[0]
+                if (acc.outbound.size > 1)
+                    oldOutbound2 = acc.outbound[1]
+            }
+            oldRegister = acc.regint > 0
+            oldRegInt = acc.configuredRegInt.toString()
+            oldMediaEnc = acc.mediaEnc
+            oldMediaNat = acc.mediaNat
+            oldStunServer = acc.stunServer
+            oldStunUser = acc.stunUser
+            oldStunPass = acc.stunPass
+            oldRtcpMux = acc.rtcpMux
+            old100Rel = acc.rel100Mode == Api.REL100_ENABLED
+            oldDtmfMode = acc.dtmfMode
+            oldAnswerMode = acc.answerMode
+            oldAutoRedirect = acc.autoRedirect
+            oldVmUri = acc.vmUri
+            oldCountryCode = acc.countryCode
+            oldTelProvider = acc.telProvider
+            oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
 
-        super.onCreateOptionsMenu(menu)
-        val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
-        return true
-
+            item { AoR() }
+            item { Nickname(ctx) }
+            item { Displayname(ctx) }
+            item { AuthUser(ctx) }
+            item { AuthPass(ctx) }
+            item { Outbound(ctx) }
+            item { Register(ctx) }
+            item { RegInt(ctx) }
+            item { AudioCodecs(ctx) }
+            item { MediaEnc(ctx) }
+            item { MediaNat(ctx) }
+            item { StunServer(ctx) }
+            item { StunUser(ctx) }
+            item { StunPass(ctx) }
+            item { RtcpMux() }
+            item { Rel100() }
+            item { Dtmf(ctx) }
+            item { Answer(ctx) }
+            item { Redirect(ctx) }
+            item { Voicemail(ctx) }
+            item { CountryCode(ctx) }
+            item { TelProvider(ctx) }
+            item { DefaultAccount() }
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    @Composable
+    private fun AoR() {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            OutlinedTextField(
+                value = aor,
+                enabled = false,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp,
+                    color = LocalCustomColors.current.itemText
+                ),
+                label = { Text(stringResource(R.string.sip_uri)) }
+            )
+        }
+    }
+
+    @Composable
+    private fun Nickname(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var nickName by remember { mutableStateOf(oldNickname) }
+            newNickname = nickName
+            OutlinedTextField(
+                value = nickName,
+                placeholder = { Text(stringResource(R.string.nickname)) },
+                onValueChange = {
+                    nickName = it
+                    newNickname = nickName
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.nickname),
+                            getString(R.string.account_nickname_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.nickname)) },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text),
+            )
+        }
+    }
+
+    @Composable
+    private fun Displayname(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var displayName by remember { mutableStateOf(oldDisplayname) }
+            newDisplayname = displayName
+            OutlinedTextField(
+                value = displayName,
+                placeholder = { Text(stringResource(R.string.display_name)) },
+                onValueChange = {
+                    displayName = it
+                    newDisplayname = displayName
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.display_name),
+                            getString(R.string.display_name_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.display_name)) },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text),
+            )
+        }
+    }
+
+    @Composable
+    private fun AuthUser(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var authUser by remember { mutableStateOf(oldAuthUser) }
+            newAuthUser = authUser
+            OutlinedTextField(
+                value = authUser,
+                placeholder = { Text(stringResource(R.string.authentication_username)) },
+                onValueChange = {
+                    authUser = it
+                    newAuthUser = authUser
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.authentication_username),
+                            getString(R.string.authentication_username_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.authentication_username)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun AuthPass(ctx: Context) {
+        val showPassword = remember { mutableStateOf(false) }
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var authPass by remember { mutableStateOf(oldAuthPass) }
+            newAuthPass = authPass
+            OutlinedTextField(
+                value = authPass,
+                placeholder = { Text(stringResource(R.string.authentication_password)) },
+                onValueChange = {
+                    authPass = it
+                    newAuthPass = authPass
+                },
+                singleLine = true,
+                visualTransformation = if (showPassword.value)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                trailingIcon = {
+                    val (icon, iconColor) = if (showPassword.value) {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility),
+                            colorResource(id = R.color.colorAccent)
+                        )
+                    } else {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility_off),
+                            colorResource(id = R.color.colorWhite))
+                    }
+                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                        Icon(
+                            icon,
+                            contentDescription = "Visibility",
+                            tint = iconColor
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.authentication_password),
+                            getString(R.string.authentication_password_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.authentication_password)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun Outbound(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.outbound_proxies),
+                color = LocalCustomColors.current.itemText,
+                modifier = Modifier.clickable {
+                    Utils.alertView(
+                        ctx, getString(R.string.outbound_proxies),
+                        getString(R.string.outbound_proxies_help)
+                    )
+                })
+        }
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var outbound1 by remember { mutableStateOf(oldOutbound1) }
+            newOutbound1 = outbound1
+            OutlinedTextField(
+                value = outbound1,
+                placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                onValueChange = {
+                    outbound1 = it
+                    newOutbound1 = outbound1
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var outbound2 by remember { mutableStateOf(oldOutbound2) }
+            newOutbound2 = outbound2
+            OutlinedTextField(
+                value = outbound2,
+                placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                onValueChange = {
+                    outbound2 = it
+                    newOutbound2 = outbound2
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun Register(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.register),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(
+                            ctx, getString(R.string.register), getString(R.string.register_help)
+                        )
+                    },
+                color = LocalCustomColors.current.itemText)
+            var register by remember { mutableStateOf(oldRegister) }
+            newRegister = register
+            Checkbox(
+                checked = register,
+                onCheckedChange = {
+                    register = it
+                    newRegister = register
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun RegInt(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var regInt by remember { mutableStateOf(oldRegInt) }
+            newRegInt = regInt
+            OutlinedTextField(
+                value = regInt,
+                placeholder = { Text(stringResource(R.string.reg_int)) },
+                onValueChange = {
+                    regInt = it
+                    newRegInt = regInt
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.reg_int),
+                            getString(R.string.reg_int_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.reg_int)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+    }
+
+    @Composable
+    private fun AudioCodecs(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(top=12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.audio_codecs),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        val i = Intent(ctx, CodecsActivity::class.java)
+                        val b = Bundle()
+                        b.putString("aor", aor)
+                        b.putString("media", "audio")
+                        i.putExtras(b)
+                        startActivity(i)
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight. Bold
+            )
+        }
+    }
+
+    @Composable
+    private fun MediaEnc(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.media_encryption),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.media_encryption),
+                            getString(R.string.media_encryption_help))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember { mutableStateOf(false) }
+            val mediaEnc = remember { mutableStateOf(oldMediaEnc) }
+            newMediaEnc = mediaEnc.value
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = mediaEncMap[mediaEnc.value]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    mediaEncMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value,
+                                color = LocalCustomColors.current.itemText)
+                        },
+                        onClick = {
+                            isDropDownExpanded.value = false
+                            mediaEnc.value = it.key
+                            newMediaEnc = mediaEnc.value
+                        })
+                        if (index < 4)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MediaNat(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.media_nat),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.media_nat),
+                            getString(R.string.media_nat_help))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember { mutableStateOf(false) }
+            val mediaNat = remember { mutableStateOf(oldMediaNat) }
+            newMediaNat = mediaNat.value
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = mediaNatMap[mediaNat.value]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    mediaNatMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                mediaNat.value = it.key
+                                newMediaNat = mediaNat.value
+                                //if (newMediaNat == "")
+                                    // don't show stunserver
+                                //else
+                                    // show stunserver
+                            })
+                        if (index < 3)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun StunServer(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var stunServer by remember { mutableStateOf(oldStunServer) }
+            newStunServer = stunServer
+            OutlinedTextField(
+                value = stunServer,
+                placeholder = { Text(stringResource(R.string.stun_server)) },
+                onValueChange = {
+                    stunServer = it
+                    newStunServer = stunServer
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.stun_server),
+                            getString(R.string.stun_server_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.stun_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun StunUser(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var stunUser by remember { mutableStateOf(oldStunUser) }
+            newStunUser = stunUser
+            OutlinedTextField(
+                value = stunUser,
+                placeholder = { Text(stringResource(R.string.stun_username)) },
+                onValueChange = {
+                    stunUser = it
+                    newStunUser = stunUser
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.stun_username),
+                            getString(R.string.stun_username_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.stun_username)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun StunPass(ctx: Context) {
+        val showPassword = remember { mutableStateOf(false) }
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var stunPass by remember { mutableStateOf(oldStunPass) }
+            newStunPass = stunPass
+            OutlinedTextField(
+                value = stunPass,
+                placeholder = { Text(stringResource(R.string.stun_password)) },
+                onValueChange = {
+                    stunPass = it
+                    newStunPass = stunPass
+                },
+                singleLine = true,
+                visualTransformation = if (showPassword.value)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                trailingIcon = {
+                    val (icon, iconColor) = if (showPassword.value) {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility),
+                            colorResource(id = R.color.colorAccent)
+                        )
+                    } else {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility_off),
+                            colorResource(id = R.color.colorWhite))
+                    }
+                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                        Icon(
+                            icon,
+                            contentDescription = "Visibility",
+                            tint = iconColor
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.stun_password),
+                            getString(R.string.stun_password_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.stun_password)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun RtcpMux() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.rtcp_mux),
+                modifier = Modifier.weight(1f),
+                color = LocalCustomColors.current.itemText)
+            var rtcpMux by remember { mutableStateOf(oldRtcpMux) }
+            newRtcpMux = rtcpMux
+            Checkbox(
+                checked = rtcpMux,
+                onCheckedChange = {
+                    rtcpMux = it
+                    newRtcpMux = rtcpMux
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Rel100() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.rtcp_mux),
+                modifier = Modifier.weight(1f),
+                color = LocalCustomColors.current.itemText)
+            var rel100 by remember { mutableStateOf(old100Rel) }
+            new100Rel = rel100
+            Checkbox(
+                checked = rel100,
+                onCheckedChange = {
+                    rel100 = it
+                    new100Rel = rel100
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun Dtmf(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(top=12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.dtmf_mode),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.dtmf_mode),
+                            getString(R.string.dtmf_mode_help))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val dtmfMode = remember { mutableIntStateOf(oldDtmfMode) }
+            newDtmfMode = dtmfMode.intValue
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = dtmfModeMap[dtmfMode.intValue]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    dtmfModeMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                        onClick = {
+                            isDropDownExpanded.value = false
+                            dtmfMode.intValue = it.key
+                            newDtmfMode = dtmfMode.intValue
+                        })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Answer(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(top=12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.answer_mode),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.answer_mode),
+                            getString(R.string.answer_mode_help))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val answerMode = remember { mutableIntStateOf(oldAnswerMode) }
+            newAnswerMode = answerMode.intValue
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = answerModeMap[answerMode.intValue]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    answerModeMap.forEach {
+                        DropdownMenuItem(text = { Text(text = it.value) },
+                        onClick = {
+                            isDropDownExpanded.value = false
+                            answerMode.intValue = it.key
+                            newAnswerMode = answerMode.intValue
+                        })
+                        if (index < 1)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Redirect(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(top=12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.redirect_mode),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.redirect_mode),
+                            getString(R.string.redirect_mode_help))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val autoRedirect = remember { mutableStateOf(oldAutoRedirect) }
+            newAutoRedirect = autoRedirect.value
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = redirectModeMap[autoRedirect.value]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    redirectModeMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                autoRedirect.value = it.key
+                                newAutoRedirect = autoRedirect.value
+                            })
+                        if (index < 1)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Voicemail(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var vmUri by remember { mutableStateOf(oldVmUri) }
+            newVmUri = vmUri
+            OutlinedTextField(
+                value = vmUri,
+                placeholder = { Text(stringResource(R.string.voicemail_uri)) },
+                onValueChange = {
+                    vmUri = it
+                    newVmUri = vmUri
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.voicemail_uri),
+                            getString(R.string.voicemain_uri_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.voicemail_uri)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun CountryCode(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var countryCode by remember { mutableStateOf(oldCountryCode) }
+            newCountryCode = countryCode
+            OutlinedTextField(
+                value = countryCode,
+                placeholder = { Text(stringResource(R.string.country_code)) },
+                onValueChange = {
+                    countryCode = it
+                    newCountryCode = countryCode
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.country_code),
+                            getString(R.string.country_code_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.country_code)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun TelProvider(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var telProvider by remember { mutableStateOf(oldTelProvider) }
+            newTelProvider = telProvider
+            OutlinedTextField(
+                value = telProvider,
+                placeholder = { Text(stringResource(R.string.telephony_provider)) },
+                onValueChange = {
+                    telProvider = it
+                    newTelProvider = telProvider
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .clickable {
+                        Utils.alertView(ctx, getString(R.string.telephony_provider),
+                            getString(R.string.telephony_provider_help)) },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.telephony_provider)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun DefaultAccount() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.default_account),
+                modifier = Modifier.weight(1f),
+                color = LocalCustomColors.current.itemText)
+            var defaultAccount by remember { mutableStateOf(oldDefaultAccount) }
+            newDefaultAccount = defaultAccount
+            Checkbox(
+                checked = defaultAccount,
+                onCheckedChange = {
+                    defaultAccount = it
+                    newDefaultAccount = defaultAccount
+                }
+            )
+        }
+    }
+
+    private fun updateAccount() {
 
         if (BaresipService.activities.indexOf("account,$aor") == -1)
-            return true
+            return
 
-        when (item.itemId) {
-
-            R.id.checkIcon -> {
-
-                val nn = nickName.text.toString().trim()
-                if (nn != acc.nickName) {
-                    if (Account.checkDisplayName(nn)) {
-                        if (nn == "" || Account.uniqueNickName(nn)) {
-                            acc.nickName = nn
-                            Log.d(TAG, "New nickname is ${acc.nickName}")
-                        } else {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.non_unique_account_nickname), nn))
-                            return false
-                        }
-                    } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_account_nickname), nn))
-                        return false
-                    }
-                }
-
-                val dn = displayName.text.toString().trim()
-                if (dn != acc.displayName) {
-                    if (Account.checkDisplayName(dn)) {
-                        if (Api.account_set_display_name(acc.accp, dn) == 0) {
-                            acc.displayName = Api.account_display_name(acc.accp)
-                            Log.d(TAG, "New display name is ${acc.displayName}")
-                        } else {
-                            Log.e(TAG, "Setting of display name failed")
-                        }
-                    } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_display_name), dn))
-                        return false
-                    }
-                }
-
-                val au = authUser.text.toString().trim()
-                val ap = authPass.text.toString().trim()
-
-                if (au != acc.authUser) {
-                    if (Account.checkAuthUser(au)) {
-                        if (Api.account_set_auth_user(acc.accp, au) == 0) {
-                            acc.authUser = Api.account_auth_user(acc.accp)
-                            Log.d(TAG, "New auth user is ${acc.authUser}")
-                            if (acc.regint > 0)
-                                reRegister = true
-                        } else {
-                            Log.e(TAG, "Setting of auth user failed")
-                        }
-                    } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_authentication_username), au))
-                        return false
-                    }
-                }
-
-                if (ap != "") {
-                    if (ap != acc.authPass) {
-                        if (Account.checkAuthPass(ap)) {
-                            if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
-                                acc.authPass = Api.account_auth_pass(acc.accp)
-                                if (acc.regint > 0)
-                                    reRegister = true
-                            } else {
-                                Log.e(TAG, "Setting of auth pass failed")
-                            }
-                            BaresipService.aorPasswords.remove(acc.aor)
-                        } else {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_authentication_password), ap))
-                            return false
-                        }
-                    } else {
-                        BaresipService.aorPasswords.remove(acc.aor)
-                    }
-                } else { // ap == ""
-                    if (acc.authPass != NO_AUTH_PASS &&
-                            acc.authPass != BaresipService.aorPasswords[acc.aor])
-                        if (Api.account_set_auth_pass(acc.accp, "") == 0) {
-                            acc.authPass = NO_AUTH_PASS
-                            BaresipService.aorPasswords[aor] = NO_AUTH_PASS
-                        }
-                }
-
-                val ob = ArrayList<String>()
-                for (i in 0..1) {
-                    var uri: String
-                    if (outbound[i].text.toString().trim() != "") {
-                        uri = outbound[i].text.toString().trim().replace(" ", "")
-                        if (!uri.startsWith("sip:"))
-                            uri = "sip:$uri"
-                        if (checkOutboundUri(uri)) {
-                            ob.add(uri)
-                        } else {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_proxy_server_uri), uri))
-                            return false
-                        }
-                    }
-                }
-                if (ob != acc.outbound) {
-                    for (i in 0..1) {
-                        val uri = if (ob.size > i)
-                            ob[i]
-                        else
-                            ""
-                        if (Api.account_set_outbound(acc.accp, uri, i) != 0)
-                            Log.e(TAG, "Setting of outbound proxy $i uri '$uri' failed")
-                    }
-                    Log.d(TAG, "New outbound proxies are $ob")
-                    acc.outbound = ob
-                    if (ob.isEmpty())
-                        Api.account_set_sipnat(acc.accp, "")
-                    else
-                        Api.account_set_sipnat(acc.accp, "outbound")
-                    if (acc.regint > 0)
-                        reRegister = true
-                }
-
-                val newConfiguredRegInt = regInt.text.toString().trim().toInt()
-                if (newConfiguredRegInt < 60 || newConfiguredRegInt > 3600) {
-                    Utils.alertView(
-                        this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_reg_int), "$newConfiguredRegInt")
-                    )
-                    return false
-                }
-                val reReg = (regCheck.isChecked != acc.regint > 0) ||
-                        (regCheck.isChecked && newConfiguredRegInt != acc.configuredRegInt)
-                if (reReg) {
-                    if (Api.account_set_regint(acc.accp,
-                            if (regCheck.isChecked) newConfiguredRegInt else 0) != 0) {
-                        Log.e(TAG, "Setting of regint failed")
-                    } else {
-                        acc.regint = Api.account_regint(acc.accp)
-                        acc.configuredRegInt = newConfiguredRegInt
-                        Log.d(TAG, "New regint is ${acc.regint}")
-                        reRegister = true
-                    }
+        val nn = newNickname.trim()
+        if (nn != oldNickname) {
+            if (Account.checkDisplayName(nn)) {
+                if (nn == "" || Account.uniqueNickName(nn)) {
+                    acc.nickName.value = nn
+                    Log.d(TAG, "New nickname is ${acc.nickName.value}")
                 } else {
-                    if (newConfiguredRegInt != acc.configuredRegInt) {
-                        acc.configuredRegInt = newConfiguredRegInt
-                    }
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.non_unique_account_nickname), nn))
+                    return
                 }
-
-                if (mediaNat != acc.mediaNat) {
-                    if (Api.account_set_medianat(acc.accp, mediaNat) == 0) {
-                        acc.mediaNat = Api.account_medianat(acc.accp)
-                        Log.d(TAG, "New medianat is ${acc.mediaNat}")
-                    } else {
-                        Log.e(TAG, "Setting of medianat failed")
-                    }
-                }
-
-                var newStunServer = stunServer.text.toString().trim()
-                if (mediaNat != "") {
-                    if (((mediaNat == "stun") || (mediaNat == "ice")) && (newStunServer == ""))
-                        newStunServer = resources.getString(R.string.stun_server_default)
-                    if (!Utils.checkStunUri(newStunServer) ||
-                            (mediaNat == "turn" &&
-                                    newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_stun_server), newStunServer))
-                        return false
-                    }
-                }
-
-                if (acc.stunServer != newStunServer) {
-                    if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
-                        acc.stunServer = Api.account_stun_uri(acc.accp)
-                        Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
-                    } else {
-                        Log.e(TAG, "Setting of STUN/TURN URI server failed")
-                    }
-                }
-
-                val newStunUser = stunUser.text.toString().trim()
-                if (acc.stunUser != newStunUser) {
-                    if (Account.checkAuthUser(newStunUser)) {
-                        if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
-                            acc.stunUser = Api.account_stun_user(acc.accp)
-                            Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
-                        } else {
-                            Log.e(TAG, "Setting of STUN/TURN user failed")
-                        }
-                    } else {
-                        Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
-                                newStunUser))
-                        return false
-                    }
-                }
-
-                val newStunPass = stunPass.text.toString().trim()
-                if (acc.stunPass != newStunPass) {
-                    if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
-                        if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
-                            acc.stunPass = Api.account_stun_pass(acc.accp)
-                        } else {
-                            Log.e(TAG, "Setting of stun pass failed")
-                        }
-                    } else {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_stun_password), newStunPass))
-                        return false
-                    }
-                }
-
-                if (mediaEnc != acc.mediaEnc) {
-                    if (Api.account_set_mediaenc(acc.accp, mediaEnc) == 0) {
-                        acc.mediaEnc = Api.account_mediaenc(acc.accp)
-                        Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
-                    } else {
-                        Log.e(TAG, "Setting of mediaenc $mediaEnc failed")
-                    }
-                }
-
-                if (rtcpCheck.isChecked != acc.rtcpMux)
-                    if (Api.account_set_rtcp_mux(acc.accp, rtcpCheck.isChecked) == 0) {
-                        acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
-                        Log.d(TAG, "New rtcpMux is ${acc.rtcpMux}")
-                    } else {
-                        Log.e(TAG, "Setting of account_rtc_mux failed")
-                    }
-
-                if (rel100Check.isChecked != (acc.rel100Mode == Api.REL100_ENABLED)) {
-                    val mode = if (rel100Check.isChecked) Api.REL100_ENABLED else Api.REL100_DISABLED
-                    if (Api.account_set_rel100_mode(acc.accp, mode) == 0) {
-                        acc.rel100Mode = Api.account_rel100_mode(acc.accp)
-                        Api.ua_update_account(ua.uap)
-                        Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
-                    } else {
-                        Log.e(TAG, "Setting of account_rel100Mode failed")
-                    }
-                }
-
-                if (dtmfMode != acc.dtmfMode) {
-                    if (Api.account_set_dtmfmode(acc.accp, dtmfMode) == 0) {
-                        acc.dtmfMode = Api.account_dtmfmode(acc.accp)
-                        Log.d(TAG, "New dtmfmode is ${acc.dtmfMode}")
-                    } else {
-                        Log.e(TAG, "Setting of dtmfmode $dtmfMode failed")
-                    }
-                }
-
-                if (answerMode != acc.answerMode) {
-                    if (Api.account_set_answermode(acc.accp, answerMode) == 0) {
-                        acc.answerMode = Api.account_answermode(acc.accp)
-                        Log.d(TAG, "New answermode is ${acc.answerMode}")
-                    } else {
-                        Log.e(TAG, "Setting of answermode $answerMode failed")
-                    }
-                }
-
-                if (autoRedirect != acc.autoRedirect) {
-                    Api.account_set_sip_autoredirect(acc.accp, autoRedirect)
-                    acc.autoRedirect = autoRedirect
-                    Log.d(TAG, "New autoRedirect is ${acc.autoRedirect}")
-                }
-
-                var tVmUri = vmUri.text.toString().trim()
-                if (tVmUri != acc.vmUri) {
-                    if (tVmUri != "") {
-                        if (!tVmUri.startsWith("sip:")) tVmUri = "sip:$tVmUri"
-                        if (!tVmUri.contains("@")) tVmUri = "$tVmUri@${acc.host()}"
-                        if (!Utils.checkUri(tVmUri)) {
-                            Utils.alertView(this, getString(R.string.notice),
-                                    String.format(getString(R.string.invalid_sip_or_tel_uri), tVmUri))
-                            return false
-                        }
-                        Api.account_set_mwi(acc.accp, true)
-                    } else {
-                        Api.account_set_mwi(acc.accp, false)
-                    }
-                    acc.vmUri = tVmUri
-                }
-
-                val newCountryCode = countryCode.text.toString().trim()
-                if (newCountryCode != acc.countryCode) {
-                    if (newCountryCode != "" && !Utils.checkCountryCode(newCountryCode)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_country_code), newCountryCode))
-                        return false
-                    }
-                    acc.countryCode = newCountryCode
-                }
-
-                val hostPart = telProvider.text.toString().trim()
-                if (hostPart != acc.telProvider) {
-                    if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_sip_uri_hostpart), hostPart))
-                        return false
-                    }
-                    acc.telProvider = hostPart
-                }
-
-                if (defaultCheck.isChecked && (uaIndex > 0)) {
-                    BaresipService.uas.add(0, BaresipService.uas[uaIndex])
-                    BaresipService.uas.removeAt(uaIndex + 1)
-                }
-
-                AccountsActivity.saveAccounts()
-
-                if (reRegister) {
-                    ua.status = R.drawable.circle_yellow
-                    if (acc.regint == 0)
-                        Api.ua_unregister(ua.uap)
-                    else
-                        Api.ua_register(ua.uap)
-                }
-
-                BaresipService.activities.remove("account,$aor")
-                returnResult(Activity.RESULT_OK)
-                return true
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_account_nickname), nn))
+                return
             }
-
-            android.R.id.home -> {
-                goBack()
-                return true
-            }
-
         }
 
-        return super.onOptionsItemSelected(item)
+        val dn = newDisplayname.trim()
+        if (dn != acc.displayName) {
+            if (Account.checkDisplayName(dn)) {
+                if (Api.account_set_display_name(acc.accp, dn) == 0) {
+                    acc.displayName = Api.account_display_name(acc.accp)
+                    Log.d(TAG, "New display name is ${acc.displayName}")
+                } else {
+                    Log.e(TAG, "Setting of display name failed")
+                }
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_display_name), dn))
+                return
+            }
+        }
 
+        val au = newAuthUser.trim()
+        if (au != oldAuthUser) {
+            if (Account.checkAuthUser(au)) {
+                if (Api.account_set_auth_user(acc.accp, au) == 0) {
+                    acc.authUser = Api.account_auth_user(acc.accp)
+                    Log.d(TAG, "New auth user is ${acc.authUser}")
+                    if (acc.regint > 0)
+                        reRegister = true
+                } else {
+                    Log.e(TAG, "Setting of auth user failed")
+                }
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_authentication_username), au))
+                return
+            }
+        }
+
+        val ap = newAuthPass.trim()
+        if (ap != "") {
+            if (ap != oldAuthPass) {
+                if (Account.checkAuthPass(ap)) {
+                    if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
+                        acc.authPass = Api.account_auth_pass(acc.accp)
+                        if (acc.regint > 0)
+                            reRegister = true
+                    } else {
+                        Log.e(TAG, "Setting of auth pass failed")
+                    }
+                    BaresipService.aorPasswords.remove(acc.aor)
+                } else {
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_authentication_password), ap))
+                    return
+                }
+            } else {
+                BaresipService.aorPasswords.remove(acc.aor)
+            }
+        } else { // ap == ""
+            if (acc.authPass != NO_AUTH_PASS &&
+                acc.authPass != BaresipService.aorPasswords[acc.aor])
+                if (Api.account_set_auth_pass(acc.accp, "") == 0) {
+                    acc.authPass = NO_AUTH_PASS
+                    BaresipService.aorPasswords[aor] = NO_AUTH_PASS
+                }
+        }
+
+        val ob = ArrayList<String>()
+        var ob1 = newOutbound1.trim().replace(" ", "")
+        if (ob1 != "") {
+            if (!ob1.startsWith("sip:"))
+                ob1 = "sip:$ob1"
+            if (checkOutboundUri(ob1)) {
+                ob.add(ob1)
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_proxy_server_uri), ob1))
+                return
+            }
+        }
+        var ob2 = newOutbound2.trim().replace(" ", "")
+        if (ob2 != "") {
+            if (!ob2.startsWith("sip:"))
+                ob2 = "sip:$ob2"
+            if (checkOutboundUri(ob2)) {
+                ob.add(ob2)
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_proxy_server_uri), ob2))
+                return
+            }
+        }
+        if (ob != acc.outbound) {
+            for (i in 0..1) {
+                val uri = if (ob.size > i)
+                    ob[i]
+                else
+                    ""
+                if (Api.account_set_outbound(acc.accp, uri, i) != 0)
+                    Log.e(TAG, "Setting of outbound proxy $i uri '$uri' failed")
+            }
+            Log.d(TAG, "New outbound proxies are $ob")
+            acc.outbound = ob
+            if (ob.isEmpty())
+                Api.account_set_sipnat(acc.accp, "")
+            else
+                Api.account_set_sipnat(acc.accp, "outbound")
+            if (acc.regint > 0)
+                reRegister = true
+        }
+
+        val regInt = newRegInt.trim().toInt()
+        if (regInt < 60 || regInt > 3600) {
+            Utils.alertView(
+                this, getString(R.string.notice),
+                String.format(getString(R.string.invalid_reg_int), "$regInt")
+            )
+            return
+        }
+        val reReg = (newRegister != acc.regint > 0) ||
+                (newRegister && regInt != acc.configuredRegInt)
+        if (reReg) {
+            if (Api.account_set_regint(acc.accp,
+                    if (newRegister) regInt else 0) != 0) {
+                Log.e(TAG, "Setting of regint failed")
+            } else {
+                acc.regint = Api.account_regint(acc.accp)
+                acc.configuredRegInt = regInt
+                Log.d(TAG, "New regint is ${acc.regint}")
+                reRegister = true
+            }
+        } else {
+            if (regInt != acc.configuredRegInt) {
+                acc.configuredRegInt = regInt
+            }
+        }
+
+        if (newMediaEnc != acc.mediaEnc) {
+            if (Api.account_set_mediaenc(acc.accp, newMediaEnc) == 0) {
+                acc.mediaEnc = Api.account_mediaenc(acc.accp)
+                Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
+            } else {
+                Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
+            }
+        }
+
+        if (newMediaNat != acc.mediaNat) {
+            if (Api.account_set_medianat(acc.accp, newMediaNat) == 0) {
+                acc.mediaNat = Api.account_medianat(acc.accp)
+                Log.d(TAG, "New medianat is ${acc.mediaNat}")
+            } else {
+                Log.e(TAG, "Setting of medianat $newMediaNat failed")
+            }
+        }
+
+        newStunServer = newStunServer.trim()
+
+        if (newMediaNat != "") {
+            if (((newMediaNat == "stun") || (newMediaNat == "ice")) && (newStunServer == ""))
+                newStunServer = resources.getString(R.string.stun_server_default)
+            if (!Utils.checkStunUri(newStunServer) ||
+                (newMediaNat == "turn" &&
+                        newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_stun_server), newStunServer))
+                return
+            }
+        }
+
+        if (acc.stunServer != newStunServer) {
+            if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
+                acc.stunServer = Api.account_stun_uri(acc.accp)
+                Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
+            } else {
+                Log.e(TAG, "Setting of STUN/TURN URI server failed")
+            }
+        }
+
+        newStunUser = newStunUser.trim()
+        if (acc.stunUser != newStunUser) {
+            if (Account.checkAuthUser(newStunUser)) {
+                if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
+                    acc.stunUser = Api.account_stun_user(acc.accp)
+                    Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
+                } else {
+                    Log.e(TAG, "Setting of STUN/TURN user failed")
+                }
+            } else {
+                Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
+                    newStunUser))
+                return
+            }
+        }
+
+        val newStunPass = newStunPass.trim()
+        if (acc.stunPass != newStunPass) {
+            if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
+                if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
+                    acc.stunPass = Api.account_stun_pass(acc.accp)
+                } else {
+                    Log.e(TAG, "Setting of stun pass failed")
+                }
+            } else {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_stun_password), newStunPass))
+                return
+            }
+        }
+
+        if (newRtcpMux != acc.rtcpMux)
+            if (Api.account_set_rtcp_mux(acc.accp, newRtcpMux) == 0) {
+                acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
+                Log.d(TAG, "New rtcpMux is ${acc.rtcpMux}")
+            } else {
+                Log.e(TAG, "Setting of account_rtc_mux $newRtcpMux failed")
+            }
+
+        if (new100Rel != (acc.rel100Mode == Api.REL100_ENABLED)) {
+            val mode = if (new100Rel) Api.REL100_ENABLED else Api.REL100_DISABLED
+            if (Api.account_set_rel100_mode(acc.accp, mode) == 0) {
+                acc.rel100Mode = Api.account_rel100_mode(acc.accp)
+                Api.ua_update_account(ua.uap)
+                Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
+            } else {
+                Log.e(TAG, "Setting of account_rel100Mode failed")
+            }
+        }
+
+        if (newDtmfMode != acc.dtmfMode) {
+            if (Api.account_set_dtmfmode(acc.accp, newDtmfMode) == 0) {
+                acc.dtmfMode = Api.account_dtmfmode(acc.accp)
+                Log.d(TAG, "New dtmfmode is ${acc.dtmfMode}")
+            } else {
+                Log.e(TAG, "Setting of dtmfmode $newDtmfMode failed")
+            }
+        }
+
+        if (newAnswerMode != acc.answerMode) {
+            if (Api.account_set_answermode(acc.accp, newAnswerMode) == 0) {
+                acc.answerMode = Api.account_answermode(acc.accp)
+                Log.d(TAG, "New answermode is ${acc.answerMode}")
+            } else {
+                Log.e(TAG, "Setting of answermode $newAnswerMode failed")
+            }
+        }
+
+        if (newAutoRedirect != acc.autoRedirect) {
+            Api.account_set_sip_autoredirect(acc.accp, newAutoRedirect)
+            acc.autoRedirect = newAutoRedirect
+            Log.d(TAG, "New autoRedirect is ${acc.autoRedirect}")
+        }
+
+        newVmUri = newVmUri.trim()
+        if (newVmUri != acc.vmUri) {
+            if (newVmUri != "") {
+                if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
+                if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+                if (!Utils.checkUri(newVmUri)) {
+                    Utils.alertView(this, getString(R.string.notice),
+                        String.format(getString(R.string.invalid_sip_or_tel_uri), newVmUri))
+                    return
+                }
+                Api.account_set_mwi(acc.accp, true)
+            } else {
+                Api.account_set_mwi(acc.accp, false)
+            }
+            acc.vmUri = newVmUri
+            Log.d(TAG, "New voicemail URI is ${acc.vmUri}")
+        }
+
+        newCountryCode = newCountryCode.trim()
+        if (newCountryCode != acc.countryCode) {
+            if (newCountryCode != "" && !Utils.checkCountryCode(newCountryCode)) {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_country_code), newCountryCode))
+                return
+            }
+            acc.countryCode = newCountryCode
+            Log.d(TAG, "New country code is ${acc.countryCode}")
+        }
+
+        val hostPart = newTelProvider.trim()
+        if (hostPart != acc.telProvider) {
+            if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
+                Utils.alertView(this, getString(R.string.notice),
+                    String.format(getString(R.string.invalid_sip_uri_hostpart), hostPart))
+                return
+            }
+            acc.telProvider = hostPart
+            Log.d(TAG, "New tel provider is ${acc.telProvider}")
+        }
+
+        val uaIndex = UserAgent.findAorIndex(aor)!!
+        if (newDefaultAccount && (uaIndex > 0)) {
+            val updatedUas = uas.value.toMutableList()
+            updatedUas.add(0, uas.value[uaIndex])
+            updatedUas.removeAt(uaIndex + 1)
+            uas.value = updatedUas.toList()
+        }
+
+        AccountsActivity.saveAccounts()
+
+        if (reRegister) {
+            ua.status = R.drawable.circle_yellow
+            if (acc.regint == 0)
+                Api.ua_unregister(ua.uap)
+            else
+                Api.ua_register(ua.uap)
+        }
+
+        BaresipService.activities.remove("account,$aor")
+        returnResult(RESULT_OK)
     }
 
     private fun goBack() {
         BaresipService.activities.remove("account,$aor")
-        returnResult(Activity.RESULT_CANCELED)
+        returnResult(RESULT_CANCELED)
     }
 
     override fun onPause() {
@@ -759,136 +1498,9 @@ class AccountActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun bindTitles() {
-        binding.NickNameTitle.setOnClickListener{
-            Utils.alertView(this, getString(R.string.nickname),
-                    getString(R.string.account_nickname_help))
-        }
-        binding.DisplayNameTitle.setOnClickListener{
-            Utils.alertView(this, getString(R.string.display_name),
-                getString(R.string.display_name_help))
-        }
-        binding.AuthUserTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.authentication_username),
-                getString(R.string.authentication_username_help)
-            )
-        }
-        binding.AuthPassTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.authentication_password),
-                getString(R.string.authentication_password_help)
-            )
-        }
-        binding.OutboundProxyTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.outbound_proxies),
-                getString(R.string.outbound_proxies_help)
-            )
-        }
-        binding.RegTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.register),
-                getString(R.string.register_help)
-            )
-        }
-        binding.RegIntTitle.setOnClickListener {
-            Utils.alertView(
-                    this, getString(R.string.reg_int),
-                    getString(R.string.reg_int_help)
-            )
-        }
-        binding.AudioCodecsTitle.setOnClickListener {
-            val i = Intent(this, CodecsActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", aor)
-            b.putString("media", "audio")
-            i.putExtras(b)
-            startActivity(i)
-        }
-        binding.MediaNatTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.media_nat),
-                getString(R.string.media_nat_help)
-            )
-        }
-        binding.StunServerTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.stun_server),
-                getString(R.string.stun_server_help)
-            )
-        }
-        binding.StunUserTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.stun_username),
-                getString(R.string.stun_username_help)
-            )
-        }
-        binding.StunPassTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.stun_password),
-                getString(R.string.stun_password_help)
-            )
-        }
-        binding.MediaEncTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.media_encryption),
-                getString(R.string.media_encryption_help)
-            )
-        }
-        binding.Rel100Title.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.rel_100),
-                getString(R.string.rel_100_help)
-            )
-        }
-        binding.DtmfModeTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.dtmf_mode),
-                getString(R.string.dtmf_mode_help)
-            )
-        }
-        binding.AnswerModeTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.answer_mode),
-                getString(R.string.answer_mode_help)
-            )
-        }
-        binding.RedirectModeTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.redirect_mode),
-                getString(R.string.redirect_mode_help)
-            )
-        }
-        binding.VoicemailUriTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.voicemail_uri),
-                getString(R.string.voicemain_uri_help)
-            )
-        }
-        binding.CountryCodeTitle.setOnClickListener {
-            Utils.alertView(
-                    this, getString(R.string.country_code),
-                    getString(R.string.country_code_help)
-            )
-        }
-        binding.TelephonyProviderTitle.setOnClickListener {
-            Utils.alertView(
-                    this, getString(R.string.telephony_provider),
-                    getString(R.string.telephony_provider_help)
-            )
-        }
-        binding.DefaultTitle.setOnClickListener {
-            Utils.alertView(
-                this, getString(R.string.default_account),
-                getString(R.string.default_account_help)
-            )
-        }
-    }
-
     private fun returnResult(code: Int) {
         val i = Intent()
-        if (code == Activity.RESULT_OK)
+        if (code == RESULT_OK)
             i.putExtra("aor", aor)
         setResult(code, i)
         finish()

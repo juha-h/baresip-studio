@@ -8,8 +8,10 @@
     <string name="about_text">
         <![CDATA[
         <h1>Baresip library based SIP User Agent</h1>
+        <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
+        <br>
         <h2>Usage Hints</h2>
         <ul>
             <li>Check that default values in baresip\'s Settings meet your needs
@@ -21,19 +23,19 @@
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Long touch on currently shown account enables or disables account\'s registration.</li>
-            <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Previous call party can be reselect by touching the call icon when Callee is empty.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more
-                information.</li>
+            <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more information.</li>
         </ul>
         <h2>Privacy Policy</h2>
-            Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.
+            <p>Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.</p>
+        <br>
         <h2>Source code</h2>
-            Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-            where also issues can be reported.
+            <p>Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            where also issues can be reported.</p>
+        <br>
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
@@ -210,10 +212,10 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
-    <string name="new_account">New Account</string>
-    <string name="accounts_help">When a new account is created, account\'s port number and transport
-        protocol may be optionally given: &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
-        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to udp.
+    <string name="new_account">SIP URI of New Account</string>
+    <string name="accounts_help">SIP URI of new account of form
+        &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
+        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to UDP.
         If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 or 5061 (TLS).
         If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
         determined solely based on domain\'s DNS information.
@@ -278,10 +280,10 @@
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audio Codecs</string>
     <string name="audio_codecs_help">List of audio codecs in priority order. Drag to reorder,
-        swipe right to enable or disable.</string>
+        long click to enable or disable.</string>
     <string name="video_codecs">Video Codecs</string>
     <string name="video_codecs_help">List of video codecs in priority order. Drag to reorder,
-        swipe right to enable or disable.</string>
+        long click to enable or disable.</string>
     <string name="codec_action">Reorder</string>
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
@@ -340,10 +342,6 @@
         available for use by the accounts.</string>
     <string name="failed_to_load_module">Failed to load module.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
-    <string name="aec_help">If checked, software based echo cancellation is in use.</string>
-    <string name="no_hw_aec">Hardware based echo canceller cannot be used on you device.</string>
-    <string name="aec_extended_filter">AEC Extended Filter</string>
-    <string name="aec_extended_filter_help">If checked, echo cancellation is using extended filter.</string>
     <string name="microphone_gain">Microphone Gain</string>
     <string name="microphone_gain_help">Multiply microphone volume by this decimal number.  Minimum
         value is 1.0 (factory default) that disables microphone gain. Larger values may negatively
@@ -413,6 +411,8 @@
     <string name="sip_or_tel_uri">SIP or tel URI</string>
     <string name="user_domain_or_number">user@domain or telephone number</string>
     <string name="favorite">Favorite</string>
+    <string name="favorite_help">If checked, contact is shown among other favorites
+        on top of contacts list.</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
@@ -452,6 +452,8 @@
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
+    <string name="hardware">Hardware</string>
+    <string name="software">Software</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>

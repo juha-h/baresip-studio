@@ -1,50 +1,23 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="actionBarTheme">@style/ActionBar</item>
-        <item name="actionOverflowMenuStyle">@style/Spinner</item>
-        <item name="android:dropDownListViewStyle">@style/Spinner</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="android:statusBarColor">@color/colorBackground</item>
-    </style>
-
-    <style name="AppTheme.Main" parent="AppTheme">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
-        <item name="android:colorBackground">@color/colorSecondaryDark</item>
-        <item name="colorSurface">@color/colorPrimary</item>
-        <item name="android:textColor">@color/colorLight</item>
-        <item name="android:textColorPrimary">@color/colorLight</item>
-        <item name="android:textColorSecondary">@color/colorLight</item>
-    </style>
-
-    <style name="Spinner" parent="Widget.AppCompat.ListView.DropDown">
-        <item name="android:popupBackground">@color/colorPopupBackground</item>
-        <item name="android:textColor">@color/colorLight</item>
-        <item name="android:dividerHeight">1dp</item>
-        <item name="android:divider">@color/colorSpinnerDivider</item>
-    </style>
-
-    <style name="AlertDialogTheme">
+    <style name="AlertDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/Alert.Title</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/Alert.Message</item>
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNegativeButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/Alert.Message</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/Alert.Title</item>
-        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="android:background">@color/colorGrayLight</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="DialogCorners">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">16dp</item>
+    <style name="Alert.Title" parent="@style/MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textColor">@color/colorAlert</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Alert.Message" parent="@style/MaterialAlertDialog.Material3.Body.Text">
+        <item name="android:textColor">@color/colorDark</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="Alert.Button.Positive" parent="Widget.Material3.Button.TextButton">
@@ -59,16 +32,6 @@
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textColor">@color/colorGray</item>
         <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="Alert.Title" parent="@style/MaterialAlertDialog.Material3.Title.Text">
-        <item name="android:textColor">@color/colorAlert</item>
-        <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="Alert.Message" parent="@style/MaterialAlertDialog.Material3.Body.Text">
-        <item name="android:textColor">@color/colorStrong</item>
-        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

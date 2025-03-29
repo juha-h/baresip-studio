@@ -62,7 +62,6 @@
     <string name="listen_address">Adresă de conectare</string>
     <string name="dns_servers">Servere DNS</string>
     <string name="aec">Anularea acustică a ecoului</string>
-    <string name="aec_help">Dacă este bifat, se încearcă eliminarea ecoului în timpul apelurilor.</string>
     <string name="opus_bit_rate">Rată de eșantionare Opus</string>
     <string name="default_call_volume">Volum implicit de apel</string>
     <string name="default_call_volume_help">Dacă este setat, volumul audio de apel implicit între 1–10.</string>
