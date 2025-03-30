@@ -665,7 +665,7 @@ class BaresipService: Service() {
             recorderSessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $recorderSessionId")
             if (recorderSessionId != 0) {
-                if (!webrtcAec) {
+                if (aecAvailable) {
                     aec = AcousticEchoCanceler.create(recorderSessionId)
                     if (aec != null) {
                         if (!aec!!.getEnabled()) {
@@ -675,11 +675,10 @@ class BaresipService: Service() {
                             else
                                 Log.w(TAG, "Failed to enable AEC")
                         }
+                        else
+                            Log.d(TAG, "AEC is already enabled")
                     } else
-                        Log.w(
-                            TAG, "Failed to create AEC for session " +
-                                    "$recorderSessionId"
-                        )
+                        Log.w(TAG, "Failed to create AEC for session $recorderSessionId")
                 }
                 if (agcAvailable) {
                     agc = AutomaticGainControl.create(recorderSessionId)
@@ -1660,7 +1659,6 @@ class BaresipService: Service() {
         private var agc: AutomaticGainControl? = null
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var ns: NoiseSuppressor? = null
-        var webrtcAec = false
         private var btAdapter: BluetoothAdapter? = null
         private var recorderSessionId = 0
 
