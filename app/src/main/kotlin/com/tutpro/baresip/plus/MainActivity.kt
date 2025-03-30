@@ -1160,8 +1160,8 @@ class MainActivity : AppCompatActivity() {
                     val parts = stats.split(",")
                     val codecs = call.videoCodecs().split(',')
                     val duration = call.duration()
-                    val txCodec = codecs[0]
-                    val rxCodec = codecs[1]
+                    val txCodec = if (codecs.isNotEmpty()) codecs[0] else ""
+                    val rxCodec = if (codecs.size > 1) codecs[1] else ""
                     Utils.alertView(this, getString(R.string.call_info),
                             "${String.format(getString(R.string.duration), duration)}\n" +
                                     "${getString(R.string.codecs)}: $txCodec/$rxCodec\n" +
