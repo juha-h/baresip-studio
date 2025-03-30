@@ -1,0 +1,4 @@
+- Added clear (x) button to Callee field
+- Improved detection of hardware Acoustic Echo Canceler
+- Always set sip_listen config variable
+- New translations (Portuguese (Brazil))
