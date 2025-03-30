@@ -13,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,7 +63,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.tutpro.baresip.Contact.BaresipContact
 import com.tutpro.baresip.CustomElements.ImageAvatar
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -245,6 +245,7 @@ class CallsActivity : ComponentActivity() {
         )
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Calls(ctx: Context, account: Account) {
         val lazyListState = rememberLazyListState()
