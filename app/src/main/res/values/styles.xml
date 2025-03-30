@@ -10,6 +10,8 @@
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainer</item>
     </style>
 
     <style name="AppTheme.Main" parent="AppTheme">
@@ -38,6 +40,7 @@
         <item name="materialAlertDialogBodyTextStyle">@style/Alert.Message</item>
         <item name="materialAlertDialogTitleTextStyle">@style/Alert.Title</item>
         <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="colorSecondaryContainer">@color/colorLight</item>
         <item name="android:textSize">14sp</item>
     </style>
 
