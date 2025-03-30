@@ -2022,7 +2022,7 @@ Java_com_tutpro_baresip_plus_Api_AAudio_1open_1stream(JNIEnv *env, jobject obj) 
     AAudioStreamBuilder_setSharingMode(builder, AAUDIO_SHARING_MODE_SHARED);
     AAudioStreamBuilder_setPerformanceMode(builder, AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
     AAudioStreamBuilder_setUsage(builder,AAUDIO_USAGE_VOICE_COMMUNICATION);
-    AAudioStreamBuilder_setInputPreset(builder, AAUDIO_INPUT_PRESET_VOICE_RECOGNITION);
+    AAudioStreamBuilder_setInputPreset(builder, AAUDIO_INPUT_PRESET_VOICE_COMMUNICATION);
     AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
     AAudioStreamBuilder_setSampleRate(builder, 16000);
     AAudioStreamBuilder_setChannelCount(builder, 1);
