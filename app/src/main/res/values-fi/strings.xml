@@ -472,8 +472,6 @@
     <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai puh. URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
-    <string name="hardware">Laitteisto</string>
-    <string name="software">Ohjelmisto</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>

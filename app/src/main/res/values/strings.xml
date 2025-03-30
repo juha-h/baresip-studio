@@ -452,8 +452,6 @@
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
-    <string name="hardware">Hardware</string>
-    <string name="software">Software</string>
     <!-- Main Activity -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
