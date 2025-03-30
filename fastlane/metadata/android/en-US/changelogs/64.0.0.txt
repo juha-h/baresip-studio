@@ -1,0 +1,2 @@
+- Migrated of user interface to Jetpack Compose (may include bugs)
+- Always try to use hardware Acoustic Echo Canceler if available
