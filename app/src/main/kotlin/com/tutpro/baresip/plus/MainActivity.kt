@@ -48,6 +48,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
+import androidx.core.view.isVisible
+import androidx.core.view.isInvisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -2430,6 +2432,7 @@ class MainActivity : AppCompatActivity() {
         callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
+    @SuppressLint("UseKtx")
     private fun showCall(ua: UserAgent, showCall: Call? = null) {
         val call = showCall ?: ua.currentCall()
         if (call == null) {
@@ -2526,7 +2529,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "connected" -> {
                     if (call.videoEnabled()) {
-                        if (defaultLayout.visibility == View.VISIBLE) {
+                        if (defaultLayout.isVisible) {
                             defaultLayout.visibility = View.INVISIBLE
                             videoLayout.visibility = View.VISIBLE
                         }
@@ -2540,7 +2543,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         return
                     }
-                    if (defaultLayout.visibility == View.INVISIBLE) {
+                    if (defaultLayout.isInvisible) {
                         videoLayout.visibility = View.INVISIBLE
                         defaultLayout.visibility = View.VISIBLE
                     }
