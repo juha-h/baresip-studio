@@ -631,6 +631,48 @@ class BaresipService: Service() {
         if (ev[0] == "recorder sessionid") {
             recorderSessionId = ev[1].toInt()
             Log.d(TAG, "got recorder sessionid $recorderSessionId")
+            if (recorderSessionId != 0) {
+                if (aecAvailable) {
+                    aec = AcousticEchoCanceler.create(recorderSessionId)
+                    if (aec != null) {
+                        if (!aec!!.getEnabled()) {
+                            aec!!.setEnabled(true)
+                            if (aec!!.getEnabled())
+                                Log.d(TAG, "AEC is enabled")
+                            else
+                                Log.w(TAG, "Failed to enable AEC")
+                        }
+                        else
+                            Log.d(TAG, "AEC is already enabled")
+                    }
+                    else
+                        Log.w(TAG,
+                            "Failed to create AEC for session $recorderSessionId")
+                }
+                if (agcAvailable) {
+                    agc = AutomaticGainControl.create(recorderSessionId)
+                    if (agc != null) {
+                        if (!agc!!.getEnabled()) {
+                            agc!!.setEnabled(true)
+                            if (agc!!.getEnabled())
+                                Log.d(TAG, "AGC is enabled")
+                        }
+                    } else
+                        Log.w(TAG, "Failed to create AGC")
+                }
+                if (nsAvailable) {
+                    ns = NoiseSuppressor.create(recorderSessionId)
+                    if (ns != null) {
+                        if (!ns!!.getEnabled()) {
+                            ns!!.setEnabled(true)
+                            if (ns!!.getEnabled())
+                                Log.d(TAG, "NS is enabled")
+                        }
+                    } else
+                        Log.w(TAG, "Failed to create NS")
+                }
+                recorderSessionId = 0
+            }
             return
         }
 
@@ -874,47 +916,6 @@ class BaresipService: Service() {
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
                         call!!.status = "connected"
-                        if (recorderSessionId != 0) {
-                            if (Utils.isAecSupported() && !webrtcAec) {
-                                aec = AcousticEchoCanceler.create(recorderSessionId)
-                                if (aec != null) {
-                                    if (!aec!!.getEnabled()) {
-                                        aec!!.setEnabled(true)
-                                        if (aec!!.getEnabled())
-                                            Log.d(TAG, "AEC is enabled")
-                                        else
-                                            Log.w(TAG, "Failed to enable AEC")
-                                    }
-                                } else
-                                    Log.w(
-                                        TAG, "Failed to create AEC for session " +
-                                                "$recorderSessionId"
-                                    )
-                            }
-                            if (agcAvailable) {
-                                agc = AutomaticGainControl.create(recorderSessionId)
-                                if (agc != null) {
-                                    if (!agc!!.getEnabled()) {
-                                        agc!!.setEnabled(true)
-                                        if (agc!!.getEnabled())
-                                            Log.d(TAG, "AGC is enabled")
-                                    }
-                                } else
-                                    Log.w(TAG, "Failed to create AGC")
-                            }
-                            if (nsAvailable) {
-                                ns = NoiseSuppressor.create(recorderSessionId)
-                                if (ns != null) {
-                                    if (!ns!!.getEnabled()) {
-                                        ns!!.setEnabled(true)
-                                        if (ns!!.getEnabled())
-                                            Log.d(TAG, "ns is enabled")
-                                    }
-                                } else
-                                    Log.w(TAG, "Failed to create NS")
-                            }
-                            recorderSessionId = 0
-                        }
                         call.onhold = false
                         if (ua.account.callHistory)
                             call.startTime = GregorianCalendar()
@@ -998,8 +999,11 @@ class BaresipService: Service() {
                             stopRinging()
                             stopMediaPlayer()
                             aec?.release()
+                            aec = null
                             agc?.release()
+                            agc = null
                             ns?.release()
+                            ns = null
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1691,12 +1695,12 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
-        var agcAvailable = AutomaticGainControl.isAvailable()
-        private val nsAvailable = NoiseSuppressor.isAvailable()
+        var aecAvailable = false
         private var aec: AcousticEchoCanceler? = null
-        private var ns: NoiseSuppressor? = null
+        var agcAvailable = false
         private var agc: AutomaticGainControl? = null
-        var webrtcAec = false
+        private val nsAvailable = NoiseSuppressor.isAvailable()
+        private var ns: NoiseSuppressor? = null
         private var btAdapter: BluetoothAdapter? = null
         private var recorderSessionId = 0
 

@@ -158,11 +158,10 @@ object Config {
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 
-        if ((!Utils.isAecSupported() && !File(configPath).exists()) ||
-                "webrtc_aecm.so" in previousModules) {
+        Utils.aecAgcCheck()
+
+        if (!BaresipService.aecAvailable)
             config = "${config}module webrtc_aecm.so\n"
-            BaresipService.webrtcAec = true
-        }
 
         val micGain = previousVariable("augain")
         config = if (BaresipService.agcAvailable || micGain == ""  || micGain == "1.0")

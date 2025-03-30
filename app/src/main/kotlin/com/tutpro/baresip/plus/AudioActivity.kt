@@ -24,7 +24,6 @@ class AudioActivity : AppCompatActivity() {
     private lateinit var micGain: EditText
     private lateinit var opusBitRate: EditText
     private lateinit var opusPacketLoss: EditText
-    private lateinit var aec: CheckBox
     private lateinit var speakerPhone: CheckBox
     private lateinit var audioDelay: EditText
 
@@ -35,7 +34,6 @@ class AudioActivity : AppCompatActivity() {
     private var oldAudioModules = mutableMapOf<String, Boolean>()
     private var oldOpusBitrate = ""
     private var oldOpusPacketLoss = ""
-    private var oldAec = false
     private var toneCountry = BaresipService.toneCountry
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -148,16 +146,6 @@ class AudioActivity : AppCompatActivity() {
         oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.setText(oldOpusPacketLoss)
 
-        aec = binding.Aec
-        oldAec = modules.contains("webrtc_aecm.so")
-        aec.isChecked = oldAec
-        aec.setOnClickListener {
-            if (!aec.isChecked)
-                if (!Utils.isAecSupported())
-                    Utils.alertView(this, getString(R.string.notice),
-                        getString(R.string.no_hw_aec))
-        }
-
         audioDelay = binding.AudioDelay
         audioDelay.setText("${BaresipService.audioDelay}")
 
@@ -212,9 +200,8 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                var gain = "1.0"
                 if (!BaresipService.agcAvailable) {
-                    gain = micGain.text.toString().trim()
+                    var gain = micGain.text.toString().trim()
                     if (!gain.contains("."))
                         gain = "$gain.0"
                     if (gain != oldMicGain) {
@@ -303,30 +290,6 @@ class AudioActivity : AppCompatActivity() {
                     save = true
                 }
 
-                if (aec.isChecked != oldAec) {
-                    if (aec.isChecked) {
-                        Config.addVariable("module", "webrtc_aecm.so")
-                        if (gain != "1.0") {
-                            restart = true
-                        } else {
-                            if (Api.module_load("webrtc_aecm.so") != 0) {
-                                Utils.alertView(
-                                    this, getString(R.string.error),
-                                    getString(R.string.failed_to_load_module)
-                                )
-                                aec.isChecked = false
-                                return false
-                            }
-                        }
-                        BaresipService.webrtcAec = true
-                    } else {
-                        Api.module_unload("webrtc_aecm.so")
-                        Config.removeVariableValue("module", "webrtc_aecm.so")
-                        BaresipService.webrtcAec = false
-                    }
-                    save = true
-                }
-
                 val audioDelay = audioDelay.text.toString().trim()
                 if (audioDelay != BaresipService.audioDelay.toString()) {
                     if (!checkAudioDelay(audioDelay)) {
@@ -396,10 +359,6 @@ class AudioActivity : AppCompatActivity() {
         binding.OpusPacketLossTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.opus_packet_loss),
                     getString(R.string.opus_packet_loss_help))
-        }
-        binding.AecTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.aec),
-                    getString(R.string.aec_help))
         }
         binding.AudioDelayTitle.setOnClickListener {
             Utils.alertView(this, getString(R.string.audio_delay),

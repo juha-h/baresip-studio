@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
@@ -22,6 +21,7 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.AcousticEchoCanceler
+import android.media.audiofx.AutomaticGainControl
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -63,6 +63,8 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 object Utils {
 
@@ -665,7 +667,7 @@ object Utils {
         if (file.exists()) file.delete()
         try {
             val out = FileOutputStream(file)
-            val scaledBitmap = createScaledBitmap(bitmap, 96, 96, true)
+            val scaledBitmap = bitmap.scale(96, 96)
             scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
@@ -679,7 +681,6 @@ object Utils {
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
-            @Suppress("ConstPropertyName")
             private const val serialVersionUID: Long = -29238082928391L
         }
     }
@@ -959,7 +960,7 @@ object Utils {
     }
 
     fun bitmapFromView(view: View): Bitmap {
-        val bitmap = Bitmap.createBitmap(view.layoutParams.width, view.layoutParams.height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(view.layoutParams.width, view.layoutParams.height)
         val canvas = Canvas(bitmap)
         view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
         view.draw(canvas)
@@ -1113,27 +1114,41 @@ object Utils {
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    fun isAecSupported(): Boolean {
-        if (!AcousticEchoCanceler.isAvailable()) {
-            Log.i(TAG, "Hardware AEC is NOT available")
-            return false
-        }
+    fun aecAgcCheck() {
 
-        val sessionId = Api.create_AAudio_SessionId()
+        val sessionId = Api.AAudio_open_stream()
         if (sessionId == -1) {
-            Log.e(TAG, "Failed to create AAudio stream for session ID")
-            return false
+            Log.e(TAG, "Failed to open AAudio stream")
+            return
         }
 
-        val aec = AcousticEchoCanceler.create(sessionId)
-        return if (aec != null) {
-            aec.release()
-            Log.i(TAG, "Hardware AEC is supported")
-            true
-        } else {
-            Log.w(TAG, "Hardware AEC is NOT supported")
-            false
+        if (AcousticEchoCanceler.isAvailable()) {
+            val aec = AcousticEchoCanceler.create(sessionId)
+            if (aec != null) {
+                BaresipService.aecAvailable = true
+                aec.release()
+                Log.d(TAG, "Creation of hardware AEC for $sessionId succeeded")
+            } else {
+                Log.w(TAG, "Creation of hardware AEC for $sessionId failed")
+            }
         }
+        else
+            Log.i(TAG, "Hardware AEC is NOT available")
+
+        if (AutomaticGainControl.isAvailable()) {
+            val agc = AcousticEchoCanceler.create(sessionId)
+            if (agc != null) {
+                BaresipService.agcAvailable = true
+                agc.release()
+                Log.d(TAG, "Creation of hardware AGC for $sessionId succeeded")
+            } else {
+                Log.w(TAG, "Creation of hardware AGC for $sessionId failed")
+            }
+        }
+        else
+            Log.i(TAG, "Hardware AGC is NOT available")
+
+        Api.AAudio_close_stream()
+
     }
-
 }

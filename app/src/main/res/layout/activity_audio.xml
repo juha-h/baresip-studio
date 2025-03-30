@@ -177,32 +177,6 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/AecLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" >
-            <TextView
-                android:id="@+id/AecTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/Aec"
-                android:textSize="18sp"
-                android:text="@string/aec" >
-            </TextView>
-            <CheckBox
-                android:id="@+id/Aec"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:checked="false" >
-            </CheckBox>
-        </RelativeLayout>
-
-        <RelativeLayout
             android:id="@+id/MicGainLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
