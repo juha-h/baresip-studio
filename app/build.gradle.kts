@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.test.android)
     implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     val composeBom = libs.androidx.compose.bom
     implementation(composeBom)
