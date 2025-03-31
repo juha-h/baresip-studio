@@ -224,6 +224,8 @@ object Config {
                     "${BaresipService.videoSize.width/5}" + "x" +
                     "${BaresipService.videoSize.height/5}\n"
         }
+        else
+            Log.w(TAG, "No supported cameras!")
 
         val videoFps = previousVariable("video_fps")
         config = if (videoFps != "" && videoFps != "15.0")
