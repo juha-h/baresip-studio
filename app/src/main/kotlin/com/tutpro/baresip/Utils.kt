@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -474,7 +475,7 @@ object Utils {
             val method: Method = wm.javaClass.getDeclaredMethod("isWifiApEnabled")
             method.isAccessible = true
             return method.invoke(wm) as Boolean
-        } catch (ignored: Throwable) {
+        } catch (_: Throwable) {
         }
         return false
     }
@@ -539,8 +540,32 @@ object Utils {
             try {
                 file.delete()
             } catch (e: IOException) {
-                Log.e(TAG, "Could not delete file ${file.absolutePath}")
+                Log.e(TAG, "Could not delete file ${file.absolutePath}: $e")
             }
+        }
+    }
+
+    fun deleteFile(ctx: Context, uri: Uri): Boolean {
+        val contentResolver: ContentResolver = ctx.contentResolver
+        try {
+            if (DocumentsContract.isDocumentUri(ctx, uri)) {
+                if (DocumentsContract.deleteDocument(contentResolver, uri)) {
+                    Log.d(TAG, "File deleted successfully: $uri")
+                    return true
+                } else {
+                    Log.d(TAG, "File not found or could not be deleted: $uri")
+                    return false
+                }
+            } else {
+                Log.d(TAG, "Uri is not a document uri: $uri")
+                return false
+            }
+        } catch (e: UnsupportedOperationException) {
+            Log.w(TAG, "Error deleting file $uri: $e")
+            return false
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting file $uri: $e")
+            return false
         }
     }
 
@@ -631,7 +656,7 @@ object Utils {
             out.close()
             Log.d(TAG, "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}")
+            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}: $e")
             return false
         }
         return true
@@ -842,7 +867,7 @@ object Utils {
     }
 
     fun addActivity(activity: String) {
-        if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
+        if ((BaresipService.activities.isEmpty()) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
     }
 

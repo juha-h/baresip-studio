@@ -1,10 +1,7 @@
 package com.tutpro.baresip
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.compositionLocalOf
 
 @Immutable
@@ -37,6 +34,7 @@ data class CustomColors(
     val alertText: Color = Color.Unspecified,
     val codec: Color = Color.Unspecified,
     val background: Color = Color.Unspecified,
+    val textFieldBackground: Color = Color.Unspecified,
     val popupBackground: Color = Color.Unspecified,
     val alert: Color = Color.Unspecified,
     val actionbar: Color = Color.Unspecified,
@@ -70,6 +68,7 @@ val light_item_text = light_black
 val light_alert_text = light_black
 val light_codec = light_black
 val light_background = Color(0xfffcfcfc)
+val light_textfield_background = light_gray_light
 val light_popup_background = light_secondary_dark
 val light_alert = Color(0xff0ca1fd) // == light_primary
 val light_actionbar = light_background
@@ -102,6 +101,7 @@ val dark_item_text = dark_gray_light
 val dark_alert_text = dark_gray_light
 val dark_codec = dark_secondary_dark
 val dark_background = dark_dark
+val dark_textfield_background = dark_gray
 val dark_popup_background = dark_secondary_dark
 val dark_alert = dark_primary_light
 val dark_actionbar = dark_gray_dark
@@ -135,6 +135,7 @@ val LightCustomColors = CustomColors(
     alertText = light_alert_text,
     codec = light_codec,
     background = light_background,
+    textFieldBackground = light_textfield_background,
     popupBackground = light_popup_background,
     alert = light_alert,
     actionbar = light_actionbar,
@@ -169,6 +170,7 @@ val DarkCustomColors = CustomColors(
     alertText = dark_alert_text,
     codec = dark_codec,
     background = dark_background,
+    textFieldBackground = dark_textfield_background,
     popupBackground = dark_popup_background,
     alert = dark_alert,
     actionbar = dark_actionbar,
