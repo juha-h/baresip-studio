@@ -150,8 +150,8 @@
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="invalid_aor">usuario@dominio[:porta][;transport=udp|tcp|tls] inválido \'%1$s\'</string>
     <string name="user_domain">usuario@dominio</string>
-    <string name="accounts_help">Quando uma nova conta é criada, a informação do número da porta, da conta e o protocolo de transporte é opcional: &lt;usuário&gt;@@&lt;domínio&gt;[:&lt;porta&gt;][;transport=udp|tcp|tls]. Caso a &lt;porta&gt; seja informada e o protocolo de transporte não, o padrão será udp. Caso a &lt;porta&gt; não seja informada e o protocolo de transporte seja, a &lt;porta&gt; padrão é 5060 ou 5061 (TLS). Caso nenhum dos dois ou nenhum proxy seja informado, o usuário da conta (caso haja) é determinado exclusivamente com base nas informações do DNS do domínio.</string>
-    <string name="new_account">Nova Conta</string>
+    <string name="accounts_help">SIP URI da nova conta no formato: &lt;usuário&gt;@@&lt;domínio&gt;[:&lt;porta&gt;][;transport=udp|tcp|tls]. Se a &lt;porta&gt; for informada e o protocolo de transporte não, o padrão será UDP. Se a &lt;porta&gt; não for informada e o protocolo de transporte for, a &lt;porta&gt; padrão é 5060 ou 5061 (TLS). Se nenhum dos dois ou nenhum proxy for informado, o usuário da conta (caso haja) é determinado exclusivamente com base nas informações do DNS do domínio.</string>
+    <string name="new_account">SIP URI da nova conta</string>
     <string name="accounts">Contas</string>
     <string name="default_account_help">Se marcado, esta conta é selecionada quando o baresip for iniciado.</string>
     <string name="default_account">Conta Padrão</string>
@@ -176,7 +176,7 @@
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="audio_codecs_help">Lista dos codecs de áudio em ordem de prioridade. Arraste para reordenar, deslize para a direita para ativar ou desativar.</string>
+    <string name="audio_codecs_help">Lista dos codecs de áudio em ordem de prioridade. Faça um clique longo para ativar ou desativar.</string>
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="register_help">Se marcado, o registro é ativado e as solicitações de REGISTRO são enviadas no intervalo determinado pelo Intervalo de registro.</string>
     <string name="register">Registro</string>
@@ -202,40 +202,42 @@
     <string name="account">Conta</string>
     <string name="about_text"><![CDATA[
         <h1>Biblioteca Baresip baseado em agente de usuário SIP</h1>
+        <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Versão %1$s</p>
+        <br>
         <h2>Dicas de Uso</h2>
         <ul>
-            <li>Verifique se os valores predefinidos nas Configurações atendem as suas necessidades
-                (clique nos títulos para ajuda).</li>
-            <li>Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).</li>
-            <li>O estado de uma conta é mostrado com um ponto colorido: verde (registro
-                bem sucedido), amarelo (registro em progresso), vermelho (registro falhou), branco
-                (registro não foi ativado).</li>
-            <li>Toque nos três pontos para ir direto para a configuração da conta.</li>
+            <li>Verifique se os valores padrão nas configurações do baresip atendem
+                 às suas necessidades (toque nos títulos dos itens para obter ajuda).
+            <li>Em seguida, em Contas, crie uma ou mais contas (toque novamente nos títulos dos itens para obter ajuda).</li>
+            <li>O status de registro de uma conta é mostrado com um ponto colorido: verde (registro
+                bem-sucedido), amarelo (registro em andamento), vermelho (falha no registro), branco (registro
+                não foi ativado).</li>
+            <li>O toque no ponto leva diretamente à configuração da conta.</li>
             <li>O gesto de deslizar para baixo causa o novo registro da conta exibida no momento.</li>
             <li>Um toque longo na conta exibida no momento ativa ou desativa o registro da conta.</li>
-            <li>Gestos para a esquerda/direita alternam as contas.</li>
-            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone
-                de chamada quando o "Callee" estiver vazio.</li>
-            <li>Os pares de chamadas e mensagens podem ser adicionados aos contatos por meio de toques longos.</li>
-            <li>Os toques longos também podem ser usados para remover chamadas, bate-papos, mensagens e contatos.</li>
-            <li>Toque/toque longo no ícone do contato pode ser usado para instalar/remover o avatar da imagem.</li>
-            <li>Consulte a <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obter
-                mais informações.</li>
+            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone de chamada quando
+                Callee estiver vazio.</li>
+            <li>É possível adicionar pares de chamadas e mensagens aos contatos por meio de toques longos.</li>
+            <li>Também é possível usar toques longos para remover chamadas, bate-papos, mensagens e contatos.</li>
+            <li>Toque/toque longo no ícone do contato para instalar/remover o avatar.</li>
+            <li>Para mais informações, consulte <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a>.</li>
         </ul>
         <h2>Política de privacidade</h2>
-            A política de privacidade está disponível <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">aqui</a>.
+            <p>A política de privacidade está disponível em<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.</p>
+        <br>
         <h2>Código fonte</h2>
-            O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-            onde os problemas encontrados também podem ser reportados.
+            <p>O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            onde os problemas encontrados também podem ser reportados.</p>
+        <br>
         <h2>Licenças</h2>
         <ul>
-            <li><b>Cláusula BSD-3</b> exceto os seguintes:</li>
-            <li><b>Apache 2.0</b>, codecs AMR e segurança TLS</li>
-            <li><b>AGPLv4</b>, criptografia de mídia ZRTP</li>
+            <li><b>BSD-3-Clause</b> exceto os seguintes:</li>
+            <li><b>Apache 2.0</b> codecs AMR e segurança TLS</li>
+            <li><b>AGPLv4</b> criptografia de mídia ZRTP</li>
             <li><b>GNU LGPL 2.1</b> G.722, G.726, e codecs Codec2</li>
-            <li><b>GNU GPLv3</b> G.729 codec</li>
+            <li><b>GNU GPLv3</b> codec G.729</li>
         </ul>
         ]]></string>
     <string name="about_title">Sobre o baresip</string>
@@ -257,7 +259,7 @@
     <string name="invalid_stun_username">Nome do usuário inválido \'%1$s\'</string>
     <string name="stun_username_help">Nome do usuário, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="stun_username">Nome do Usuário STUN/TURN</string>
-    <string name="video_codecs_help">Lista dos codecs de vídeo em ordem de prioridade. Arraste para reordenar, deslize para a direita para ativar ou desativar.</string>
+    <string name="video_codecs_help">Lista dos codecs de vídeo em ordem de prioridade. Faça um clique longo para ativar ou desativar.</string>
     <string name="video_codecs">Codecs de Vídeo</string>
     <string name="transfer_request_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="transfer_failed">A transferência falhou</string>
@@ -425,5 +427,5 @@
     <string name="invalid_microphone_gain">Valor inválido do ganho do microfone</string>
     <string name="microphone_gain">Ganho do microfone</string>
     <string name="microphone_gain_help">Multiplique o volume do microfone por esse número decimal. O valor mínimo é 1,0 (padrão de fábrica), que desativa o ganho do microfone. Valores maiores podem afetar negativamente a qualidade do áudio.</string>
-    <string name="no_hw_aec">O cancelador de eco baseado em hardware não pode ser usado em seu dispositivo.</string>
+    <string name="favorite_help">Se marcada, o contato será exibido entre os favoritos na parte superior da lista.</string>
 </resources>
