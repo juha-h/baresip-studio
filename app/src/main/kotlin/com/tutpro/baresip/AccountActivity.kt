@@ -30,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -425,21 +426,17 @@ class AccountActivity : ComponentActivity() {
                 else
                     PasswordVisualTransformation(),
                 trailingIcon = {
-                    val (icon, iconColor) = if (showPassword.value) {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility),
-                            colorResource(id = R.color.colorAccent)
-                        )
-                    } else {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility_off),
-                            colorResource(id = R.color.colorWhite))
-                    }
-                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                    IconButton(onClick = {
+                        showPassword.value = !showPassword.value
+                    }) {
                         Icon(
-                            icon,
+                            if (showPassword.value)
+                                ImageVector.vectorResource(R.drawable.visibility)
+                            else
+                                ImageVector.vectorResource(R.drawable.visibility_off),
                             contentDescription = "Visibility",
-                            tint = iconColor
+                            tint = LocalCustomColors.current.itemText
+
                         )
                     }
                 },
