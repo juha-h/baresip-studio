@@ -90,8 +90,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui)
-
-    //implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlin.stdlib.jdk8)

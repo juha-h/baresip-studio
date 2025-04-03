@@ -1,13 +1,11 @@
 buildscript {
-    ext.kotlin_version = '2.1.20'
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        // noinspection AndroidGradlePluginVersion
-        classpath libs.gradle.v881
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath libs.gradle
+        classpath libs.kotlin.gradle.plugin
     }
 }
 
