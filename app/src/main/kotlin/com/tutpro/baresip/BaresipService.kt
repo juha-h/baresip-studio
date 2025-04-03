@@ -1645,8 +1645,7 @@ class BaresipService: Service() {
         val messageUpdate = MutableLiveData<Long>()
         val contactUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
-        @SuppressLint("MutableCollectionMutableState")
-        val baresipContacts = mutableStateOf(mutableListOf<Contact.BaresipContact>())
+        val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
         var contactsMode = "baresip"

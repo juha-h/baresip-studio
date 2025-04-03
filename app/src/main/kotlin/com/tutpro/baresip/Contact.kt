@@ -244,7 +244,7 @@ sealed class Contact {
                             Log.e(TAG, "Could not read avatar image from file $id.png: ${e.message}")
                         }
                     }
-                    BaresipService.baresipContacts.value.add(contact)
+                    BaresipService.baresipContacts.value += contact
                 }
             }
             return true
@@ -267,22 +267,26 @@ sealed class Contact {
         }
 
         fun addBaresipContact(contact: BaresipContact) {
-            BaresipService.baresipContacts.value.add(contact)
+            BaresipService.baresipContacts.value += contact
             saveBaresipContacts()
             contactsUpdate()
         }
 
         fun updateBaresipContact(contact: BaresipContact) {
-            val newContact = contact.copy() as BaresipContact
-            BaresipService.baresipContacts.value.removeIf { it.id == contact.id }
-            newContact.id = System.currentTimeMillis()
-            BaresipService.baresipContacts.value.add(newContact)
+            val updatedContacts = BaresipService.baresipContacts.value.toMutableList()
+            val updatedContact = contact.copy() as BaresipContact
+            updatedContact.id = System.currentTimeMillis()
+            updatedContacts.removeIf { it.id == contact.id }
+            updatedContacts.add(updatedContact)
+            BaresipService.baresipContacts.value = updatedContacts
             saveBaresipContacts()
             contactsUpdate()
         }
 
         fun removeBaresipContact(contact: BaresipContact) {
-            BaresipService.baresipContacts.value.removeIf { it.id == contact.id }
+            val removed = BaresipService.baresipContacts.value.toMutableList()
+            removed.removeIf { it.id == contact.id }
+            BaresipService.baresipContacts.value = removed.toList()
             saveBaresipContacts()
             contactsUpdate()
         }

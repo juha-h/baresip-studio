@@ -340,7 +340,6 @@ class ContactsActivity : ComponentActivity() {
                                                                 }
                                                             }
                                                             Contact.removeBaresipContact(contact)
-                                                            //Contact.contactsUpdate()
                                                         }
 
                                                         DialogInterface.BUTTON_NEUTRAL -> {
