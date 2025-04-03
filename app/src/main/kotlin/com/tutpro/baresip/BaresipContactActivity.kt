@@ -231,7 +231,7 @@ class BaresipContactActivity : ComponentActivity() {
                             imageAvatarUri = Uri.fromFile(tmpFile).toString()
                         }
                     } catch (e: Exception) {
-                        Log.e(TAG, "Could not read avatar image: $e")
+                        Log.e(TAG, "Could not read avatar image: ${e.message}")
                     }
             }
 
@@ -498,10 +498,6 @@ class BaresipContactActivity : ComponentActivity() {
                 Contact.updateBaresipContact(contact)
         }
 
-        Contact.contactsUpdate()
-
-        Contact.saveBaresipContacts()
-
         BaresipService.activities.remove("baresip contact,$new,$uriOrName")
 
         val i = Intent(ctx, MainActivity::class.java)
@@ -595,7 +591,7 @@ class BaresipContactActivity : ComponentActivity() {
         try {
             ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e(TAG, "Adding of contact ${contact.name} failed")
+            Log.e(TAG, "Adding of contact ${contact.name} failed: ${e.message}")
             return false
         }
         return true
@@ -625,7 +621,7 @@ class BaresipContactActivity : ComponentActivity() {
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
         } catch (e: Exception) {
-            Log.e(TAG, "Adding of SIP URI $uri failed")
+            Log.e(TAG, "Adding of SIP URI $uri failed: ${e.message}")
         }
     }
 
@@ -641,7 +637,7 @@ class BaresipContactActivity : ComponentActivity() {
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e(TAG, "Update of Android URI $uri failed")
+            Log.e(TAG, "Update of Android URI $uri failed: ${e.message}")
             0
         }
     }
@@ -660,7 +656,7 @@ class BaresipContactActivity : ComponentActivity() {
             try {
                 contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
             } catch (e: Exception) {
-                Log.e(TAG, "Adding of Android photo failed")
+                Log.e(TAG, "Adding of Android photo failed: ${e.message}")
             }
         }
     }
@@ -677,7 +673,7 @@ class BaresipContactActivity : ComponentActivity() {
         return try {
             contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
         }  catch (e: Exception) {
-            Log.e(TAG, "updateAndroidPhoto failed")
+            Log.e(TAG, "updateAndroidPhoto failed: ${e.message}")
             0
         }
     }
@@ -691,7 +687,7 @@ class BaresipContactActivity : ComponentActivity() {
             out.close()
             out.toByteArray()
         } catch (e: Exception) {
-            Log.w(TAG, "Unable to serialize photo: $e")
+            Log.w(TAG, "Unable to serialize photo: ${e.message}")
             null
         }
     }

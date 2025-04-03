@@ -53,9 +53,9 @@ sealed class Contact {
         }
         when (this) {
             is BaresipContact ->
-                (copy as BaresipContact).avatarImage = avatarImage
+                (copy as BaresipContact).avatarImage = this.avatarImage
             is AndroidContact ->
-                (copy as AndroidContact).uris.addAll(uris)
+                (copy as AndroidContact).uris.addAll(this.uris)
         }
         return copy
     }
@@ -211,8 +211,7 @@ sealed class Contact {
             val contacts = String(content)
             var contactNo = 0
             val baseId = System.currentTimeMillis()
-            val restored = mutableListOf<BaresipContact>()
-            BaresipService.baresipContacts.value = listOf()
+            BaresipService.baresipContacts.value = mutableListOf<BaresipContact>()
             contacts.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
@@ -242,53 +241,50 @@ sealed class Contact {
                             if (contact.avatarImage == null)
                                 Log.d(TAG, "Contact $id avatarImage is null")
                         } catch (e: Exception) {
-                            Log.e(TAG, "Could not read avatar image from '$id.png")
+                            Log.e(TAG, "Could not read avatar image from file $id.png: ${e.message}")
                         }
                     }
-                    restored.add(contact)
+                    BaresipService.baresipContacts.value.add(contact)
                 }
             }
-            BaresipService.baresipContacts.value = restored.toList()
             return true
         }
 
         fun contactsUpdate() {
-            val newList = mutableListOf<Contact>()
+            BaresipService.contacts = mutableListOf<Contact>()
             if (BaresipService.contactsMode != "android")
                 for (c in BaresipService.baresipContacts.value)
-                    newList.add(c.copy())
+                    BaresipService.contacts.add(c.copy())
             if (BaresipService.contactsMode != "baresip")
                 for (c in BaresipService.androidContacts.value)
-                    if (!nameExists(c.name, newList, true))
-                        newList.add(c.copy())
-            newList.sortBy{ when (it) {
+                    if (!nameExists(c.name, BaresipService.contacts, true))
+                        BaresipService.contacts.add(c.copy())
+            BaresipService.contacts.sortBy{ when (it) {
                 is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
                 is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
             }}
-            BaresipService.contacts = newList.toList()
             generateContactNames()
-            //BaresipService.contactUpdate.postValue(System.nanoTime())
         }
 
         fun addBaresipContact(contact: BaresipContact) {
-            val updatedList = BaresipService.baresipContacts.value.toMutableList()
-            updatedList.add(contact)
-            BaresipService.baresipContacts.value = updatedList.toList()
+            BaresipService.baresipContacts.value.add(contact)
+            saveBaresipContacts()
+            contactsUpdate()
         }
 
         fun updateBaresipContact(contact: BaresipContact) {
-            val updatedList = BaresipService.baresipContacts.value.toMutableList()
-            val contactCopy = contact.copy()
-            updatedList.removeIf { it.id == contact.id }
-            updatedList.add(contactCopy as BaresipContact)
-            BaresipService.baresipContacts.value = updatedList.toList()
+            val newContact = contact.copy() as BaresipContact
+            BaresipService.baresipContacts.value.removeIf { it.id == contact.id }
+            newContact.id = System.currentTimeMillis()
+            BaresipService.baresipContacts.value.add(newContact)
+            saveBaresipContacts()
+            contactsUpdate()
         }
 
         fun removeBaresipContact(contact: BaresipContact) {
-            val updatedList = BaresipService.baresipContacts.value.toMutableList()
-            updatedList.removeIf { it.id == contact.id }
-            BaresipService.baresipContacts.value = updatedList.toList()
+            BaresipService.baresipContacts.value.removeIf { it.id == contact.id }
             saveBaresipContacts()
+            contactsUpdate()
         }
 
         private fun generateContactNames () {

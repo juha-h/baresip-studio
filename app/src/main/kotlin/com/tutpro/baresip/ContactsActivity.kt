@@ -83,7 +83,6 @@ class ContactsActivity : ComponentActivity() {
                 if (it.data != null && it.data!!.hasExtra("name"))
                     newAndroidName = it.data!!.getStringExtra("name")
             }
-            Contact.contactsUpdate()
         }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,11 +106,11 @@ class ContactsActivity : ComponentActivity() {
                         ContactsContract.Contacts.DISPLAY_NAME + "='" + newAndroidName + "'", null
                     )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Update of Android favorite failed")
+                    Log.e(TAG, "Update of Android favorite failed: ${e.message}")
                 }
                 newAndroidName = null
             }
-            Contact.contactsUpdate()
+            //Contact.contactsUpdate()
         }
         BaresipService.contactUpdate.observe(this, androidContactsObserver)
 
@@ -207,7 +206,7 @@ class ContactsActivity : ComponentActivity() {
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            items(BaresipService.contacts, key = { contact -> contact.id() }) { contact ->
+            items(BaresipService.contacts, key = { it.id() }) { contact ->
 
                 val name = contact.name()
 
@@ -336,12 +335,12 @@ class ContactsActivity : ComponentActivity() {
                                                                 } catch (e: IOException) {
                                                                     Log.e(
                                                                         TAG,
-                                                                        "Could not delete file '$id.png"
+                                                                        "Could not delete file $id.png: ${e.message}"
                                                                     )
                                                                 }
                                                             }
                                                             Contact.removeBaresipContact(contact)
-                                                            Contact.contactsUpdate()
+                                                            //Contact.contactsUpdate()
                                                         }
 
                                                         DialogInterface.BUTTON_NEUTRAL -> {

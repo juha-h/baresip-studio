@@ -140,7 +140,7 @@ class ConfigActivity : ComponentActivity() {
                     } catch (e: Error) {
                         Utils.alertView(
                             this, getString(R.string.error),
-                            getString(R.string.read_cert_error)
+                            getString(R.string.read_cert_error) + ": " + e.message
                         )
                         newTlsCertificateFile = false
                     }
@@ -165,7 +165,7 @@ class ConfigActivity : ComponentActivity() {
                     } catch (e: Error) {
                         Utils.alertView(
                             this, getString(R.string.error),
-                            getString(R.string.read_ca_certs_error)
+                            getString(R.string.read_ca_certs_error) + ": " + e.message
                         )
                         newCaFile = false
                     }
@@ -222,7 +222,7 @@ class ConfigActivity : ComponentActivity() {
         val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
         oldCaFile = caCertsFile.exists()
 
-        powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        powerManager = getSystemService(POWER_SERVICE) as PowerManager
         oldBatteryOptimizations = powerManager
             .isIgnoringBatteryOptimizations(packageName) == false
 
@@ -814,7 +814,7 @@ class ConfigActivity : ComponentActivity() {
                      try {
                         androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
                     } catch (e: ActivityNotFoundException) {
-                        Log.e(TAG, "ActivityNotFound exception: $e")
+                        Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                     }
                 }
             )
@@ -857,7 +857,7 @@ class ConfigActivity : ComponentActivity() {
                         try {
                             dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
-                            Log.e(TAG, "ActivityNotFound exception: $e")
+                            Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
                     }
                 }
@@ -1173,7 +1173,7 @@ class ConfigActivity : ComponentActivity() {
                     baresipService.action = "Stop Content Observer"
                 }
                 "android" -> {
-                    BaresipService.baresipContacts.value = listOf()
+                    BaresipService.baresipContacts.value = mutableListOf<Contact.BaresipContact>()
                     Contact.loadAndroidContacts(this)
                     baresipService.action = "Start Content Observer"
                 }

@@ -412,7 +412,7 @@ class BaresipService: Service() {
                     try {
                         File(filesPath).mkdirs()
                     } catch (e: Error) {
-                        Log.e(TAG, "Failed to create directory: $e")
+                        Log.e(TAG, "Failed to create directory: ${e.message}")
                     }
                 }
                 for (a in assets) {
@@ -618,6 +618,7 @@ class BaresipService: Service() {
             sendBroadcast(Intent("com.tutpro.baresip.Restart"))
     }
 
+    @Suppress("unused")
     @SuppressLint("UnspecifiedImmutableFlag", "DiscouragedApi")
     @Keep
     fun uaEvent(event: String, uap: Long, callp: Long) {
@@ -1092,6 +1093,7 @@ class BaresipService: Service() {
         }
     }
 
+    @Suppress("unused")
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
     fun messageEvent(uap: Long, peerUri: String, cType: String, msg: ByteArray) {
@@ -1105,13 +1107,13 @@ class BaresipService: Service() {
         val charsetString = Utils.paramValue(cType.replace(" ", ""), "charset")
         val charset = try {
             Charset.forName(charsetString)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             StandardCharsets.UTF_8
         }
         val text = try {
             String(msg, charset)
         } catch (e: Exception) {
-            val error = "Decoding of message failed using charset $charset from $cType!"
+            val error = "Decoding of message failed using charset $charset from $cType: ${e.message}!"
             Log.w(TAG, error)
             error
         }
@@ -1194,6 +1196,7 @@ class BaresipService: Service() {
             }
     }
 
+    @Suppress("unused")
     @Keep
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
@@ -1207,6 +1210,7 @@ class BaresipService: Service() {
         updateStatusNotification()
     }
 
+    @Suppress("unused")
     @Keep
     fun stopped(error: String) {
         Log.d(TAG, "Received 'stopped' from baresip with start error '$error'")
@@ -1262,7 +1266,7 @@ class BaresipService: Service() {
             else
                 startForeground(STATUS_NOTIFICATION_ID, snb.build())
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start foreground service")
+            Log.e(TAG, "Failed to start foreground service: ${e.message}")
         }
     }
 
@@ -1564,7 +1568,7 @@ class BaresipService: Service() {
                         true, androidContactsObserver)
                 androidContactsObserverRegistered = true
             } catch (e: SecurityException) {
-                Log.i(TAG, "No Contacts permission")
+                Log.i(TAG, "No Contacts permission: ${e.message}")
             }
     }
 
@@ -1609,6 +1613,7 @@ class BaresipService: Service() {
 
     external fun baresipStop(force: Boolean)
 
+    @SuppressLint("MutableCollectionMutableState")
     companion object {
 
         var isServiceRunning = false
@@ -1631,7 +1636,7 @@ class BaresipService: Service() {
 
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
-        var contacts by mutableStateOf(emptyList<Contact>())
+        var contacts by mutableStateOf(mutableListOf<Contact>())
         val darkTheme = mutableStateOf(false)
         var messages by mutableStateOf(emptyList<Message>())
 
@@ -1640,7 +1645,8 @@ class BaresipService: Service() {
         val messageUpdate = MutableLiveData<Long>()
         val contactUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
-        val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
+        @SuppressLint("MutableCollectionMutableState")
+        val baresipContacts = mutableStateOf(mutableListOf<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
         var contactsMode = "baresip"
