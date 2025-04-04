@@ -3,7 +3,6 @@ package com.tutpro.baresip
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -14,35 +13,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -53,8 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -130,6 +119,7 @@ class AccountActivity : ComponentActivity() {
     private var oldDefaultAccount = false
     private var newDefaultAccount = false
     private var arrowTint = Color.Unspecified
+    private var password = mutableStateOf("")
     private var showPasswordDialog = mutableStateOf(false)
     private var keyboardController: SoftwareKeyboardController? = null
 
@@ -1166,137 +1156,25 @@ class AccountActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AskPassword(ctx: Context) {
-        if (showPasswordDialog.value) {
-            val showPassword = remember { mutableStateOf(false) }
-            BasicAlertDialog(
-                onDismissRequest = {
-                    keyboardController?.hide()
-                    showPasswordDialog.value = false
+        if (showPasswordDialog.value)
+            CustomElements.PasswordDialog(
+                ctx = ctx,
+                showPasswordDialog = showPasswordDialog,
+                password = password,
+                keyboardController = keyboardController,
+                title = getString(R.string.authentication_password),
+                okAction = {
+                    BaresipService.aorPasswords[acc.aor] = password.value
+                    Api.account_set_auth_pass(acc.accp, password.value)
+                    password.value = ""
+                    reRegister = true
+                    finishActivity()
+                },
+                cancelAction = {
+                    reRegister = true
+                    finishActivity()
                 }
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .wrapContentHeight(),
-                    color = LocalCustomColors.current.background,
-                    shape = MaterialTheme.shapes.large,
-                    tonalElevation = AlertDialogDefaults.TonalElevation
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        CustomElements.Text(
-                            text = getString(R.string.authentication_password),
-                            fontSize = 20.sp,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                            color = LocalCustomColors.current.alert,
-                        )
-                        val message = getString(R.string.account) + " " + Utils.plainAor(acc.aor)
-                        CustomElements.Text(
-                            text = message,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(16.dp),
-                            color = LocalCustomColors.current.itemText,
-                        )
-                        var password by remember { mutableStateOf("") }
-                        val focusRequester = remember { FocusRequester() }
-                        OutlinedTextField(
-                            value = password,
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = LocalCustomColors.current.textFieldBackground,
-                                unfocusedContainerColor = LocalCustomColors.current.textFieldBackground,
-                                cursorColor = LocalCustomColors.current.primary,
-                            ),
-                            onValueChange = {
-                                password = it
-                            },
-                            visualTransformation = if (showPassword.value)
-                                VisualTransformation.None
-                            else
-                                PasswordVisualTransformation(),
-                            trailingIcon = {
-                                IconButton(onClick = {
-                                    showPassword.value = !showPassword.value
-                                }) {
-                                    Icon(
-                                        if (showPassword.value)
-                                            ImageVector.vectorResource(R.drawable.visibility)
-                                        else
-                                            ImageVector.vectorResource(R.drawable.visibility_off),
-                                        contentDescription = "Visibility",
-                                        tint = LocalCustomColors.current.grayDark
-
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = 4.dp,
-                                    end = 4.dp,
-                                    top = 12.dp,
-                                    bottom = 2.dp
-                                )
-                                .focusRequester(focusRequester),
-                            textStyle = TextStyle(
-                                fontSize = 18.sp,
-                                color = LocalCustomColors.current.dark
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            TextButton(
-                                onClick = {
-                                    keyboardController?.hide()
-                                    showPasswordDialog.value = false
-                                    reRegister = true
-                                    finishActivity()
-                                },
-                                modifier = Modifier.padding(8.dp),
-                            ) {
-                                CustomElements.Text(
-                                    text = stringResource(R.string.cancel),
-                                    color = LocalCustomColors.current.gray
-                                )
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                            TextButton(
-                                onClick = {
-                                    keyboardController?.hide()
-                                    showPasswordDialog.value = false
-                                    password = password.trim()
-                                    if (!Account.checkAuthPass(password)) {
-                                        Toast.makeText(
-                                            ctx,
-                                            String.format(
-                                                getString(R.string.invalid_authentication_password),
-                                                password
-                                            ),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        password = ""
-                                        showPasswordDialog.value = true
-                                    }
-                                    else {
-                                        BaresipService.aorPasswords[acc.aor] = password
-                                        Api.account_set_auth_pass(acc.accp, password)
-                                        reRegister = true
-                                        finishActivity()
-                                    }
-                                },
-                                modifier = Modifier.padding(8.dp),
-                            ) {
-                                CustomElements.Text(
-                                    text = stringResource(R.string.ok),
-                                    color = LocalCustomColors.current.alert
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            )
     }
 
     private fun updateAccount() {
