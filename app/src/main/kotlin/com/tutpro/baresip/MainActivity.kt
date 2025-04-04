@@ -314,14 +314,6 @@ class MainActivity : ComponentActivity() {
             spinToAor(activityAor)
             val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
             updateIcons(ua.account)
-            if (it.resultCode == RESULT_OK)
-                if (BaresipService.aorPasswords[activityAor] == NO_AUTH_PASS) {
-                    passwordAccounts = String(
-                        Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
-                        Charsets.UTF_8
-                    ).lines().toMutableList()
-                    showPasswordsDialog.value = true
-                }
         }
 
         contactsRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
