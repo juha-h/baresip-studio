@@ -14,4 +14,5 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun updateSelectedAor(newValue: String) {
         _selectedAor.value = newValue
     }
+
 }

@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,9 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -30,7 +31,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.CustomElements.Checkbox
-import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AccountActivity : ComponentActivity() {
 
@@ -225,19 +224,13 @@ class AccountActivity : ComponentActivity() {
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
-        val lazyListState = rememberLazyListState()
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
-                .verticalScrollbar(
-                    state = lazyListState,
-                    width = 4.dp,
-                    color = LocalCustomColors.current.gray
-                ),
-            state = lazyListState,
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             oldNickname = acc.nickName.value
@@ -246,7 +239,7 @@ class AccountActivity : ComponentActivity() {
             if (BaresipService.aorPasswords[aor] == null &&  // check if OK
                 acc.authPass != NO_AUTH_PASS)
                 oldAuthPass = acc.authPass
-            if (acc.outbound.size > 0) {
+            if (acc.outbound.isNotEmpty()) {
                 oldOutbound1 = acc.outbound[0]
                 if (acc.outbound.size > 1)
                     oldOutbound2 = acc.outbound[1]
@@ -267,30 +260,29 @@ class AccountActivity : ComponentActivity() {
             oldCountryCode = acc.countryCode
             oldTelProvider = acc.telProvider
             oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
-
-            item { AoR() }
-            item { Nickname(ctx) }
-            item { Displayname(ctx) }
-            item { AuthUser(ctx) }
-            item { AuthPass(ctx) }
-            item { Outbound(ctx) }
-            item { Register(ctx) }
-            item { RegInt(ctx) }
-            item { AudioCodecs(ctx) }
-            item { MediaEnc(ctx) }
-            item { MediaNat(ctx) }
-            item { StunServer(ctx) }
-            item { StunUser(ctx) }
-            item { StunPass(ctx) }
-            item { RtcpMux() }
-            item { Rel100() }
-            item { Dtmf(ctx) }
-            item { Answer(ctx) }
-            item { Redirect(ctx) }
-            item { Voicemail(ctx) }
-            item { CountryCode(ctx) }
-            item { TelProvider(ctx) }
-            item { DefaultAccount() }
+            AoR()
+            Nickname(ctx)
+            Displayname(ctx)
+            AuthUser(ctx)
+            AuthPass(ctx)
+            Outbound(ctx)
+            Register(ctx)
+            RegInt(ctx)
+            AudioCodecs(ctx)
+            MediaEnc(ctx)
+            MediaNat(ctx)
+            StunServer(ctx)
+            StunUser(ctx)
+            StunPass(ctx)
+            RtcpMux()
+            Rel100()
+            Dtmf(ctx)
+            Answer(ctx)
+            Redirect(ctx)
+            Voicemail(ctx)
+            CountryCode(ctx)
+            TelProvider(ctx)
+            DefaultAccount()
         }
     }
 
@@ -1231,10 +1223,10 @@ class AccountActivity : ComponentActivity() {
             }
         } else { // ap == ""
             if (acc.authPass != NO_AUTH_PASS &&
-                acc.authPass != BaresipService.aorPasswords[acc.aor])
+                    acc.authPass != BaresipService.aorPasswords[acc.aor])
                 if (Api.account_set_auth_pass(acc.accp, "") == 0) {
                     acc.authPass = NO_AUTH_PASS
-                    BaresipService.aorPasswords[aor] = NO_AUTH_PASS
+                    BaresipService.aorPasswords[acc.aor] = NO_AUTH_PASS
                 }
         }
 

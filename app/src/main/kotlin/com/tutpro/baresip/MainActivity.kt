@@ -32,12 +32,9 @@ import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Chronometer
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -122,7 +119,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -206,6 +202,7 @@ class MainActivity : ComponentActivity() {
     private var showHangupButton = mutableStateOf(false)
     private var showOnHoldNotice = mutableStateOf(false)
     private var showPasswordDialog = mutableStateOf(false)
+    private var showPasswordsDialog = mutableStateOf(false)
     private var holdIcon = mutableIntStateOf(R.drawable.call_hold)
     private var transferButtonEnabled = mutableStateOf(false)
     private var transferIcon = mutableIntStateOf(R.drawable.call_transfer)
@@ -221,10 +218,8 @@ class MainActivity : ComponentActivity() {
     private var dialpad by mutableStateOf(false)
     private var dialpadButtonEnabled by mutableStateOf(true)
     private var pullToRefreshEnabled by mutableStateOf(true)
-    private var passwordUa: UserAgent? = null
     private var passwordAccounts = mutableListOf<String>()
     private var passwordTitle by mutableStateOf("")
-    private var password by mutableStateOf("")
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -321,7 +316,11 @@ class MainActivity : ComponentActivity() {
             updateIcons(ua.account)
             if (it.resultCode == RESULT_OK)
                 if (BaresipService.aorPasswords[activityAor] == NO_AUTH_PASS) {
-                    askPassword(getString(R.string.authentication_password), ua)
+                    passwordAccounts = String(
+                        Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
+                        Charsets.UTF_8
+                    ).lines().toMutableList()
+                    showPasswordsDialog.value = true
                 }
         }
 
@@ -407,7 +406,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LocalCustomColors.current.background
                 ) {
-                    MainContent(this)
+                    MainScreen(this)
                 }
             }
         }
@@ -472,8 +471,7 @@ class MainActivity : ComponentActivity() {
                     Utils.getFileContents(filesDir.absolutePath + "/accounts")!!,
                     Charsets.UTF_8
                 ).lines().toMutableList()
-                //showPasswordDialog.value = true
-                askPasswords(passwordAccounts)
+                showPasswordsDialog.value = true
             } else {
                 // Baresip is started for the first time
                 requestPermissionsLauncher.launch(permissions)
@@ -483,57 +481,63 @@ class MainActivity : ComponentActivity() {
     } // OnCreate
 
     @Composable
-    private fun MainContent(ctx: Context) {
+    private fun MainScreen(ctx: Context) {
         Scaffold(
             modifier = Modifier.safeDrawingPadding(),
             containerColor = LocalCustomColors.current.background,
             topBar = { TopAppBar(ctx, String.format(getString(R.string.baresip))) },
-            bottomBar = { Buttons(ctx) },
+            bottomBar = { BottomBar(ctx) },
             content = { contentPadding ->
-                var isRefreshing by remember { mutableStateOf(false) }
-                LaunchedEffect(isRefreshing) {
-                    if (isRefreshing) {
-                        delay(1000)
-                        isRefreshing = false
-                    }
-                }
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.fillMaxSize(),
-                    enabled = pullToRefreshEnabled,
-                    onRefresh = {
-                        isRefreshing = true
-                        if (uas.value.isNotEmpty()) {
-                            if (viewModel.selectedAor.value == "")
-                                spinToAor(uas.value.first().account.aor)
-                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                            if (ua.account.regint > 0)
-                                Api.ua_register(ua.uap)
-                        }
-                    }
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .consumeWindowInsets(contentPadding)
-                            .padding(
-                                PaddingValues(
-                                    top = 76.dp, bottom = 6.dp,
-                                    start = 16.dp, end = 16.dp
-                                )
-                            )
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        AccountSpinner(this@MainActivity)
-                        CallUriRow(this@MainActivity)
-                        CallRow(this@MainActivity)
-                        OnHoldNotice()
-                        AskPassword(this@MainActivity)
-                    }
-                }
+                MainContent(ctx, contentPadding)
             }
         )
+    }
+
+    @Composable
+    fun MainContent(ctx: Context, contentPadding: PaddingValues) {
+        var isRefreshing by remember { mutableStateOf(false) }
+        LaunchedEffect(isRefreshing) {
+            if (isRefreshing) {
+                delay(1000)
+                isRefreshing = false
+            }
+        }
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            modifier = Modifier.fillMaxSize(),
+            enabled = pullToRefreshEnabled,
+            onRefresh = {
+                isRefreshing = true
+                if (uas.value.isNotEmpty()) {
+                    if (viewModel.selectedAor.value == "")
+                        spinToAor(uas.value.first().account.aor)
+                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    if (ua.account.regint > 0)
+                        Api.ua_register(ua.uap)
+                }
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .consumeWindowInsets(contentPadding)
+                    .padding(
+                        PaddingValues(
+                            top = 76.dp, bottom = 6.dp,
+                            start = 16.dp, end = 16.dp
+                        )
+                    )
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AccountSpinner(ctx)
+                CallUriRow(ctx)
+                CallRow(ctx)
+                OnHoldNotice()
+                AskPasswords(ctx)
+                AskPassword(ctx)
+            }
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -1658,7 +1662,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Buttons(ctx: Context) {
+    fun BottomBar(ctx: Context) {
         val buttonSize = 48.dp
         Row( modifier = Modifier
             .fillMaxWidth()
@@ -1811,34 +1815,34 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun AskPasswords(ctx: Context) {
-        if (showPasswordDialog.value && passwordAccounts.isNotEmpty()) {
-            val account = passwordAccounts.removeAt(0)
-            val params = account.substringAfter(">")
-            if (Utils.paramValue(params, "auth_user") != "" && Utils.paramValue(params, "auth_pass") == "") {
-                val aor = account.substringAfter("<").substringBefore(">")
-                val showPassword = remember { mutableStateOf(false) }
-                BasicAlertDialog(
-                    onDismissRequest = {
-                        keyboardController?.hide()
-                        showPasswordDialog.value = false
-                    }
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .wrapContentHeight(),
-                        color = LocalCustomColors.current.grayLight,
-                        shape = MaterialTheme.shapes.large,
-                        tonalElevation = AlertDialogDefaults.TonalElevation
+        if (showPasswordsDialog.value) {
+            if (passwordAccounts.isNotEmpty()) {
+                val account = passwordAccounts.removeAt(0)
+                val params = account.substringAfter(">")
+                if (Utils.paramValue(params, "auth_user") != "" && Utils.paramValue(params, "auth_pass") == "") {
+                    val aor = account.substringAfter("<").substringBefore(">")
+                    val showPassword = remember { mutableStateOf(false) }
+                    BasicAlertDialog(
+                        onDismissRequest = {
+                            keyboardController?.hide()
+                            showPasswordsDialog.value = false
+                        }
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = passwordTitle,
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(16.dp),
-                                color = LocalCustomColors.current.primary,
-                            )
-                            if (passwordTitle == getString(R.string.authentication_password)) {
+                        Surface(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .wrapContentHeight(),
+                            color = LocalCustomColors.current.background,
+                            shape = MaterialTheme.shapes.large,
+                            tonalElevation = AlertDialogDefaults.TonalElevation
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = getString(R.string.authentication_password),
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                                    color = LocalCustomColors.current.alert,
+                                )
                                 val message =
                                     getString(R.string.account) + " " + Utils.plainAor(aor)
                                 Text(
@@ -1847,103 +1851,109 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.padding(16.dp),
                                     color = LocalCustomColors.current.itemText,
                                 )
-                            }
-                            var password by remember { mutableStateOf("") }
-                            val focusRequester = remember { FocusRequester() }
-                            OutlinedTextField(
-                                value = password,
-                                singleLine = true,
-                                onValueChange = {
-                                    password = it
-                                },
-                                visualTransformation = if (showPassword.value)
-                                    VisualTransformation.None
-                                else
-                                    PasswordVisualTransformation(),
-                                trailingIcon = {
-                                    val (icon, iconColor) = if (showPassword.value) {
-                                        Pair(
-                                            ImageVector.vectorResource(R.drawable.visibility),
-                                            colorResource(id = R.color.colorAccent)
+                                var password by remember { mutableStateOf("") }
+                                val focusRequester = remember { FocusRequester() }
+                                OutlinedTextField(
+                                    value = password,
+                                    singleLine = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedContainerColor = LocalCustomColors.current.textFieldBackground,
+                                        unfocusedContainerColor = LocalCustomColors.current.textFieldBackground,
+                                        cursorColor = LocalCustomColors.current.primary,
+                                    ),
+                                    onValueChange = {
+                                        password = it
+                                    },
+                                    visualTransformation = if (showPassword.value)
+                                        VisualTransformation.None
+                                    else
+                                        PasswordVisualTransformation(),
+                                    trailingIcon = {
+                                        IconButton(onClick = {
+                                            showPassword.value = !showPassword.value
+                                        }) {
+                                            Icon(
+                                                if (showPassword.value)
+                                                    ImageVector.vectorResource(R.drawable.visibility)
+                                                else
+                                                    ImageVector.vectorResource(R.drawable.visibility_off),
+                                                contentDescription = "Visibility",
+                                                tint = LocalCustomColors.current.grayDark
+
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 4.dp,
+                                            end = 4.dp,
+                                            top = 12.dp,
+                                            bottom = 2.dp
                                         )
-                                    } else {
-                                        Pair(
-                                            ImageVector.vectorResource(R.drawable.visibility_off),
-                                            colorResource(id = R.color.colorWhite)
+                                        .focusRequester(focusRequester),
+                                    textStyle = TextStyle(
+                                        fontSize = 18.sp,
+                                        color = LocalCustomColors.current.dark
+                                    ),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            keyboardController?.hide()
+                                            showPasswordsDialog.value = false
+                                            showPasswordsDialog.value = true
+                                        },
+                                        modifier = Modifier.padding(8.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.cancel),
+                                            color = LocalCustomColors.current.gray
                                         )
                                     }
-                                    IconButton(onClick = {
-                                        showPassword.value = !showPassword.value
-                                    }) {
-                                        Icon(
-                                            icon,
-                                            contentDescription = "Visibility",
-                                            tint = iconColor
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    TextButton(
+                                        onClick = {
+                                            keyboardController?.hide()
+                                            showPasswordsDialog.value = false
+                                            password = password.trim()
+                                            if (!Account.checkAuthPass(password)) {
+                                                Toast.makeText(
+                                                    ctx,
+                                                    String.format(
+                                                        getString(R.string.invalid_authentication_password),
+                                                        password
+                                                    ),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                password = ""
+                                                passwordAccounts.add(0, account)
+                                            } else
+                                                BaresipService.aorPasswords[aor] = password
+                                            showPasswordsDialog.value = true
+                                        },
+                                        modifier = Modifier.padding(8.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.ok),
+                                            color = LocalCustomColors.current.alert
                                         )
                                     }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        start = 4.dp,
-                                        end = 4.dp,
-                                        top = 12.dp,
-                                        bottom = 2.dp
-                                    )
-                                    .focusRequester(focusRequester),
-                                textStyle = TextStyle(
-                                    fontSize = 18.sp,
-                                    color = LocalCustomColors.current.dark
-                                ),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                            )
-                            Row(
-                                horizontalArrangement = Arrangement.Absolute.SpaceEvenly
-                            ) {
-                                TextButton(
-                                    onClick = {
-                                        keyboardController?.hide()
-                                        showPasswordDialog.value = false
-                                    },
-                                    modifier = Modifier.padding(8.dp),
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.cancel),
-                                        color = LocalCustomColors.current.gray
-                                    )
-                                }
-                                TextButton(
-                                    onClick = {
-                                        keyboardController?.hide()
-                                        showPasswordDialog.value = false
-                                        password = password.trim()
-                                        if (!Account.checkAuthPass(password)) {
-                                            Toast.makeText(
-                                                ctx,
-                                                String.format(
-                                                    getString(R.string.invalid_authentication_password),
-                                                    password
-                                                ),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            password = ""
-                                            passwordAccounts.add(0, account)
-                                        } else
-                                            BaresipService.aorPasswords[aor] = password
-                                        showPasswordDialog.value = true
-                                    },
-                                    modifier = Modifier.padding(8.dp),
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.ok),
-                                        color = LocalCustomColors.current.primary
-                                    )
                                 }
                             }
                         }
                     }
                 }
+                else {
+                    showPasswordsDialog.value = false
+                    showPasswordsDialog.value = true
+                }
             }
+            else
+                requestPermissionsLauncher.launch(permissions)
         }
     }
 
@@ -2731,120 +2741,6 @@ class MainActivity : ComponentActivity() {
                 }
                 showCall(ua)
             }
-        }
-    }
-
-    private fun askPassword(title: String, ua: UserAgent? = null) {
-        val layout = LayoutInflater.from(this)
-            .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
-                false)
-        val titleView: TextView = layout.findViewById(R.id.title)
-        titleView.text = title
-        if (ua != null) {
-            val messageView: TextView = layout.findViewById(R.id.message)
-            val message = getString(R.string.account) + " " + Utils.plainAor(activityAor)
-            messageView.text = message
-        }
-        val input: EditText = layout.findViewById(R.id.password)
-        input.requestFocus()
-        with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-            setView(layout)
-            setPositiveButton(android.R.string.ok) { dialog, _ ->
-                imm.hideSoftInputFromWindow(input.windowToken, 0)
-                dialog.dismiss()
-                var password = input.text.toString().trim()
-                if (!Account.checkAuthPass(password)) {
-                    Toast.makeText(
-                        applicationContext,
-                        String.format(getString(R.string.invalid_authentication_password), password),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    password = ""
-                }
-                when (title) {
-                    getString(R.string.encrypt_password) ->
-                        if (password != "") backup(password)
-                    getString(R.string.decrypt_password) ->
-                        if (password != "") restore(password)
-                    else ->
-                        if (password == "") {
-                            askPassword(title, ua!!)
-                        } else {
-                            Api.account_set_auth_pass(ua!!.account.accp, password)
-                            ua.account.authPass =  Api.account_auth_pass(ua.account.accp)
-                            BaresipService.aorPasswords[ua.account.aor] = ua.account.authPass
-                            if (ua.account.regint == 0)
-                                Api.ua_unregister(ua.uap)
-                            else
-                                Api.ua_register(ua.uap)
-                        }
-                }
-            }
-            setNeutralButton(android.R.string.cancel) { dialog, _ ->
-                imm.hideSoftInputFromWindow(input.windowToken, 0)
-                dialog.cancel()
-            }
-            val dialog = this.create()
-            dialog.setCancelable(false)
-            dialog.setCanceledOnTouchOutside(false)
-            dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-            dialog.show()
-        }
-    }
-
-    private fun askPasswords(accounts: MutableList<String>) {
-        if (accounts.isNotEmpty()) {
-            val account = accounts.removeAt(0)
-            val params = account.substringAfter(">")
-            if ((Utils.paramValue(params, "auth_user") != "") &&
-                (Utils.paramValue(params, "auth_pass") == "")) {
-                val aor = account.substringAfter("<").substringBefore(">")
-                val layout = LayoutInflater.from(this)
-                    .inflate(R.layout.password_dialog, findViewById(android.R.id.content),
-                        false)
-                val titleView: TextView = layout.findViewById(R.id.title)
-                titleView.text = getString(R.string.authentication_password)
-                val messageView: TextView = layout.findViewById(R.id.message)
-                val message = getString(R.string.account) + " " + Utils.plainAor(aor)
-                messageView.text = message
-                val input: EditText = layout.findViewById(R.id.password)
-                input.requestFocus()
-                with (MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)) {
-                    setView(layout)
-                    setPositiveButton(android.R.string.ok) { dialog, _ ->
-                        imm.hideSoftInputFromWindow(input.windowToken, 0)
-                        dialog.dismiss()
-                        val password = input.text.toString().trim()
-                        if (!Account.checkAuthPass(password)) {
-                            Toast.makeText(
-                                applicationContext,
-                                String.format(getString(R.string.invalid_authentication_password),
-                                    password),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            accounts.add(0, account)
-                        } else {
-                            BaresipService.aorPasswords[aor] = password
-                        }
-                        askPasswords(accounts)
-                    }
-                    setNeutralButton(android.R.string.cancel) { dialog, _ ->
-                        imm.hideSoftInputFromWindow(input.windowToken, 0)
-                        dialog.cancel()
-                        BaresipService.aorPasswords[aor] = NO_AUTH_PASS
-                        askPasswords(accounts)
-                    }
-                    val dialog = this.create()
-                    dialog.setCancelable(false)
-                    dialog.setCanceledOnTouchOutside(false)
-                    dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                    dialog.show()
-                }
-            } else {
-                askPasswords(accounts)
-            }
-        } else {
-            requestPermissionsLauncher.launch(permissions)
         }
     }
 
