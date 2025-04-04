@@ -478,8 +478,7 @@ class AccountsActivity : ComponentActivity() {
             for (a in Account.accounts()) accounts = accounts + a.print() + "\n"
             Utils.putFileContents(BaresipService.filesPath + "/accounts",
                 accounts.toByteArray(Charsets.UTF_8))
-            //
-        // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
     }
