@@ -31,9 +31,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -66,7 +66,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.CustomElements.Checkbox
-import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
 import java.io.File
 import java.io.FileInputStream
@@ -341,38 +340,32 @@ class ConfigActivity : ComponentActivity() {
                 .background(LocalCustomColors.current.background)
                 .padding(contentPadding),
         ) {
-            val lazyListState = rememberLazyListState()
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                    .verticalScrollbar(
-                        state = lazyListState,
-                        width = 4.dp,
-                        color = LocalCustomColors.current.gray
-                    )
+                    .verticalScroll(rememberScrollState())
                     .background(LocalCustomColors.current.background),
-                state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                item { StartAutomatically(ctx) }
-                item { ListenAddress(ctx) }
-                item { AddressFamily(ctx) }
-                item { DnsServers(ctx) }
-                item { TlsCertificateFile(ctx) }
-                item { VerifyServer(ctx) }
-                item { CaFile(ctx) }
-                item { UserAgent(ctx) }
-                item { AudioSettings(ctx) }
-                item { BatteryOptimizations(ctx) }
+                StartAutomatically(ctx)
+                ListenAddress(ctx)
+                AddressFamily(ctx)
+                DnsServers(ctx)
+                TlsCertificateFile(ctx)
+                VerifyServer(ctx)
+                CaFile(ctx)
+                UserAgent(ctx)
+                AudioSettings(ctx)
+                BatteryOptimizations(ctx)
                 if (Build.VERSION.SDK_INT >= 29)
-                    item { DefaultDialer(ctx) }
-                item { Contacts(ctx) }
-                item { DarkTheme(ctx) }
-                item { Debug(ctx) }
-                item { SipTrace(ctx) }
-                item { Reset(ctx) }
+                    DefaultDialer(ctx)
+                Contacts(ctx)
+                DarkTheme(ctx)
+                Debug(ctx)
+                SipTrace(ctx)
+                Reset(ctx)
             }
         }
     }
