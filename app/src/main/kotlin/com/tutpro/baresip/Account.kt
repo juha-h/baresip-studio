@@ -94,7 +94,7 @@ class Account(val accp: Long) {
         if ((authPass != "") && !BaresipService.aorPasswords.containsKey(aor))
             res += ";auth_pass=\"${authPass}\""
 
-        if (outbound.size > 0) {
+        if (outbound.isNotEmpty()) {
             res += ";outbound=\"${outbound[0]}\""
             if (outbound.size > 1) res += ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
@@ -111,7 +111,7 @@ class Account(val accp: Long) {
         if (stunPass != "")
             res += ";stunpass=\"${stunPass}\""
 
-        if (audioCodec.size > 0) {
+        if (audioCodec.isNotEmpty()) {
             var first = true
             res = "$res;audio_codecs="
             for (c in audioCodec)
@@ -252,7 +252,7 @@ class Account(val accp: Long) {
 
         fun checkDisplayName(dn: String): Boolean {
             if (dn == "") return true
-            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}\$")
+            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}$")
             return dnRegex.matches(dn)
         }
 
@@ -268,7 +268,7 @@ class Account(val accp: Long) {
 
         fun checkAuthPass(ap: String): Boolean {
             return (ap.isNotEmpty()) && (ap.length <= 64) &&
-                    Regex("^[ -~]*\$").matches(ap) && !ap.contains('"')
+                    Regex("^[ -~]*$").matches(ap) && !ap.contains('"')
         }
 
         fun uniqueNickName(nickName: String): Boolean {
