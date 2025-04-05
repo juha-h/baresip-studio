@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,9 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -52,7 +51,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.CustomElements.Checkbox
-import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AudioActivity : ComponentActivity() {
 
@@ -166,33 +164,21 @@ class AudioActivity : ComponentActivity() {
             LocalCustomColors.current.black
         Column(
             modifier = Modifier
+                .imePadding()
                 .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
-                .padding(contentPadding),
+                .padding(contentPadding)
+                .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            val lazyListState = rememberLazyListState()
-            LazyColumn(
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                    .verticalScrollbar(
-                        state = lazyListState,
-                        width = 4.dp,
-                        color = LocalCustomColors.current.gray
-                    )
-                    .background(LocalCustomColors.current.background),
-                state = lazyListState,
-            ) {
-                item { CallVolume(ctx) }
-                item { MicGain(ctx) }
-                item { SpeakerPhone(ctx) }
-                item { AudioModules(ctx) }
-                item { OpusBitRate(ctx) }
-                item { OpusPacketLoss(ctx) }
-                item { AudioDelay(ctx) }
-                item { ToneCountry(ctx) }
-            }
+            CallVolume(ctx)
+            MicGain(ctx)
+            SpeakerPhone(ctx)
+            AudioModules(ctx)
+            OpusBitRate(ctx)
+            OpusPacketLoss(ctx)
+            AudioDelay(ctx)
+            ToneCountry(ctx)
         }
     }
 
@@ -649,7 +635,7 @@ class AudioActivity : ComponentActivity() {
         val number =
             try {
                 micGain.toDouble()
-            } catch (e: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 return false
             }
         return number >= 1.0
