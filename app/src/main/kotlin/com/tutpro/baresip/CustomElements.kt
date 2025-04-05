@@ -22,12 +22,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
@@ -50,7 +47,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,15 +71,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat.getString
-import com.tutpro.baresip.CustomElements.ThreeButtonAlertDialog
 
 object CustomElements {
 
@@ -232,24 +225,18 @@ object CustomElements {
     ): Modifier {
         val targetAlpha = if (state.isScrollInProgress || alwaysShow) 1f else 0f
         val duration = if (state.isScrollInProgress) 150 else 500
-
         val alpha by animateFloatAsState(
             targetValue = targetAlpha,
             animationSpec = tween(durationMillis = duration)
         )
-
         return drawWithContent {
             drawContent()
-
             val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
             val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
-
-            // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
             if (needDrawScrollbar && firstVisibleElementIndex != null) {
                 val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
                 val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
                 val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
-
                 drawRect(
                     color = color,
                     topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
@@ -266,7 +253,7 @@ object CustomElements {
         ctx: Context,
         showPasswordDialog: MutableState<Boolean>,
         password: MutableState<String>,
-        keyboardController:SoftwareKeyboardController?,
+        keyboardController: SoftwareKeyboardController?,
         title: String,
         message: String = "",
         okAction: () -> Unit,
@@ -275,7 +262,10 @@ object CustomElements {
         val showPassword = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
         BasicAlertDialog(
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            ),
             onDismissRequest = {
                 keyboardController?.hide()
                 showPasswordDialog.value = false
@@ -302,7 +292,7 @@ object CustomElements {
                             fontSize = 16.sp,
                             modifier = Modifier.padding(16.dp),
                             color = LocalCustomColors.current.itemText,
-                            )
+                        )
                     OutlinedTextField(
                         value = password.value,
                         singleLine = true,
@@ -338,7 +328,7 @@ object CustomElements {
                             .fillMaxWidth()
                             .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                             .focusRequester(focusRequester),
-                            textStyle = TextStyle(
+                        textStyle = TextStyle(
                             fontSize = 18.sp,
                             color = LocalCustomColors.current.dark
                         ),
@@ -370,8 +360,14 @@ object CustomElements {
                                 showPasswordDialog.value = false
                                 password.value = password.value.trim()
                                 if (!Account.checkAuthPass(password.value)) {
-                                    Toast.makeText(ctx,
-                                        String.format(getString(ctx, R.string.invalid_authentication_password), password.value),
+                                    Toast.makeText(
+                                        ctx,
+                                        String.format(
+                                            getString(
+                                                ctx,
+                                                R.string.invalid_authentication_password
+                                            ), password.value
+                                        ),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     password.value = ""
@@ -388,76 +384,5 @@ object CustomElements {
                 }
             }
         }
-    }
-
-    @Composable
-    fun ThreeButtonAlertDialog(
-        onDismissRequest: () -> Unit,
-        onPositiveClick: () -> Unit,
-        onNegativeClick: () -> Unit,
-        onNeutralClick: () -> Unit,
-        dialogTitle: String,
-        dialogText: String,
-    ) {
-        Dialog(onDismissRequest = { onDismissRequest() }) {
-            Card(
-                modifier = Modifier
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        text = dialogTitle
-                    )
-
-                    Text(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        text = dialogText
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        TextButton(
-                            onClick = { onNeutralClick() },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Neutral")
-                        }
-                        TextButton(
-                            onClick = { onNegativeClick() },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Negative")
-                        }
-                        Button(
-                            onClick = { onPositiveClick() },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Positive")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ThreeButtonAlertDialogPreview() {
-    var openDialog by remember { mutableStateOf(true) }
-    if (openDialog) {
-        ThreeButtonAlertDialog(
-            onDismissRequest = { openDialog = false },
-            onPositiveClick = { openDialog = false },
-            onNegativeClick = { openDialog = false },
-            onNeutralClick = { openDialog = false },
-            dialogTitle = "My Dialog Title",
-            dialogText = "This is the message text of my dialog.",
-        )
     }
 }
