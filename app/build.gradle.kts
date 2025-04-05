@@ -11,8 +11,8 @@ android {
         applicationId = "com.tutpro.baresip"
         minSdk = 28
         targetSdk = 35
-        versionCode = 417
-        versionName = "64.0.0"
+        versionCode = 418
+        versionName = "64.1.0"
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
@@ -68,33 +68,19 @@ android {
 
 composeCompiler {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
-    // stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
 
 dependencies {
-
     implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.tools.core)
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.ui.test.android)
-    implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.compose.material3)
-    val composeBom = libs.androidx.compose.bom
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation(libs.androidx.ui.tooling.preview)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.material)
-    implementation(libs.androidx.cardview)
     implementation(libs.androidx.localbroadcastmanager)
-    implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.core.ktx)
@@ -104,8 +90,4 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.media)
     implementation(libs.coil.compose)
-
-    implementation(libs.ui.tooling.preview)
-    debugImplementation(libs.ui.tooling)
-
 }

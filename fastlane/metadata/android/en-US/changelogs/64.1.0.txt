@@ -1,0 +1,2 @@
+- Several user interface related fixes and improvements
+- New translations (Portuguese (Brazil))
