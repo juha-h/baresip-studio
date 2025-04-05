@@ -413,6 +413,8 @@
     <string name="sip_or_tel_uri">SIP or tel URI</string>
     <string name="user_domain_or_number">user@domain or telephone number</string>
     <string name="favorite">Favorite</string>
+    <string name="favorite_help">If checked, contact is shown among other favorites
+        on top of contacts list.</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
     <string name="invalid_contact_uri">Invalid SIP URI</string>
