@@ -268,6 +268,7 @@ object CustomElements {
         password: MutableState<String>,
         keyboardController:SoftwareKeyboardController?,
         title: String,
+        message: String = "",
         okAction: () -> Unit,
         cancelAction: () -> Unit
     ) {
@@ -295,6 +296,13 @@ object CustomElements {
                         modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                         color = LocalCustomColors.current.alert,
                     )
+                    if (message != "")
+                        Text(
+                            text = message,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(16.dp),
+                            color = LocalCustomColors.current.itemText,
+                            )
                     OutlinedTextField(
                         value = password.value,
                         singleLine = true,
@@ -368,8 +376,7 @@ object CustomElements {
                                     ).show()
                                     password.value = ""
                                 }
-                                if (password.value != "")
-                                    okAction()
+                                okAction()
                             },
                         ) {
                             Text(

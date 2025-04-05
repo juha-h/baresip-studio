@@ -1164,11 +1164,13 @@ class AccountActivity : ComponentActivity() {
                 keyboardController = keyboardController,
                 title = getString(R.string.authentication_password),
                 okAction = {
-                    BaresipService.aorPasswords[acc.aor] = password.value
-                    Api.account_set_auth_pass(acc.accp, password.value)
-                    password.value = ""
-                    reRegister = true
-                    finishActivity()
+                    if (password.value != "") {
+                        BaresipService.aorPasswords[acc.aor] = password.value
+                        Api.account_set_auth_pass(acc.accp, password.value)
+                        password.value = ""
+                        reRegister = true
+                        finishActivity()
+                    }
                 },
                 cancelAction = {
                     reRegister = true
