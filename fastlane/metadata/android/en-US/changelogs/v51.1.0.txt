@@ -1,0 +1,3 @@
+- Prevent possible crash in call video info
+- Added log message if no supported cameras
+- New translations (Portuguese (Brazil))
