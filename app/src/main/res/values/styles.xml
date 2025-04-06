@@ -6,7 +6,7 @@
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNegativeButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
-        <item name="android:background">@color/colorGrayLight</item>
+        <item name="android:background">@color/colorBackground</item>
         <item name="android:textSize">14sp</item>
     </style>
 
@@ -16,7 +16,7 @@
     </style>
 
     <style name="Alert.Message" parent="@style/MaterialAlertDialog.Material3.Body.Text">
-        <item name="android:textColor">@color/colorDark</item>
+        <item name="android:textColor">@color/colorItemText</item>
         <item name="android:textSize">16sp</item>
     </style>
 
