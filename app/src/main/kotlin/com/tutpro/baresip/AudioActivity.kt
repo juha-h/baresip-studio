@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AudioActivity : ComponentActivity() {
 
@@ -162,13 +163,15 @@ class AudioActivity : ComponentActivity() {
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScrollbar(scrollState)
+                .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             CallVolume(ctx)
