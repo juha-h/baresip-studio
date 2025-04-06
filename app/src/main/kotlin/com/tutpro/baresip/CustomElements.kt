@@ -235,11 +235,11 @@ object CustomElements {
             val contentHeight = state.maxValue + viewHeight
             val scrollbarHeight = (viewHeight * (viewHeight / contentHeight )).coerceIn(10.dp.toPx() .. viewHeight)
             val variableZone = viewHeight - scrollbarHeight
-            val scrollbarYoffset = (state.value.toFloat() / state.maxValue) * variableZone
+            val scrollbarOffsetY = (state.value.toFloat() / state.maxValue) * variableZone
             drawRoundRect(
                 cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2, scrollbarWidth.toPx() / 2),
                 color = color,
-                topLeft = Offset(this.size.width - scrollbarWidth.toPx(), scrollbarYoffset),
+                topLeft = Offset(this.size.width - scrollbarWidth.toPx(), scrollbarOffsetY),
                 size = Size(scrollbarWidth.toPx(), scrollbarHeight),
                 alpha = alpha
             )
