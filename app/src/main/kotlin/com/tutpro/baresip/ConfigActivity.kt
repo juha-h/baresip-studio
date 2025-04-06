@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
 import java.io.File
 import java.io.FileInputStream
@@ -334,39 +335,34 @@ class ConfigActivity : ComponentActivity() {
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
+                .imePadding()
                 .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
-                .padding(contentPadding),
+                .padding(contentPadding)
+                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                .verticalScrollbar(scrollState)
+                .verticalScroll(state = scrollState),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                    .verticalScroll(rememberScrollState())
-                    .background(LocalCustomColors.current.background),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                StartAutomatically(ctx)
-                ListenAddress(ctx)
-                AddressFamily(ctx)
-                DnsServers(ctx)
-                TlsCertificateFile(ctx)
-                VerifyServer(ctx)
-                CaFile(ctx)
-                UserAgent(ctx)
-                AudioSettings(ctx)
-                BatteryOptimizations(ctx)
-                if (Build.VERSION.SDK_INT >= 29)
-                    DefaultDialer(ctx)
-                Contacts(ctx)
-                DarkTheme(ctx)
-                Debug(ctx)
-                SipTrace(ctx)
-                Reset(ctx)
-            }
+            StartAutomatically(ctx)
+            ListenAddress(ctx)
+            AddressFamily(ctx)
+            DnsServers(ctx)
+            TlsCertificateFile(ctx)
+            VerifyServer(ctx)
+            CaFile(ctx)
+            UserAgent(ctx)
+            AudioSettings(ctx)
+            BatteryOptimizations(ctx)
+            if (Build.VERSION.SDK_INT >= 29)
+                DefaultDialer(ctx)
+            Contacts(ctx)
+            DarkTheme(ctx)
+            Debug(ctx)
+            SipTrace(ctx)
+            Reset(ctx)
         }
     }
 

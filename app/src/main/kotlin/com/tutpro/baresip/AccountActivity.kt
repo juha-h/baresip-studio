@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AccountActivity : ComponentActivity() {
 
@@ -232,14 +233,16 @@ class AccountActivity : ComponentActivity() {
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
-                .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                .verticalScrollbar(scrollState)
+                .verticalScroll(state = scrollState),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             oldNickname = acc.nickName.value
             oldDisplayname = acc.displayName

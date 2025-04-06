@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -218,6 +220,34 @@ object CustomElements {
 
     @Composable
     fun Modifier.verticalScrollbar(
+        state: ScrollState,
+        scrollbarWidth: Dp = 4.dp,
+        alwaysShow: Boolean = true,
+        color: Color = LocalCustomColors.current.gray
+    ): Modifier {
+        val alpha by animateFloatAsState(
+            targetValue = if(state.isScrollInProgress || alwaysShow) 1f else 0f,
+            animationSpec = tween(400, delayMillis = if(state.isScrollInProgress) 0 else 700)
+        )
+        return this then Modifier.drawWithContent {
+            drawContent()
+            val viewHeight = state.viewportSize.toFloat()
+            val contentHeight = state.maxValue + viewHeight
+            val scrollbarHeight = (viewHeight * (viewHeight / contentHeight )).coerceIn(10.dp.toPx() .. viewHeight)
+            val variableZone = viewHeight - scrollbarHeight
+            val scrollbarYoffset = (state.value.toFloat() / state.maxValue) * variableZone
+            drawRoundRect(
+                cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2, scrollbarWidth.toPx() / 2),
+                color = color,
+                topLeft = Offset(this.size.width - scrollbarWidth.toPx(), scrollbarYoffset),
+                size = Size(scrollbarWidth.toPx(), scrollbarHeight),
+                alpha = alpha
+            )
+        }
+    }
+
+    @Composable
+    fun Modifier.verticalScrollbar(
         state: LazyListState,
         width: Dp = 8.dp,
         alwaysShow: Boolean = true,
@@ -237,7 +267,8 @@ object CustomElements {
                 val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
                 val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
                 val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
-                drawRect(
+                drawRoundRect(
+                    cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
                     color = color,
                     topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
                     size = Size(width.toPx(), scrollbarHeight),
