@@ -9,7 +9,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,9 +22,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -77,6 +73,7 @@ class AccountsActivity : ComponentActivity() {
     private lateinit var mediaEncMap: Map<String, String>
     private lateinit var mediaNatMap: Map<String, String>
 
+    private var showAccounts = mutableStateOf(true)
     private var lastClick: Long = 0
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -156,30 +153,19 @@ class AccountsActivity : ComponentActivity() {
 
     @Composable
     fun AccountsContent(ctx: Context, contentPadding: PaddingValues) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(LocalCustomColors.current.background)
-                .padding(contentPadding)
-                .padding(top = 8.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            val lazyListState = rememberLazyListState()
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
+        if (showAccounts.value) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 4.dp)
-                    .verticalScrollbar(
-                        state = lazyListState,
-                        width = 4.dp,
-                        color = LocalCustomColors.current.gray
-                    ),
-                state = lazyListState,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(contentPadding)
+                    .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                    .verticalScrollbar(scrollState)
+                    .verticalScroll(state = scrollState),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                items(BaresipService.uas.value, key = { it.account.aor }) { ua ->
+                for (ua in BaresipService.uas.value) {
                     val account = ua.account
                     val aor = account.aor
                     val text = if (account.nickName.value != "")
@@ -226,6 +212,8 @@ class AccountsActivity : ComponentActivity() {
                                                 Api.ua_destroy(ua.uap)
                                             saveAccounts()
                                             dialog.dismiss()
+                                            showAccounts.value = false
+                                            showAccounts.value = true
                                         }
                                         setNeutralButton(ctx.getText(R.string.cancel)) { dialog, _ ->
                                             dialog.dismiss()
@@ -307,6 +295,7 @@ class AccountsActivity : ComponentActivity() {
                                 startActivity(i)
                                 newAor = ""
                                 focusManager.clearFocus()
+                                showAccounts.value = false
                             }
                         }
                     ),
@@ -368,7 +357,7 @@ class AccountsActivity : ComponentActivity() {
             val config = try {
                 URL(url).readText()
             } catch (e: java.lang.Exception) {
-                Log.d(TAG, "Failed to get account configuration from network")
+                Log.d(TAG, "Failed to get account configuration from network: ${e.message}")
                 null
             }
             if (config != null && !ctx.isFinishing) {
@@ -469,6 +458,11 @@ class AccountsActivity : ComponentActivity() {
     override fun onPause() {
         MainActivity.activityAor = aor
         super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showAccounts.value = true
     }
 
     companion object {
