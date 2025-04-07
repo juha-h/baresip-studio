@@ -61,6 +61,7 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textColor">@color/colorGray</item>
+        <item name="android:textAllCaps">true</item>
         <item name="android:textSize">14sp</item>
     </style>
 
@@ -70,7 +71,7 @@
     </style>
 
     <style name="Alert.Message" parent="@style/MaterialAlertDialog.Material3.Body.Text">
-        <item name="android:textColor">@color/colorStrong</item>
+        <item name="android:textColor">@color/colorItemText</item>
         <item name="android:textSize">16sp</item>
     </style>
 
