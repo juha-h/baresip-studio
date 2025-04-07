@@ -29,7 +29,6 @@
     </style>
 
     <style name="Alert.Button.Neutral" parent="Widget.Material3.Button.TextButton">
-        <item name="backgroundTint">@android:color/transparent</item>
         <item name="rippleColor">@color/colorAccent</item>
         <item name="android:textColor">@color/colorGray</item>
         <item name="android:textSize">14sp</item>
