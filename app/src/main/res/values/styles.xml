@@ -6,6 +6,7 @@
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNegativeButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:background">@color/colorBackground</item>
         <item name="android:textSize">14sp</item>
     </style>
