@@ -40,7 +40,8 @@
         <item name="materialAlertDialogBodyTextStyle">@style/Alert.Message</item>
         <item name="materialAlertDialogTitleTextStyle">@style/Alert.Title</item>
         <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
-        <item name="colorSecondaryContainer">@color/colorLight</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:background">@color/colorBackground</item>
         <item name="android:textSize">14sp</item>
     </style>
 
