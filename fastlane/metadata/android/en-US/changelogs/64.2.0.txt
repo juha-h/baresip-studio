@@ -1,0 +1,4 @@
+- Added vertical scrollbars to Settings, Account, and Audio activities
+- Fixed call and transfer URI suggestions handling
+- Dialog style improvements
+- New translations (Portuguese)
