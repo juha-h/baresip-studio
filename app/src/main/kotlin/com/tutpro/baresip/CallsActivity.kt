@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -210,7 +211,6 @@ class CallsActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
                 .padding(contentPadding)
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -258,9 +258,7 @@ class CallsActivity : ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(items = uaHistory.value) { callRow ->
-
                 var recordings = false
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -304,6 +302,7 @@ class CallsActivity : ComponentActivity() {
                                     ImageAvatar(avatarImage)
                                 }
                             }
+                            Spacer(modifier = Modifier.width(4.dp))
                             var count = 1
                             for (d in callRow.details) {
                                 if (d.recording[0] != "")

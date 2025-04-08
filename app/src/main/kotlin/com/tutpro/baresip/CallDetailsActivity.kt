@@ -144,7 +144,6 @@ class CallDetailsActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
                 .padding(contentPadding)
                 .padding(top = 16.dp, start = 16.dp, end = 4.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -355,21 +354,6 @@ class CallDetailsActivity : ComponentActivity() {
     override fun onPause() {
         MainActivity.activityAor = aor
         super.onPause()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if (BaresipService.activities.indexOf("call_details,$aor,$peer,$position") == -1)
-            return true
-
-        when (item.itemId) {
-            android.R.id.home -> {
-                goBack()
-                return true
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun goBack() {
