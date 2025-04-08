@@ -1214,33 +1214,33 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.padding(16.dp),
                                         color = LocalCustomColors.current.primary,
                                     )
-                                    var uri by remember { mutableStateOf("") }
+                                    var transferUri by remember { mutableStateOf("") }
                                     val suggestions by remember { contactNames }
                                     var filteredSuggestions by remember { mutableStateOf(suggestions) }
                                     var showSuggestions by remember { mutableStateOf(false) }
                                     val focusRequester = remember { FocusRequester() }
                                     val lazyListState = rememberLazyListState()
                                     OutlinedTextField(
-                                        value = uri,
+                                        value = transferUri,
                                         singleLine = true,
                                         onValueChange = {
-                                            uri = it
-                                            showSuggestions = uri.isNotEmpty()
-                                            filteredSuggestions = if (uri.isEmpty())
+                                            transferUri = it
+                                            showSuggestions = transferUri.isNotEmpty()
+                                            filteredSuggestions = if (transferUri.isEmpty())
                                                 suggestions
                                             else
                                                 suggestions.filter { suggestion ->
-                                                    uri.length > 2 && suggestion.startsWith(uri,
-                                                        ignoreCase = true)
+                                                    transferUri.length > 2 &&
+                                                            suggestion.startsWith(transferUri, ignoreCase = true)
                                                 }
                                         },
                                         trailingIcon = {
-                                            if (uri.isNotEmpty())
+                                            if (transferUri.isNotEmpty())
                                                 Icon(
                                                     Icons.Outlined.Clear,
                                                     contentDescription = null,
                                                     modifier = Modifier.clickable {
-                                                        uri = ""
+                                                        transferUri = ""
                                                         showSuggestions = false
                                                     }
                                                 )
@@ -1303,7 +1303,7 @@ class MainActivity : ComponentActivity() {
                                                             modifier = Modifier
                                                                 .fillMaxWidth()
                                                                 .clickable {
-                                                                    callUri.value = suggestion
+                                                                    transferUri = suggestion
                                                                     showSuggestions = false
                                                                 }
                                                                 .padding(12.dp)
@@ -1365,7 +1365,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                         TextButton(
                                             onClick = {
-                                                var uriText = uri.trim()
+                                                var uriText = transferUri.trim()
                                                 if (uriText.isNotEmpty()) {
                                                     val uris = Contact.contactUris(uriText)
                                                     if (uris.size > 1) {
