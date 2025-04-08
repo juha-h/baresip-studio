@@ -19,7 +19,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
     companion object {
 
         private const val serialVersionUID: Long = 3
-        private const val CALL_HISTORY_SIZE = 128
+        private const val CALL_HISTORY_SIZE = 256
 
         fun add(history: CallHistoryNew) {
             BaresipService.callHistory.add(history)

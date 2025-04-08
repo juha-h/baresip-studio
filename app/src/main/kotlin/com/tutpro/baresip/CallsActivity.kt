@@ -7,8 +7,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.SystemClock
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -175,10 +173,7 @@ class CallsActivity : ComponentActivity() {
                         when (selectedItem) {
                             delete ->
                                 with(
-                                    MaterialAlertDialogBuilder(
-                                        this@CallsActivity,
-                                        R.style.AlertDialogTheme
-                                    )
+                                    MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)
                                 ) {
                                     setTitle(R.string.confirmation)
                                     setMessage(
@@ -190,8 +185,7 @@ class CallsActivity : ComponentActivity() {
                                     setPositiveButton(delete) { dialog, _ ->
                                         CallHistoryNew.clear(aor)
                                         CallHistoryNew.save()
-                                        aorGenerateHistory(aor)
-                                        //clAdapter.notifyDataSetChanged()
+                                        uaHistory.value = emptyList()
                                         dialog.dismiss()
                                     }
                                     setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
@@ -425,7 +419,6 @@ class CallsActivity : ComponentActivity() {
                     DialogInterface.BUTTON_POSITIVE -> {
                         removeFromHistory(callRow)
                         CallHistoryNew.save()
-                        /// clAdapter.notifyDataSetChanged()
                     }
                     DialogInterface.BUTTON_NEUTRAL -> {
                     }
@@ -483,49 +476,6 @@ class CallsActivity : ComponentActivity() {
             }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if (BaresipService.activities.indexOf("calls,$aor") == -1)
-            return true
-
-        when (item.itemId) {
-
-            R.id.delete_history -> {
-                with (MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)) {
-                    setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.delete_history_alert),
-                            aor.substringAfter(":")))
-                    setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        CallHistoryNew.clear(aor)
-                        CallHistoryNew.save()
-                        aorGenerateHistory(aor)
-                        // clAdapter.notifyDataSetChanged()
-                        dialog.dismiss()
-                    }
-                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    show()
-                }
-                return true
-            }
-
-            R.id.history_on_off -> {
-                account.callHistory = !account.callHistory
-                invalidateOptionsMenu()
-                AccountsActivity.saveAccounts()
-                return true
-            }
-
-            android.R.id.home -> {
-                goBack()
-                return true
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun goBack() {
         BaresipService.activities.remove("calls,$aor")
         returnResult()
@@ -539,21 +489,6 @@ class CallsActivity : ComponentActivity() {
     private fun returnResult() {
         setResult(RESULT_CANCELED, Intent())
         finish()
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-
-        if (account.callHistory)
-            menu.findItem(R.id.history_on_off).title = getString(R.string.disable_history)
-        else
-            menu.findItem(R.id.history_on_off).title = getString(R.string.enable_history)
-        return super.onPrepareOptionsMenu(menu)
-
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.calls_menu, menu)
-        return true
     }
 
     private fun aorGenerateHistory(aor: String) {
@@ -603,7 +538,6 @@ class CallsActivity : ComponentActivity() {
         }
         CallHistoryNew.deleteRecording(callRow.recording)
         deleteFromUaHistory(callRow)
-        updateUaHistory()
     }
 
     private fun addToUaHistory(callRow: CallRow) {
@@ -615,13 +549,6 @@ class CallsActivity : ComponentActivity() {
     private fun deleteFromUaHistory(callRow: CallRow) {
         val updatedList = uaHistory.value.toMutableList()
         updatedList.remove(callRow)
-        uaHistory.value = updatedList
-    }
-
-    private fun updateUaHistory() {
-        val updatedList: MutableList<CallRow> = mutableListOf()
-        for (h in uaHistory.value)
-            updatedList.add(h)
         uaHistory.value = updatedList
     }
 
