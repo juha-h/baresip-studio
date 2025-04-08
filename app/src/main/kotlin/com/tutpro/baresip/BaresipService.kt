@@ -1637,24 +1637,25 @@ class BaresipService: Service() {
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
         var contacts by mutableStateOf(mutableListOf<Contact>())
-        val darkTheme = mutableStateOf(false)
-        var messages by mutableStateOf(emptyList<Message>())
-
-        val calls = ArrayList<Call>()
-        var callHistory = ArrayList<CallHistoryNew>()
-        val messageUpdate = MutableLiveData<Long>()
-        val contactUpdate = MutableLiveData<Long>()
-        val registrationUpdate = MutableLiveData<Long>()
         val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
-        var contactsMode = "baresip"
+        val contactUpdate = MutableLiveData<Long>()
+        val darkTheme = mutableStateOf(false)
+        var messages by mutableStateOf(emptyList<Message>())
+        val messageUpdate = MutableLiveData<Long>()
         val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
-        var addressFamily = ""
-        var dnsServers = listOf<InetAddress>()
+        val registrationUpdate = MutableLiveData<Long>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
+
+        val calls = ArrayList<Call>()
+        var callHistory = ArrayList<CallHistoryNew>()
+
+        var contactsMode = "baresip"
+        var addressFamily = ""
+        var dnsServers = listOf<InetAddress>()
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
