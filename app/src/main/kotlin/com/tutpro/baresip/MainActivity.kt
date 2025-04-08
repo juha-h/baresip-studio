@@ -194,6 +194,7 @@ class MainActivity : ComponentActivity() {
     private var securityIcon = mutableIntStateOf(-1)
     private var callTimer: Chronometer? = null
     private var showCallTimer = mutableStateOf(false)
+    private var showSuggestions = mutableStateOf(false)
     private var showCallButton = mutableStateOf(true)
     private var showAnswerRejectButtons = mutableStateOf(false)
     private var showHangupButton = mutableStateOf(false)
@@ -887,7 +888,6 @@ class MainActivity : ComponentActivity() {
     fun CallUriRow(ctx: Context) {
         val suggestions by remember { contactNames }
         var filteredSuggestions by remember { mutableStateOf(suggestions) }
-        var showSuggestions by remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
         val lazyListState = rememberLazyListState()
 
@@ -907,7 +907,7 @@ class MainActivity : ComponentActivity() {
                         val newValue = it
                         if (it != callUri.value) {
                             callUri.value = newValue
-                            showSuggestions = newValue.length > 2
+                            showSuggestions.value = newValue.length > 2
                             filteredSuggestions = suggestions.filter { suggestion ->
                                 newValue.length > 2 && suggestion.startsWith(newValue, ignoreCase = true)
                             }
@@ -920,7 +920,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .clickable {
                                         callUri.value = ""
-                                        showSuggestions = false
+                                        showSuggestions.value = false
                                     }
                             )
                     },
@@ -954,7 +954,7 @@ class MainActivity : ComponentActivity() {
                         )
                         .animateContentSize()
                 ) {
-                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                    if (showSuggestions.value && filteredSuggestions.isNotEmpty()) {
                         Box(modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = 150.dp)) {
@@ -977,7 +977,7 @@ class MainActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .clickable {
                                                 callUri.value = suggestion
-                                                showSuggestions = false
+                                                showSuggestions.value = false
                                             }
                                             .padding(12.dp)
                                     ) {
@@ -1081,6 +1081,7 @@ class MainActivity : ComponentActivity() {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
+                        showSuggestions.value = false
                         callClick(ctx)
                     },
                 ) {
