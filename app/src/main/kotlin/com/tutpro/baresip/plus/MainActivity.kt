@@ -1021,7 +1021,7 @@ class MainActivity : AppCompatActivity() {
             sb.setOnClickListener {
                 val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
                 val fileName = "IMG_" + sdf.format(Date()) + ".png"
-                val filePath = BaresipService.filesPath + "/" + fileName
+                val filePath = Utils.downloadsPath(fileName)
                 if (Api.cmd_exec("snapshot_recv $filePath") != 0)
                     Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
                 else

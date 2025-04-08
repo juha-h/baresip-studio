@@ -690,9 +690,9 @@ class BaresipService: Service() {
                         try {
                             val bitmap = BitmapFactory.decodeStream(file.inputStream())
                             Utils.savePicture(this, bitmap, fileName)
-                            Log.d(TAG, "Saved snapshot $fileName")
+                            Log.d(TAG, "Saved snapshot to $fileName")
                         } catch (e: IOException) {
-                            Log.d(TAG, "Failed to save snapshot $fileName")
+                            Log.e(TAG, "Failed to save snapshot to $fileName: $e")
                         }
                     }
                     file.delete()
