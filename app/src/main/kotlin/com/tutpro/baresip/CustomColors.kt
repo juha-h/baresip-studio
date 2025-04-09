@@ -59,7 +59,7 @@ val light_red = Color(0xffff0000)
 val light_traffic_green = Color(0xFF4CAF50)
 val light_traffic_yellow = Color(0xFFFFEB3B)
 val light_traffic_red = Color(0xFFFF5722)
-val light_light = light_white
+val light_light = Color(0xfffcfcfc)
 val light_dark = Color(0xFF383838)
 val light_spinner_text = light_dark
 val light_spinner_dropdown = light_gray_light
@@ -67,10 +67,10 @@ val light_spinner_divider = light_gray
 val light_item_text = light_black
 val light_alert_text = light_black
 val light_codec = light_black
-val light_background = Color(0xfffcfcfc)
+val light_background = light_light
 val light_textfield_background = light_gray_light
 val light_popup_background = light_secondary_dark
-val light_alert = Color(0xff0ca1fd) // == light_primary
+val light_alert = light_primary
 val light_actionbar = light_background
 
 val dark_primary = Color(0xff0073c9)

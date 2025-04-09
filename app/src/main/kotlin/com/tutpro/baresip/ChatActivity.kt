@@ -150,7 +150,6 @@ class ChatActivity : ComponentActivity() {
                 keyboardController = LocalSoftwareKeyboardController.current
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = LocalCustomColors.current.background
                 ) {
                     ChatScreen(this, title) { goBack() }
                 }
@@ -167,6 +166,7 @@ class ChatActivity : ComponentActivity() {
                 .fillMaxHeight()
                 .imePadding()
                 .safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
             topBar = { TopAppBar(ctx, title, navigateBack) },
             bottomBar = { NewMessage(ctx, peerUri) },
             content = { contentPadding ->
