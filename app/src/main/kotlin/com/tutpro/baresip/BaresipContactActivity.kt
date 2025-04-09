@@ -52,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -168,7 +171,7 @@ class BaresipContactActivity : ComponentActivity() {
             title = {
                 Text(
                     text = title,
-                    color = LocalCustomColors.current.grayLight,
+                    color = LocalCustomColors.current.light,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -244,7 +247,7 @@ class BaresipContactActivity : ComponentActivity() {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     drawCircle(SolidColor(Color(textAvatarColor)))
                 }
-                textAvatarText = if (name == "") "" else name[0].toString()
+                textAvatarText = if (name == "") "?" else name[0].toString()
                 Text(textAvatarText, fontSize = 72.sp, color = Color.White)
             }
         }
@@ -266,10 +269,9 @@ class BaresipContactActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (new) {
-                    textAvatarText = "?"
+                if (new)
                     textAvatarColor = color
-                } else {
+                else {
                     val avatarImage = avatarImage
                     val avatarFile = File(BaresipService.filesPath, "${id}.png")
                     if (avatarImage != null && (newAvatar == "" || newAvatar == "image")) {
@@ -308,6 +310,7 @@ class BaresipContactActivity : ComponentActivity() {
 
         @Composable
         fun contactName() {
+            val focusRequester = FocusRequester()
             var contactName by remember { mutableStateOf(name) }
             newName = contactName
             OutlinedTextField(
@@ -317,7 +320,7 @@ class BaresipContactActivity : ComponentActivity() {
                     contactName = it
                     newName = contactName
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText
                 ),
@@ -327,6 +330,10 @@ class BaresipContactActivity : ComponentActivity() {
                     capitalization = KeyboardCapitalization.Sentences
                 )
             )
+            LaunchedEffect(new) {
+                if (new)
+                    focusRequester.requestFocus()
+            }
         }
 
         @Composable
