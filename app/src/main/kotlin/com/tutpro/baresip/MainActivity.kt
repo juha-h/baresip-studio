@@ -1424,16 +1424,16 @@ class MainActivity : ComponentActivity() {
                 val shouldRequestFocus by focusDtmf
                 TextField(
                     value = dtmfText.value,
-                    onValueChange = { newText ->
-                        if (newText.length > dtmfText.value.length) {
-                            val char = newText.last()
-                            Log.d(TAG, "Got DTMF digit '$char'")
+                    onValueChange = {
+                        if (it.length > dtmfText.value.length) {
+                            val char = it.last()
                             if (char.isDigit() || char == '*' || char == '#') {
-                                dtmfText.value = newText
+                                Log.d(TAG, "Got DTMF digit '$char'")
                                 ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
                                 ua.currentCall()!!.sendDigit(char)
                             }
                         }
+                        dtmfText.value = it
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier
