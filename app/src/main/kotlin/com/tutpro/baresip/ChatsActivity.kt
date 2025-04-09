@@ -17,7 +17,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,14 +40,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,6 +73,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -233,13 +232,11 @@ class ChatsActivity: ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .background(LocalCustomColors.current.background)
                 .padding(contentPadding),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Top
         ) {
             Account(account)
-            Spacer(modifier = Modifier.weight(1f))
+            // Spacer(modifier = Modifier.weight(1f))
             Chats(ctx, account)
         }
     }
@@ -269,7 +266,7 @@ class ChatsActivity: ComponentActivity() {
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 4.dp)
+                .padding(start = 8.dp, end = 4.dp)
                 .verticalScrollbar(
                     state = lazyListState,
                     width = 4.dp,
@@ -281,9 +278,37 @@ class ChatsActivity: ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(items = uaMessages, key = { message -> message.timeStamp }) { message ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.combinedClickable(
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    when (val contact = Contact.findContact(message.peerUri)) {
+                        is Contact.BaresipContact -> {
+                            val avatarImage = contact.avatarImage
+                            if (avatarImage != null)
+                                ImageAvatar(avatarImage)
+                            else
+                                TextAvatar(contact.name, contact.color)
+                        }
+                        is Contact.AndroidContact -> {
+                            val thumbNailUri = contact.thumbnailUri
+                            if (thumbNailUri != null)
+                                AsyncImage(
+                                    model = thumbNailUri,
+                                    contentDescription = "Avatar",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape),
+                                )
+                            else
+                                TextAvatar(contact.name, contact.color)
+                        }
+                        null -> {
+                            val avatarImage = BitmapFactory
+                                .decodeResource(ctx.resources, R.drawable.person_image)
+                            ImageAvatar(avatarImage)
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    CustomElements.Button(
                         onClick = {
                             val i = Intent(ctx, ChatActivity::class.java)
                             val b = Bundle()
@@ -305,16 +330,13 @@ class ChatsActivity: ComponentActivity() {
                                             i.putExtras(b)
                                             startActivity(i)
                                         }
-
                                         DialogInterface.BUTTON_NEGATIVE -> {
                                             Message.deleteAorPeerMessages(aor, message.peerUri)
                                         }
-
                                         DialogInterface.BUTTON_NEUTRAL -> {
                                         }
                                     }
                                 }
-
                             val builder = MaterialAlertDialogBuilder(
                                 this@ChatsActivity,
                                 R.style.AlertDialogTheme
@@ -362,62 +384,28 @@ class ChatsActivity: ComponentActivity() {
                                     )
                                     show()
                                 }
-                        }
-                    )) {
-                    when (val contact = Contact.findContact(message.peerUri)) {
-                        is Contact.BaresipContact -> {
-                            val avatarImage = contact.avatarImage
-                            if (avatarImage != null)
-                                ImageAvatar(avatarImage)
-                            else
-                                TextAvatar(contact.name, contact.color)
-                        }
-
-                        is Contact.AndroidContact -> {
-                            val thumbNailUri = contact.thumbnailUri
-                            if (thumbNailUri != null)
-                                AsyncImage(
-                                    model = thumbNailUri,
-                                    contentDescription = "Avatar",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape),
-                                )
-                            else
-                                TextAvatar(contact.name, contact.color)
-                        }
-
-                        null -> {
-                            val avatarImage = BitmapFactory
-                                .decodeResource(ctx.resources, R.drawable.person_image)
-                            ImageAvatar(avatarImage)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    Button(
-                        onClick = {
-                            val i = Intent(this@ChatsActivity, ChatActivity::class.java)
-                            val b = Bundle()
-                            b.putString("aor", aor)
-                            b.putString("peer", message.peerUri)
-                            i.putExtras(b)
-                            chatRequest.launch(i) },
-                        shape = if (message.direction == MESSAGE_DOWN)
-                            RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
-                        else
-                            RoundedCornerShape(20.dp, 50.dp, 20.dp, 10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor =
-                            if (message.direction == MESSAGE_DOWN)
-                                LocalCustomColors.current.secondaryLight
-                            else
-                                LocalCustomColors.current.primaryLight),
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .padding(start = 8.dp, end = 16.dp)
+                            .padding(end = 6.dp),
+                        shape = if (message.direction == MESSAGE_DOWN)
+                            RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
+                        else
+                            RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
+                        color = //ButtonDefaults.buttonColors(containerColor =
+                            if (message.direction == MESSAGE_DOWN) {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.secondaryDark
+                                else
+                                    LocalCustomColors.current.secondaryLight
+                            }
+                            else {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.primaryDark
+                                else
+                                    LocalCustomColors.current.primaryLight
+                            },
                     ) {
                         val peer = Utils.friendlyUri(ctx, message.peerUri, account)
                         val cal = GregorianCalendar()
@@ -429,20 +417,34 @@ class ChatsActivity: ComponentActivity() {
                         val info = fmt.format(cal.time)
                         Column {
                             Row {
-                                Text(
-                                    peer, color = LocalCustomColors.current.dark,
-                                    fontSize = 12.sp
-                                )
+                                val textColor =
+                                    if (message.direction == MESSAGE_DOWN) {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.secondaryLight
+                                        else
+                                            LocalCustomColors.current.secondaryDark
+                                    }
+                                    else {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.primaryLight
+                                        else
+                                            LocalCustomColors.current.primaryDark
+                                    }
+                                Text(text = peer, color = textColor, fontSize = 12.sp)
                                 Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    info, color = LocalCustomColors.current.dark,
-                                    fontSize = 12.sp
-                                )
+                                Text(text = info, color = textColor, fontSize = 12.sp)
                             }
                             Row {
-                                Text(
-                                    text = message.message, color = LocalCustomColors.current.dark,
-                                    maxLines = 1
+                                BasicText(
+                                    text = message.message,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = TextStyle(
+                                        color = LocalCustomColors.current.itemText,
+                                        fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
+                                            FontWeight.Bold else FontWeight.Normal,
+                                        fontSize = 16.sp
+                                    )
                                 )
                             }
                         }
@@ -666,7 +668,7 @@ class ChatsActivity: ComponentActivity() {
     private fun uaMessages(aor: String) : List<Message> {
         val res = mutableListOf<Message>()
         account.unreadMessages = false
-        for (m in BaresipService.messages) {
+        for (m in BaresipService.messages.reversed()) {
             if (m.aor != aor) continue
             var found = false
             for (r in res)
@@ -675,7 +677,7 @@ class ChatsActivity: ComponentActivity() {
                     break
                 }
             if (!found) {
-                res.add(m)
+                res.add(0, m)
                 if (m.new)
                     account.unreadMessages = true
             }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.format.DateUtils.isToday
-import android.view.Menu
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -15,7 +14,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -125,7 +123,7 @@ class ChatActivity : ComponentActivity() {
 
         val userAgent = UserAgent.ofAor(aor)
         if (userAgent == null) {
-            Log.w(TAG, "MessageActivity did not find ua of $aor")
+            Log.w(TAG, "ChatActivity did not find ua of $aor")
             MainActivity.activityAor = aor
             returnResult(RESULT_CANCELED)
             return
@@ -135,7 +133,7 @@ class ChatActivity : ComponentActivity() {
 
         chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account, true)
 
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
         val title = String.format(getString(R.string.chat_with), chatPeer)
 
@@ -169,7 +167,6 @@ class ChatActivity : ComponentActivity() {
                 .fillMaxHeight()
                 .imePadding()
                 .safeDrawingPadding(),
-            containerColor = LocalCustomColors.current.background,
             topBar = { TopAppBar(ctx, title, navigateBack) },
             bottomBar = { NewMessage(ctx, peerUri) },
             content = { contentPadding ->
@@ -232,8 +229,6 @@ class ChatActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .background(LocalCustomColors.current.background)
                 .padding(contentPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
@@ -287,8 +282,7 @@ class ChatActivity : ComponentActivity() {
                     state = lazyListState,
                     width = 4.dp,
                     color = LocalCustomColors.current.gray
-                )
-                .background(LocalCustomColors.current.background),
+                ),
             reverseLayout = true,
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -390,31 +384,48 @@ class ChatActivity : ComponentActivity() {
                         else
                             RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
                         colors = ButtonDefaults.buttonColors(containerColor =
-                            if (message.direction == MESSAGE_DOWN)
-                                LocalCustomColors.current.secondaryLight
-                            else
-                                LocalCustomColors.current.primaryLight),
+                            if (message.direction == MESSAGE_DOWN) {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.secondaryDark
+                                else
+                                    LocalCustomColors.current.secondaryLight
+                            }
+                            else {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.primaryDark
+                                else
+                                    LocalCustomColors.current.primaryLight
+                            }),
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .padding(start = if (message.direction == MESSAGE_DOWN) 0.dp else 24.dp,
+                                end = if (message.direction == MESSAGE_DOWN) 24.dp else 0.dp)
                     ) {
                         Column {
                             Row {
-                                Text(
-                                    peer, color = LocalCustomColors.current.dark,
-                                    fontSize = 12.sp
-                                )
+                                val textColor =
+                                    if (message.direction == MESSAGE_DOWN) {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.secondaryLight
+                                        else
+                                            LocalCustomColors.current.secondaryDark
+                                    }
+                                    else {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.primaryLight
+                                        else
+                                            LocalCustomColors.current.primaryDark
+                                    }
+                                Text(text = peer, fontSize = 12.sp, color = textColor)
                                 Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    info, color = LocalCustomColors.current.dark,
-                                    fontSize = 12.sp
-                                )
+                                Text(text = info, fontSize = 12.sp, color = textColor)
                             }
                             Row {
                                 SelectionContainer {
                                     Text(
                                         text = message.message,
-                                        color = LocalCustomColors.current.dark,
+                                        color = LocalCustomColors.current.itemText,
                                         fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
                                             FontWeight.Bold else FontWeight.Normal
                                     )
@@ -505,7 +516,7 @@ class ChatActivity : ComponentActivity() {
                         },
                         onLongClick = {
                             val clipboardManager =
-                                ctx.getSystemService(Context.CLIPBOARD_SERVICE) as
+                                ctx.getSystemService(CLIPBOARD_SERVICE) as
                                         android.content.ClipboardManager
                             val clipData = clipboardManager.primaryClip
                             if (clipData != null && clipData.itemCount > 0) {
@@ -595,11 +606,6 @@ class ChatActivity : ComponentActivity() {
                     }
             )
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.call_icon, menu)
-        return true
     }
 
     override fun onResume() {
