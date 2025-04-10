@@ -74,10 +74,10 @@ composeCompiler {
 dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.material)
