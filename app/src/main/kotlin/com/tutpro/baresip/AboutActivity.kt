@@ -2,9 +2,6 @@ package com.tutpro.baresip
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
-import android.view.MenuItem
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -34,8 +31,6 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.HtmlCompat
 
 class AboutActivity : ComponentActivity() {
 
@@ -114,20 +109,9 @@ class AboutActivity : ComponentActivity() {
                     .padding(contentPadding)
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(LocalCustomColors.current.background)
             )
         }
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-            android.R.id.home ->
-                goBack()
-        }
-
-        return true
     }
 
     private fun goBack() {
