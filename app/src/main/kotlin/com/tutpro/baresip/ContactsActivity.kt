@@ -466,14 +466,6 @@ class ContactsActivity : ComponentActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home ->
-                goBack()
-        }
-        return true
-    }
-
     private fun goBack() {
         BaresipService.activities.remove("contacts,$aor")
         setResult(RESULT_OK, Intent())
