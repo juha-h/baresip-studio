@@ -153,7 +153,7 @@ class AccountsActivity : ComponentActivity() {
 
     @Composable
     fun AccountsContent(ctx: Context, contentPadding: PaddingValues) {
-        if (showAccounts.value) {
+        if (showAccounts.value && BaresipService.uas.value.isNotEmpty()) {
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
