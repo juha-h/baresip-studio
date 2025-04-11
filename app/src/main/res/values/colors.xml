@@ -28,6 +28,7 @@
     <color name="colorItemText">@color/colorBlack</color>
     <color name="colorAlertText">@color/colorBlack</color>
     <color name="colorCodec">@color/colorBlack</color>
+    <color name="colorCardBackground">@color/colorGrayLight</color>
     <color name="colorPopupBackground">@color/colorSecondaryDark</color>
     <color name="colorAlert">@color/colorPrimary</color>
 </resources>
