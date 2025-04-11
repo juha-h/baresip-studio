@@ -19,16 +19,19 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
@@ -120,11 +123,13 @@ object CustomElements {
         Surface(
             shape = shape,
             color = color,
-            modifier = modifier.pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { onClick() },
-                    onLongPress = { onLongClick() },
-                ) }
+            modifier = modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { onClick() },
+                        onLongPress = { onLongClick() },
+                    )
+                }
                 .then(modifier),
         ) {
             Row(
@@ -312,6 +317,126 @@ object CustomElements {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
+    fun AlertDialog(
+        openDialog: MutableState<Boolean>,
+        title: String,
+        message: String,
+        positiveButtonText: String,
+        onPositiveClicked: () -> Unit,
+        negativeButtonText: String = "",
+        onNegativeClicked: () -> Unit = {},
+        neutralButtonText: String = "",
+        onNeutralClicked: () -> Unit = {}
+    ) {
+        if (openDialog.value) {
+            BasicAlertDialog(
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                content = {
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            androidx.compose.material3.Text(
+                                text = title,
+                                fontSize = 20.sp,
+                                color = LocalCustomColors.current.alert,
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            androidx.compose.material3.Text(
+                                text = message,
+                                fontSize = 16.sp,
+                                color = LocalCustomColors.current.itemText,
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            if (negativeButtonText.isNotEmpty() && neutralButtonText.isNotEmpty()) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    TextButton(onClick = {
+                                        onPositiveClicked()
+                                        openDialog.value = false
+                                    }) {
+                                        androidx.compose.material3.Text(
+                                            text = positiveButtonText.uppercase(),
+                                            fontSize = 14.sp,
+                                            color = LocalCustomColors.current.alert,
+                                        )
+                                    }
+                                    TextButton(onClick = {
+                                        onNeutralClicked()
+                                        openDialog.value = false
+                                    }) {
+                                        androidx.compose.material3.Text(
+                                            text = neutralButtonText.uppercase(),
+                                            fontSize = 14.sp,
+                                            color = LocalCustomColors.current.alert
+                                        )
+                                    }
+                                    TextButton(onClick = {
+                                        onNegativeClicked()
+                                        openDialog.value = false
+                                    }) {
+                                        androidx.compose.material3.Text(
+                                            text = negativeButtonText.uppercase(),
+                                            fontSize = 14.sp,
+                                            color = LocalCustomColors.current.gray
+                                        )
+                                    }
+                                }
+                            }
+                            else {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    if (negativeButtonText.isNotEmpty())
+                                        TextButton(onClick = {
+                                            onNegativeClicked()
+                                            openDialog.value = false
+                                        }) {
+                                            androidx.compose.material3.Text(
+                                                text = negativeButtonText.uppercase(),
+                                                fontSize = 14.sp,
+                                                color = LocalCustomColors.current.gray
+                                            )
+                                        }
+                                    if (neutralButtonText.isNotEmpty())
+                                        TextButton(onClick = {
+                                            onNeutralClicked()
+                                            openDialog.value = false
+                                        }) {
+                                            androidx.compose.material3.Text(
+                                                text = neutralButtonText.uppercase(),
+                                                fontSize = 14.sp,
+                                                color = LocalCustomColors.current.alert
+                                            )
+                                        }
+                                    TextButton(onClick = {
+                                        onPositiveClicked()
+                                        openDialog.value = false
+                                    }) {
+                                        androidx.compose.material3.Text(
+                                            text = positiveButtonText.uppercase(),
+                                            fontSize = 14.sp,
+                                            color = LocalCustomColors.current.alert,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
     fun PasswordDialog(
         ctx: Context,
         showPasswordDialog: MutableState<Boolean>,
@@ -448,4 +573,5 @@ object CustomElements {
             }
         }
     }
+
 }

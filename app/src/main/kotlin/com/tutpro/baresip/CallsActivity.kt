@@ -2,11 +2,9 @@ package com.tutpro.baresip
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -61,7 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.ImageAvatar
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -71,7 +69,6 @@ class CallsActivity : ComponentActivity() {
     private lateinit var account: Account
 
     private var aor = ""
-    private var lastClick: Long = 0
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -136,6 +133,18 @@ class CallsActivity : ComponentActivity() {
         val disable = String.format(getString(R.string.disable_history))
         val enable = String.format(getString(R.string.enable_history))
 
+        val openDialog = remember { mutableStateOf(false) }
+        val positiveAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            openDialog = openDialog,
+            title = getString(R.string.confirmation),
+            message = String.format(getString(R.string.delete_history_alert), aor.substringAfter(":")),
+            positiveButtonText = getString(R.string.delete),
+            negativeButtonText = getString(R.string.cancel),
+            onPositiveClicked = positiveAction.value,
+        )
+
         TopAppBar(
             title = {
                 Text(
@@ -172,29 +181,14 @@ class CallsActivity : ComponentActivity() {
                     onItemClick = { selectedItem ->
                         expanded = false
                         when (selectedItem) {
-                            delete ->
-                                with(
-                                    MaterialAlertDialogBuilder(this@CallsActivity, R.style.AlertDialogTheme)
-                                ) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(
-                                        String.format(
-                                            getString(R.string.delete_history_alert),
-                                            aor.substringAfter(":")
-                                        )
-                                    )
-                                    setPositiveButton(delete) { dialog, _ ->
-                                        CallHistoryNew.clear(aor)
-                                        CallHistoryNew.save()
-                                        uaHistory.value = emptyList()
-                                        dialog.dismiss()
-                                    }
-                                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                                        dialog.dismiss()
-                                    }
-                                    show()
+                            delete -> {
+                                positiveAction.value = {
+                                    CallHistoryNew.clear(aor)
+                                    CallHistoryNew.save()
+                                    uaHistory.value = emptyList()
                                 }
-
+                                openDialog.value = true
+                            }
                             disable, enable -> {
                                 account.callHistory = !account.callHistory
                                 AccountsActivity.saveAccounts()
@@ -242,6 +236,25 @@ class CallsActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Calls(ctx: Context, account: Account) {
+
+        val openDialog = remember { mutableStateOf(false) }
+        val message = remember { mutableStateOf("") }
+        val positiveButtonText = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+        val neutralButtonText = remember { mutableStateOf("") }
+        val neutralAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            openDialog = openDialog,
+            title = getString(R.string.confirmation),
+            message = message.value,
+            positiveButtonText = positiveButtonText.value,
+            onPositiveClicked = positiveAction.value,
+            neutralButtonText = neutralButtonText.value,
+            onNeutralClicked = neutralAction.value,
+            negativeButtonText = getString(R.string.cancel)
+        )
+
         val lazyListState = rememberLazyListState()
         LazyColumn(
             modifier = Modifier
@@ -268,10 +281,76 @@ class CallsActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.combinedClickable(
                                 onClick = {
-                                    callMessageClick(ctx, callRow)
+                                    val peerUri = callRow.peerUri
+                                    val peerName = Utils.friendlyUri(ctx, peerUri, account)
+                                    message.value = String.format(ctx.getString(R.string.contact_action_question), peerName)
+                                    positiveButtonText.value = ctx.getString(R.string.call)
+                                    positiveAction.value = {
+                                        BaresipService.activities.remove("calls,$aor")
+                                        MainActivity.activityAor = aor
+                                        returnResult()
+                                        val i = Intent(this@CallsActivity, MainActivity::class.java)
+                                        i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                        i.putExtra("action", "call")
+                                        i.putExtra("uap", UserAgent.ofAor(aor)!!.uap)
+                                        i.putExtra("peer", peerUri)
+                                        startActivity(i)
+                                    }
+                                    neutralButtonText.value = ctx.getString(R.string.send_message)
+                                    neutralAction.value = {
+                                        BaresipService.activities.remove("calls,$aor")
+                                        MainActivity.activityAor = aor
+                                        returnResult()
+                                        val i = Intent(this@CallsActivity, MainActivity::class.java)
+                                        i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                        i.putExtra("action", "message")
+                                        i.putExtra("uap", UserAgent.ofAor(aor)!!.uap)
+                                        i.putExtra("peer", peerUri)
+                                        startActivity(i)
+                                    }
+                                    openDialog.value = true
                                 },
                                 onLongClick = {
-                                    callMessageLongClick(ctx, callRow)
+                                    val peerUri = callRow.peerUri
+                                    val peerName = Utils.friendlyUri(ctx, peerUri, account)
+                                    val callText: String = if (callRow.details.size > 1)
+                                        getString(R.string.calls_calls)
+                                    else
+                                        getString(R.string.calls_call)
+                                    val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
+                                    if (contactExists) {
+                                        message.value = String.format(
+                                            getString(R.string.calls_delete_question),
+                                            peerName, callText
+                                        )
+                                        positiveButtonText.value = getString(R.string.delete)
+                                        positiveAction.value = {
+                                            removeFromHistory(callRow)
+                                            CallHistoryNew.save()
+                                        }
+                                        neutralButtonText.value = ""
+                                    }
+                                    else {
+                                        message.value = String.format(
+                                            getString(R.string.calls_add_delete_question),
+                                            peerName, callText
+                                        )
+                                        positiveButtonText.value = getString(R.string.add_contact)
+                                        positiveAction.value = {
+                                            val i = Intent(ctx, BaresipContactActivity::class.java)
+                                            val b = Bundle()
+                                            b.putBoolean("new", true)
+                                            b.putString("uri", callRow.peerUri)
+                                            i.putExtras(b)
+                                            ctx.startActivity(i)
+                                        }
+                                        neutralButtonText.value = getString(R.string.delete)
+                                        neutralAction.value = {
+                                            removeFromHistory(callRow)
+                                            CallHistoryNew.save()
+                                        }
+                                    }
+                                    openDialog.value = true
                                 }
                             )
                         ) {
@@ -291,7 +370,9 @@ class CallsActivity : ComponentActivity() {
                                             model = thumbNailUri,
                                             contentDescription = "Avatar",
                                             contentScale = ContentScale.Crop,
-                                            modifier = Modifier.size(36.dp).clip(CircleShape),
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(CircleShape),
                                         )
                                     else
                                         TextAvatar(contact.name, contact.color)
@@ -334,7 +415,9 @@ class CallsActivity : ComponentActivity() {
                                 LocalCustomColors.current.accent
                             else
                                 LocalCustomColors.current.itemText,
-                            modifier = Modifier.padding(end = 16.dp).width(64.dp)
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .width(64.dp)
                                 .clickable(onClick = {
                                     val i = Intent(ctx, CallDetailsActivity::class.java)
                                     val b = Bundle()
@@ -349,130 +432,6 @@ class CallsActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private fun callMessageClick(ctx: Context, callRow: CallRow) {
-        val peerUri = callRow.peerUri
-        val peerName = Utils.friendlyUri(ctx, peerUri, account)
-        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
-                    BaresipService.activities.remove("calls,$aor")
-                    MainActivity.activityAor = aor
-                    returnResult()
-                    val i = Intent(this@CallsActivity, MainActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    if (which == DialogInterface.BUTTON_NEGATIVE)
-                        i.putExtra("action", "call")
-                    else
-                        i.putExtra("action", "message")
-                    i.putExtra("uap", UserAgent.ofAor(aor)!!.uap)
-                    i.putExtra("peer", peerUri)
-                    startActivity(i)
-                }
-
-                DialogInterface.BUTTON_NEUTRAL -> {
-                }
-            }
-        }
-        if (SystemClock.elapsedRealtime() - lastClick > 1000) {
-            lastClick = SystemClock.elapsedRealtime()
-            with(
-                MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
-            ) {
-                setTitle(R.string.confirmation)
-                setMessage(
-                    String.format(ctx.getString(R.string.contact_action_question), peerName)
-                )
-                setNeutralButton(
-                    ctx.getText(R.string.cancel),
-                    dialogClickListener
-                )
-                setNegativeButton(
-                    ctx.getText(R.string.call),
-                    dialogClickListener
-                )
-                setPositiveButton(
-                    ctx.getText(R.string.send_message),
-                    dialogClickListener
-                )
-                show()
-            }
-        }
-    }
-
-    private fun callMessageLongClick(ctx: Context, callRow: CallRow) {
-        val peerUri = callRow.peerUri
-        val peerName = Utils.friendlyUri(ctx, peerUri, account)
-        val dialogClickListener =
-            DialogInterface.OnClickListener { _, which ->
-                when (which) {
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        val i = Intent(ctx, BaresipContactActivity::class.java)
-                        val b = Bundle()
-                        b.putBoolean("new", true)
-                        b.putString("uri", peerUri)
-                        i.putExtras(b)
-                        ctx.startActivity(i)
-                    }
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        removeFromHistory(callRow)
-                        CallHistoryNew.save()
-                    }
-                    DialogInterface.BUTTON_NEUTRAL -> {
-                    }
-                }
-            }
-        val callText: String = if (callRow.details.size > 1)
-            getString(R.string.calls_calls)
-        else
-            getString(R.string.calls_call)
-        val builder = MaterialAlertDialogBuilder(
-            this@CallsActivity,
-            R.style.AlertDialogTheme
-        )
-        if (!Contact.nameExists(peerName, BaresipService.contacts, false))
-            with(builder) {
-                setTitle(R.string.confirmation)
-                setMessage(
-                    String.format(
-                        getString(R.string.calls_add_delete_question),
-                        peerName, callText
-                    )
-                )
-                setNeutralButton(
-                    getString(R.string.cancel),
-                    dialogClickListener
-                )
-                setPositiveButton(
-                    getString(R.string.delete),
-                    dialogClickListener
-                )
-                setNegativeButton(
-                    getString(R.string.add_contact),
-                    dialogClickListener
-                )
-                show()
-            }
-        else
-            with(builder) {
-                setTitle(R.string.confirmation)
-                setMessage(
-                    String.format(
-                        getString(R.string.calls_delete_question),
-                        peerName, callText
-                    )
-                )
-                setNeutralButton(
-                    getString(R.string.cancel),
-                    dialogClickListener
-                )
-                setPositiveButton(
-                    getString(R.string.delete),
-                    dialogClickListener
-                )
-                show()
-            }
     }
 
     private fun goBack() {
