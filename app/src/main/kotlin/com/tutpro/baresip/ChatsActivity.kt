@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -77,12 +76,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.BaresipService.Companion.contactNames
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.ImageAvatar
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
+import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import java.text.DateFormat
 import java.util.GregorianCalendar
 
@@ -92,7 +92,9 @@ class ChatsActivity: ComponentActivity() {
     internal lateinit var account: Account
     private lateinit var chatRequest: ActivityResultLauncher<Intent>
     private var _uaMessages = mutableStateOf<List<Message>>(emptyList())
-    private var uaMessages : List<Message> by _uaMessages
+    private var uaMessages: List<Message> by _uaMessages
+    private var showNotice by mutableStateOf(false)
+    private var noticeMessage = mutableStateOf("")
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -158,8 +160,21 @@ class ChatsActivity: ComponentActivity() {
         var expanded by remember { mutableStateOf(false) }
 
         val delete = String.format(getString(R.string.delete))
-        val disable = String.format(getString(R.string.disable_history))
-        val enable = String.format(getString(R.string.enable_history))
+
+        val showDialog = remember { mutableStateOf(false) }
+        val positiveAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.confirmation),
+            message = String.format(
+                getString(R.string.delete_chats_alert),
+                aor.substringAfter(":")
+            ),
+            positiveButtonText = getString(R.string.delete),
+            onPositiveClicked = positiveAction.value,
+            negativeButtonText = getString(R.string.cancel),
+        )
 
         TopAppBar(
             title = {
@@ -192,34 +207,22 @@ class ChatsActivity: ComponentActivity() {
                         tint = LocalCustomColors.current.light
                     )
                 }
-                CustomElements.DropdownMenu(expanded,
+                CustomElements.DropdownMenu(
+                    expanded,
                     { expanded = false },
-                    listOf(delete, if (account.callHistory) disable else enable),
+                    listOf(delete),
                     onItemClick = { selectedItem ->
                         expanded = false
                         when (selectedItem) {
-                            delete ->
-                                with(
-                                    MaterialAlertDialogBuilder(
-                                        this@ChatsActivity,
-                                        R.style.AlertDialogTheme
-                                    )
-                                ) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(String.format(getString(R.string.delete_chats_alert),
-                                            aor.substringAfter(":")))
-                                    setPositiveButton(delete) { dialog, _ ->
-                                        Message.clearMessagesOfAor(aor)
-                                        Message.save()
-                                        _uaMessages.value = listOf()
-                                        account.unreadMessages = false
-                                        dialog.dismiss()
-                                    }
-                                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                                        dialog.dismiss()
-                                    }
-                                    show()
+                            delete -> {
+                                positiveAction.value = {
+                                    Message.clearMessagesOfAor(aor)
+                                    Message.save()
+                                    _uaMessages.value = listOf()
+                                    account.unreadMessages = false
                                 }
+                                showDialog.value = true
+                            }
                         }
                     }
                 )
@@ -236,8 +239,10 @@ class ChatsActivity: ComponentActivity() {
             verticalArrangement = Arrangement.Top
         ) {
             Account(account)
-            // Spacer(modifier = Modifier.weight(1f))
             Chats(ctx, account)
+            if (showNotice)
+                Notice()
+
         }
     }
 
@@ -261,6 +266,25 @@ class ChatsActivity: ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Chats(ctx: Context, account: Account) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val dialogMessage = remember { mutableStateOf("") }
+        val positiveButtonText = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+        val neutralButtonText = remember { mutableStateOf("") }
+        val neutralAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.confirmation),
+            message = dialogMessage.value,
+            positiveButtonText = positiveButtonText.value,
+            onPositiveClicked = positiveAction.value,
+            neutralButtonText = neutralButtonText.value,
+            onNeutralClicked = neutralAction.value,
+            negativeButtonText = getString(R.string.cancel)
+        )
+
         val lazyListState = rememberLazyListState()
         LazyColumn(
             modifier = Modifier
@@ -287,6 +311,7 @@ class ChatsActivity: ComponentActivity() {
                             else
                                 TextAvatar(contact.name, contact.color)
                         }
+
                         is Contact.AndroidContact -> {
                             val thumbNailUri = contact.thumbnailUri
                             if (thumbNailUri != null)
@@ -301,6 +326,7 @@ class ChatsActivity: ComponentActivity() {
                             else
                                 TextAvatar(contact.name, contact.color)
                         }
+
                         null -> {
                             val avatarImage = BitmapFactory
                                 .decodeResource(ctx.resources, R.drawable.person_image)
@@ -318,72 +344,40 @@ class ChatsActivity: ComponentActivity() {
                             chatRequest.launch(i)
                         },
                         onLongClick = {
-                            val dialogClickListener =
-                                DialogInterface.OnClickListener { _, which ->
-                                    when (which) {
-                                        DialogInterface.BUTTON_POSITIVE -> {
-                                            val i =
-                                                Intent(ctx, BaresipContactActivity::class.java)
-                                            val b = Bundle()
-                                            b.putBoolean("new", true)
-                                            b.putString("uri", message.peerUri)
-                                            i.putExtras(b)
-                                            startActivity(i)
-                                        }
-                                        DialogInterface.BUTTON_NEGATIVE -> {
-                                            Message.deleteAorPeerMessages(aor, message.peerUri)
-                                        }
-                                        DialogInterface.BUTTON_NEUTRAL -> {
-                                        }
-                                    }
-                                }
-                            val builder = MaterialAlertDialogBuilder(
-                                this@ChatsActivity,
-                                R.style.AlertDialogTheme
-                            )
                             val peer = Utils.friendlyUri(ctx, message.peerUri, account)
-                            if (!Contact.nameExists(peer, BaresipService.contacts, false))
-                                with(builder) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(
-                                        String.format(
-                                            getString(R.string.long_chat_question),
-                                            peer
-                                        )
-                                    )
-                                    setNeutralButton(
-                                        getText(R.string.cancel),
-                                        dialogClickListener
-                                    )
-                                    setNegativeButton(
-                                        getText(R.string.delete),
-                                        dialogClickListener
-                                    )
-                                    setPositiveButton(
-                                        getText(R.string.add_contact),
-                                        dialogClickListener
-                                    )
-                                    show()
+                            val contactExists =
+                                Contact.nameExists(peer, BaresipService.contacts, false)
+                            if (contactExists) {
+                                dialogMessage.value = String.format(
+                                    getString(R.string.short_chat_question),
+                                    peer
+                                )
+                                positiveButtonText.value = getString(R.string.delete)
+                                positiveAction.value = {
+                                    Message.deleteAorPeerMessages(aor, message.peerUri)
+                                    _uaMessages.value = uaMessages(aor)
                                 }
-                            else
-                                with(builder) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(
-                                        String.format(
-                                            getString(R.string.short_chat_question),
-                                            peer
-                                        )
-                                    )
-                                    setNeutralButton(
-                                        getText(R.string.cancel),
-                                        dialogClickListener
-                                    )
-                                    setNegativeButton(
-                                        getText(R.string.delete),
-                                        dialogClickListener
-                                    )
-                                    show()
+                                neutralButtonText.value = ""
+                            } else {
+                                dialogMessage.value = String.format(
+                                    getString(R.string.long_chat_question),
+                                    peer
+                                )
+                                positiveButtonText.value = getString(R.string.add_contact)
+                                positiveAction.value = {
+                                    val i = Intent(ctx, BaresipContactActivity::class.java)
+                                    val b = Bundle()
+                                    b.putBoolean("new", true)
+                                    b.putString("uri", message.peerUri)
+                                    i.putExtras(b)
+                                    startActivity(i)
                                 }
+                                neutralButtonText.value = getString(R.string.delete)
+                                neutralAction.value = {
+                                    Message.deleteAorPeerMessages(aor, message.peerUri)
+                                }
+                            }
+                            showDialog.value = true
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -393,14 +387,13 @@ class ChatsActivity: ComponentActivity() {
                             RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
                         else
                             RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
-                        color = //ButtonDefaults.buttonColors(containerColor =
+                        color =
                             if (message.direction == MESSAGE_DOWN) {
                                 if (BaresipService.darkTheme.value)
                                     LocalCustomColors.current.secondaryDark
                                 else
                                     LocalCustomColors.current.secondaryLight
-                            }
-                            else {
+                            } else {
                                 if (BaresipService.darkTheme.value)
                                     LocalCustomColors.current.primaryDark
                                 else
@@ -423,8 +416,7 @@ class ChatsActivity: ComponentActivity() {
                                             LocalCustomColors.current.secondaryLight
                                         else
                                             LocalCustomColors.current.secondaryDark
-                                    }
-                                    else {
+                                    } else {
                                         if (BaresipService.darkTheme.value)
                                             LocalCustomColors.current.primaryLight
                                         else
@@ -456,6 +448,20 @@ class ChatsActivity: ComponentActivity() {
 
     @Composable
     fun NewChatPeer() {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val items = remember { mutableStateOf(listOf<String>()) }
+        val itemAction = remember { mutableStateOf<(Int) -> Unit>({ index -> {} }) }
+
+        SelectableAlertDialog(
+            openDialog = showDialog,
+            title = "Choose Destination",
+            items = items.value,
+            onItemClicked = itemAction.value,
+            neutralButtonText = getString(R.string.cancel),
+            onNeutralClicked = {}
+        )
+
         val suggestions by remember { contactNames }
         var filteredSuggestions by remember { mutableStateOf(suggestions) }
         var showSuggestions by remember { mutableStateOf(false) }
@@ -477,8 +483,10 @@ class ChatsActivity: ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .shadow(8.dp, RoundedCornerShape(8.dp))
-                            .background(LocalCustomColors.current.grayLight,
-                                shape = RoundedCornerShape(8.dp))
+                            .background(
+                                LocalCustomColors.current.grayLight,
+                                shape = RoundedCornerShape(8.dp)
+                            )
                             .animateContentSize()
                     ) {
                         Box(modifier = Modifier.fillMaxWidth()) {
@@ -565,7 +573,10 @@ class ChatsActivity: ComponentActivity() {
                         fontSize = 18.sp,
                         color = LocalCustomColors.current.itemText
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    )
                 )
             }
             Spacer(Modifier.width(4.dp))
@@ -573,10 +584,21 @@ class ChatsActivity: ComponentActivity() {
                 modifier = Modifier.padding(end = 4.dp),
                 onClick = {
                     showSuggestions = false
-                    if (makeChat(newPeer, true)) {
-                        newPeer = ""
-                        focusManager.clearFocus()
+                    var peerUri = newPeer.trim()
+                    if (peerUri.isNotEmpty()) {
+                        val uris = Contact.contactUris(peerUri)
+                        if (uris.size == 1) {
+                            makeChat(uris[0])
+                        } else if (uris.size > 1) {
+                            items.value = uris
+                            itemAction.value = { index ->
+                                makeChat(uris[index])
+                            }
+                        }
+                        showDialog.value = true
                     }
+                    newPeer = ""
+                    focusManager.clearFocus()
                 },
                 containerColor = LocalCustomColors.current.accent,
                 contentColor = LocalCustomColors.current.background
@@ -590,54 +612,48 @@ class ChatsActivity: ComponentActivity() {
         }
     }
 
-    private fun makeChat(peer: String, lookForContact: Boolean = true): Boolean {
-        var peerUri = peer.trim()
-        if (peerUri.isNotEmpty()) {
-            if (lookForContact) {
-                val uris = Contact.contactUris(peerUri)
-                if (uris.size == 1)
-                    peerUri = uris[0]
-                else if (uris.size > 1) {
-                    val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                    with(builder) {
-                        setTitle("Choose Destination")
-                        setItems(uris.toTypedArray()) { _, which ->
-                            peerUri = uris[which]
-                            makeChat(peerUri, false)
-                        }
-                        setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
-                        show()
-                    }
-                    return true
-                }
-            }
-            if (Utils.isTelNumber(peerUri))
-                peerUri = "tel:$peerUri"
-            val uri = if (Utils.isTelUri(peerUri)) {
-                if (account.telProvider == "") {
-                    Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.no_telephony_provider), account.aor))
-                    return false
-                }
+
+    @Composable
+    fun Notice() {
+        AlertDialog(
+            showDialog = remember { mutableStateOf(true) },
+            title = getString(R.string.notice),
+            message = noticeMessage.value,
+            positiveButtonText = getString(R.string.ok),
+            onPositiveClicked = { showNotice = false },
+        )
+    }
+
+    private fun makeChat(chatPeer: String) {
+
+        val peerUri = if (Utils.isTelNumber(chatPeer))
+            "tel:$chatPeer"
+        else
+            chatPeer
+        val uri = if (Utils.isTelUri(peerUri)) {
+            if (account.telProvider == "") {
+                noticeMessage.value =
+                    String.format(getString(R.string.no_telephony_provider), account.aor)
+                showNotice = true
+                ""
+            } else
                 Utils.telToSip(peerUri, account)
-            } else {
-                Utils.uriComplete(peerUri, aor)
-            }
+        } else
+            Utils.uriComplete(peerUri, aor)
+        if (noticeMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
-                return false
-            } else {
+                noticeMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
+                showNotice = true
+            }
+            else {
                 val i = Intent(this@ChatsActivity, ChatActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aor)
                 b.putString("peer", uri)
                 i.putExtras(b)
                 chatRequest.launch(i)
-                return true
             }
         }
-        return false
     }
 
     override fun onPause() {

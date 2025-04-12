@@ -24,7 +24,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -330,6 +333,7 @@ object CustomElements {
         onNeutralClicked: () -> Unit = {}
     ) {
         if (showDialog.value) {
+            Log.d(TAG, "*********** message = '$message'")
             BasicAlertDialog(
                 onDismissRequest = {
                     showDialog.value = false
@@ -433,6 +437,81 @@ object CustomElements {
                                             )
                                         }
                                     }
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun SelectableAlertDialog(
+        openDialog: MutableState<Boolean>,
+        title: String,
+        items: List<String>,
+        onItemClicked: (Int) -> Unit,
+        neutralButtonText: String = "",
+        onNeutralClicked: () -> Unit = {}
+    ) {
+        if (openDialog.value) {
+            BasicAlertDialog(
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                content = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = LocalCustomColors.current.cardBackground
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            androidx.compose.material3.Text(
+                                text = title,
+                                fontSize = 20.sp,
+                                color = LocalCustomColors.current.alert,
+                                textAlign = TextAlign.Start,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            val lazyListState = rememberLazyListState()
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.End,
+                                state = lazyListState,
+                            ) {
+                                itemsIndexed(items) { index, item ->
+                                    TextButton(
+                                        onClick = {
+                                            onItemClicked(index)
+                                            openDialog.value = false
+                                        },
+                                        modifier = Modifier.align(Alignment.End)
+                                    ) {
+                                        androidx.compose.material3.Text(
+                                            text = item,
+                                            color = LocalCustomColors.current.itemText,
+                                        )
+                                    }
+                                }
+                            }
+                            if (neutralButtonText.isNotEmpty()) {
+                                TextButton(
+                                    onClick = {
+                                        onNeutralClicked()
+                                        openDialog.value = false
+                                    },
+                                    modifier = Modifier.align(Alignment.End)){
+                                    androidx.compose.material3.Text(
+                                        text = neutralButtonText.uppercase(),
+                                        color = LocalCustomColors.current.gray,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
