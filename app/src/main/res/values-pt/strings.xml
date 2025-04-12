@@ -424,4 +424,5 @@
     <string name="favorite_help">Se estiver marcada, o contacto será exibido entre os favoritos na parte superior da lista.</string>
     <string name="dtmf_auto">INFO RTP ou SIP em banda</string>
     <string name="dialer_role_not_available">A função de discador não está disponível</string>
+    <string name="restore_unzip_failed">Falha ao restaurar os dados da aplicação. A versão 14 e superior do Android não permite a restauração de dados cujo backup foi feito %1$s antes da versão %2$s.</string>
 </resources>
