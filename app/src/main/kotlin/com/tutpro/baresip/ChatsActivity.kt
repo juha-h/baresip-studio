@@ -625,7 +625,6 @@ class ChatsActivity: ComponentActivity() {
     }
 
     private fun makeChat(chatPeer: String) {
-
         val peerUri = if (Utils.isTelNumber(chatPeer))
             "tel:$chatPeer"
         else
@@ -664,11 +663,6 @@ class ChatsActivity: ComponentActivity() {
     override fun onResume() {
         super.onResume()
         _uaMessages.value = uaMessages(aor)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.chats_menu, menu)
-        return true
     }
 
     private fun goBack() {
