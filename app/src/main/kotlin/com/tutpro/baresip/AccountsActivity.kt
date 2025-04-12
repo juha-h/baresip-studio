@@ -55,7 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -153,6 +153,20 @@ class AccountsActivity : ComponentActivity() {
 
     @Composable
     fun AccountsContent(ctx: Context, contentPadding: PaddingValues) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val message = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.confirmation),
+            message = message.value,
+            positiveButtonText = getString(R.string.delete),
+            onPositiveClicked = positiveAction.value,
+            negativeButtonText = getString(R.string.cancel),
+        )
+
         if (showAccounts.value && BaresipService.uas.value.isNotEmpty()) {
             val scrollState = rememberScrollState()
             Column(
@@ -192,34 +206,20 @@ class AccountsActivity : ComponentActivity() {
                             onClick = {
                                 if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                                     lastClick = SystemClock.elapsedRealtime()
-                                    with(
-                                        MaterialAlertDialogBuilder(
-                                            ctx,
-                                            R.style.AlertDialogTheme
-                                        )
-                                    ) {
-                                        setTitle(R.string.confirmation)
-                                        setMessage(
-                                            String.format(
-                                                ctx.getString(R.string.delete_account),
-                                                text
-                                            )
-                                        )
-                                        setPositiveButton(R.string.delete) { dialog, _ ->
-                                                CallHistoryNew.clear(aor)
-                                                Message.clearMessagesOfAor(aor)
-                                                ua.remove()
-                                                Api.ua_destroy(ua.uap)
-                                            saveAccounts()
-                                            dialog.dismiss()
-                                            showAccounts.value = false
-                                            showAccounts.value = true
-                                        }
-                                        setNeutralButton(ctx.getText(R.string.cancel)) { dialog, _ ->
-                                            dialog.dismiss()
-                                        }
-                                        show()
+                                    message.value = String.format(
+                                        ctx.getString(R.string.delete_account),
+                                        text
+                                    )
+                                    positiveAction.value = {
+                                        CallHistoryNew.clear(aor)
+                                        Message.clearMessagesOfAor(aor)
+                                        ua.remove()
+                                        Api.ua_destroy(ua.uap)
+                                        saveAccounts()
+                                        showAccounts.value = false
+                                        showAccounts.value = true
                                     }
+                                    showDialog.value = true
                                 }
                             },
                             containerColor = LocalCustomColors.current.background,

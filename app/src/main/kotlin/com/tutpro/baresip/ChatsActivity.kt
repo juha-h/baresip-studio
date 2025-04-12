@@ -455,7 +455,7 @@ class ChatsActivity: ComponentActivity() {
 
         SelectableAlertDialog(
             openDialog = showDialog,
-            title = "Choose Destination",
+            title = getString(R.string.choose_destination_uri),
             items = items.value,
             onItemClicked = itemAction.value,
             neutralButtonText = getString(R.string.cancel),
