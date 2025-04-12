@@ -247,6 +247,7 @@
     <string name="direction">Direction</string>
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
+    <string name="playing_recording">Playing recording …</string>
     <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?

@@ -319,20 +319,20 @@ object CustomElements {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AlertDialog(
-        openDialog: MutableState<Boolean>,
+        showDialog: MutableState<Boolean>,
         title: String,
         message: String,
-        positiveButtonText: String,
-        onPositiveClicked: () -> Unit,
+        positiveButtonText: String = "",
+        onPositiveClicked: () -> Unit = {},
         negativeButtonText: String = "",
         onNegativeClicked: () -> Unit = {},
         neutralButtonText: String = "",
         onNeutralClicked: () -> Unit = {}
     ) {
-        if (openDialog.value) {
+        if (showDialog.value) {
             BasicAlertDialog(
                 onDismissRequest = {
-                    openDialog.value = false
+                    showDialog.value = false
                 },
                 content = {
                     Card(
@@ -364,7 +364,7 @@ object CustomElements {
                                 ) {
                                     TextButton(onClick = {
                                         onPositiveClicked()
-                                        openDialog.value = false
+                                        showDialog.value = false
                                     }) {
                                         androidx.compose.material3.Text(
                                             text = positiveButtonText.uppercase(),
@@ -374,7 +374,7 @@ object CustomElements {
                                     }
                                     TextButton(onClick = {
                                         onNeutralClicked()
-                                        openDialog.value = false
+                                        showDialog.value = false
                                     }) {
                                         androidx.compose.material3.Text(
                                             text = neutralButtonText.uppercase(),
@@ -384,7 +384,7 @@ object CustomElements {
                                     }
                                     TextButton(onClick = {
                                         onNegativeClicked()
-                                        openDialog.value = false
+                                        showDialog.value = false
                                     }) {
                                         androidx.compose.material3.Text(
                                             text = negativeButtonText.uppercase(),
@@ -394,45 +394,45 @@ object CustomElements {
                                     }
                                 }
                             }
-                            else {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    if (negativeButtonText.isNotEmpty())
+                            else
+                                if (positiveButtonText.isNotEmpty())
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        if (negativeButtonText.isNotEmpty())
+                                            TextButton(onClick = {
+                                                onNegativeClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                androidx.compose.material3.Text(
+                                                    text = negativeButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = LocalCustomColors.current.gray
+                                                )
+                                            }
+                                        if (neutralButtonText.isNotEmpty())
+                                            TextButton(onClick = {
+                                                onNeutralClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                androidx.compose.material3.Text(
+                                                    text = neutralButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = LocalCustomColors.current.alert
+                                                )
+                                            }
                                         TextButton(onClick = {
-                                            onNegativeClicked()
-                                            openDialog.value = false
+                                            onPositiveClicked()
+                                            showDialog.value = false
                                         }) {
                                             androidx.compose.material3.Text(
-                                                text = negativeButtonText.uppercase(),
+                                                text = positiveButtonText.uppercase(),
                                                 fontSize = 14.sp,
-                                                color = LocalCustomColors.current.gray
+                                                color = LocalCustomColors.current.alert,
                                             )
                                         }
-                                    if (neutralButtonText.isNotEmpty())
-                                        TextButton(onClick = {
-                                            onNeutralClicked()
-                                            openDialog.value = false
-                                        }) {
-                                            androidx.compose.material3.Text(
-                                                text = neutralButtonText.uppercase(),
-                                                fontSize = 14.sp,
-                                                color = LocalCustomColors.current.alert
-                                            )
-                                        }
-                                    TextButton(onClick = {
-                                        onPositiveClicked()
-                                        openDialog.value = false
-                                    }) {
-                                        androidx.compose.material3.Text(
-                                            text = positiveButtonText.uppercase(),
-                                            fontSize = 14.sp,
-                                            color = LocalCustomColors.current.alert,
-                                        )
                                     }
-                                }
-                            }
                         }
                     }
                 }

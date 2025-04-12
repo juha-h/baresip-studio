@@ -133,11 +133,11 @@ class CallsActivity : ComponentActivity() {
         val disable = String.format(getString(R.string.disable_history))
         val enable = String.format(getString(R.string.enable_history))
 
-        val openDialog = remember { mutableStateOf(false) }
+        val showDialog = remember { mutableStateOf(false) }
         val positiveAction = remember { mutableStateOf({}) }
 
         AlertDialog(
-            openDialog = openDialog,
+            showDialog = showDialog,
             title = getString(R.string.confirmation),
             message = String.format(getString(R.string.delete_history_alert), aor.substringAfter(":")),
             positiveButtonText = getString(R.string.delete),
@@ -187,7 +187,7 @@ class CallsActivity : ComponentActivity() {
                                     CallHistoryNew.save()
                                     uaHistory.value = emptyList()
                                 }
-                                openDialog.value = true
+                                showDialog.value = true
                             }
                             disable, enable -> {
                                 account.callHistory = !account.callHistory
@@ -237,7 +237,7 @@ class CallsActivity : ComponentActivity() {
     @Composable
     fun Calls(ctx: Context, account: Account) {
 
-        val openDialog = remember { mutableStateOf(false) }
+        val showDialog = remember { mutableStateOf(false) }
         val message = remember { mutableStateOf("") }
         val positiveButtonText = remember { mutableStateOf("") }
         val positiveAction = remember { mutableStateOf({}) }
@@ -245,7 +245,7 @@ class CallsActivity : ComponentActivity() {
         val neutralAction = remember { mutableStateOf({}) }
 
         AlertDialog(
-            openDialog = openDialog,
+            showDialog = showDialog,
             title = getString(R.string.confirmation),
             message = message.value,
             positiveButtonText = positiveButtonText.value,
@@ -308,7 +308,7 @@ class CallsActivity : ComponentActivity() {
                                         i.putExtra("peer", peerUri)
                                         startActivity(i)
                                     }
-                                    openDialog.value = true
+                                    showDialog.value = true
                                 },
                                 onLongClick = {
                                     val peerUri = callRow.peerUri
@@ -350,7 +350,7 @@ class CallsActivity : ComponentActivity() {
                                             CallHistoryNew.save()
                                         }
                                     }
-                                    openDialog.value = true
+                                    showDialog.value = true
                                 }
                             )
                         ) {

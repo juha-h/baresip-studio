@@ -38,6 +38,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -46,8 +48,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutpro.baresip.CallsActivity.Companion.uaHistory
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
@@ -258,18 +260,22 @@ class CallDetailsActivity : ComponentActivity() {
 
     @Composable
     fun Duration(ctx: Context, detail: CallRow.Details, durationText: String) {
+
+        val showDialog = remember { mutableStateOf(false) }
         val recording = detail.recording
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.playing_recording),
+            message = "",
+        )
+
         if (recording[0] != "") {
             Text(
                 text = durationText,
                 color = LocalCustomColors.current.accent,
                 modifier = Modifier.padding(end = 12.dp)
                     .clickable(onClick = {
-                    val builder = MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
-                    builder.setTitle("Playing recording ...")
-                        .setMessage("")
-                        .setCancelable(true)
-                    val dialog = builder.create()
                     if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
                         decPlayer.reset()
                         encPlayer.reset()
@@ -293,12 +299,12 @@ class CallDetailsActivity : ComponentActivity() {
                                         it.start()
                                         decPlayer.start()
                                         Log.d(TAG, "Started players")
-                                        dialog.show()
+                                        showDialog.value = true
                                     }
                                     setOnCompletionListener {
                                         Log.d(TAG, "Stopping encPlayer")
                                         it.stop()
-                                        dialog.cancel()
+                                        showDialog.value = false
                                     }
                                     try {
                                         val file = recording[0]
@@ -320,6 +326,7 @@ class CallDetailsActivity : ComponentActivity() {
                             setOnCompletionListener {
                                 Log.d(TAG, "Stopping decPlayer")
                                 it.stop()
+                                showDialog.value = false
                             }
                             try {
                                 val file = recording[1]

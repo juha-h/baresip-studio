@@ -261,6 +261,7 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
+    <string name="playing_recording">Tallenteen kuuntelu …</string>
     <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
         \'%1$s\'\?
     </string>
