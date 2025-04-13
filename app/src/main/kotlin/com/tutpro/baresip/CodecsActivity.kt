@@ -329,16 +329,6 @@ class CodecsActivity : ComponentActivity() {
         finish()
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        super.onCreateOptionsMenu(menu)
-        val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
-        return true
-
-    }
-
     private fun goBack() {
         BaresipService.activities.remove("codecs,$aor,$media")
         finish()

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.format.DateUtils.isToday
-import android.view.Menu
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -527,7 +526,6 @@ class ChatsActivity: ComponentActivity() {
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-
                 OutlinedTextField(
                     value = newPeer,
                     placeholder = {
@@ -584,18 +582,20 @@ class ChatsActivity: ComponentActivity() {
                 modifier = Modifier.padding(end = 4.dp),
                 onClick = {
                     showSuggestions = false
-                    var peerUri = newPeer.trim()
-                    if (peerUri.isNotEmpty()) {
-                        val uris = Contact.contactUris(peerUri)
-                        if (uris.size == 1) {
+                    var peerText = newPeer.trim()
+                    if (peerText.isNotEmpty()) {
+                        val uris = Contact.contactUris(peerText)
+                        if (uris.isEmpty())
+                            makeChat(peerText)
+                        else if (uris.size == 1)
                             makeChat(uris[0])
-                        } else if (uris.size > 1) {
+                        else {
                             items.value = uris
                             itemAction.value = { index ->
                                 makeChat(uris[index])
                             }
+                            showDialog.value = true
                         }
-                        showDialog.value = true
                     }
                     newPeer = ""
                     focusManager.clearFocus()

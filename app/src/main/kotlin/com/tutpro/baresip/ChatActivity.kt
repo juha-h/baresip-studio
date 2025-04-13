@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
@@ -74,7 +73,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -257,6 +256,25 @@ class ChatActivity : ComponentActivity() {
 
     @Composable
     fun Messages(ctx: Context) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val dialogMessage = remember { mutableStateOf("") }
+        val positiveButtonText = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+        val neutralButtonText = remember { mutableStateOf("") }
+        val neutralAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.confirmation),
+            message = dialogMessage.value,
+            positiveButtonText = positiveButtonText.value,
+            onPositiveClicked = positiveAction.value,
+            neutralButtonText = neutralButtonText.value,
+            onNeutralClicked = neutralAction.value,
+            negativeButtonText = getString(R.string.cancel)
+        )
+
         val lazyListState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
@@ -319,65 +337,34 @@ class ChatActivity : ComponentActivity() {
                 ) {
                     Button(
                         onClick = {
-                            val dialogClickListener =
-                                DialogInterface.OnClickListener { _, which ->
-                                    when (which) {
-                                        DialogInterface.BUTTON_POSITIVE -> {
-                                            val i = Intent(ctx, BaresipContactActivity::class.java)
-                                            val b = Bundle()
-                                            b.putBoolean("new", true)
-                                            b.putString("uri", peerUri)
-                                            i.putExtras(b)
-                                            ctx.startActivity(i)
-                                        }
-
-                                        DialogInterface.BUTTON_NEGATIVE -> {
-                                            message.delete()
-                                            _chatMessages.value = uaPeerMessages(aor, peerUri)
-                                        }
-
-                                        DialogInterface.BUTTON_NEUTRAL -> {
-                                        }
-                                    }
+                            if (chatPeer == peerUri) {
+                                dialogMessage.value = String.format(ctx.getString(R.string.long_message_question),
+                                    peerUri
+                                )
+                                positiveButtonText.value = ctx.getString(R.string.add_contact)
+                                positiveAction.value = {
+                                    val i = Intent(ctx, BaresipContactActivity::class.java)
+                                    val b = Bundle()
+                                    b.putBoolean("new", true)
+                                    b.putString("uri", peerUri)
+                                    i.putExtras(b)
+                                    ctx.startActivity(i)
                                 }
-                            val builder = MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
-                            if (chatPeer == peerUri)
-                                with(builder) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(
-                                        String.format(
-                                            ctx.getString(R.string.long_message_question),
-                                            peerUri
-                                        )
-                                    )
-                                    setNeutralButton(
-                                        ctx.getString(R.string.cancel),
-                                        dialogClickListener
-                                    )
-                                    setNegativeButton(
-                                        ctx.getString(R.string.delete),
-                                        dialogClickListener
-                                    )
-                                    setPositiveButton(
-                                        ctx.getString(R.string.add_contact),
-                                        dialogClickListener
-                                    )
-                                    show()
+                                neutralButtonText.value = ctx.getString(R.string.delete)
+                                neutralAction.value = {
+                                    message.delete()
+                                    _chatMessages.value = uaPeerMessages(aor, peerUri)
                                 }
-                            else
-                                with(builder) {
-                                    setTitle(R.string.confirmation)
-                                    setMessage(ctx.getText(R.string.short_message_question))
-                                    setNeutralButton(
-                                        ctx.getString(R.string.cancel),
-                                        dialogClickListener
-                                    )
-                                    setNegativeButton(
-                                        ctx.getString(R.string.delete),
-                                        dialogClickListener
-                                    )
-                                    show()
+                            }
+                            else {
+                                dialogMessage.value = ctx.getString(R.string.short_message_question)
+                                positiveButtonText.value = ctx.getString(R.string.delete)
+                                positiveAction.value = {
+                                    message.delete()
+                                    _chatMessages.value = uaPeerMessages(aor, peerUri)
                                 }
+                            }
+                            showDialog.value = true
                         },
                         shape = if (message.direction == MESSAGE_DOWN)
                             RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
@@ -441,8 +428,18 @@ class ChatActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun NewMessage(ctx: Context, peerUri: String) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val dialogMessage = remember { mutableStateOf("") }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.notice),
+            message = dialogMessage.value,
+            positiveButtonText = getString(R.string.ok),
+        )
+
         var newMessage by remember { mutableStateOf("") }
-        // var textFieldState = rememberTextFieldState()
         Row(modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
@@ -479,13 +476,10 @@ class ChatActivity : ComponentActivity() {
                                 _chatMessages.value += msg
                                 if (Utils.isTelUri(peerUri))
                                     if (ua.account.telProvider == "") {
-                                        Utils.alertView(
-                                            ctx, getString(R.string.notice),
-                                            String.format(
-                                                getString(R.string.no_telephony_provider),
-                                                Utils.plainAor(aor)
-                                            )
-                                        )
+                                        dialogMessage.value = String.format(
+                                            getString(R.string.no_telephony_provider),
+                                            Utils.plainAor(aor))
+                                        showDialog.value = true
                                     } else {
                                         msgUri = Utils.telToSip(peerUri, ua.account)
                                     }
@@ -569,13 +563,10 @@ class ChatActivity : ComponentActivity() {
                             _chatMessages.value += msg
                             if (Utils.isTelUri(peerUri))
                                 if (ua.account.telProvider == "") {
-                                    Utils.alertView(
-                                        ctx, getString(R.string.notice),
-                                        String.format(
-                                            getString(R.string.no_telephony_provider),
-                                            Utils.plainAor(aor)
-                                        )
-                                    )
+                                    dialogMessage.value = String.format(
+                                        getString(R.string.no_telephony_provider),
+                                        Utils.plainAor(aor))
+                                    showDialog.value = true
                                 } else {
                                     msgUri = Utils.telToSip(peerUri, ua.account)
                                 }
