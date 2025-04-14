@@ -3,12 +3,10 @@ package com.tutpro.baresip
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.ContactsContract
-import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -46,6 +44,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import coil.compose.AsyncImage
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
@@ -191,7 +191,28 @@ class ContactsActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun ContactsContent(ctx: Context, contentPadding: PaddingValues) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val dialogMessage = remember { mutableStateOf("") }
+        val positiveText = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+        val neutralText = remember { mutableStateOf("") }
+        val neutralAction = remember { mutableStateOf({}) }
+
+        if (showDialog.value)
+            AlertDialog(
+                showDialog = showDialog,
+                title = getString(R.string.confirmation),
+                message = dialogMessage.value,
+                positiveButtonText = positiveText.value,
+                onPositiveClicked = positiveAction.value,
+                neutralButtonText = neutralText.value,
+                onNeutralClicked = neutralAction.value,
+                negativeButtonText = getString(R.string.cancel)
+            )
+
         val lazyListState = rememberLazyListState()
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -258,117 +279,74 @@ class ContactsActivity : ComponentActivity() {
                                     .padding(start = 10.dp)
                                     .combinedClickable(
                                         onClick = {
-                                            val dialogClickListener =
-                                                DialogInterface.OnClickListener { _, which ->
-                                                    when (which) {
-                                                        DialogInterface.BUTTON_POSITIVE, DialogInterface.BUTTON_NEGATIVE -> {
-                                                            val i = Intent(
-                                                                ctx,
-                                                                MainActivity::class.java
-                                                            )
-                                                            i.flags =
-                                                                Intent.FLAG_ACTIVITY_NEW_TASK or
-                                                                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                                            if (which == DialogInterface.BUTTON_NEGATIVE)
-                                                                i.putExtra("action", "call")
-                                                            else
-                                                                i.putExtra("action", "message")
-                                                            val ua = UserAgent.ofAor(aor)
-                                                            if (ua == null) {
-                                                                Log.w(
-                                                                    TAG,
-                                                                    "onClickListener did not find AoR $aor"
-                                                                )
-                                                            } else {
-                                                                BaresipService.activities.clear()
-                                                                i.putExtra("uap", ua.uap)
-                                                                i.putExtra("peer", contact.uri)
-                                                                (ctx as Activity).startActivity(i)
-                                                            }
-                                                        }
-
-                                                        DialogInterface.BUTTON_NEUTRAL -> {
-                                                        }
-                                                    }
-                                                }
-                                            if (SystemClock.elapsedRealtime() - lastClick > 1000) {
-                                                lastClick = SystemClock.elapsedRealtime()
-                                                with(
-                                                    MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)
-                                                ) {
-                                                    setTitle(R.string.confirmation)
-                                                    setMessage(
-                                                        String.format(
-                                                            ctx.getString(R.string.contact_action_question),
-                                                            name
-                                                        )
-                                                    )
-                                                    setNeutralButton(
-                                                        ctx.getText(R.string.cancel),
-                                                        dialogClickListener
-                                                    )
-                                                    setNegativeButton(
-                                                        ctx.getText(R.string.call),
-                                                        dialogClickListener
-                                                    )
-                                                    setPositiveButton(
-                                                        ctx.getText(R.string.send_message),
-                                                        dialogClickListener
-                                                    )
-                                                    show()
+                                            dialogMessage.value = String.format(
+                                                ctx.getString(R.string.contact_action_question),
+                                                name
+                                            )
+                                            positiveText.value = ctx.getString(R.string.call)
+                                            positiveAction.value = {
+                                                val i = Intent(ctx, MainActivity::class.java)
+                                                i.flags =
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                                i.putExtra("action", "call")
+                                                val ua = UserAgent.ofAor(aor)
+                                                if (ua == null)
+                                                    Log.w(TAG, "onClickListener did not find AoR $aor")
+                                                else {
+                                                    BaresipService.activities.clear()
+                                                    i.putExtra("uap", ua.uap)
+                                                    i.putExtra("peer", contact.uri)
+                                                    (ctx as Activity).startActivity(i)
                                                 }
                                             }
+                                            neutralText.value = ctx.getString(R.string.send_message)
+                                            neutralAction.value = {
+                                                val i = Intent(
+                                                    ctx,
+                                                    MainActivity::class.java
+                                                )
+                                                i.flags =
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                            Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                                i.putExtra("action", "message")
+                                                val ua = UserAgent.ofAor(aor)
+                                                if (ua == null)
+                                                    Log.w(TAG, "onClickListener did not find AoR $aor")
+                                                else {
+                                                    BaresipService.activities.clear()
+                                                    i.putExtra("uap", ua.uap)
+                                                    i.putExtra("peer", contact.uri)
+                                                    (ctx as Activity).startActivity(i)
+                                                }
+                                            }
+                                            showDialog.value = true
                                         },
                                         onLongClick = {
-                                            val dialogClickListener =
-                                                DialogInterface.OnClickListener { _, which ->
-                                                    when (which) {
-                                                        DialogInterface.BUTTON_POSITIVE -> {
-                                                            val id = contact.id
-                                                            val avatarFile = File(
-                                                                BaresipService.filesPath,
-                                                                "$id.png"
-                                                            )
-                                                            if (avatarFile.exists()) {
-                                                                try {
-                                                                    avatarFile.delete()
-                                                                } catch (e: IOException) {
-                                                                    Log.e(
-                                                                        TAG,
-                                                                        "Could not delete file $id.png: ${e.message}"
-                                                                    )
-                                                                }
-                                                            }
-                                                            Contact.removeBaresipContact(contact)
-                                                        }
-
-                                                        DialogInterface.BUTTON_NEUTRAL -> {
-                                                        }
+                                            dialogMessage.value = String.format(
+                                                ctx.getString(R.string.contact_delete_question),
+                                                name
+                                            )
+                                            positiveText.value = ctx.getString(R.string.delete)
+                                            positiveAction.value = {
+                                                val id = contact.id
+                                                val avatarFile = File(
+                                                    BaresipService.filesPath,
+                                                    "$id.png"
+                                                )
+                                                if (avatarFile.exists()) {
+                                                    try {
+                                                        avatarFile.delete()
+                                                    } catch (e: IOException) {
+                                                        Log.e(
+                                                            TAG,
+                                                            "Could not delete file $id.png: ${e.message}"
+                                                        )
                                                     }
                                                 }
-                                            with(
-                                                MaterialAlertDialogBuilder(
-                                                    ctx,
-                                                    R.style.AlertDialogTheme
-                                                )
-                                            ) {
-                                                setTitle(R.string.confirmation)
-                                                setMessage(
-                                                    String.format(
-                                                        ctx.getString(R.string.contact_delete_question),
-                                                        name
-                                                    )
-                                                )
-                                                setNeutralButton(
-                                                    ctx.getText(R.string.cancel),
-                                                    dialogClickListener
-                                                )
-                                                setPositiveButton(
-                                                    ctx.getText(R.string.delete),
-                                                    dialogClickListener
-                                                )
-                                                show()
+                                                Contact.removeBaresipContact(contact)
                                             }
+                                            showDialog.value = true
                                         }
                                     )
                             )
@@ -418,44 +396,19 @@ class ContactsActivity : ComponentActivity() {
                                             }
                                         },
                                         onLongClick = {
-                                            val dialogClickListener =
-                                                DialogInterface.OnClickListener { _, which ->
-                                                    when (which) {
-                                                        DialogInterface.BUTTON_POSITIVE -> {
-                                                            ctx.contentResolver.delete(
-                                                                ContactsContract.RawContacts.CONTENT_URI,
-                                                                ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
-                                                                null
-                                                            )
-                                                        }
-
-                                                        DialogInterface.BUTTON_NEUTRAL -> {
-                                                        }
-                                                    }
-                                                }
-                                            with(
-                                                MaterialAlertDialogBuilder(
-                                                    ctx,
-                                                    R.style.AlertDialogTheme
+                                            dialogMessage.value = String.format(
+                                                ctx.getString(R.string.contact_delete_question),
+                                                name
+                                            )
+                                            positiveText.value = ctx.getString(R.string.delete)
+                                            positiveAction.value = {
+                                                ctx.contentResolver.delete(
+                                                    ContactsContract.RawContacts.CONTENT_URI,
+                                                    ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
+                                                    null
                                                 )
-                                            ) {
-                                                setTitle(R.string.confirmation)
-                                                setMessage(
-                                                    String.format(
-                                                        ctx.getString(R.string.contact_delete_question),
-                                                        name
-                                                    )
-                                                )
-                                                setNeutralButton(
-                                                    ctx.getText(R.string.cancel),
-                                                    dialogClickListener
-                                                )
-                                                setPositiveButton(
-                                                    ctx.getText(R.string.delete),
-                                                    dialogClickListener
-                                                )
-                                                show()
                                             }
+                                            showDialog.value = true
                                         }
                                     )
                             )
