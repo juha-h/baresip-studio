@@ -334,6 +334,7 @@
     <string name="tls_ca_file_help">If checked, a file has been or will be loaded that contains
         TLS certificates of such Certificate Authorities that are not included in Android OS.
         In Android version 9, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
+    <string name="no_read_permission">No External Storage read permission</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="speaker_phone">Speaker Phone</string>
     <string name="speaker_phone_help">If checked, speaker phone is turned automatically on

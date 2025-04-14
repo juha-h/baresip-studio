@@ -333,7 +333,6 @@ object CustomElements {
         onNeutralClicked: () -> Unit = {}
     ) {
         if (showDialog.value) {
-            Log.d(TAG, "*********** message = '$message'")
             BasicAlertDialog(
                 onDismissRequest = {
                     showDialog.value = false
