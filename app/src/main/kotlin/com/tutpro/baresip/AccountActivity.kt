@@ -44,7 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -127,9 +126,9 @@ class AccountActivity : ComponentActivity() {
     private var showPasswordDialog = mutableStateOf(false)
     private var keyboardController: SoftwareKeyboardController? = null
 
-    val alertTitle = mutableStateOf("")
-    val alertMessage = mutableStateOf("")
-    val showAlert = mutableStateOf(false)
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
