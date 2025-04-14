@@ -90,10 +90,13 @@ class ChatsActivity: ComponentActivity() {
     internal lateinit var aor: String
     internal lateinit var account: Account
     private lateinit var chatRequest: ActivityResultLauncher<Intent>
+
     private var _uaMessages = mutableStateOf<List<Message>>(emptyList())
     private var uaMessages: List<Message> by _uaMessages
-    private var showNotice by mutableStateOf(false)
-    private var noticeMessage = mutableStateOf("")
+
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -231,6 +234,16 @@ class ChatsActivity: ComponentActivity() {
 
     @Composable
     fun ChatsContent(ctx: Context, contentPadding: PaddingValues) {
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -239,9 +252,6 @@ class ChatsActivity: ComponentActivity() {
         ) {
             Account(account)
             Chats(ctx, account)
-            if (showNotice)
-                Notice()
-
         }
     }
 
@@ -273,18 +283,20 @@ class ChatsActivity: ComponentActivity() {
         val neutralButtonText = remember { mutableStateOf("") }
         val neutralAction = remember { mutableStateOf({}) }
 
-        AlertDialog(
-            showDialog = showDialog,
-            title = getString(R.string.confirmation),
-            message = dialogMessage.value,
-            positiveButtonText = positiveButtonText.value,
-            onPositiveClicked = positiveAction.value,
-            neutralButtonText = neutralButtonText.value,
-            onNeutralClicked = neutralAction.value,
-            negativeButtonText = getString(R.string.cancel)
-        )
+        if (showDialog.value)
+            AlertDialog(
+                showDialog = showDialog,
+                title = getString(R.string.confirmation),
+                message = dialogMessage.value,
+                positiveButtonText = positiveButtonText.value,
+                onPositiveClicked = positiveAction.value,
+                neutralButtonText = neutralButtonText.value,
+                onNeutralClicked = neutralAction.value,
+                negativeButtonText = getString(R.string.cancel)
+            )
 
         val lazyListState = rememberLazyListState()
+
         LazyColumn(
             modifier = Modifier
                 .imePadding()
@@ -612,18 +624,6 @@ class ChatsActivity: ComponentActivity() {
         }
     }
 
-
-    @Composable
-    fun Notice() {
-        AlertDialog(
-            showDialog = remember { mutableStateOf(true) },
-            title = getString(R.string.notice),
-            message = noticeMessage.value,
-            positiveButtonText = getString(R.string.ok),
-            onPositiveClicked = { showNotice = false },
-        )
-    }
-
     private fun makeChat(chatPeer: String) {
         val peerUri = if (Utils.isTelNumber(chatPeer))
             "tel:$chatPeer"
@@ -631,18 +631,20 @@ class ChatsActivity: ComponentActivity() {
             chatPeer
         val uri = if (Utils.isTelUri(peerUri)) {
             if (account.telProvider == "") {
-                noticeMessage.value =
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value =
                     String.format(getString(R.string.no_telephony_provider), account.aor)
-                showNotice = true
+                showAlert.value = true
                 ""
             } else
                 Utils.telToSip(peerUri, account)
         } else
             Utils.uriComplete(peerUri, aor)
-        if (noticeMessage.value.isEmpty()) {
+        if (alertMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
-                noticeMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
-                showNotice = true
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
+                showAlert.value = true
             }
             else {
                 val i = Intent(this@ChatsActivity, ChatActivity::class.java)
