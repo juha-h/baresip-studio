@@ -63,7 +63,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
@@ -116,6 +116,18 @@ class ConfigActivity : ComponentActivity() {
     private var restart = false
     private var audioRestart = false
 
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
+    private val dialogTitle = mutableStateOf("")
+    private val dialogMessage = mutableStateOf("")
+    private val positiveText = mutableStateOf("")
+    private val onPositiveClicked = mutableStateOf({})
+    private val negativeText = mutableStateOf("")
+    private val onNegativeClicked = mutableStateOf({})
+    private val showDialog = mutableStateOf(false)
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -137,10 +149,9 @@ class ConfigActivity : ComponentActivity() {
                         save = true
                         restart = true
                     } catch (e: Error) {
-                        Utils.alertView(
-                            this, getString(R.string.error),
-                            getString(R.string.read_cert_error) + ": " + e.message
-                        )
+                        alertTitle.value = getString(R.string.error)
+                        alertMessage.value = getString(R.string.read_cert_error) + ": " + e.message
+                        showAlert.value = true
                         newTlsCertificateFile = false
                     }
                 }
@@ -162,10 +173,9 @@ class ConfigActivity : ComponentActivity() {
                         inputStream.close()
                         restart = true
                     } catch (e: Error) {
-                        Utils.alertView(
-                            this, getString(R.string.error),
-                            getString(R.string.read_ca_certs_error) + ": " + e.message
-                        )
+                        alertTitle.value = getString(R.string.error)
+                        alertMessage.value = getString(R.string.read_ca_certs_error) + ": " + e.message
+                        showAlert.value = true
                         newCaFile = false
                     }
                 }
@@ -330,38 +340,62 @@ class ConfigActivity : ComponentActivity() {
 
     @Composable
     fun ConfigContent(ctx: Context, contentPadding: PaddingValues) {
+
         arrowTint = if (BaresipService.darkTheme.value)
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
+
+        if (showDialog.value)
+            AlertDialog(
+                showDialog = showDialog,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = positiveText.value,
+                onPositiveClicked = onPositiveClicked.value,
+                negativeButtonText = negativeText.value,
+                onNegativeClicked = onNegativeClicked.value,
+            )
+
         val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
-                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
                 .verticalScrollbar(scrollState)
                 .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             StartAutomatically(ctx)
-            ListenAddress(ctx)
-            AddressFamily(ctx)
-            DnsServers(ctx)
+            ListenAddress()
+            AddressFamily()
+            DnsServers()
             TlsCertificateFile(ctx)
-            VerifyServer(ctx)
+            VerifyServer()
             CaFile(ctx)
-            UserAgent(ctx)
+            UserAgent()
             AudioSettings(ctx)
-            BatteryOptimizations(ctx)
+            BatteryOptimizations()
             if (Build.VERSION.SDK_INT >= 29)
-                DefaultDialer(ctx)
+                DefaultDialer()
             Contacts(ctx)
-            DarkTheme(ctx)
-            Debug(ctx)
-            SipTrace(ctx)
-            Reset(ctx)
+            DarkTheme()
+            Debug()
+            SipTrace()
+            Reset()
         }
     }
 
@@ -376,10 +410,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.start_automatically),
-                            getString(R.string.start_automatically_help)
-                        )
+                        alertTitle.value = getString(R.string.start_automatically)
+                        alertMessage.value = getString(R.string.start_automatically_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -390,28 +423,19 @@ class ConfigActivity : ComponentActivity() {
                 onCheckedChange = {
                     if (it) {
                         if (!isAppearOnTopPermissionGranted(ctx)) {
-                            with(
-                                MaterialAlertDialogBuilder(
-                                    ctx,
-                                    R.style.AlertDialogTheme
-                                )
-                            ) {
-                                setTitle(getText(R.string.notice))
-                                setMessage(getText(R.string.appear_on_top_permission))
-                                setPositiveButton(getText(R.string.ok)) { dialog, _ ->
-                                    dialog.dismiss()
-                                    managingOverlayPermission = true
-                                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                                    startActivity(intent)
-                                }
-                                setNegativeButton(getText(R.string.cancel)) { dialog, _ ->
-                                    dialog.dismiss()
-                                }
-                                val dialog = this.create()
-                                dialog.setCancelable(false)
-                                dialog.setCanceledOnTouchOutside(false)
-                                dialog.show()
+                            dialogTitle.value = getString(R.string.notice)
+                            dialogMessage.value = getString(R.string.appear_on_top_permission)
+                            positiveText.value = getString(R.string.ok)
+                            onPositiveClicked.value = {
+                                managingOverlayPermission = true
+                                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                                startActivity(intent)
                             }
+                            negativeText.value = getString(R.string.cancel)
+                            onNegativeClicked.value = {
+                                negativeText.value = ""
+                            }
+                            showDialog.value = true
                             startAutomatically = false
                         }
                         else
@@ -426,7 +450,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ListenAddress(ctx: Context) {
+    private fun ListenAddress() {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -446,10 +470,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.listen_address),
-                            getString(R.string.listen_address_help)
-                        )
+                        alertTitle.value = getString(R.string.listen_address)
+                        alertMessage.value = getString(R.string.listen_address_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
@@ -460,7 +483,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AddressFamily(ctx: Context) {
+    private fun AddressFamily() {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -472,10 +495,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.address_family),
-                            getString(R.string.address_family_help)
-                        )
+                        alertTitle.value = getString(R.string.address_family)
+                        alertMessage.value = getString(R.string.address_family_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -526,7 +548,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun DnsServers(ctx: Context) {
+    private fun DnsServers() {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -545,10 +567,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.dns_servers),
-                            getString(R.string.dns_servers_help)
-                        )
+                        alertTitle.value = getString(R.string.dns_servers)
+                        alertMessage.value = getString(R.string.dns_servers_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
@@ -560,6 +581,7 @@ class ConfigActivity : ComponentActivity() {
 
     @Composable
     private fun TlsCertificateFile(ctx: Context) {
+        val showAlertDialog = remember { mutableStateOf(false) }
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -569,10 +591,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.tls_certificate_file),
-                            getString(R.string.tls_certificate_file_help)
-                        )
+                        alertTitle.value = getString(R.string.tls_certificate_file)
+                        alertMessage.value = getString(R.string.tls_certificate_file_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -594,10 +615,9 @@ class ConfigActivity : ComponentActivity() {
                                     val downloadsPath = Utils.downloadsPath("cert.pem")
                                     val content = Utils.getFileContents(downloadsPath)
                                     if (content == null) {
-                                        Utils.alertView(
-                                            ctx, getString(R.string.error),
-                                            getString(R.string.read_cert_error)
-                                        )
+                                        alertTitle.value = getString(R.string.error)
+                                        alertMessage.value = getString(R.string.read_cert_error)
+                                        showAlert.value = true
                                         return@Checkbox
                                     }
                                     val certPath = BaresipService.filesPath + "/cert.pem"
@@ -607,10 +627,9 @@ class ConfigActivity : ComponentActivity() {
                                     save = true
                                     restart = true
                                 }
-                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) ->
-                                    Utils.alertView(ctx, getString(R.string.notice), getString(R.string.no_android_contacts)) {
-                                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                                    }
+                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                                    showAlertDialog.value = true
+                                }
                                 else ->
                                     requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                             }
@@ -625,10 +644,20 @@ class ConfigActivity : ComponentActivity() {
                 }
             )
         }
+        if (showAlertDialog.value)
+            AlertDialog(
+                showDialog = showAlertDialog,
+                title = getString(R.string.notice),
+                message = getString(R.string.no_read_permission),
+                positiveButtonText = getString(R.string.ok),
+                onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
+                negativeButtonText = "",
+                onNegativeClicked = {},
+            )
     }
 
     @Composable
-    private fun VerifyServer(ctx: Context) {
+    private fun VerifyServer() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -638,10 +667,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.verify_server),
-                            getString(R.string.verify_server_help)
-                        )
+                        alertTitle.value = getString(R.string.verify_server)
+                        alertMessage.value = getString(R.string.verify_server_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -667,10 +695,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.tls_ca_file),
-                            getString(R.string.tls_certificate_file_help)
-                        )
+                        alertTitle.value = getString(R.string.tls_ca_file)
+                        alertMessage.value = getString(R.string.tls_ca_file_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -691,24 +718,33 @@ class ConfigActivity : ComponentActivity() {
                                     val downloadsPath = Utils.downloadsPath("ca_certs.crt")
                                     val content = Utils.getFileContents(downloadsPath)
                                     if (content == null) {
-                                        Utils.alertView(ctx, getString(R.string.error), getString(R.string.read_ca_certs_error))
+                                        alertTitle.value = getString(R.string.error)
+                                        alertMessage.value = getString(R.string.read_ca_certs_error)
+                                        showAlert.value = true
                                         return@Checkbox
                                     }
                                     caCertsFile.writeBytes(content)
                                     caFile = true
                                     restart = true
                                 }
-                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) ->
-                                    Utils.alertView(ctx, getString(R.string.notice), getString(R.string.no_android_contacts)) {
+                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                                    dialogTitle.value = getString(R.string.notice)
+                                    dialogMessage.value = getString(R.string.no_read_permission)
+                                    positiveText.value = getString(R.string.ok)
+                                    onPositiveClicked.value = {
                                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                                     }
+                                    negativeText.value = ""
+                                    showDialog.value = true
+                                }
                                 else ->
                                     requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                             }
-                        } else {
-                            Utils.selectInputFile(caCertsRequest)
                         }
-                    } else {
+                        else
+                            Utils.selectInputFile(caCertsRequest)
+                    }
+                    else {
                         if (caCertsFile.exists())
                             caCertsFile.delete()
                         restart = true
@@ -719,7 +755,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun UserAgent(ctx: Context) {
+    private fun UserAgent() {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -739,10 +775,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.user_agent),
-                            getString(R.string.user_agent_help)
-                        )
+                        alertTitle.value = getString(R.string.user_agent)
+                        alertMessage.value = getString(R.string.user_agent_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
@@ -776,7 +811,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun BatteryOptimizations(ctx: Context) {
+    private fun BatteryOptimizations() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -786,10 +821,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.battery_optimizations),
-                            getString(R.string.battery_optimizations_help)
-                        )
+                        alertTitle.value = getString(R.string.battery_optimizations)
+                        alertMessage.value = getString(R.string.battery_optimizations_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -811,7 +845,7 @@ class ConfigActivity : ComponentActivity() {
 
     @RequiresApi(29)
     @Composable
-    private fun DefaultDialer(ctx: Context) {
+    private fun DefaultDialer() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -821,10 +855,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.default_phone_app),
-                            getString(R.string.default_phone_app_help)
-                        )
+                        alertTitle.value = getString(R.string.default_phone_app)
+                        alertMessage.value = getString(R.string.default_phone_app_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -835,9 +868,11 @@ class ConfigActivity : ComponentActivity() {
                     defaultDialer = it
                     newDefaultDialer = defaultDialer
                     if (it) {
-                        if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER))
-                            Utils.alertView(ctx, getString(R.string.notice),
-                                getString(R.string.dialer_role_not_available))
+                        if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
+                            alertTitle.value = getString(R.string.alert)
+                            alertMessage.value = getString(R.string.dialer_role_not_available)
+                            showAlert.value = true
+                        }
                         else
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
                                 dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
@@ -855,6 +890,7 @@ class ConfigActivity : ComponentActivity() {
 
     @Composable
     private fun Contacts(ctx: Context) {
+        val showAlertDialog = remember { mutableStateOf(false) }
         Row(
             Modifier
                 .fillMaxWidth()
@@ -866,10 +902,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.contacts),
-                            getString(R.string.contacts_help)
-                        )
+                        alertTitle.value = getString(R.string.contacts)
+                        alertMessage.value = getString(R.string.contacts_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -908,24 +943,42 @@ class ConfigActivity : ComponentActivity() {
                             onClick = {
                                 isDropDownExpanded.value = false
                                 val mode = contactValues[index]
-                                if (mode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions))
-                                    with(MaterialAlertDialogBuilder(ctx, R.style.AlertDialogTheme)) {
-                                        setTitle(getText(R.string.consent_request))
-                                        setMessage(getText(R.string.contacts_consent))
-                                        setPositiveButton(getText(R.string.accept)) { dialog, _ ->
-                                            dialog.dismiss()
-                                            newContactsMode = mode
-                                            askForContactsPermission(ctx)
+                                if (mode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions)) {
+                                    dialogTitle.value = getString(R.string.consent_request)
+                                    dialogMessage.value = getString(R.string.contacts_consent)
+                                    positiveText.value = getString(R.string.accept)
+                                    onPositiveClicked.value = {
+                                        showDialog.value = false
+                                        newContactsMode = mode
+                                        if (ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.READ_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.WRITE_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            Log.d(TAG, "Contacts permissions already granted")
+                                        } else {
+                                            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS) ||
+                                                    shouldShowRequestPermissionRationale(Manifest.permission.WRITE_CONTACTS))
+                                                showAlertDialog.value = true
+                                            else
+                                                requestPermissionsLauncher.launch(
+                                                    arrayOf(
+                                                        Manifest.permission.READ_CONTACTS,
+                                                        Manifest.permission.WRITE_CONTACTS
+                                                    )
+                                                )
                                         }
-                                        setNegativeButton(getText(R.string.deny)) { dialog, _ ->
-                                            itemPosition.intValue = contactValues.indexOf(oldContactsMode)
-                                            dialog.dismiss()
-                                        }
-                                        val dialog = this.create()
-                                        dialog.setCancelable(false)
-                                        dialog.setCanceledOnTouchOutside(false)
-                                        dialog.show()
                                     }
+                                    negativeText.value = getString(R.string.deny)
+                                    onNegativeClicked.value = {
+                                        itemPosition.intValue = contactValues.indexOf(oldContactsMode)
+                                        negativeText.value = ""
+                                    }
+                                    showDialog.value = true
+                                }
                                 else {
                                     itemPosition.intValue = index
                                     newContactsMode = contactValues[index]
@@ -939,11 +992,26 @@ class ConfigActivity : ComponentActivity() {
                     }
                 }
             }
+            if (showAlertDialog.value)
+                AlertDialog(
+                    showDialog = showAlertDialog,
+                    title = getString(R.string.notice),
+                    message = getString(R.string.no_android_contacts),
+                    positiveButtonText = getString(R.string.ok),
+                    onPositiveClicked = { requestPermissionsLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS
+                        )
+                    )},
+                    negativeButtonText = "",
+                    onNegativeClicked = {},
+                )
         }
     }
 
     @Composable
-    private fun DarkTheme(ctx: Context) {
+    private fun DarkTheme() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -953,10 +1021,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.dark_theme),
-                            getString(R.string.dark_theme_help)
-                        )
+                        alertTitle.value = getString(R.string.dark_theme)
+                        alertMessage.value = getString(R.string.dark_theme_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -972,7 +1039,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Debug(ctx: Context) {
+    private fun Debug() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -982,10 +1049,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.debug),
-                            getString(R.string.debug_help)
-                        )
+                        alertTitle.value = getString(R.string.debug)
+                        alertMessage.value = getString(R.string.debug_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -1001,7 +1067,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun SipTrace(ctx: Context) {
+    private fun SipTrace() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -1011,10 +1077,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.sip_trace),
-                            getString(R.string.sip_trace_help)
-                        )
+                        alertTitle.value = getString(R.string.sip_trace)
+                        alertMessage.value = getString(R.string.sip_trace_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -1030,7 +1095,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Reset(ctx: Context) {
+    private fun Reset() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -1040,10 +1105,9 @@ class ConfigActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.reset_config),
-                            getString(R.string.reset_config_help)
-                        )
+                        alertTitle.value = getString(R.string.reset_config)
+                        alertMessage.value = getString(R.string.reset_config_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -1051,23 +1115,21 @@ class ConfigActivity : ComponentActivity() {
             Checkbox(
                 checked = reset,
                 onCheckedChange = {
-                    with(MaterialAlertDialogBuilder(ctx,
-                        R.style.AlertDialogTheme)) {
-                        setTitle(R.string.confirmation)
-                        setMessage(getString(R.string.reset_config_alert))
-                        setPositiveButton(getText(R.string.reset)) { dialog, _ ->
-                            Config.reset()
-                            save = false
-                            restart = true
-                            done()
-                            dialog.dismiss()
-                        }
-                        setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                            reset = false
-                            dialog.dismiss()
-                        }
-                        show()
+                    dialogTitle.value = getString(R.string.confirmation)
+                    dialogMessage.value = getString(R.string.reset_config_alert)
+                    positiveText.value = getString(R.string.reset)
+                    onPositiveClicked.value = {
+                        Config.reset()
+                        save = false
+                        restart = true
+                        done()
                     }
+                    negativeText.value = getString(R.string.cancel)
+                    onNegativeClicked.value = {
+                        reset = false
+                        negativeText.value = ""
+                    }
+                    showDialog.value = true
                 }
             )
         }
@@ -1087,8 +1149,9 @@ class ConfigActivity : ComponentActivity() {
         val listenAddr = newListenAddr.trim()
         if (listenAddr != oldListenAddr) {
             if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    "${getString(R.string.invalid_listen_address)}: $listenAddr")
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_listen_address)}: $listenAddr"
+                showAlert.value = true
                 return
             }
             Config.replaceVariable("sip_listen", listenAddr)
@@ -1107,8 +1170,9 @@ class ConfigActivity : ComponentActivity() {
         dnsServers = addMissingPorts(dnsServers)
         if (dnsServers != oldDnsServers.replace(" ", "")) {
             if (!checkDnsServers(dnsServers)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    "${getString(R.string.invalid_dns_servers)}: $dnsServers")
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_dns_servers)}: $dnsServers"
+                showAlert.value = true
                 return
             }
             Config.removeVariable("dns_server")
@@ -1117,8 +1181,9 @@ class ConfigActivity : ComponentActivity() {
                     Config.addVariable("dns_server", server)
                 Config.replaceVariable("dyn_dns", "no")
                 if (Api.net_use_nameserver(dnsServers) != 0) {
-                    Utils.alertView(this, getString(R.string.error),
-                        "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers"
+                    showAlert.value = true
                     return
                 }
             } else {
@@ -1139,8 +1204,9 @@ class ConfigActivity : ComponentActivity() {
         newUserAgent = newUserAgent.trim()
         if (newUserAgent != oldUserAgent) {
             if ((newUserAgent != "") && !Utils.checkServerVal(newUserAgent)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    "${getString(R.string.invalid_user_agent)}: $newUserAgent")
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_user_agent)}: $newUserAgent"
+                showAlert.value = true
                 return
             }
             if (newUserAgent != "")
@@ -1217,38 +1283,6 @@ class ConfigActivity : ComponentActivity() {
         super.onStart()
         requestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-    }
-
-    private fun askForContactsPermission(ctx: Context) {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.d(TAG, "Contacts permissions already granted")
-        } else {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS) ||
-                shouldShowRequestPermissionRationale(Manifest.permission.WRITE_CONTACTS)) {
-                    Utils.alertView(ctx, getString(R.string.notice), getString(R.string.no_android_contacts)
-                ) {
-                    requestPermissionsLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.WRITE_CONTACTS
-                        )
-                    )
-                }
-            } else
-                requestPermissionsLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.WRITE_CONTACTS
-                    )
-                )
-        }
     }
 
     private fun isAppearOnTopPermissionGranted(ctx: Context): Boolean {
