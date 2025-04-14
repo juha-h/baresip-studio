@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.os.Bundle
-import android.view.Menu
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -40,11 +39,13 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class CodecsActivity : ComponentActivity() {
@@ -59,6 +60,10 @@ class CodecsActivity : ComponentActivity() {
     private var aor = ""
     private var media = ""
     private var title = ""
+
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -164,6 +169,16 @@ class CodecsActivity : ComponentActivity() {
 
     @Composable
     fun CodecsContent(contentPadding: PaddingValues) {
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -191,16 +206,15 @@ class CodecsActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(top = 8.dp)
                 .clickable {
-                    if (media == "audio")
-                        Utils.alertView(
-                            this, getString(R.string.audio_codecs),
-                            getString(R.string.audio_codecs_help)
-                        )
-                    else
-                        Utils.alertView(
-                            this, getString(R.string.video_codecs),
-                            getString(R.string.video_codecs_help)
-                        )
+                    if (media == "audio") {
+                        alertTitle.value = getString(R.string.audio_codecs)
+                        alertMessage.value = getString(R.string.audio_codecs_help)
+                    }
+                    else {
+                        alertTitle.value = getString(R.string.video_codecs)
+                        alertMessage.value = getString(R.string.video_codecs_help)
+                    }
+                    showAlert.value = true
                 },
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
