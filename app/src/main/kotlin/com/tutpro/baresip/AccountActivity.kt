@@ -44,8 +44,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
@@ -60,6 +62,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.BaresipService.Companion.uas
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
@@ -124,6 +127,9 @@ class AccountActivity : ComponentActivity() {
     private var showPasswordDialog = mutableStateOf(false)
     private var keyboardController: SoftwareKeyboardController? = null
 
+    val alertTitle = mutableStateOf("")
+    val alertMessage = mutableStateOf("")
+    val showAlert = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -229,11 +235,25 @@ class AccountActivity : ComponentActivity() {
 
     @Composable
     fun AccountContent(ctx: Context, contentPadding: PaddingValues) {
+
         arrowTint = if (BaresipService.darkTheme.value)
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+
         val scrollState = rememberScrollState()
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
+        val focusManager = LocalFocusManager.current
+
         Column(
             modifier = Modifier
                 .imePadding()
@@ -241,7 +261,8 @@ class AccountActivity : ComponentActivity() {
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
                 .verticalScrollbar(scrollState)
-                .verticalScroll(state = scrollState),
+                .verticalScroll(state = scrollState)
+                .clickable { focusManager.clearFocus() },
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             oldNickname = acc.nickName.value
@@ -272,27 +293,27 @@ class AccountActivity : ComponentActivity() {
             oldTelProvider = acc.telProvider
             oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
             AoR()
-            Nickname(ctx)
-            Displayname(ctx)
-            AuthUser(ctx)
-            AuthPass(ctx)
-            Outbound(ctx)
-            Register(ctx)
-            RegInt(ctx)
+            Nickname()
+            DisplayName()
+            AuthUser()
+            AuthPass()
+            Outbound()
+            Register()
+            RegInt()
             AudioCodecs(ctx)
-            MediaEnc(ctx)
-            MediaNat(ctx)
-            StunServer(ctx)
-            StunUser(ctx)
-            StunPass(ctx)
+            MediaEnc()
+            MediaNat()
+            StunServer()
+            StunUser()
+            StunPass()
             RtcpMux()
             Rel100()
-            Dtmf(ctx)
-            Answer(ctx)
-            Redirect(ctx)
-            Voicemail(ctx)
-            CountryCode(ctx)
-            TelProvider(ctx)
+            Dtmf()
+            Answer()
+            Redirect()
+            Voicemail()
+            CountryCode()
+            TelProvider()
             DefaultAccount()
             AskPassword(ctx)
         }
@@ -301,7 +322,7 @@ class AccountActivity : ComponentActivity() {
     @Composable
     private fun AoR() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -320,9 +341,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Nickname(ctx: Context) {
+    private fun Nickname() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -337,8 +358,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.nickname),
-                            getString(R.string.account_nickname_help)) },
+                        alertTitle.value = getString(R.string.nickname)
+                        alertMessage.value = getString(R.string.account_nickname_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.nickname)) },
@@ -350,9 +372,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Displayname(ctx: Context) {
+    private fun DisplayName() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -367,8 +389,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.display_name),
-                            getString(R.string.display_name_help)) },
+                        alertTitle.value = getString(R.string.display_name)
+                        alertMessage.value = getString(R.string.display_name_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.display_name)) },
@@ -380,9 +403,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AuthUser(ctx: Context) {
+    private fun AuthUser() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -397,8 +420,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.authentication_username),
-                            getString(R.string.authentication_username_help)) },
+                        alertTitle.value = getString(R.string.authentication_username)
+                        alertMessage.value = getString(R.string.authentication_username_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.authentication_username)) },
@@ -408,10 +432,10 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AuthPass(ctx: Context) {
+    private fun AuthPass() {
         val showPassword = remember { mutableStateOf(false) }
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -446,8 +470,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.authentication_password),
-                            getString(R.string.authentication_password_help)) },
+                        alertTitle.value = getString(R.string.authentication_password)
+                        alertMessage.value = getString(R.string.authentication_password_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.authentication_password)) },
@@ -457,23 +482,18 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Outbound(ctx: Context) {
+    private fun Outbound() {
+        Text(text = stringResource(R.string.outbound_proxies),
+            color = LocalCustomColors.current.itemText,
+            modifier = Modifier.padding(top=8.dp)
+                .clickable {
+                    alertTitle.value = getString(R.string.outbound_proxies)
+                    alertMessage.value = getString(R.string.outbound_proxies_help)
+                    showAlert.value = true
+                }
+        )
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(text = stringResource(R.string.outbound_proxies),
-                color = LocalCustomColors.current.itemText,
-                modifier = Modifier.clickable {
-                    Utils.alertView(
-                        ctx, getString(R.string.outbound_proxies),
-                        getString(R.string.outbound_proxies_help)
-                    )
-                })
-        }
-        Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -495,7 +515,7 @@ class AccountActivity : ComponentActivity() {
             )
         }
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -519,7 +539,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Register(ctx: Context) {
+    fun Register() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -528,9 +548,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.register),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.register), getString(R.string.register_help)
-                        )
+                        alertTitle.value = getString(R.string.register)
+                        alertMessage.value = getString(R.string.register_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText)
             var register by remember { mutableStateOf(oldRegister) }
@@ -546,7 +566,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun RegInt(ctx: Context) {
+    private fun RegInt() {
         Row(
             Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -563,8 +583,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.reg_int),
-                            getString(R.string.reg_int_help)) },
+                        alertTitle.value = getString(R.string.reg_int)
+                        alertMessage.value = getString(R.string.reg_int_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.reg_int)) },
@@ -599,7 +620,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun MediaEnc(ctx: Context) {
+    private fun MediaEnc() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -608,8 +629,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.media_encryption),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.media_encryption),
-                            getString(R.string.media_encryption_help))
+                        alertTitle.value = getString(R.string.media_encryption)
+                        alertMessage.value = getString(R.string.media_encryption_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -658,7 +680,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun MediaNat(ctx: Context) {
+    private fun MediaNat() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -667,8 +689,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.media_nat),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.media_nat),
-                            getString(R.string.media_nat_help))
+                        alertTitle.value = getString(R.string.media_nat)
+                        alertMessage.value = getString(R.string.media_nat_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -720,7 +743,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun StunServer(ctx: Context) {
+    private fun StunServer() {
         Row(
             Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -737,8 +760,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.stun_server),
-                            getString(R.string.stun_server_help)) },
+                        alertTitle.value = getString(R.string.stun_server)
+                        alertMessage.value = getString(R.string.stun_server_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.stun_server)) },
@@ -748,9 +772,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun StunUser(ctx: Context) {
+    private fun StunUser() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -765,8 +789,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.stun_username),
-                            getString(R.string.stun_username_help)) },
+                        alertTitle.value = getString(R.string.stun_username)
+                        alertMessage.value = getString(R.string.stun_username_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.stun_username)) },
@@ -776,7 +801,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun StunPass(ctx: Context) {
+    private fun StunPass() {
         val showPassword = remember { mutableStateOf(false) }
         Row(
             Modifier.fillMaxWidth().padding(end=10.dp),
@@ -818,8 +843,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.stun_password),
-                            getString(R.string.stun_password_help)) },
+                        alertTitle.value = getString(R.string.stun_password)
+                        alertMessage.value = getString(R.string.stun_password_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.stun_password)) },
@@ -836,7 +862,12 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = stringResource(R.string.rtcp_mux),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.rtcp_mux)
+                        alertMessage.value = getString(R.string.rtcp_mux_help)
+                        showAlert.value = true
+                    },
                 color = LocalCustomColors.current.itemText)
             var rtcpMux by remember { mutableStateOf(oldRtcpMux) }
             newRtcpMux = rtcpMux
@@ -857,8 +888,13 @@ class AccountActivity : ComponentActivity() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.rtcp_mux),
-                modifier = Modifier.weight(1f),
+            Text(text = stringResource(R.string.rel_100),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.rel_100)
+                        alertMessage.value = getString(R.string.rel_100_help)
+                        showAlert.value = true
+                    },
                 color = LocalCustomColors.current.itemText)
             var rel100 by remember { mutableStateOf(old100Rel) }
             new100Rel = rel100
@@ -873,7 +909,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Dtmf(ctx: Context) {
+    private fun Dtmf() {
         Row(
             Modifier.fillMaxWidth().padding(top=12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -882,8 +918,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.dtmf_mode),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.dtmf_mode),
-                            getString(R.string.dtmf_mode_help))
+                        alertTitle.value = getString(R.string.dtmf_mode)
+                        alertMessage.value = getString(R.string.dtmf_mode_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -933,7 +970,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Answer(ctx: Context) {
+    private fun Answer() {
         Row(
             Modifier.fillMaxWidth().padding(top=12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -942,8 +979,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.answer_mode),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.answer_mode),
-                            getString(R.string.answer_mode_help))
+                        alertTitle.value = getString(R.string.answer_mode)
+                        alertMessage.value = getString(R.string.answer_mode_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -991,7 +1029,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Redirect(ctx: Context) {
+    private fun Redirect() {
         Row(
             Modifier.fillMaxWidth().padding(top=12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -1000,8 +1038,9 @@ class AccountActivity : ComponentActivity() {
             Text(text = stringResource(R.string.redirect_mode),
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.redirect_mode),
-                            getString(R.string.redirect_mode_help))
+                        alertTitle.value = getString(R.string.redirect_mode)
+                        alertMessage.value = getString(R.string.redirect_mode_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -1051,7 +1090,7 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Voicemail(ctx: Context) {
+    private fun Voicemail() {
         Row(
             Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -1068,8 +1107,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.voicemail_uri),
-                            getString(R.string.voicemain_uri_help)) },
+                        alertTitle.value = getString(R.string.voicemail_uri)
+                        alertMessage.value = getString(R.string.voicemain_uri_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.voicemail_uri)) },
@@ -1079,9 +1119,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun CountryCode(ctx: Context) {
+    private fun CountryCode() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1096,8 +1136,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.country_code),
-                            getString(R.string.country_code_help)) },
+                        alertTitle.value = getString(R.string.country_code)
+                        alertMessage.value = getString(R.string.country_code_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.country_code)) },
@@ -1107,9 +1148,9 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun TelProvider(ctx: Context) {
+    private fun TelProvider() {
         Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
+            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1124,8 +1165,9 @@ class AccountActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.telephony_provider),
-                            getString(R.string.telephony_provider_help)) },
+                        alertTitle.value = getString(R.string.telephony_provider)
+                        alertMessage.value = getString(R.string.telephony_provider_help)
+                        showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.telephony_provider)) },
@@ -1142,7 +1184,11 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = stringResource(R.string.default_account),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.default_account)
+                        alertMessage.value = getString(R.string.default_account_help)
+                        showAlert.value = true },
                 color = LocalCustomColors.current.itemText)
             var defaultAccount by remember { mutableStateOf(oldDefaultAccount) }
             newDefaultAccount = defaultAccount
@@ -1193,15 +1239,19 @@ class AccountActivity : ComponentActivity() {
                 if (nn == "" || Account.uniqueNickName(nn)) {
                     acc.nickName.value = nn
                     Log.d(TAG, "New nickname is ${acc.nickName.value}")
-                } else {
-                    Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.non_unique_account_nickname), nn))
+                }
+                else {
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = String.format(getString(R.string.non_unique_account_nickname), nn)
+                    showAlert.value = true
                     return
                 }
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_account_nickname), nn))
-                return
+            }
+        else {
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.invalid_account_nickname), nn)
+            showAlert.value = true
+            return
             }
         }
 
@@ -1214,9 +1264,11 @@ class AccountActivity : ComponentActivity() {
                 } else {
                     Log.e(TAG, "Setting of display name failed")
                 }
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_display_name), dn))
+            }
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_display_name), dn)
+                showAlert.value = true
                 return
             }
         }
@@ -1229,12 +1281,15 @@ class AccountActivity : ComponentActivity() {
                     Log.d(TAG, "New auth user is ${acc.authUser}")
                     if (acc.regint > 0)
                         reRegister = true
-                } else {
+                }
+                else {
                     Log.e(TAG, "Setting of auth user failed")
                 }
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_authentication_username), au))
+            }
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_authentication_username), au)
+                showAlert.value = true
                 return
             }
         }
@@ -1247,20 +1302,22 @@ class AccountActivity : ComponentActivity() {
                         acc.authPass = Api.account_auth_pass(acc.accp)
                         if (acc.regint > 0)
                             reRegister = true
-                    } else {
-                        Log.e(TAG, "Setting of auth pass failed")
                     }
+                    else
+                        Log.e(TAG, "Setting of auth pass failed")
                     BaresipService.aorPasswords.remove(acc.aor)
-                } else {
-                    Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_authentication_password), ap))
+                }
+                else {
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = String.format(getString(R.string.invalid_authentication_password), ap)
+                    showAlert.value = true
                     return
                 }
             }
-            else {
+            else
                 BaresipService.aorPasswords.remove(acc.aor)
-            }
-        } else { // ap == ""
+        }
+        else { // ap == ""
             if (acc.authPass != NO_AUTH_PASS &&
                     acc.authPass != BaresipService.aorPasswords[acc.aor])
                 if (Api.account_set_auth_pass(acc.accp, "") == 0) {
@@ -1276,9 +1333,11 @@ class AccountActivity : ComponentActivity() {
                 ob1 = "sip:$ob1"
             if (checkOutboundUri(ob1)) {
                 ob.add(ob1)
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_proxy_server_uri), ob1))
+            }
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_proxy_server_uri), ob1)
+                showAlert.value = true
                 return
             }
         }
@@ -1286,11 +1345,12 @@ class AccountActivity : ComponentActivity() {
         if (ob2 != "") {
             if (!ob2.startsWith("sip:"))
                 ob2 = "sip:$ob2"
-            if (checkOutboundUri(ob2)) {
+            if (checkOutboundUri(ob2))
                 ob.add(ob2)
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_proxy_server_uri), ob2))
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_proxy_server_uri), ob2)
+                showAlert.value = true
                 return
             }
         }
@@ -1315,10 +1375,9 @@ class AccountActivity : ComponentActivity() {
 
         val regInt = newRegInt.trim().toInt()
         if (regInt < 60 || regInt > 3600) {
-            Utils.alertView(
-                this, getString(R.string.notice),
-                String.format(getString(R.string.invalid_reg_int), "$regInt")
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.invalid_reg_int), "$regInt")
+            showAlert.value = true
             return
         }
         val reReg = (newRegister != acc.regint > 0) ||
@@ -1363,10 +1422,11 @@ class AccountActivity : ComponentActivity() {
             if (((newMediaNat == "stun") || (newMediaNat == "ice")) && (newStunServer == ""))
                 newStunServer = resources.getString(R.string.stun_server_default)
             if (!Utils.checkStunUri(newStunServer) ||
-                (newMediaNat == "turn" &&
+                    (newMediaNat == "turn" &&
                         newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_stun_server), newStunServer))
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_stun_server), newStunServer)
+                showAlert.value = true
                 return
             }
         }
@@ -1386,12 +1446,14 @@ class AccountActivity : ComponentActivity() {
                 if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
                     acc.stunUser = Api.account_stun_user(acc.accp)
                     Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
-                } else {
-                    Log.e(TAG, "Setting of STUN/TURN user failed")
                 }
-            } else {
-                Utils.alertView(this, getString(R.string.notice), String.format(getString(R.string.invalid_stun_username),
-                    newStunUser))
+                else
+                    Log.e(TAG, "Setting of STUN/TURN user failed")
+            }
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_stun_username), newStunUser)
+                showAlert.value = true
                 return
             }
         }
@@ -1399,14 +1461,15 @@ class AccountActivity : ComponentActivity() {
         val newStunPass = newStunPass.trim()
         if (acc.stunPass != newStunPass) {
             if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
-                if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0) {
+                if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0)
                     acc.stunPass = Api.account_stun_pass(acc.accp)
-                } else {
+                else
                     Log.e(TAG, "Setting of stun pass failed")
-                }
-            } else {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_stun_password), newStunPass))
+            }
+            else {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_stun_password), newStunPass)
+                showAlert.value = true
                 return
             }
         }
@@ -1460,14 +1523,15 @@ class AccountActivity : ComponentActivity() {
                 if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
                 if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
                 if (!Utils.checkUri(newVmUri)) {
-                    Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_sip_or_tel_uri), newVmUri))
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), newVmUri)
+                    showAlert.value = true
                     return
                 }
                 Api.account_set_mwi(acc.accp, true)
-            } else {
-                Api.account_set_mwi(acc.accp, false)
             }
+            else
+                Api.account_set_mwi(acc.accp, false)
             acc.vmUri = newVmUri
             Log.d(TAG, "New voicemail URI is ${acc.vmUri}")
         }
@@ -1475,8 +1539,9 @@ class AccountActivity : ComponentActivity() {
         newCountryCode = newCountryCode.trim()
         if (newCountryCode != acc.countryCode) {
             if (newCountryCode != "" && !Utils.checkCountryCode(newCountryCode)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_country_code), newCountryCode))
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_country_code), newCountryCode)
+                showAlert.value = true
                 return
             }
             acc.countryCode = newCountryCode
@@ -1486,8 +1551,9 @@ class AccountActivity : ComponentActivity() {
         val hostPart = newTelProvider.trim()
         if (hostPart != acc.telProvider) {
             if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_sip_uri_hostpart), hostPart))
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_sip_uri_hostpart), hostPart)
+                showAlert.value = true
                 return
             }
             acc.telProvider = hostPart
