@@ -50,7 +50,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AudioActivity : ComponentActivity() {
@@ -71,6 +73,10 @@ class AudioActivity : ComponentActivity() {
     private var newAudioDelay = BaresipService.audioDelay.toString()
     private var newToneCountry = BaresipService.toneCountry
     private var arrowTint = Color.Unspecified
+
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -115,7 +121,7 @@ class AudioActivity : ComponentActivity() {
             containerColor = LocalCustomColors.current.background,
             topBar = { TopAppBar(title, navigateBack) },
             content = { contentPadding ->
-                AudioContent(ctx, contentPadding)
+                AudioContent(contentPadding)
             }
         )
     }
@@ -158,12 +164,23 @@ class AudioActivity : ComponentActivity() {
     }
 
     @Composable
-    fun AudioContent(ctx: Context, contentPadding: PaddingValues) {
+    fun AudioContent(contentPadding: PaddingValues) {
+
         arrowTint = if (BaresipService.darkTheme.value)
             LocalCustomColors.current.grayLight
         else
             LocalCustomColors.current.black
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
         val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier
                 .imePadding()
@@ -174,19 +191,19 @@ class AudioActivity : ComponentActivity() {
                 .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            CallVolume(ctx)
-            MicGain(ctx)
-            SpeakerPhone(ctx)
-            AudioModules(ctx)
-            OpusBitRate(ctx)
-            OpusPacketLoss(ctx)
-            AudioDelay(ctx)
-            ToneCountry(ctx)
+            CallVolume()
+            MicGain()
+            SpeakerPhone()
+            AudioModules()
+            OpusBitRate()
+            OpusPacketLoss()
+            AudioDelay()
+            ToneCountry()
         }
     }
 
     @Composable
-    private fun CallVolume(ctx: Context) {
+    private fun CallVolume() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -196,10 +213,9 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.default_call_volume),
-                            getString(R.string.default_call_volume_help)
-                        )
+                        alertTitle.value = getString(R.string.default_call_volume)
+                        alertMessage.value = getString(R.string.default_call_volume_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -250,7 +266,7 @@ class AudioActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun MicGain(ctx: Context) {
+    private fun MicGain() {
         if (!BaresipService.agcAvailable)
             Row(
                 Modifier.fillMaxWidth().padding(end = 10.dp),
@@ -269,22 +285,21 @@ class AudioActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            Utils.alertView(
-                                ctx, getString(R.string.microphone_gain),
-                                getString(R.string.microphone_gain_help)
-                            )
+                            alertTitle.value = getString(R.string.microphone_gain)
+                            alertMessage.value = getString(R.string.microphone_gain_help)
+                            showAlert.value = true
                         },
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 18.sp, color = LocalCustomColors.current.itemText
                     ),
-                    label = { Text(stringResource(R.string.microphone_gain)) },
+                    label = { LabelText(stringResource(R.string.microphone_gain)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 )
             }
     }
 
     @Composable
-    private fun SpeakerPhone(ctx: Context) {
+    private fun SpeakerPhone() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -294,10 +309,9 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.speaker_phone),
-                            getString(R.string.speaker_phone_help)
-                        )
+                        alertTitle.value = getString(R.string.speaker_phone)
+                        alertMessage.value = getString(R.string.speaker_phone_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -314,7 +328,7 @@ class AudioActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AudioModules(ctx: Context) {
+    private fun AudioModules() {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.Start,
@@ -323,8 +337,9 @@ class AudioActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp,
                 modifier = Modifier.clickable {
-                    Utils.alertView(ctx, getString(R.string.audio_modules_title),
-                        getString(R.string.audio_modules_help))
+                    alertTitle.value = getString(R.string.audio_modules_title)
+                    alertMessage.value = getString(R.string.audio_modules_help)
+                    showAlert.value = true
                 })
             for (module in audioModules) {
                 Row(horizontalArrangement = Arrangement.Start,
@@ -347,7 +362,7 @@ class AudioActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun OpusBitRate(ctx: Context) {
+    private fun OpusBitRate() {
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -365,20 +380,20 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.opus_bit_rate),
-                            getString(R.string.opus_bit_rate_help)
-                        )
+                        alertTitle.value = getString(R.string.opus_bit_rate)
+                        alertMessage.value = getString(R.string.opus_bit_rate_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.opus_bit_rate)) },
+                label = { LabelText(stringResource(R.string.opus_bit_rate)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
     }
 
     @Composable
-    private fun OpusPacketLoss(ctx: Context) {
+    private fun OpusPacketLoss() {
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -396,20 +411,20 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.opus_packet_loss),
-                            getString(R.string.opus_packet_loss_help)
-                        )
+                        alertTitle.value = getString(R.string.opus_packet_loss)
+                        alertMessage.value = getString(R.string.opus_packet_loss_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.opus_packet_loss)) },
+                label = { LabelText(stringResource(R.string.opus_packet_loss)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
     }
 
     @Composable
-    private fun AudioDelay(ctx: Context) {
+    private fun AudioDelay() {
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -419,7 +434,7 @@ class AudioActivity : ComponentActivity() {
             newAudioDelay = audioDelay
             OutlinedTextField(
                 value = audioDelay,
-                placeholder = { Text(stringResource(R.string.audio_delay)) },
+                placeholder = { Text(getString(R.string.audio_delay)) },
                 onValueChange = {
                     audioDelay = it
                     newAudioDelay = audioDelay
@@ -427,20 +442,20 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.audio_delay),
-                            getString(R.string.audio_delay_help)
-                        )
+                        alertTitle.value = getString(R.string.audio_delay)
+                        alertMessage.value = getString(R.string.audio_delay_help)
+                        showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.audio_delay)) },
+                label = { LabelText(getString(R.string.audio_delay)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
     }
 
     @Composable
-    private fun ToneCountry(ctx: Context) {
+    private fun ToneCountry() {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -450,10 +465,9 @@ class AudioActivity : ComponentActivity() {
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        Utils.alertView(
-                            ctx, getString(R.string.tone_country),
-                            getString(R.string.tone_country_help)
-                        )
+                        alertTitle.value = getString(R.string.tone_country)
+                        alertMessage.value = getString(R.string.tone_country_help)
+                        showAlert.value = true
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
@@ -520,10 +534,9 @@ class AudioActivity : ComponentActivity() {
                 gain = "$gain.0"
             if (gain != oldMicGain) {
                 if (!checkMicGain(gain)) {
-                    Utils.alertView(
-                        this, getString(R.string.notice),
-                        "${getString(R.string.invalid_microphone_gain)}: $gain."
-                    )
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = "${getString(R.string.invalid_microphone_gain)}: $gain."
+                    showAlert.value = true
                     return
                 }
                 if (gain == "1.0") {
@@ -533,10 +546,9 @@ class AudioActivity : ComponentActivity() {
                 } else {
                     if (oldMicGain == "1.0") {
                         if (Api.module_load("augain") != 0) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                getString(R.string.failed_to_load_module)
-                            )
+                            alertTitle.value = getString(R.string.error)
+                            alertMessage.value = getString(R.string.failed_to_load_module) + ": augain.so"
+                            showAlert.value = true
                             return
                         }
                         Config.addVariable("module", "augain.so")
@@ -560,10 +572,9 @@ class AudioActivity : ComponentActivity() {
                 if (newAudioModules[module]!!) {
                     if (!modules.contains("${module}.so")) {
                         if (Api.module_load("${module}.so") != 0) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                "${getString(R.string.failed_to_load_module)}: ${module}.so"
-                            )
+                            alertTitle.value = getString(R.string.error)
+                            alertMessage.value = "${getString(R.string.failed_to_load_module)}: ${module}.so"
+                            showAlert.value = true
                             return
                         }
                         Config.addVariable("module", "${module}.so")
@@ -582,8 +593,9 @@ class AudioActivity : ComponentActivity() {
 
         if (newOpusBitrate != oldOpusBitrate) {
             if (!checkOpusBitRate(newOpusBitrate)) {
-                Utils.alertView(this, getString(R.string.notice),
-                        "${getString(R.string.invalid_opus_bitrate)}: $newOpusBitrate.")
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_opus_bitrate)}: $newOpusBitrate."
+                showAlert.value = true
                 return
             }
             Config.replaceVariable("opus_bitrate", newOpusBitrate)
@@ -593,8 +605,9 @@ class AudioActivity : ComponentActivity() {
 
         if (newOpusPacketLoss != oldOpusPacketLoss) {
             if (!checkOpusPacketLoss(newOpusPacketLoss)) {
-                Utils.alertView(this, getString(R.string.notice),
-                        "${getString(R.string.invalid_opus_packet_loss)}: $newOpusPacketLoss")
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_opus_packet_loss)}: $newOpusPacketLoss"
+                showAlert.value = true
                 return
             }
             Config.replaceVariable("opus_packet_loss", newOpusPacketLoss)
@@ -605,8 +618,9 @@ class AudioActivity : ComponentActivity() {
         val audioDelay = newAudioDelay.trim()
         if (audioDelay != BaresipService.audioDelay.toString()) {
             if (!checkAudioDelay(audioDelay)) {
-                Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.invalid_audio_delay), audioDelay))
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_audio_delay), audioDelay)
+                showAlert.value = true
                 return
             }
             Config.replaceVariable("audio_delay", audioDelay)

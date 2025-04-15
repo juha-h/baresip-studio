@@ -77,6 +77,10 @@ class AccountsActivity : ComponentActivity() {
     private var lastClick: Long = 0
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -167,6 +171,15 @@ class AccountsActivity : ComponentActivity() {
             negativeButtonText = getString(R.string.cancel),
         )
 
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
         if (showAccounts.value && BaresipService.uas.value.isNotEmpty()) {
             val scrollState = rememberScrollState()
             Column(
@@ -249,15 +262,17 @@ class AccountsActivity : ComponentActivity() {
         ) {
             OutlinedTextField(
                 value = newAor,
-                placeholder = { CustomElements.Text(text = getString(R.string.new_account)) },
+                placeholder = { Text(text = getString(R.string.new_account)) },
                 onValueChange = { newAor = it },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .verticalScroll(rememberScrollState())
                     .clickable {
-                        Utils.alertView(ctx, getString(R.string.new_account),
-                            getString(R.string.accounts_help)) },
+                        alertTitle.value = getString(R.string.new_account)
+                        alertMessage.value = getString(R.string.accounts_help)
+                        showAlert.value = true
+                    },
                 singleLine = false,
                 trailingIcon = {
                     if (newAor.isNotEmpty()) {
@@ -311,22 +326,16 @@ class AccountsActivity : ComponentActivity() {
                 "sip:$newAor"
 
         if (!Utils.checkAor(aor)) {
-            Log.d(TAG, "Invalid Address of Record $aor")
-            Utils.alertView(
-                this, getString(R.string.notice),
-                String.format(getString(R.string.invalid_aor),
-                    aor.split(":")[1])
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.invalid_aor), aor.split(":")[1])
+            showAlert.value = true
             return null
         }
 
         if (Account.ofAor(aor) != null) {
-            Log.d(TAG, "Account $aor already exists")
-            Utils.alertView(
-                this, getString(R.string.notice),
-                String.format(getString(R.string.account_exists),
-                    aor.split(":")[1])
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.account_exists), aor.split(":")[1])
+            showAlert.value = true
             return null
         }
 
@@ -334,11 +343,9 @@ class AccountsActivity : ComponentActivity() {
             "<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;mwi=no"
         )
         if (ua == null) {
-            Log.e(TAG, "Failed to allocate UA for $aor")
-            Utils.alertView(
-                this, getString(R.string.notice),
-                getString(R.string.account_allocation_failure)
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = getString(R.string.account_allocation_failure)
+            showAlert.value = true
             return null
         }
 

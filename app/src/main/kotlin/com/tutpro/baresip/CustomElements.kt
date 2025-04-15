@@ -116,6 +116,27 @@ object CustomElements {
     }
 
     @Composable
+    fun LabelText(
+        text: String,
+        modifier: Modifier = Modifier,
+        color: Color = LocalCustomColors.current.itemText,
+        fontSize: TextUnit = 16.sp,
+        fontWeight: FontWeight = FontWeight.Normal,
+        textAlign: TextAlign? = null,
+        maxLines: Int = 1,
+    ) {
+        androidx.compose.material3.Text(
+            text = text,
+            modifier = modifier,
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textAlign = textAlign,
+            maxLines = maxLines
+        )
+    }
+
+    @Composable
     fun Button(
         onClick: () -> Unit,
         onLongClick: () -> Unit,
