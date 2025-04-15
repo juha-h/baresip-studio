@@ -139,12 +139,17 @@ sealed class Contact {
         }
 
         fun saveBaresipContacts() {
+            val avatarFiles = avatarFileNames()
             var contents = ""
-            for (c in BaresipService.baresipContacts.value)
+            for (c in BaresipService.baresipContacts.value) {
                 contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}" +
                         ";favorite=${if (c.favorite) "yes" else "no"}\n"
+                avatarFiles.remove(c.id.toString() + ".png")
+            }
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
                     contents.toByteArray())
+            for (f in avatarFiles)
+                File(BaresipService.filesPath + "/" + f).delete()
         }
 
         fun loadAndroidContacts(ctx: Context) {
@@ -299,6 +304,10 @@ sealed class Contact {
                         newList.add(c.name)
                 }
             contactNames.value = newList.toList()
+        }
+
+        private fun avatarFileNames(): MutableList<String> {
+            return File(BaresipService.filesPath).list()!!.filter{ it.endsWith(".png")}.toMutableList()
         }
     }
 }
