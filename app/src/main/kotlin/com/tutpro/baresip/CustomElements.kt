@@ -563,13 +563,14 @@ object CustomElements {
                 showPasswordDialog.value = false
             }
         ) {
-            Surface(
+            Card(
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-                color = LocalCustomColors.current.background,
-                shape = MaterialTheme.shapes.large,
-                tonalElevation = AlertDialogDefaults.TonalElevation
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = LocalCustomColors.current.cardBackground
+                )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
