@@ -136,6 +136,7 @@ import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
 import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.LabelText
+import com.tutpro.baresip.CustomElements.PasswordDialog
 import com.tutpro.baresip.CustomElements.PullToRefreshBox
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.Text
@@ -511,6 +512,15 @@ class MainActivity : ComponentActivity() {
                 delay(1000)
                 isRefreshing = false
             }
+        }
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
         }
 
         if (showDialog.value)
@@ -1828,7 +1838,7 @@ class MainActivity : ComponentActivity() {
                 val params = account.substringAfter(">")
                 if (Utils.paramValue(params, "auth_user") != "" && Utils.paramValue(params, "auth_pass") == "") {
                     val aor = account.substringAfter("<").substringBefore(">")
-                    CustomElements.PasswordDialog(
+                    PasswordDialog(
                         ctx = ctx,
                         showPasswordDialog = showPasswordsDialog,
                         password = password,
