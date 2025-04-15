@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
 import java.io.File
@@ -476,7 +477,7 @@ class ConfigActivity : ComponentActivity() {
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.listen_address)) },
+                label = { LabelText(stringResource(R.string.listen_address)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -573,7 +574,7 @@ class ConfigActivity : ComponentActivity() {
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.dns_servers)) },
+                label = { LabelText(stringResource(R.string.dns_servers)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -781,7 +782,7 @@ class ConfigActivity : ComponentActivity() {
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.user_agent)) },
+                label = { LabelText(stringResource(R.string.user_agent)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }

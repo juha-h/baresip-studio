@@ -64,6 +64,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.CustomElements.AlertDialog
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -530,7 +532,7 @@ class ChatActivity : ComponentActivity() {
                             modifier = Modifier.clickable { newMessage = "" }
                         )
                     } },
-                label = { Text(text = getString(R.string.new_message), fontSize = 18.sp) },
+                label = { LabelText(text = stringResource(R.string.new_message), fontSize = 16.sp) },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,

@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 class AccountActivity : ComponentActivity() {
@@ -334,7 +335,10 @@ class AccountActivity : ComponentActivity() {
                     fontSize = 18.sp,
                     color = LocalCustomColors.current.itemText
                 ),
-                label = { Text(stringResource(R.string.sip_uri)) }
+                label = {
+                    LabelText(text = stringResource(R.string.sip_uri),
+                        fontWeight = FontWeight.Bold)
+                }
             )
         }
     }
@@ -362,7 +366,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.nickname)) },
+                label = { LabelText(stringResource(R.string.nickname)) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text),
@@ -393,7 +397,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.display_name)) },
+                label = { LabelText(stringResource(R.string.display_name)) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text),
@@ -424,7 +428,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.authentication_username)) },
+                label = { LabelText(stringResource(R.string.authentication_username)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -474,7 +478,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.authentication_password)) },
+                label = { LabelText(stringResource(R.string.authentication_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -509,7 +513,7 @@ class AccountActivity : ComponentActivity() {
                 singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                label = { LabelText(stringResource(R.string.sip_uri_of_proxy_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -531,7 +535,7 @@ class AccountActivity : ComponentActivity() {
                 singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                label = { LabelText(stringResource(R.string.sip_uri_of_another_proxy_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -587,7 +591,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.reg_int)) },
+                label = { LabelText(stringResource(R.string.reg_int)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
@@ -764,7 +768,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.stun_server)) },
+                label = { LabelText(stringResource(R.string.stun_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -793,7 +797,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.stun_username)) },
+                label = { LabelText(stringResource(R.string.stun_username)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -847,7 +851,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.stun_password)) },
+                label = { LabelText(stringResource(R.string.stun_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1111,7 +1115,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.voicemail_uri)) },
+                label = { LabelText(stringResource(R.string.voicemail_uri)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1140,7 +1144,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.country_code)) },
+                label = { LabelText(stringResource(R.string.country_code)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1169,7 +1173,7 @@ class AccountActivity : ComponentActivity() {
                         showAlert.value = true },
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { Text(stringResource(R.string.telephony_provider)) },
+                label = { LabelText(stringResource(R.string.telephony_provider)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }

@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -103,7 +102,7 @@ class AudioActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LocalCustomColors.current.background
                 ) {
-                    AudioScreen(this, title) { goBack() }
+                    AudioScreen(title) { goBack() }
                 }
             }
         }
@@ -112,7 +111,7 @@ class AudioActivity : ComponentActivity() {
     }
 
     @Composable
-    fun AudioScreen(ctx: Context, title: String, navigateBack: () -> Unit) {
+    fun AudioScreen(title: String, navigateBack: () -> Unit) {
         Scaffold(
             modifier = Modifier
                 .fillMaxHeight()
@@ -448,7 +447,7 @@ class AudioActivity : ComponentActivity() {
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(getString(R.string.audio_delay)) },
+                label = { LabelText(stringResource(R.string.audio_delay)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }

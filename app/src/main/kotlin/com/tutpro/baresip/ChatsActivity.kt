@@ -78,6 +78,7 @@ import coil.compose.AsyncImage
 import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.ImageAvatar
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -574,9 +575,9 @@ class ChatsActivity: ComponentActivity() {
                             )
                     },
                     label = {
-                        Text(
-                            text = getString(R.string.new_chat_peer),
-                            fontSize = 18.sp
+                        LabelText(
+                            text = stringResource(R.string.new_chat_peer),
+                            fontSize = 16.sp
                         )
                     },
                     textStyle = TextStyle(

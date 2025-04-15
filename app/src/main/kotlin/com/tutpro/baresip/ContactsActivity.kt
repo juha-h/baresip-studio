@@ -369,7 +369,7 @@ class ContactsActivity : ComponentActivity() {
                                 Icon(
                                     imageVector = Icons.Filled.Edit,
                                     modifier = Modifier.size(28.dp),
-                                    contentDescription = stringResource(R.string.add)
+                                    contentDescription = stringResource(R.string.edit)
                                 )
                             }
                         }

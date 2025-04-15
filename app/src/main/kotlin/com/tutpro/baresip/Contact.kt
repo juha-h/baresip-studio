@@ -272,13 +272,11 @@ sealed class Contact {
             contactsUpdate()
         }
 
-        fun updateBaresipContact(contact: BaresipContact) {
+        fun updateBaresipContact(id: Long, contact: BaresipContact) {
             val updatedContacts = BaresipService.baresipContacts.value.toMutableList()
-            val updatedContact = contact.copy() as BaresipContact
-            updatedContact.id = System.currentTimeMillis()
-            updatedContacts.removeIf { it.id == contact.id }
-            updatedContacts.add(updatedContact)
-            BaresipService.baresipContacts.value = updatedContacts
+            updatedContacts.removeIf { it.id == id }
+            updatedContacts.add(contact)
+            BaresipService.baresipContacts.value = updatedContacts.toList()
             saveBaresipContacts()
             contactsUpdate()
         }

@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
 import coil.compose.rememberAsyncImagePainter
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.Checkbox
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -86,7 +87,6 @@ class BaresipContactActivity : ComponentActivity() {
     private var new = false
     private var favorite = false
     private var android = false
-    private var avatarImage: Bitmap? = null
     private var newName = ""
     private var newUri = ""
     private var newFavorite = false
@@ -94,8 +94,16 @@ class BaresipContactActivity : ComponentActivity() {
     private var uriOrName = ""
     private var color = 0
     private var id: Long = 0
-    private var newAvatar = ""
+    private var newId: Long = 0
     private var tmpFile: File? = null
+
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
+    private val textAvatarText = mutableStateOf("")
+    private val textAvatarColor = mutableIntStateOf(0)
+    private val imageAvatarUri = mutableStateOf("")
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -117,23 +125,29 @@ class BaresipContactActivity : ComponentActivity() {
             name = ""
             uri = intent.getStringExtra("uri")!!
             favorite = false
-            avatarImage = null
             android = BaresipService.contactsMode == "android"
             title = getString(R.string.new_contact)
             uriOrName = uri
             color = Utils.randomColor()
             id = System.currentTimeMillis()
-        } else {
+            newId = id
+        }
+        else {
             name = intent.getStringExtra("name")!!
             val contact = Contact.baresipContact(name)!!
             uri = contact.uri
             favorite = contact.favorite
-            avatarImage = contact.avatarImage
             android = false
             title = name
             uriOrName = name
             color = contact.color
             id = contact.id
+            newId = id
+            if (contact.avatarImage != null) {
+                val avatarFile = File(BaresipService.filesPath, "${newId}.png")
+                if (avatarFile.exists())
+                    imageAvatarUri.value = Uri.fromFile(avatarFile).toString()
+            }
         }
 
         setContent {
@@ -159,7 +173,7 @@ class BaresipContactActivity : ComponentActivity() {
             containerColor = LocalCustomColors.current.background,
             topBar = { TopAppBar(ctx, title, navigateBack) },
             content = { contentPadding ->
-                ContactContent(ctx, contentPadding)
+                ContactContent(contentPadding)
             }
         )
     }
@@ -203,13 +217,60 @@ class BaresipContactActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ContactContent(ctx: Context, contentPadding: PaddingValues) {
+    fun ContactContent(contentPadding: PaddingValues) {
 
-        var avatarType by remember { mutableStateOf(if (avatarImage != null) "image" else "text") }
-        var textAvatarText by remember { mutableStateOf("") }
-        var textAvatarColor by remember { mutableIntStateOf(0) }
-        var imageAvatarUri by remember { mutableStateOf("") }
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
 
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(LocalCustomColors.current.background)
+                .padding(contentPadding)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Avatar()
+            ContactName()
+            ContactUri()
+            Favorite()
+            Android()
+        }
+    }
+
+
+    @Composable
+    fun TextAvatar(size: Int) {
+        Box(
+            modifier = Modifier.size(size.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawCircle(SolidColor(Color(textAvatarColor.intValue)))
+            }
+            Text(textAvatarText.value, fontSize = 72.sp, color = Color.White)
+        }
+    }
+
+    @Composable
+    fun ImageAvatar(size: Int) {
+        Image(
+            painter = rememberAsyncImagePainter(model = imageAvatarUri.value),
+            contentDescription = stringResource(R.string.avatar_image),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(size.dp).clip(CircleShape)
+        )
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun Avatar() {
         val avatarRequest =
             rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
                 if (it != null)
@@ -224,208 +285,151 @@ class BaresipContactActivity : ComponentActivity() {
                             ExifInterface.ORIENTATION_NORMAL
                         )
                         val rotatedBitmap = rotateBitmap(scaledBitmap, orientation)
-                        tmpFile = File(
-                            BaresipService.filesPath + "/tmp",
-                            "${System.currentTimeMillis()}.png"
-                        )
+                        if (tmpFile != null && tmpFile!!.exists())
+                            Utils.deleteFile(tmpFile!!)
+                        newId = System.currentTimeMillis()
+                        tmpFile = File(BaresipService.filesPath, "${newId}.png")
                         if (Utils.saveBitmap(rotatedBitmap, tmpFile!!)) {
-                            newAvatar = "image"
-                            avatarType = newAvatar
-                            imageAvatarUri = Uri.fromFile(tmpFile).toString()
+                            imageAvatarUri.value = Uri.fromFile(tmpFile).toString()
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Could not read avatar image: ${e.message}")
                     }
             }
-
-        @Composable
-        fun TextAvatar(size: Int) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Box(
-                modifier = Modifier.size(size.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(96.dp)
+                    .combinedClickable(
+                        onClick = {
+                            avatarRequest.launch("image/*")
+                        },
+                        onLongClick = {
+                            textAvatarColor.intValue = Utils.randomColor()
+                            color = textAvatarColor.intValue
+                            imageAvatarUri.value = ""
+                        }
+                    ),
             ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawCircle(SolidColor(Color(textAvatarColor)))
-                }
-                textAvatarText = if (name == "") "?" else name[0].toString()
-                Text(textAvatarText, fontSize = 72.sp, color = Color.White)
-            }
-        }
-
-        @Composable
-        fun ImageAvatar(size: Int) {
-            Image(
-                painter = rememberAsyncImagePainter(model = imageAvatarUri),
-                contentDescription = stringResource(R.string.avatar_image),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(size.dp).clip(CircleShape)
-            )
-        }
-
-        @Composable
-        fun avatar() {
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (new)
-                    textAvatarColor = color
-                else {
-                    val avatarImage = avatarImage
-                    val avatarFile = File(BaresipService.filesPath, "${id}.png")
-                    if (avatarImage != null && (newAvatar == "" || newAvatar == "image")) {
-                        imageAvatarUri = if (tmpFile != null && tmpFile!!.exists())
-                            Uri.fromFile(tmpFile).toString()
-                        else
-                            Uri.fromFile(avatarFile).toString()
-                    }
-                    else {
-                        textAvatarText = "${name[0]}"
-                        textAvatarColor = color
-                    }
-                }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(96.dp)
-                        .combinedClickable(
-                            onClick = {
-                                avatarRequest.launch("image/*")
-                            },
-                            onLongClick = {
-                                textAvatarColor = Utils.randomColor()
-                                color = textAvatarColor
-                                newAvatar = "text"
-                                avatarType = newAvatar
-                            }
-                        ),
-                ) {
-                    if (avatarType == "text")
-                        TextAvatar(96)
+                if (imageAvatarUri.value == "") {
+                    textAvatarText.value = if (new)
+                        "?"
                     else
-                        ImageAvatar(96)
+                        "${name[0]}"
+                    textAvatarColor.intValue = color
+                    TextAvatar(96)
+                } else
+                    ImageAvatar(96)
+            }
+        }
+    }
+
+    @Composable
+    fun ContactName() {
+        val focusRequester = FocusRequester()
+        var contactName by remember { mutableStateOf(name) }
+        newName = contactName
+        OutlinedTextField(
+            value = contactName,
+            placeholder = { Text(stringResource(R.string.contact_name)) },
+            onValueChange = {
+                contactName = it
+                newName = contactName
+            },
+            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 18.sp, color = LocalCustomColors.current.itemText
+            ),
+            label = { Text(stringResource(R.string.contact_name)) },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+        LaunchedEffect(new) {
+            if (new)
+                focusRequester.requestFocus()
+        }
+    }
+
+    @Composable
+    fun ContactUri() {
+        var contactUri by remember { mutableStateOf(uri) }
+        newUri = contactUri
+        OutlinedTextField(
+            value = contactUri,
+            placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
+            onValueChange = {
+                contactUri = it
+                newUri = contactUri
+            },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 18.sp, color = LocalCustomColors.current.itemText
+            ),
+            label = { Text(stringResource(R.string.sip_or_tel_uri)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        )
+    }
+
+    @Composable
+    fun Favorite() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.favorite),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.favorite)
+                        alertMessage.value = getString(R.string.favorite_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+            )
+            var favoriteContact by remember { mutableStateOf(favorite) }
+            newFavorite = favoriteContact
+            Checkbox(
+                checked = favoriteContact,
+                onCheckedChange = {
+                    favoriteContact = it
+                    newFavorite = favoriteContact
                 }
-            }
-        }
-
-        @Composable
-        fun contactName() {
-            val focusRequester = FocusRequester()
-            var contactName by remember { mutableStateOf(name) }
-            newName = contactName
-            OutlinedTextField(
-                value = contactName,
-                placeholder = { Text(stringResource(R.string.contact_name)) },
-                onValueChange = {
-                    contactName = it
-                    newName = contactName
-                },
-                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
-                ),
-                label = { Text(stringResource(R.string.contact_name)) },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
-                )
-            )
-            LaunchedEffect(new) {
-                if (new)
-                    focusRequester.requestFocus()
-            }
-        }
-
-        @Composable
-        fun contactUri() {
-            var contactUri by remember { mutableStateOf(uri) }
-            newUri = contactUri
-            OutlinedTextField(
-                value = contactUri,
-                placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
-                onValueChange = {
-                    contactUri = it
-                    newUri = contactUri
-                },
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
-                ),
-                label = { Text(stringResource(R.string.sip_or_tel_uri)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
+    }
 
-        @Composable
-        fun favorite(ctx: Context) {
+    @Composable
+    fun Android() {
+        if (new && BaresipService.contactsMode != "baresip")
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = stringResource(R.string.favorite),
-                    modifier = Modifier.weight(1f)
-                        .clickable {
-                            Utils.alertView(
-                                ctx, getString(R.string.favorite), getString(R.string.favorite_help)
-                            )
-                        },
-                    color = LocalCustomColors.current.itemText,
+                    text = stringResource(R.string.android),
+                    modifier = Modifier.weight(1f),
+                    color = LocalCustomColors.current.itemText
                 )
-                var favoriteContact by remember { mutableStateOf(favorite) }
-                newFavorite = favoriteContact
+                var androidContact by remember { mutableStateOf(android) }
+                newAndroid = androidContact
                 Checkbox(
-                    checked = favoriteContact,
+                    checked = androidContact,
                     onCheckedChange = {
-                        favoriteContact = it
-                        newFavorite = favoriteContact
+                        if (BaresipService.contactsMode != "android") {
+                            androidContact = it
+                            newAndroid = androidContact
+                        }
                     }
                 )
             }
-        }
-
-        @Composable
-        fun android() {
-            if (new && BaresipService.contactsMode != "baresip")
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = stringResource(R.string.android),
-                        modifier = Modifier.weight(1f),
-                        color = LocalCustomColors.current.itemText
-                    )
-                    var androidContact by remember { mutableStateOf(android) }
-                    newAndroid = androidContact
-                    Checkbox(
-                        checked = androidContact,
-                        onCheckedChange = {
-                            if (BaresipService.contactsMode != "android") {
-                                androidContact = it
-                                newAndroid = androidContact
-                            }
-                        }
-                    )
-                }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
-                .padding(contentPadding)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            avatar()
-            contactName()
-            contactUri()
-            favorite(ctx)
-            android()
-        }
     }
 
     private fun checkOnClick(ctx: Context) {
@@ -439,20 +443,18 @@ class BaresipContactActivity : ComponentActivity() {
             else
                 "sip:$newUri"
         if (!Utils.checkUri(newUri)) {
-            Utils.alertView(
-                ctx, getString(R.string.notice),
-                String.format(getString(R.string.invalid_sip_or_tel_uri), newUri)
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), newUri)
+            showAlert.value = true
             return
         }
 
         newName = newName.trim()
         if (newName == "") newName = newUri.substringAfter(":")
         if (!Utils.checkName(newName)) {
-            Utils.alertView(
-                ctx, getString(R.string.notice),
-                String.format(getString(R.string.invalid_contact), newName)
-            )
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.invalid_contact), newName)
+            showAlert.value = true
             return
         }
 
@@ -462,39 +464,25 @@ class BaresipContactActivity : ComponentActivity() {
             (uriOrName != newName) && Contact.nameExists(newName, BaresipService.contacts, false)
         }
         if (alert) {
-            Utils.alertView(
-                ctx, getString(R.string.notice),
-                String.format(getString(R.string.contact_already_exists), newName))
+            alertTitle.value = getString(R.string.notice)
+            alertMessage.value = String.format(getString(R.string.contact_already_exists), newName)
+            showAlert.value = true
             return
         }
 
-        val contact: Contact.BaresipContact
+        val contact: Contact.BaresipContact =
+            Contact.BaresipContact(newName, newUri, color, newId, newFavorite)
 
-        if (new) {
-            contact = Contact.BaresipContact(newName, newUri, color, id, newFavorite)
-        } else {
-            contact = Contact.baresipContact(name)!!
-            contact.uri = newUri
-            contact.name = newName
-            contact.color = color
-            contact.favorite = newFavorite
-        }
-
-        when (newAvatar) {
-            "text" -> {
-                if (contact.avatarImage != null) {
-                    contact.avatarImage = null
-                    Utils.deleteFile(File(BaresipService.filesPath, "${contact.id}.png"))
-                }
-            }
-            "image" -> {
-                val imageFilePath = BaresipService.filesPath + "/${contact.id}.png"
-                val imageFile = File(imageFilePath)
-                tmpFile!!.copyTo(target = imageFile, overwrite = true)
-                contact.avatarImage = BitmapFactory.decodeFile(imageFilePath)
+        if (imageAvatarUri.value == "") {
+            if (contact.avatarImage != null) {
+                contact.avatarImage = null
+                Utils.deleteFile(File(BaresipService.filesPath, "${newId}.png"))
             }
         }
-
+        else {
+            val imageFilePath = BaresipService.filesPath + "/${newId}.png"
+            contact.avatarImage = BitmapFactory.decodeFile(imageFilePath)
+        }
 
         if (newAndroid)
             addOrUpdateAndroidContact(ctx, contact)
@@ -502,7 +490,7 @@ class BaresipContactActivity : ComponentActivity() {
             if (new)
                 Contact.addBaresipContact(contact)
             else
-                Contact.updateBaresipContact(contact)
+                Contact.updateBaresipContact(id, contact)
         }
 
         BaresipService.activities.remove("baresip contact,$new,$uriOrName")

@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.CustomElements.AlertDialog
+import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -283,12 +284,7 @@ class AccountsActivity : ComponentActivity() {
                         )
                     }
                 },
-                label = {
-                    CustomElements.Text(
-                        text = getString(R.string.new_account),
-                        fontSize = 18.sp
-                    )
-                },
+                label = { LabelText(stringResource(R.string.new_account)) },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,

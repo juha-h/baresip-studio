@@ -8,8 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
@@ -25,21 +23,14 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.format.DateUtils
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -90,18 +81,6 @@ object Utils {
         for (line in lines.split("\n"))
             if (!line.startsWith(string) && (line.isNotEmpty())) result += line + "\n"
         return result
-    }
-
-    fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        with(MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)) {
-            setTitle(title)
-            setMessage(message)
-            setPositiveButton(R.string.ok) { dialog, _ ->
-                dialog.dismiss()
-                action()
-            }
-            show()
-        }
     }
 
     fun uriHostPart(uri: String): String {
@@ -405,46 +384,6 @@ object Utils {
 
     private fun checkToken(token: String): Boolean {
         return Regex("^[-a-zA-Z0-9.!%*_+`'~]+\$").matches(token)
-    }
-
-    fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
-
-        when (val contact = Contact.findContact(uri)) {
-
-            is Contact.BaresipContact -> {
-                val avatarImage = contact.avatarImage
-                if (avatarImage != null) {
-                    imageView.setImageBitmap(avatarImage)
-                } else {
-                    textView.background.setTint(contact.color)
-                    if (contact.name.isNotEmpty())
-                        textView.text = "${contact.name[0]}"
-                    else
-                        textView.text = ""
-                    imageView.setImageBitmap(bitmapFromView(textView))
-                }
-            }
-
-            is Contact.AndroidContact -> {
-                val thumbnailUri = contact.thumbnailUri
-                if (thumbnailUri != null) {
-                    imageView.setImageURI(thumbnailUri)
-                } else {
-                    textView.background.setTint(contact.color)
-                    if (contact.name.isNotEmpty())
-                        textView.text = "${contact.name[0]}"
-                    else
-                        textView.text = ""
-                    imageView.setImageBitmap(bitmapFromView(textView))
-                }
-            }
-
-            null -> {
-                val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
-                imageView.setImageBitmap(bitmap)
-            }
-
-        }
     }
 
     @Suppress("unused")
@@ -883,13 +822,6 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
-    @Composable
-    fun isNightMode() = when (AppCompatDelegate.getDefaultNightMode()) {
-        AppCompatDelegate.MODE_NIGHT_NO -> false
-        AppCompatDelegate.MODE_NIGHT_YES -> true
-        else -> isSystemInDarkTheme()
-    }
-
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {
         return if (DateUtils.isToday(time.timeInMillis)) {
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
@@ -905,14 +837,6 @@ object Utils {
                 "$month $day" + "\n" + time.get(Calendar.YEAR)
             }
         }
-    }
-
-    private fun bitmapFromView(view: View): Bitmap {
-        val bitmap = createBitmap(view.layoutParams.width, view.layoutParams.height)
-        val canvas = Canvas(bitmap)
-        view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
-        view.draw(canvas)
-        return bitmap
     }
 
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
