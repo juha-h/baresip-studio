@@ -83,6 +83,8 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
@@ -1251,20 +1253,20 @@ class MainActivity : ComponentActivity() {
                                 showTransferDialog = false
                             }
                         ) {
-                            Surface(
+                            Card(
                                 modifier = Modifier
-                                    .wrapContentWidth()
-                                    .wrapContentHeight(),
-                                color = LocalCustomColors.current.grayLight,
-                                shape = MaterialTheme.shapes.large,
-                                tonalElevation = AlertDialogDefaults.TonalElevation
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = LocalCustomColors.current.cardBackground
+                                )
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = ContextCompat.getString(ctx, R.string.call_transfer),
+                                    androidx.compose.material3.Text(
+                                        text = stringResource(R.string.call_transfer),
                                         fontSize = 20.sp,
-                                        modifier = Modifier.padding(16.dp),
-                                        color = LocalCustomColors.current.primary,
+                                        color = LocalCustomColors.current.alert,
                                     )
                                     var transferUri by remember { mutableStateOf("") }
                                     val suggestions by remember { contactNames }
@@ -1309,7 +1311,7 @@ class MainActivity : ComponentActivity() {
                                         label = { LabelText(stringResource(R.string.transfer_destination)) },
                                         textStyle = TextStyle(
                                             fontSize = 18.sp,
-                                            color = LocalCustomColors.current.dark
+                                            color = LocalCustomColors.current.itemText
                                         ),
                                         keyboardOptions = if (dialpad)
                                             KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -1357,7 +1359,7 @@ class MainActivity : ComponentActivity() {
                                                             Text(
                                                                 text = suggestion,
                                                                 modifier = Modifier.fillMaxWidth(),
-                                                                color = LocalCustomColors.current.grayDark,
+                                                                color = LocalCustomColors.current.itemText,
                                                                 fontSize = 18.sp
                                                             )
                                                         }
@@ -1374,7 +1376,7 @@ class MainActivity : ComponentActivity() {
                                         ) {
                                             Text(
                                                 text = ContextCompat.getString(ctx, R.string.blind),
-                                                color = LocalCustomColors.current.dark,
+                                                color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
                                             Checkbox(
@@ -1384,7 +1386,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                             Text(
                                                 text = ContextCompat.getString(ctx, R.string.attended),
-                                                color = LocalCustomColors.current.dark,
+                                                color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
                                             Checkbox(
