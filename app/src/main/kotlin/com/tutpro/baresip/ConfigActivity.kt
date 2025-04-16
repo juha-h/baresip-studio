@@ -137,14 +137,15 @@ class ConfigActivity : ComponentActivity() {
 
     private val certificateRequest =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val certPath = BaresipService.filesPath + "/cert.pem"
+            val certFile = File(certPath)
             if (it.resultCode == RESULT_OK) {
                 it.data?.data?.also { uri ->
                     try {
                         val inputStream =
                             applicationContext.contentResolver.openInputStream(uri)
                                     as FileInputStream
-                        val certPath = BaresipService.filesPath + "/cert.pem"
-                        File(certPath).copyInputStreamToFile(inputStream)
+                        certFile.copyInputStreamToFile(inputStream)
                         inputStream.close()
                         Config.replaceVariable("sip_certificate", certPath)
                         save = true
@@ -156,14 +157,16 @@ class ConfigActivity : ComponentActivity() {
                         newTlsCertificateFile = false
                     }
                 }
-            } else {
-                newTlsCertificateFile = false
             }
+            else
+                newTlsCertificateFile = false
+            if (!newTlsCertificateFile)
+                Utils.deleteFile(certFile)
         }
 
-    private val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
     private val caCertsRequest =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
             if (it.resultCode == RESULT_OK)
                 it.data?.data?.also { uri ->
                     try {
@@ -182,7 +185,7 @@ class ConfigActivity : ComponentActivity() {
                 }
             else
                 newCaFile = false
-            if (!newCaFile && caCertsFile.exists())
+            if (!newCaFile)
                 caCertsFile.delete()
         }
 
@@ -227,7 +230,11 @@ class ConfigActivity : ComponentActivity() {
             oldDnsServers = serverList.trimStart(',').trimStart(' ')
         }
 
-        oldTlsCertificateFile = Config.variable("sip_certificate") != ""
+        val certFile = File(BaresipService.filesPath + "/cert.pem")
+        oldTlsCertificateFile = certFile.exists()
+
+        oldVerifyServer = Config.variable("sip_verify_server") == "yes"
+        newVerifyServer = oldVerifyServer
 
         val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
         oldCaFile = caCertsFile.exists()
@@ -235,6 +242,7 @@ class ConfigActivity : ComponentActivity() {
         powerManager = getSystemService(POWER_SERVICE) as PowerManager
         oldBatteryOptimizations = powerManager
             .isIgnoringBatteryOptimizations(packageName) == false
+        newBatteryOptimizations = oldBatteryOptimizations
 
         androidSettingsRequest = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -634,11 +642,12 @@ class ConfigActivity : ComponentActivity() {
                                 else ->
                                     requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                             }
-                        } else {
-                            Utils.selectInputFile(certificateRequest)
                         }
+                        else
+                            Utils.selectInputFile(certificateRequest)
                     else {
                         Config.removeVariable("sip_certificate")
+                        Utils.deleteFile(File(BaresipService.filesPath + "/cert.pem"))
                         save = true
                         restart = true
                     }
@@ -724,7 +733,7 @@ class ConfigActivity : ComponentActivity() {
                                         showAlert.value = true
                                         return@Checkbox
                                     }
-                                    caCertsFile.writeBytes(content)
+                                    File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
                                     caFile = true
                                     restart = true
                                 }
@@ -746,8 +755,7 @@ class ConfigActivity : ComponentActivity() {
                             Utils.selectInputFile(caCertsRequest)
                     }
                     else {
-                        if (caCertsFile.exists())
-                            caCertsFile.delete()
+                        Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
                         restart = true
                     }
                 }
@@ -1196,8 +1204,7 @@ class ConfigActivity : ComponentActivity() {
         }
 
         if (oldVerifyServer != newVerifyServer) {
-            Config.replaceVariable("sip_verify_server",
-                if (newVerifyServer) "yes" else "no")
+            Config.replaceVariable("sip_verify_server", if (newVerifyServer) "yes" else "no")
             Api.config_verify_server_set(newVerifyServer)
             save = true
         }
