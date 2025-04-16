@@ -85,16 +85,20 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -962,6 +966,8 @@ class MainActivity : ComponentActivity() {
                     value = callUri.value,
                     enabled = callUriEnabled.value,
                     singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledBorderColor = OutlinedTextFieldDefaults.colors().unfocusedIndicatorColor),
                     onValueChange = {
                         val newValue = it
                         if (it != callUri.value) {
@@ -1868,7 +1874,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun AskPassword(ctx: Context) {
         if (showPasswordDialog.value)
-            CustomElements.PasswordDialog(
+            PasswordDialog(
                 ctx = ctx,
                 showPasswordDialog = showPasswordDialog,
                 password = password,
