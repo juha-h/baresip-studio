@@ -1,0 +1,3 @@
+- Completed user interface conversion to Jetpack Compose
+- Fixed Verify Server Certificates setting
+- New Portuguese translations
