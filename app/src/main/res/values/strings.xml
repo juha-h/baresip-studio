@@ -23,6 +23,7 @@
             <li>Touch on the dot leads directly to account configuration.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Long touch on currently shown account enables or disables account\'s registration.</li>
+            <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Previous call party can be reselect by touching the call icon when Callee is empty.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>

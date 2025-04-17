@@ -52,6 +52,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,6 +103,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -568,7 +570,8 @@ class MainActivity : ComponentActivity() {
                 neutralButtonText = getString(R.string.cancel),
                 onNeutralClicked = {}
             )
-
+            var offset by remember { mutableFloatStateOf(0f) }
+            val swipeThreshold = 200
             Column(
                 modifier = Modifier
                     .imePadding()
@@ -576,7 +579,46 @@ class MainActivity : ComponentActivity() {
                     .padding(contentPadding)
                     .padding(top = 18.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
                     .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onDragStart = { offset = 0f },
+                            onDragEnd = {
+                                if (offset < -swipeThreshold) {
+                                    if (uas.value.isNotEmpty()) {
+                                        val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
+                                        val newPos = if (curPos == null)
+                                            0
+                                        else
+                                            (curPos + 1) % uas.value.size
+                                        if (curPos != newPos) {
+                                            val ua = uas.value[newPos]
+                                            spinToAor(ua.account.aor)
+                                            showCall(ua)
+                                        }
+                                    }
+                                }
+                                else if (offset > swipeThreshold) {
+                                    if (uas.value.isNotEmpty()) {
+                                        val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
+                                        val newPos = when (curPos) {
+                                            null -> 0
+                                            0 -> uas.value.size - 1
+                                            else -> curPos - 1
+                                        }
+                                        if (curPos != newPos) {
+                                            val ua = uas.value[newPos]
+                                            spinToAor(ua.account.aor)
+                                            showCall(ua)
+                                        }
+                                    }
+                                }
+                            }
+                        ) { _, dragAmount ->
+                            offset += dragAmount
+                        }
+                    }
                     .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 AccountSpinner(ctx)
@@ -1096,11 +1138,13 @@ class MainActivity : ComponentActivity() {
                                     alertMessage.value = getString(R.string.call_not_secure)
                                     showAlert.value = true
                                 }
+
                                 R.drawable.locked_yellow -> {
                                     alertTitle.value = getString(R.string.alert)
                                     alertMessage.value = getString(R.string.peer_not_verified)
                                     showAlert.value = true
                                 }
+
                                 R.drawable.locked_green -> {
                                     dialogTitle.value = getString(R.string.info)
                                     dialogMessage.value = getString(R.string.call_is_secure)
@@ -1156,7 +1200,7 @@ class MainActivity : ComponentActivity() {
 
             if (showHangupButton.value) {
 
-                var ua: UserAgent = userAgentofSelectedAor()
+                var ua: UserAgent = userAgentOfSelectedAor()
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -2686,7 +2730,7 @@ class MainActivity : ComponentActivity() {
         updateIcons(Account.ofAor(aor))
     }
 
-    private fun userAgentofSelectedAor(): UserAgent {
+    private fun userAgentOfSelectedAor(): UserAgent {
         return UserAgent.ofAor(viewModel.selectedAor.value)!!
     }
 

@@ -19,6 +19,7 @@
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li> <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
+                <li>Pyyhkäisy vasemmalle/oikealle vaihtaa näkyvissä olevaa tiliä.</li>
                 <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.</li>
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
