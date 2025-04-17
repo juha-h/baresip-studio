@@ -45,14 +45,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:largeHeap="true"
+        android:enableOnBackInvokedCallback="false"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
-        tools:remove="android:appComponentFactory" >
+        tools:remove="android:appComponentFactory"
+        tools:targetApi="33">
 
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
+            android:enableOnBackInvokedCallback="true"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

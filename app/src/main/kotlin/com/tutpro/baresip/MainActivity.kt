@@ -35,6 +35,8 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Chronometer
 import android.widget.Toast
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -66,8 +68,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -80,17 +80,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -99,8 +96,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -244,6 +239,10 @@ class MainActivity : ComponentActivity() {
     val items = mutableStateOf(listOf<String>())
     val itemAction = mutableStateOf<(Int) -> Unit>({ index -> {} })
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        moveTaskToBack(true)
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             moveTaskToBack(true)
@@ -257,7 +256,13 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val extraAction = intent.getStringExtra("action")
         Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
@@ -986,8 +991,10 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = null,
                                 modifier = Modifier
                                     .clickable {
-                                        callUri.value = ""
-                                        showSuggestions.value = false
+                                        if (showSuggestions.value)
+                                            showSuggestions.value = false
+                                        else
+                                            callUri.value = ""
                                     }
                             )
                     },
@@ -2017,14 +2024,24 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         Log.d(TAG, "Main onDestroy")
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+
         this.unregisterReceiver(screenEventReceiver)
+
         if (Build.VERSION.SDK_INT >= 31)
             am.removeOnCommunicationDeviceChangedListener(comDevChangedListener)
+
         BaresipService.serviceEvent.removeObserver(serviceEventObserver)
         BaresipService.serviceEvents.clear()
         BaresipService.activities.clear()
+
+        super.onDestroy()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

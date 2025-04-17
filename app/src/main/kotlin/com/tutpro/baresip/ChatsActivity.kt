@@ -569,8 +569,10 @@ class ChatsActivity: ComponentActivity() {
                                 contentDescription = null,
                                 modifier = Modifier
                                     .clickable {
-                                        newPeer = ""
-                                        showSuggestions = false
+                                        if (showSuggestions)
+                                            showSuggestions = false
+                                        else
+                                            newPeer = ""
                                     }
                             )
                     },
