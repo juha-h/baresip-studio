@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
@@ -130,6 +131,7 @@ class AccountActivity : ComponentActivity() {
     private val alertTitle = mutableStateOf("")
     private val alertMessage = mutableStateOf("")
     private val showAlert = mutableStateOf(false)
+    private val showStun = mutableStateOf(false)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -165,6 +167,35 @@ class AccountActivity : ComponentActivity() {
         redirectModeMap = mapOf(false to getString(R.string.manual),
             true to getString(R.string.auto))
 
+        oldNickname = acc.nickName.value
+        oldDisplayname = acc.displayName
+        oldAuthUser = acc.authUser
+        if (BaresipService.aorPasswords[aor] == null &&  // check if OK
+            acc.authPass != NO_AUTH_PASS)
+            oldAuthPass = acc.authPass
+        if (acc.outbound.isNotEmpty()) {
+            oldOutbound1 = acc.outbound[0]
+            if (acc.outbound.size > 1)
+                oldOutbound2 = acc.outbound[1]
+        }
+        oldRegister = acc.regint > 0
+        oldRegInt = acc.configuredRegInt.toString()
+        oldMediaEnc = acc.mediaEnc
+        oldMediaNat = acc.mediaNat
+        showStun.value = oldMediaNat != ""
+        oldStunServer = acc.stunServer
+        oldStunUser = acc.stunUser
+        oldStunPass = acc.stunPass
+        oldRtcpMux = acc.rtcpMux
+        old100Rel = acc.rel100Mode == Api.REL100_ENABLED
+        oldDtmfMode = acc.dtmfMode
+        oldAnswerMode = acc.answerMode
+        oldAutoRedirect = acc.autoRedirect
+        oldVmUri = acc.vmUri
+        oldCountryCode = acc.countryCode
+        oldTelProvider = acc.telProvider
+        oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
+
         setContent {
             AppTheme {
                 keyboardController = LocalSoftwareKeyboardController.current
@@ -180,7 +211,6 @@ class AccountActivity : ComponentActivity() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         // Api.account_debug(acc.accp)
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -252,8 +282,6 @@ class AccountActivity : ComponentActivity() {
             )
         }
 
-        val focusManager = LocalFocusManager.current
-
         Column(
             modifier = Modifier
                 .imePadding()
@@ -261,37 +289,9 @@ class AccountActivity : ComponentActivity() {
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
                 .verticalScrollbar(scrollState)
-                .verticalScroll(state = scrollState)
-                .clickable { focusManager.clearFocus() },
+                .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            oldNickname = acc.nickName.value
-            oldDisplayname = acc.displayName
-            oldAuthUser = acc.authUser
-            if (BaresipService.aorPasswords[aor] == null &&  // check if OK
-                acc.authPass != NO_AUTH_PASS)
-                oldAuthPass = acc.authPass
-            if (acc.outbound.isNotEmpty()) {
-                oldOutbound1 = acc.outbound[0]
-                if (acc.outbound.size > 1)
-                    oldOutbound2 = acc.outbound[1]
-            }
-            oldRegister = acc.regint > 0
-            oldRegInt = acc.configuredRegInt.toString()
-            oldMediaEnc = acc.mediaEnc
-            oldMediaNat = acc.mediaNat
-            oldStunServer = acc.stunServer
-            oldStunUser = acc.stunUser
-            oldStunPass = acc.stunPass
-            oldRtcpMux = acc.rtcpMux
-            old100Rel = acc.rel100Mode == Api.REL100_ENABLED
-            oldDtmfMode = acc.dtmfMode
-            oldAnswerMode = acc.answerMode
-            oldAutoRedirect = acc.autoRedirect
-            oldVmUri = acc.vmUri
-            oldCountryCode = acc.countryCode
-            oldTelProvider = acc.telProvider
-            oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
             AoR()
             Nickname()
             DisplayName()
@@ -488,6 +488,7 @@ class AccountActivity : ComponentActivity() {
     private fun Outbound() {
         Text(text = stringResource(R.string.outbound_proxies),
             color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp,
             modifier = Modifier.padding(top=8.dp)
                 .clickable {
                     alertTitle.value = getString(R.string.outbound_proxies)
@@ -555,6 +556,7 @@ class AccountActivity : ComponentActivity() {
                         alertMessage.value = getString(R.string.register_help)
                         showAlert.value = true
                     },
+                fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var register by remember { mutableStateOf(oldRegister) }
             newRegister = register
@@ -565,6 +567,7 @@ class AccountActivity : ComponentActivity() {
                     newRegister = register
                 }
             )
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -679,6 +682,7 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -728,10 +732,7 @@ class AccountActivity : ComponentActivity() {
                                 isDropDownExpanded.value = false
                                 mediaNat.value = it.key
                                 newMediaNat = mediaNat.value
-                                //if (newMediaNat == "")
-                                    // don't show stunserver
-                                //else
-                                    // show stunserver
+                                showStun.value = newMediaNat != ""
                             })
                         if (index < 3)
                             HorizontalDivider(
@@ -742,118 +743,126 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun StunServer() {
-        Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            var stunServer by remember { mutableStateOf(oldStunServer) }
-            newStunServer = stunServer
-            OutlinedTextField(
-                value = stunServer,
-                placeholder = { Text(stringResource(R.string.stun_server)) },
-                onValueChange = {
-                    stunServer = it
-                    newStunServer = stunServer
-                },
-                modifier = Modifier.fillMaxWidth()
-                    .clickable {
-                        alertTitle.value = getString(R.string.stun_server)
-                        alertMessage.value = getString(R.string.stun_server_help)
-                        showAlert.value = true },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_server)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-        }
+        if (showStun.value)
+            Row(
+                Modifier.fillMaxWidth().padding(end=10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                var stunServer by remember { mutableStateOf(oldStunServer) }
+                newStunServer = stunServer
+                OutlinedTextField(
+                    value = stunServer,
+                    placeholder = { Text(stringResource(R.string.stun_server)) },
+                    onValueChange = {
+                        stunServer = it
+                        newStunServer = stunServer
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable {
+                            alertTitle.value = getString(R.string.stun_server)
+                            alertMessage.value = getString(R.string.stun_server_help)
+                            showAlert.value = true },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                    label = { LabelText(stringResource(R.string.stun_server)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+            }
     }
 
     @Composable
     private fun StunUser() {
-        Row(
-            Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            var stunUser by remember { mutableStateOf(oldStunUser) }
-            newStunUser = stunUser
-            OutlinedTextField(
-                value = stunUser,
-                placeholder = { Text(stringResource(R.string.stun_username)) },
-                onValueChange = {
-                    stunUser = it
-                    newStunUser = stunUser
-                },
-                modifier = Modifier.fillMaxWidth()
-                    .clickable {
-                        alertTitle.value = getString(R.string.stun_username)
-                        alertMessage.value = getString(R.string.stun_username_help)
-                        showAlert.value = true },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_username)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-        }
+        if (showStun.value)
+            Row(
+                Modifier.fillMaxWidth().padding(top=8.dp, end=10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                var stunUser by remember { mutableStateOf(oldStunUser) }
+                newStunUser = stunUser
+                OutlinedTextField(
+                    value = stunUser,
+                    placeholder = { Text(stringResource(R.string.stun_username)) },
+                    onValueChange = {
+                        stunUser = it
+                        newStunUser = stunUser
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable {
+                            alertTitle.value = getString(R.string.stun_username)
+                            alertMessage.value = getString(R.string.stun_username_help)
+                            showAlert.value = true },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                    label = { LabelText(stringResource(R.string.stun_username)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+            }
     }
 
     @Composable
     private fun StunPass() {
-        val showPassword = remember { mutableStateOf(false) }
-        Row(
-            Modifier.fillMaxWidth().padding(end=10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            var stunPass by remember { mutableStateOf(oldStunPass) }
-            newStunPass = stunPass
-            OutlinedTextField(
-                value = stunPass,
-                placeholder = { Text(stringResource(R.string.stun_password)) },
-                onValueChange = {
-                    stunPass = it
-                    newStunPass = stunPass
-                },
-                singleLine = true,
-                visualTransformation = if (showPassword.value)
-                    VisualTransformation.None
-                else
-                    PasswordVisualTransformation(),
-                trailingIcon = {
-                    val (icon, iconColor) = if (showPassword.value) {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility),
-                            colorResource(id = R.color.colorAccent)
-                        )
-                    } else {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility_off),
-                            colorResource(id = R.color.colorWhite))
-                    }
-                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
-                        Icon(
-                            icon,
-                            contentDescription = "Visibility",
-                            tint = iconColor
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-                    .clickable {
-                        alertTitle.value = getString(R.string.stun_password)
-                        alertMessage.value = getString(R.string.stun_password_help)
-                        showAlert.value = true },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_password)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
+        if (showStun.value) {
+            val showPassword = remember { mutableStateOf(false) }
+            Row(
+                Modifier.fillMaxWidth().padding(end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                var stunPass by remember { mutableStateOf(oldStunPass) }
+                newStunPass = stunPass
+                OutlinedTextField(
+                    value = stunPass,
+                    placeholder = { Text(stringResource(R.string.stun_password)) },
+                    onValueChange = {
+                        stunPass = it
+                        newStunPass = stunPass
+                    },
+                    singleLine = true,
+                    visualTransformation = if (showPassword.value)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val (icon, iconColor) = if (showPassword.value) {
+                            Pair(
+                                ImageVector.vectorResource(R.drawable.visibility),
+                                colorResource(id = R.color.colorAccent)
+                            )
+                        } else {
+                            Pair(
+                                ImageVector.vectorResource(R.drawable.visibility_off),
+                                colorResource(id = R.color.colorWhite)
+                            )
+                        }
+                        IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                            Icon(
+                                icon,
+                                contentDescription = "Visibility",
+                                tint = iconColor
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable {
+                            alertTitle.value = getString(R.string.stun_password)
+                            alertMessage.value = getString(R.string.stun_password_help)
+                            showAlert.value = true
+                        },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp, color = LocalCustomColors.current.itemText
+                    ),
+                    label = { LabelText(stringResource(R.string.stun_password)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+            }
         }
     }
 
@@ -871,6 +880,7 @@ class AccountActivity : ComponentActivity() {
                         alertMessage.value = getString(R.string.rtcp_mux_help)
                         showAlert.value = true
                     },
+                fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var rtcpMux by remember { mutableStateOf(oldRtcpMux) }
             newRtcpMux = rtcpMux
@@ -881,6 +891,7 @@ class AccountActivity : ComponentActivity() {
                     newRtcpMux = rtcpMux
                 }
             )
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -898,6 +909,7 @@ class AccountActivity : ComponentActivity() {
                         alertMessage.value = getString(R.string.rel_100_help)
                         showAlert.value = true
                     },
+                fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var rel100 by remember { mutableStateOf(old100Rel) }
             new100Rel = rel100
@@ -908,13 +920,14 @@ class AccountActivity : ComponentActivity() {
                     new100Rel = rel100
                 }
             )
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Dtmf() {
         Row(
-            Modifier.fillMaxWidth().padding(top=12.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -969,13 +982,14 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Answer() {
         Row(
-            Modifier.fillMaxWidth().padding(top=12.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1028,13 +1042,14 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Redirect() {
         Row(
-            Modifier.fillMaxWidth().padding(top=12.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1089,6 +1104,7 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -1192,6 +1208,7 @@ class AccountActivity : ComponentActivity() {
                         alertTitle.value = getString(R.string.default_account)
                         alertMessage.value = getString(R.string.default_account_help)
                         showAlert.value = true },
+                fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var defaultAccount by remember { mutableStateOf(oldDefaultAccount) }
             newDefaultAccount = defaultAccount
@@ -1202,6 +1219,7 @@ class AccountActivity : ComponentActivity() {
                     newDefaultAccount = defaultAccount
                 }
             )
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
