@@ -99,6 +99,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -140,7 +143,6 @@ import com.tutpro.baresip.CustomElements.Checkbox
 import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.PasswordDialog
-import com.tutpro.baresip.CustomElements.PullToRefreshBox
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -520,6 +522,10 @@ class MainActivity : ComponentActivity() {
     fun MainContent(ctx: Context, contentPadding: PaddingValues) {
 
         var isRefreshing by remember { mutableStateOf(false) }
+        val refreshState = rememberPullToRefreshState()
+        var offset by remember { mutableFloatStateOf(0f) }
+        val swipeThreshold = 200
+
         LaunchedEffect(isRefreshing) {
             if (isRefreshing) {
                 delay(1000)
@@ -527,14 +533,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (showAlert.value) {
+        if (showAlert.value)
             AlertDialog(
                 showDialog = showAlert,
                 title = alertTitle.value,
                 message = alertMessage.value,
                 positiveButtonText = stringResource(R.string.ok),
             )
-        }
 
         if (showDialog.value)
             AlertDialog(
@@ -547,87 +552,90 @@ class MainActivity : ComponentActivity() {
                 onNegativeClicked = onNegativeClicked.value
             )
 
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            modifier = Modifier.fillMaxSize(),
-            enabled = pullToRefreshEnabled,
-            onRefresh = {
-                isRefreshing = true
-                if (uas.value.isNotEmpty()) {
-                    if (viewModel.selectedAor.value == "")
-                        spinToAor(uas.value.first().account.aor)
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    if (ua.account.regint > 0)
-                        Api.ua_register(ua.uap)
-                }
-            }
-        ) {
-            SelectableAlertDialog(
-                openDialog = showSelectItemDialog,
-                title = getString(R.string.choose_destination_uri),
-                items = items.value,
-                onItemClicked = itemAction.value,
-                neutralButtonText = getString(R.string.cancel),
-                onNeutralClicked = {}
-            )
-            var offset by remember { mutableFloatStateOf(0f) }
-            val swipeThreshold = 200
-            Column(
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxWidth()
-                    .padding(contentPadding)
-                    .padding(top = 18.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectHorizontalDragGestures(
-                            onDragStart = { offset = 0f },
-                            onDragEnd = {
-                                if (offset < -swipeThreshold) {
-                                    if (uas.value.isNotEmpty()) {
-                                        val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
-                                        val newPos = if (curPos == null)
-                                            0
-                                        else
-                                            (curPos + 1) % uas.value.size
-                                        if (curPos != newPos) {
-                                            val ua = uas.value[newPos]
-                                            spinToAor(ua.account.aor)
-                                            showCall(ua)
-                                        }
-                                    }
-                                }
-                                else if (offset > swipeThreshold) {
-                                    if (uas.value.isNotEmpty()) {
-                                        val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
-                                        val newPos = when (curPos) {
-                                            null -> 0
-                                            0 -> uas.value.size - 1
-                                            else -> curPos - 1
-                                        }
-                                        if (curPos != newPos) {
-                                            val ua = uas.value[newPos]
-                                            spinToAor(ua.account.aor)
-                                            showCall(ua)
-                                        }
+        SelectableAlertDialog(
+            openDialog = showSelectItemDialog,
+            title = getString(R.string.choose_destination_uri),
+            items = items.value,
+            onItemClicked = itemAction.value,
+            neutralButtonText = getString(R.string.cancel),
+            onNeutralClicked = {}
+        )
+
+        Column(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .padding(top = 18.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
+                .fillMaxSize()
+                .pullToRefresh(
+                    state = refreshState,
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        isRefreshing = true
+                        if (uas.value.isNotEmpty()) {
+                            if (viewModel.selectedAor.value == "")
+                                spinToAor(uas.value.first().account.aor)
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                            if (ua.account.regint > 0)
+                                Api.ua_register(ua.uap)
+                        }
+                    },
+                    enabled = pullToRefreshEnabled,
+                )
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { offset = 0f },
+                        onDragEnd = {
+                            if (offset < -swipeThreshold) {
+                                if (uas.value.isNotEmpty()) {
+                                    val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
+                                    val newPos = if (curPos == null)
+                                        0
+                                    else
+                                        (curPos + 1) % uas.value.size
+                                    if (curPos != newPos) {
+                                        val ua = uas.value[newPos]
+                                        spinToAor(ua.account.aor)
+                                        showCall(ua)
                                     }
                                 }
                             }
-                        ) { _, dragAmount ->
-                            offset += dragAmount
+                            else if (offset > swipeThreshold) {
+                                if (uas.value.isNotEmpty()) {
+                                    val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
+                                    val newPos = when (curPos) {
+                                        null -> 0
+                                        0 -> uas.value.size - 1
+                                        else -> curPos - 1
+                                    }
+                                    if (curPos != newPos) {
+                                        val ua = uas.value[newPos]
+                                        spinToAor(ua.account.aor)
+                                        showCall(ua)
+                                    }
+                                }
+                            }
                         }
+                    ) { _, dragAmount ->
+                        offset += dragAmount
                     }
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                AccountSpinner(ctx)
-                CallUriRow()
-                CallRow(ctx)
-                OnHoldNotice()
-                AskPasswords(ctx)
-                AskPassword(ctx)
-            }
+                }
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AccountSpinner(ctx)
+            CallUriRow()
+            CallRow(ctx)
+            OnHoldNotice()
+            AskPasswords(ctx)
+            AskPassword(ctx)
+            Indicator(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                isRefreshing = isRefreshing,
+                state = refreshState,
+            )
         }
     }
 
