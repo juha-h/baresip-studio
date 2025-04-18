@@ -22,7 +22,7 @@ android {
         }
         ndk {
             // noinspection ChromeOsAbiSupport
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
         }
         vectorDrawables.useSupportLibrary = true
     }
@@ -42,6 +42,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            ndk {
+                abiFilters.add("x86_64")
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
