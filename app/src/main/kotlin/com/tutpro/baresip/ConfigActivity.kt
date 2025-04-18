@@ -114,7 +114,6 @@ class ConfigActivity : ComponentActivity() {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
-    private var managingOverlayPermission = false
     private var save = false
     private var restart = false
     private var audioRestart = false
@@ -380,8 +379,8 @@ class ConfigActivity : ComponentActivity() {
         if (showDialog.value)
             AlertDialog(
                 showDialog = showDialog,
-                title = alertTitle.value,
-                message = alertMessage.value,
+                title = dialogTitle.value,
+                message = dialogMessage.value,
                 positiveButtonText = positiveText.value,
                 onPositiveClicked = onPositiveClicked.value,
                 negativeButtonText = negativeText.value,
@@ -448,7 +447,6 @@ class ConfigActivity : ComponentActivity() {
                             dialogMessage.value = getString(R.string.appear_on_top_permission)
                             positiveText.value = getString(R.string.ok)
                             onPositiveClicked.value = {
-                                managingOverlayPermission = true
                                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                                 startActivity(intent)
                             }
@@ -1295,14 +1293,6 @@ class ConfigActivity : ComponentActivity() {
         super.onStart()
         requestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (managingOverlayPermission) {
-            managingOverlayPermission = false
-            oldAutoStart = isAppearOnTopPermissionGranted(this)
-        }
     }
 
     override fun onDestroy() {
