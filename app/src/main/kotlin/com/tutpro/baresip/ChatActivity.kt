@@ -2,11 +2,14 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.format.DateUtils.isToday
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -98,6 +101,10 @@ class ChatActivity : ComponentActivity() {
     private var unsentMessage = ""
     private var keyboardController: SoftwareKeyboardController? = null
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -109,6 +116,14 @@ class ChatActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         aor = intent.getStringExtra("aor")!!
         peerUri = intent.getStringExtra("peer")!!
@@ -156,8 +171,6 @@ class ChatActivity : ComponentActivity() {
                 }
             }
         }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @Composable
@@ -620,6 +633,15 @@ class ChatActivity : ComponentActivity() {
             BaresipService.chatTexts["$aor::$peerUri"] = unsentMessage
         }
         MainActivity.activityAor = aor
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {

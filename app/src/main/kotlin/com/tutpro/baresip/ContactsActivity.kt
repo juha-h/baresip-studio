@@ -4,9 +4,12 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.ContactsContract
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -71,6 +74,10 @@ class ContactsActivity : ComponentActivity() {
     private var newAndroidName: String? = null
     private var lastClick: Long = 0
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -90,6 +97,14 @@ class ContactsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val title = String.format(getString(R.string.contacts))
 
@@ -126,8 +141,6 @@ class ContactsActivity : ComponentActivity() {
                 }
             }
         }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -417,6 +430,15 @@ class ContactsActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {

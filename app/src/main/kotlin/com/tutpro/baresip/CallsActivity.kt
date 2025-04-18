@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -70,6 +73,10 @@ class CallsActivity : ComponentActivity() {
 
     private var aor = ""
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -81,6 +88,14 @@ class CallsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val title = String.format(getString(R.string.call_history))
 
@@ -103,9 +118,6 @@ class CallsActivity : ComponentActivity() {
         }
 
         account.missedCalls = false
-        invalidateOptionsMenu()
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @Composable
@@ -439,14 +451,23 @@ class CallsActivity : ComponentActivity() {
         returnResult()
     }
 
+    private fun returnResult() {
+        setResult(RESULT_CANCELED, Intent())
+        finish()
+    }
+
     override fun onPause() {
         MainActivity.activityAor = aor
         super.onPause()
     }
 
-    private fun returnResult() {
-        setResult(RESULT_CANCELED, Intent())
-        finish()
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun aorGenerateHistory(aor: String) {

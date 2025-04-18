@@ -10,6 +10,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -129,6 +131,10 @@ class ConfigActivity : ComponentActivity() {
     private val onNegativeClicked = mutableStateOf({})
     private val showDialog = mutableStateOf(false)
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -200,6 +206,14 @@ class ConfigActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val title = String.format(getString(R.string.configuration))
 
@@ -291,8 +305,6 @@ class ConfigActivity : ComponentActivity() {
                 }
             }
         }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @Composable
@@ -1279,6 +1291,12 @@ class ConfigActivity : ComponentActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        requestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    }
+
     override fun onResume() {
         super.onResume()
         if (managingOverlayPermission) {
@@ -1287,10 +1305,13 @@ class ConfigActivity : ComponentActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        requestPermissionLauncher =
-                registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun isAppearOnTopPermissionGranted(ctx: Context): Boolean {

@@ -3,8 +3,11 @@ package com.tutpro.baresip
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -67,6 +70,10 @@ class CallDetailsActivity : ComponentActivity() {
     private val encPlayer = MediaPlayer()
     private var position = 0
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -78,6 +85,14 @@ class CallDetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         aor = intent.getStringExtra("aor")!!
         account = Account.ofAor(aor)!!
@@ -98,8 +113,6 @@ class CallDetailsActivity : ComponentActivity() {
                 }
             }
         }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -360,6 +373,15 @@ class CallDetailsActivity : ComponentActivity() {
     override fun onPause() {
         MainActivity.activityAor = aor
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {

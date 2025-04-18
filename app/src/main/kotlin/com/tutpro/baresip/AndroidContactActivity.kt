@@ -4,7 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -61,6 +64,10 @@ class AndroidContactActivity : ComponentActivity() {
 
     private var color = 0
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -73,6 +80,14 @@ class AndroidContactActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
         aor = intent.getStringExtra("aor")!!
         name = intent.getStringExtra("name")!!
 
@@ -84,6 +99,8 @@ class AndroidContactActivity : ComponentActivity() {
             goBack()
         }
 
+        Utils.addActivity("android contact, $name")
+
         setContent {
             AppTheme {
                 Surface(
@@ -94,10 +111,6 @@ class AndroidContactActivity : ComponentActivity() {
                 }
             }
         }
-
-        Utils.addActivity("android contact, $name")
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -266,6 +279,15 @@ class AndroidContactActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {

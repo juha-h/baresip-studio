@@ -3,8 +3,11 @@ package com.tutpro.baresip
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils.isToday
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -99,6 +102,10 @@ class ChatsActivity: ComponentActivity() {
     private val alertMessage = mutableStateOf("")
     private val showAlert = mutableStateOf(false)
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -110,6 +117,14 @@ class ChatsActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
@@ -135,9 +150,6 @@ class ChatsActivity: ComponentActivity() {
                 }
             }
         }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
     }
 
     @Composable
@@ -668,6 +680,15 @@ class ChatsActivity: ComponentActivity() {
     override fun onResume() {
         super.onResume()
         _uaMessages.value = uaMessages(aor)
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {

@@ -9,10 +9,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.Contacts.Data
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -105,6 +108,10 @@ class BaresipContactActivity : ComponentActivity() {
     private val textAvatarColor = mutableIntStateOf(0)
     private val imageAvatarUri = mutableStateOf("")
 
+    private val backInvokedCallback = OnBackInvokedCallback {
+        goBack()
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goBack()
@@ -116,6 +123,14 @@ class BaresipContactActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            )
+        else
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val title: String
 
@@ -150,6 +165,8 @@ class BaresipContactActivity : ComponentActivity() {
             }
         }
 
+        Utils.addActivity("baresip contact,$new,$uriOrName")
+
         setContent {
             AppTheme {
                 Surface(
@@ -160,10 +177,6 @@ class BaresipContactActivity : ComponentActivity() {
                 }
             }
         }
-
-        Utils.addActivity("baresip contact,$new,$uriOrName")
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     @Composable
@@ -685,6 +698,15 @@ class BaresipContactActivity : ComponentActivity() {
             Log.w(TAG, "Unable to serialize photo: ${e.message}")
             null
         }
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
+        } else {
+            onBackPressedCallback.remove()
+        }
+        super.onDestroy()
     }
 
     private fun goBack() {
