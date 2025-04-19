@@ -1581,7 +1581,8 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (!isServiceClean) {
-            this.unregisterReceiver(bluetoothReceiver)
+            if (btAdapter != null)
+                this.unregisterReceiver(bluetoothReceiver)
             this.unregisterReceiver(hotSpotReceiver)
             stopRinging()
             stopMediaPlayer()
