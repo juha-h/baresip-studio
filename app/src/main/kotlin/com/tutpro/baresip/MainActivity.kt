@@ -243,14 +243,18 @@ class MainActivity : ComponentActivity() {
     val items = mutableStateOf(listOf<String>())
     private val itemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
 
-    private val backInvokedCallback = OnBackInvokedCallback {
-        moveTaskToBack(true)
-    }
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback {
             moveTaskToBack(true)
         }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -260,13 +264,16 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        if (Build.VERSION.SDK_INT >= 33)
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                backInvokedCallback
-            )
-        else
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    moveTaskToBack(true)
+                }
+            }
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        }
 
         val extraAction = intent.getStringExtra("action")
         Log.d(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
@@ -2079,10 +2086,11 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Main onDestroy")
 
         if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
-        } else {
-            onBackPressedCallback.remove()
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
 
         this.unregisterReceiver(screenEventReceiver)
 

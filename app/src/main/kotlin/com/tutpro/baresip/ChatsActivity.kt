@@ -14,8 +14,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -102,14 +102,16 @@ class ChatsActivity: ComponentActivity() {
     private val alertMessage = mutableStateOf("")
     private val showAlert = mutableStateOf(false)
 
-    private val backInvokedCallback = OnBackInvokedCallback {
-        goBack()
-    }
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,12 +121,15 @@ class ChatsActivity: ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= 33)
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                backInvokedCallback
-            )
-        else
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        }
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
@@ -285,7 +290,6 @@ class ChatsActivity: ComponentActivity() {
         )
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Chats(ctx: Context, account: Account) {
 
@@ -475,7 +479,7 @@ class ChatsActivity: ComponentActivity() {
 
         val showDialog = remember { mutableStateOf(false) }
         val items = remember { mutableStateOf(listOf<String>()) }
-        val itemAction = remember { mutableStateOf<(Int) -> Unit>({ index -> {} }) }
+        val itemAction = remember { mutableStateOf<(Int) -> Unit>({ _ -> run {} }) }
 
         SelectableAlertDialog(
             openDialog = showDialog,
@@ -609,7 +613,7 @@ class ChatsActivity: ComponentActivity() {
                 modifier = Modifier.padding(end = 4.dp),
                 onClick = {
                     showSuggestions = false
-                    var peerText = newPeer.trim()
+                    val peerText = newPeer.trim()
                     if (peerText.isNotEmpty()) {
                         val uris = Contact.contactUris(peerText)
                         if (uris.isEmpty())
@@ -684,10 +688,11 @@ class ChatsActivity: ComponentActivity() {
 
     override fun onDestroy() {
         if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
-        } else {
-            onBackPressedCallback.remove()
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
         super.onDestroy()
     }
 

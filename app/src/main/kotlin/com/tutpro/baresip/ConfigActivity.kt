@@ -130,14 +130,16 @@ class ConfigActivity : ComponentActivity() {
     private val onNegativeClicked = mutableStateOf({})
     private val showDialog = mutableStateOf(false)
 
-    private val backInvokedCallback = OnBackInvokedCallback {
-        goBack()
-    }
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     private val certificateRequest =
@@ -207,12 +209,15 @@ class ConfigActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= 33)
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                backInvokedCallback
-            )
-        else
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        }
 
         val title = String.format(getString(R.string.configuration))
 
@@ -1245,7 +1250,7 @@ class ConfigActivity : ComponentActivity() {
                     baresipService.action = "Stop Content Observer"
                 }
                 "android" -> {
-                    BaresipService.baresipContacts.value = mutableListOf<Contact.BaresipContact>()
+                    BaresipService.baresipContacts.value = mutableListOf()
                     Contact.loadAndroidContacts(this)
                     baresipService.action = "Start Content Observer"
                 }
@@ -1297,10 +1302,11 @@ class ConfigActivity : ComponentActivity() {
 
     override fun onDestroy() {
         if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
-        } else {
-            onBackPressedCallback.remove()
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
         super.onDestroy()
     }
 

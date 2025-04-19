@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,14 +81,16 @@ class AudioActivity : ComponentActivity() {
     private val alertMessage = mutableStateOf("")
     private val showAlert = mutableStateOf(false)
 
-    private val backInvokedCallback = OnBackInvokedCallback {
-        goBack()
-    }
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,12 +100,15 @@ class AudioActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= 33)
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                backInvokedCallback
-            )
-        else
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        }
 
         val title = String.format(getString(R.string.configuration))
 
@@ -657,10 +663,11 @@ class AudioActivity : ComponentActivity() {
 
     override fun onDestroy() {
         if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
-        } else {
-            onBackPressedCallback.remove()
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
         super.onDestroy()
     }
 

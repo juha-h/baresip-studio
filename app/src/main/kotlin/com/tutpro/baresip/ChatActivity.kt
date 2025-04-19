@@ -14,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -101,14 +102,16 @@ class ChatActivity : ComponentActivity() {
     private var unsentMessage = ""
     private var keyboardController: SoftwareKeyboardController? = null
 
-    private val backInvokedCallback = OnBackInvokedCallback {
-        goBack()
-    }
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,12 +121,15 @@ class ChatActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= 33)
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                backInvokedCallback
-            )
-        else
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        }
 
         aor = intent.getStringExtra("aor")!!
         peerUri = intent.getStringExtra("peer")!!
@@ -637,10 +643,11 @@ class ChatActivity : ComponentActivity() {
 
     override fun onDestroy() {
         if (Build.VERSION.SDK_INT >= 33) {
-            onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback)
-        } else {
-            onBackPressedCallback.remove()
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
         super.onDestroy()
     }
 
