@@ -1,0 +1,3 @@
+- Improved pull-to-register look and implementation
+- Make sure bluetoothreceiver is registered before unregistering it
+- Fixed back press action for API < 33 compatibility
