@@ -57,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -103,7 +104,7 @@ class CallsActivity : ComponentActivity() {
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        val title = String.format(getString(R.string.call_history))
+        val title = getString(R.string.call_history)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("calls,$aor")
@@ -147,19 +148,19 @@ class CallsActivity : ComponentActivity() {
 
         var expanded by remember { mutableStateOf(false) }
 
-        val delete = String.format(getString(R.string.delete))
-        val disable = String.format(getString(R.string.disable_history))
-        val enable = String.format(getString(R.string.enable_history))
+        val delete = stringResource(R.string.delete)
+        val disable = stringResource(R.string.disable_history)
+        val enable = stringResource(R.string.enable_history)
 
         val showDialog = remember { mutableStateOf(false) }
         val positiveAction = remember { mutableStateOf({}) }
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.confirmation),
-            message = String.format(getString(R.string.delete_history_alert), aor.substringAfter(":")),
-            positiveButtonText = getString(R.string.delete),
-            negativeButtonText = getString(R.string.cancel),
+            title = stringResource(R.string.confirmation),
+            message = String.format(stringResource(R.string.delete_history_alert), aor.substringAfter(":")),
+            positiveButtonText = stringResource(R.string.delete),
+            negativeButtonText = stringResource(R.string.cancel),
             onPositiveClicked = positiveAction.value,
         )
 
@@ -234,7 +235,7 @@ class CallsActivity : ComponentActivity() {
 
     @Composable
     fun Account(account: Account) {
-        val headerText = getString(R.string.account) + " " +
+        val headerText = stringResource(R.string.account) + " " +
                 if (account.nickName.value != "")
                     account.nickName.value
                 else
@@ -264,13 +265,13 @@ class CallsActivity : ComponentActivity() {
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.confirmation),
+            title = stringResource(R.string.confirmation),
             message = message.value,
             positiveButtonText = positiveButtonText.value,
             onPositiveClicked = positiveAction.value,
             neutralButtonText = neutralButtonText.value,
             onNeutralClicked = neutralAction.value,
-            negativeButtonText = getString(R.string.cancel)
+            negativeButtonText = stringResource(R.string.cancel)
         )
 
         val lazyListState = rememberLazyListState()
@@ -301,8 +302,8 @@ class CallsActivity : ComponentActivity() {
                                 onClick = {
                                     val peerUri = callRow.peerUri
                                     val peerName = Utils.friendlyUri(ctx, peerUri, account)
-                                    message.value = String.format(ctx.getString(R.string.contact_action_question), peerName)
-                                    positiveButtonText.value = ctx.getString(R.string.call)
+                                    message.value = String.format(getString(R.string.contact_action_question), peerName)
+                                    positiveButtonText.value = getString(R.string.call)
                                     positiveAction.value = {
                                         BaresipService.activities.remove("calls,$aor")
                                         MainActivity.activityAor = aor
@@ -314,7 +315,7 @@ class CallsActivity : ComponentActivity() {
                                         i.putExtra("peer", peerUri)
                                         startActivity(i)
                                     }
-                                    neutralButtonText.value = ctx.getString(R.string.send_message)
+                                    neutralButtonText.value = getString(R.string.send_message)
                                     neutralAction.value = {
                                         BaresipService.activities.remove("calls,$aor")
                                         MainActivity.activityAor = aor

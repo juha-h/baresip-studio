@@ -69,7 +69,7 @@ class AboutActivity : ComponentActivity() {
 
         Utils.addActivity("about")
 
-        val aboutTitle = String.format(getString(R.string.about_title))
+        val aboutTitle = getString(R.string.about_title)
         val aboutText = String.format(getString(R.string.about_text),
             BuildConfig.VERSION_NAME)
 

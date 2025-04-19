@@ -517,7 +517,7 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             modifier = Modifier.safeDrawingPadding(),
             containerColor = LocalCustomColors.current.background,
-            topBar = { TopAppBar(ctx, String.format(getString(R.string.baresip))) },
+            topBar = { TopAppBar(ctx, getString(R.string.baresip)) },
             bottomBar = { BottomBar(ctx) },
             content = { contentPadding ->
                 MainContent(ctx, contentPadding)
@@ -551,20 +551,20 @@ class MainActivity : ComponentActivity() {
         if (showDialog.value)
             AlertDialog(
                 showDialog = showDialog,
-                title = getString(R.string.confirmation),
+                title = stringResource(R.string.confirmation),
                 message = dialogMessage.value,
                 positiveButtonText = positiveText.value,
                 onPositiveClicked = onPositiveClicked.value,
-                negativeButtonText = getString(R.string.cancel),
+                negativeButtonText = stringResource(R.string.cancel),
                 onNegativeClicked = onNegativeClicked.value
             )
 
         SelectableAlertDialog(
             openDialog = showSelectItemDialog,
-            title = getString(R.string.choose_destination_uri),
+            title = stringResource(R.string.choose_destination_uri),
             items = items.value,
             onItemClicked = itemAction.value,
-            neutralButtonText = getString(R.string.cancel),
+            neutralButtonText = stringResource(R.string.cancel),
             onNeutralClicked = {}
         )
 
@@ -656,14 +656,14 @@ class MainActivity : ComponentActivity() {
         var recImage by remember { mutableStateOf(recOffImage) }
         var menuExpanded by remember { mutableStateOf(false) }
 
-        val about = String.format(getString(R.string.about))
-        val settings = String.format(getString(R.string.configuration))
-        val accounts = String.format(getString(R.string.accounts))
-        val backup = String.format(getString(R.string.backup))
-        val restore = String.format(getString(R.string.restore))
-        val logcat = String.format(getString(R.string.logcat))
-        val restart = String.format(getString(R.string.restart))
-        val quit = String.format(getString(R.string.quit))
+        val about = stringResource(R.string.about)
+        val settings = stringResource(R.string.configuration)
+        val accounts = stringResource(R.string.accounts)
+        val backup = stringResource(R.string.backup)
+        val restore = stringResource(R.string.restore)
+        val logcat = stringResource(R.string.logcat)
+        val restart = stringResource(R.string.restart)
+        val quit = stringResource(R.string.quit)
 
         TopAppBar(
             title = {
@@ -1441,7 +1441,7 @@ class MainActivity : ComponentActivity() {
                                             horizontalArrangement = Arrangement.Center,
                                         ) {
                                             Text(
-                                                text = ContextCompat.getString(ctx, R.string.blind),
+                                                text = stringResource(R.string.blind),
                                                 color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
@@ -1451,7 +1451,7 @@ class MainActivity : ComponentActivity() {
                                                 blindChecked.value = true
                                             }
                                             Text(
-                                                text = ContextCompat.getString(ctx, R.string.attended),
+                                                text = stringResource(R.string.attended),
                                                 color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
@@ -1897,7 +1897,7 @@ class MainActivity : ComponentActivity() {
                 shape = RoundedCornerShape(20)
            ) {
                 Text(
-                    text = getString(R.string.call_is_on_hold),
+                    text = stringResource(R.string.call_is_on_hold),
                     fontSize = 18.sp,
                     color = LocalCustomColors.current.itemText,
                 )
@@ -1917,8 +1917,8 @@ class MainActivity : ComponentActivity() {
                         showPasswordDialog = showPasswordsDialog,
                         password = password,
                         keyboardController = keyboardController,
-                        title = getString(R.string.authentication_password),
-                        message = getString(R.string.account) + " " + Utils.plainAor(aor),
+                        title = stringResource(R.string.authentication_password),
+                        message = stringResource(R.string.account) + " " + Utils.plainAor(aor),
                         okAction = {
                             if (password.value != "")
                                 BaresipService.aorPasswords[aor] = password.value

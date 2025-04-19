@@ -47,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -115,7 +116,7 @@ class CallDetailsActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LocalCustomColors.current.background
                 ) {
-                    CallDetailsScreen(this, getString(R.string.call_details)) { goBack() }
+                    CallDetailsScreen(this, stringResource(R.string.call_details)) { goBack() }
                 }
             }
         }
@@ -175,7 +176,7 @@ class CallDetailsActivity : ComponentActivity() {
 
     @Composable
     fun Peer(ctx: Context, peer: String, account: Account) {
-        val headerText = getString(R.string.peer) + " " +
+        val headerText = stringResource(R.string.peer) + " " +
                 Utils.friendlyUri(ctx, peer, account)
         Text(
             text = headerText,
@@ -190,20 +191,20 @@ class CallDetailsActivity : ComponentActivity() {
     @Composable
     fun Calls(ctx: Context) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = getString(R.string.direction),
+            Text(text = stringResource(R.string.direction),
                 color = LocalCustomColors.current.itemText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.width(96.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Text(text = getString(R.string.time),
+            Text(text = stringResource(R.string.time),
                 color = LocalCustomColors.current.itemText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = getString(R.string.calls_duration),
+            Text(text = stringResource(R.string.calls_duration),
                 modifier = Modifier.padding(end = 12.dp),
                 color = LocalCustomColors.current.itemText,
                 fontSize = 16.sp,
@@ -232,7 +233,7 @@ class CallDetailsActivity : ComponentActivity() {
                         modifier = Modifier.width(64.dp)
                     )
                     Spacer(modifier = Modifier.width(38.dp))
-                    val durationText = startTime(ctx, detail)
+                    val durationText = startTime(detail)
                     Spacer(modifier = Modifier.weight(1f))
                     Duration(ctx, detail, durationText)
                 }
@@ -241,14 +242,14 @@ class CallDetailsActivity : ComponentActivity() {
     }
 
     @Composable
-    fun startTime(ctx: Context, detail: CallRow.Details): String {
+    fun startTime(detail: CallRow.Details): String {
         val startTime = detail.startTime
         val stopTime = detail.stopTime
         val startTimeText: String
         val durationText: String
         val stopText = if (DateUtils.isToday(stopTime.timeInMillis)) {
             val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
-            ctx.getString(R.string.today) + " " + fmt.format(stopTime.time)
+            stringResource(R.string.today) + " " + fmt.format(stopTime.time)
         } else {
             val fmt = DateFormat.getDateTimeInstance()
             fmt.format(stopTime.time)
@@ -263,7 +264,7 @@ class CallDetailsActivity : ComponentActivity() {
             } else {
                 val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
                     val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
-                    ctx.getString(R.string.today) + " " + fmt.format(startTime.time)
+                    stringResource(R.string.today) + " " + fmt.format(startTime.time)
                 } else {
                     val fmt = DateFormat.getDateTimeInstance()
                     fmt.format(startTime.time)
@@ -285,7 +286,7 @@ class CallDetailsActivity : ComponentActivity() {
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.playing_recording),
+            title = stringResource(R.string.playing_recording),
             message = "",
         )
 

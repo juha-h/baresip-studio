@@ -112,7 +112,7 @@ class ContactsActivity : ComponentActivity() {
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        val title = String.format(getString(R.string.contacts))
+        val title = getString(R.string.contacts)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("contacts,$aor")
@@ -221,13 +221,13 @@ class ContactsActivity : ComponentActivity() {
         if (showDialog.value)
             AlertDialog(
                 showDialog = showDialog,
-                title = getString(R.string.confirmation),
+                title = stringResource(R.string.confirmation),
                 message = dialogMessage.value,
                 positiveButtonText = positiveText.value,
                 onPositiveClicked = positiveAction.value,
                 neutralButtonText = neutralText.value,
                 onNeutralClicked = neutralAction.value,
-                negativeButtonText = getString(R.string.cancel)
+                negativeButtonText = stringResource(R.string.cancel)
             )
 
         val lazyListState = rememberLazyListState()
@@ -299,10 +299,10 @@ class ContactsActivity : ComponentActivity() {
                                     .combinedClickable(
                                         onClick = {
                                             dialogMessage.value = String.format(
-                                                ctx.getString(R.string.contact_action_question),
+                                                getString(R.string.contact_action_question),
                                                 name
                                             )
-                                            positiveText.value = ctx.getString(R.string.call)
+                                            positiveText.value = getString(R.string.call)
                                             positiveAction.value = {
                                                 val i = Intent(ctx, MainActivity::class.java)
                                                 i.flags =
@@ -319,7 +319,7 @@ class ContactsActivity : ComponentActivity() {
                                                     (ctx as Activity).startActivity(i)
                                                 }
                                             }
-                                            neutralText.value = ctx.getString(R.string.send_message)
+                                            neutralText.value = getString(R.string.send_message)
                                             neutralAction.value = {
                                                 val i = Intent(
                                                     ctx,
@@ -343,10 +343,10 @@ class ContactsActivity : ComponentActivity() {
                                         },
                                         onLongClick = {
                                             dialogMessage.value = String.format(
-                                                ctx.getString(R.string.contact_delete_question),
+                                                getString(R.string.contact_delete_question),
                                                 name
                                             )
-                                            positiveText.value = ctx.getString(R.string.delete)
+                                            positiveText.value = getString(R.string.delete)
                                             positiveAction.value = {
                                                 val id = contact.id
                                                 val avatarFile = File(
@@ -416,10 +416,10 @@ class ContactsActivity : ComponentActivity() {
                                         },
                                         onLongClick = {
                                             dialogMessage.value = String.format(
-                                                ctx.getString(R.string.contact_delete_question),
+                                                getString(R.string.contact_delete_question),
                                                 name
                                             )
-                                            positiveText.value = ctx.getString(R.string.delete)
+                                            positiveText.value = getString(R.string.delete)
                                             positiveAction.value = {
                                                 ctx.contentResolver.delete(
                                                     ContactsContract.RawContacts.CONTENT_URI,

@@ -219,7 +219,7 @@ class ConfigActivity : ComponentActivity() {
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        val title = String.format(getString(R.string.configuration))
+        val title = getString(R.string.configuration)
 
         Utils.addActivity("config")
 
@@ -672,9 +672,9 @@ class ConfigActivity : ComponentActivity() {
         if (showAlertDialog.value)
             AlertDialog(
                 showDialog = showAlertDialog,
-                title = getString(R.string.notice),
-                message = getString(R.string.no_read_permission),
-                positiveButtonText = getString(R.string.ok),
+                title = stringResource(R.string.notice),
+                message = stringResource(R.string.no_read_permission),
+                positiveButtonText = stringResource(R.string.ok),
                 onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
                 negativeButtonText = "",
                 onNegativeClicked = {},
@@ -1019,9 +1019,9 @@ class ConfigActivity : ComponentActivity() {
             if (showAlertDialog.value)
                 AlertDialog(
                     showDialog = showAlertDialog,
-                    title = getString(R.string.notice),
-                    message = getString(R.string.no_android_contacts),
-                    positiveButtonText = getString(R.string.ok),
+                    title = stringResource(R.string.notice),
+                    message = stringResource(R.string.no_android_contacts),
+                    positiveButtonText = stringResource(R.string.ok),
                     onPositiveClicked = { requestPermissionsLauncher.launch(
                         arrayOf(
                             Manifest.permission.READ_CONTACTS,

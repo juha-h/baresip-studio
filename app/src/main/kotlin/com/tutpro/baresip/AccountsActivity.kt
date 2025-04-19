@@ -115,7 +115,7 @@ class AccountsActivity : ComponentActivity() {
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        val title = String.format(getString(R.string.accounts))
+        val title = getString(R.string.accounts)
 
         aor = intent.getStringExtra("aor")!!
         Utils.addActivity("accounts,$aor")
@@ -183,11 +183,11 @@ class AccountsActivity : ComponentActivity() {
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.confirmation),
+            title = stringResource(R.string.confirmation),
             message = message.value,
-            positiveButtonText = getString(R.string.delete),
+            positiveButtonText = stringResource(R.string.delete),
             onPositiveClicked = positiveAction.value,
-            negativeButtonText = getString(R.string.cancel),
+            negativeButtonText = stringResource(R.string.cancel),
         )
 
         if (showAlert.value) {
@@ -281,7 +281,7 @@ class AccountsActivity : ComponentActivity() {
         ) {
             OutlinedTextField(
                 value = newAor,
-                placeholder = { Text(text = getString(R.string.new_account)) },
+                placeholder = { Text(text = stringResource(R.string.new_account)) },
                 onValueChange = { newAor = it },
                 modifier = Modifier
                     .weight(1f)

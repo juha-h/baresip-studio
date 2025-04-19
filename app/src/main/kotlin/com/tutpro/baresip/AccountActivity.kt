@@ -1248,7 +1248,7 @@ class AccountActivity : ComponentActivity() {
                 showPasswordDialog = showPasswordDialog,
                 password = password,
                 keyboardController = keyboardController,
-                title = getString(R.string.authentication_password),
+                title = stringResource(R.string.authentication_password),
                 okAction = {
                     if (password.value != "") {
                         BaresipService.aorPasswords[acc.aor] = password.value

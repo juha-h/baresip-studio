@@ -150,7 +150,7 @@ class CodecsActivity : ComponentActivity() {
                 TopAppBar(
                     title = {
                         Text(
-                            text = getString(R.string.codecs),
+                            text = stringResource(R.string.codecs),
                             color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )

@@ -179,21 +179,21 @@ class ChatsActivity: ComponentActivity() {
 
         var expanded by remember { mutableStateOf(false) }
 
-        val delete = String.format(getString(R.string.delete))
+        val delete = stringResource(R.string.delete)
 
         val showDialog = remember { mutableStateOf(false) }
         val positiveAction = remember { mutableStateOf({}) }
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.confirmation),
+            title = stringResource(R.string.confirmation),
             message = String.format(
-                getString(R.string.delete_chats_alert),
+                stringResource(R.string.delete_chats_alert),
                 aor.substringAfter(":")
             ),
-            positiveButtonText = getString(R.string.delete),
+            positiveButtonText = stringResource(R.string.delete),
             onPositiveClicked = positiveAction.value,
-            negativeButtonText = getString(R.string.cancel),
+            negativeButtonText = stringResource(R.string.cancel),
         )
 
         TopAppBar(
@@ -275,7 +275,7 @@ class ChatsActivity: ComponentActivity() {
 
     @Composable
     fun Account(account: Account) {
-        val headerText = getString(R.string.account) + " " +
+        val headerText = stringResource(R.string.account) + " " +
                 if (account.nickName.value != "")
                     account.nickName.value
                 else
@@ -303,13 +303,13 @@ class ChatsActivity: ComponentActivity() {
         if (showDialog.value)
             AlertDialog(
                 showDialog = showDialog,
-                title = getString(R.string.confirmation),
+                title = stringResource(R.string.confirmation),
                 message = dialogMessage.value,
                 positiveButtonText = positiveButtonText.value,
                 onPositiveClicked = positiveAction.value,
                 neutralButtonText = neutralButtonText.value,
                 onNeutralClicked = neutralAction.value,
-                negativeButtonText = getString(R.string.cancel)
+                negativeButtonText = stringResource(R.string.cancel)
             )
 
         val lazyListState = rememberLazyListState()
@@ -483,10 +483,10 @@ class ChatsActivity: ComponentActivity() {
 
         SelectableAlertDialog(
             openDialog = showDialog,
-            title = getString(R.string.choose_destination_uri),
+            title = stringResource(R.string.choose_destination_uri),
             items = items.value,
             onItemClicked = itemAction.value,
-            neutralButtonText = getString(R.string.cancel),
+            neutralButtonText = stringResource(R.string.cancel),
             onNeutralClicked = {}
         )
 
@@ -558,7 +558,7 @@ class ChatsActivity: ComponentActivity() {
                 OutlinedTextField(
                     value = newPeer,
                     placeholder = {
-                        Text(text = getString(R.string.new_chat_peer))
+                        Text(text = stringResource(R.string.new_chat_peer))
                     },
                     onValueChange = {
                         newPeer = it
