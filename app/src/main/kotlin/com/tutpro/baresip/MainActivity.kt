@@ -241,7 +241,7 @@ class MainActivity : ComponentActivity() {
 
     private val showSelectItemDialog = mutableStateOf(false)
     val items = mutableStateOf(listOf<String>())
-    val itemAction = mutableStateOf<(Int) -> Unit>({ index -> {} })
+    private val itemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
 
     private val backInvokedCallback = OnBackInvokedCallback {
         moveTaskToBack(true)
@@ -1479,10 +1479,10 @@ class MainActivity : ComponentActivity() {
                                                     if (uris.size > 1) {
                                                         items.value = uris
                                                         itemAction.value = { index ->
-                                                            val uriText = uris[index]
+                                                            val uri = uris[index]
                                                             transfer(
                                                                 ua,
-                                                                if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                                if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
                                                                 !blindChecked.value
                                                             )
                                                             showSelectItemDialog.value = false
@@ -1642,7 +1642,7 @@ class MainActivity : ComponentActivity() {
             if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
                 if (Call.inCall())
                     return
-                var uriText = callUri.value.trim()
+                val uriText = callUri.value.trim()
                 if (uriText.isNotEmpty()) {
                     val uris = Contact.contactUris(uriText)
                     if (uris.isEmpty())
