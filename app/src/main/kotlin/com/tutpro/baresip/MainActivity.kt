@@ -2408,7 +2408,7 @@ class MainActivity : ComponentActivity() {
                     return
                 }
                 dialogTitle.value = getString(R.string.verify)
-                dialogMessage.value = String.format(getString(R.string.verify_sas), call.zid)
+                dialogMessage.value = String.format(getString(R.string.verify_sas), ev[1])
                 positiveText.value = getString(R.string.yes)
                 onPositiveClicked.value = {
                     call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
@@ -2429,6 +2429,7 @@ class MainActivity : ComponentActivity() {
                         securityIcon.intValue = R.drawable.locked_yellow
                     onNegativeClicked.value = {}
                 }
+                showDialog.value = true
             }
             "call verified", "call secure" -> {
                 val callp = params[1] as Long
