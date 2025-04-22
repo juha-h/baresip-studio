@@ -378,6 +378,8 @@
     <string name="video_fps_help">Video frame rate that will be offered during the SDP handshake.
         Valid values are from 10 to 30.</string>
     <string name="invalid_fps">Invalid Frames Per Second \'%1$d\'</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="select_ringtone">Select Ringtone</string>
     <string name="user_agent">User Agent</string>
     <string name="user_agent_help">Custom SIP request/response User-Agent header field value</string>
     <string name="invalid_user_agent">Invalid User-Agent header field value</string>
