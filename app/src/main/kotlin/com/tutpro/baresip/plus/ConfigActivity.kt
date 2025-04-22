@@ -6,7 +6,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -14,8 +16,10 @@ import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -65,6 +69,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.Checkbox
 import com.tutpro.baresip.plus.CustomElements.LabelText
@@ -95,6 +100,8 @@ class ConfigActivity : ComponentActivity() {
     private var newCaFile = false
     private var oldUserAgent = ""
     private var newUserAgent = ""
+    private var oldRingtoneUri = ""
+    private var newRingtoneUri = ""
     private var oldVideoSize = Config.variable("video_size")
     private var newVideoSize = oldVideoSize
     private var oldVideoFps = Config.variable("video_fps")
@@ -212,7 +219,7 @@ class ConfigActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        if (Build.VERSION.SDK_INT >= 33)
+        if (VERSION.SDK_INT >= 33)
             registerBackInvokedCallback()
         else {
             onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -278,11 +285,11 @@ class ConfigActivity : ComponentActivity() {
         ) {
             Log.d(TAG, "dialerRoleRequest succeeded: " +
                     "${it.resultCode == RESULT_OK}")
-            if (Build.VERSION.SDK_INT >= 29)
+            if (VERSION.SDK_INT >= 29)
                 newDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
             }
 
-        if (Build.VERSION.SDK_INT >= 29) {
+        if (VERSION.SDK_INT >= 29) {
             roleManager = getSystemService(ROLE_SERVICE) as RoleManager
             oldDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
         }
@@ -417,10 +424,11 @@ class ConfigActivity : ComponentActivity() {
             CaFile(ctx)
             UserAgent()
             AudioSettings(ctx)
-            VideoSize(ctx)
-            VideoFps(ctx)
+            Ringtone()
+            VideoSize()
+            VideoFps()
             BatteryOptimizations()
-            if (Build.VERSION.SDK_INT >= 29)
+            if (VERSION.SDK_INT >= 29)
                 DefaultDialer()
             Contacts(ctx)
             DarkTheme()
@@ -634,7 +642,7 @@ class ConfigActivity : ComponentActivity() {
                     tlsCertificateFile = it
                     newTlsCertificateFile = tlsCertificateFile
                     if (it)
-                        if (Build.VERSION.SDK_INT < 29) {
+                        if (VERSION.SDK_INT < 29) {
                             tlsCertificateFile = false
                             when {
                                 ContextCompat.checkSelfPermission(
@@ -739,7 +747,7 @@ class ConfigActivity : ComponentActivity() {
                     caFile = it
                     newCaFile = caFile
                     if (it) {
-                        if (Build.VERSION.SDK_INT < 29) {
+                        if (VERSION.SDK_INT < 29) {
                             caFile = false
                             when {
                                 ContextCompat.checkSelfPermission(ctx,
@@ -841,7 +849,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun VideoSize(ctx: Context) {
+    private fun VideoSize() {
         Row(
             Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -906,7 +914,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun VideoFps(ctx: Context) {
+    private fun VideoFps() {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -934,6 +942,54 @@ class ConfigActivity : ComponentActivity() {
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { Text(stringResource(R.string.video_fps)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun Ringtone() {
+        oldRingtoneUri = if (Preferences(applicationContext).ringtoneUri == "")
+            RingtoneManager.getActualDefaultRingtoneUri(applicationContext, RingtoneManager.TYPE_RINGTONE).toString()
+        else
+            Preferences(applicationContext).ringtoneUri!!
+        newRingtoneUri = oldRingtoneUri
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                val uri: Uri? = if (VERSION.SDK_INT >= 33)
+                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+                else
+                    @Suppress("DEPRECATION")
+                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                if (uri != null)
+                    newRingtoneUri = uri.toString()
+            }
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.ringtone),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,
+                            RingtoneManager.TYPE_RINGTONE)
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.select_ringtone))
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, newRingtoneUri.toUri())
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                        launcher.launch(intent)
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -1364,6 +1420,11 @@ class ConfigActivity : ComponentActivity() {
             save = true
         }
 
+        Log.d(TAG, "Old/new ringtone: $oldRingtoneUri / $newRingtoneUri")
+        if (newRingtoneUri != oldRingtoneUri) {
+            Preferences(applicationContext).ringtoneUri = newRingtoneUri
+            BaresipService.rt = RingtoneManager.getRingtone(applicationContext, newRingtoneUri.toUri())
+        }
         if (oldContactsMode != newContactsMode) {
             Config.replaceVariable("contacts_mode", newContactsMode)
             BaresipService.contactsMode = newContactsMode
@@ -1425,7 +1486,7 @@ class ConfigActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        if (Build.VERSION.SDK_INT >= 33) {
+        if (VERSION.SDK_INT >= 33) {
             if (backInvokedCallback != null)
                 onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }

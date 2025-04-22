@@ -68,6 +68,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
@@ -87,7 +88,6 @@ class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     private lateinit var am: AudioManager
-    private lateinit var rt: Ringtone
     private lateinit var nt: Ringtone
     private lateinit var nm: NotificationManager
     private lateinit var snb: NotificationCompat.Builder
@@ -135,8 +135,10 @@ class BaresipService: Service() {
                 RingtoneManager.TYPE_NOTIFICATION)
         nt = RingtoneManager.getRingtone(applicationContext, ntUri)
 
-        val rtUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
-                RingtoneManager.TYPE_RINGTONE)
+        val rtUri = if (Preferences(applicationContext).ringtoneUri == "")
+            Settings.System.RINGTONE.toUri()
+        else
+            Preferences(applicationContext).ringtoneUri!!.toUri()
         rt = RingtoneManager.getRingtone(applicationContext, rtUri)
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -1362,8 +1364,8 @@ class BaresipService: Service() {
     }
 
     private fun startRinging() {
-        rt.isLooping = true
-        rt.play()
+        rt!!.isLooping = true
+        rt!!.play()
         if (shouldVibrate()) {
             vbTimer = Timer()
             vbTimer!!.schedule(object : TimerTask() {
@@ -1397,7 +1399,7 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        rt.stop()
+        rt!!.stop()
         if (vbTimer != null) {
             vbTimer!!.cancel()
             vbTimer = null
@@ -1655,6 +1657,7 @@ class BaresipService: Service() {
         }
     }
 
+    @Suppress("unused")
     private external fun baresipStart(
         path: String,
         addresses: String,
@@ -1662,6 +1665,7 @@ class BaresipService: Service() {
         software: String
     )
 
+    @Suppress("unused")
     external fun baresipStop(force: Boolean)
 
     @SuppressLint("MutableCollectionMutableState")
@@ -1715,6 +1719,7 @@ class BaresipService: Service() {
         var aecAvailable = false
         private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
+        var rt: Ringtone? = null
         private var agc: AutomaticGainControl? = null
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var ns: NoiseSuppressor? = null
