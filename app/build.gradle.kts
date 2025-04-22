@@ -11,8 +11,8 @@ android {
         applicationId = "com.tutpro.baresip.plus"
         minSdk = 28
         targetSdk = 35
-        versionCode = 194
-        versionName = "51.1.0"
+        versionCode = 195
+        versionName = "52.0.0"
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
@@ -83,7 +83,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.swiperefreshlayout)
-
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.compose.material3)

@@ -1,0 +1,4 @@
+- User interface is now based on Jetpack Compose
+- Saved video snapshots to downloads folder
+- New Portuguese translations
+- May include more bugs than smaller app updates
