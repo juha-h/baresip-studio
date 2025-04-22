@@ -2,8 +2,7 @@
 <resources>
     <!-- About Activity -->
     <string name="about_title">Относно baresip</string>
-    <string name="about_text">
-        <![CDATA[
+    <string name="about_text"><![CDATA[
         <h1>SES потребителско приложение, базирано на библиотеката Baresip</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>версия %1$s</p>
@@ -19,8 +18,7 @@
 		<h2>Програмен код</h2>
         Изходният код е достъпен на адрес <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
         където също могат да се докладват проблеми.
-        ]]>
-    </string>
+        ]]></string>
     <!-- Account Activity -->
     <string name="account">Акаунт</string>
     <string name="display_name">Показване на име</string>
@@ -151,7 +149,6 @@
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.</string>
     <string name="aec">Акустично отменяне на ехото</string>
-    <string name="aec_help">Ако е поставена отметка, се прави опит за отмяна на ехо при аудио повикване.</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.

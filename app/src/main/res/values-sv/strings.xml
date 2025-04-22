@@ -219,12 +219,9 @@
     <string name="transfer_request">Kopplingsbegäran</string>
     <string name="default_call_volume_help">Kryssa i för att använda en förvald ljudvolym, 1–10, vid samtal.</string>
     <string name="accept">Acceptera</string>
-    <string name="aec_extended_filter">Utökat filter vid ekoutsläckning</string>
     <string name="android_contact_help">Kryssa i för att lägga till kontakten till dina Android-kontakter.</string>
     <string name="sip_trace_help">Kryssa i för att inkludera SIP-meddelanden i Logcat-meddelanden när Felsökning är aktiverat. Funktionen inaktiveras automatiskt när baresip startar.</string>
     <string name="debug_help">Kryssa i för att skicka felsöknings- och info-meddelanden till Logcat.</string>
-    <string name="aec_extended_filter_help">Kryssa i för att använda ett utökat filter vid ekoutsläckning.</string>
-    <string name="aec_help">Kryssa i för att aktivera ekoutsläckning för samtalsljud.</string>
     <string name="tls_ca_file_help">Kryssa i för att ladda TLS-certifikat för certifikatauktoriteter från fil. I Android 9 och tidigare versioner laddas en fil med namnet \'ca_certs.crt\' från katalogen Nedladdningar.</string>
     <string name="verify_server_help">Kryssa i om baresip ska verifiera TLS-certifikat för SIP user agent och SIP proxyserver när transportprotokollet TLS används. TLS CA-fil måste då också laddas.</string>
     <string name="tls_certificate_file_help">Kryssa i för att ladda TLS-certifikat och privat nyckel för den här baresip-instansen från fil. I Android 9 och tidigare versioner laddas en fil med namnet \'cert.pem\' från katalogen Nedladdningar. Av säkerhetsskäl tas filen bort efter att den lästs in.</string>

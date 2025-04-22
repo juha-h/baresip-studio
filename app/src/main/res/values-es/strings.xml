@@ -160,7 +160,6 @@
     <string name="tls_ca_file">Archivo de CA de TLS</string>
     <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene certificados TLS de dichas Autoridades de Certificación que no están incluidas en el SO Android. En las versión de Android 9, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
     <string name="aec">Cancelación de eco acústico</string>
-    <string name="aec_help">Si está marcada, se intenta la cancelación del eco en el audio de la llamada.</string>
     <string name="opus_bit_rate">Tasa de bits de Opus</string>
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
@@ -289,8 +288,6 @@
     <string name="video_size">Tamaño del fotograma de vídeo</string>
     <string name="dark_theme_help">Forzar el tema de la pantalla oscura</string>
     <string name="dark_theme">Tema oscuro</string>
-    <string name="aec_extended_filter_help">Si está marcada, la cancelación de eco está utilizando el filtro extendido.</string>
-    <string name="aec_extended_filter">Filtro extendido AEC</string>
     <string name="verify_server_help">Si está marcada, baresip verifica los certificados TLS del Agente de Usuario SIP y de los Servidores Proxy SIP cuando se utiliza el transporte TLS.</string>
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>

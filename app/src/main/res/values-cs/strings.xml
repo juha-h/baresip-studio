@@ -237,7 +237,6 @@
     <string name="calls_call">volání</string>
     <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzi systému Android 9 se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
     <string name="audio_settings">Nastavení zvuku</string>
-    <string name="aec_extended_filter_help">Pokud je zaškrtnuto, používá se rozšířený filtr pro potlačení ozvěny.</string>
     <string name="opus_bit_rate_help">Průměrná maximální přenosová rychlost používaná zvukovým tokem Opus. Platné hodnoty jsou 6000-510000. Výchozí hodnota je 28000.</string>
     <string name="opus_packet_loss">Očekávaná ztráta paketů Opus</string>
     <string name="opus_packet_loss_help">Očekávaná procentuální ztráta paketů zvukového toku Opus od 0 do 100. Výchozí hodnota je 1. Hodnota 0 také vypíná funkci Opus Forward Error Correction (FEC).</string>
@@ -246,9 +245,7 @@
     <string name="default_call_volume">Výchozí hlasitost volání</string>
     <string name="dark_theme_help">Vynutit tmavé téma</string>
     <string name="failed_to_load_module">Nepodařilo se načíst modul.</string>
-    <string name="aec_help">Pokud je zaškrtnuto, dojde u hovoru k pokusu o potlačení ozvěny.</string>
     <string name="audio_modules_help">Zvukové kodeky poskytované zaškrtnutými moduly jsou k dispozici pro použití v účtech.</string>
-    <string name="aec_extended_filter">Rozšířený filtr AEC</string>
     <string name="invalid_opus_packet_loss">Neplatné procento ztráty paketů Opus</string>
     <string name="invalid_opus_bitrate">Neplatný datový tok Opus</string>
     <string name="default_call_volume_help">Pokud je nastaveno, je výchozí hlasitost zvuku hovoru na stupnici 1-10.</string>

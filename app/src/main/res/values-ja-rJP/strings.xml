@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_text">
-        <![CDATA[
+    <string name="about_text"><![CDATA[
         <h1>Baresip library based SIP User Agent</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
@@ -36,8 +35,7 @@
             <li><b>AGPLv4</b> ZRTP media encryption</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
         </ul>
-        ]]>
-    </string>
+        ]]></string>
     <string name="about_text_plus">
         <![CDATA[
         <h1>Baresip library based SIP User Agent with video calls</h1>
@@ -121,12 +119,7 @@
         messages (Message Waiting Indications) are not subscribed to.
     </string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.</string>
-    <string name="accounts_help">Account\'s port number and transport protocol may be optionally given when a new
-        account is created: username@domain[:port][;transport=udp|tcp|tls]. If port is given and transport protocol is
-        not given, transport protocol defaults to udp. If port is not given and transport protocol is given, port
-        defaults to 5060 or 5061 (TLS). If neither is given and no outbound proxy is specified, account\'s registrar (if
-        any) is determined solely based on domain\'s DNS information.
-    </string>
+    <string name="accounts_help">Account\'s port number and transport protocol may be optionally given when a new account is created: username@domain[:port][;transport=udp|tcp|tls]. If port is given and transport protocol is not given, transport protocol defaults to udp. If port is not given and transport protocol is given, port defaults to 5060 or 5061 (TLS). If neither is given and no outbound proxy is specified, account\'s registrar (if any) is determined solely based on domain\'s DNS information.</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete %2$s from call history?
     </string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or add peer to contacts?</string>
@@ -295,8 +288,6 @@
     <string name="tls_ca_file">TLS CA証明書ファイル</string>
     <string name="audio_modules_title">オーディオモジュール</string>
     <string name="failed_to_load_module">モジュールの読み込みに失敗しました</string>
-    <string name="aec_help">チェックを入れると、通話音声のエコーキャンセルを試みます</string>
-    <string name="aec_extended_filter">音響エコーキャンセル拡張フィルタ</string>
     <string name="opus_bit_rate">Opusのビットレート</string>
     <string name="opus_packet_loss">期待されるOpusのパケットロス</string>
     <string name="invalid_opus_bitrate">Opusのビットレートが無効です</string>
@@ -351,7 +342,6 @@
     <string name="answer_mode_help">着信した電話にどのように応答するかを選択します。</string>
     <string name="start_automatically_help">チェックを入れると、デバイスの再起動後に自動的にbaresipが起動します</string>
     <string name="aec">音響エコーキャンセル</string>
-    <string name="aec_extended_filter_help">チェックを入れると、エコーキャンセルは拡張フィルタを使用しています。</string>
     <string name="default_call_volume_help">設定されている場合、デフォルトの通話音声の音量は1～10段階です</string>
     <string name="dark_theme_help">ダークテーマを強制する</string>
     <string name="debug_help">チェックを入れると、デバッグおよび情報レベルのログメッセージをLogcatに提供します。</string>

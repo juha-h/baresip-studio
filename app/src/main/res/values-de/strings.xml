@@ -241,26 +241,7 @@
 \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is usedif offered in incoming call.</string>
     <string name="start_failed">Baresip konnte nicht gestartet werden. Das kann wegen eines ungültigen Einstellungswertes sein. Überprüfen Sie die Hören (Listen) Adresse, TLS Zertifikat, TLS CA File. Starten Sie dann baresip neu.</string>
     <string name="audio_permissions">baresip benötigt \"Mikrofon\"-Berechtigung für Sprachanrufe, \"Geräte in der Nähe\"-Berechtigung für Bluetooth-Mikrofon/Hörer-Erkennung und \"Benachrichtigungen\"-Berechtigung für die Benachrichtigungen.</string>
-    <string name="about_text">&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt;
-\n &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; 
-\n&lt;h2&gt;Benutzerhinweise&lt;/h2&gt;
-\n &lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt;
-\n &lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt;
-\n &lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt; 
-\n&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt;
-\n &lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt; 
-\n&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt;
-\n &lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt;
-\n &lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt; 
-\n&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt; 
-\n&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt; 
-\n&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt; 
-\n&lt;li&gt;See &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt; 
-\n&lt;h2&gt;Privacy Policy&lt;/h2&gt;
-\n Privacy policy is available &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;here&lt;/a&gt;. 
-\n&lt;h2&gt;Source code&lt;/h2&gt; Source code is available at &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;,where also issues can be reported. 
-\n&lt;h2&gt;Lizenzen&lt;/h2&gt; 
-\n&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
+    <string name="about_text">&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt; \n &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; \n&lt;h2&gt;Benutzerhinweise&lt;/h2&gt; \n &lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt; \n &lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt; \n &lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt; \n&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt; \n &lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt; \n&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt; \n &lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt; \n &lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt; \n&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt; \n&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt; \n&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt; \n&lt;li&gt;See &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt; \n&lt;h2&gt;Privacy Policy&lt;/h2&gt; \n Privacy policy is available &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;here&lt;/a&gt;. \n&lt;h2&gt;Source code&lt;/h2&gt; Source code is available at &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;,where also issues can be reported. \n&lt;h2&gt;Lizenzen&lt;/h2&gt; \n&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
     <string name="about_text_plus"><![CDATA[
 
         <h1>SIP Endgerät mit Videoanrufen, basierend auf der Baresip Bibliothek </h1>
@@ -359,7 +340,6 @@
     <string name="video_codecs">Video Codecs</string>
     <string name="audio_settings">Audioeinstellungen</string>
     <string name="backup">Sicherungskopie</string>
-    <string name="aec_help">Falls angekreuzt, wird versucht, Echounterdrückung auf den Anruf anzuwenden.</string>
     <string name="rtcp_mux">RTCP Multiplexverfahren</string>
     <string name="invalid_opus_packet_loss">Ungültiger Opus Paketverlustprozentsatz</string>
     <string name="default_call_volume">Standardmäßige Anruflautstärke</string>
@@ -381,8 +361,6 @@
     <string name="speaker_phone_help">Falls angekreuzt, wird die Lautsprecherfunktion automatisch aktiviert, wenn der Anruf beginnt.</string>
     <string name="audio_modules_title">Audiomodule</string>
     <string name="audio_modules_help">Audio Codecs, die von den ausgewählten Modulen bereitgestellt werden, sind für die Benutzer verfügbar.</string>
-    <string name="aec_extended_filter">AEC Erweiterter Filter</string>
-    <string name="aec_extended_filter_help">Falls angekreuzt, nutzt die Echounterdrückung den erweiterten Filter.</string>
     <string name="opus_bit_rate">Opus Bitrate</string>
     <string name="opus_bit_rate_help">Durchschnittliche maximale Bitrate, die vom Opus Audiostream genutzt wird. Gültige Werte sind 6000-510000. Die Werkseinstellung beträgt 28000.</string>
     <string name="opus_packet_loss">Erwarteter Paketverlust von Opus</string>

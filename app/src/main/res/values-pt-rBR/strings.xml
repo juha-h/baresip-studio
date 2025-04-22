@@ -91,7 +91,6 @@
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
     <string name="opus_bit_rate_help">Taxa de bits máxima média usada pelo fluxo de áudio do Opus. Os valores válidos são 6000-510000. O padrão de fábrica é 28000.</string>
     <string name="opus_bit_rate">Taxa de Bits Opus</string>
-    <string name="aec_help">Se estiver marcado, o cancelamento de eco baseado em software está em uso.</string>
     <string name="aec">Cancelamento de Eco Acústico</string>
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
     <string name="audio_modules_help">Codecs de áudio providos pelos módulos selecionados estão disponíveis para uso das contas.</string>
@@ -251,8 +250,6 @@
     <string name="confirmation">Confirmação</string>
     <string name="video_size_help">Tamanho dos quadros de vídeo que foram transmitidos (largura x altura)</string>
     <string name="video_size">Tamanho do Quadro do Vídeo</string>
-    <string name="aec_extended_filter_help">Caso esteja marcado, o cancelamento do eco estará utilizando um filtro estendido.</string>
-    <string name="aec_extended_filter">Filtro Estendido do AEC</string>
     <string name="invalid_stun_password">Senha inválida \'%1$s\'</string>
     <string name="stun_password_help">Senha, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="stun_password">Senha STUN/TURN</string>
