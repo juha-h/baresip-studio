@@ -52,15 +52,16 @@
         android:label="@string/app_name_plus"
         android:supportsRtl="true"
         android:largeHeap="true"
-        android:theme="@style/AppTheme"
-        tools:remove="android:appComponentFactory" >
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+        tools:remove="android:appComponentFactory"
+        tools:targetApi="33">
 
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.Main"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,9 +84,17 @@
         </activity>
 
         <activity
+            android:name=".AboutActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/about_title"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".MainActivity" >
+        </activity>
+
+        <activity
             android:name=".AccountsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/accounts"
             android:parentActivityName=".MainActivity" >
         </activity>
@@ -93,7 +102,7 @@
         <activity
             android:name=".AccountActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/account" >
         </activity>
 
@@ -101,6 +110,7 @@
             android:name=".CodecsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/codecs"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".AccountActivity" >
         </activity>
 
@@ -108,13 +118,14 @@
             android:name=".ContactsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contacts"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan" >
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".MainActivity" >
         </activity>
 
         <activity
-            android:name=".ContactActivity"
+            android:name=".BaresipContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/contact"
             android:parentActivityName=".ContactsActivity" >
         </activity>
@@ -123,6 +134,7 @@
             android:name=".AndroidContactActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/contact"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".ContactsActivity" >
         </activity>
 
@@ -130,6 +142,7 @@
             android:name=".ConfigActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/configuration"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".MainActivity" >
         </activity>
 
@@ -137,6 +150,7 @@
             android:name=".AudioActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/audio_settings"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".ConfigActivity" >
         </activity>
 
@@ -144,6 +158,7 @@
             android:name=".CallsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_history"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".MainActivity" >
         </activity>
 
@@ -151,28 +166,23 @@
             android:name=".CallDetailsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/call_details"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".CallsActivity" >
         </activity>
 
         <activity
             android:name=".ChatsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/chats"
             android:parentActivityName=".MainActivity" >
         </activity>
 
         <activity
             android:name=".ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/chat" >
-        </activity>
-
-        <activity
-            android:name=".AboutActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/about_title_plus"
-            android:parentActivityName=".MainActivity" >
         </activity>
 
         <service

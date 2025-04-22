@@ -10,8 +10,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.hardware.camera2.CameraAccessException
@@ -30,22 +28,16 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.format.DateUtils
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import java.io.*
 import java.lang.reflect.Method
 import java.net.InetAddress
@@ -64,7 +56,6 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import androidx.core.graphics.scale
-import androidx.core.graphics.createBitmap
 
 object Utils {
 
@@ -83,19 +74,6 @@ object Utils {
         for (line in lines.split("\n"))
             if (!line.startsWith(string) && (line.isNotEmpty())) result += line + "\n"
         return result
-    }
-
-    fun alertView(context: Context, title: String, message: String, action: () -> (Unit) = {}) {
-        with(MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)) {
-            setTitle(title)
-            setMessage(message)
-            setPositiveButton(R.string.ok) { dialog, _ ->
-                dialog.dismiss()
-                action()
-            }
-            val dialog = this.create()
-            dialog.show()
-        }
     }
 
     fun uriHostPart(uri: String): String {
@@ -401,46 +379,6 @@ object Utils {
         return Regex("^[-a-zA-Z0-9.!%*_+`'~]+\$").matches(token)
     }
 
-    fun setAvatar(ctx: Context, imageView: ImageView, textView: TextView, uri: String) {
-
-        when (val contact = Contact.findContact(uri)) {
-
-            is Contact.BaresipContact -> {
-                val avatarImage = contact.avatarImage
-                if (avatarImage != null) {
-                    imageView.setImageBitmap(avatarImage)
-                } else {
-                    textView.background.setTint(contact.color)
-                    if (contact.name.isNotEmpty())
-                        textView.text = "${contact.name[0]}"
-                    else
-                        textView.text = ""
-                    imageView.setImageBitmap(bitmapFromView(textView))
-                }
-            }
-
-            is Contact.AndroidContact -> {
-                val thumbnailUri = contact.thumbnailUri
-                if (thumbnailUri != null) {
-                    imageView.setImageURI(thumbnailUri)
-                } else {
-                    textView.background.setTint(contact.color)
-                    if (contact.name.isNotEmpty())
-                        textView.text = "${contact.name[0]}"
-                    else
-                        textView.text = ""
-                    imageView.setImageBitmap(bitmapFromView(textView))
-                }
-            }
-
-            null -> {
-                val bitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
-                imageView.setImageBitmap(bitmap)
-            }
-
-        }
-    }
-
     @Suppress("unused")
     fun checkIfName(name: String): Boolean {
         if ((name.length < 2) || !name.first().isLetter()) return false
@@ -469,7 +407,7 @@ object Utils {
             val method: Method = wm.javaClass.getDeclaredMethod("isWifiApEnabled")
             method.isAccessible = true
             return method.invoke(wm) as Boolean
-        } catch (ignored: Throwable) {
+        } catch (_: Throwable) {
         }
         return false
     }
@@ -500,30 +438,6 @@ object Utils {
         return result
     }
 
-    fun dtmfWatcher(callp: Long): TextWatcher {
-        return object : TextWatcher {
-            override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) {
-                val text = sequence.subSequence(start, start + count).toString()
-                if (text.isNotEmpty()) {
-                    val digit = text[0]
-                    val call = Call.ofCallp(callp)
-                    if (call == null) {
-                        Log.w(TAG, "dtmfWatcher did not find call $callp")
-                    } else {
-                        Log.d(TAG, "Got DTMF digit '$digit'")
-                        if (((digit >= '0') && (digit <= '9')) || (digit == '*') || (digit == '#'))
-                            call.sendDigit(digit)
-                    }
-                }
-            }
-            override fun afterTextChanged(sequence: Editable) {
-                // KEYCODE_REL
-                // call_send_digit(callp, 4.toChar())
-            }
-        }
-    }
-
     fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
         for (p in permissions) {
             if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
@@ -540,23 +454,6 @@ object Utils {
         return BaresipService.supportedCameras &&
                 ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED
-    }
-
-    fun View.showSnackBar(
-        view: View,
-        msg: String,
-        length: Int,
-        actionMessage: CharSequence?,
-        action: (View) -> Unit
-    ) {
-        val snackBar = Snackbar.make(view, msg, length)
-        if (actionMessage != null) {
-            snackBar.setAction(actionMessage) {
-                action(this)
-            }.show()
-        } else {
-            snackBar.show()
-        }
     }
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
@@ -581,8 +478,32 @@ object Utils {
             try {
                 file.delete()
             } catch (e: IOException) {
-                Log.e(TAG, "Could not delete file ${file.absolutePath}")
+                Log.e(TAG, "Could not delete file ${file.absolutePath}: ${e.message}")
             }
+        }
+    }
+
+    fun deleteFile(ctx: Context, uri: Uri): Boolean {
+        val contentResolver: ContentResolver = ctx.contentResolver
+        try {
+            if (DocumentsContract.isDocumentUri(ctx, uri)) {
+                if (DocumentsContract.deleteDocument(contentResolver, uri)) {
+                    Log.d(TAG, "File deleted successfully: $uri")
+                    return true
+                } else {
+                    Log.d(TAG, "File not found or could not be deleted: $uri")
+                    return false
+                }
+            } else {
+                Log.d(TAG, "Uri is not a document uri: $uri")
+                return false
+            }
+        } catch (e: UnsupportedOperationException) {
+            Log.w(TAG, "Error deleting file $uri: $e")
+            return false
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting file $uri: $e")
+            return false
         }
     }
 
@@ -673,7 +594,7 @@ object Utils {
             out.close()
             Log.d(TAG, "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}")
+            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}: ${e.message}")
             return false
         }
         return true
@@ -922,9 +843,9 @@ object Utils {
             val resolver: ContentResolver = ctx.contentResolver
             val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val uri = resolver.insert(contentUri, contentValues)
-                    ?: throw IOException("Failed to create new MediaStore record")
+                ?: throw IOException("Failed to create new MediaStore record")
             val stream = resolver.openOutputStream(uri)
-                    ?: throw IOException("Failed to open output stream")
+                ?: throw IOException("Failed to open output stream")
             if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
                 resolver.delete(uri, null, null)
                 stream.close()
@@ -959,14 +880,6 @@ object Utils {
         }
     }
 
-    fun bitmapFromView(view: View): Bitmap {
-        val bitmap = createBitmap(view.layoutParams.width, view.layoutParams.height)
-        val canvas = Canvas(bitmap)
-        view.layout(0, 0, view.layoutParams.width, view.layoutParams.height)
-        view.draw(canvas)
-        return bitmap
-    }
-
     fun isSpeakerPhoneOn(am: AudioManager): Boolean {
         return if (Build.VERSION.SDK_INT >= 31)
             am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
@@ -976,7 +889,7 @@ object Utils {
     }
 
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
-        if (Build.VERSION.SDK_INT > 31) {
+        if (Build.VERSION.SDK_INT >= 31) {
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
@@ -1109,9 +1022,10 @@ object Utils {
         }
     }
 
-    fun isDarkTheme(ctx: Context): Boolean {
-        return ctx.resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    fun isThemeDark(ctx: Context) : Boolean {
+        return Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES ||
+                ctx.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
     }
 
     fun aecAgcCheck() {

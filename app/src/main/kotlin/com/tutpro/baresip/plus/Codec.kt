@@ -1,3 +1,5 @@
 package com.tutpro.baresip.plus
 
-data class Codec(val name: String, var enabled: Boolean)
+import androidx.compose.runtime.MutableState
+
+data class Codec(val name: String, var enabled: MutableState<Boolean>)

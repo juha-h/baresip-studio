@@ -1,207 +1,671 @@
 package com.tutpro.baresip.plus
 
-import android.app.Activity
-import android.content.DialogInterface
+import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.*
+import android.text.format.DateUtils.isToday
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.tutpro.baresip.plus.databinding.ActivityChatsBinding
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.tutpro.baresip.plus.BaresipService.Companion.contactNames
+import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.ImageAvatar
+import com.tutpro.baresip.plus.CustomElements.LabelText
+import com.tutpro.baresip.plus.CustomElements.Text
+import com.tutpro.baresip.plus.CustomElements.TextAvatar
+import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
+import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
+import java.text.DateFormat
+import java.util.GregorianCalendar
 
-class ChatsActivity: AppCompatActivity() {
+class ChatsActivity: ComponentActivity() {
 
-    private lateinit var binding: ActivityChatsBinding
-    private lateinit var uaMessages: ArrayList<Message>
-    private lateinit var listView: ListView
-    private lateinit var clAdapter: ChatListAdapter
-    internal lateinit var peerUri: AutoCompleteTextView
-    private lateinit var plusButton: ImageButton
     internal lateinit var aor: String
     internal lateinit var account: Account
     private lateinit var chatRequest: ActivityResultLauncher<Intent>
-    private var scrollPosition = -1
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    private var _uaMessages = mutableStateOf<List<Message>>(emptyList())
+    private var uaMessages: List<Message> by _uaMessages
+
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
+
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        binding = ActivityChatsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        enableEdgeToEdge()
 
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            if (Build.VERSION.SDK_INT >= 35)
-                binding.ChatsView.updatePadding(top = systemBars.top + 56)
-            WindowInsetsCompat.CONSUMED
+        if (Build.VERSION.SDK_INT >= 33)
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
-
-        if (!Utils.isDarkTheme(this))
-            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
-
-        listView = binding.chats
-        plusButton = binding.plusButton
 
         aor = intent.extras!!.getString("aor")!!
         Utils.addActivity("chats,$aor")
         account = UserAgent.ofAor(aor)!!.account
 
-        val headerView = binding.account
-        val headerText = getString(R.string.account) + " " +
-                if (account.nickName != "")
-                    account.nickName
-                else
-                    aor.split(":")[1]
-        headerView.text = headerText
+        val title = getString(R.string.chats)
 
-        uaMessages = uaMessages(aor)
-        clAdapter = ChatListAdapter(this, account, uaMessages)
-        listView.adapter = clAdapter
-        listView.isLongClickable = true
+        _uaMessages.value = uaMessages(aor)
 
         chatRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == RESULT_OK) {
-                    clAdapter.clear()
-                    uaMessages = uaMessages(aor)
-                    clAdapter = ChatListAdapter(this, account, uaMessages)
-                    listView.adapter = clAdapter
-                }
+                if (it.resultCode == RESULT_OK)
+                    _uaMessages.value = uaMessages(aor)
             }
 
-        listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
-            scrollPosition = pos
-            val i = Intent(this, ChatActivity::class.java)
-            val b = Bundle()
-            b.putString("aor", aor)
-            b.putString("peer", uaMessages[pos].peerUri)
-            i.putExtras(b)
-            chatRequest.launch(i)
-        }
-
-        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, pos, _ ->
-            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        val i = Intent(this, ContactActivity::class.java)
-                        val b = Bundle()
-                        b.putBoolean("new", true)
-                        b.putString("uri", uaMessages[pos].peerUri)
-                        i.putExtras(b)
-                        startActivity(i)
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        val peerUri = uaMessages[pos].peerUri
-                        val messages = ArrayList<Message>()
-                        for (m in Message.messages())
-                            if ((m.aor != aor) || (m.peerUri != peerUri))
-                                messages.add(m)
-                            else
-                                clAdapter.remove(m)
-                        clAdapter.notifyDataSetChanged()
-                        BaresipService.messages = messages
-                        Message.save()
-                        uaMessages = uaMessages(aor)
-                    }
-                    DialogInterface.BUTTON_NEUTRAL -> {
-                    }
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalCustomColors.current.background
+                ) {
+                    ChatsScreen(this, title) { goBack() }
                 }
             }
-
-            val builder = MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialogTheme)
-            val peer = Utils.friendlyUri(this@ChatsActivity, uaMessages[pos].peerUri, account)
-            if (!Contact.nameExists(peer, false))
-                with (builder) {
-                    setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.long_chat_question),
-                            peer))
-                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                    setNegativeButton(getText(R.string.delete), dialogClickListener)
-                    setPositiveButton(getText(R.string.add_contact), dialogClickListener)
-                    show()
-                }
-            else
-                with (builder) {
-                    setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.short_chat_question), peer))
-                    setNeutralButton(getText(R.string.cancel), dialogClickListener)
-                    setNegativeButton(getText(R.string.delete), dialogClickListener)
-                    show()
-                }
-            true
         }
-
-        peerUri = binding.peer
-        peerUri.threshold = 2
-        peerUri.setAdapter(ArrayAdapter(this, android.R.layout.select_dialog_item,
-                Contact.contactNames()))
-
-        plusButton.setOnClickListener {
-            makeChat(true)
-        }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
     }
 
-    private fun makeChat(lookForContact: Boolean = true) {
-        var uriText = peerUri.text.toString().trim()
-        if (uriText.isNotEmpty()) {
-            if (lookForContact) {
-                val uris = Contact.contactUris(uriText)
-                if (uris.size == 1)
-                    uriText = uris[0]
-                else if (uris.size > 1) {
-                    val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                    with(builder) {
-                        setTitle("Choose Destination")
-                        setItems(uris.toTypedArray()) { _, which ->
-                            peerUri.setText(uris[which])
-                            makeChat(false)
+    @Composable
+    fun ChatsScreen(ctx: Context, title: String, navigateBack: () -> Unit) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxHeight()
+                .imePadding()
+                .safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = { TopAppBar(title, navigateBack) },
+            bottomBar = { NewChatPeer() },
+            content = { contentPadding ->
+                ChatsContent(ctx, contentPadding)
+            }
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TopAppBar(title: String, navigateBack: () -> Unit) {
+
+        var expanded by remember { mutableStateOf(false) }
+
+        val delete = String.format(getString(R.string.delete))
+
+        val showDialog = remember { mutableStateOf(false) }
+        val positiveAction = remember { mutableStateOf({}) }
+
+        AlertDialog(
+            showDialog = showDialog,
+            title = getString(R.string.confirmation),
+            message = String.format(
+                getString(R.string.delete_chats_alert),
+                aor.substringAfter(":")
+            ),
+            positiveButtonText = getString(R.string.delete),
+            onPositiveClicked = positiveAction.value,
+            negativeButtonText = getString(R.string.cancel),
+        )
+
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    color = LocalCustomColors.current.light,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(
+                containerColor = LocalCustomColors.current.primary
+            ),
+            navigationIcon = {
+                IconButton(onClick = navigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = LocalCustomColors.current.light
+                    )
+                }
+            },
+            actions = {
+                IconButton(
+                    onClick = { expanded = !expanded }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Menu",
+                        tint = LocalCustomColors.current.light
+                    )
+                }
+                CustomElements.DropdownMenu(
+                    expanded,
+                    { expanded = false },
+                    listOf(delete),
+                    onItemClick = { selectedItem ->
+                        expanded = false
+                        when (selectedItem) {
+                            delete -> {
+                                positiveAction.value = {
+                                    Message.clearMessagesOfAor(aor)
+                                    Message.save()
+                                    _uaMessages.value = listOf()
+                                    account.unreadMessages = false
+                                }
+                                showDialog.value = true
+                            }
                         }
-                        setNeutralButton(getString(R.string.cancel)) { _: DialogInterface, _: Int -> }
-                        show()
                     }
-                    return
+                )
+            }
+        )
+    }
+
+    @Composable
+    fun ChatsContent(ctx: Context, contentPadding: PaddingValues) {
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(contentPadding),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Account(account)
+            Chats(ctx, account)
+        }
+    }
+
+    @Composable
+    fun Account(account: Account) {
+        val headerText = getString(R.string.account) + " " +
+                if (account.nickName.value != "")
+                    account.nickName.value
+                else
+                    aor.split(":")[1]
+        Text(
+            text = headerText, modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 8.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
+        )
+    }
+
+    @Composable
+    fun Chats(ctx: Context, account: Account) {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val dialogMessage = remember { mutableStateOf("") }
+        val positiveButtonText = remember { mutableStateOf("") }
+        val positiveAction = remember { mutableStateOf({}) }
+        val neutralButtonText = remember { mutableStateOf("") }
+        val neutralAction = remember { mutableStateOf({}) }
+
+        if (showDialog.value)
+            AlertDialog(
+                showDialog = showDialog,
+                title = getString(R.string.confirmation),
+                message = dialogMessage.value,
+                positiveButtonText = positiveButtonText.value,
+                onPositiveClicked = positiveAction.value,
+                neutralButtonText = neutralButtonText.value,
+                onNeutralClicked = neutralAction.value,
+                negativeButtonText = getString(R.string.cancel)
+            )
+
+        val lazyListState = rememberLazyListState()
+
+        LazyColumn(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 4.dp)
+                .verticalScrollbar(
+                    state = lazyListState,
+                    width = 4.dp,
+                    color = LocalCustomColors.current.gray
+                )
+                .background(LocalCustomColors.current.background),
+            reverseLayout = true,
+            state = lazyListState,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(items = uaMessages, key = { message -> message.timeStamp }) { message ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    when (val contact = Contact.findContact(message.peerUri)) {
+                        is Contact.BaresipContact -> {
+                            val avatarImage = contact.avatarImage
+                            if (avatarImage != null)
+                                ImageAvatar(avatarImage)
+                            else
+                                TextAvatar(contact.name, contact.color)
+                        }
+
+                        is Contact.AndroidContact -> {
+                            val thumbNailUri = contact.thumbnailUri
+                            if (thumbNailUri != null)
+                                AsyncImage(
+                                    model = thumbNailUri,
+                                    contentDescription = "Avatar",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape),
+                                )
+                            else
+                                TextAvatar(contact.name, contact.color)
+                        }
+
+                        null -> {
+                            val avatarImage = BitmapFactory
+                                .decodeResource(ctx.resources, R.drawable.person_image)
+                            ImageAvatar(avatarImage)
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    CustomElements.Button(
+                        onClick = {
+                            val i = Intent(ctx, ChatActivity::class.java)
+                            val b = Bundle()
+                            b.putString("aor", aor)
+                            b.putString("peer", message.peerUri)
+                            i.putExtras(b)
+                            chatRequest.launch(i)
+                        },
+                        onLongClick = {
+                            val peer = Utils.friendlyUri(ctx, message.peerUri, account)
+                            val contactExists =
+                                Contact.nameExists(peer, BaresipService.contacts, false)
+                            if (contactExists) {
+                                dialogMessage.value = String.format(
+                                    getString(R.string.short_chat_question),
+                                    peer
+                                )
+                                positiveButtonText.value = getString(R.string.delete)
+                                positiveAction.value = {
+                                    Message.deleteAorPeerMessages(aor, message.peerUri)
+                                    _uaMessages.value = uaMessages(aor)
+                                }
+                                neutralButtonText.value = ""
+                            } else {
+                                dialogMessage.value = String.format(
+                                    getString(R.string.long_chat_question),
+                                    peer
+                                )
+                                positiveButtonText.value = getString(R.string.add_contact)
+                                positiveAction.value = {
+                                    val i = Intent(ctx, BaresipContactActivity::class.java)
+                                    val b = Bundle()
+                                    b.putBoolean("new", true)
+                                    b.putString("uri", message.peerUri)
+                                    i.putExtras(b)
+                                    startActivity(i)
+                                }
+                                neutralButtonText.value = getString(R.string.delete)
+                                neutralAction.value = {
+                                    Message.deleteAorPeerMessages(aor, message.peerUri)
+                                }
+                            }
+                            showDialog.value = true
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(end = 6.dp),
+                        shape = if (message.direction == MESSAGE_DOWN)
+                            RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
+                        else
+                            RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
+                        color =
+                            if (message.direction == MESSAGE_DOWN) {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.secondaryDark
+                                else
+                                    LocalCustomColors.current.secondaryLight
+                            } else {
+                                if (BaresipService.darkTheme.value)
+                                    LocalCustomColors.current.primaryDark
+                                else
+                                    LocalCustomColors.current.primaryLight
+                            },
+                    ) {
+                        val peer = Utils.friendlyUri(ctx, message.peerUri, account)
+                        val cal = GregorianCalendar()
+                        cal.timeInMillis = message.timeStamp
+                        val fmt: DateFormat = if (isToday(message.timeStamp))
+                            DateFormat.getTimeInstance(DateFormat.SHORT)
+                        else
+                            DateFormat.getDateInstance(DateFormat.SHORT)
+                        val info = fmt.format(cal.time)
+                        Column {
+                            Row {
+                                val textColor =
+                                    if (message.direction == MESSAGE_DOWN) {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.secondaryLight
+                                        else
+                                            LocalCustomColors.current.secondaryDark
+                                    } else {
+                                        if (BaresipService.darkTheme.value)
+                                            LocalCustomColors.current.primaryLight
+                                        else
+                                            LocalCustomColors.current.primaryDark
+                                    }
+                                Text(text = peer, color = textColor, fontSize = 12.sp)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(text = info, color = textColor, fontSize = 12.sp)
+                            }
+                            Row {
+                                BasicText(
+                                    text = message.message,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = TextStyle(
+                                        color = LocalCustomColors.current.itemText,
+                                        fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
+                                            FontWeight.Bold else FontWeight.Normal,
+                                        fontSize = 16.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
                 }
             }
-            if (Utils.isTelNumber(uriText))
-                uriText = "tel:$uriText"
-            val uri = if (Utils.isTelUri(uriText)) {
-                if (account.telProvider == "") {
-                    Utils.alertView(this, getString(R.string.notice),
-                        String.format(getString(R.string.no_telephony_provider), account.aor))
-                    return
+        }
+    }
+
+    @Composable
+    fun NewChatPeer() {
+
+        val showDialog = remember { mutableStateOf(false) }
+        val items = remember { mutableStateOf(listOf<String>()) }
+        val itemAction = remember { mutableStateOf<(Int) -> Unit>({ _ -> run {} }) }
+
+        SelectableAlertDialog(
+            openDialog = showDialog,
+            title = getString(R.string.choose_destination_uri),
+            items = items.value,
+            onItemClicked = itemAction.value,
+            neutralButtonText = getString(R.string.cancel),
+            onNeutralClicked = {}
+        )
+
+        val suggestions by remember { contactNames }
+        var filteredSuggestions by remember { mutableStateOf(suggestions) }
+        var showSuggestions by remember { mutableStateOf(false) }
+        val lazyListState = rememberLazyListState()
+        val focusManager = LocalFocusManager.current
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            var newPeer by remember { mutableStateOf("") }
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(1f)
+            ) {
+                if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .shadow(8.dp, RoundedCornerShape(8.dp))
+                            .background(
+                                LocalCustomColors.current.grayLight,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .animateContentSize()
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 180.dp)
+                                    .verticalScrollbar(
+                                        state = lazyListState,
+                                        color = LocalCustomColors.current.gray
+                                    ),
+                                horizontalAlignment = Alignment.Start,
+                                state = lazyListState
+                            ) {
+                                items(
+                                    items = filteredSuggestions,
+                                    key = { suggestion -> suggestion }
+                                ) { suggestion ->
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                newPeer = suggestion
+                                                showSuggestions = false
+                                            }
+                                            .padding(12.dp)
+                                    ) {
+                                        Text(
+                                            text = suggestion,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = LocalCustomColors.current.grayDark,
+                                            fontSize = 18.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Utils.telToSip(uriText, account)
-            } else {
-                Utils.uriComplete(uriText, aor)
+                OutlinedTextField(
+                    value = newPeer,
+                    placeholder = {
+                        Text(text = getString(R.string.new_chat_peer))
+                    },
+                    onValueChange = {
+                        newPeer = it
+                        showSuggestions = newPeer.length > 2
+                        filteredSuggestions = if (it.isEmpty()) {
+                            suggestions
+                        } else {
+                            suggestions.filter { suggestion ->
+                                newPeer.length > 2 && suggestion.startsWith(
+                                    newPeer,
+                                    ignoreCase = true
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .fillMaxWidth(),
+                    singleLine = true,
+                    trailingIcon = {
+                        if (newPeer.isNotEmpty())
+                            Icon(
+                                Icons.Outlined.Clear,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        if (showSuggestions)
+                                            showSuggestions = false
+                                        else
+                                            newPeer = ""
+                                    }
+                            )
+                    },
+                    label = {
+                        LabelText(
+                            text = stringResource(R.string.new_chat_peer),
+                            fontSize = 16.sp
+                        )
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp,
+                        color = LocalCustomColors.current.itemText
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    )
+                )
             }
+            Spacer(Modifier.width(4.dp))
+            SmallFloatingActionButton(
+                modifier = Modifier.padding(end = 4.dp),
+                onClick = {
+                    showSuggestions = false
+                    val peerText = newPeer.trim()
+                    if (peerText.isNotEmpty()) {
+                        val uris = Contact.contactUris(peerText)
+                        if (uris.isEmpty())
+                            makeChat(peerText)
+                        else if (uris.size == 1)
+                            makeChat(uris[0])
+                        else {
+                            items.value = uris
+                            itemAction.value = { index ->
+                                makeChat(uris[index])
+                            }
+                            showDialog.value = true
+                        }
+                    }
+                    newPeer = ""
+                    focusManager.clearFocus()
+                },
+                containerColor = LocalCustomColors.current.accent,
+                contentColor = LocalCustomColors.current.background
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    modifier = Modifier.size(36.dp),
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+        }
+    }
+
+    private fun makeChat(chatPeer: String) {
+        val peerUri = if (Utils.isTelNumber(chatPeer))
+            "tel:$chatPeer"
+        else
+            chatPeer
+        val uri = if (Utils.isTelUri(peerUri)) {
+            if (account.telProvider == "") {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value =
+                    String.format(getString(R.string.no_telephony_provider), account.aor)
+                showAlert.value = true
+                ""
+            } else
+                Utils.telToSip(peerUri, account)
+        } else
+            Utils.uriComplete(peerUri, aor)
+        if (alertMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
-                Utils.alertView(this, getString(R.string.notice),
-                    String.format(getString(R.string.invalid_sip_or_tel_uri), uri))
-            } else {
-                peerUri.text.clear()
-                peerUri.isCursorVisible = false
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
+                showAlert.value = true
+            }
+            else {
                 val i = Intent(this@ChatsActivity, ChatActivity::class.java)
                 val b = Bundle()
                 b.putString("aor", aor)
@@ -219,58 +683,17 @@ class ChatsActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        clAdapter.clear()
-        uaMessages = uaMessages(aor)
-        clAdapter = ChatListAdapter(this, account, uaMessages)
-        listView.adapter = clAdapter
-        if (uaMessages.isNotEmpty()) {
-            if (scrollPosition >= 0) {
-                listView.setSelection(scrollPosition)
-                scrollPosition = -1
-            } else {
-                listView.setSelection(0)
-            }
-        }
+        _uaMessages.value = uaMessages(aor)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.chats_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-
-            R.id.delete_chats -> {
-                with (MaterialAlertDialogBuilder(this@ChatsActivity, R.style.AlertDialogTheme)) {
-                    setTitle(R.string.confirmation)
-                    setMessage(String.format(getString(R.string.delete_chats_alert),
-                            aor.substringAfter(":")))
-                    setPositiveButton(getText(R.string.delete)) { dialog, _ ->
-                        Message.clear(aor)
-                        Message.save()
-                        uaMessages.clear()
-                        clAdapter.notifyDataSetChanged()
-                        account.unreadMessages = false
-                        dialog.dismiss()
-                    }
-                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    show()
-                }
-                return true
-            }
-
-            android.R.id.home -> {
-                goBack()
-                return true
-            }
-
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
-
-        return super.onOptionsItemSelected(item)
+        else
+            onBackPressedCallback.remove()
+        super.onDestroy()
     }
 
     private fun goBack() {
@@ -279,14 +702,14 @@ class ChatsActivity: AppCompatActivity() {
     }
 
     private fun returnResult() {
-        setResult(Activity.RESULT_CANCELED, Intent())
+        setResult(RESULT_CANCELED, Intent())
         finish()
     }
 
-    private fun uaMessages(aor: String) : ArrayList<Message> {
-        val res = ArrayList<Message>()
+    private fun uaMessages(aor: String) : List<Message> {
+        val res = mutableListOf<Message>()
         account.unreadMessages = false
-        for (m in Message.messages().reversed()) {
+        for (m in BaresipService.messages.reversed()) {
             if (m.aor != aor) continue
             var found = false
             for (r in res)
@@ -295,35 +718,11 @@ class ChatsActivity: AppCompatActivity() {
                     break
                 }
             if (!found) {
-                res.add(m)
+                res.add(0, m)
                 if (m.new)
                     account.unreadMessages = true
             }
         }
-        return res
-    }
-
-    companion object {
-
-        fun saveUaMessage(aor: String, time: Long) {
-            for (i in Message.messages().indices.reversed())
-                if ((Message.messages()[i].aor == aor) &&
-                        (Message.messages()[i].timeStamp == time)) {
-                    Message.messages()[i].new = false
-                    Message.save()
-                    return
-                }
-        }
-
-        fun deleteUaMessage(aor: String, time: Long) {
-            for (i in Message.messages().indices.reversed())
-                if ((Message.messages()[i].aor == aor) &&
-                        (Message.messages()[i].timeStamp == time)) {
-                    Message.messages().removeAt(i)
-                    Message.save()
-                    return
-                }
-        }
-
+        return res.toList()
     }
 }

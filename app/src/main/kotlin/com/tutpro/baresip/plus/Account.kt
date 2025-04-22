@@ -1,6 +1,8 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import java.util.*
 import kotlin.collections.ArrayList
 import java.net.URLEncoder
@@ -8,10 +10,10 @@ import java.net.URLDecoder
 
 class Account(val accp: Long) {
 
-    var nickName = ""
+    val nickName: MutableState<String> = mutableStateOf("")
     var displayName = Api.account_display_name(accp)
     val aor = Api.account_aor(accp)
-    var luri = Api.account_luri(accp)
+    private var luri = Api.account_luri(accp)
     var authUser = Api.account_auth_user(accp)
     var authPass = Api.account_auth_pass(accp)
     var outbound = ArrayList<String>()
@@ -66,21 +68,9 @@ class Account(val accp: Long) {
             }
         }
 
-        i = 0
-        while (true) {
-            val vc = Api.account_video_codec(accp, i)
-            if (vc != "") {
-                if (!videoCodec.contains(vc) && vc != "H265")
-                    videoCodec.add(vc)
-                i++
-            } else {
-                break
-            }
-        }
-
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
-            nickName = Utils.paramValue(extra,"nickname")
+            nickName.value = Utils.paramValue(extra,"nickname")
         if (Utils.paramExists(extra, "regint"))
             configuredRegInt = Utils.paramValue(extra,"regint").toInt()
         callHistory = Utils.paramValue(extra,"call_history") == ""
@@ -104,7 +94,7 @@ class Account(val accp: Long) {
         if ((authPass != "") && !BaresipService.aorPasswords.containsKey(aor))
             res += ";auth_pass=\"${authPass}\""
 
-        if (outbound.size > 0) {
+        if (outbound.isNotEmpty()) {
             res += ";outbound=\"${outbound[0]}\""
             if (outbound.size > 1) res += ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
@@ -121,22 +111,10 @@ class Account(val accp: Long) {
         if (stunPass != "")
             res += ";stunpass=\"${stunPass}\""
 
-        if (audioCodec.size > 0) {
+        if (audioCodec.isNotEmpty()) {
             var first = true
             res = "$res;audio_codecs="
             for (c in audioCodec)
-                if (first) {
-                    res += c
-                    first = false
-                } else {
-                    res = "$res,$c"
-                }
-        }
-
-        if (videoCodec.size > 0) {
-            var first = true
-            res = "$res;video_codecs="
-            for (c in videoCodec)
                 if (first) {
                     res += c
                     first = false
@@ -175,8 +153,8 @@ class Account(val accp: Long) {
 
         var extra = ""
 
-        if (nickName != "")
-            extra += ";nickname=$nickName"
+        if (nickName.value != "")
+            extra += ";nickname=${nickName.value}"
 
         if (!callHistory)
             extra += ";call_history=no"
@@ -231,6 +209,13 @@ class Account(val accp: Long) {
         return aor.split("@")[1]
     }
 
+    fun text(): String {
+        return if (nickName.value != "")
+            nickName.value
+        else
+            aor.split(":")[1].substringBefore(";")
+    }
+
     private fun removeAudioCodecsStartingWith(prefix: String) {
         val newCodecs = ArrayList<String>()
         for (acSpec in audioCodec)
@@ -253,21 +238,21 @@ class Account(val accp: Long) {
 
         fun accounts(): ArrayList<Account> {
             val res = ArrayList<Account>()
-            for (ua in BaresipService.uas) {
+            for (ua in BaresipService.uas.value) {
                 res.add(ua.account)
             }
             return res
         }
 
         fun ofAor(aor: String): Account? {
-            for (ua in BaresipService.uas)
+            for (ua in BaresipService.uas.value)
                 if (ua.account.aor == aor) return ua.account
             return null
         }
 
         fun checkDisplayName(dn: String): Boolean {
             if (dn == "") return true
-            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}\$")
+            val dnRegex = Regex("^([* .!%_`'~]|[+]|[-a-zA-Z0-9]){1,64}$")
             return dnRegex.matches(dn)
         }
 
@@ -283,12 +268,12 @@ class Account(val accp: Long) {
 
         fun checkAuthPass(ap: String): Boolean {
             return (ap.isNotEmpty()) && (ap.length <= 64) &&
-                    Regex("^[ -~]*\$").matches(ap) && !ap.contains('"')
+                    Regex("^[ -~]*$").matches(ap) && !ap.contains('"')
         }
 
         fun uniqueNickName(nickName: String): Boolean {
-            for (ua in BaresipService.uas)
-                if (ua.account.nickName == nickName)
+            for (ua in BaresipService.uas.value)
+                if (ua.account.nickName.value == nickName)
                     return false
             return true
         }

@@ -1,75 +1,151 @@
 package com.tutpro.baresip.plus
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.core.text.HtmlCompat
-import androidx.appcompat.app.AppCompatActivity
-import android.text.method.LinkMovementMethod
-import android.view.MenuItem
-import android.view.View
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.tutpro.baresip.plus.databinding.ActivityAboutBinding
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.unit.dp
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : ComponentActivity() {
 
-    private lateinit var binding: ActivityAboutBinding
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        binding = ActivityAboutBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            if (Build.VERSION.SDK_INT >= 35)
-                binding.aboutText.updatePadding(top = 172)
-            WindowInsetsCompat.CONSUMED
+        enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
-
-        if (!Utils.isDarkTheme(this))
-            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
 
         Utils.addActivity("about")
 
-        val text = String.format(getString(R.string.about_text_plus),
-                BuildConfig.VERSION_NAME)
-        binding.aboutText.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.aboutText.movementMethod = LinkMovementMethod.getInstance()
+        val aboutTitle = String.format(getString(R.string.about_title_plus))
+        val aboutText = String.format(getString(R.string.about_text_plus),
+            BuildConfig.VERSION_NAME)
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AboutContent(aboutTitle, aboutText) { goBack() }
+                }
+            }
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AboutContent(title: String, text: String, navigateBack: () -> Unit) {
+        Scaffold(
+            modifier = Modifier.safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = title,
+                            color = LocalCustomColors.current.light,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                        containerColor = LocalCustomColors.current.primary
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = navigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Localized description",
+                                tint = LocalCustomColors.current.light
+                            )
+                        }
+                    },
+                )
 
-        when (item.itemId) {
-            android.R.id.home ->
-                goBack()
+            }
+        ) { contentPadding ->
+            Text(
+                text = AnnotatedString.Companion.fromHtml(
+                    htmlString = text,
+                    linkStyles = TextLinkStyles(
+                        style = SpanStyle(color = LocalCustomColors.current.accent)
+                    )
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .padding(contentPadding)
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .background(LocalCustomColors.current.background)
+            )
         }
+    }
 
-        return true
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
+        }
+        else
+            onBackPressedCallback.remove()
+        super.onDestroy()
     }
 
     private fun goBack() {
         BaresipService.activities.remove("about")
-        setResult(Activity.RESULT_CANCELED, Intent())
+        setResult(RESULT_CANCELED, Intent())
         finish()
     }
 
 }
-

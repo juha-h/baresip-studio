@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
-import android.app.Activity
 import android.app.role.RoleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -10,186 +9,238 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
-import android.text.method.LinkMovementMethod
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.*
+import android.provider.Settings
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
+import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.Checkbox
+import com.tutpro.baresip.plus.CustomElements.LabelText
+import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
-import com.tutpro.baresip.plus.Utils.showSnackBar
-import com.tutpro.baresip.plus.databinding.ActivityConfigBinding
 import java.io.File
 import java.io.FileInputStream
-import java.util.*
+import java.util.Locale
 
-class ConfigActivity : AppCompatActivity() {
+class ConfigActivity : ComponentActivity() {
 
-    private lateinit var binding: ActivityConfigBinding
-    private lateinit var layout: ScrollView
     private lateinit var baresipService: Intent
-    private lateinit var autoStart: CheckBox
-    private lateinit var listenAddr: EditText
-    private lateinit var netAfSpinner: Spinner
-    private lateinit var netAf: String
-    private lateinit var netAfKeys: ArrayList<String>
-    private lateinit var dnsServers: EditText
-    private lateinit var certificateFile: CheckBox
-    private lateinit var verifyServer: CheckBox
-    private lateinit var caFile: CheckBox
-    private lateinit var userAgent: EditText
-    private lateinit var darkTheme: CheckBox
-    private lateinit var videoFps: EditText
-    private lateinit var contactsSpinner: Spinner
-    private lateinit var contactsMode: String
-    private lateinit var contactsModeKeys: ArrayList<String>
-    private lateinit var batteryOptimizations: CheckBox
-    private lateinit var defaultDialer: CheckBox
-    private lateinit var debug: CheckBox
-    private lateinit var sipTrace: CheckBox
-    private lateinit var reset: CheckBox
+    private var oldAutoStart = false
+    private var newAutoStart = false
+    private var oldDarkTheme = false
+    private var newDarkTheme = false
+    private var oldListenAddr = ""
+    private var newListenAddr = ""
+    private var oldAddressFamily = ""
+    private var newAddressFamily = ""
+    private var oldDnsServers = ""
+    private var newDnsServers = ""
+    private var oldTlsCertificateFile = false
+    private var newTlsCertificateFile = false
+    private var oldVerifyServer = false
+    private var newVerifyServer = false
+    private var oldCaFile = false
+    private var newCaFile = false
+    private var oldUserAgent = ""
+    private var newUserAgent = ""
+    private var oldVideoSize = Config.variable("video_size")
+    private var newVideoSize = oldVideoSize
+    private var oldVideoFps = Config.variable("video_fps")
+    private var newVideoFps = ""
+    private var oldBatteryOptimizations = false
+    private var newBatteryOptimizations = false
+    private var oldDefaultDialer = false
+    private var newDefaultDialer = false
+    private var oldContactsMode = ""
+    private var newContactsMode = ""
+    private var oldDebug = false
+    private var newDebug = false
+    private var oldSipTrace = false
+    private var newSipTrace = false
+    private var arrowTint = Color.Unspecified
+
+    private lateinit var roleManager: RoleManager
+    private lateinit var powerManager: PowerManager
+    private lateinit var dialerRoleRequest: ActivityResultLauncher<Intent>
+    private lateinit var androidSettingsRequest: ActivityResultLauncher<Intent>
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
-    private var oldAutoStart = ""
-    private var oldListenAddr = ""
-    private var oldDnsServers = ""
-    private var oldCertificateFile = false
-    private var oldVerifyServer = false
-    private var oldUserAgent = ""
-    private var oldLogLevel = ""
-    private var oldDisplayTheme = -1
-    private var oldContactsMode = ""
-    private var oldNetAf = ""
-    private var videoSize = ""
-    private var oldVideoSize = Config.variable("video_size")
-    private var oldVideoFps = Config.variable("video_fps")
     private var save = false
     private var restart = false
     private var audioRestart = false
-    private var menu: Menu? = null
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
+    private val dialogTitle = mutableStateOf("")
+    private val dialogMessage = mutableStateOf("")
+    private val positiveText = mutableStateOf("")
+    private val onPositiveClicked = mutableStateOf({})
+    private val negativeText = mutableStateOf("")
+    private val onNegativeClicked = mutableStateOf({})
+    private val showDialog = mutableStateOf(false)
+
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
+
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
+    }
+
+    private val certificateRequest =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val certPath = BaresipService.filesPath + "/cert.pem"
+            val certFile = File(certPath)
+            if (it.resultCode == RESULT_OK) {
+                it.data?.data?.also { uri ->
+                    try {
+                        val inputStream =
+                            applicationContext.contentResolver.openInputStream(uri)
+                                    as FileInputStream
+                        certFile.copyInputStreamToFile(inputStream)
+                        inputStream.close()
+                        Config.replaceVariable("sip_certificate", certPath)
+                        save = true
+                        restart = true
+                    } catch (e: Error) {
+                        alertTitle.value = getString(R.string.error)
+                        alertMessage.value = getString(R.string.read_cert_error) + ": " + e.message
+                        showAlert.value = true
+                        newTlsCertificateFile = false
+                    }
+                }
+            }
+            else
+                newTlsCertificateFile = false
+            if (!newTlsCertificateFile)
+                Utils.deleteFile(certFile)
         }
+
+    private val caCertsRequest =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
+            if (it.resultCode == RESULT_OK)
+                it.data?.data?.also { uri ->
+                    try {
+                        val inputStream =
+                            applicationContext.contentResolver.openInputStream(uri)
+                                    as FileInputStream
+                        caCertsFile.copyInputStreamToFile(inputStream)
+                        inputStream.close()
+                        restart = true
+                    } catch (e: Error) {
+                        alertTitle.value = getString(R.string.error)
+                        alertMessage.value = getString(R.string.read_ca_certs_error) + ": " + e.message
+                        showAlert.value = true
+                        newCaFile = false
+                    }
+                }
+            else
+                newCaFile = false
+            if (!newCaFile)
+                caCertsFile.delete()
+        }
+
+    private val audioRequest = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        audioRestart = it.resultCode == RESULT_OK
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
+        enableEdgeToEdge()
 
-        binding = ActivityConfigBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        layout = binding.ConfigView
-
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            if (Build.VERSION.SDK_INT >= 35)
-                binding.ConfigView.updatePadding(top = 172)
-            WindowInsetsCompat.CONSUMED
+        if (Build.VERSION.SDK_INT >= 33)
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        if (!Utils.isDarkTheme(this))
-            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
+        val title = String.format(getString(R.string.configuration))
 
         Utils.addActivity("config")
 
         baresipService = Intent(this@ConfigActivity, BaresipService::class.java)
 
-        autoStart = binding.AutoStart
-        oldAutoStart = Config.variable("auto_start")
-        autoStart.isChecked = oldAutoStart == "yes"
-
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        val androidSettingsRequest = registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-        ) {
-            batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
-        }
-        batteryOptimizations = binding.BatteryOptimizations
-        batteryOptimizations.isChecked = pm.isIgnoringBatteryOptimizations(packageName) == false
-        batteryOptimizations.setOnCheckedChangeListener { _, _ ->
-            try {
-                androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
-            } catch (e: ActivityNotFoundException) {
-                Log.e(TAG, "ActivityNotFound exception: $e")
-            }
+        oldAutoStart = Config.variable("auto_start") == "yes"
+        if (oldAutoStart && !isAppearOnTopPermissionGranted(this)) {
+            Config.replaceVariable("auto_start", "no")
+            oldAutoStart = false
+            save = true
         }
 
-        if (Build.VERSION.SDK_INT >= 29) {
-            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-            defaultDialer = binding.DefaultPhoneApp
-            defaultDialer.isChecked = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-            val dialerRoleRequest = registerForActivityResult(
-                    ActivityResultContracts.StartActivityForResult()
-            ) {
-                Log.d(TAG, "dialerRoleRequest succeeded: ${it.resultCode == Activity.RESULT_OK}")
-                defaultDialer.isChecked = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-            }
-            defaultDialer.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER))
-                        Utils.alertView(this, getString(R.string.notice),
-                                getString(R.string.dialer_role_not_available))
-                    else
-                        if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
-                            dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
-                } else {
-                    try {
-                        dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
-                    } catch (e: ActivityNotFoundException) {
-                        Log.e(TAG, "ActivityNotFound exception: $e")
-
-                    }
-                }
-            }
-        } else {
-            binding.PhoneApp.visibility = View.GONE
-        }
-
-        listenAddr = binding.ListenAddress
         oldListenAddr = Config.variable("sip_listen")
-        listenAddr.setText(oldListenAddr)
 
-        netAfSpinner = binding.NetAfSpinner
-        netAfKeys = arrayListOf("", "ipv4", "ipv6")
-        val netAfVals = arrayListOf("-", "IPv4", "IPv6")
-        oldNetAf = Config.variable("net_af").lowercase()
-        netAf = oldNetAf
-        val netAfIndex = netAfKeys.indexOf(oldNetAf)
-        val netAfValue = netAfVals.elementAt(netAfIndex)
-        netAfKeys.removeAt(netAfIndex)
-        netAfVals.removeAt(netAfIndex)
-        netAfKeys.add(0, oldNetAf)
-        netAfVals.add(0, netAfValue)
-        val netAfAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item, netAfVals)
-        netAfAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        netAfSpinner.adapter = netAfAdapter
-        netAfSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                netAf = netAfKeys[position]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
+        oldAddressFamily = Config.variable("net_af").lowercase()
+        newAddressFamily = oldAddressFamily
 
-        dnsServers = binding.DnsServers
         val dynamicDns = Config.variable("dyn_dns")
         if (dynamicDns == "yes") {
             oldDnsServers = ""
@@ -200,281 +251,1170 @@ class ConfigActivity : AppCompatActivity() {
                 serverList += ", $server"
             oldDnsServers = serverList.trimStart(',').trimStart(' ')
         }
-        dnsServers.setText(oldDnsServers)
 
-        certificateFile = binding.CertificateFile
-        oldCertificateFile = Config.variable("sip_certificate") != ""
-        certificateFile.isChecked = oldCertificateFile
+        val certFile = File(BaresipService.filesPath + "/cert.pem")
+        oldTlsCertificateFile = certFile.exists()
 
-        val certificateRequest =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == RESULT_OK) {
-                    it.data?.data?.also { uri ->
-                        try {
-                            val inputStream =
-                                applicationContext.contentResolver.openInputStream(uri)
-                                        as FileInputStream
-                            val certPath = BaresipService.filesPath + "/cert.pem"
-                            File(certPath).copyInputStreamToFile(inputStream)
-                            inputStream.close()
-                            Config.replaceVariable("sip_certificate", certPath)
-                            save = true
-                            restart = true
-                        } catch (e: Error) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                getString(R.string.read_cert_error)
-                            )
-                            certificateFile.isChecked = false
-                        }
-                    }
-                } else {
-                    certificateFile.isChecked = false
-                }
-            }
-
-        certificateFile.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                if (Build.VERSION.SDK_INT < 29) {
-                    certificateFile.isChecked = false
-                    when {
-                        ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED -> {
-                            Log.d(TAG, "Read External Storage permission granted")
-                            val downloadsPath = Utils.downloadsPath("cert.pem")
-                            val content = Utils.getFileContents(downloadsPath)
-                            if (content == null) {
-                                Utils.alertView(
-                                    this, getString(R.string.error),
-                                    getString(R.string.read_cert_error)
-                                )
-                                return@setOnCheckedChangeListener
-                            }
-                            val certPath = BaresipService.filesPath + "/cert.pem"
-                            Utils.putFileContents(certPath, content)
-                            Config.replaceVariable("sip_certificate", certPath)
-                            certificateFile.isChecked = true
-                            save = true
-                            restart = true
-                        }
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) -> {
-                            layout.showSnackBar(
-                                binding.root,
-                                getString(R.string.no_restore),
-                                Snackbar.LENGTH_INDEFINITE,
-                                getString(R.string.ok)
-                            ) {
-                                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            }
-                        }
-                        else -> {
-                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        }
-                    }
-                } else {
-                    Utils.selectInputFile(certificateRequest)
-                }
-            } else {
-                Config.removeVariable("sip_certificate")
-                save = true
-                restart = true
-            }
-        }
-
-        verifyServer = binding.VerifyServer
         oldVerifyServer = Config.variable("sip_verify_server") == "yes"
-        verifyServer.isChecked = oldVerifyServer
+        newVerifyServer = oldVerifyServer
 
-        caFile = binding.CAFile
         val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
-        caFile.isChecked = caCertsFile.exists()
+        oldCaFile = caCertsFile.exists()
 
-        val certificatesRequest =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == Activity.RESULT_OK)
-                    it.data?.data?.also { uri ->
-                        try {
-                            val inputStream =
-                                applicationContext.contentResolver.openInputStream(uri)
-                                        as FileInputStream
-                            caCertsFile.copyInputStreamToFile(inputStream)
-                            inputStream.close()
-                            restart = true
-                        } catch (e: Error) {
-                            Utils.alertView(
-                                this, getString(R.string.error),
-                                getString(R.string.read_ca_certs_error)
-                            )
-                            caFile.isChecked = false
-                        }
-                    }
-                else
-                    caFile.isChecked = false
-                if (!caFile.isChecked && caCertsFile.exists())
-                    caCertsFile.delete()
-            }
+        powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        oldBatteryOptimizations = powerManager
+            .isIgnoringBatteryOptimizations(packageName) == false
+        newBatteryOptimizations = oldBatteryOptimizations
 
-        caFile.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                if (Build.VERSION.SDK_INT < 29) {
-                    caFile.isChecked = false
-                    when {
-                        ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED -> {
-                            Log.d(TAG, "Read External Storage permission granted")
-                            val downloadsPath = Utils.downloadsPath("ca_certs.crt")
-                            val content = Utils.getFileContents(downloadsPath)
-                            if (content == null) {
-                                Utils.alertView(
-                                    this, getString(R.string.error),
-                                    getString(R.string.read_ca_certs_error)
-                                )
-                                return@setOnCheckedChangeListener
-                            }
-                            caCertsFile.writeBytes(content)
-                            caFile.isChecked = true
-                            restart = true
-                        }
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) -> {
-                            layout.showSnackBar(
-                                binding.root,
-                                getString(R.string.no_restore),
-                                Snackbar.LENGTH_INDEFINITE,
-                                getString(R.string.ok)
-                            ) {
-                                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            }
-                        }
-                        else -> {
-                            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        }
-                    }
-                } else {
-                    Utils.selectInputFile(certificatesRequest)
-                }
-            } else {
-                if (caCertsFile.exists())
-                    caCertsFile.delete()
-                restart = true
-            }
+        androidSettingsRequest = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            newBatteryOptimizations = powerManager
+                .isIgnoringBatteryOptimizations(packageName) == false
         }
 
-        videoFps = binding.VideoFps
-        videoFps.setText(oldVideoFps)
+        dialerRoleRequest = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            Log.d(TAG, "dialerRoleRequest succeeded: " +
+                    "${it.resultCode == RESULT_OK}")
+            if (Build.VERSION.SDK_INT >= 29)
+                newDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            }
 
-        val videoSizeSpinner = findViewById<Spinner>(R.id.VideoSizeSpinner)
-        val sizes = mutableListOf<String>()
-        sizes.addAll(Config.videoSizes)
-        sizes.removeIf{it == oldVideoSize}
-        sizes.add(0, oldVideoSize)
-        val videoSizeAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                sizes)
-        videoSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        videoSizeSpinner.adapter = videoSizeAdapter
-        videoSizeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                videoSize = parent.selectedItem.toString()
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                videoSize = oldVideoSize
-            }
+        if (Build.VERSION.SDK_INT >= 29) {
+            roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+            oldDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
         }
 
-        userAgent = binding.UserAgent
-        oldUserAgent = Config.variable("user_agent")
-        userAgent.setText(oldUserAgent)
-
-        darkTheme = binding.DarkTheme
-        oldDisplayTheme = Preferences(applicationContext).displayTheme
-        darkTheme.isChecked = oldDisplayTheme == AppCompatDelegate.MODE_NIGHT_YES
-
-        contactsSpinner = binding.contactsSpinner
-        contactsModeKeys = arrayListOf("baresip", "android", "both")
-        val contactsModeVals = arrayListOf(getString(R.string.baresip), getString(R.string.android),
-                getString(R.string.both))
         oldContactsMode = Config.variable("contacts_mode").lowercase()
-        contactsMode = oldContactsMode
-        val keyIndex = contactsModeKeys.indexOf(oldContactsMode)
-        val keyValue = contactsModeVals.elementAt(keyIndex)
-        contactsModeKeys.removeAt(keyIndex)
-        contactsModeVals.removeAt(keyIndex)
-        contactsModeKeys.add(0, oldContactsMode)
-        contactsModeVals.add(0, keyValue)
-        val contactsAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-                contactsModeVals)
-        contactsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        contactsSpinner.adapter = contactsAdapter
-        contactsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                contactsMode = contactsModeKeys[position]
-                if (contactsMode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions))
-                    with(MaterialAlertDialogBuilder(this@ConfigActivity, R.style.AlertDialogTheme)) {
-                        setTitle(getText(R.string.consent_request))
-                        setMessage(getText(R.string.contacts_consent))
-                        setPositiveButton(getText(R.string.accept)) { dialog, _ ->
-                            dialog.dismiss()
-                            requestPermissions(contactsPermissions, CONTACTS_PERMISSION_REQUEST_CODE)
-                        }
-                        setNegativeButton(getText(R.string.deny)) { dialog, _ ->
-                            contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
-                            dialog.dismiss()
-                        }
-                        val dialog = this.create()
-                        dialog.setCancelable(false)
-                        dialog.setCanceledOnTouchOutside(false)
-                        dialog.show().apply {
-                            findViewById<TextView>(android.R.id.message)
-                                ?.movementMethod = LinkMovementMethod.getInstance()
-                        }
-                    }
+        newContactsMode = oldContactsMode
+
+        oldDarkTheme = Preferences(applicationContext).displayTheme ==
+                AppCompatDelegate.MODE_NIGHT_YES
+        newDarkTheme = oldDarkTheme
+
+        oldDebug = Config.variable("log_level") == "0"
+        newDebug = oldDebug
+
+        oldSipTrace = BaresipService.sipTrace
+        newSipTrace = oldSipTrace
+
+        requestPermissionsLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
+
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalCustomColors.current.background
+                ) {
+                    ConfigScreen(this, title) { goBack() }
+                }
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    @Composable
+    fun ConfigScreen(ctx: Context, title: String, navigateBack: () -> Unit) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxHeight()
+                .imePadding()
+                .safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = { TopAppBar(title, navigateBack) },
+            content = { contentPadding ->
+                ConfigContent(ctx, contentPadding)
+            }
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TopAppBar(title: String, navigateBack: () -> Unit) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    color = LocalCustomColors.current.light,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(
+                containerColor = LocalCustomColors.current.primary
+            ),
+            navigationIcon = {
+                IconButton(onClick = navigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = LocalCustomColors.current.light
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+                    checkOnClick()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        tint = LocalCustomColors.current.light,
+                        contentDescription = "Check"
+                    )
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun ConfigContent(ctx: Context, contentPadding: PaddingValues) {
+
+        arrowTint = if (BaresipService.darkTheme.value)
+            LocalCustomColors.current.grayLight
+        else
+            LocalCustomColors.current.black
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
         }
 
-        debug = binding.Debug
-        oldLogLevel = Config.variable("log_level")
-        debug.isChecked = oldLogLevel == "0"
 
-        sipTrace = binding.SipTrace
-        sipTrace.isChecked = BaresipService.sipTrace
+        if (showDialog.value)
+            AlertDialog(
+                showDialog = showDialog,
+                title = dialogTitle.value,
+                message = dialogMessage.value,
+                positiveButtonText = positiveText.value,
+                onPositiveClicked = onPositiveClicked.value,
+                negativeButtonText = negativeText.value,
+                onNegativeClicked = onNegativeClicked.value,
+            )
 
-        reset = binding.Reset
-        reset.isChecked = false
+        val scrollState = rememberScrollState()
 
-        reset.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                with(MaterialAlertDialogBuilder(this@ConfigActivity, R.style.AlertDialogTheme)) {
-                    setTitle(R.string.confirmation)
-                    setMessage(getString(R.string.reset_config_alert))
-                    setPositiveButton(getText(R.string.reset)) { dialog, _ ->
+        Column(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
+                .verticalScrollbar(scrollState)
+                .verticalScroll(state = scrollState),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            StartAutomatically(ctx)
+            ListenAddress()
+            AddressFamily()
+            DnsServers()
+            TlsCertificateFile(ctx)
+            VerifyServer()
+            CaFile(ctx)
+            UserAgent()
+            AudioSettings(ctx)
+            VideoSize(ctx)
+            VideoFps(ctx)
+            BatteryOptimizations()
+            if (Build.VERSION.SDK_INT >= 29)
+                DefaultDialer()
+            Contacts(ctx)
+            DarkTheme()
+            Debug()
+            SipTrace()
+            Reset()
+        }
+    }
+
+    @Composable
+    private fun StartAutomatically(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.start_automatically),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.start_automatically)
+                        alertMessage.value = getString(R.string.start_automatically_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var startAutomatically by remember { mutableStateOf(oldAutoStart) }
+            newAutoStart = startAutomatically
+            Checkbox(
+                checked = startAutomatically,
+                onCheckedChange = {
+                    if (it) {
+                        if (!isAppearOnTopPermissionGranted(ctx)) {
+                            dialogTitle.value = getString(R.string.notice)
+                            dialogMessage.value = getString(R.string.appear_on_top_permission)
+                            positiveText.value = getString(R.string.ok)
+                            onPositiveClicked.value = {
+                                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                                startActivity(intent)
+                            }
+                            negativeText.value = getString(R.string.cancel)
+                            onNegativeClicked.value = {
+                                negativeText.value = ""
+                            }
+                            showDialog.value = true
+                            startAutomatically = false
+                        }
+                        else
+                            startAutomatically = true
+                    }
+                    else
+                        startAutomatically = false
+                    newAutoStart = startAutomatically
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun ListenAddress() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            var listenAddr by remember { mutableStateOf(oldListenAddr) }
+            newListenAddr = listenAddr
+            OutlinedTextField(
+                value = listenAddr,
+                placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
+                onValueChange = {
+                    listenAddr = it
+                    newListenAddr = listenAddr
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.listen_address)
+                        alertMessage.value = getString(R.string.listen_address_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.listen_address)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun AddressFamily() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.address_family),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.address_family)
+                        alertMessage.value = getString(R.string.address_family_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val familyNames = listOf("--",  "IPv4", "IPv6")
+            val familyValues = listOf("",  "ipv4", "ipv6")
+            val itemPosition = remember {
+                mutableIntStateOf(familyValues.indexOf(oldAddressFamily))
+            }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = familyNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                            tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    familyNames.forEachIndexed { index, family ->
+                        DropdownMenuItem(text = {
+                            Text(text = family)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                newAddressFamily = familyValues[index]
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun DnsServers() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var dnsServers by remember { mutableStateOf(oldDnsServers) }
+            newDnsServers = dnsServers
+            OutlinedTextField(
+                value = dnsServers,
+                onValueChange = {
+                    dnsServers = it
+                    newDnsServers = dnsServers
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.dns_servers)
+                        alertMessage.value = getString(R.string.dns_servers_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.dns_servers)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun TlsCertificateFile(ctx: Context) {
+        val showAlertDialog = remember { mutableStateOf(false) }
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.tls_certificate_file),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.tls_certificate_file)
+                        alertMessage.value = getString(R.string.tls_certificate_file_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var tlsCertificateFile by remember { mutableStateOf(oldTlsCertificateFile) }
+            Checkbox(
+                checked = tlsCertificateFile,
+                onCheckedChange = {
+                    tlsCertificateFile = it
+                    newTlsCertificateFile = tlsCertificateFile
+                    if (it)
+                        if (Build.VERSION.SDK_INT < 29) {
+                            tlsCertificateFile = false
+                            when {
+                                ContextCompat.checkSelfPermission(
+                                    ctx,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                ) == PackageManager.PERMISSION_GRANTED -> {
+                                    Log.d(TAG, "Read External Storage permission granted")
+                                    val downloadsPath = Utils.downloadsPath("cert.pem")
+                                    val content = Utils.getFileContents(downloadsPath)
+                                    if (content == null) {
+                                        alertTitle.value = getString(R.string.error)
+                                        alertMessage.value = getString(R.string.read_cert_error)
+                                        showAlert.value = true
+                                        return@Checkbox
+                                    }
+                                    val certPath = BaresipService.filesPath + "/cert.pem"
+                                    Utils.putFileContents(certPath, content)
+                                    Config.replaceVariable("sip_certificate", certPath)
+                                    tlsCertificateFile = true
+                                    save = true
+                                    restart = true
+                                }
+                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                                    showAlertDialog.value = true
+                                }
+                                else ->
+                                    requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
+                        }
+                        else
+                            Utils.selectInputFile(certificateRequest)
+                    else {
+                        Config.removeVariable("sip_certificate")
+                        Utils.deleteFile(File(BaresipService.filesPath + "/cert.pem"))
+                        save = true
+                        restart = true
+                    }
+                }
+            )
+        }
+        if (showAlertDialog.value)
+            AlertDialog(
+                showDialog = showAlertDialog,
+                title = getString(R.string.notice),
+                message = getString(R.string.no_read_permission),
+                positiveButtonText = getString(R.string.ok),
+                onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
+                negativeButtonText = "",
+                onNegativeClicked = {},
+            )
+    }
+
+    @Composable
+    private fun VerifyServer() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.verify_server),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.verify_server)
+                        alertMessage.value = getString(R.string.verify_server_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var verifyServer by remember { mutableStateOf(oldVerifyServer) }
+            Checkbox(
+                checked = verifyServer,
+                onCheckedChange = {
+                    verifyServer = it
+                    newVerifyServer = verifyServer
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun CaFile(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.tls_ca_file),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.tls_ca_file)
+                        alertMessage.value = getString(R.string.tls_ca_file_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var caFile by remember { mutableStateOf(oldCaFile) }
+            Checkbox(
+                checked = caFile,
+                onCheckedChange = {
+                    caFile = it
+                    newCaFile = caFile
+                    if (it) {
+                        if (Build.VERSION.SDK_INT < 29) {
+                            caFile = false
+                            when {
+                                ContextCompat.checkSelfPermission(ctx,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                ) == PackageManager.PERMISSION_GRANTED -> {
+                                    Log.d(TAG, "Read External Storage permission granted")
+                                    val downloadsPath = Utils.downloadsPath("ca_certs.crt")
+                                    val content = Utils.getFileContents(downloadsPath)
+                                    if (content == null) {
+                                        alertTitle.value = getString(R.string.error)
+                                        alertMessage.value = getString(R.string.read_ca_certs_error)
+                                        showAlert.value = true
+                                        return@Checkbox
+                                    }
+                                    File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
+                                    caFile = true
+                                    restart = true
+                                }
+                                shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                                    dialogTitle.value = getString(R.string.notice)
+                                    dialogMessage.value = getString(R.string.no_read_permission)
+                                    positiveText.value = getString(R.string.ok)
+                                    onPositiveClicked.value = {
+                                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                    }
+                                    negativeText.value = ""
+                                    showDialog.value = true
+                                }
+                                else ->
+                                    requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            }
+                        }
+                        else
+                            Utils.selectInputFile(caCertsRequest)
+                    }
+                    else {
+                        Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
+                        restart = true
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun UserAgent() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var userAgent by remember { mutableStateOf(oldUserAgent) }
+            newUserAgent = userAgent
+            OutlinedTextField(
+                value = userAgent,
+                placeholder = { Text(stringResource(R.string.user_agent)) },
+                onValueChange = {
+                    userAgent = it
+                    newUserAgent = userAgent
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.user_agent)
+                        alertMessage.value = getString(R.string.user_agent_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.user_agent)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun AudioSettings(ctx: Context) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.audio_settings),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        audioRequest.launch(Intent(ctx, AudioActivity::class.java))
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight. Bold
+            )
+        }
+    }
+
+    @Composable
+    private fun VideoSize(ctx: Context) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.video_size),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.video_size)
+                        alertMessage.value = getString(R.string.video_size_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val frameSizes = mutableListOf<String>()
+            frameSizes.addAll(Config.videoSizes)
+            frameSizes.removeIf{it == oldVideoSize}
+            frameSizes.add(0, oldVideoSize)
+            val itemPosition = remember {
+                mutableIntStateOf(frameSizes.indexOf(oldVideoSize))
+            }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = frameSizes[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    frameSizes.forEachIndexed { index, size ->
+                        DropdownMenuItem(text = {
+                            Text(text = size)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                newVideoSize = frameSizes[index]
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun VideoFps(ctx: Context) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var fps by remember { mutableStateOf(oldVideoFps) }
+            newVideoFps = fps
+            OutlinedTextField(
+                value = fps,
+                placeholder = { Text(stringResource(R.string.user_agent)) },
+                onValueChange = {
+                    fps = it
+                    newVideoFps = fps
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.video_fps)
+                        alertMessage.value = getString(R.string.video_fps_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { Text(stringResource(R.string.video_fps)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun BatteryOptimizations() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.battery_optimizations),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.battery_optimizations)
+                        alertMessage.value = getString(R.string.battery_optimizations_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var battery by remember { mutableStateOf(oldBatteryOptimizations) }
+            Checkbox(
+                checked = battery,
+                onCheckedChange = {
+                    battery = it
+                    newBatteryOptimizations = battery
+                     try {
+                        androidSettingsRequest.launch(Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"))
+                    } catch (e: ActivityNotFoundException) {
+                        Log.e(TAG, "ActivityNotFound exception: ${e.message}")
+                    }
+                }
+            )
+        }
+    }
+
+    @RequiresApi(29)
+    @Composable
+    private fun DefaultDialer() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.default_phone_app),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.default_phone_app)
+                        alertMessage.value = getString(R.string.default_phone_app_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var defaultDialer by remember { mutableStateOf(oldDefaultDialer) }
+            Checkbox(
+                checked = defaultDialer,
+                onCheckedChange = {
+                    defaultDialer = it
+                    newDefaultDialer = defaultDialer
+                    if (it) {
+                        if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
+                            alertTitle.value = getString(R.string.alert)
+                            alertMessage.value = getString(R.string.dialer_role_not_available)
+                            showAlert.value = true
+                        }
+                        else
+                            if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
+                                dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
+                    } else {
+                        try {
+                            dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                        } catch (e: ActivityNotFoundException) {
+                            Log.e(TAG, "ActivityNotFound exception: ${e.message}")
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun Contacts(ctx: Context) {
+        val showAlertDialog = remember { mutableStateOf(false) }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.contacts),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.contacts)
+                        alertMessage.value = getString(R.string.contacts_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val contactNames = listOf("baresip",  "Android", "Both")
+            val contactValues = listOf("baresip",  "android", "both")
+            val itemPosition = remember {
+                mutableIntStateOf(contactValues.indexOf(oldContactsMode))
+            }
+            val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS)
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = contactNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                            tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    contactNames.forEachIndexed { index, name ->
+                        DropdownMenuItem(text = {
+                            Text(text = name)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                val mode = contactValues[index]
+                                if (mode != "baresip" && !Utils.checkPermissions(applicationContext, contactsPermissions)) {
+                                    dialogTitle.value = getString(R.string.consent_request)
+                                    dialogMessage.value = getString(R.string.contacts_consent)
+                                    positiveText.value = getString(R.string.accept)
+                                    onPositiveClicked.value = {
+                                        showDialog.value = false
+                                        newContactsMode = mode
+                                        if (ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.READ_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.WRITE_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            Log.d(TAG, "Contacts permissions already granted")
+                                        } else {
+                                            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS) ||
+                                                    shouldShowRequestPermissionRationale(Manifest.permission.WRITE_CONTACTS))
+                                                showAlertDialog.value = true
+                                            else
+                                                requestPermissionsLauncher.launch(
+                                                    arrayOf(
+                                                        Manifest.permission.READ_CONTACTS,
+                                                        Manifest.permission.WRITE_CONTACTS
+                                                    )
+                                                )
+                                        }
+                                    }
+                                    negativeText.value = getString(R.string.deny)
+                                    onNegativeClicked.value = {
+                                        itemPosition.intValue = contactValues.indexOf(oldContactsMode)
+                                        negativeText.value = ""
+                                    }
+                                    showDialog.value = true
+                                }
+                                else {
+                                    itemPosition.intValue = index
+                                    newContactsMode = contactValues[index]
+                                }
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+            if (showAlertDialog.value)
+                AlertDialog(
+                    showDialog = showAlertDialog,
+                    title = getString(R.string.notice),
+                    message = getString(R.string.no_android_contacts),
+                    positiveButtonText = getString(R.string.ok),
+                    onPositiveClicked = { requestPermissionsLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS
+                        )
+                    )},
+                    negativeButtonText = "",
+                    onNegativeClicked = {},
+                )
+        }
+    }
+
+    @Composable
+    private fun DarkTheme() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.dark_theme),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.dark_theme)
+                        alertMessage.value = getString(R.string.dark_theme_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var darkTheme by remember { mutableStateOf(oldDarkTheme) }
+            Checkbox(
+                checked = darkTheme,
+                onCheckedChange = {
+                    darkTheme = it
+                    newDarkTheme = darkTheme
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun Debug() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.debug),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.debug)
+                        alertMessage.value = getString(R.string.debug_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var debug by remember { mutableStateOf(oldDebug) }
+            Checkbox(
+                checked = debug,
+                onCheckedChange = {
+                    debug = it
+                    newDebug = debug
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun SipTrace() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.sip_trace),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.sip_trace)
+                        alertMessage.value = getString(R.string.sip_trace_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var sipTrace by remember { mutableStateOf(oldSipTrace) }
+            Checkbox(
+                checked = sipTrace,
+                onCheckedChange = {
+                    sipTrace = it
+                    newSipTrace = sipTrace
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun Reset() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.reset_config),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.reset_config)
+                        alertMessage.value = getString(R.string.reset_config_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var reset by remember { mutableStateOf(false) }
+            Checkbox(
+                checked = reset,
+                onCheckedChange = {
+                    dialogTitle.value = getString(R.string.confirmation)
+                    dialogMessage.value = getString(R.string.reset_config_alert)
+                    positiveText.value = getString(R.string.reset)
+                    onPositiveClicked.value = {
                         Config.reset()
                         save = false
                         restart = true
                         done()
-                        dialog.dismiss()
                     }
-                    setNeutralButton(getText(R.string.cancel)) { dialog, _ ->
-                        reset.isChecked = false
-                        dialog.dismiss()
+                    negativeText.value = getString(R.string.cancel)
+                    onNegativeClicked.value = {
+                        reset = false
+                        negativeText.value = ""
                     }
-                    show()
+                    showDialog.value = true
                 }
-            }
+            )
+        }
+    }
+
+    private fun checkOnClick() {
+
+        if (BaresipService.activities.indexOf("config") == -1)
+            return
+
+        if (oldAutoStart != newAutoStart) {
+            Config.replaceVariable("auto_start",
+                if (newAutoStart) "yes" else "no")
+            save = true
         }
 
-        bindTitles()
+        val listenAddr = newListenAddr.trim()
+        if (listenAddr != oldListenAddr) {
+            if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_listen_address)}: $listenAddr"
+                showAlert.value = true
+                return
+            }
+            Config.replaceVariable("sip_listen", listenAddr)
+            save = true
+            restart = true
+        }
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        if (oldAddressFamily != newAddressFamily) {
+            Config.replaceVariable("net_af", newAddressFamily)
+            save = true
+            restart = true
+        }
+
+        var dnsServers = newDnsServers.lowercase(Locale.ROOT)
+            .replace(" ", "")
+        dnsServers = addMissingPorts(dnsServers)
+        if (dnsServers != oldDnsServers.replace(" ", "")) {
+            if (!checkDnsServers(dnsServers)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_dns_servers)}: $dnsServers"
+                showAlert.value = true
+                return
+            }
+            Config.removeVariable("dns_server")
+            if (dnsServers.isNotEmpty()) {
+                for (server in dnsServers.split(","))
+                    Config.addVariable("dns_server", server)
+                Config.replaceVariable("dyn_dns", "no")
+                if (Api.net_use_nameserver(dnsServers) != 0) {
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers"
+                    showAlert.value = true
+                    return
+                }
+            } else {
+                Config.replaceVariable("dyn_dns", "yes")
+                Config.updateDnsServers(BaresipService.dnsServers)
+            }
+            // Api.net_dns_debug()
+            save = true
+        }
+
+        if (oldVerifyServer != newVerifyServer) {
+            Config.replaceVariable("sip_verify_server", if (newVerifyServer) "yes" else "no")
+            Api.config_verify_server_set(newVerifyServer)
+            save = true
+        }
+
+        newUserAgent = newUserAgent.trim()
+        if (newUserAgent != oldUserAgent) {
+            if ((newUserAgent != "") && !Utils.checkServerVal(newUserAgent)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_user_agent)}: $newUserAgent"
+                showAlert.value = true
+                return
+            }
+            if (newUserAgent != "")
+                Config.replaceVariable("user_agent", newUserAgent)
+            else
+                Config.removeVariable("user_agent")
+            save = true
+            restart = true
+        }
+
+        if (oldVideoSize != newVideoSize) {
+            Config.replaceVariable("video_size", newVideoSize)
+            Api.config_video_frame_size_set(newVideoSize.substringBefore("x").toInt(),
+                newVideoSize.substringAfter("x").toInt())
+            save = true
+        }
+
+        val videoFps = newVideoFps.trim().toInt()
+        if (oldVideoFps.toInt() != videoFps) {
+            if (videoFps < 10 || videoFps > 30) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_fps), videoFps)
+                showAlert.value = true
+                return
+            }
+            Config.replaceVariable("video_fps", videoFps.toString())
+            Api.config_video_fps_set(videoFps)
+            save = true
+        }
+
+        if (oldContactsMode != newContactsMode) {
+            Config.replaceVariable("contacts_mode", newContactsMode)
+            BaresipService.contactsMode = newContactsMode
+            when (newContactsMode) {
+                "baresip" -> {
+                    BaresipService.androidContacts.value = listOf()
+                    Contact.restoreBaresipContacts()
+                    baresipService.action = "Stop Content Observer"
+                }
+                "android" -> {
+                    BaresipService.baresipContacts.value = mutableListOf()
+                    Contact.loadAndroidContacts(this)
+                    baresipService.action = "Start Content Observer"
+                }
+                "both" -> {
+                    Contact.restoreBaresipContacts()
+                    Contact.loadAndroidContacts(this)
+                    baresipService.action = "Start Content Observer"
+                }
+            }
+            Contact.contactsUpdate()
+            startService(baresipService)
+            save = true
+        }
+
+        val newDisplayTheme = if (newDarkTheme)
+            AppCompatDelegate.MODE_NIGHT_YES
+        else
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        if (oldDarkTheme != newDarkTheme) {
+            Preferences(applicationContext).displayTheme = newDisplayTheme
+            BaresipService.darkTheme.value = newDarkTheme
+            Config.replaceVariable("dark_theme",
+                if (newDarkTheme) "yes" else "no")
+            save = true
+        }
+
+        if (oldDebug != newDebug) {
+            val logLevelString = if (newDebug) "0" else "2"
+            Config.replaceVariable("log_level", logLevelString)
+            Api.log_level_set(logLevelString.toInt())
+            Log.logLevelSet(logLevelString.toInt())
+            save = true
+        }
+
+        if (oldSipTrace != newSipTrace) {
+            BaresipService.sipTrace = newSipTrace
+            Api.uag_enable_sip_trace(newSipTrace)
+        }
+
+        done()
 
     }
 
@@ -482,329 +1422,43 @@ class ConfigActivity : AppCompatActivity() {
         super.onStart()
         requestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        requestPermissionsLauncher =
-                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-                    if (it.containsValue(false)) {
-                        contactsMode = oldContactsMode
-                        contactsSpinner.setSelection(contactsModeKeys.indexOf(oldContactsMode))
-                        Snackbar.make(layout, getString(R.string.no_android_contacts), Snackbar.LENGTH_LONG)
-                                .setAction(getString(R.string.ok)) {}
-                                .show()
-                    }
-                }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        super.onCreateOptionsMenu(menu)
-
-        val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
-
-        this.menu = menu
-
-        return true
-
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            CONTACTS_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.contains(PackageManager.PERMISSION_DENIED)) {
-                    when {
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,
-                                Manifest.permission.READ_CONTACTS) -> {
-                            layout.showSnackBar(
-                                    binding.root,
-                                    getString(R.string.no_android_contacts),
-                                    Snackbar.LENGTH_INDEFINITE,
-                                    getString(R.string.ok)
-                            ) {
-                                requestPermissionsLauncher.launch(permissions)
-                            }
-                        }
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,
-                                Manifest.permission.WRITE_CONTACTS) -> {
-                            layout.showSnackBar(
-                                    binding.root,
-                                    getString(R.string.no_android_contacts),
-                                    Snackbar.LENGTH_INDEFINITE,
-                                    getString(R.string.ok)
-                            ) {
-                                requestPermissionsLauncher.launch(permissions)
-                            }
-                        }
-                        else -> {
-                            requestPermissionsLauncher.launch(permissions)
-                        }
-                    }
-                }
-            }
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
         }
+        else
+            onBackPressedCallback.remove()
+        super.onDestroy()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if (BaresipService.activities.indexOf("config") == -1) return true
-
-        when (item.itemId) {
-
-            R.id.checkIcon -> {
-
-                val autoStartString = if (autoStart.isChecked) "yes" else "no"
-                if (oldAutoStart != autoStartString) {
-                    Config.replaceVariable("auto_start", autoStartString)
-                    save = true
-                }
-
-                val listenAddr = listenAddr.text.toString().trim()
-                if (listenAddr != oldListenAddr) {
-                    if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_listen_address)}: $listenAddr")
-                        return false
-                    }
-                    if (listenAddr != "")
-                        Config.replaceVariable("sip_listen", listenAddr)
-                    else
-                         Config.removeVariable("sip_listen")
-                    save = true
-                    restart = true
-                }
-
-                if (oldNetAf != netAf) {
-                    Config.replaceVariable("net_af", netAf)
-                    save = true
-                    restart = true
-                }
-
-                var dnsServers = dnsServers.text.toString().lowercase(Locale.ROOT)
-                    .replace(" ", "")
-                dnsServers = addMissingPorts(dnsServers)
-                if (dnsServers != oldDnsServers.replace(" ", "")) {
-                    if (!checkDnsServers(dnsServers)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_dns_servers)}: $dnsServers")
-                        return false
-                    }
-                    Config.removeVariable("dns_server")
-                    if (dnsServers.isNotEmpty()) {
-                        for (server in dnsServers.split(","))
-                            Config.addVariable("dns_server", server)
-                        Config.replaceVariable("dyn_dns", "no")
-                        if (Api.net_use_nameserver(dnsServers) != 0) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    "${getString(R.string.failed_to_set_dns_servers)}: $dnsServers")
-                            return false
-                        }
-                    } else {
-                        Config.replaceVariable("dyn_dns", "yes")
-                        Config.updateDnsServers(BaresipService.dnsServers)
-                    }
-                    Api.net_debug()
-                    save = true
-                }
-
-                if (oldVerifyServer != verifyServer.isChecked) {
-                    Config.replaceVariable("sip_verify_server",
-                            if (verifyServer.isChecked) "yes" else "no")
-                    Api.config_verify_server_set(verifyServer.isChecked)
-                    save = true
-                }
-
-                if (oldVideoSize != videoSize) {
-                    Config.replaceVariable("video_size", videoSize)
-                    Api.config_video_frame_size_set(videoSize.substringBefore("x").toInt(),
-                        videoSize.substringAfter("x").toInt())
-                    save = true
-                }
-
-                val newFps = videoFps.text.toString().trim().toInt()
-                if (oldVideoFps.toInt() != newFps) {
-                    if (newFps < 10 || newFps > 30) {
-                        Utils.alertView(
-                            this, getString(R.string.notice),
-                            String.format(getString(R.string.invalid_fps), newFps)
-                        )
-                        return false
-                    }
-                    Config.replaceVariable("video_fps", newFps.toString())
-                    Api.config_video_fps_set(newFps)
-                    save = true
-                }
-
-                val userAgent = userAgent.text.toString().trim()
-                if (userAgent != oldUserAgent) {
-                    if ((userAgent != "") && !Utils.checkServerVal(userAgent)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                            "${getString(R.string.invalid_user_agent)}: $userAgent")
-                        return false
-                    }
-                    if (userAgent != "")
-                        Config.replaceVariable("user_agent", userAgent)
-                    else
-                        Config.removeVariable("user_agent")
-                    save = true
-                    restart = true
-                }
-
-                val newDisplayTheme = if (darkTheme.isChecked)
-                    AppCompatDelegate.MODE_NIGHT_YES
-                else
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                if (oldDisplayTheme != newDisplayTheme) {
-                    Preferences(applicationContext).displayTheme = newDisplayTheme
-                    Config.replaceVariable("dark_theme",
-                        if (darkTheme.isChecked) "yes" else "no")
-                    save = true
-                }
-
-                if (oldContactsMode != contactsMode) {
-                    Config.replaceVariable("contacts_mode", contactsMode)
-                    BaresipService.contactsMode = contactsMode
-                    when (contactsMode) {
-                        "baresip" -> {
-                            BaresipService.androidContacts.clear()
-                            Contact.restoreBaresipContacts()
-                            baresipService.action = "Stop Content Observer"
-                        }
-                        "android" -> {
-                            BaresipService.baresipContacts.clear()
-                            Contact.loadAndroidContacts(this)
-                            baresipService.action = "Start Content Observer"
-                        }
-                        "both" -> {
-                            Contact.restoreBaresipContacts()
-                            Contact.loadAndroidContacts(this)
-                            baresipService.action = "Start Content Observer"
-                        }
-                    }
-                    Contact.contactsUpdate()
-                    startService(baresipService)
-                    save = true
-                }
-
-                val logLevelString = if (debug.isChecked) "0" else "2"
-                if (oldLogLevel != logLevelString) {
-                    Config.replaceVariable("log_level", logLevelString)
-                    Api.log_level_set(logLevelString.toInt())
-                    Log.logLevelSet(logLevelString.toInt())
-                    save = true
-                }
-
-                BaresipService.sipTrace = sipTrace.isChecked
-                Api.uag_enable_sip_trace(sipTrace.isChecked)
-
-                done()
-            }
-
-            android.R.id.home -> {
-                goBack()
-            }
-        }
-
-        return true
-
+    private fun isAppearOnTopPermissionGranted(ctx: Context): Boolean {
+        return Settings.canDrawOverlays(ctx)
     }
 
     private fun done() {
-
-        if (save) Config.save()
+        if (save)
+            Config.save()
         BaresipService.activities.remove("config")
         val intent = Intent(this, MainActivity::class.java)
         if (restart || audioRestart)
             intent.putExtra("restart", true)
         setResult(RESULT_OK, intent)
         finish()
-
     }
 
     private fun goBack() {
-
         BaresipService.activities.remove("config")
         if (audioRestart) {
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("restart", true)
             setResult(RESULT_OK, intent)
         } else {
-            setResult(Activity.RESULT_CANCELED, Intent(this, MainActivity::class.java))
+            setResult(RESULT_CANCELED, Intent(this, MainActivity::class.java))
         }
         finish()
-
-    }
-
-    private fun bindTitles() {
-        val audioRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            audioRestart = it.resultCode == Activity.RESULT_OK
-        }
-        binding.AutoStartTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.start_automatically),
-                    getString(R.string.start_automatically_help))
-        }
-        binding.ListenAddressTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.listen_address),
-                    getString(R.string.listen_address_help))
-        }
-        binding.NetAfTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.address_family),
-                    getString(R.string.address_family_help))
-        }
-        binding.DnsServersTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.dns_servers),
-                    getString(R.string.dns_servers_help))
-        }
-        binding.CertificateFileTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.tls_certificate_file),
-                    getString(R.string.tls_certificate_file_help))
-        }
-        binding.VerifyServerTitle .setOnClickListener {
-            Utils.alertView(this, getString(R.string.verify_server),
-                    getString(R.string.verify_server_help))
-        }
-        binding.CAFileTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.tls_ca_file),
-                    getString(R.string.tls_ca_file_help))
-        }
-        binding.UserAgentTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.user_agent),
-                getString(R.string.user_agent_help))
-        }
-        binding.AudioSettingsTitle.setOnClickListener {
-            audioRequest.launch(Intent(this,  AudioActivity::class.java))
-        }
-        binding.VideoSizeTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.video_size),
-                    getString(R.string.video_size_help))
-        }
-        binding.DarkThemeTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.dark_theme),
-                    getString(R.string.dark_theme_help))
-        }
-        binding.ContactsTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.contacts),
-                    getString(R.string.contacts_help))
-        }
-        binding.BatteryOptimizationsTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.battery_optimizations),
-                    getString(R.string.battery_optimizations_help))
-        }
-        binding.DefaultPhoneAppTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.default_phone_app),
-                    getString(R.string.default_phone_app_help))
-        }
-        binding.DebugTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.debug), getString(R.string.debug_help))
-        }
-        binding.SipTraceTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.sip_trace),
-                    getString(R.string.sip_trace_help))
-        }
-        binding.ResetTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.reset_config),
-                    getString(R.string.reset_config_help))
-        }
     }
 
     private fun checkDnsServers(dnsServers: String): Boolean {

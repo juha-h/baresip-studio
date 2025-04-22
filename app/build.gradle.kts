@@ -1,11 +1,12 @@
 plugins {
+    alias(libs.plugins.compose.compiler)
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
 
 android {
     compileSdk = 35
-    ndkVersion = "27.2.12479018"
+    ndkVersion = "28.0.13004108"
     defaultConfig {
         applicationId = "com.tutpro.baresip.plus"
         minSdk = 28
@@ -21,7 +22,7 @@ android {
         }
         ndk {
             // noinspection ChromeOsAbiSupport
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"/*, "x86_64"*/))
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
         }
         vectorDrawables.useSupportLibrary = true
     }
@@ -32,12 +33,20 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.7"
+    }
     splits {
         abi {
             reset()
         }
     }
     buildTypes {
+        debug {
+            ndk {
+                abiFilters.add("x86_64")
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -52,6 +61,7 @@ android {
         //noinspection DataBindingWithoutKapt
         dataBinding = true
         buildConfig = true
+        compose = true
     }
     sourceSets {
         getByName("main").java.srcDirs("src/main/kotlin")
@@ -64,13 +74,25 @@ android {
     namespace = "com.tutpro.baresip.plus"
 }
 
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.material)
     implementation(libs.androidx.cardview)
-    implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.androidx.swiperefreshlayout)
+
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.compose.material3)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.material)
+    implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.core.ktx)
@@ -79,5 +101,6 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.media)
+    implementation(libs.coil.compose)
 }
 

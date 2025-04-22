@@ -2,331 +2,673 @@ package com.tutpro.baresip.plus
 
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.*
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
-import com.tutpro.baresip.plus.databinding.ActivityAudioBinding
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.Checkbox
+import com.tutpro.baresip.plus.CustomElements.LabelText
+import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
-class AudioActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityAudioBinding
-    private lateinit var micGain: EditText
-    private lateinit var opusBitRate: EditText
-    private lateinit var opusPacketLoss: EditText
-    private lateinit var speakerPhone: CheckBox
-    private lateinit var audioDelay: EditText
+class AudioActivity : ComponentActivity() {
 
     private var save = false
     private var restart = false
-    private var callVolume = BaresipService.callVolume
+    private var oldCallVolume = BaresipService.callVolume
+    private var newCallVolume = oldCallVolume
     private var oldMicGain = ""
-    private var oldAudioModules = mutableMapOf<String, Boolean>()
-    private var oldOpusBitrate = ""
-    private var oldOpusPacketLoss = ""
-    private var toneCountry = BaresipService.toneCountry
+    private var newMicGain = ""
+    private var newSpeakerPhone = BaresipService.speakerPhone
+    private val modules = Config.variables("module")
+    private var newAudioModules = mutableMapOf<String, Boolean>()
+    private var oldOpusBitrate = Config.variable("opus_bitrate")
+    private var newOpusBitrate = oldOpusBitrate
+    private var oldOpusPacketLoss = Config.variable("opus_packet_loss")
+    private var newOpusPacketLoss = oldOpusPacketLoss
+    private var newAudioDelay = BaresipService.audioDelay.toString()
+    private var newToneCountry = BaresipService.toneCountry
+    private var arrowTint = Color.Unspecified
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
+    private val alertTitle = mutableStateOf("")
+    private val alertMessage = mutableStateOf("")
+    private val showAlert = mutableStateOf(false)
+
+    private var backInvokedCallback: OnBackInvokedCallback? = null
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
+
+    @RequiresApi(33)
+    private fun registerBackInvokedCallback() {
+        backInvokedCallback = OnBackInvokedCallback { goBack() }
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backInvokedCallback!!
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        binding = ActivityAudioBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v: View, insets: WindowInsetsCompat ->
-            val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            if (Build.VERSION.SDK_INT >= 35)
-                binding.AudioView.updatePadding(top = systemBars.top + 56)
-            WindowInsetsCompat.CONSUMED
+        enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= 33)
+            registerBackInvokedCallback()
+        else {
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            }
+            onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        if (!Utils.isDarkTheme(this))
-            WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
+        val title = String.format(getString(R.string.configuration))
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Utils.addActivity("audio")
 
-        val callVolSpinner = binding.VolumeSpinner
-        val volKeys = arrayListOf("None", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-        val volVals = arrayListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        val curVal = callVolume
-        val curKey = volKeys[curVal]
-        volKeys.removeAt(curVal)
-        volVals.removeAt(curVal)
-        volKeys.add(0, curKey)
-        volVals.add(0, curVal)
-        val callVolAdapter = ArrayAdapter(
-            this, android.R.layout.simple_spinner_item,
-            volKeys
-        )
-        callVolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        callVolSpinner.adapter = callVolAdapter
-        callVolSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View?,
-                    position: Int,
-                    id: Long
-            ) {
-                callVolume = volVals[volKeys.indexOf(parent.selectedItem.toString())]
-            }
+        if (!BaresipService.agcAvailable)
+            oldMicGain = Config.variable("augain")
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
+        setContent {
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalCustomColors.current.background
+                ) {
+                    AudioScreen(title) { goBack() }
+                }
             }
+        }
+    }
+
+    @Composable
+    fun AudioScreen(title: String, navigateBack: () -> Unit) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxHeight()
+                .imePadding()
+                .safeDrawingPadding(),
+            containerColor = LocalCustomColors.current.background,
+            topBar = { TopAppBar(title, navigateBack) },
+            content = { contentPadding ->
+                AudioContent(contentPadding)
+            }
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TopAppBar(title: String, navigateBack: () -> Unit) {
+        androidx.compose.material3.TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    color = LocalCustomColors.current.light,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(
+                containerColor = LocalCustomColors.current.primary
+            ),
+            navigationIcon = {
+                IconButton(onClick = navigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = LocalCustomColors.current.light
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+                    checkOnClick()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        tint = LocalCustomColors.current.light,
+                        contentDescription = "Check"
+                    )
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun AudioContent(contentPadding: PaddingValues) {
+
+        arrowTint = if (BaresipService.darkTheme.value)
+            LocalCustomColors.current.grayLight
+        else
+            LocalCustomColors.current.black
+
+        if (showAlert.value) {
+            AlertDialog(
+                showDialog = showAlert,
+                title = alertTitle.value,
+                message = alertMessage.value,
+                positiveButtonText = stringResource(R.string.ok),
+            )
+        }
+        val scrollState = rememberScrollState()
+
+        Column(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 4.dp)
+                .verticalScrollbar(scrollState)
+                .verticalScroll(state = scrollState),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            CallVolume()
+            MicGain()
+            SpeakerPhone()
+            AudioModules()
+            OpusBitRate()
+            OpusPacketLoss()
+            AudioDelay()
+            ToneCountry()
+        }
+    }
+
+    @Composable
+    private fun CallVolume() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.default_call_volume),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.default_call_volume)
+                        alertMessage.value = getString(R.string.default_call_volume_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val volNames = listOf("--",  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+            val volValues = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+            val itemPosition = remember {
+                mutableIntStateOf(volValues.indexOf(oldCallVolume))
+            }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = volNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    volNames.forEachIndexed { index, vol ->
+                        DropdownMenuItem(text = {
+                            Text(text = vol)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                newCallVolume = volValues[index]
+                            })
+                        if (index < 10)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MicGain() {
+        if (!BaresipService.agcAvailable)
+            Row(
+                Modifier.fillMaxWidth().padding(end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                var micGain by remember { mutableStateOf(oldMicGain) }
+                newMicGain = micGain
+                OutlinedTextField(
+                    value = micGain,
+                    placeholder = { Text(stringResource(R.string.microphone_gain)) },
+                    onValueChange = {
+                        micGain = it
+                        newMicGain = micGain
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            alertTitle.value = getString(R.string.microphone_gain)
+                            alertMessage.value = getString(R.string.microphone_gain_help)
+                            showAlert.value = true
+                        },
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = 18.sp, color = LocalCustomColors.current.itemText
+                    ),
+                    label = { LabelText(stringResource(R.string.microphone_gain)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+            }
+    }
+
+    @Composable
+    private fun SpeakerPhone() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.speaker_phone),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.speaker_phone)
+                        alertMessage.value = getString(R.string.speaker_phone_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
+            newSpeakerPhone = speakerPhone
+            Checkbox(
+                checked = speakerPhone,
+                onCheckedChange = {
+                    speakerPhone = it
+                    newSpeakerPhone = speakerPhone
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun AudioModules() {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
+        ) {
+            Text(text = stringResource(R.string.audio_modules_title),
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                modifier = Modifier.clickable {
+                    alertTitle.value = getString(R.string.audio_modules_title)
+                    alertMessage.value = getString(R.string.audio_modules_help)
+                    showAlert.value = true
+                })
+            for (module in audioModules) {
+                Row(horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 18.dp)
+                ) {
+                    Text(text = String.format(getString(R.string.bullet_item), module),
+                        color = LocalCustomColors.current.itemText,
+                        fontSize = 18.sp)
+                    Spacer(modifier = Modifier.weight(1f))
+                    Checkbox(
+                        checked = modules.contains("${module}.so"),
+                        onCheckedChange = {
+                            newAudioModules[module] = it
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun OpusBitRate() {
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var opusBitrate by remember { mutableStateOf(oldOpusBitrate) }
+            newOpusBitrate = opusBitrate
+            OutlinedTextField(
+                value = opusBitrate,
+                placeholder = { Text(stringResource(R.string.opus_bit_rate)) },
+                onValueChange = {
+                    opusBitrate = it
+                    newOpusBitrate = opusBitrate
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.opus_bit_rate)
+                        alertMessage.value = getString(R.string.opus_bit_rate_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.opus_bit_rate)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun OpusPacketLoss() {
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var opusPacketLoss by remember { mutableStateOf(oldOpusPacketLoss) }
+            newOpusPacketLoss = opusPacketLoss
+            OutlinedTextField(
+                value = opusPacketLoss,
+                placeholder = { Text(stringResource(R.string.opus_packet_loss)) },
+                onValueChange = {
+                    opusPacketLoss = it
+                    newOpusPacketLoss = opusPacketLoss
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.opus_packet_loss)
+                        alertMessage.value = getString(R.string.opus_packet_loss_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.opus_packet_loss)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun AudioDelay() {
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var audioDelay by remember { mutableStateOf(BaresipService.audioDelay.toString()) }
+            newAudioDelay = audioDelay
+            OutlinedTextField(
+                value = audioDelay,
+                placeholder = { Text(getString(R.string.audio_delay)) },
+                onValueChange = {
+                    audioDelay = it
+                    newAudioDelay = audioDelay
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = getString(R.string.audio_delay)
+                        alertMessage.value = getString(R.string.audio_delay_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.audio_delay)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    private fun ToneCountry() {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.tone_country),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.tone_country)
+                        alertMessage.value = getString(R.string.tone_country_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
+            val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
+            val itemPosition = remember {
+                mutableIntStateOf(countryValues.indexOf(BaresipService.toneCountry))
+            }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = countryNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = arrowTint)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    countryNames.forEachIndexed { index, name ->
+                        DropdownMenuItem(text = {
+                            Text(text = name)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                newToneCountry = countryValues[index]
+                            })
+                        if (index < 10)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkOnClick() {
+
+        if (BaresipService.activities.indexOf("audio") == -1)
+            return
+
+        if (BaresipService.callVolume != newCallVolume) {
+            BaresipService.callVolume = newCallVolume
+            Config.replaceVariable("call_volume", newCallVolume.toString())
+            save = true
         }
 
         if (!BaresipService.agcAvailable) {
-            micGain = binding.MicGain
-            oldMicGain = Config.variable("augain")
-            micGain.setText(oldMicGain)
-        } else {
-            binding.MicGainLayout.visibility = View.GONE
-        }
-
-        speakerPhone = binding.SpeakerPhone
-        speakerPhone.isChecked = BaresipService.speakerPhone
-
-        val modules = Config.variables("module")
-
-        val audioModulesList = binding.AudioModulesList
-        var id = 1000
-        for (module in audioModules) {
-            val rl = RelativeLayout(this)
-            val rlParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT)
-            rlParams.marginStart = 16
-            rl.layoutParams = rlParams
-            val tv = TextView(this)
-            tv.id = id++
-            val tvParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT)
-            tvParams.addRule(RelativeLayout.ALIGN_PARENT_START)
-            tvParams.addRule(RelativeLayout.CENTER_VERTICAL)
-            tvParams.addRule(RelativeLayout.START_OF, id)
-            tv.layoutParams = tvParams
-            tv.text = String.format(getString(R.string.bullet_item), module)
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-            tv.setTextColor(ContextCompat.getColor(this, R.color.colorItemText))
-            rl.addView(tv)
-            val cb = CheckBox(this)
-            cb.id = id++
-            val cbParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT)
-            cbParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-            cbParams.addRule(RelativeLayout.CENTER_VERTICAL)
-            cb.layoutParams = cbParams
-            cb.gravity = Gravity.END
-            cb.isChecked = modules.contains("${module}.so")
-            oldAudioModules[module] = cb.isChecked
-            rl.addView(cb)
-            audioModulesList.addView(rl)
-        }
-
-        opusBitRate = binding.OpusBitRate
-        oldOpusBitrate = Config.variable("opus_bitrate")
-        opusBitRate.setText(oldOpusBitrate)
-
-        opusPacketLoss = binding.OpusPacketLoss
-        oldOpusPacketLoss = Config.variable("opus_packet_loss")
-        opusPacketLoss.setText(oldOpusPacketLoss)
-
-        audioDelay = binding.AudioDelay
-        audioDelay.setText("${BaresipService.audioDelay}")
-
-        val toneCountrySpinner = binding.ToneCountrySpinner
-        val toneCountryKeys = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
-        val toneCountryVals = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
-        val keyIx = toneCountryKeys.indexOf(toneCountry)
-        val keyVal = toneCountryVals.elementAt(keyIx)
-        toneCountryKeys.removeAt(keyIx)
-        toneCountryVals.removeAt(keyIx)
-        toneCountryKeys.add(0, toneCountry)
-        toneCountryVals.add(0, keyVal)
-        val toneCountryAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,
-            toneCountryVals)
-        toneCountryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        toneCountrySpinner.adapter = toneCountryAdapter
-        toneCountrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                toneCountry = toneCountryKeys[toneCountryVals.indexOf(parent.selectedItem.toString())]
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
-        bindTitles()
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        super.onCreateOptionsMenu(menu)
-        val inflater = menuInflater
-        inflater.inflate(R.menu.check_icon, menu)
-        return true
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if (BaresipService.activities.indexOf("audio") == -1)
-            return true
-
-        when (item.itemId) {
-
-            R.id.checkIcon -> {
-
-                if (BaresipService.callVolume != callVolume) {
-                    BaresipService.callVolume = callVolume
-                    Config.replaceVariable("call_volume", callVolume.toString())
-                    save = true
+            var gain = newMicGain.trim()
+            if (!gain.contains("."))
+                gain = "$gain.0"
+            if (gain != oldMicGain) {
+                if (!checkMicGain(gain)) {
+                    alertTitle.value = getString(R.string.notice)
+                    alertMessage.value = "${getString(R.string.invalid_microphone_gain)}: $gain."
+                    showAlert.value = true
+                    return
                 }
-
-                if (!BaresipService.agcAvailable) {
-                    var gain = micGain.text.toString().trim()
-                    if (!gain.contains("."))
-                        gain = "$gain.0"
-                    if (gain != oldMicGain) {
-                        if (!checkMicGain(gain)) {
-                            Utils.alertView(
-                                this, getString(R.string.notice),
-                                "${getString(R.string.invalid_microphone_gain)}: $gain."
-                            )
-                            micGain.setText(oldMicGain)
-                            return false
+                if (gain == "1.0") {
+                    Api.module_unload("augain")
+                    Config.removeVariableValue("module", "augain.so")
+                    Config.replaceVariable("augain", "1.0")
+                } else {
+                    if (oldMicGain == "1.0") {
+                        if (Api.module_load("augain") != 0) {
+                            alertTitle.value = getString(R.string.error)
+                            alertMessage.value = getString(R.string.failed_to_load_module) + ": augain.so"
+                            showAlert.value = true
+                            return
                         }
-                        if (gain == "1.0") {
-                            Api.module_unload("augain")
-                            Config.removeVariableValue("module", "augain.so")
-                            Config.replaceVariable("augain", "1.0")
-                        } else {
-                            if (oldMicGain == "1.0") {
-                                if (Api.module_load("augain") != 0) {
-                                    Utils.alertView(
-                                        this, getString(R.string.error),
-                                        getString(R.string.failed_to_load_module)
-                                    )
-                                    micGain.setText(oldMicGain)
-                                    return false
-                                }
-                                Config.addVariable("module", "augain.so")
-                            }
-                            Config.replaceVariable("augain", gain)
-                            Api.cmd_exec("augain $gain")
-                        }
-                        save = true
+                        Config.addVariable("module", "augain.so")
                     }
+                    Config.replaceVariable("augain", gain)
+                    Api.cmd_exec("augain $gain")
                 }
+                save = true
+            }
+        }
 
-                if (speakerPhone.isChecked != BaresipService.speakerPhone) {
-                    BaresipService.speakerPhone = speakerPhone.isChecked
-                    Config.replaceVariable("speaker_phone",
-                        if (BaresipService.speakerPhone) "yes" else "no")
-                    save = true
-                }
+        if (newSpeakerPhone != BaresipService.speakerPhone) {
+            BaresipService.speakerPhone = newSpeakerPhone
+            Config.replaceVariable("speaker_phone",
+                if (BaresipService.speakerPhone) "yes" else "no")
+            save = true
+        }
 
-                var id = 1001
-                for (module in audioModules) {
-                    val box = findViewById<CheckBox>(id++)
-                    if (box.isChecked && !oldAudioModules[module]!!) {
+        for (module in audioModules) {
+            if (newAudioModules[module] != null) {
+                if (newAudioModules[module]!!) {
+                    if (!modules.contains("${module}.so")) {
                         if (Api.module_load("${module}.so") != 0) {
-                            Utils.alertView(this, getString(R.string.error),
-                                    "${getString(R.string.failed_to_load_module)}: ${module}.so")
-                            return false
+                            alertTitle.value = getString(R.string.error)
+                            alertMessage.value = "${getString(R.string.failed_to_load_module)}: ${module}.so"
+                            showAlert.value = true
+                            return
                         }
                         Config.addVariable("module", "${module}.so")
                         save = true
                     }
-                    if (!box.isChecked && oldAudioModules[module]!!) {
-                        Api.module_unload("${module}.so")
-                        Config.removeVariableValue("module", "${module}.so")
-                        for (ua in BaresipService.uas)
-                            ua.account.removeAudioCodecs(module)
-                        AccountsActivity.saveAccounts()
-                        save = true
-                    }
-                    id++
-                }
-
-                val opusBitRate = opusBitRate.text.toString().trim()
-                if (opusBitRate != oldOpusBitrate) {
-                    if (!checkOpusBitRate(opusBitRate)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_opus_bitrate)}: $opusBitRate.")
-                        return false
-                    }
-                    Config.replaceVariable("opus_bitrate", opusBitRate)
-                    restart = true
+                } else if (modules.contains("${module}.so")) {
+                    Api.module_unload("${module}.so")
+                    Config.removeVariableValue("module", "${module}.so")
+                    for (ua in BaresipService.uas.value)
+                        ua.account.removeAudioCodecs(module)
+                    AccountsActivity.saveAccounts()
                     save = true
                 }
-
-                val opusPacketLoss = opusPacketLoss.text.toString().trim()
-                if (opusPacketLoss != oldOpusPacketLoss) {
-                    if (!checkOpusPacketLoss(opusPacketLoss)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                "${getString(R.string.invalid_opus_packet_loss)}: $opusPacketLoss")
-                        return false
-                    }
-                    Config.replaceVariable("opus_packet_loss", opusPacketLoss)
-                    restart = true
-                    save = true
-                }
-
-                val audioDelay = audioDelay.text.toString().trim()
-                if (audioDelay != BaresipService.audioDelay.toString()) {
-                    if (!checkAudioDelay(audioDelay)) {
-                        Utils.alertView(this, getString(R.string.notice),
-                                String.format(getString(R.string.invalid_audio_delay), audioDelay))
-                        return false
-                    }
-                    Config.replaceVariable("audio_delay", audioDelay)
-                    BaresipService.audioDelay = audioDelay.toLong()
-                    save = true
-                }
-
-                if (BaresipService.toneCountry != toneCountry) {
-                    BaresipService.toneCountry = toneCountry
-                    Config.replaceVariable("tone_country", toneCountry)
-                    save = true
-                }
-
-                if (save)
-                    Config.save()
-
-                setResult(if (restart) RESULT_OK else RESULT_CANCELED)
-
-                BaresipService.activities.remove("audio")
-                finish()
-                return true
             }
-
-            android.R.id.home -> {
-                goBack()
-                return true
-            }
-
         }
 
-        return super.onOptionsItemSelected(item)
+        if (newOpusBitrate != oldOpusBitrate) {
+            if (!checkOpusBitRate(newOpusBitrate)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_opus_bitrate)}: $newOpusBitrate."
+                showAlert.value = true
+                return
+            }
+            Config.replaceVariable("opus_bitrate", newOpusBitrate)
+            restart = true
+            save = true
+        }
 
+        if (newOpusPacketLoss != oldOpusPacketLoss) {
+            if (!checkOpusPacketLoss(newOpusPacketLoss)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = "${getString(R.string.invalid_opus_packet_loss)}: $newOpusPacketLoss"
+                showAlert.value = true
+                return
+            }
+            Config.replaceVariable("opus_packet_loss", newOpusPacketLoss)
+            restart = true
+            save = true
+        }
+
+        val audioDelay = newAudioDelay.trim()
+        if (audioDelay != BaresipService.audioDelay.toString()) {
+            if (!checkAudioDelay(audioDelay)) {
+                alertTitle.value = getString(R.string.notice)
+                alertMessage.value = String.format(getString(R.string.invalid_audio_delay), audioDelay)
+                showAlert.value = true
+                return
+            }
+            Config.replaceVariable("audio_delay", audioDelay)
+            BaresipService.audioDelay = audioDelay.toLong()
+            save = true
+        }
+
+        if (BaresipService.toneCountry != newToneCountry) {
+            BaresipService.toneCountry = newToneCountry
+            Config.replaceVariable("tone_country", newToneCountry)
+            save = true
+        }
+
+        if (save)
+            Config.save()
+
+        setResult(if (restart) RESULT_OK else RESULT_CANCELED)
+
+        BaresipService.activities.remove("audio")
+        finish()
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (backInvokedCallback != null)
+                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(backInvokedCallback!!)
+        }
+        else
+            onBackPressedCallback.remove()
+        super.onDestroy()
     }
 
     private fun goBack() {
@@ -334,47 +676,11 @@ class AudioActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun bindTitles() {
-        binding.VolumeTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.default_call_volume),
-                    getString(R.string.default_call_volume_help))
-        }
-        binding.MicGainTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.microphone_gain),
-                getString(R.string.microphone_gain_help)
-            )
-        }
-        binding.SpeakerPhoneTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.speaker_phone),
-                getString(R.string.speaker_phone_help))
-        }
-        binding.AudioModulesTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.audio_modules_title),
-                    getString(R.string.audio_modules_help))
-        }
-        binding.OpusBitRateTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.opus_bit_rate),
-                    getString(R.string.opus_bit_rate_help))
-        }
-        binding.OpusPacketLossTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.opus_packet_loss),
-                    getString(R.string.opus_packet_loss_help))
-        }
-        binding.AudioDelayTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.audio_delay),
-                    getString(R.string.audio_delay_help))
-        }
-        binding.ToneCountryTitle.setOnClickListener {
-            Utils.alertView(this, getString(R.string.tone_country),
-                getString(R.string.tone_country_help))
-        }
-    }
-
     private fun checkMicGain(micGain: String): Boolean {
         val number =
             try {
                 micGain.toDouble()
-            } catch (e: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 return false
             }
         return number >= 1.0

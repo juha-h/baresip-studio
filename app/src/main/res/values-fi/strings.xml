@@ -6,8 +6,10 @@
     <string name="about_text">
         <![CDATA[
             <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+            <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
+            <br>
             <h2>Käyttövihjeitä</h2>
             <ul>
                 <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
@@ -17,7 +19,7 @@
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li> <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
-                <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
+                <li>Pyyhkäisy vasemmalle/oikealle vaihtaa näkyvissä olevaa tiliä.</li>
                 <li>Voit valita edellisen puhelun uudelleen koskettamalla virheää luuria silloin, kun puhelun kohde on tyhjä.</li>
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
@@ -25,10 +27,12 @@
                 <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tietosuoja</h2>
-                Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.
+                <p>Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.</p>
+            <br>
             <h2>Lähdekoodi</h2>
-                Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
-                missä voi myös raportoida virheistä.
+                <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
+                missä voi myös raportoida virheistä.</p>
+            <br>
             <h2>Lisenssit</h2>
                 <ul>
                     <li><b>BSD-3-Clause</b> except the following:</li>
@@ -223,9 +227,9 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Tilit</string>
-    <string name="new_account">Uusi tili</string>
-    <string name="accounts_help">Kun uusi tili luodaan, voidaan haluttaessa antaa myös porttinumero
-        ja tiedonsiirtoprotokolla: &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls].
+    <string name="new_account">Uuden tilin SIP URI</string>
+    <string name="accounts_help">Uuden tilin SIP URI muotoa
+        &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls].
         Jos &lt;portti&gt; on annettu, mutta protokollaa ei ole annettu, protokolla on udp.
         Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).
         Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
@@ -258,6 +262,7 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
+    <string name="playing_recording">Tallenteen kuuntelu …</string>
     <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
         \'%1$s\'\?
     </string>
@@ -293,11 +298,11 @@
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audion koodausmenetelmät</string>
     <string name="audio_codecs_help">Luettelo audion koodausmenetelmistä prioriteettijärjestyksessä.
-        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pyyhkäisemällä oikealle.
+        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pitkällä painalluksella.
     </string>
     <string name="video_codecs">Videon koodausmenetelmät</string>
     <string name="video_codecs_help">Luettelo videon koodausmenetelmistä prioriteettijärjestyksessä.
-        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pyyhkäisemällä oikealle.
+        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pitkällä painalluksella.
     </string>
     <string name="codec_action">Järjestä</string>
     <!-- Config Activity -->
@@ -354,6 +359,7 @@
         jotka eivät sisälly Android-käyttöjärjestelmään. Android versiossa 9 tiedosto
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
+    <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>
     <string name="speaker_phone_help">Jos merkitty, kaiutin kytketään sutomaattisesti päälle
@@ -365,9 +371,6 @@
     </string>
     <string name="failed_to_load_module">Modulin lataaminen epäonnistui.</string>
     <string name="aec">Akustinen kaiun poisto (AKP)</string>
-    <string name="aec_help">Jos merkitty, kaikua yritetään poistaa ohjelmiston avulla.</string>
-    <string name="no_hw_aec">Laitteellasi ei voida poistaa kaikua laitteiston avulla.</string>
-    <string name="aec_extended_filter">AKP laajennettu suodatin</string>
     <string name="microphone_gain">Mikrofonin äänikerroin</string>
     <string name="microphone_gain_help">Kertoo mikrofonin äänen voimakkuuden tällä desimaaliluvulla.
         Minimikerroin on 1.0 (tehdasasetus), mikä ei muuta mikrofonin äänen voimakkuutta.  Suuremmat
@@ -433,6 +436,8 @@
     <string name="sip_or_tel_uri">SIP tai tel URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
     <string name="favorite">Suosikki</string>
+    <string name="favorite_help">If ruksattu, kontakti näytetään muiden suosikkien
+        kanssa yhteystietolistan alussa</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="invalid_contact_uri">Virheellinen SIP:n URI</string>

@@ -8,8 +8,10 @@
     <string name="about_text">
         <![CDATA[
         <h1>Baresip library based SIP User Agent</h1>
+        <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
+        <br>
         <h2>Usage Hints</h2>
         <ul>
             <li>Check that default values in baresip\'s Settings meet your needs
@@ -26,14 +28,15 @@
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more
-                information.</li>
+            <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more information.</li>
         </ul>
         <h2>Privacy Policy</h2>
-            Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.
+            <p>Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.</p>
+        <br>
         <h2>Source code</h2>
-            Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-            where also issues can be reported.
+            <p>Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            where also issues can be reported.</p>
+        <br>
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
@@ -210,10 +213,10 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
-    <string name="new_account">New Account</string>
-    <string name="accounts_help">When a new account is created, account\'s port number and transport
-        protocol may be optionally given: &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
-        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to udp.
+    <string name="new_account">SIP URI of New Account</string>
+    <string name="accounts_help">SIP URI of new account of form
+        &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
+        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to UDP.
         If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 or 5061 (TLS).
         If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
         determined solely based on domain\'s DNS information.
@@ -245,6 +248,7 @@
     <string name="direction">Direction</string>
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
+    <string name="playing_recording">Playing recording …</string>
     <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?
@@ -278,10 +282,10 @@
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audio Codecs</string>
     <string name="audio_codecs_help">List of audio codecs in priority order. Drag to reorder,
-        swipe right to enable or disable.</string>
+        long click to enable or disable.</string>
     <string name="video_codecs">Video Codecs</string>
     <string name="video_codecs_help">List of video codecs in priority order. Drag to reorder,
-        swipe right to enable or disable.</string>
+        long click to enable or disable.</string>
     <string name="codec_action">Reorder</string>
     <!-- Config Activity -->
     <string name="configuration">Settings</string>
@@ -331,6 +335,7 @@
     <string name="tls_ca_file_help">If checked, a file has been or will be loaded that contains
         TLS certificates of such Certificate Authorities that are not included in Android OS.
         In Android version 9, a file called \'ca_certs.crt\' is loaded from Download folder.</string>
+    <string name="no_read_permission">No External Storage read permission</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="speaker_phone">Speaker Phone</string>
     <string name="speaker_phone_help">If checked, speaker phone is turned automatically on
@@ -340,10 +345,6 @@
         available for use by the accounts.</string>
     <string name="failed_to_load_module">Failed to load module.</string>
     <string name="aec">Acoustic Echo Cancellation</string>
-    <string name="aec_help">If checked, software based echo cancellation is in use.</string>
-    <string name="no_hw_aec">Hardware based echo canceller cannot be used on you device.</string>
-    <string name="aec_extended_filter">AEC Extended Filter</string>
-    <string name="aec_extended_filter_help">If checked, echo cancellation is using extended filter.</string>
     <string name="microphone_gain">Microphone Gain</string>
     <string name="microphone_gain_help">Multiply microphone volume by this decimal number.  Minimum
         value is 1.0 (factory default) that disables microphone gain. Larger values may negatively
