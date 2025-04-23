@@ -559,9 +559,10 @@
     <string name="no_restore">You are not able restore backup without \"Storage\" permission.</string>
     <string name="no_android_contacts">You are not able to access Android contacts without
         \"Contacts\" permission.</string>
-    <string name="no_cameras">You don\'t have any supported video cameras.</string>
+    <string name="no_cameras">No supported video cameras!</string>
     <string name="show_password">Show Password</string>
     <string name="no_network">No network connection!</string>
+    <string name="no_aec">No hardware Acoustic Echo Cancellation!</string>
     <string name="audio_focus_denied">Audio focus denied!</string>
     <string name="permissions_rationale">Permissions rationale</string>
     <string name="audio_permissions">baresip needs \"Microphone\" permission for voice calls,

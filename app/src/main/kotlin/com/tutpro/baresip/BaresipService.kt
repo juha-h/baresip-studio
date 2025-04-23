@@ -468,7 +468,7 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                Log.d(TAG, "AGC/NS available = $agcAvailable/$nsAvailable")
+                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
                 val userAgent = Config.variable("user_agent")
                 Thread {
@@ -498,15 +498,13 @@ class BaresipService: Service() {
                     )
                 }
 
-                if (linkAddresses.isEmpty()) {
-                    val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags =
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "no network")
-                    startActivity(newIntent)
-                }
-
+                var message = ""
+                if (linkAddresses.isEmpty())
+                    message = '\u2022' + " " + getString(R.string.no_network) + '\n'
+                if (!aecAvailable)
+                    message = message + '\u2022' + " " + getString(R.string.no_aec) + '\n'
+                if (message != "")
+                    toast(message.dropLast(1), Toast.LENGTH_LONG)
             }
 
             "Start Content Observer" -> {
@@ -1299,9 +1297,9 @@ class BaresipService: Service() {
         }
     }
 
-    private fun toast(message: String) {
+    private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
         Handler(Looper.getMainLooper()).post {
-            Toast.makeText(this@BaresipService.applicationContext, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this@BaresipService.applicationContext, message, length).show()
         }
     }
 
@@ -1607,6 +1605,7 @@ class BaresipService: Service() {
         }
     }
 
+    @Suppress("unused")
     private external fun baresipStart(
         path: String,
         addresses: String,
@@ -1614,6 +1613,7 @@ class BaresipService: Service() {
         software: String
     )
 
+    @Suppress("unused")
     external fun baresipStop(force: Boolean)
 
     @SuppressLint("MutableCollectionMutableState")
