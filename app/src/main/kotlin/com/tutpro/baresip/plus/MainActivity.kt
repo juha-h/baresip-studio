@@ -105,7 +105,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -2625,10 +2624,12 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Handling intent '$action'")
         val ev = action.split(",")
         when (ev[0]) {
-            "no network" -> {
-                alertTitle.value = getString(R.string.notice)
-                alertMessage.value = getString(R.string.no_network)
-                showAlert.value = true
+            "no" -> {
+                var message = ""
+                if ("network" in ev) message = '\u2022' + " " + getString(R.string.no_network) + '\n'
+                if ("cameras" in ev) message = message + '\u2022' + " " + getString(R.string.no_cameras) + '\n'
+                if ("aec" in ev) message = message + '\u2022' + " " + getString(R.string.no_aec) + '\n'
+                Toast.makeText(applicationContext, message.dropLast(1), Toast.LENGTH_LONG).show()
                 return
             }
             "call", "dial" -> {

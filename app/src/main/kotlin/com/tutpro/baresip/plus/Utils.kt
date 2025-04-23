@@ -1041,7 +1041,7 @@ object Utils {
             if (aec != null) {
                 BaresipService.aecAvailable = true
                 aec.release()
-                Log.d(TAG, "Creation of hardware AEC for $sessionId succeeded")
+                Log.i(TAG, "Creation of hardware AEC for $sessionId succeeded")
             } else {
                 Log.w(TAG, "Creation of hardware AEC for $sessionId failed")
             }

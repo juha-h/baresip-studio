@@ -472,7 +472,7 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                Log.d(TAG, "AGC/NS available = $agcAvailable/$nsAvailable")
+                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
                 val userAgent = Config.variable("user_agent")
                 Thread {
@@ -502,15 +502,18 @@ class BaresipService: Service() {
                     )
                 }
 
-                if (linkAddresses.isEmpty()) {
+                var no = "no"
+                if (linkAddresses.isEmpty()) no += ",network"
+                if (!supportedCameras) no += ",cameras"
+                if (!aecAvailable) no += ",aec"
+                if (no != "no") {
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags =
                         Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                 Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "no network")
+                    newIntent.putExtra("action", no)
                     startActivity(newIntent)
                 }
-
             }
 
             "Start Content Observer" -> {

@@ -576,9 +576,10 @@
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>
     <string name="no_restore">Et voi palauttaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>
-    <string name="no_cameras">Sinulla ei ole yhtään tuettua video-kameraa.</string>
+    <string name="no_cameras">Ei tuettuja videokameroita.</string>
     <string name="show_password">Näytä salasana</string>
     <string name="no_network">Ei verkkoyhteyttä!</string>
+    <string name="no_aec">Ei laitteistolla tuettua kaiun poistoa!</string>
     <string name="call_details">Puhelutiedot</string>
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audio fokus evätty!</string>
