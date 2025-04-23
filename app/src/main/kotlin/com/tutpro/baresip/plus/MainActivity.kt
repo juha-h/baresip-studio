@@ -3420,7 +3420,8 @@ class MainActivity : ComponentActivity() {
                     showCallTimer.value = true
                     showCallButton.value = false
                     showCallVideoButton.value = false
-                    videoIcon.intValue = R.drawable.video_on
+                    if (call.hasVideo())
+                        videoIcon.intValue = R.drawable.video_on
                     showHangupButton.value = true
                     showAnswerRejectButtons.value = false
                     if (call.onhold)
