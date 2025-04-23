@@ -61,6 +61,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,6 +106,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -138,6 +141,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -1567,7 +1571,8 @@ class MainActivity : ComponentActivity() {
 
                 val focusRequester = remember { FocusRequester() }
                 val shouldRequestFocus by focusDtmf
-                TextField(
+                val interactionSource = remember { MutableInteractionSource() }
+                BasicTextField(
                     value = dtmfText.value,
                     onValueChange = {
                         if (it.length > dtmfText.value.length) {
@@ -1580,18 +1585,29 @@ class MainActivity : ComponentActivity() {
                         dtmfText.value = it
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    modifier = Modifier
-                        .width(64.dp)
-                        .focusRequester(focusRequester),
-                    enabled = dtmfEnabled.value,
-                    textStyle = TextStyle(fontSize = 14.sp),
-                    label = {
-                        Text(
-                            text = stringResource(R.string.dtmf),
-                            style = TextStyle(fontSize = 12.sp)
-                        )},
-                    singleLine = true
-                )
+                    modifier = Modifier.width(48.dp)
+                        .focusRequester(focusRequester),//545.border(1.dp, Color.Gray),
+                    visualTransformation = VisualTransformation.None,
+                    interactionSource = interactionSource,
+                    textStyle = TextStyle(fontSize = 14.sp, color = LocalCustomColors.current.itemText),
+                    singleLine = true,
+                ) { innerTextField ->
+                    TextFieldDefaults.DecorationBox(
+                        value = dtmfText.value,
+                        visualTransformation = VisualTransformation.None,
+                        innerTextField = innerTextField,
+                        singleLine = true,
+                        enabled = dtmfEnabled.value,
+                        interactionSource = interactionSource,
+                        label =  {
+                            Text(
+                                text = stringResource(R.string.dtmf),
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        },
+                        contentPadding = PaddingValues(4.dp), // this is how you can remove the padding
+                    )
+                }
                 LaunchedEffect(shouldRequestFocus) {
                     if (shouldRequestFocus) {
                         focusRequester.requestFocus()
@@ -2985,6 +3001,7 @@ class MainActivity : ComponentActivity() {
                 }
                 else
                     callTimer?.stop()
+                dtmfText.value = ""
                 if (aor == viewModel.selectedAor.value) {
                     ua.account.resumeUri = ""
                     showCall(ua)
