@@ -17,13 +17,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -67,7 +67,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.plus.BaresipService.Companion.uas
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
-import com.tutpro.baresip.plus.CustomElements.Checkbox
 import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
@@ -189,33 +188,57 @@ class AccountActivity : ComponentActivity() {
             true to getString(R.string.auto))
 
         oldNickname = acc.nickName.value
+        newNickname = oldNickname
         oldDisplayname = acc.displayName
+        newDisplayname = oldDisplayname
         oldAuthUser = acc.authUser
+        newAuthUser = oldAuthUser
         if (BaresipService.aorPasswords[aor] == null &&  // check if OK
-            acc.authPass != NO_AUTH_PASS)
+                acc.authPass != NO_AUTH_PASS) {
             oldAuthPass = acc.authPass
+            newAuthPass = oldAuthPass
+        }
         if (acc.outbound.isNotEmpty()) {
             oldOutbound1 = acc.outbound[0]
-            if (acc.outbound.size > 1)
+            newOutbound1 = oldOutbound1
+            if (acc.outbound.size > 1) {
                 oldOutbound2 = acc.outbound[1]
+                newOutbound2 = oldOutbound2
+            }
         }
         oldRegister = acc.regint > 0
+        newRegister = oldRegister
         oldRegInt = acc.configuredRegInt.toString()
+        newRegInt = oldRegInt
         oldMediaEnc = acc.mediaEnc
+        newMediaEnc = oldMediaEnc
         oldMediaNat = acc.mediaNat
+        newMediaNat = oldMediaNat
         showStun.value = oldMediaNat != ""
         oldStunServer = acc.stunServer
+        newStunServer = oldStunServer
         oldStunUser = acc.stunUser
+        newStunUser = oldStunUser
         oldStunPass = acc.stunPass
+        newStunPass = oldStunPass
         oldRtcpMux = acc.rtcpMux
+        newRtcpMux = oldRtcpMux
         old100Rel = acc.rel100Mode == Api.REL100_ENABLED
+        new100Rel = old100Rel
         oldDtmfMode = acc.dtmfMode
+        newDtmfMode = oldDtmfMode
         oldAnswerMode = acc.answerMode
+        newAnswerMode = oldAnswerMode
         oldAutoRedirect = acc.autoRedirect
+        newAutoRedirect = oldAutoRedirect
         oldVmUri = acc.vmUri
+        newVmUri = oldVmUri
         oldCountryCode = acc.countryCode
+        newCountryCode = oldCountryCode
         oldTelProvider = acc.telProvider
+        newTelProvider = oldTelProvider
         oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
+        newDefaultAccount = oldDefaultAccount
 
         setContent {
             AppTheme {
@@ -238,7 +261,10 @@ class AccountActivity : ComponentActivity() {
         else
             acc.aor.substringAfter(":")
         Scaffold(
-            modifier = Modifier.safeDrawingPadding(),
+            modifier = Modifier
+                .fillMaxHeight()
+                .imePadding()
+                .safeDrawingPadding(),
             containerColor = LocalCustomColors.current.background,
             topBar = {
                 TopAppBar(
@@ -301,10 +327,9 @@ class AccountActivity : ComponentActivity() {
 
         Column(
             modifier = Modifier
-                .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
-                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 16.dp)
                 .verticalScrollbar(scrollState)
                 .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -369,7 +394,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var nickName by remember { mutableStateOf(oldNickname) }
-            newNickname = nickName
             OutlinedTextField(
                 value = nickName,
                 placeholder = { Text(stringResource(R.string.nickname)) },
@@ -400,7 +424,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var displayName by remember { mutableStateOf(oldDisplayname) }
-            newDisplayname = displayName
             OutlinedTextField(
                 value = displayName,
                 placeholder = { Text(stringResource(R.string.display_name)) },
@@ -431,7 +454,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var authUser by remember { mutableStateOf(oldAuthUser) }
-            newAuthUser = authUser
             OutlinedTextField(
                 value = authUser,
                 placeholder = { Text(stringResource(R.string.authentication_username)) },
@@ -461,7 +483,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var authPass by remember { mutableStateOf(oldAuthPass) }
-            newAuthPass = authPass
             OutlinedTextField(
                 value = authPass,
                 placeholder = { Text(stringResource(R.string.authentication_password)) },
@@ -520,7 +541,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var outbound1 by remember { mutableStateOf(oldOutbound1) }
-            newOutbound1 = outbound1
             OutlinedTextField(
                 value = outbound1,
                 placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
@@ -542,7 +562,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var outbound2 by remember { mutableStateOf(oldOutbound2) }
-            newOutbound2 = outbound2
             OutlinedTextField(
                 value = outbound2,
                 placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
@@ -563,7 +582,7 @@ class AccountActivity : ComponentActivity() {
     @Composable
     fun Register() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -577,15 +596,13 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var register by remember { mutableStateOf(oldRegister) }
-            newRegister = register
-            Checkbox(
+            Switch(
                 checked = register,
                 onCheckedChange = {
                     register = it
                     newRegister = register
                 }
             )
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -597,7 +614,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var regInt by remember { mutableStateOf(oldRegInt) }
-            newRegInt = regInt
             OutlinedTextField(
                 value = regInt,
                 placeholder = { Text(stringResource(R.string.reg_int)) },
@@ -671,7 +687,7 @@ class AccountActivity : ComponentActivity() {
     @Composable
     private fun MediaEnc() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -686,7 +702,6 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp)
             val isDropDownExpanded = remember { mutableStateOf(false) }
             val mediaEnc = remember { mutableStateOf(oldMediaEnc) }
-            newMediaEnc = mediaEnc.value
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -725,14 +740,13 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun MediaNat() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -747,7 +761,6 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp)
             val isDropDownExpanded = remember { mutableStateOf(false) }
             val mediaNat = remember { mutableStateOf(oldMediaNat) }
-            newMediaNat = mediaNat.value
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -786,7 +799,6 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -799,7 +811,6 @@ class AccountActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Start
             ) {
                 var stunServer by remember { mutableStateOf(oldStunServer) }
-                newStunServer = stunServer
                 OutlinedTextField(
                     value = stunServer,
                     placeholder = { Text(stringResource(R.string.stun_server)) },
@@ -829,7 +840,6 @@ class AccountActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Start
             ) {
                 var stunUser by remember { mutableStateOf(oldStunUser) }
-                newStunUser = stunUser
                 OutlinedTextField(
                     value = stunUser,
                     placeholder = { Text(stringResource(R.string.stun_username)) },
@@ -860,7 +870,6 @@ class AccountActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Start
             ) {
                 var stunPass by remember { mutableStateOf(oldStunPass) }
-                newStunPass = stunPass
                 OutlinedTextField(
                     value = stunPass,
                     placeholder = { Text(stringResource(R.string.stun_password)) },
@@ -912,7 +921,7 @@ class AccountActivity : ComponentActivity() {
     @Composable
     fun RtcpMux() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -926,22 +935,20 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var rtcpMux by remember { mutableStateOf(oldRtcpMux) }
-            newRtcpMux = rtcpMux
-            Checkbox(
+            Switch(
                 checked = rtcpMux,
                 onCheckedChange = {
                     rtcpMux = it
                     newRtcpMux = rtcpMux
                 }
             )
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     fun Rel100() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -955,22 +962,20 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var rel100 by remember { mutableStateOf(old100Rel) }
-            new100Rel = rel100
-            Checkbox(
+            Switch(
                 checked = rel100,
                 onCheckedChange = {
                     rel100 = it
                     new100Rel = rel100
                 }
             )
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Dtmf() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -987,7 +992,6 @@ class AccountActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
             val dtmfMode = remember { mutableIntStateOf(oldDtmfMode) }
-            newDtmfMode = dtmfMode.intValue
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -1025,14 +1029,13 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Answer() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1049,7 +1052,6 @@ class AccountActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
             val answerMode = remember { mutableIntStateOf(oldAnswerMode) }
-            newAnswerMode = answerMode.intValue
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -1085,14 +1087,13 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
     @Composable
     private fun Redirect() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1109,7 +1110,6 @@ class AccountActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
             val autoRedirect = remember { mutableStateOf(oldAutoRedirect) }
-            newAutoRedirect = autoRedirect.value
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -1147,7 +1147,6 @@ class AccountActivity : ComponentActivity() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 
@@ -1159,7 +1158,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var vmUri by remember { mutableStateOf(oldVmUri) }
-            newVmUri = vmUri
             OutlinedTextField(
                 value = vmUri,
                 placeholder = { Text(stringResource(R.string.voicemail_uri)) },
@@ -1188,7 +1186,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var countryCode by remember { mutableStateOf(oldCountryCode) }
-            newCountryCode = countryCode
             OutlinedTextField(
                 value = countryCode,
                 placeholder = { Text(stringResource(R.string.country_code)) },
@@ -1217,7 +1214,6 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             var telProvider by remember { mutableStateOf(oldTelProvider) }
-            newTelProvider = telProvider
             OutlinedTextField(
                 value = telProvider,
                 placeholder = { Text(stringResource(R.string.telephony_provider)) },
@@ -1241,7 +1237,7 @@ class AccountActivity : ComponentActivity() {
     @Composable
     fun DefaultAccount() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1254,15 +1250,13 @@ class AccountActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
             var defaultAccount by remember { mutableStateOf(oldDefaultAccount) }
-            newDefaultAccount = defaultAccount
-            Checkbox(
+            Switch(
                 checked = defaultAccount,
                 onCheckedChange = {
                     defaultAccount = it
                     newDefaultAccount = defaultAccount
                 }
             )
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 

@@ -52,6 +52,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Switch
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -71,7 +72,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
-import com.tutpro.baresip.plus.CustomElements.Checkbox
 import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
@@ -242,6 +242,7 @@ class ConfigActivity : ComponentActivity() {
             oldAutoStart = false
             save = true
         }
+        newAutoStart = oldAutoStart
 
         oldListenAddr = Config.variable("sip_listen")
 
@@ -407,7 +408,6 @@ class ConfigActivity : ComponentActivity() {
 
         Column(
             modifier = Modifier
-                .imePadding()
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
@@ -441,13 +441,12 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun StartAutomatically(ctx: Context) {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = stringResource(R.string.start_automatically),
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
                     .clickable {
                         alertTitle.value = getString(R.string.start_automatically)
                         alertMessage.value = getString(R.string.start_automatically_help)
@@ -456,8 +455,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var startAutomatically by remember { mutableStateOf(oldAutoStart) }
-            newAutoStart = startAutomatically
-            Checkbox(
+            Switch(
                 checked = startAutomatically,
                 onCheckedChange = {
                     if (it) {
@@ -490,9 +488,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun ListenAddress() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
@@ -523,9 +519,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun AddressFamily() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -549,7 +543,7 @@ class ConfigActivity : ComponentActivity() {
             }
             Box {
                 Row(
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable {
                         isDropDownExpanded.value = true
@@ -588,9 +582,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun DnsServers() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -621,7 +613,7 @@ class ConfigActivity : ComponentActivity() {
     private fun TlsCertificateFile(ctx: Context) {
         val showAlertDialog = remember { mutableStateOf(false) }
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -636,7 +628,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var tlsCertificateFile by remember { mutableStateOf(oldTlsCertificateFile) }
-            Checkbox(
+            Switch(
                 checked = tlsCertificateFile,
                 onCheckedChange = {
                     tlsCertificateFile = it
@@ -656,7 +648,7 @@ class ConfigActivity : ComponentActivity() {
                                         alertTitle.value = getString(R.string.error)
                                         alertMessage.value = getString(R.string.read_cert_error)
                                         showAlert.value = true
-                                        return@Checkbox
+                                        return@Switch
                                     }
                                     val certPath = BaresipService.filesPath + "/cert.pem"
                                     Utils.putFileContents(certPath, content)
@@ -698,7 +690,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun VerifyServer() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -713,7 +705,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var verifyServer by remember { mutableStateOf(oldVerifyServer) }
-            Checkbox(
+            Switch(
                 checked = verifyServer,
                 onCheckedChange = {
                     verifyServer = it
@@ -726,7 +718,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun CaFile(ctx: Context) {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -741,7 +733,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var caFile by remember { mutableStateOf(oldCaFile) }
-            Checkbox(
+            Switch(
                 checked = caFile,
                 onCheckedChange = {
                     caFile = it
@@ -760,7 +752,7 @@ class ConfigActivity : ComponentActivity() {
                                         alertTitle.value = getString(R.string.error)
                                         alertMessage.value = getString(R.string.read_ca_certs_error)
                                         showAlert.value = true
-                                        return@Checkbox
+                                        return@Switch
                                     }
                                     File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
                                     caFile = true
@@ -795,9 +787,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun UserAgent() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -828,9 +818,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun AudioSettings(ctx: Context) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -997,7 +985,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun BatteryOptimizations() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1012,7 +1000,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var battery by remember { mutableStateOf(oldBatteryOptimizations) }
-            Checkbox(
+            Switch(
                 checked = battery,
                 onCheckedChange = {
                     battery = it
@@ -1031,7 +1019,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun DefaultDialer() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1046,7 +1034,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var defaultDialer by remember { mutableStateOf(oldDefaultDialer) }
-            Checkbox(
+            Switch(
                 checked = defaultDialer,
                 onCheckedChange = {
                     defaultDialer = it
@@ -1076,9 +1064,7 @@ class ConfigActivity : ComponentActivity() {
     private fun Contacts(ctx: Context) {
         val showAlertDialog = remember { mutableStateOf(false) }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1197,7 +1183,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun DarkTheme() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1212,7 +1198,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var darkTheme by remember { mutableStateOf(oldDarkTheme) }
-            Checkbox(
+            Switch(
                 checked = darkTheme,
                 onCheckedChange = {
                     darkTheme = it
@@ -1225,7 +1211,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun Debug() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1240,7 +1226,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var debug by remember { mutableStateOf(oldDebug) }
-            Checkbox(
+            Switch(
                 checked = debug,
                 onCheckedChange = {
                     debug = it
@@ -1253,7 +1239,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun SipTrace() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1268,7 +1254,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var sipTrace by remember { mutableStateOf(oldSipTrace) }
-            Checkbox(
+            Switch(
                 checked = sipTrace,
                 onCheckedChange = {
                     sipTrace = it
@@ -1281,7 +1267,7 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     private fun Reset() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1296,7 +1282,7 @@ class ConfigActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var reset by remember { mutableStateOf(false) }
-            Checkbox(
+            Switch(
                 checked = reset,
                 onCheckedChange = {
                     dialogTitle.value = getString(R.string.confirmation)

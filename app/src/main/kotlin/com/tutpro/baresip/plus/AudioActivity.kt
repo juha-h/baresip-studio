@@ -37,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -54,7 +55,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
-import com.tutpro.baresip.plus.CustomElements.Checkbox
 import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
@@ -223,7 +223,7 @@ class AudioActivity : ComponentActivity() {
     @Composable
     private fun CallVolume() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -319,7 +319,7 @@ class AudioActivity : ComponentActivity() {
     @Composable
     private fun SpeakerPhone() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -334,8 +334,7 @@ class AudioActivity : ComponentActivity() {
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
-            newSpeakerPhone = speakerPhone
-            Checkbox(
+            Switch(
                 checked = speakerPhone,
                 onCheckedChange = {
                     speakerPhone = it
@@ -362,16 +361,18 @@ class AudioActivity : ComponentActivity() {
             for (module in audioModules) {
                 Row(horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 18.dp)
+                    modifier = Modifier.padding(start = 18.dp, end = 10.dp)
                 ) {
                     Text(text = String.format(getString(R.string.bullet_item), module),
                         color = LocalCustomColors.current.itemText,
                         fontSize = 18.sp)
                     Spacer(modifier = Modifier.weight(1f))
-                    Checkbox(
-                        checked = modules.contains("${module}.so"),
+                    var checked by remember { mutableStateOf(modules.contains("${module}.so")) }
+                    Switch(
+                        checked = checked,
                         onCheckedChange = {
-                            newAudioModules[module] = it
+                            checked = it
+                            newAudioModules[module] = checked
                         }
                     )
                 }
@@ -475,7 +476,7 @@ class AudioActivity : ComponentActivity() {
     @Composable
     private fun ToneCountry() {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(end=10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {

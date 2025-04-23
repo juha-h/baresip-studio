@@ -32,8 +32,6 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -183,21 +181,6 @@ object CustomElements {
                     HorizontalDivider(color = LocalCustomColors.current.spinnerDivider)
             }
         }
-    }
-
-    @Composable
-    fun Checkbox(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = {
-                onCheckedChange(!checked)
-            },
-            colors = CheckboxDefaults.colors(
-                checkedColor = LocalCustomColors.current.accent,
-                uncheckedColor = LocalCustomColors.current.strong,
-                checkmarkColor = LocalCustomColors.current.strong,
-            )
-        )
     }
 
     @Composable
