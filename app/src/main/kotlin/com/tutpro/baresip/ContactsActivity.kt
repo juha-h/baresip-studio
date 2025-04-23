@@ -252,6 +252,7 @@ class ContactsActivity : ComponentActivity() {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     when(contact) {
 
@@ -370,7 +371,7 @@ class ContactsActivity : ComponentActivity() {
                                     )
                             )
                             SmallFloatingActionButton(
-                                modifier = Modifier.padding(end = 16.dp),
+                                modifier = Modifier.padding(end = 10.dp),
                                 onClick = {
                                     if (SystemClock.elapsedRealtime() - lastClick > 1000) {
                                         lastClick = SystemClock.elapsedRealtime()
