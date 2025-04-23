@@ -52,6 +52,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -80,7 +81,6 @@ import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
 import coil.compose.rememberAsyncImagePainter
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.Checkbox
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -414,7 +414,7 @@ class BaresipContactActivity : ComponentActivity() {
             )
             var favoriteContact by remember { mutableStateOf(favorite) }
             newFavorite = favoriteContact
-            Checkbox(
+            Switch(
                 checked = favoriteContact,
                 onCheckedChange = {
                     favoriteContact = it
@@ -439,7 +439,7 @@ class BaresipContactActivity : ComponentActivity() {
                 )
                 var androidContact by remember { mutableStateOf(android) }
                 newAndroid = androidContact
-                Checkbox(
+                Switch(
                     checked = androidContact,
                     onCheckedChange = {
                         if (BaresipService.contactsMode != "android") {

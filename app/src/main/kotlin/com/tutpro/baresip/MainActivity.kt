@@ -94,6 +94,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -139,7 +140,6 @@ import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.Checkbox
 import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.PasswordDialog
@@ -151,6 +151,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.set
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
@@ -1445,21 +1446,23 @@ class MainActivity : ComponentActivity() {
                                                 color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
-                                            Checkbox(
-                                                checked = blindChecked.value
-                                            ) {
-                                                blindChecked.value = true
-                                            }
+                                            Switch(
+                                                checked = blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = true
+                                                }
+                                            )
                                             Text(
                                                 text = stringResource(R.string.attended),
                                                 color = LocalCustomColors.current.alert,
                                                 modifier = Modifier.padding(16.dp),
                                             )
-                                            Checkbox(
-                                                checked = !blindChecked.value
-                                            ) {
-                                                blindChecked.value = false
-                                            }
+                                            Switch(
+                                                checked = !blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = false
+                                                }
+                                            )
                                         }
                                     Row(
                                         horizontalArrangement = Arrangement.Absolute.SpaceEvenly
