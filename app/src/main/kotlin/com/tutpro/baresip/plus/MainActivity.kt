@@ -2624,14 +2624,6 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Handling intent '$action'")
         val ev = action.split(",")
         when (ev[0]) {
-            "no" -> {
-                var message = ""
-                if ("network" in ev) message = '\u2022' + " " + getString(R.string.no_network) + '\n'
-                if ("cameras" in ev) message = message + '\u2022' + " " + getString(R.string.no_cameras) + '\n'
-                if ("aec" in ev) message = message + '\u2022' + " " + getString(R.string.no_aec) + '\n'
-                Toast.makeText(applicationContext, message.dropLast(1), Toast.LENGTH_LONG).show()
-                return
-            }
             "call", "dial" -> {
                 if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),

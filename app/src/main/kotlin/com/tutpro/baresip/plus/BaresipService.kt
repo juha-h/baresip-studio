@@ -502,18 +502,15 @@ class BaresipService: Service() {
                     )
                 }
 
-                var no = "no"
-                if (linkAddresses.isEmpty()) no += ",network"
-                if (!supportedCameras) no += ",cameras"
-                if (!aecAvailable) no += ",aec"
-                if (no != "no") {
-                    val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags =
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", no)
-                    startActivity(newIntent)
-                }
+                var message = ""
+                if (linkAddresses.isEmpty())
+                    message = '\u2022' + " " + getString(R.string.no_network) + '\n'
+                if (!supportedCameras)
+                    message += '\u2022' + " " + getString(R.string.no_cameras) + '\n'
+                if (!aecAvailable)
+                    message += '\u2022' + " " + getString(R.string.no_aec) + '\n'
+                if (message != "")
+                    toast(message.dropLast(1), Toast.LENGTH_LONG)
             }
 
             "Start Content Observer" -> {
@@ -1353,9 +1350,9 @@ class BaresipService: Service() {
         }
     }
 
-    private fun toast(message: String) {
+    private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
         Handler(Looper.getMainLooper()).post {
-            Toast.makeText(this@BaresipService.applicationContext, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this@BaresipService.applicationContext, message, length).show()
         }
     }
 
