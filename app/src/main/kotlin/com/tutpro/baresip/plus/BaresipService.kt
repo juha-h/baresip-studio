@@ -509,8 +509,13 @@ class BaresipService: Service() {
                     message += '\u2022' + " " + getString(R.string.no_cameras) + '\n'
                 if (!aecAvailable)
                     message += '\u2022' + " " + getString(R.string.no_aec) + '\n'
-                if (message != "")
-                    toast(message.dropLast(1), Toast.LENGTH_LONG)
+                if (message != "") {
+                    val newIntent = Intent(this, MainActivity::class.java)
+                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    newIntent.putExtra("action", "no,${message.dropLast(1)}")
+                    startActivity(newIntent)
+                }
             }
 
             "Start Content Observer" -> {
