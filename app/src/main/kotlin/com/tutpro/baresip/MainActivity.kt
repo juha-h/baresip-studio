@@ -82,6 +82,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -92,17 +93,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -111,6 +116,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -147,6 +153,7 @@ import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -608,8 +615,7 @@ class MainActivity : ComponentActivity() {
                                         showCall(ua)
                                     }
                                 }
-                            }
-                            else if (offset > swipeThreshold) {
+                            } else if (offset > swipeThreshold) {
                                 if (uas.value.isNotEmpty()) {
                                     val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                     val newPos = when (curPos) {
@@ -679,28 +685,58 @@ class MainActivity : ComponentActivity() {
                 containerColor = LocalCustomColors.current.primary
             ),
             actions = {
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp),
-                    onClick = {
-                        if (Call.call("connected") == null) {
-                            BaresipService.isRecOn = !BaresipService.isRecOn
-                            recImage = if (BaresipService.isRecOn) {
-                                Api.module_load("sndfile")
-                                recOnImage
-                            }
-                            else {
-                                Api.module_unload("sndfile")
-                                recOffImage
-                            }
-                        }
-                        else
-                            Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
-                    }
+                val scope = rememberCoroutineScope()
+                val tooltipState = rememberTooltipState()
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                    tooltip = {
+                        RichTooltip(
+                            title = { Text(
+                                text = "Call Recording",
+                                color = LocalCustomColors.current.alert,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            ) },
+                            text = { Text(
+                                text = "If activated, new incoming or outgoing calls are recorded.",
+                                color = LocalCustomColors.current.itemText,
+                                fontSize = 16.sp
+                            ) },
+                            caretSize = TooltipDefaults.caretSize,
+                            shape = RoundedCornerShape(16.dp),
+                            colors = TooltipDefaults.richTooltipColors(
+                                containerColor = LocalCustomColors.current.cardBackground,
+                            ),
+                        )
+                    },
+                    enableUserInput = true,
+                    state = tooltipState
                 ) {
-                    Icon(imageVector = recImage,
-                        tint = Color.Unspecified,
-                        contentDescription = null)
+                    IconButton(
+                        onClick = {
+                            if (Call.call("connected") == null) {
+                                BaresipService.isRecOn = !BaresipService.isRecOn
+                                recImage = if (BaresipService.isRecOn) {
+                                    Api.module_load("sndfile")
+                                    recOnImage
+                                } else {
+                                    Api.module_unload("sndfile")
+                                    recOffImage
+                                }
+                            } else
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = recImage,
+                            tint = Color.Unspecified,
+                            contentDescription = null
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
                 IconButton(
                     modifier = Modifier.padding(end=12.dp),
                     onClick = {
@@ -721,6 +757,7 @@ class MainActivity : ComponentActivity() {
                         tint = Color.Unspecified,
                         contentDescription = null)
                 }
+
                 IconButton(
                     modifier = Modifier.padding(end=6.dp),
                     onClick = {
@@ -740,6 +777,7 @@ class MainActivity : ComponentActivity() {
                         tint = Color.Unspecified,
                         contentDescription = null)
                 }
+
                 IconButton(
                     onClick = { menuExpanded = !menuExpanded }
                 ) {
@@ -749,6 +787,7 @@ class MainActivity : ComponentActivity() {
                         tint = LocalCustomColors.current.light
                     )
                 }
+
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
@@ -1693,15 +1732,16 @@ class MainActivity : ComponentActivity() {
                 showAlert.value = true
                 return
             }
-            Utils.telToSip(uriText, ua.account)
-        } else {
-            Utils.uriComplete(uriText, aor)
+            Utils.telToSip(peerUri, ua.account)
         }
+        else
+            Utils.uriComplete(peerUri, aor)
         if (!Utils.checkUri(uri)) {
             alertTitle.value = getString(R.string.notice)
             alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
             showAlert.value = true
-        } else if (!BaresipService.requestAudioFocus(applicationContext)) {
+        }
+        else if (!BaresipService.requestAudioFocus(applicationContext)) {
             Toast.makeText(applicationContext, R.string.audio_focus_denied,
                 Toast.LENGTH_SHORT).show()
         } else {
