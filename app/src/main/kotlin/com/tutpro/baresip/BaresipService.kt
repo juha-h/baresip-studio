@@ -498,13 +498,23 @@ class BaresipService: Service() {
                     )
                 }
 
-                var message = ""
-                if (linkAddresses.isEmpty())
-                    message = '\u2022' + " " + getString(R.string.no_network) + '\n'
-                if (!aecAvailable)
-                    message = message + '\u2022' + " " + getString(R.string.no_aec) + '\n'
-                if (message != "")
-                    toast(message.dropLast(1), Toast.LENGTH_LONG)
+                val message = if (linkAddresses.isEmpty()) {
+                    if (!aecAvailable)
+                        '\u2022' + " " + getString(R.string.no_network) + '\n' +
+                                '\u2022' + " " + getString(R.string.no_aec)
+                    else
+                        getString(R.string.no_network)
+                }
+                else
+                    if (!aecAvailable) getString(R.string.no_aec) else ""
+                if (message != "") {
+                    val newIntent = Intent(this, MainActivity::class.java)
+                    newIntent.flags =
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                    newIntent.putExtra("action", "no,$message")
+                    startActivity(newIntent)
+                }
             }
 
             "Start Content Observer" -> {
