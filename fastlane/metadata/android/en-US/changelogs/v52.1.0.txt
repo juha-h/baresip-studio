@@ -1,0 +1,5 @@
+- Use switches instead of check boxes in all activities
+- Added Ringtone setting
+- Alert at start if network, supported cameras, or hardware Acoustic Echo Cancellation is not available
+- Fixed bug that caused truncation of called telephone number
+- Avoid crash related to using baresip as the dialer app
