@@ -2119,10 +2119,10 @@ class MainActivity : ComponentActivity() {
                 showAlert.value = true
                 return
             }
-            Utils.telToSip(uriText, ua.account)
-        } else {
-            Utils.uriComplete(uriText, aor)
+            Utils.telToSip(peerUri, ua.account)
         }
+        else
+            Utils.uriComplete(peerUri, aor)
         if (!Utils.checkUri(uri)) {
             alertTitle.value = getString(R.string.notice)
             alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
