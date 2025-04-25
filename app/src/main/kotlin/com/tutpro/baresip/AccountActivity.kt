@@ -369,7 +369,7 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             OutlinedTextField(
-                value = aor,
+                value = acc.luri,
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),

@@ -13,7 +13,7 @@ class Account(val accp: Long) {
     val nickName: MutableState<String> = mutableStateOf("")
     var displayName = Api.account_display_name(accp)
     val aor = Api.account_aor(accp)
-    private var luri = Api.account_luri(accp)
+    val luri = Api.account_luri(accp)
     var authUser = Api.account_auth_user(accp)
     var authPass = Api.account_auth_pass(accp)
     var outbound = ArrayList<String>()
