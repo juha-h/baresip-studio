@@ -678,8 +678,9 @@ class MainActivity : ComponentActivity() {
             ),
             actions = {
 
-                IconButton(
-                    modifier = Modifier.combinedClickable(
+                Icon(
+                    imageVector = recImage,
+                    modifier = Modifier.size(40.dp).combinedClickable(
                         onClick = {
                             if (Call.call("connected") == null) {
                                 BaresipService.isRecOn = !BaresipService.isRecOn
@@ -696,77 +697,68 @@ class MainActivity : ComponentActivity() {
                         onLongClick = {
                             alertTitle.value = "Call Recording"
                             alertMessage.value = "If activated, new incoming and outgoing calls will be recorded." +
-                                    "Recordings can be played on Call Details page"
+                                    " Recordings can be played on Call Details page"
                             showAlert.value = true
                         }
                     ),
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = recImage,
-                        tint = Color.Unspecified,
-                        contentDescription = null
-                    )
-                }
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(22.dp))
 
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp)
-                            .combinedClickable(
-                                onClick = {
-                                    if (Call.call("connected") != null) {
-                                        BaresipService.isMicMuted = !BaresipService.isMicMuted
-                                        if (BaresipService.isMicMuted) {
-                                            micIcon = R.drawable.mic_off
-                                            Api.calls_mute(true)
-                                        } else {
-                                            micIcon = R.drawable.mic_on
-                                            Api.calls_mute(false)
-                                        }
-                                    }
-                                },
-                                onLongClick = {
-                                    alertTitle.value = "Microphone"
-                                    alertMessage.value = "If activated, microphone is muted."
-                                    showAlert.value = true
-                                },
-                            ),
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(micIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
-
-                IconButton(
-                    modifier = Modifier.padding(end=6.dp)
-                        .combinedClickable(
+                Icon(
+                    imageVector = ImageVector.vectorResource(micIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
                             onClick = {
-                                if (Build.VERSION.SDK_INT >= 31)
-                                    Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                            "${am.communicationDevice!!.type}/${am.mode}"
-                                    )
-                                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                                speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                                    R.drawable.speaker_on
-                                else
-                                    R.drawable.speaker_off
+                                if (Call.call("connected") != null) {
+                                    BaresipService.isMicMuted = !BaresipService.isMicMuted
+                                    if (BaresipService.isMicMuted) {
+                                        micIcon = R.drawable.mic_off
+                                        Api.calls_mute(true)
+                                    } else {
+                                        micIcon = R.drawable.mic_on
+                                        Api.calls_mute(false)
+                                    }
+                                }
                             },
                             onLongClick = {
-                                alertTitle.value = "Speakerphone"
-                                alertMessage.value = "If activated, audio is player via speakerphone."
+                                alertTitle.value = "Microphone"
+                                alertMessage.value = "If activated during call, microphone is muted."
                                 showAlert.value = true
                             },
                         ),
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(speakerIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(speakerIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 31)
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
+                                )
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                                R.drawable.speaker_on
+                            else
+                                R.drawable.speaker_off
+                        },
+                        onLongClick = {
+                            alertTitle.value = "Speakerphone"
+                            alertMessage.value = "If activated, audio is player via device speakerphone."
+                            showAlert.value = true
+                        },
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 IconButton(
                     onClick = { menuExpanded = !menuExpanded }
