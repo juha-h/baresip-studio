@@ -364,7 +364,6 @@ class CallsActivity : ComponentActivity() {
                                         neutralButtonText.value = getString(R.string.delete)
                                         neutralAction.value = {
                                             removeFromHistory(callRow)
-                                            CallHistoryNew.save()
                                         }
                                     }
                                     showDialog.value = true
