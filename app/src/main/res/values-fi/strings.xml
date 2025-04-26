@@ -16,7 +16,9 @@
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
-                    valkoinen (rekisteröintiä ei ole aktivoitu).</li> <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                    valkoinen (rekisteröintiä ei ole aktivoitu).</li>
+                <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Pitkä kosketus baresip-palkin ikoneihin näyttää tietoa ikoneista.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisy vasemmalle/oikealle vaihtaa näkyvissä olevaa tiliä.</li>
@@ -53,10 +55,11 @@
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+                <li>Tilin rekisteröintitila kerrotaan värillisellä ympyrällä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
-                <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Ympyrän kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Pitkä kosketus baresip-palkin ikoneihin näyttää tietoa ikoneista.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>

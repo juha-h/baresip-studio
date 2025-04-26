@@ -20,14 +20,15 @@
             <li>Registration status of an account is shown with a colored dot: green (registration
                 succeeded), yellow (registration is in progress), red (registration failed), white (registration
                 has not been activated).</li>
-            <li>Touch on the dot leads directly to account configuration.</li>
+            <li>Touch on the status dot leads directly to account configuration.</li>
+            <li>Long touch on baresip bar icons shows information about the icons.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Long touch on currently shown account enables or disables account\'s registration.</li>
             <li>Swipe left/right gesture toggles between the accounts.</li>
             <li>Previous call party can be reselect by touching the call icon when Callee is empty.</li>
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
-            <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
+            <li>Touch/long touch on contact icon can be used to install/remove image avatar.</li>
             <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more information.</li>
         </ul>
         <h2>Privacy Policy</h2>
@@ -60,7 +61,8 @@
             <li>Registration status of an account is shown with a colored dot: green (registration
                 succeeded), yellow (registration is in progress), red (registration failed), white (registration
                 has not been activated).</li>
-            <li>Touch on the dot leads directly to account configuration.</li>
+            <li>Touch on the status dot leads directly to account configuration.</li>
+            <li>Long touch on baresip bar icons shows information about the icons.</li>
             <li>Swipe down gesture causes re-registration of the currently shown account.</li>
             <li>Long touch on currently shown account enables or disables account\'s registration.</li>
             <li>Swipe left/right gesture toggles between the accounts.</li>
