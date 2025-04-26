@@ -2759,7 +2759,7 @@ class MainActivity : ComponentActivity() {
         val callp = ua.callAlloc(0L, Api.VIDMODE_OFF)
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", "outgoing", null)
+            val call = Call(callp, ua, uri, "out", "outgoing")
             call.onHoldCall = onHoldCall
             call.add()
             if (onHoldCall != null)
@@ -2786,7 +2786,7 @@ class MainActivity : ComponentActivity() {
         val newCallp = ua.callAlloc(call.callp, Api.VIDMODE_OFF)
         if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
-            val newCall = Call(newCallp, ua, uri, "out", "transferring", null)
+            val newCall = Call(newCallp, ua, uri, "out", "transferring")
             newCall.add()
             if (newCall.connect(uri)) {
                 if (ua.account.aor != viewModel.selectedAor.value)

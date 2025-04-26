@@ -1,10 +1,8 @@
 package com.tutpro.baresip
 
-import android.text.TextWatcher
 import java.util.*
 
-class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String,
-           var status: String, val dtmfWatcher: TextWatcher?) {
+class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, var status: String) {
 
     var onhold = false
     var held = false
