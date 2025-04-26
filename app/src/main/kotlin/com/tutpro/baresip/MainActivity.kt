@@ -151,7 +151,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.set
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
@@ -608,8 +607,7 @@ class MainActivity : ComponentActivity() {
                                         showCall(ua)
                                     }
                                 }
-                            }
-                            else if (offset > swipeThreshold) {
+                            } else if (offset > swipeThreshold) {
                                 if (uas.value.isNotEmpty()) {
                                     val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                     val newPos = when (curPos) {
@@ -679,67 +677,89 @@ class MainActivity : ComponentActivity() {
                 containerColor = LocalCustomColors.current.primary
             ),
             actions = {
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp),
-                    onClick = {
-                        if (Call.call("connected") == null) {
-                            BaresipService.isRecOn = !BaresipService.isRecOn
-                            recImage = if (BaresipService.isRecOn) {
-                                Api.module_load("sndfile")
-                                recOnImage
-                            }
-                            else {
-                                Api.module_unload("sndfile")
-                                recOffImage
-                            }
+
+                Icon(
+                    imageVector = recImage,
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Call.call("connected") == null) {
+                                BaresipService.isRecOn = !BaresipService.isRecOn
+                                recImage = if (BaresipService.isRecOn) {
+                                    Api.module_load("sndfile")
+                                    recOnImage
+                                } else {
+                                    Api.module_unload("sndfile")
+                                    recOffImage
+                                }
+                            } else
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                        },
+                        onLongClick = {
+                            alertTitle.value = "Call Recording"
+                            alertMessage.value = "If activated, new incoming and outgoing calls will be recorded." +
+                                    " Recordings can be played on Call Details page"
+                            showAlert.value = true
                         }
-                        else
-                            Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
-                    }
-                ) {
-                    Icon(imageVector = recImage,
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp),
-                    onClick = {
-                        if (Call.call("connected") != null) {
-                            BaresipService.isMicMuted = !BaresipService.isMicMuted
-                            if (BaresipService.isMicMuted) {
-                                micIcon = R.drawable.mic_off
-                                Api.calls_mute(true)
-                            } else {
-                                micIcon = R.drawable.mic_on
-                                Api.calls_mute(false)
-                            }
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(micIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
-                IconButton(
-                    modifier = Modifier.padding(end=6.dp),
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= 31)
-                            Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                    "${am.communicationDevice!!.type}/${am.mode}"
-                            )
-                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                        speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                            R.drawable.speaker_on
-                        else
-                            R.drawable.speaker_off
-                    }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(speakerIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(22.dp))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(micIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                            onClick = {
+                                if (Call.call("connected") != null) {
+                                    BaresipService.isMicMuted = !BaresipService.isMicMuted
+                                    if (BaresipService.isMicMuted) {
+                                        micIcon = R.drawable.mic_off
+                                        Api.calls_mute(true)
+                                    } else {
+                                        micIcon = R.drawable.mic_on
+                                        Api.calls_mute(false)
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                alertTitle.value = "Microphone"
+                                alertMessage.value = "If activated during call, microphone is muted."
+                                showAlert.value = true
+                            },
+                        ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(speakerIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 31)
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
+                                )
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                                R.drawable.speaker_on
+                            else
+                                R.drawable.speaker_off
+                        },
+                        onLongClick = {
+                            alertTitle.value = "Speakerphone"
+                            alertMessage.value = "If activated, audio is player via device speakerphone."
+                            showAlert.value = true
+                        },
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 IconButton(
                     onClick = { menuExpanded = !menuExpanded }
                 ) {
@@ -749,6 +769,7 @@ class MainActivity : ComponentActivity() {
                         tint = LocalCustomColors.current.light
                     )
                 }
+
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
@@ -1701,7 +1722,8 @@ class MainActivity : ComponentActivity() {
             alertTitle.value = getString(R.string.notice)
             alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
             showAlert.value = true
-        } else if (!BaresipService.requestAudioFocus(applicationContext)) {
+        }
+        else if (!BaresipService.requestAudioFocus(applicationContext)) {
             Toast.makeText(applicationContext, R.string.audio_focus_denied,
                 Toast.LENGTH_SHORT).show()
         } else {
