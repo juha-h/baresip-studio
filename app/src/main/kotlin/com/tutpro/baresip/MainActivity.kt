@@ -2726,11 +2726,6 @@ class MainActivity : ComponentActivity() {
                 Utils.deleteFile(it)
         }
 
-        CallHistoryNew.restore()
-        for (h in BaresipService.callHistory)
-            h.recording = arrayOf("", "")
-        CallHistoryNew.save()
-
         dialogTitle.value = getString(R.string.info)
         dialogMessage.value = getString(R.string.restored)
         positiveText.value = getString(R.string.restart)

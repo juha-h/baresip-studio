@@ -454,7 +454,6 @@ class BaresipService: Service() {
                         new.recording = old.recording
                         new.add()
                     }
-                    CallHistoryNew.save()
                 }
 
                 Message.restore()
