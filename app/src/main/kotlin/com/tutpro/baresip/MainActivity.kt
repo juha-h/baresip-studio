@@ -695,9 +695,8 @@ class MainActivity : ComponentActivity() {
                                 Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
                         },
                         onLongClick = {
-                            alertTitle.value = "Call Recording"
-                            alertMessage.value = "If activated, new incoming and outgoing calls will be recorded." +
-                                    " Recordings can be played on Call Details page"
+                            alertTitle.value = getString(R.string.call_recording_title)
+                            alertMessage.value = getString(R.string.call_recording_tip)
                             showAlert.value = true
                         }
                     ),
@@ -723,8 +722,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             onLongClick = {
-                                alertTitle.value = "Microphone"
-                                alertMessage.value = "If activated during call, microphone is muted."
+                                alertTitle.value = getString(R.string.microphone_title)
+                                alertMessage.value = getString(R.string.microphone_tip)
                                 showAlert.value = true
                             },
                         ),
@@ -749,8 +748,8 @@ class MainActivity : ComponentActivity() {
                                 R.drawable.speaker_off
                         },
                         onLongClick = {
-                            alertTitle.value = "Speakerphone"
-                            alertMessage.value = "If activated, audio is player via device speakerphone."
+                            alertTitle.value = getString(R.string.speakerphone_title)
+                            alertMessage.value = getString(R.string.speakerphone_tip)
                             showAlert.value = true
                         },
                     ),

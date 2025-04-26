@@ -571,4 +571,11 @@
     <string name="audio_and_video_permissions">baresip+ needs \"Microphone\" permission for voice calls,
         \"Camera\" permission for video calls, \"Nearby devices\" permission for Bluetooth
         microphone/speaker detection, and \"Notifications\" permission for posting notifications.</string>
+    <string name="call_recording_title">Call Recording</string>
+    <string name="call_recording_tip">If activated, new incoming and outgoing calls will be recorded.
+        Recordings can be played on Call Details page</string>
+    <string name="microphone_title">Microphone</string>
+    <string name="microphone_tip">If activated during call, microphone is muted.</string>
+    <string name="speakerphone_title">Speakerphone</string>
+    <string name="speakerphone_tip">If activated, audio is played via device speakerphone.</string>
 </resources>
