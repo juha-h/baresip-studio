@@ -596,7 +596,8 @@ class ConfigActivity : ComponentActivity() {
                         showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
+                ),
                 label = { LabelText(stringResource(R.string.dns_servers)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )

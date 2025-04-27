@@ -52,6 +52,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -80,7 +81,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.LabelText
-import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -266,9 +266,8 @@ class ChatActivity : ComponentActivity() {
                 else
                     aor.split(":")[1]
         Text(
-            text = headerText, modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 8.dp),
+            text = headerText,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
@@ -470,7 +469,7 @@ class ChatActivity : ComponentActivity() {
             val keyboardController = LocalSoftwareKeyboardController.current
             OutlinedTextField(
                 value = newMessage,
-                placeholder = { Text(text = stringResource(R.string.new_message)) },
+                placeholder = { Text(stringResource(R.string.new_message)) },
                 onValueChange = { newMessage = it },
                 modifier = Modifier
                     .weight(1f)
@@ -514,11 +513,7 @@ class ChatActivity : ComponentActivity() {
                                             time.toString()
                                         ) != 0
                                     ) {
-                                        Toast.makeText(
-                                            ctx,
-                                            "${getString(R.string.message_failed)}!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast.makeText(ctx, "${getString(R.string.message_failed)}!", Toast.LENGTH_SHORT).show()
                                         msg.direction = MESSAGE_UP_FAIL
                                         msg.responseReason = getString(R.string.message_failed)
                                     } else {
@@ -551,7 +546,7 @@ class ChatActivity : ComponentActivity() {
                             modifier = Modifier.clickable { newMessage = "" }
                         )
                     } },
-                label = { LabelText(text = stringResource(R.string.new_message), fontSize = 16.sp) },
+                label = { LabelText(stringResource(R.string.new_message)) },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -601,11 +596,7 @@ class ChatActivity : ComponentActivity() {
                                         time.toString()
                                     ) != 0
                                 ) {
-                                    Toast.makeText(
-                                        ctx,
-                                        "${getString(R.string.message_failed)}!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(ctx, "${getString(R.string.message_failed)}!", Toast.LENGTH_SHORT).show()
                                     msg.direction = MESSAGE_UP_FAIL
                                     msg.responseReason = getString(R.string.message_failed)
                                 } else {

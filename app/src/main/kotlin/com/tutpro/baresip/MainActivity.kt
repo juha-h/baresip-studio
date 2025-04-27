@@ -144,7 +144,6 @@ import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.PasswordDialog
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
-import com.tutpro.baresip.CustomElements.Text
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.delay
 import java.io.File
@@ -1350,7 +1349,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    androidx.compose.material3.Text(
+                                    Text(
                                         text = stringResource(R.string.call_transfer),
                                         fontSize = 20.sp,
                                         color = LocalCustomColors.current.alert,
