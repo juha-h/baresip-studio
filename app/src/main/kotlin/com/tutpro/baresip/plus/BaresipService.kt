@@ -457,9 +457,8 @@ class BaresipService: Service() {
                         new.stopTime = old.stopTime
                         new.startTime = old.startTime
                         new.recording = old.recording
-                        callHistory.add(new)
+                        new.add()
                     }
-                    CallHistoryNew.save()
                 }
 
                 Message.restore()
@@ -852,8 +851,7 @@ class BaresipService: Service() {
                                 Log.e(TAG, "Callwaiting tone $name.wav not found\")")
                             }
                             if (ua.account.callHistory) {
-                                CallHistoryNew.add(CallHistoryNew(aor, peerUri, "in"))
-                                CallHistoryNew.save()
+                                CallHistoryNew(aor, peerUri, "in").add()
                                 ua.account.missedCalls = true
                             }
                             return
@@ -865,7 +863,7 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
-                        Call(callp, ua, peerUri, "in", "incoming", null).add()
+                        Call(callp, ua, peerUri, "in", "incoming").add()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                         if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
@@ -1089,8 +1087,7 @@ class BaresipService: Service() {
                                 history.rejected = call.rejected
                                 if (call.startTime != null && call.dumpfiles[0] != "")
                                     history.recording = call.dumpfiles
-                                CallHistoryNew.add(history)
-                                CallHistoryNew.save()
+                                history.add()
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {
@@ -1185,7 +1182,6 @@ class BaresipService: Service() {
         val timeStampString = timeStamp.toString()
         Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
         Message(ua.account.aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
-        Message.save()
         ua.account.unreadMessages = true
 
         if (!Utils.isVisible()) {

@@ -365,7 +365,7 @@ class AccountsActivity : ComponentActivity() {
 
         // Api.account_debug(ua.account.accp)
         val acc = ua.account
-        Log.d(TAG, "Allocated UA ${ua.uap} for ${Api.account_luri(acc.accp)}")
+        Log.d(TAG, "Allocated UA ${ua.uap} with SIP URI ${acc.luri}")
         initAccountFromConfig(this@AccountsActivity, acc)
         saveAccounts()
 

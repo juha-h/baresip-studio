@@ -638,7 +638,8 @@ class MainActivity : ComponentActivity() {
                                         showCall(ua)
                                     }
                                 }
-                            } else if (offset > swipeThreshold) {
+                            }
+                            else if (offset > swipeThreshold) {
                                 if (uas.value.isNotEmpty()) {
                                     val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                     val newPos = when (curPos) {
@@ -799,7 +800,6 @@ class MainActivity : ComponentActivity() {
                         tint = LocalCustomColors.current.light
                     )
                 }
-
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
@@ -2148,10 +2148,11 @@ class MainActivity : ComponentActivity() {
             alertTitle.value = getString(R.string.notice)
             alertMessage.value = String.format(getString(R.string.invalid_sip_or_tel_uri), uri)
             showAlert.value = true
-        } else if (!BaresipService.requestAudioFocus(applicationContext)) {
+        }
+        else if (!BaresipService.requestAudioFocus(applicationContext))
             Toast.makeText(applicationContext, R.string.audio_focus_denied,
                 Toast.LENGTH_SHORT).show()
-        } else {
+        else {
             callUriEnabled.value = false
             showCallButton.value = false
             showCallVideoButton.value = false
@@ -3247,11 +3248,6 @@ class MainActivity : ComponentActivity() {
                 Utils.deleteFile(it)
         }
 
-        CallHistoryNew.restore()
-        for (h in BaresipService.callHistory)
-            h.recording = arrayOf("", "")
-        CallHistoryNew.save()
-
         dialogTitle.value = getString(R.string.info)
         dialogMessage.value = getString(R.string.restored)
         positiveText.value = getString(R.string.restart)
@@ -3285,7 +3281,7 @@ class MainActivity : ComponentActivity() {
         val callp = ua.callAlloc(0L, Api.VIDMODE_ON)
         return if (callp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-            val call = Call(callp, ua, uri, "out", "outgoing", null)
+            val call = Call(callp, ua, uri, "out", "outgoing")
             call.onHoldCall = onHoldCall
             call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
             call.add()
@@ -3313,7 +3309,7 @@ class MainActivity : ComponentActivity() {
         val newCallp = ua.callAlloc(call.callp, Api.VIDMODE_OFF)
         if (newCallp != 0L) {
             Log.d(TAG, "Adding outgoing call ${ua.uap}/$newCallp/$uri")
-            val newCall = Call(newCallp, ua, uri, "out", "transferring", null)
+            val newCall = Call(newCallp, ua, uri, "out", "transferring")
             newCall.add()
             if (newCall.connect(uri)) {
                 if (ua.account.aor != viewModel.selectedAor.value)

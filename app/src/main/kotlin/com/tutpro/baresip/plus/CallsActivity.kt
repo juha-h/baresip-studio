@@ -202,7 +202,6 @@ class CallsActivity : ComponentActivity() {
                             delete -> {
                                 positiveAction.value = {
                                     CallHistoryNew.clear(aor)
-                                    CallHistoryNew.save()
                                     uaHistory.value = emptyList()
                                 }
                                 showDialog.value = true
@@ -344,7 +343,6 @@ class CallsActivity : ComponentActivity() {
                                         positiveButtonText.value = getString(R.string.delete)
                                         positiveAction.value = {
                                             removeFromHistory(callRow)
-                                            CallHistoryNew.save()
                                         }
                                         neutralButtonText.value = ""
                                     }
@@ -523,6 +521,7 @@ class CallsActivity : ComponentActivity() {
         }
         CallHistoryNew.deleteRecording(callRow.recording)
         deleteFromUaHistory(callRow)
+        CallHistoryNew.save()
     }
 
     private fun addToUaHistory(callRow: CallRow) {

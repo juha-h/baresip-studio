@@ -16,22 +16,35 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
     var rejected = false
     var recording = arrayOf("", "")           // Encoder and decoder recording files
 
+    fun add() {
+        BaresipService.callHistory.add(this)
+        var count = 0
+        var remove: CallHistoryNew? = null
+        for (h in BaresipService.callHistory)
+            if (h.aor == this.aor) {
+                count++
+                if (count > CALL_HISTORY_SIZE) {
+                    remove = h
+                    break
+                }
+            }
+        if (remove != null) {
+            if (remove.recording[0] != "")
+                deleteRecording(remove.recording)
+            BaresipService.callHistory.remove(remove)
+        }
+        save()
+    }
+
     companion object {
 
         private const val serialVersionUID: Long = 3
-        private const val CALL_HISTORY_SIZE = 128
+        private const val CALL_HISTORY_SIZE = 256
 
-        fun add(history: CallHistoryNew) {
-            BaresipService.callHistory.add(history)
-            if (aorHistorySize(history.aor) > CALL_HISTORY_SIZE) {
-                for (h in BaresipService.callHistory)
-                    if (h.aor == history.aor) {
-                        if (h.recording[0] != "")
-                            deleteRecording(h.recording)
-                        BaresipService.callHistory.remove(h)
-                        break
-                    }
-            }
+        fun aorLatestPeerUri(aor: String): String? {
+            for (h in BaresipService.callHistory.reversed())
+                if (h.aor == aor) return h.peerUri
+            return null
         }
 
         fun clear(aor: String) {
@@ -43,15 +56,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                     BaresipService.callHistory.removeAt(i)
                 }
             }
-        }
-
-        private fun aorHistorySize(aor: String): Int {
-            return BaresipService.callHistory.count { it.aor == aor }
-        }
-        fun aorLatestPeerUri(aor: String): String? {
-            for (h in BaresipService.callHistory.reversed())
-                if (h.aor == aor) return h.peerUri
-            return null
+            save()
         }
 
         fun save() {

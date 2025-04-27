@@ -47,6 +47,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             val it = updatedMessages.iterator()
             while (it.hasNext()) if (it.next().aor == aor) it.remove()
             BaresipService.messages = updatedMessages.toList()
+            save()
         }
 
         fun deleteAorMessage(aor: String, time: Long) {
