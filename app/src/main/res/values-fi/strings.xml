@@ -16,7 +16,9 @@
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
-                    valkoinen (rekisteröintiä ei ole aktivoitu).</li> <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                    valkoinen (rekisteröintiä ei ole aktivoitu).</li>
+                <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Pitkä kosketus baresip-palkin ikoneihin näyttää tietoa ikoneista.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisy vasemmalle/oikealle vaihtaa näkyvissä olevaa tiliä.</li>
@@ -53,10 +55,11 @@
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
+                <li>Tilin rekisteröintitila kerrotaan värillisellä ympyrällä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
-                <li>Pisteen kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Ympyrän kosketus johtaa suoraan tilin asetuksiin.</li>
+                <li>Pitkä kosketus baresip-palkin ikoneihin näyttää tietoa ikoneista.</li>
                 <li>Pyyhkäisy alas aikaansaa parhaillaan näkyvissä olevan tilin uudelleen rekisteröinnin.</li>
                 <li>Parhaillaan näkyvissä olevan tilin pitkä kosketus aktivoi tai passivoi tilin rekisteröinnin.</li>
                 <li>Pyyhkäisyllä vasemmalle/oikealle voit vaihtaa näkyvissä olevaa tiliä.</li>
@@ -582,8 +585,15 @@
     <string name="no_aec">Ei laitteistolla tuettua kaiun poistoa!</string>
     <string name="call_details">Puhelutiedot</string>
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
-    <string name="audio_focus_denied">Audio fokus evätty!</string>
+    <string name="audio_focus_denied">Audiofokus on evätty!</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
     <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
     <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten, Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten näyttämistä varten.</string>
+    <string name="call_recording_title">Puheluiden talletus</string>
+    <string name="call_recording_tip">Jos aktivoitu, uudet soitetut ja vastatut puhelut talletetaan.
+        Tallennukset voi kuunnella Puhelutiedot-sivulla.</string>
+    <string name="microphone_title">Mikrofoni</string>
+    <string name="microphone_tip">Jos aktivoidaan puhelun aikana, mikrofoni suljetaan.</string>
+    <string name="speakerphone_title">Kaiutin</string>
+    <string name="speakerphone_tip">Jos aktivoitu, laitteen kaiutin on päällä.</string>
 </resources>
