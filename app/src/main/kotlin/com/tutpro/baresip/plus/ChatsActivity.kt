@@ -55,6 +55,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -82,7 +83,6 @@ import com.tutpro.baresip.plus.BaresipService.Companion.contactNames
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.ImageAvatar
 import com.tutpro.baresip.plus.CustomElements.LabelText
-import com.tutpro.baresip.plus.CustomElements.Text
 import com.tutpro.baresip.plus.CustomElements.TextAvatar
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
@@ -281,9 +281,9 @@ class ChatsActivity: ComponentActivity() {
                 else
                     aor.split(":")[1]
         Text(
-            text = headerText, modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 8.dp),
+            text = headerText,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
+            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
@@ -558,7 +558,7 @@ class ChatsActivity: ComponentActivity() {
                 OutlinedTextField(
                     value = newPeer,
                     placeholder = {
-                        Text(text = getString(R.string.new_chat_peer))
+                        Text(stringResource(R.string.new_chat_peer))
                     },
                     onValueChange = {
                         newPeer = it
@@ -595,7 +595,6 @@ class ChatsActivity: ComponentActivity() {
                     label = {
                         LabelText(
                             text = stringResource(R.string.new_chat_peer),
-                            fontSize = 16.sp
                         )
                     },
                     textStyle = TextStyle(

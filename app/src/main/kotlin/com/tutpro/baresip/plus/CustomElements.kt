@@ -41,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -85,27 +86,6 @@ import androidx.core.content.ContextCompat.getString
 object CustomElements {
 
     @Composable
-    fun Text(
-        text: String,
-        modifier: Modifier = Modifier,
-        color: Color = LocalCustomColors.current.itemText,
-        fontSize: TextUnit = 16.sp,
-        fontWeight: FontWeight = FontWeight.Normal,
-        textAlign: TextAlign? = null,
-        maxLines: Int = Int.MAX_VALUE,
-    ) {
-        androidx.compose.material3.Text(
-            text = text,
-            modifier = modifier,
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            textAlign = textAlign,
-            maxLines = maxLines
-        )
-    }
-
-    @Composable
     fun LabelText(
         text: String,
         modifier: Modifier = Modifier,
@@ -115,7 +95,7 @@ object CustomElements {
         textAlign: TextAlign? = null,
         maxLines: Int = 1,
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = text,
             modifier = modifier,
             color = color,
@@ -174,7 +154,12 @@ object CustomElements {
             while (itemsIterator.hasNext()) {
                 val item = itemsIterator.next()
                 DropdownMenuItem(
-                    text = { Text(item, color = LocalCustomColors.current.light) },
+                    text = {
+                        Text(
+                            text = item,
+                            color = LocalCustomColors.current.light,
+                            fontSize = 16.sp
+                        ) },
                     onClick = { onItemClick(item) }
                 )
                 if (itemsIterator.hasNext())
@@ -314,13 +299,13 @@ object CustomElements {
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            androidx.compose.material3.Text(
+                            Text(
                                 text = title,
                                 fontSize = 20.sp,
                                 color = LocalCustomColors.current.alert,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            androidx.compose.material3.Text(
+                            Text(
                                 text = message,
                                 fontSize = 16.sp,
                                 color = LocalCustomColors.current.itemText,
@@ -335,7 +320,7 @@ object CustomElements {
                                         onPositiveClicked()
                                         showDialog.value = false
                                     }) {
-                                        androidx.compose.material3.Text(
+                                        Text(
                                             text = positiveButtonText.uppercase(),
                                             fontSize = 14.sp,
                                             color = LocalCustomColors.current.alert,
@@ -345,7 +330,7 @@ object CustomElements {
                                         onNeutralClicked()
                                         showDialog.value = false
                                     }) {
-                                        androidx.compose.material3.Text(
+                                        Text(
                                             text = neutralButtonText.uppercase(),
                                             fontSize = 14.sp,
                                             color = LocalCustomColors.current.alert
@@ -355,7 +340,7 @@ object CustomElements {
                                         onNegativeClicked()
                                         showDialog.value = false
                                     }) {
-                                        androidx.compose.material3.Text(
+                                        Text(
                                             text = negativeButtonText.uppercase(),
                                             fontSize = 14.sp,
                                             color = LocalCustomColors.current.gray
@@ -374,7 +359,7 @@ object CustomElements {
                                                 onNegativeClicked()
                                                 showDialog.value = false
                                             }) {
-                                                androidx.compose.material3.Text(
+                                                Text(
                                                     text = negativeButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = LocalCustomColors.current.gray
@@ -385,7 +370,7 @@ object CustomElements {
                                                 onNeutralClicked()
                                                 showDialog.value = false
                                             }) {
-                                                androidx.compose.material3.Text(
+                                                Text(
                                                     text = neutralButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = LocalCustomColors.current.alert
@@ -395,7 +380,7 @@ object CustomElements {
                                             onPositiveClicked()
                                             showDialog.value = false
                                         }) {
-                                            androidx.compose.material3.Text(
+                                            Text(
                                                 text = positiveButtonText.uppercase(),
                                                 fontSize = 14.sp,
                                                 color = LocalCustomColors.current.alert,
@@ -435,7 +420,7 @@ object CustomElements {
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            androidx.compose.material3.Text(
+                            Text(
                                 text = title,
                                 fontSize = 20.sp,
                                 color = LocalCustomColors.current.alert,
@@ -457,7 +442,7 @@ object CustomElements {
                                         },
                                         modifier = Modifier.align(Alignment.End)
                                     ) {
-                                        androidx.compose.material3.Text(
+                                        Text(
                                             text = item,
                                             color = LocalCustomColors.current.itemText,
                                         )
@@ -471,7 +456,7 @@ object CustomElements {
                                         openDialog.value = false
                                     },
                                     modifier = Modifier.align(Alignment.End)){
-                                    androidx.compose.material3.Text(
+                                    Text(
                                         text = neutralButtonText.uppercase(),
                                         color = LocalCustomColors.current.gray,
                                     )
