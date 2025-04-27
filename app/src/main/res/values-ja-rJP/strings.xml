@@ -36,8 +36,7 @@
             <li><b>GNU GPLv3</b> G.729 codec</li>
         </ul>
         ]]></string>
-    <string name="about_text_plus">
-        <![CDATA[
+    <string name="about_text_plus"><![CDATA[
         <h1>Baresip library based SIP User Agent with video calls</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
@@ -76,8 +75,7 @@
             <li><b>GNU GPLv2</b> H.264 codec</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
         </ul>
-        ]]>
-    </string>
+        ]]></string>
     <string name="authentication_username_help">SIPリクエストの認証が必要な場合は、認証ユーザー名を入力して下さい。
         デフォルト値はアカウントのユーザー名です。
     </string>
