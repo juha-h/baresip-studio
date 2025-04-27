@@ -676,7 +676,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     fun TopAppBar(ctx: Context, title: String) {
 
@@ -708,67 +708,88 @@ class MainActivity : ComponentActivity() {
                 containerColor = LocalCustomColors.current.primary
             ),
             actions = {
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp),
-                    onClick = {
-                        if (Call.call("connected") == null) {
-                            BaresipService.isRecOn = !BaresipService.isRecOn
-                            recImage = if (BaresipService.isRecOn) {
-                                Api.module_load("sndfile")
-                                recOnImage
-                            }
-                            else {
-                                Api.module_unload("sndfile")
-                                recOffImage
-                            }
+
+                Icon(
+                    imageVector = recImage,
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Call.call("connected") == null) {
+                                BaresipService.isRecOn = !BaresipService.isRecOn
+                                recImage = if (BaresipService.isRecOn) {
+                                    Api.module_load("sndfile")
+                                    recOnImage
+                                } else {
+                                    Api.module_unload("sndfile")
+                                    recOffImage
+                                }
+                            } else
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                        },
+                        onLongClick = {
+                            alertTitle.value = getString(R.string.call_recording_title)
+                            alertMessage.value = getString(R.string.call_recording_tip)
+                            showAlert.value = true
                         }
-                        else
-                            Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
-                    }
-                ) {
-                    Icon(imageVector = recImage,
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
-                IconButton(
-                    modifier = Modifier.padding(end=12.dp),
-                    onClick = {
-                        if (Call.call("connected") != null) {
-                            BaresipService.isMicMuted = !BaresipService.isMicMuted
-                            if (BaresipService.isMicMuted) {
-                                micIcon = R.drawable.mic_off
-                                Api.calls_mute(true)
-                            } else {
-                                micIcon = R.drawable.mic_on
-                                Api.calls_mute(false)
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(22.dp))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(micIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Call.call("connected") != null) {
+                                BaresipService.isMicMuted = !BaresipService.isMicMuted
+                                if (BaresipService.isMicMuted) {
+                                    micIcon = R.drawable.mic_off
+                                    Api.calls_mute(true)
+                                } else {
+                                    micIcon = R.drawable.mic_on
+                                    Api.calls_mute(false)
+                                }
                             }
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(micIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
-                IconButton(
-                    modifier = Modifier.padding(end=6.dp),
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= 31)
-                            Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                    "${am.communicationDevice!!.type}/${am.mode}"
-                            )
-                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                        speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                            R.drawable.speaker_on
-                        else
-                            R.drawable.speaker_off
-                    }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(speakerIcon),
-                        tint = Color.Unspecified,
-                        contentDescription = null)
-                }
+                        },
+                        onLongClick = {
+                            alertTitle.value = getString(R.string.microphone_title)
+                            alertMessage.value = getString(R.string.microphone_tip)
+                            showAlert.value = true
+                        },
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(speakerIcon),
+                    modifier = Modifier.size(40.dp).combinedClickable(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 31)
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
+                                )
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                                R.drawable.speaker_on
+                            else
+                                R.drawable.speaker_off
+                        },
+                        onLongClick = {
+                            alertTitle.value = getString(R.string.speakerphone_title)
+                            alertMessage.value = getString(R.string.speakerphone_tip)
+                            showAlert.value = true
+                        },
+                    ),
+                    tint = Color.Unspecified,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 IconButton(
                     onClick = { menuExpanded = !menuExpanded }
                 ) {
@@ -778,6 +799,7 @@ class MainActivity : ComponentActivity() {
                         tint = LocalCustomColors.current.light
                     )
                 }
+
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
