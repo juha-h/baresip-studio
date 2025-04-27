@@ -81,6 +81,7 @@ import java.nio.charset.StandardCharsets
 import java.util.GregorianCalendar
 import java.util.Timer
 import java.util.TimerTask
+import kotlin.collections.listOf
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
@@ -502,18 +503,23 @@ class BaresipService: Service() {
                     )
                 }
 
-                var message = ""
+                val messages = mutableListOf<String>()
                 if (linkAddresses.isEmpty())
-                    message = '\u2022' + " " + getString(R.string.no_network) + '\n'
+                    messages.add(getString(R.string.no_network))
                 if (!supportedCameras)
-                    message += '\u2022' + " " + getString(R.string.no_cameras) + '\n'
+                    messages.add(getString(R.string.no_cameras))
                 if (!aecAvailable)
-                    message += '\u2022' + " " + getString(R.string.no_aec) + '\n'
-                if (message != "") {
+                    messages.add(getString(R.string.no_aec))
+                if (messages.isNotEmpty()) {
+                    val message =
+                    if (messages.size == 1)
+                        messages[0]
+                    else
+                        messages.joinToString(separator = "\n\u2022 ", prefix = "\u2022 ")
                     val newIntent = Intent(this, MainActivity::class.java)
                     newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "no,${message.dropLast(1)}")
+                    newIntent.putExtra("action", "no,$message")
                     startActivity(newIntent)
                 }
             }
