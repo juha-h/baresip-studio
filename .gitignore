@@ -17,3 +17,4 @@ build
 gradle/wrapper/gradle-wrapper.jar
 /distribution/*
 /distribution.video/*
+/distribution.video
