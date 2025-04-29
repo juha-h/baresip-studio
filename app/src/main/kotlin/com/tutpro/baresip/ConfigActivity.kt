@@ -63,7 +63,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -112,7 +111,6 @@ class ConfigActivity : ComponentActivity() {
     private var newDebug = false
     private var oldSipTrace = false
     private var newSipTrace = false
-    private var arrowTint = Color.Unspecified
 
     private lateinit var roleManager: RoleManager
     private lateinit var powerManager: PowerManager
@@ -374,11 +372,6 @@ class ConfigActivity : ComponentActivity() {
     @Composable
     fun ConfigContent(ctx: Context, contentPadding: PaddingValues) {
 
-        arrowTint = if (BaresipService.darkTheme.value)
-            LocalCustomColors.current.grayLight
-        else
-            LocalCustomColors.current.black
-
         if (showAlert.value) {
             AlertDialog(
                 showDialog = showAlert,
@@ -546,7 +539,7 @@ class ConfigActivity : ComponentActivity() {
                     Text(text = familyNames[itemPosition.intValue],
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                            tint = arrowTint)
+                            tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -996,7 +989,7 @@ class ConfigActivity : ComponentActivity() {
                     Text(text = contactNames[itemPosition.intValue],
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                            tint = arrowTint)
+                            tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,

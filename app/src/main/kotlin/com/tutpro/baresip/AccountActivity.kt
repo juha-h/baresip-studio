@@ -50,7 +50,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -127,7 +126,6 @@ class AccountActivity : ComponentActivity() {
     private var oldDefaultAccount = false
     private var newDefaultAccount = false
     private var newNumericKeypad = false
-    private var arrowTint = Color.Unspecified
     private var password = mutableStateOf("")
     private var showPasswordDialog = mutableStateOf(false)
     private var keyboardController: SoftwareKeyboardController? = null
@@ -310,11 +308,6 @@ class AccountActivity : ComponentActivity() {
 
     @Composable
     fun AccountContent(ctx: Context, contentPadding: PaddingValues) {
-
-        arrowTint = if (BaresipService.darkTheme.value)
-            LocalCustomColors.current.grayLight
-        else
-            LocalCustomColors.current.black
 
         val scrollState = rememberScrollState()
 
@@ -690,7 +683,7 @@ class AccountActivity : ComponentActivity() {
                     Text(text = mediaEncMap[mediaEnc.value]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -749,7 +742,7 @@ class AccountActivity : ComponentActivity() {
                     Text(text = mediaNatMap[mediaNat.value]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -980,7 +973,7 @@ class AccountActivity : ComponentActivity() {
                     Text(text = dtmfModeMap[dtmfMode.intValue]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -1040,7 +1033,7 @@ class AccountActivity : ComponentActivity() {
                     Text(text = answerModeMap[answerMode.intValue]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -1098,7 +1091,7 @@ class AccountActivity : ComponentActivity() {
                     Text(text = redirectModeMap[autoRedirect.value]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
