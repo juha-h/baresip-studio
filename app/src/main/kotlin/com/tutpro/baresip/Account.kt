@@ -40,7 +40,7 @@ class Account(val accp: Long) {
     var countryCode = ""
     var telProvider = Utils.aorDomain(aor)
     var resumeUri = ""
-    var numericKeyboard = false
+    var numericKeypad = false
 
     init {
 
@@ -79,7 +79,7 @@ class Account(val accp: Long) {
             countryCode = Utils.paramValue(extra, "country_code")
         if (Utils.paramExists(extra, "tel_provider"))
             telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
-        numericKeyboard = Utils.paramExists(extra, "numeric_keyboard")
+        numericKeypad = Utils.paramExists(extra, "numeric_keypad")
     }
 
     fun print() : String {
@@ -169,8 +169,8 @@ class Account(val accp: Long) {
         if (configuredRegInt != REGISTRATION_INTERVAL)
             extra += ";regint=$configuredRegInt"
 
-        if (numericKeyboard)
-            extra += ";numeric_keyboard=yes"
+        if (numericKeypad)
+            extra += ";numeric_keypad=yes"
 
         if (extra !="")
             res += ";extra=\"" + extra.substringAfter(";") + "\""

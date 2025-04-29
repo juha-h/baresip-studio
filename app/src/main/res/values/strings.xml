@@ -209,6 +209,9 @@
         telephone numbers.
     </string>
     <string name="telephony_provider_hint">SIP URI host part</string>
+    <string name="numeric_keypad">Numeric Keypad</string>"
+    <string name="numeric_keypad_help">If checked, numeric keypad is shown when \"Call to …\"
+        field is focused.</string>"
     <string name="invalid_sip_uri_hostpart">Invalid SIP URI host part \'%1$s\'</string>
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.

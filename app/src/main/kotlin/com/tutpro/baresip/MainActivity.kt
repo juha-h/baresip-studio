@@ -1083,7 +1083,7 @@ class MainActivity : ComponentActivity() {
                         .onFocusChanged {
                             val account = Account.ofAor(viewModel.selectedAor.value)
                             if (account != null) {
-                                dialpad = account.numericKeyboard
+                                dialpad = account.numericKeypad
                             }
                         },
                     label = {
