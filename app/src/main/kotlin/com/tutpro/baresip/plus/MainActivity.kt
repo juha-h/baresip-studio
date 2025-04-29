@@ -3094,7 +3094,7 @@ class MainActivity : ComponentActivity() {
                 backupRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "application/octet-stream"
-                    putExtra(Intent.EXTRA_TITLE, "baresip_" +
+                    putExtra(Intent.EXTRA_TITLE, "baresip+_" +
                             SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()))
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
@@ -3110,7 +3110,7 @@ class MainActivity : ComponentActivity() {
                 logcatRequest.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "text/plain"
-                    putExtra(Intent.EXTRA_TITLE, "baresip_logcat_" +
+                    putExtra(Intent.EXTRA_TITLE, "baresip+_logcat_" +
                             SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date()))
                     putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
                 })
