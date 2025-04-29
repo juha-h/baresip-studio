@@ -286,13 +286,13 @@ class ChatActivity : ComponentActivity() {
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.confirmation),
+            title = stringResource(R.string.confirmation),
             message = dialogMessage.value,
             positiveButtonText = positiveButtonText.value,
             onPositiveClicked = positiveAction.value,
             neutralButtonText = neutralButtonText.value,
             onNeutralClicked = neutralAction.value,
-            negativeButtonText = getString(R.string.cancel)
+            negativeButtonText = stringResource(R.string.cancel)
         )
 
         val lazyListState = rememberLazyListState()
@@ -335,7 +335,7 @@ class ChatActivity : ComponentActivity() {
                         chatPeer
                 }
                 else
-                    ctx.getString(R.string.you)
+                    stringResource(R.string.you)
                 var info: String
                 val cal = GregorianCalendar()
                 cal.timeInMillis = message.timeStamp
@@ -344,12 +344,12 @@ class ChatActivity : ComponentActivity() {
                 else
                     DateFormat.getDateInstance(DateFormat.SHORT)
                 info = fmt.format(cal.time)
-                if (info.length < 6) info = "${ctx.getString(R.string.today)} $info"
+                if (info.length < 6) info = "${stringResource(R.string.today)} $info"
                 if (message.direction == MESSAGE_UP_FAIL) {
                     info = if (message.responseCode != 0)
-                        "$info - ${ctx.getString(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
+                        "$info - ${stringResource(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
                     else
-                        "$info - ${ctx.getString(R.string.sending_failed)}"
+                        "$info - ${stringResource(R.string.sending_failed)}"
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -358,10 +358,10 @@ class ChatActivity : ComponentActivity() {
                     Button(
                         onClick = {
                             if (chatPeer == peerUri) {
-                                dialogMessage.value = String.format(ctx.getString(R.string.long_message_question),
+                                dialogMessage.value = String.format(getString(R.string.long_message_question),
                                     peerUri
                                 )
-                                positiveButtonText.value = ctx.getString(R.string.add_contact)
+                                positiveButtonText.value = getString(R.string.add_contact)
                                 positiveAction.value = {
                                     val i = Intent(ctx, BaresipContactActivity::class.java)
                                     val b = Bundle()
@@ -370,15 +370,15 @@ class ChatActivity : ComponentActivity() {
                                     i.putExtras(b)
                                     ctx.startActivity(i)
                                 }
-                                neutralButtonText.value = ctx.getString(R.string.delete)
+                                neutralButtonText.value = getString(R.string.delete)
                                 neutralAction.value = {
                                     message.delete()
                                     _chatMessages.value = uaPeerMessages(aor, peerUri)
                                 }
                             }
                             else {
-                                dialogMessage.value = ctx.getString(R.string.short_message_question)
-                                positiveButtonText.value = ctx.getString(R.string.delete)
+                                dialogMessage.value = getString(R.string.short_message_question)
+                                positiveButtonText.value = getString(R.string.delete)
                                 positiveAction.value = {
                                     message.delete()
                                     _chatMessages.value = uaPeerMessages(aor, peerUri)
@@ -454,9 +454,9 @@ class ChatActivity : ComponentActivity() {
 
         AlertDialog(
             showDialog = showDialog,
-            title = getString(R.string.notice),
+            title = stringResource(R.string.notice),
             message = dialogMessage.value,
-            positiveButtonText = getString(R.string.ok),
+            positiveButtonText = stringResource(R.string.ok),
         )
 
         var newMessage by remember { mutableStateOf("") }
