@@ -223,9 +223,9 @@
         voi käyttää soitettaessa puhelinnumeroihin.
     </string>
     <string name="telephony_provider_hint">SIP URI:n domain osa</string>
-    <string name="numeric_keypad">Numeerinen näppäimistö</string>"
-    <string name="numeric_keypad_help">Jos valittu, \"Puhelu ulos …\" kentässä käytetään numeerista
-        näppäimistöä.</string>"
+    <string name="numeric_keypad">Numeronäppäimistö</string>"
+    <string name="numeric_keypad_help">Jos valittu, \"Puhelu ulos …\" kentässä käytetään
+        numeronäppäimistöä.</string>"
     <string name="invalid_sip_uri_hostpart">Virheellinen SIP URI:n domain-osa \'%1$s\'</string>
     <string name="default_account">Oletustili</string>
     <string name="default_account_help">Jos merkitty, niin tämä tili on
