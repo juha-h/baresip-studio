@@ -1,0 +1,4 @@
+- Added Numeric Keypad account settings
+- Added tooltips to main activity top app bar icons
+- Show account's full SIP URI on Account page
+- New translations (Japanese and Tamil)
