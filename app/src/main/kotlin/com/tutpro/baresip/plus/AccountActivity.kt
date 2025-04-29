@@ -126,6 +126,7 @@ class AccountActivity : ComponentActivity() {
     private var newTelProvider = ""
     private var oldDefaultAccount = false
     private var newDefaultAccount = false
+    private var newNumericKeypad = false
     private var arrowTint = Color.Unspecified
     private var password = mutableStateOf("")
     private var showPasswordDialog = mutableStateOf(false)
@@ -237,6 +238,7 @@ class AccountActivity : ComponentActivity() {
         newCountryCode = oldCountryCode
         oldTelProvider = acc.telProvider
         newTelProvider = oldTelProvider
+        newNumericKeypad = acc.numericKeypad
         oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
         newDefaultAccount = oldDefaultAccount
 
@@ -357,6 +359,7 @@ class AccountActivity : ComponentActivity() {
             Voicemail()
             CountryCode()
             TelProvider()
+            NumericKeypad()
             DefaultAccount()
             AskPassword(ctx)
         }
@@ -1235,6 +1238,33 @@ class AccountActivity : ComponentActivity() {
     }
 
     @Composable
+    fun NumericKeypad() {
+        Row(
+            Modifier.fillMaxWidth().padding(end=10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.numeric_keypad),
+                modifier = Modifier.weight(1f)
+                    .clickable {
+                        alertTitle.value = getString(R.string.numeric_keypad)
+                        alertMessage.value = getString(R.string.numeric_keypad_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var numericKeypad by remember { mutableStateOf(acc.numericKeypad) }
+            Switch(
+                checked = numericKeypad,
+                onCheckedChange = {
+                    numericKeypad = it
+                    newNumericKeypad = numericKeypad
+                }
+            )
+        }
+    }
+
+    @Composable
     fun DefaultAccount() {
         Row(
             Modifier.fillMaxWidth().padding(end=10.dp),
@@ -1615,6 +1645,11 @@ class AccountActivity : ComponentActivity() {
             }
             acc.telProvider = hostPart
             Log.d(TAG, "New tel provider is ${acc.telProvider}")
+        }
+
+        if (newNumericKeypad != acc.numericKeypad) {
+            acc.numericKeypad = newNumericKeypad
+            Log.d(TAG, "New numericKeyboard is ${acc.numericKeypad}")
         }
 
         val uaIndex = UserAgent.findAorIndex(aor)!!

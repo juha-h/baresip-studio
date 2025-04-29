@@ -40,6 +40,7 @@ class Account(val accp: Long) {
     var countryCode = ""
     var telProvider = Utils.aorDomain(aor)
     var resumeUri = ""
+    var numericKeypad = false
 
     init {
 
@@ -70,14 +71,15 @@ class Account(val accp: Long) {
 
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
-            nickName.value = Utils.paramValue(extra,"nickname")
+            nickName.value = Utils.paramValue(extra, "nickname")
         if (Utils.paramExists(extra, "regint"))
-            configuredRegInt = Utils.paramValue(extra,"regint").toInt()
-        callHistory = Utils.paramValue(extra,"call_history") == ""
+            configuredRegInt = Utils.paramValue(extra, "regint").toInt()
+        callHistory = Utils.paramValue(extra, "call_history") == ""
         if (Utils.paramExists(extra, "country_code"))
-            countryCode = Utils.paramValue(extra,"country_code")
+            countryCode = Utils.paramValue(extra, "country_code")
         if (Utils.paramExists(extra, "tel_provider"))
-            telProvider = URLDecoder.decode(Utils.paramValue(extra,"tel_provider"), "UTF-8")
+            telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
+        numericKeypad = Utils.paramExists(extra, "numeric_keypad")
     }
 
     fun print() : String {
@@ -166,6 +168,9 @@ class Account(val accp: Long) {
 
         if (configuredRegInt != REGISTRATION_INTERVAL)
             extra += ";regint=$configuredRegInt"
+
+        if (numericKeypad)
+            extra += ";numeric_keypad=yes"
 
         if (extra !="")
             res += ";extra=\"" + extra.substringAfter(";") + "\""
