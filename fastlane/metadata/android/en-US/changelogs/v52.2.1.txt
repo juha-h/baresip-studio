@@ -1,0 +1,3 @@
+- Restore and focus new message after pause/resume
+- Use baresip+ prefix in backup and logcat files
+- Small colors cleanup
