@@ -605,7 +605,7 @@ class ChatActivity : ComponentActivity() {
             )
             LaunchedEffect(Unit) {
                 if (newMessage.value.text.isNotEmpty())
-                focusRequester.requestFocus()
+                    focusRequester.requestFocus()
             }
             Image(
                 painter = painterResource(id = R.drawable.send),
