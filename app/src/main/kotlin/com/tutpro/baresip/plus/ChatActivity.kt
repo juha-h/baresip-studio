@@ -61,25 +61,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.EventListener
 import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -99,7 +107,6 @@ class ChatActivity : ComponentActivity() {
     private var chatMessages : List<Message> by _chatMessages
     private var focus = false
     private var lastCall: Long = 0
-    private var unsentMessage = ""
     private var keyboardController: SoftwareKeyboardController? = null
 
     private var backInvokedCallback: OnBackInvokedCallback? = null
@@ -267,7 +274,9 @@ class ChatActivity : ComponentActivity() {
                     aor.split(":")[1]
         Text(
             text = headerText,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 8.dp),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
@@ -406,8 +415,10 @@ class ChatActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .padding(start = if (message.direction == MESSAGE_DOWN) 0.dp else 24.dp,
-                                end = if (message.direction == MESSAGE_DOWN) 24.dp else 0.dp)
+                            .padding(
+                                start = if (message.direction == MESSAGE_DOWN) 0.dp else 24.dp,
+                                end = if (message.direction == MESSAGE_DOWN) 24.dp else 0.dp
+                            )
                     ) {
                         Column {
                             Row {
@@ -449,6 +460,37 @@ class ChatActivity : ComponentActivity() {
     @Composable
     fun NewMessage(ctx: Context, peerUri: String) {
 
+        var newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(""))
+        }
+        var textFieldLoaded by remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
+
+        EventListener {
+            when (it) {
+                Lifecycle.Event.ON_RESUME -> {
+                    val chatText = BaresipService.chatTexts["$aor::$peerUri"]
+                    if (chatText != null) {
+                        Log.d(TAG, "Restoring newMessage '$chatText' for $aor::$peerUri")
+                        newMessage.value = TextFieldValue(
+                            text = chatText,
+                            selection = TextRange(chatText.length)
+                        )
+                        BaresipService.chatTexts.remove("$aor::$peerUri")
+                    }
+                    _chatMessages.value = uaPeerMessages(aor, peerUri)
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    if (newMessage.value != TextFieldValue("")) {
+                        Log.d(TAG, "Saving newMessage '${newMessage.value.text}' for $aor::$peerUri")
+                        BaresipService.chatTexts["$aor::$peerUri"] = newMessage.value.text
+                    }
+                    MainActivity.activityAor = aor
+                }
+                else -> {}
+            }
+        }
+
         val showDialog = remember { mutableStateOf(false) }
         val dialogMessage = remember { mutableStateOf("") }
 
@@ -459,7 +501,6 @@ class ChatActivity : ComponentActivity() {
             positiveButtonText = stringResource(R.string.ok),
         )
 
-        var newMessage by remember { mutableStateOf("") }
         Row(modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
@@ -468,16 +509,21 @@ class ChatActivity : ComponentActivity() {
         ) {
             val keyboardController = LocalSoftwareKeyboardController.current
             OutlinedTextField(
-                value = newMessage,
+                value = newMessage.value,
                 placeholder = { Text(stringResource(R.string.new_message)) },
-                onValueChange = { newMessage = it },
+                onValueChange = { newMessage.value = it },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .verticalScroll(rememberScrollState())
+                    .focusRequester(focusRequester)
+                    .onGloballyPositioned {
+                        if (!textFieldLoaded)
+                            textFieldLoaded = true
+                    }
                     .combinedClickable(
                         onClick = {
-                            val msgText = newMessage
+                            val msgText = newMessage.value.text
                             if (msgText.isNotEmpty()) {
                                 keyboardController?.hide()
                                 val time = System.currentTimeMillis()
@@ -498,7 +544,8 @@ class ChatActivity : ComponentActivity() {
                                     if (ua.account.telProvider == "") {
                                         dialogMessage.value = String.format(
                                             getString(R.string.no_telephony_provider),
-                                            Utils.plainAor(aor))
+                                            Utils.plainAor(aor)
+                                        )
                                         showDialog.value = true
                                     } else {
                                         msgUri = Utils.telToSip(peerUri, ua.account)
@@ -513,12 +560,14 @@ class ChatActivity : ComponentActivity() {
                                             time.toString()
                                         ) != 0
                                     ) {
-                                        Toast.makeText(ctx, "${getString(R.string.message_failed)}!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            ctx, "${getString(R.string.message_failed)}!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         msg.direction = MESSAGE_UP_FAIL
                                         msg.responseReason = getString(R.string.message_failed)
                                     } else {
-                                        newMessage = ""
-                                        unsentMessage = ""
+                                        newMessage.value = TextFieldValue("")
                                         keyboardController?.hide()
                                         BaresipService.chatTexts.remove("$aor::$peerUri")
                                     }
@@ -531,7 +580,7 @@ class ChatActivity : ComponentActivity() {
                             val clipData = clipboardManager.primaryClip
                             if (clipData != null && clipData.itemCount > 0) {
                                 val pastedText = clipData.getItemAt(0).text.toString()
-                                newMessage = pastedText
+                                newMessage.value = TextFieldValue(pastedText)
                             } else {
                                 Toast.makeText(ctx, "Nothing to paste", Toast.LENGTH_SHORT).show()
                             }
@@ -539,11 +588,11 @@ class ChatActivity : ComponentActivity() {
                     ),
                 singleLine = false,
                 trailingIcon = {
-                    if (newMessage.isNotEmpty()) {
+                    if (newMessage.value.text.isNotEmpty()) {
                         Icon(
                             Icons.Outlined.Clear,
                             contentDescription = "Clear",
-                            modifier = Modifier.clickable { newMessage = "" }
+                            modifier = Modifier.clickable { newMessage.value = TextFieldValue("") }
                         )
                     } },
                 label = { LabelText(stringResource(R.string.new_message)) },
@@ -554,26 +603,23 @@ class ChatActivity : ComponentActivity() {
                     autoCorrectEnabled = true
                 )
             )
+            LaunchedEffect(Unit) {
+                if (newMessage.value.text.isNotEmpty())
+                    focusRequester.requestFocus()
+            }
             Image(
                 painter = painterResource(id = R.drawable.send),
                 contentDescription = "Send",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier
+                    .size(36.dp)
                     .clickable {
-                        val msgText = newMessage
+                        val msgText = newMessage.value.text
                         if (msgText.isNotEmpty()) {
                             keyboardController?.hide()
                             val time = System.currentTimeMillis()
-                            val msg = Message(
-                                aor,
-                                peerUri,
-                                msgText,
-                                time,
-                                MESSAGE_UP_WAIT,
-                                0,
-                                "",
-                                true
-                            )
+                            val msg =
+                                Message(aor, peerUri, msgText, time, MESSAGE_UP_WAIT, 0, "", true)
                             msg.add()
                             var msgUri = ""
                             _chatMessages.value += msg
@@ -581,7 +627,8 @@ class ChatActivity : ComponentActivity() {
                                 if (ua.account.telProvider == "") {
                                     dialogMessage.value = String.format(
                                         getString(R.string.no_telephony_provider),
-                                        Utils.plainAor(aor))
+                                        Utils.plainAor(aor)
+                                    )
                                     showDialog.value = true
                                 } else {
                                     msgUri = Utils.telToSip(peerUri, ua.account)
@@ -589,19 +636,16 @@ class ChatActivity : ComponentActivity() {
                             else
                                 msgUri = peerUri
                             if (msgUri != "")
-                                if (Api.message_send(
-                                        ua.uap,
-                                        msgUri,
-                                        msgText,
-                                        time.toString()
-                                    ) != 0
+                                if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0
                                 ) {
-                                    Toast.makeText(ctx, "${getString(R.string.message_failed)}!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        ctx, "${getString(R.string.message_failed)}!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     msg.direction = MESSAGE_UP_FAIL
                                     msg.responseReason = getString(R.string.message_failed)
                                 } else {
-                                    newMessage = ""
-                                    unsentMessage = ""
+                                    newMessage.value = TextFieldValue("")
                                     keyboardController?.hide()
                                     BaresipService.chatTexts.remove("$aor::$peerUri")
                                 }
@@ -609,27 +653,6 @@ class ChatActivity : ComponentActivity() {
                     }
             )
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val chatText = BaresipService.chatTexts["$aor::$peerUri"]
-        if (chatText != null) {
-            Log.d(TAG, "Restoring newMessage $chatText for $aor::$peerUri")
-            unsentMessage = chatText
-            //newMessage.requestFocus()
-            BaresipService.chatTexts.remove("$aor::$peerUri")
-        }
-        _chatMessages.value = uaPeerMessages(aor, peerUri)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (unsentMessage != "") {
-            Log.d(TAG, "Saving newMessage $unsentMessage for $aor::$peerUri")
-            BaresipService.chatTexts["$aor::$peerUri"] = unsentMessage
-        }
-        MainActivity.activityAor = aor
     }
 
     override fun onDestroy() {
