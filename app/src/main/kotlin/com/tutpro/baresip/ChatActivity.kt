@@ -65,6 +65,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -462,6 +464,7 @@ class ChatActivity : ComponentActivity() {
             mutableStateOf(TextFieldValue(""))
         }
         var textFieldLoaded by remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
 
         EventListener {
             when (it) {
@@ -506,23 +509,17 @@ class ChatActivity : ComponentActivity() {
         ) {
             val keyboardController = LocalSoftwareKeyboardController.current
             OutlinedTextField(
-                value = newMessage.value.text,
+                value = newMessage.value,
                 placeholder = { Text(stringResource(R.string.new_message)) },
-                onValueChange = {
-                    newMessage.value = newMessage.value.copy(text = it)
-                },
+                onValueChange = { newMessage.value = it },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .verticalScroll(rememberScrollState())
+                    .focusRequester(focusRequester)
                     .onGloballyPositioned {
-                        if (!textFieldLoaded) {
+                        if (!textFieldLoaded)
                             textFieldLoaded = true
-                            //val textLength = newMessage.value.text.length
-                            //newMessage.value = newMessage.value.copy(
-                            //    selection = TextRange(textLength)
-                            //)
-                        }
                     }
                     .combinedClickable(
                         onClick = {
@@ -607,6 +604,8 @@ class ChatActivity : ComponentActivity() {
                 )
             )
             LaunchedEffect(Unit) {
+                if (newMessage.value.text.isNotEmpty())
+                focusRequester.requestFocus()
             }
             Image(
                 painter = painterResource(id = R.drawable.send),
