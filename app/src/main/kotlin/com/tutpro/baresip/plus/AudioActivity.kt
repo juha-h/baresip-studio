@@ -48,7 +48,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -75,7 +74,6 @@ class AudioActivity : ComponentActivity() {
     private var newOpusPacketLoss = oldOpusPacketLoss
     private var newAudioDelay = BaresipService.audioDelay.toString()
     private var newToneCountry = BaresipService.toneCountry
-    private var arrowTint = Color.Unspecified
 
     private val alertTitle = mutableStateOf("")
     private val alertMessage = mutableStateOf("")
@@ -184,11 +182,6 @@ class AudioActivity : ComponentActivity() {
     @Composable
     fun AudioContent(contentPadding: PaddingValues) {
 
-        arrowTint = if (BaresipService.darkTheme.value)
-            LocalCustomColors.current.grayLight
-        else
-            LocalCustomColors.current.black
-
         if (showAlert.value) {
             AlertDialog(
                 showDialog = showAlert,
@@ -256,7 +249,7 @@ class AudioActivity : ComponentActivity() {
                     Text(text = volNames[itemPosition.intValue],
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -509,7 +502,7 @@ class AudioActivity : ComponentActivity() {
                     Text(text = countryNames[itemPosition.intValue],
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = arrowTint)
+                        tint = LocalCustomColors.current.itemText)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
