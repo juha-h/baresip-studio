@@ -18,7 +18,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -100,7 +99,6 @@ class ChatActivity : ComponentActivity() {
     private lateinit var aor: String
     private lateinit var account: Account
     private lateinit var peerUri: String
-    private lateinit var chatPeer: String
     private lateinit var ua: UserAgent
 
     private var _chatMessages = mutableStateOf<List<Message>>(emptyList())
@@ -108,6 +106,7 @@ class ChatActivity : ComponentActivity() {
     private var focus = false
     private var lastCall: Long = 0
     private var keyboardController: SoftwareKeyboardController? = null
+    private val chatPeer = mutableStateOf("")
 
     private var backInvokedCallback: OnBackInvokedCallback? = null
     private lateinit var onBackPressedCallback: OnBackPressedCallback
@@ -160,11 +159,9 @@ class ChatActivity : ComponentActivity() {
             ua = userAgent
         }
 
-        chatPeer = Utils.friendlyUri(this, peerUri, userAgent.account, true)
+        chatPeer.value = Utils.friendlyUri(this, peerUri, userAgent.account, true)
 
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-
-        val title = String.format(getString(R.string.chat_with), chatPeer)
 
         val messagesObserver = Observer<Long> {
             _chatMessages.value = listOf()
@@ -180,21 +177,21 @@ class ChatActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    ChatScreen(this, title) { goBack() }
+                    ChatScreen(this) { goBack() }
                 }
             }
         }
     }
 
     @Composable
-    fun ChatScreen(ctx: Context, title: String, navigateBack: () -> Unit) {
+    fun ChatScreen(ctx: Context, navigateBack: () -> Unit) {
         Scaffold(
             modifier = Modifier
                 .fillMaxHeight()
                 .imePadding()
                 .safeDrawingPadding(),
             containerColor = LocalCustomColors.current.background,
-            topBar = { TopAppBar(ctx, title, navigateBack) },
+            topBar = { TopAppBar(ctx, navigateBack) },
             bottomBar = { NewMessage(ctx, peerUri) },
             content = { contentPadding ->
                 ChatContent(ctx, contentPadding)
@@ -204,11 +201,11 @@ class ChatActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TopAppBar(ctx: Context, title: String, navigateBack: () -> Unit) {
+    fun TopAppBar(ctx: Context, navigateBack: () -> Unit) {
         TopAppBar(
             title = {
                 Text(
-                    text = title,
+                    text = String.format(getString(R.string.chat_with), chatPeer.value),
                     color = LocalCustomColors.current.light,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
@@ -337,11 +334,11 @@ class ChatActivity : ComponentActivity() {
             items(items = chatMessages, key = { message -> message.timeStamp }) { message ->
                 val down = message.direction == MESSAGE_DOWN
                 val peer: String = if (down) {
-                    if (chatPeer.startsWith("sip:") &&
-                        (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
+                    if (chatPeer.value.startsWith("sip:") &&
+                            (Utils.uriHostPart(message.peerUri) == Utils.uriHostPart(message.aor)))
                         Utils.uriUserPart(message.peerUri)
                     else
-                        chatPeer
+                        chatPeer.value
                 }
                 else
                     stringResource(R.string.you)
@@ -366,9 +363,9 @@ class ChatActivity : ComponentActivity() {
                 ) {
                     Button(
                         onClick = {
-                            if (chatPeer == peerUri) {
+                            if (Contact.findContact(peerUri) == null) {
                                 dialogMessage.value = String.format(getString(R.string.long_message_question),
-                                    peerUri
+                                    chatPeer.value
                                 )
                                 positiveButtonText.value = getString(R.string.add_contact)
                                 positiveAction.value = {
@@ -392,6 +389,7 @@ class ChatActivity : ComponentActivity() {
                                     message.delete()
                                     _chatMessages.value = uaPeerMessages(aor, peerUri)
                                 }
+                                neutralButtonText.value = ""
                             }
                             showDialog.value = true
                         },
@@ -478,14 +476,12 @@ class ChatActivity : ComponentActivity() {
                         )
                         BaresipService.chatTexts.remove("$aor::$peerUri")
                     }
-                    _chatMessages.value = uaPeerMessages(aor, peerUri)
                 }
                 Lifecycle.Event.ON_PAUSE -> {
                     if (newMessage.value != TextFieldValue("")) {
                         Log.d(TAG, "Saving newMessage '${newMessage.value.text}' for $aor::$peerUri")
                         BaresipService.chatTexts["$aor::$peerUri"] = newMessage.value.text
                     }
-                    MainActivity.activityAor = aor
                 }
                 else -> {}
             }
@@ -520,72 +516,7 @@ class ChatActivity : ComponentActivity() {
                     .onGloballyPositioned {
                         if (!textFieldLoaded)
                             textFieldLoaded = true
-                    }
-                    .combinedClickable(
-                        onClick = {
-                            val msgText = newMessage.value.text
-                            if (msgText.isNotEmpty()) {
-                                keyboardController?.hide()
-                                val time = System.currentTimeMillis()
-                                val msg = Message(
-                                    aor,
-                                    peerUri,
-                                    msgText,
-                                    time,
-                                    MESSAGE_UP_WAIT,
-                                    0,
-                                    "",
-                                    true
-                                )
-                                msg.add()
-                                var msgUri = ""
-                                _chatMessages.value += msg
-                                if (Utils.isTelUri(peerUri))
-                                    if (ua.account.telProvider == "") {
-                                        dialogMessage.value = String.format(
-                                            getString(R.string.no_telephony_provider),
-                                            Utils.plainAor(aor)
-                                        )
-                                        showDialog.value = true
-                                    } else {
-                                        msgUri = Utils.telToSip(peerUri, ua.account)
-                                    }
-                                else
-                                    msgUri = peerUri
-                                if (msgUri != "")
-                                    if (Api.message_send(
-                                            ua.uap,
-                                            msgUri,
-                                            msgText,
-                                            time.toString()
-                                        ) != 0
-                                    ) {
-                                        Toast.makeText(
-                                            ctx, "${getString(R.string.message_failed)}!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        msg.direction = MESSAGE_UP_FAIL
-                                        msg.responseReason = getString(R.string.message_failed)
-                                    } else {
-                                        newMessage.value = TextFieldValue("")
-                                        keyboardController?.hide()
-                                        BaresipService.chatTexts.remove("$aor::$peerUri")
-                                    }
-                            }
-                        },
-                        onLongClick = {
-                            val clipboardManager =
-                                ctx.getSystemService(CLIPBOARD_SERVICE) as
-                                        android.content.ClipboardManager
-                            val clipData = clipboardManager.primaryClip
-                            if (clipData != null && clipData.itemCount > 0) {
-                                val pastedText = clipData.getItemAt(0).text.toString()
-                                newMessage.value = TextFieldValue(pastedText)
-                            } else {
-                                Toast.makeText(ctx, "Nothing to paste", Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                    ),
+                    },
                 singleLine = false,
                 trailingIcon = {
                     if (newMessage.value.text.isNotEmpty()) {
@@ -653,6 +584,17 @@ class ChatActivity : ComponentActivity() {
                     }
             )
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MainActivity.activityAor = aor
+    }
+
+    override fun onResume() {
+        super.onResume()
+        _chatMessages.value = uaPeerMessages(aor, peerUri)
+        chatPeer.value = Utils.friendlyUri(this, peerUri, ua.account, true)
     }
 
     override fun onDestroy() {
