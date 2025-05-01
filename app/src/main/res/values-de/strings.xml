@@ -82,7 +82,7 @@
     <string name="media_nat_help">Wählt ein oder kein media NAT traversal protocol. Mögliche Werte sind STUN (Session Traversal Utilities for NAT, RFC 5389) und ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="invalid_voicemail_uri">Ungültige Sprachnachrichten URI \'%1$s \'</string>
     <string name="accounts">Konten</string>
-    <string name="new_account">Neues Konto</string>
+    <string name="new_account">SIP URI des neuen Kontos</string>
     <string name="decrypt_password">Passwort entschlüsseln</string>
     <string name="calls_call_message_question">Wollen Sie \'%1$s\' anrufen oder eine Nachricht senden?</string>
     <string name="new_message">Neue Nachricht</string>
@@ -108,7 +108,7 @@
     <string name="long_message_question">Möchten Sie die Nachricht löschen oder Gesprächspartner \'%1$s\' zu Kontakten hinzufügen?</string>
     <string name="message_failed">Fehlgeschlagen</string>
     <string name="delete_chats">Löschen</string>
-    <string name="video_codecs_help">Liste der Video-Codecs nach Priorität. Ziehen um Umzuordnen, Rechtswischen, um zu Aktivieren / Deaktivieren.</string>
+    <string name="video_codecs_help">Liste der Video-Codecs nach Priorität. Ziehen, um umzuordnen, lange gedrückt halten, um zu aktivieren / deaktivieren.</string>
     <string name="codec_action">Neuordnen</string>
     <string name="configuration">Einstellungen</string>
     <string name="start_automatically_help">Wenn angeklickt wird Baresip automatisch ausgeführt nach dem Gerät (Neu)Start.</string>
@@ -174,7 +174,7 @@
     <string name="one_old_message">eine alte Nachricht</string>
     <string name="call_is_secure">Dieser Anruf ist SICHER, und die Gegenstelle ist VERIFIZIERT! Wollen Sie die Gegenstelle unsicher erklären?</string>
     <string name="unverify">Unsicher erklären</string>
-    <string name="backed_up">Anwendungsdaten wurden gesichert in \'%1$s\'. In Android Version 9 ist die Datei im Download-Ordner.</string>
+    <string name="backed_up">Anwendungsdaten (keine Aufnahmen) gesichert in \'%1$s\'. In Android Version 9 ist die Datei im Download-Ordner.</string>
     <string name="restart_request">Neustarten</string>
     <string name="anonymous">Anonym</string>
     <string name="send_message">Nachricht senden</string>
@@ -217,7 +217,7 @@
     <string name="missed_call_from">Verpasster Anruf von</string>
     <string name="sending_failed">Nachricht senden fehlgeschlagen</string>
     <string name="delete_chats_alert">Möchten Sie den Chat-Verlauf des Kontos \'%1$s\' löschen?</string>
-    <string name="audio_codecs_help">Liste der Audio-Codecs nach Priorität. Ziehen zum Umordnen, Rechtswischen zum Aktivieren oder Deaktivieren.</string>
+    <string name="audio_codecs_help">Liste der Audio-Codecs nach Priorität. Ziehen zum Umordnen, zum Aktivieren oder Deaktivieren lange gedrückt halten.</string>
     <string name="rel_100">Zuverlässige temporäre Antworten</string>
     <string name="rel_100_help">Wenn angeklickt gibt das Unterstützung für zuverlässige vorläufige Antworten an (RFC 3262).</string>
     <string name="redirect_mode_help">Bestimmt ob eine Rufumleitungsanfrage automatisch befolgt wird oder erst nach einer Bestätigung (manuell).</string>
@@ -332,8 +332,8 @@
 
         ]]></string>
     <string name="country_code_help">E.164 Ländercode dieses Kontos. Wenn der Benutzerteil der Von-URI des eingehenden Anrufs oder der Nachricht eine Telefonnummer enthält, die nicht mit \'+\'-Zeichen beginnt und wenn der Kontakt nicht bekannt ist, wird der Nummer dieser Ländercode vorangestellt und die Kontaktsuche beginnt erneut. Wenn die Telefonnummer mit einer einzigen Ziffer \'0\' beginnt, wird die Zahl \'0\' entfernt, bevor der Ländercode vorangestellt wird.</string>
-    <string name="accounts_help">Wenn ein neues Konto erstellt wird, kann die Portnummer und das Transportprotokoll des Kontos optional angegeben werden: &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Wird &lt;port&gt; angegeben und das Transportprotokoll nicht angegeben, wird das Transportprotokoll standardmäßig auf udp gesetzt. Wenn &lt;port&gt; nicht und das Transportprotokoll schon angegeben ist, wird &lt;port&gt; 5060 oder 5061 eingestellt (TLS). Wenn weder noch angegeben wird und kein Proxy für ausgehende Verbindungen angegeben wird, wird der Registrar (falls vorhanden) des Kontos ausschließlich auf Basis der DNS-Informationen der Domain ermittelt.</string>
-    <string name="listen_address_help">IP-Adresse und Port in der Form \'address:port\', an der Baresip für eingehende SIP-Anfragen lauscht. Wenn die IP-Adresse eine IPv6-Adresse ist, muss sie innerhalb von Klammern geschrieben werden []. IPv4 Adresse 0.0.0.0 oder IPv6 Adresse [:] läßt Baresip an allen verfügbaren Adressen lauschen. Wenn leer gelassen (Standard), hört Baresip auf Port 5060 aller verfügbaren Adressen.</string>
+    <string name="accounts_help">SIP URI des neuen Kontos nach dem Muster &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Wird &lt;port&gt; angegeben und das Transportprotokoll nicht angegeben, wird das Transportprotokoll standardmäßig auf UDP gesetzt. Wenn &lt;port&gt; nicht und das Transportprotokoll schon angegeben ist, wird &lt;port&gt; 5060 oder 5061 eingestellt (TLS). Wenn weder noch angegeben wird und kein Proxy für ausgehende Verbindungen angegeben wird, wird der Registrar (falls vorhanden) des Kontos ausschließlich auf Basis der DNS-Informationen der Domain ermittelt.</string>
+    <string name="listen_address_help">IP-Adresse und Port in der Form \'address:port\', an der Baresip für eingehende SIP-Anfragen lauscht. Wenn die IP-Adresse eine IPv6-Adresse ist, muss sie innerhalb von Klammern geschrieben werden []. IPv4 Adresse 0.0.0.0 oder IPv6 Adresse [:] läßt Baresip an allen verfügbaren Adressen lauschen. Wenn leer gelassen (Standard), hört Baresip auf einem zufälligen Port aller verfügbaren Adressen.</string>
     <string name="address_family_help">Wählt, welche IP-Adressen Baresip verwendet. Wird IPv4 oder IPv6 gewählt, verwendet Baresip nur IPv4 oder IPv6 Adressen. Wird nichts gewählt, verwendet Baresip sowohl IPv4 als auch IPv6 Adressen.</string>
     <string name="dns_servers_help">Kommagetrennte Liste von Adressen von DNS-Servern. Wenn nicht angegeben, werden DNS-Serveradressen dynamisch aus dem System gewonnen. Jede DNS-Adresse ist in der Form \'ip:port\' oder \'ip\'. Wenn der Port weggelassen ist, wird dieser auf 53 gesetzt. Wenn ip eine IPv6-Adresse ist und auch Port angegeben ist, muss ip in Klammern geschrieben werden []. Als Beispiel zeigt die Liste \'8.8.8.8.8:53,[2001:4860:4860:::888888]:53\' auf IPv4 und IPv6 Adressen öffentlicher Google DNS-Server.</string>
     <string name="tls_certificate_file_help">Falls angeklickt, wurde oder wird eine Datei mit TLS-Zertifikat und privatem Schlüssel dieser Baresip-Instanz geladen. In Android-Version 9 wird eine Datei namens \'cert.pem\' aus dem Download-Ordner geladen. Löschen Sie aus Sicherheitsgründen diese Datei nach dem Laden.</string>
@@ -427,4 +427,18 @@
     <string name="user_agent">User Agent</string>
     <string name="user_agent_help">Benutzerdefinierter Wert für das SIP request/response User-Agent header-Feld</string>
     <string name="invalid_user_agent">Ungültiger Wert für das User-Agent header-Feld</string>
+    <string name="numeric_keypad">Ziffernblock</string>"
+    <string name="numeric_keypad_help">Falls angekreuzt, wird der Ziffernblock angezeigt, sobald das \"Anruf an ...\"- Feld fokussiert wird</string>"
+    <string name="microphone_title">Mikrofon</string>
+    <string name="microphone_tip">Falls in einem Anruf aktiviert, wird das Mikrofon stummgestellt.</string>
+    <string name="speakerphone_title">Lautsprecher</string>
+    <string name="no_read_permission">Keine Berechtigung, den externen Speicher zu lesen</string>
+    <string name="favorite_help">Falls angekreuzt, wird der Kontakt mit anderen Favoriten am Anfang der Kontaktliste angezeigt.</string>
+    <string name="speakerphone_tip">Falls aktiviert, wird der Ton über den Lautsprecher des Geräts abgespielt.</string>
+    <string name="ringtone">Klingelton</string>
+    <string name="select_ringtone">Klingelton auswählen</string>
+    <string name="no_aec">Keine hardwarebasierte akustische Echounterdrückung!</string>
+    <string name="call_recording_title">Anrufsaufzeichnung</string>
+    <string name="call_recording_tip">Falls aktiviert, werden ein-/ ausgehende Anrufe aufgenommen. Aufnahmen lassen sich unter den Anrufsdetails abspielen</string>
+    <string name="playing_recording">Spiele Aufnahme ab…</string>
 </resources>
