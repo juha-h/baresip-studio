@@ -51,8 +51,10 @@
     <string name="about_text_plus">
         <![CDATA[
         <h1>Baresip library based SIP User Agent with video calls</h1>
+        <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
+        <br>
         <h2>Usage Hints</h2>
         <ul>
             <li>Check that default values in baresip+\'s Settings meet your needs
@@ -80,10 +82,12 @@
             <li>Selfview is not properly shown when video stream is sendonly.</li>
         </ul>
         <h2>Privacy Policy</h2>
-            Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">here</a>.
+        <p>Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">here</a>.</p>
+        <br>
         <h2>Source code</h2>
-        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        where also issues can be reported.
+        <p>Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        where also issues can be reported.</p>
+        <br>
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>

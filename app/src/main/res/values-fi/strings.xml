@@ -49,8 +49,10 @@
     <string name="about_text_plus">
         <![CDATA[
             <h1>Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+            <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
+            <br>
             <h2>Käyttövihjeitä</h2>
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
@@ -76,10 +78,11 @@
                 <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
             </ul>
             <h2>Tietosuoja</h2>
-                Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">täältä</a>.
+                <p>Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">täältä</a>.</p>
             <h2>Lähdekoodi</h2>
-                Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
-                missä voi myös raportoida virheistä.
+                <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
+                missä voi myös raportoida virheistä.</p>
+            <br>
             <h2>Lisenssit</h2>
             <ul>
                 <li><b>BSD-3-Clause</b> except the following:</li>
