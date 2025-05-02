@@ -1291,7 +1291,7 @@ class MainActivity : ComponentActivity() {
             if (showHangupButton.value) {
 
                 val ua: UserAgent = userAgentOfSelectedAor()
-                val call = ua.currentCall()
+                val call = ua.currentCall()!!
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -1312,7 +1312,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.size(48.dp),
                         onClick = {
                             videoIcon.intValue = R.drawable.video_pending
-                            videoClick(call!!)
+                            videoClick(call)
                         }
                     ) {
                         Icon(
@@ -1327,7 +1327,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         val aor = ua.account.aor
-                        if (call!!.onhold) {
+                        if (call.onhold) {
                             Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.value}")
                             call.resume()
                             call.onhold = false
@@ -1353,17 +1353,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     enabled = transferButtonEnabled.value,
                     onClick = {
-                        if (call != null) {
-                            if (call.onHoldCall != null) {
-                                if (!call.executeTransfer()) {
-                                    alertTitle.value = getString(R.string.notice)
-                                    alertMessage.value = getString(R.string.transfer_failed)
-                                    showAlert.value = true
-                                }
+                        if (call.onHoldCall != null) {
+                            if (!call.executeTransfer()) {
+                                alertTitle.value = getString(R.string.notice)
+                                alertMessage.value = getString(R.string.transfer_failed)
+                                showAlert.value = true
                             }
-                            else
-                                showTransferDialog = true
                         }
+                        else
+                            showTransferDialog = true
                     },
                 ) {
                     Icon(
@@ -1375,7 +1373,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (showTransferDialog) {
-                    val showDialog = remember { mutableStateOf(call != null) }
+                    val showDialog = remember { mutableStateOf(true) }
                     val blindChecked = remember { mutableStateOf(true) }
                     if (showDialog.value)
                         BasicAlertDialog(
@@ -1500,7 +1498,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
-                                    if (call!!.replaces())
+                                    if (call.replaces())
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
@@ -1645,8 +1643,8 @@ class MainActivity : ComponentActivity() {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
-                        val stats = call?.stats("audio")
-                        if (stats != null && stats != "") {
+                        val stats = call.stats("audio")
+                        if (stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
@@ -2160,10 +2158,6 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(applicationContext, R.string.audio_focus_denied,
                 Toast.LENGTH_SHORT).show()
         else {
-            callUriEnabled.value = false
-            showCallButton.value = false
-            showCallVideoButton.value = false
-            showHangupButton.value = true
             if (Build.VERSION.SDK_INT < 31) {
                 Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
                 am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -2192,6 +2186,24 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun runCall(ua: UserAgent, uri: String, video: Boolean) {
+        callRunnable = Runnable {
+            callRunnable = null
+            if (!call(ua, uri, video)) {
+                BaresipService.abandonAudioFocus(applicationContext)
+                showCallButton.value = true
+                showCallVideoButton.value = true
+                showHangupButton.value = false
+            }
+            else {
+                showCallButton.value = false
+                showCallVideoButton.value = false
+                showHangupButton.value = true
+            }
+        }
+        callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
     private fun answer(ctx: Context, video: Boolean) {
@@ -3330,19 +3342,6 @@ class MainActivity : ComponentActivity() {
             Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
             call.notifySipfrag(500, "Call Error")
         }
-    }
-
-    private fun runCall(ua: UserAgent, uri: String, video: Boolean) {
-        callRunnable = Runnable {
-            callRunnable = null
-            if (!call(ua, uri, video)) {
-                BaresipService.abandonAudioFocus(applicationContext)
-                showCallButton.value = true
-                showCallVideoButton.value = true
-                showHangupButton.value = false
-            }
-        }
-        callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
     private fun showCall(ua: UserAgent?, showCall: Call? = null) {
