@@ -1243,6 +1243,7 @@ class MainActivity : ComponentActivity() {
             if (showHangupButton.value) {
 
                 var ua: UserAgent = userAgentOfSelectedAor()
+                val call = ua.currentCall()!!
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -1285,7 +1286,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         val aor = ua.account.aor
-                        val call = ua.currentCall()!!
                         if (call.onhold) {
                             Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.value}")
                             call.resume()
@@ -1312,18 +1312,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     enabled = transferButtonEnabled.value,
                     onClick = {
-                        val call = ua.currentCall()
-                        if (call != null) {
-                            if (call.onHoldCall != null) {
-                                if (!call.executeTransfer()) {
-                                    alertTitle.value = getString(R.string.notice)
-                                    alertMessage.value = getString(R.string.transfer_failed)
-                                    showAlert.value = true
-                                }
+                        if (call.onHoldCall != null) {
+                            if (!call.executeTransfer()) {
+                                alertTitle.value = getString(R.string.notice)
+                                alertMessage.value = getString(R.string.transfer_failed)
+                                showAlert.value = true
                             }
-                            else
-                                showTransferDialog = true
                         }
+                        else
+                            showTransferDialog = true
                     },
                 ) {
                     Icon(
@@ -1335,8 +1332,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (showTransferDialog) {
-                    val call = ua.currentCall()
-                    val showDialog = remember { mutableStateOf(call != null) }
+                    val showDialog = remember { mutableStateOf(true) }
                     val blindChecked = remember { mutableStateOf(true) }
                     if (showDialog.value)
                         BasicAlertDialog(
@@ -1461,7 +1457,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
-                                    if (call!!.replaces())
+                                    if (call.replaces())
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
@@ -1592,9 +1588,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val call = ua.currentCall()
-                        val stats = call?.stats("audio")
-                        if (stats != null && stats != "") {
+                        val stats = call.stats("audio")
+                        if (call.startTime != null && stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
@@ -1732,9 +1727,6 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(applicationContext, R.string.audio_focus_denied,
                 Toast.LENGTH_SHORT).show()
         } else {
-            callUriEnabled.value = false
-            showCallButton.value = false
-            showHangupButton.value = true
             if (Build.VERSION.SDK_INT < 31) {
                 Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
                 am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -2831,6 +2823,10 @@ class MainActivity : ComponentActivity() {
                 BaresipService.abandonAudioFocus(applicationContext)
                 showCallButton.value = true
                 showHangupButton.value = false
+            }
+            else {
+                showCallButton.value = false
+                showHangupButton.value = true
             }
         }
         callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
