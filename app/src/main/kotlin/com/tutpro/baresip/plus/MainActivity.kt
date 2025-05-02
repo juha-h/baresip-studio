@@ -1645,8 +1645,8 @@ class MainActivity : ComponentActivity() {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
-                        val stats = call!!.stats("audio")
-                        if (stats != "") {
+                        val stats = call?.stats("audio")
+                        if (stats != null && stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
