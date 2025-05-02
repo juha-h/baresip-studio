@@ -1592,9 +1592,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val call = ua.currentCall()!!
-                        val stats = call.stats("audio")
-                        if (stats != "") {
+                        val call = ua.currentCall()
+                        val stats = call?.stats("audio")
+                        if (stats != null && stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
