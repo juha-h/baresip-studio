@@ -663,7 +663,7 @@ class AccountActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
-                text = stringResource(R.string.audio_codecs),
+                text = stringResource(R.string.video_codecs),
                 modifier = Modifier.weight(1f)
                     .clickable {
                         val i = Intent(ctx, CodecsActivity::class.java)
