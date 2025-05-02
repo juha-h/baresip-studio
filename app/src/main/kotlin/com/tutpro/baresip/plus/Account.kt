@@ -69,6 +69,17 @@ class Account(val accp: Long) {
             }
         }
 
+        i = 0
+        while (true) {
+            val vc = Api.account_video_codec(accp, i)
+            if (vc != "" && !videoCodec.contains(vc)) {
+                videoCodec.add(vc)
+                i++
+            } else {
+                break
+            }
+        }
+
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
             nickName.value = Utils.paramValue(extra, "nickname")
@@ -117,6 +128,18 @@ class Account(val accp: Long) {
             var first = true
             res = "$res;audio_codecs="
             for (c in audioCodec)
+                if (first) {
+                    res += c
+                    first = false
+                } else {
+                    res = "$res,$c"
+                }
+        }
+
+        if (videoCodec.size > 0) {
+            var first = true
+            res = "$res;video_codecs="
+            for (c in videoCodec)
                 if (first) {
                     res += c
                     first = false
