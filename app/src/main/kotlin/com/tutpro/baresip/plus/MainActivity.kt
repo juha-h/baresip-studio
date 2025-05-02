@@ -1644,7 +1644,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         val stats = call.stats("audio")
-                        if (stats != "") {
+                        if (call.startTime != null && stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
