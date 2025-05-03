@@ -366,7 +366,7 @@ class BaresipContactActivity : ComponentActivity() {
             label = { Text(stringResource(R.string.contact_name)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
+                capitalization = KeyboardCapitalization.Words
             )
         )
         LaunchedEffect(new) {
