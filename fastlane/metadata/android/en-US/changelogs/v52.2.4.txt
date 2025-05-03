@@ -1,0 +1,8 @@
+- Fixed account's video codec configuration
+- Restore and focus new message after pause/resume
+- Use baresip+ prefix in backup and logcat files
+- Added cancel button for canceling outgoing call
+- Fixed showing of call transfer target suggestions
+- In chat activity, fixed adding chat peer to contacts
+- Small colors cleanup
+- New translations (German, Japanese, Russian, and Tamil)
