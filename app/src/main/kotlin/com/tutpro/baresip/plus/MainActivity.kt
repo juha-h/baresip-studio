@@ -1662,8 +1662,7 @@ class MainActivity : ComponentActivity() {
                         dtmfText.value = it
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    modifier = Modifier.width(48.dp)
-                        .focusRequester(focusRequester),//545.border(1.dp, Color.Gray),
+                    modifier = Modifier.width(48.dp).focusRequester(focusRequester),
                     visualTransformation = VisualTransformation.None,
                     interactionSource = interactionSource,
                     textStyle = TextStyle(fontSize = 14.sp, color = LocalCustomColors.current.itemText),
@@ -1682,7 +1681,7 @@ class MainActivity : ComponentActivity() {
                                 style = TextStyle(fontSize = 12.sp)
                             )
                         },
-                        contentPadding = PaddingValues(4.dp), // this is how you can remove the padding
+                        contentPadding = PaddingValues(4.dp),
                     )
                 }
                 LaunchedEffect(shouldRequestFocus) {
