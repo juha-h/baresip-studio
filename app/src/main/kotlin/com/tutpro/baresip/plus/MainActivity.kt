@@ -1320,7 +1320,6 @@ class MainActivity : ComponentActivity() {
             if (showHangupButton.value) {
 
                 val ua: UserAgent = userAgentOfSelectedAor()
-                val call = ua.currentCall()!!
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -1347,8 +1346,11 @@ class MainActivity : ComponentActivity() {
                     IconButton(
                         modifier = Modifier.size(48.dp),
                         onClick = {
-                            videoIcon.intValue = R.drawable.video_pending
-                            videoClick(call)
+                            val call = ua.currentCall()
+                            if (call != null) {
+                                videoIcon.intValue = R.drawable.video_pending
+                                videoClick(call)
+                            }
                         }
                     ) {
                         Icon(
@@ -1363,16 +1365,25 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         val aor = ua.account.aor
-                        if (call.onhold) {
-                            Log.d(TAG, "AoR $aor resuming call ${call.callp} with ${callUri.value}")
-                            call.resume()
-                            call.onhold = false
-                            holdIcon.intValue = R.drawable.call_hold
-                        } else {
-                            Log.d(TAG, "AoR $aor holding call ${call.callp} with ${callUri.value}")
-                            call.hold()
-                            call.onhold = true
-                            holdIcon.intValue = R.drawable.resume
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            if (call.onhold) {
+                                Log.d(
+                                    TAG,
+                                    "AoR $aor resuming call ${call.callp} with ${callUri.value}"
+                                )
+                                call.resume()
+                                call.onhold = false
+                                holdIcon.intValue = R.drawable.call_hold
+                            } else {
+                                Log.d(
+                                    TAG,
+                                    "AoR $aor holding call ${call.callp} with ${callUri.value}"
+                                )
+                                call.hold()
+                                call.onhold = true
+                                holdIcon.intValue = R.drawable.resume
+                            }
                         }
                     },
                 ) {
@@ -1389,15 +1400,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.size(48.dp),
                     enabled = transferButtonEnabled.value,
                     onClick = {
-                        if (call.onHoldCall != null) {
-                            if (!call.executeTransfer()) {
-                                alertTitle.value = getString(R.string.notice)
-                                alertMessage.value = getString(R.string.transfer_failed)
-                                showAlert.value = true
-                            }
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            if (call.onHoldCall != null) {
+                                if (!call.executeTransfer()) {
+                                    alertTitle.value = getString(R.string.notice)
+                                    alertMessage.value = getString(R.string.transfer_failed)
+                                    showAlert.value = true
+                                }
+                            } else
+                                showTransferDialog = true
                         }
-                        else
-                            showTransferDialog = true
                     },
                 ) {
                     Icon(
@@ -1538,7 +1551,8 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
-                                    if (call.replaces())
+                                    val call = ua.currentCall()
+                                    if (call != null && call.replaces())
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.Center,
@@ -1681,8 +1695,9 @@ class MainActivity : ComponentActivity() {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
-                        val stats = call.stats("audio")
-                        if (call.startTime != null && stats != "") {
+                        val call = ua.currentCall()
+                        val stats = call?.stats("audio")
+                        if (stats != null && call.startTime != null && stats != "") {
                             val parts = stats.split(",") as java.util.ArrayList
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
@@ -2271,11 +2286,13 @@ class MainActivity : ComponentActivity() {
     private fun reject() {
         val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
         val aor = ua.account.aor
-        val call = ua.currentCall()!!
-        val callp = call.callp
-        Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.value}")
-        call.rejected = true
-        Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
+        val call = ua.currentCall()
+        if (call != null) {
+            val callp = call.callp
+            Log.d(TAG, "AoR $aor rejecting call $callp from ${callUri.value}")
+            call.rejected = true
+            Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
+        }
     }
 
     @Composable
