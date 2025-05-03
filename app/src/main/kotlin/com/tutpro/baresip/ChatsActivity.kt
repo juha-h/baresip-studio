@@ -517,7 +517,10 @@ class ChatsActivity: ComponentActivity() {
                             )
                             .animateContentSize()
                     ) {
-                        Box(modifier = Modifier.fillMaxWidth()) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 150.dp)
+                        ) {
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
