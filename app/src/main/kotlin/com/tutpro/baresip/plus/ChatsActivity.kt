@@ -521,7 +521,7 @@ class ChatsActivity: ComponentActivity() {
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = 180.dp)
+                                    .heightIn(max = 150.dp)
                                     .verticalScrollbar(
                                         state = lazyListState,
                                         color = LocalCustomColors.current.gray
