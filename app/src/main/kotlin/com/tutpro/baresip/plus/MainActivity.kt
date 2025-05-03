@@ -1656,7 +1656,7 @@ class MainActivity : ComponentActivity() {
                             val char = it.last()
                             if (char.isDigit() || char == '*' || char == '#') {
                                 Log.d(TAG, "Got DTMF digit '$char'")
-                                ua.currentCall()!!.sendDigit(char)
+                                ua.currentCall()?.sendDigit(char)
                             }
                         }
                         dtmfText.value = it
