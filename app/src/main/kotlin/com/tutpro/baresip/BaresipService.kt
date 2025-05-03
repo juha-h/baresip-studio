@@ -783,7 +783,6 @@ class BaresipService: Service() {
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
                         proximitySensing(true)
-                        return
                     }
                     "call ringing" -> {
                         playRingBack()

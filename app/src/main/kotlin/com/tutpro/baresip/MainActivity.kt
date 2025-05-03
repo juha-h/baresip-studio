@@ -203,6 +203,7 @@ class MainActivity : ComponentActivity() {
     private var showCallTimer = mutableStateOf(false)
     private var showSuggestions = mutableStateOf(false)
     private var showCallButton = mutableStateOf(true)
+    private var showCancelButton = mutableStateOf(false)
     private var showAnswerRejectButtons = mutableStateOf(false)
     private var showHangupButton = mutableStateOf(false)
     private var showOnHoldNotice = mutableStateOf(false)
@@ -692,14 +693,15 @@ class MainActivity : ComponentActivity() {
                                     recOffImage
                                 }
                             } else
-                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT)
+                                    .show()
                         },
                         onLongClick = {
                             alertTitle.value = getString(R.string.call_recording_title)
                             alertMessage.value = getString(R.string.call_recording_tip)
                             showAlert.value = true
                         }
-                    ),
+                        ),
                     tint = Color.Unspecified,
                     contentDescription = null
                 )
@@ -708,7 +710,9 @@ class MainActivity : ComponentActivity() {
 
                 Icon(
                     imageVector = ImageVector.vectorResource(micIcon),
-                    modifier = Modifier.size(40.dp).combinedClickable(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .combinedClickable(
                             onClick = {
                                 if (Call.call("connected") != null) {
                                     BaresipService.isMicMuted = !BaresipService.isMicMuted
@@ -735,24 +739,27 @@ class MainActivity : ComponentActivity() {
 
                 Icon(
                     imageVector = ImageVector.vectorResource(speakerIcon),
-                    modifier = Modifier.size(40.dp).combinedClickable(
-                        onClick = {
-                            if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                        "${am.communicationDevice!!.type}/${am.mode}"
-                                )
-                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                            speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                                R.drawable.speaker_on
-                            else
-                                R.drawable.speaker_off
-                        },
-                        onLongClick = {
-                            alertTitle.value = getString(R.string.speakerphone_title)
-                            alertMessage.value = getString(R.string.speakerphone_tip)
-                            showAlert.value = true
-                        },
-                    ),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .combinedClickable(
+                            onClick = {
+                                if (Build.VERSION.SDK_INT >= 31)
+                                    Log.d(
+                                        TAG, "Toggling speakerphone when dev/mode is " +
+                                                "${am.communicationDevice!!.type}/${am.mode}"
+                                    )
+                                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                                speakerIcon = if (Utils.isSpeakerPhoneOn(am))
+                                    R.drawable.speaker_on
+                                else
+                                    R.drawable.speaker_off
+                            },
+                            onLongClick = {
+                                alertTitle.value = getString(R.string.speakerphone_title)
+                                alertMessage.value = getString(R.string.speakerphone_tip)
+                                showAlert.value = true
+                            },
+                        ),
                     tint = Color.Unspecified,
                     contentDescription = null
                 )
@@ -1054,13 +1061,12 @@ class MainActivity : ComponentActivity() {
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledBorderColor = OutlinedTextFieldDefaults.colors().unfocusedIndicatorColor),
                     onValueChange = {
-                        val newValue = it
                         if (it != callUri.value) {
-                            callUri.value = newValue
-                            showSuggestions.value = newValue.length > 2
+                            callUri.value = it
                             filteredSuggestions = suggestions.filter { suggestion ->
-                                newValue.length > 2 && suggestion.startsWith(newValue, ignoreCase = true)
+                                it.length > 2 && suggestion.startsWith(it, ignoreCase = true)
                             }
+                            showSuggestions.value = it.length > 2
                         }
                     },
                     trailingIcon = {
@@ -1240,6 +1246,35 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+            if (showCancelButton.value) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        showSuggestions.value = false
+                        abandonAudioFocus()
+                        var ua: UserAgent = userAgentOfSelectedAor()
+                        val call = ua.currentCall()
+                        if (call != null) {
+                            val callp = call.callp
+                            Log.d(
+                                TAG,
+                                "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}"
+                            )
+                            Api.ua_hangup(ua.uap, callp, 0, "")
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = null,
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+            }
+
             if (showHangupButton.value) {
 
                 var ua: UserAgent = userAgentOfSelectedAor()
@@ -1248,31 +1283,15 @@ class MainActivity : ComponentActivity() {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
-                        if (Build.VERSION.SDK_INT < 31) {
-                            if (callRunnable != null) {
-                                callHandler.removeCallbacks(callRunnable!!)
-                                callRunnable = null
-                                BaresipService.abandonAudioFocus(applicationContext)
-                                showCall(ua)
-                            }
-                        } else {
-                            if (audioModeChangedListener != null) {
-                                am.removeOnModeChangedListener(audioModeChangedListener!!)
-                                audioModeChangedListener = null
-                                BaresipService.abandonAudioFocus(applicationContext)
-                                showCall(ua)
-                            }
-                        }
-                        val aor = ua.account.aor
+                        abandonAudioFocus()
                         val uaCalls = ua.calls()
                         if (uaCalls.isNotEmpty()) {
-                            val call = uaCalls[uaCalls.size - 1]
+                            val call = uaCalls.last()
                             val callp = call.callp
-                            Log.d(TAG, "AoR $aor hanging up call $callp with ${callUri.value}")
-                            showHangupButton.value = false
+                            Log.d(TAG, "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}")
                             Api.ua_hangup(ua.uap, callp, 0, "")
                         }
-                    },
+                    }
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
@@ -1360,22 +1379,24 @@ class MainActivity : ComponentActivity() {
                                     var transferUri by remember { mutableStateOf("") }
                                     val suggestions by remember { contactNames }
                                     var filteredSuggestions by remember { mutableStateOf(suggestions) }
-                                    var showSuggestions by remember { mutableStateOf(false) }
                                     val focusRequester = remember { FocusRequester() }
                                     val lazyListState = rememberLazyListState()
                                     OutlinedTextField(
                                         value = transferUri,
                                         singleLine = true,
                                         onValueChange = {
-                                            transferUri = it
-                                            showSuggestions = transferUri.isNotEmpty()
-                                            filteredSuggestions = if (transferUri.isEmpty())
-                                                suggestions
-                                            else
-                                                suggestions.filter { suggestion ->
-                                                    transferUri.length > 2 &&
-                                                            suggestion.startsWith(transferUri, ignoreCase = true)
-                                                }
+                                            if (it != transferUri) {
+                                                transferUri = it
+                                                filteredSuggestions =
+                                                    suggestions.filter { suggestion ->
+                                                        transferUri.length > 2 &&
+                                                                suggestion.startsWith(
+                                                                    transferUri,
+                                                                    ignoreCase = true
+                                                                )
+                                                    }
+                                                showSuggestions.value = transferUri.length > 2
+                                            }
                                         },
                                         trailingIcon = {
                                             if (transferUri.isNotEmpty())
@@ -1383,8 +1404,10 @@ class MainActivity : ComponentActivity() {
                                                     Icons.Outlined.Clear,
                                                     contentDescription = null,
                                                     modifier = Modifier.clickable {
-                                                        transferUri = ""
-                                                        showSuggestions = false
+                                                        if (showSuggestions.value)
+                                                            showSuggestions.value = false
+                                                        else
+                                                            transferUri = ""
                                                     }
                                                 )
                                         },
@@ -1418,10 +1441,10 @@ class MainActivity : ComponentActivity() {
                                             )
                                             .animateContentSize()
                                     ) {
-                                        if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                                        if (showSuggestions.value && filteredSuggestions.isNotEmpty()) {
                                             Box(modifier = Modifier
                                                 .fillMaxWidth()
-                                                .heightIn(150.dp)) {
+                                                .heightIn(max = 150.dp)) {
                                                 LazyColumn(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
@@ -1441,14 +1464,14 @@ class MainActivity : ComponentActivity() {
                                                                 .fillMaxWidth()
                                                                 .clickable {
                                                                     transferUri = suggestion
-                                                                    showSuggestions = false
+                                                                    showSuggestions.value = false
                                                                 }
                                                                 .padding(12.dp)
                                                         ) {
                                                             Text(
                                                                 text = suggestion,
                                                                 modifier = Modifier.fillMaxWidth(),
-                                                                color = LocalCustomColors.current.itemText,
+                                                                color = LocalCustomColors.current.grayDark,
                                                                 fontSize = 18.sp
                                                             )
                                                         }
@@ -1459,8 +1482,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                     if (call.replaces())
                                         Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
+                                            modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.Center,
                                         ) {
                                             Text(
@@ -1504,7 +1526,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                         TextButton(
                                             onClick = {
-                                                showSuggestions = false
+                                                showSuggestions.value = false
                                                 var uriText = transferUri.trim()
                                                 if (uriText.isNotEmpty()) {
                                                     val uris = Contact.contactUris(uriText)
@@ -1522,14 +1544,13 @@ class MainActivity : ComponentActivity() {
                                                         showSelectItemDialog.value = true
                                                     }
                                                     else {
-                                                        if (uris.size == 1)
-                                                            uriText = uris[0]
+                                                        if (uris.size == 1) uriText = uris[0]
+                                                        transfer(
+                                                            ua,
+                                                            if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                            !blindChecked.value
+                                                        )
                                                     }
-                                                    transfer(
-                                                        ua,
-                                                        if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
-                                                        !blindChecked.value
-                                                    )
                                                     keyboardController?.hide()
                                                     showDialog.value = false
                                                     showTransferDialog = false
@@ -1755,6 +1776,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun runCall(ua: UserAgent, uri: String) {
+        callRunnable = Runnable {
+            callRunnable = null
+            if (!call(ua, uri)) {
+                BaresipService.abandonAudioFocus(applicationContext)
+                showCallButton.value = true
+                showCancelButton.value = false
+            }
+            else {
+                showCallButton.value = false
+                showCancelButton.value = true
+            }
+        }
+        callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
     }
 
     private fun answer(ctx: Context) {
@@ -2816,22 +2853,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun runCall(ua: UserAgent, uri: String) {
-        callRunnable = Runnable {
-            callRunnable = null
-            if (!call(ua, uri)) {
-                BaresipService.abandonAudioFocus(applicationContext)
-                showCallButton.value = true
-                showHangupButton.value = false
-            }
-            else {
-                showCallButton.value = false
-                showHangupButton.value = true
-            }
-        }
-        callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
-    }
-
     private fun showCall(ua: UserAgent?, showCall: Call? = null) {
         if (ua == null)
             return
@@ -2852,6 +2873,7 @@ class MainActivity : ComponentActivity() {
             dtmfEnabled.value = false
             focusDtmf.value = false
             showCallButton.value = true
+            showCancelButton.value = false
             showAnswerRejectButtons.value = false
             showOnHoldNotice.value = false
             dialpadButtonEnabled = true
@@ -2872,7 +2894,8 @@ class MainActivity : ComponentActivity() {
                     showCallTimer.value = false
                     securityIcon.intValue = -1
                     showCallButton.value = false
-                    showHangupButton.value = true
+                    showCancelButton.value = call.status == "outgoing"
+                    showHangupButton.value = !showCancelButton.value
                     showAnswerRejectButtons.value = false
                     showOnHoldNotice.value = false
                     dialpadButtonEnabled = false
@@ -2890,6 +2913,7 @@ class MainActivity : ComponentActivity() {
                         callUri.value = Utils.friendlyUri(this, call.peerUri, ua.account)
                     }
                     showCallButton.value = false
+                    showCancelButton.value = false
                     showHangupButton.value = false
                     showAnswerRejectButtons.value = true
                     showOnHoldNotice.value = false
@@ -2921,6 +2945,7 @@ class MainActivity : ComponentActivity() {
                     else
                        securityIcon.intValue = call.security
                     showCallButton.value = false
+                    showCancelButton.value = false
                     showHangupButton.value = true
                     showAnswerRejectButtons.value = false
                     if (call.onhold)
@@ -3058,6 +3083,22 @@ class MainActivity : ComponentActivity() {
             callTimer?.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
             callTimer?.start()
         }, 100)
+    }
+
+    private fun abandonAudioFocus() {
+        if (Build.VERSION.SDK_INT < 31) {
+            if (callRunnable != null) {
+                callHandler.removeCallbacks(callRunnable!!)
+                callRunnable = null
+                BaresipService.abandonAudioFocus(applicationContext)
+            }
+        } else {
+            if (audioModeChangedListener != null) {
+                am.removeOnModeChangedListener(audioModeChangedListener!!)
+                audioModeChangedListener = null
+                BaresipService.abandonAudioFocus(applicationContext)
+            }
+        }
     }
 
     companion object {
