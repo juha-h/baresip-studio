@@ -406,7 +406,7 @@ class AccountActivity : ComponentActivity() {
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.nickname)) },
                 keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
+                    capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text),
             )
         }
