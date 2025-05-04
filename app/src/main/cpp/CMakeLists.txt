@@ -28,6 +28,10 @@ add_library(lib_x264 STATIC IMPORTED)
 set_target_properties(lib_x264 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/x264/lib/${ANDROID_ABI}/libx264.a)
 
+add_library(lib_x265 STATIC IMPORTED)
+set_target_properties(lib_x265 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/x265/lib/${ANDROID_ABI}/libx265.a)
+
 add_library(lib_aom STATIC IMPORTED)
 set_target_properties(lib_aom PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/aom/lib/${ANDROID_ABI}/libaom.a)
@@ -71,6 +75,10 @@ set_target_properties(lib_swscale PROPERTIES IMPORTED_LOCATION
 add_library(lib_avformat SHARED IMPORTED)
 set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.so)
+
+add_library(lib_postproc SHARED IMPORTED)
+set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.so)
 
 add_library(lib_spandsp STATIC IMPORTED)
 set_target_properties(lib_spandsp PROPERTIES IMPORTED_LOCATION
@@ -151,6 +159,7 @@ target_link_libraries(baresip
         lib_vpx
         lib_avutil
         lib_swresample
+        lib_postproc
         lib_spandsp
         lib_g722_1
         lib_g729
@@ -164,6 +173,4 @@ target_link_libraries(baresip
         z
         log
         camera2ndk
-        lib_cpu_features
-        lib_ndk_compat
         mediandk)
