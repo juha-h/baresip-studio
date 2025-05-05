@@ -1555,33 +1555,40 @@ class MainActivity : ComponentActivity() {
                                     if (call != null && call.replaces())
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Center,
+                                            horizontalArrangement = Arrangement.Start,
                                         ) {
-                                            Text(
-                                                text = stringResource(R.string.blind),
-                                                color = LocalCustomColors.current.alert,
-                                                modifier = Modifier.padding(16.dp),
-                                            )
-                                            Switch(
-                                                checked = blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = true
-                                                }
-                                            )
-                                            Text(
-                                                text = stringResource(R.string.attended),
-                                                color = LocalCustomColors.current.alert,
-                                                modifier = Modifier.padding(16.dp),
-                                            )
-                                            Switch(
-                                                checked = !blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = false
-                                                }
-                                            )
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = stringResource(R.string.blind),
+                                                    color = LocalCustomColors.current.alert,
+                                                    modifier = Modifier.padding(8.dp),
+                                                )
+                                                Switch(
+                                                    checked = blindChecked.value,
+                                                    onCheckedChange = {
+                                                        blindChecked.value = true
+                                                    }
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = stringResource(R.string.attended),
+                                                    color = LocalCustomColors.current.alert,
+                                                    modifier = Modifier.padding(8.dp),
+                                                )
+                                                Switch(
+                                                    checked = !blindChecked.value,
+                                                    onCheckedChange = {
+                                                        blindChecked.value = false
+                                                    }
+                                                )
+                                            }
                                         }
                                     Row(
-                                        horizontalArrangement = Arrangement.Absolute.SpaceEvenly
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         TextButton(
                                             onClick = {
@@ -1589,7 +1596,7 @@ class MainActivity : ComponentActivity() {
                                                 showDialog.value = false
                                                 showTransferDialog = false
                                             },
-                                            modifier = Modifier.padding(8.dp),
+                                            modifier = Modifier.padding(end = 32.dp),
                                         ) {
                                             Text(
                                                 text = stringResource(R.string.cancel),
@@ -1628,7 +1635,7 @@ class MainActivity : ComponentActivity() {
                                                     showTransferDialog = false
                                                 }
                                             },
-                                            modifier = Modifier.padding(8.dp),
+                                            modifier = Modifier.padding(end = 16.dp),
                                         ) {
                                             Text(
                                                 text = stringResource(
