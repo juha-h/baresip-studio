@@ -206,7 +206,7 @@
     <string name="restored">Anwendungsdaten wurden wiederhergestellt und baresip muß neugestartet werden. Neustarten?</string>
     <string name="restore_failed">Wiederherstellung der Anwendungsdaten fehlgeschlagen. Überprüfen Sie das eingegebene Passwort und dass die Wiederherstellungsdatei von dieser Anwendung stammt. In Android Version 9: Überprüfen Sie Apps → baresip → Berechtigungen → Speicher, sowie, dass \'%1$s\' im Download Ordner existiert.</string>
     <string name="no_calls">baresip braucht \"Mikrofon\" Berechtigung für Telefonanrufe.</string>
-    <string name="no_cameras">Sie haben keine unterstützten Videokameras.</string>
+    <string name="no_cameras">Keine unterstützten Kameras!</string>
     <string name="no_backup">Eine Sicherungskopie kann nicht ohne die \"Speicher\"-Berechtigung erstellt werden.</string>
     <string name="no_restore">Sie können keine Sicherung wiederherstellen ohne \"Speicher\"-Berechtigung.</string>
     <string name="invalid_stun_server">Ungültiger STUN/TURN Server URI \'%1$s\'</string>
@@ -241,14 +241,18 @@
 \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is usedif offered in incoming call.</string>
     <string name="start_failed">Baresip konnte nicht gestartet werden. Das kann wegen eines ungültigen Einstellungswertes sein. Überprüfen Sie die Hören (Listen) Adresse, TLS Zertifikat, TLS CA File. Starten Sie dann baresip neu.</string>
     <string name="audio_permissions">baresip benötigt \"Mikrofon\"-Berechtigung für Sprachanrufe, \"Geräte in der Nähe\"-Berechtigung für Bluetooth-Mikrofon/Hörer-Erkennung und \"Benachrichtigungen\"-Berechtigung für die Benachrichtigungen.</string>
-    <string name="about_text">&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt; \n &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; \n&lt;h2&gt;Benutzerhinweise&lt;/h2&gt; \n &lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt; \n &lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt; \n &lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt; \n&lt;li&gt;Tippen auf den Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt; \n &lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt; \n&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt; \n &lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt; \n &lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt; \n&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt; \n&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt; \n&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt; \n&lt;li&gt;See &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt; \n&lt;h2&gt;Privacy Policy&lt;/h2&gt; \n Privacy policy is available &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;here&lt;/a&gt;. \n&lt;h2&gt;Source code&lt;/h2&gt; Source code is available at &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;,where also issues can be reported. \n&lt;h2&gt;Lizenzen&lt;/h2&gt; \n&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
+    <string name="about_text">&lt;h1&gt;SIP Endgerät, basierend auf der Baresip Bibliothek &lt;/h1&gt; \n &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; \n&lt;h2&gt;Benutzerhinweise&lt;/h2&gt; \n &lt;ul&gt;&lt;li&gt;Überprüfen Sie, dass die Einstellungen in baresip Ihren Bedürfnissen entsprechen(tippen Sie auf die Überschriften für Hilfe).&lt;/li&gt; \n &lt;li&gt;In Konten, erstellen sie mindestens eines (tippen Sie auf die einzelnen Punkte für Hilfe).&lt;/li&gt; \n &lt;li&gt;Der Registrierungsstatus eines Kontos wird mit einem farbigen Punkt markiert: grün (Registrierung erfolgreich), gelb (Registrierung im Gange), rot (Registrierung fehlgeschlagen), weiß (Konto ist nicht aktiviert).&lt;/li&gt; \n&lt;li&gt;Tippen auf den Status-Punkt öffnet direkt die Kontokonfiguration.&lt;/li&gt; \n&lt;li&gt;Ein langes Antippen der Navigationssymbole zeigt weitere Informationen zu den Symbolen an.&lt;/li&gt;\n &lt;li&gt;Nach-unten-wischen registriert das aktuelle Konto erneut.&lt;/li&gt; \n&lt;li&gt;Langes Drücken auf das gegenwärtige Konto aktiviert oder deaktiviert die Registrierung.&lt;/li&gt; \n &lt;li&gt;Links/rechts-Wischen schaltet durch die verschiedenen Konten.&lt;/li&gt; \n &lt;li&gt;Der letzte Anrufer kann erneut gewählt werden durch Berühren des Anruf-Symbols, wenn das Anruffeld leer ist.&lt;/li&gt; \n&lt;li&gt;Anrufer und Absender von Nachrichten können zu den Kontakten hinzugefügt werden durch langes Drücken.&lt;/li&gt; \n&lt;li&gt;Langes Drücken kann ebenfalls verwendet werden um Anrufe, Chats, Nachrichten und Kontakte zu löschen.&lt;/li&gt; \n&lt;li&gt;Drücken/langes Drücken des Kontakte-Bildes kann benutzt werden um das Bild zu installieren/entfernen.&lt;/li&gt; \n&lt;li&gt;See &lt;a href=https://github.com/juha-h/baresip-studio/wiki&gt;Wiki&lt;/a&gt; for more information (in english).&lt;/li&gt;&lt;/ul&gt; \n&lt;h2&gt;Privacy Policy&lt;/h2&gt; \n Privacy policy is available &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;here&lt;/a&gt;. \n&lt;h2&gt;Source code&lt;/h2&gt; Source code is available at &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;,where also issues can be reported. \n&lt;h2&gt;Lizenzen&lt;/h2&gt; \n&lt;ul&gt;&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; except the following:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR codecs and TLS security&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP media encryption&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; G.722, G.726, and Codec2 codecs&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 codec&lt;/li&gt;&lt;/ul&gt;</string>
     <string name="about_text_plus"><![CDATA[
 
         <h1>SIP Endgerät mit Videoanrufen, basierend auf der Baresip Bibliothek </h1>
 
+        <br>
+
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
 
         <p>Version %1$s</p>
+
+        <br>
 
         <h2>Benutzerhinweise</h2>
 
@@ -302,13 +306,17 @@
 
         <h2>Datenschutzerklärung</h2>
 
-            Die Datenschutzerklärung ist <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">hier</a> abrufbar.
+        <br>
+
+            <p>Die Datenschutzerklärung ist <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">hier</a> abrufbar.</p>
 
         <h2>Quellcode</h2>
 
-        Der Quellcode wird auf <a href="https://github.com/juha-h/baresip-studio">GitHub</a> bereitgestellt,
+        <p>Der Quellcode wird auf <a href="https://github.com/juha-h/baresip-studio">GitHub</a> bereitgestellt,
 
-        wo auch Fehler gemeldet werden können.
+        wo auch Fehler gemeldet werden können.</p>
+
+        <br>
 
         <h2>Lizenzen</h2>
 
