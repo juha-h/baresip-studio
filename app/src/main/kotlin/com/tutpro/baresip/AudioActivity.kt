@@ -48,7 +48,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -109,8 +108,6 @@ class AudioActivity : ComponentActivity() {
             onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         }
 
-        val title = String.format(getString(R.string.configuration))
-
         Utils.addActivity("audio")
 
         if (!BaresipService.agcAvailable)
@@ -122,21 +119,21 @@ class AudioActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LocalCustomColors.current.background
                 ) {
-                    AudioScreen(title) { goBack() }
+                    AudioScreen { goBack() }
                 }
             }
         }
     }
 
     @Composable
-    fun AudioScreen(title: String, navigateBack: () -> Unit) {
+    fun AudioScreen(navigateBack: () -> Unit) {
         Scaffold(
             modifier = Modifier
                 .fillMaxHeight()
                 .imePadding()
                 .safeDrawingPadding(),
             containerColor = LocalCustomColors.current.background,
-            topBar = { TopAppBar(title, navigateBack) },
+            topBar = { TopAppBar(navigateBack) },
             content = { contentPadding ->
                 AudioContent(contentPadding)
             }
@@ -145,11 +142,11 @@ class AudioActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TopAppBar(title: String, navigateBack: () -> Unit) {
+    fun TopAppBar(navigateBack: () -> Unit) {
         androidx.compose.material3.TopAppBar(
             title = {
                 Text(
-                    text = title,
+                    text = stringResource(R.string.audio_settings),
                     color = LocalCustomColors.current.light,
                     fontWeight = FontWeight.Bold
                 )
