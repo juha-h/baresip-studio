@@ -267,6 +267,9 @@ class ConfigActivity : ComponentActivity() {
         val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
         oldCaFile = caCertsFile.exists()
 
+        oldUserAgent = Config.variable("user_agent")
+        newUserAgent = oldUserAgent
+
         powerManager = getSystemService(POWER_SERVICE) as PowerManager
         oldBatteryOptimizations = powerManager
             .isIgnoringBatteryOptimizations(packageName) == false

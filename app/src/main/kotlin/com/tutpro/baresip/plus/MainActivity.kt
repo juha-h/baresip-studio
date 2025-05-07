@@ -816,7 +816,7 @@ class MainActivity : ComponentActivity() {
                                 startActivity(Intent(ctx, AboutActivity::class.java))
                             }
                             settings -> {
-                                startActivity(Intent(ctx, ConfigActivity::class.java))
+                                configRequest.launch(Intent(ctx, ConfigActivity::class.java))
                             }
                             accounts -> {
                                 val i = Intent(ctx, AccountsActivity::class.java)
