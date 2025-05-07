@@ -1,0 +1,5 @@
+- Updated FFMPEG video libraries and restored H.265 video codec
+- Fixed AV1 video codec related crash
+- Several Settings related fixes
+- Improved transfer dialog layout
+- New translations (German)
