@@ -1,0 +1,3 @@
+- Several Settings related fixes
+- Improved transfer dialog layout
+- New translations (German)
