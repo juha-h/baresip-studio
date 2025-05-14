@@ -62,15 +62,6 @@ import androidx.compose.ui.unit.sp
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
-import java.io.StringReader
-import java.net.URL
-import java.util.Locale
 
 class AccountsActivity : ComponentActivity() {
 
@@ -80,7 +71,6 @@ class AccountsActivity : ComponentActivity() {
 
     private var showAccounts = mutableStateOf(true)
     private var lastClick: Long = 0
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     private val alertTitle = mutableStateOf("")
     private val alertMessage = mutableStateOf("")
@@ -320,6 +310,7 @@ class AccountsActivity : ComponentActivity() {
                                 val i = Intent(ctx, AccountActivity::class.java)
                                 val b = Bundle()
                                 b.putString("aor", account.aor)
+                                b.putString("kind", "new")
                                 i.putExtras(b)
                                 startActivity(i)
                                 newAor = ""
@@ -366,108 +357,9 @@ class AccountsActivity : ComponentActivity() {
         // Api.account_debug(ua.account.accp)
         val acc = ua.account
         Log.d(TAG, "Allocated UA ${ua.uap} with SIP URI ${acc.luri}")
-        initAccountFromConfig(this@AccountsActivity, acc)
         saveAccounts()
 
         return acc
-    }
-
-    private fun initAccountFromConfig(ctx: AccountsActivity, acc: Account) {
-        scope.launch(Dispatchers.IO) {
-            val url = "https://${Utils.uriHostPart(acc.aor)}/baresip/account_config.xml"
-            val config = try {
-                URL(url).readText()
-            } catch (e: java.lang.Exception) {
-                Log.d(TAG, "Failed to get account configuration from network: ${e.message}")
-                null
-            }
-            if (config != null && !ctx.isFinishing) {
-                Log.d(TAG, "Got account config '$config'")
-                val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
-                val parser: XmlPullParser = parserFactory.newPullParser()
-                parser.setInput(StringReader(config))
-                var tag: String?
-                var text = ""
-                var event = parser.eventType
-                val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-                val videoCodecs = ArrayList(Api.video_codecs().split(","))
-                while (event != XmlPullParser.END_DOCUMENT) {
-                    tag = parser.name
-                    when (event) {
-                        XmlPullParser.TEXT ->
-                            text = parser.text
-                        XmlPullParser.START_TAG -> {
-                            if (tag == "audio-codecs")
-                                acc.audioCodec.clear()
-                            if (tag == "video-codecs")
-                                acc.videoCodec.clear()
-                        }
-                        XmlPullParser.END_TAG ->
-                            when (tag) {
-                                "outbound-proxy-1" ->
-                                    if (text.isNotEmpty())
-                                        acc.outbound.add(text)
-                                "outbound-proxy-2" ->
-                                    if (text.isNotEmpty())
-                                        acc.outbound.add(text)
-                                "registration-interval" ->
-                                    acc.configuredRegInt = text.toInt()
-                                "register" ->
-                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
-                                "audio-codec" ->
-                                    if (text in audioCodecs)
-                                        acc.audioCodec.add(text)
-                                "video-codec" ->
-                                    if (text in videoCodecs)
-                                        acc.videoCodec.add(text)
-                                "media-encoding" -> {
-                                    val enc = text.lowercase(Locale.ROOT)
-                                    if (enc in mediaEncMap.keys && enc.isNotEmpty())
-                                        acc.mediaEnc = enc
-                                }
-                                "media-nat" -> {
-                                    val nat = text.lowercase(Locale.ROOT)
-                                    if (nat in mediaNatMap.keys && nat.isNotEmpty())
-                                        acc.mediaNat = nat
-                                }
-                                "stun-turn-server" ->
-                                    if (text.isNotEmpty())
-                                        acc.stunServer = text
-                                "rtcp-mux" ->
-                                    acc.rtcpMux = text == "yes"
-                                "100rel-mode" ->
-                                    acc.rel100Mode = if (text == "yes")
-                                        Api.REL100_ENABLED
-                                    else
-                                        Api.REL100_DISABLED
-                                "dtmf-mode" ->
-                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
-                                        acc.dtmfMode = when (text) {
-                                            "rtp-event" -> Api.DTMFMODE_RTP_EVENT
-                                            "sip-info" -> Api.DTMFMODE_SIP_INFO
-                                            else -> Api.DTMFMODE_AUTO
-                                        }
-                                "answer-mode" ->
-                                    if (text in arrayOf("manual", "auto"))
-                                        acc.answerMode = if (text == "manual")
-                                            Api.ANSWERMODE_MANUAL
-                                        else
-                                            Api.ANSWERMODE_AUTO
-                                "redirect-mode" ->
-                                    acc.autoRedirect = text == "yes"
-                                "voicemail-uri" ->
-                                    if (text.isNotEmpty())
-                                        acc.vmUri = text
-                                "country-code" ->
-                                    acc.countryCode = text
-                                "tel-provider" ->
-                                    acc.telProvider = text
-                            }
-                    }
-                    event = parser.next()
-                }
-            }
-        }
     }
 
     private fun goBack() {
