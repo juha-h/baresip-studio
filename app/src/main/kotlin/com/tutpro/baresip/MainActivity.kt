@@ -2261,12 +2261,6 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Handling intent '$action'")
         val ev = action.split(",")
         when (ev[0]) {
-            "no" -> {
-                alertTitle.value = getString(R.string.notice)
-                alertMessage.value = ev[1]
-                showAlert.value = true
-                return
-            }
             "call", "dial" -> {
                 if (Call.inCall()) {
                     Toast.makeText(applicationContext, getString(R.string.call_already_active),
