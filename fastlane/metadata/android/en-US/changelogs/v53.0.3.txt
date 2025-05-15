@@ -1,0 +1,4 @@
+- Improved transfer dialog layout
+- Fixed initialization of account from network
+- Use toasts for no network, no hw aec, and no cameras notices
+- New translations (German)
