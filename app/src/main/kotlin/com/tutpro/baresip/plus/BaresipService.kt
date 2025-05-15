@@ -502,25 +502,14 @@ class BaresipService: Service() {
                     )
                 }
 
-                val messages = mutableListOf<String>()
                 if (linkAddresses.isEmpty())
-                    messages.add(getString(R.string.no_network))
-                if (!supportedCameras)
-                    messages.add(getString(R.string.no_cameras))
+                    toast(getString(R.string.no_network), Toast.LENGTH_LONG)
+
                 if (!aecAvailable)
-                    messages.add(getString(R.string.no_aec))
-                if (messages.isNotEmpty()) {
-                    val message =
-                    if (messages.size == 1)
-                        messages[0]
-                    else
-                        messages.joinToString(separator = "\n\u2022 ", prefix = "\u2022 ")
-                    val newIntent = Intent(this, MainActivity::class.java)
-                    newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    newIntent.putExtra("action", "no,$message")
-                    startActivity(newIntent)
-                }
+                    toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
+
+                if (!supportedCameras)
+                    toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
             }
 
             "Start Content Observer" -> {
