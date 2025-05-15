@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +70,15 @@ import com.tutpro.baresip.plus.BaresipService.Companion.uas
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
+import java.io.StringReader
+import java.net.URL
+import java.util.Locale
 
 class AccountActivity : ComponentActivity() {
 
@@ -80,6 +91,7 @@ class AccountActivity : ComponentActivity() {
     private lateinit var ua: UserAgent
     private lateinit var aor: String
 
+    private var kind: String? = null
     private var reRegister = false
     private var oldNickname = ""
     private var newNickname = ""
@@ -165,6 +177,7 @@ class AccountActivity : ComponentActivity() {
         }
 
         aor = intent.getStringExtra("aor")!!
+        kind = intent.getStringExtra("kind")
 
         Utils.addActivity("account,$aor")
 
@@ -183,62 +196,7 @@ class AccountActivity : ComponentActivity() {
         answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to getString(R.string.manual),
             Api.ANSWERMODE_AUTO to getString(R.string.auto))
 
-        redirectModeMap = mapOf(false to getString(R.string.manual),
-            true to getString(R.string.auto))
-
-        oldNickname = acc.nickName.value
-        newNickname = oldNickname
-        oldDisplayname = acc.displayName
-        newDisplayname = oldDisplayname
-        oldAuthUser = acc.authUser
-        newAuthUser = oldAuthUser
-        if (BaresipService.aorPasswords[aor] == null &&  // check if OK
-                acc.authPass != NO_AUTH_PASS) {
-            oldAuthPass = acc.authPass
-            newAuthPass = oldAuthPass
-        }
-        if (acc.outbound.isNotEmpty()) {
-            oldOutbound1 = acc.outbound[0]
-            newOutbound1 = oldOutbound1
-            if (acc.outbound.size > 1) {
-                oldOutbound2 = acc.outbound[1]
-                newOutbound2 = oldOutbound2
-            }
-        }
-        oldRegister = acc.regint > 0
-        newRegister = oldRegister
-        oldRegInt = acc.configuredRegInt.toString()
-        newRegInt = oldRegInt
-        oldMediaEnc = acc.mediaEnc
-        newMediaEnc = oldMediaEnc
-        oldMediaNat = acc.mediaNat
-        newMediaNat = oldMediaNat
-        showStun.value = oldMediaNat != ""
-        oldStunServer = acc.stunServer
-        newStunServer = oldStunServer
-        oldStunUser = acc.stunUser
-        newStunUser = oldStunUser
-        oldStunPass = acc.stunPass
-        newStunPass = oldStunPass
-        oldRtcpMux = acc.rtcpMux
-        newRtcpMux = oldRtcpMux
-        old100Rel = acc.rel100Mode == Api.REL100_ENABLED
-        new100Rel = old100Rel
-        oldDtmfMode = acc.dtmfMode
-        newDtmfMode = oldDtmfMode
-        oldAnswerMode = acc.answerMode
-        newAnswerMode = oldAnswerMode
-        oldAutoRedirect = acc.autoRedirect
-        newAutoRedirect = oldAutoRedirect
-        oldVmUri = acc.vmUri
-        newVmUri = oldVmUri
-        oldCountryCode = acc.countryCode
-        newCountryCode = oldCountryCode
-        oldTelProvider = acc.telProvider
-        newTelProvider = oldTelProvider
-        newNumericKeypad = acc.numericKeypad
-        oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
-        newDefaultAccount = oldDefaultAccount
+        redirectModeMap = mapOf(false to getString(R.string.manual), true to getString(R.string.auto))
 
         setContent {
             AppTheme {
@@ -247,7 +205,7 @@ class AccountActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LocalCustomColors.current.background
                 ) {
-                    AccountScreen { goBack() }
+                    AccountScreen(kind) { goBack() }
                 }
             }
         }
@@ -255,7 +213,17 @@ class AccountActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AccountScreen(navigateBack: () -> Unit) {
+    fun AccountScreen(kind: String?, navigateBack: () -> Unit) {
+
+        var isConfigLoaded by remember { mutableStateOf(false) }
+
+        LaunchedEffect(kind, acc) {
+            if (kind == "new")
+                initAccountFromConfig(acc) { isConfigLoaded = true }
+            else
+                isConfigLoaded = true
+        }
+
         val title = if (acc.nickName.value != "")
             acc.nickName.value
         else
@@ -301,13 +269,75 @@ class AccountActivity : ComponentActivity() {
                 )
             },
             content = { contentPadding ->
-                AccountContent(this, contentPadding)
+                if (isConfigLoaded)
+                    AccountContent(this, contentPadding)
+                else
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
             }
         )
     }
 
     @Composable
     fun AccountContent(ctx: Context, contentPadding: PaddingValues) {
+
+        oldNickname = acc.nickName.value
+        newNickname = oldNickname
+        oldDisplayname = acc.displayName
+        newDisplayname = oldDisplayname
+        oldAuthUser = acc.authUser
+        newAuthUser = oldAuthUser
+        if (BaresipService.aorPasswords[aor] == null &&  // check if OK
+            acc.authPass != NO_AUTH_PASS) {
+            oldAuthPass = acc.authPass
+            newAuthPass = oldAuthPass
+        }
+        if (acc.outbound.isNotEmpty()) {
+            oldOutbound1 = acc.outbound[0]
+            newOutbound1 = oldOutbound1
+            if (acc.outbound.size > 1) {
+                oldOutbound2 = acc.outbound[1]
+                newOutbound2 = oldOutbound2
+            }
+        }
+        oldRegister = acc.regint > 0
+        newRegister = oldRegister
+        oldRegInt = acc.configuredRegInt.toString()
+        newRegInt = oldRegInt
+        oldMediaEnc = acc.mediaEnc
+        newMediaEnc = oldMediaEnc
+        oldMediaNat = acc.mediaNat
+        newMediaNat = oldMediaNat
+        showStun.value = oldMediaNat != ""
+        oldStunServer = acc.stunServer
+        newStunServer = oldStunServer
+        oldStunUser = acc.stunUser
+        newStunUser = oldStunUser
+        oldStunPass = acc.stunPass
+        newStunPass = oldStunPass
+        oldRtcpMux = acc.rtcpMux
+        newRtcpMux = oldRtcpMux
+        old100Rel = acc.rel100Mode == Api.REL100_ENABLED
+        new100Rel = old100Rel
+        oldDtmfMode = acc.dtmfMode
+        newDtmfMode = oldDtmfMode
+        oldAnswerMode = acc.answerMode
+        newAnswerMode = oldAnswerMode
+        oldAutoRedirect = acc.autoRedirect
+        newAutoRedirect = oldAutoRedirect
+        oldVmUri = acc.vmUri
+        newVmUri = oldVmUri
+        oldCountryCode = acc.countryCode
+        newCountryCode = oldCountryCode
+        oldTelProvider = acc.telProvider
+        newTelProvider = oldTelProvider
+        newNumericKeypad = acc.numericKeypad
+        oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
+        newDefaultAccount = oldDefaultAccount
 
         val scrollState = rememberScrollState()
 
@@ -1704,6 +1734,126 @@ class AccountActivity : ComponentActivity() {
     private fun checkOutboundUri(uri: String): Boolean {
         if (!uri.startsWith("sip:")) return false
         return Utils.checkHostPortParams(uri.substring(4))
+    }
+
+
+    private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
+        val scope = CoroutineScope(Job() + Dispatchers.Main)
+        scope.launch(Dispatchers.IO) {
+            val url = "https://${Utils.uriHostPart(acc.aor)}/baresip/plus/account_config.xml"
+            val config = try {
+                URL(url).readText()
+            } catch (e: java.lang.Exception) {
+                Log.d(TAG, "Failed to get account configuration from network: ${e.message}")
+                null
+            }
+            if (config != null) {
+                Log.d(TAG, "Got account config '$config'")
+                val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
+                val parser: XmlPullParser = parserFactory.newPullParser()
+                parser.setInput(StringReader(config))
+                var tag: String?
+                var text = ""
+                var event = parser.eventType
+                val audioCodecs = ArrayList(Api.audio_codecs().split(","))
+                val videoCodecs = ArrayList(Api.video_codecs().split(","))
+
+                while (event != XmlPullParser.END_DOCUMENT) {
+                    tag = parser.name
+                    when (event) {
+                        XmlPullParser.TEXT ->
+                            text = parser.text
+
+                        XmlPullParser.START_TAG -> {
+                            if (tag == "audio-codecs")
+                                acc.audioCodec.clear()
+                            if (tag == "video-codecs")
+                                acc.videoCodec.clear()
+                        }
+
+                        XmlPullParser.END_TAG ->
+                            when (tag) {
+                                "outbound-proxy-1" ->
+                                    if (text.isNotEmpty())
+                                        acc.outbound.add(text)
+
+                                "outbound-proxy-2" ->
+                                    if (text.isNotEmpty())
+                                        acc.outbound.add(text)
+
+                                "registration-interval" ->
+                                    acc.configuredRegInt = text.toInt()
+
+                                "register" ->
+                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
+
+                                "audio-codec" ->
+                                    if (text in audioCodecs)
+                                        acc.audioCodec.add(text)
+
+                                "video-codec" ->
+                                    if (text in videoCodecs)
+                                        acc.videoCodec.add(text)
+
+                                "media-encoding" -> {
+                                    val enc = text.lowercase(Locale.ROOT)
+                                    if (enc in mediaEncMap.keys && enc.isNotEmpty())
+                                        acc.mediaEnc = enc
+                                }
+
+                                "media-nat" -> {
+                                    val nat = text.lowercase(Locale.ROOT)
+                                    if (nat in mediaNatMap.keys && nat.isNotEmpty())
+                                        acc.mediaNat = nat
+                                }
+
+                                "stun-turn-server" ->
+                                    if (text.isNotEmpty())
+                                        acc.stunServer = text
+
+                                "rtcp-mux" ->
+                                    acc.rtcpMux = text == "yes"
+
+                                "100rel-mode" ->
+                                    acc.rel100Mode = if (text == "yes")
+                                        Api.REL100_ENABLED
+                                    else
+                                        Api.REL100_DISABLED
+
+                                "dtmf-mode" ->
+                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
+                                        acc.dtmfMode = when (text) {
+                                            "rtp-event" -> Api.DTMFMODE_RTP_EVENT
+                                            "sip-info" -> Api.DTMFMODE_SIP_INFO
+                                            else -> Api.DTMFMODE_AUTO
+                                        }
+
+                                "answer-mode" ->
+                                    if (text in arrayOf("manual", "auto"))
+                                        acc.answerMode = if (text == "manual")
+                                            Api.ANSWERMODE_MANUAL
+                                        else
+                                            Api.ANSWERMODE_AUTO
+
+                                "redirect-mode" ->
+                                    acc.autoRedirect = text == "yes"
+
+                                "voicemail-uri" ->
+                                    if (text.isNotEmpty())
+                                        acc.vmUri = text
+
+                                "country-code" ->
+                                    acc.countryCode = text
+
+                                "tel-provider" ->
+                                    acc.telProvider = text
+                            }
+                    }
+                    event = parser.next()
+                }
+            }
+            onConfigLoaded()
+        }
     }
 
 }
