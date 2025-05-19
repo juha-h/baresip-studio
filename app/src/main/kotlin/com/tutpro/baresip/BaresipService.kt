@@ -518,6 +518,7 @@ class BaresipService: Service() {
                 val vidMode = intent.getIntExtra("video", Api.VIDMODE_OFF)
                 stopRinging()
                 stopMediaPlayer()
+                am.mode = MODE_IN_COMMUNICATION
                 setCallVolume()
                 proximitySensing(true)
                 Api.ua_answer(uap, callp, vidMode)
@@ -1304,6 +1305,7 @@ class BaresipService: Service() {
     }
 
     private fun startRinging() {
+        am.mode = AudioManager.MODE_RINGTONE
         rt!!.isLooping = true
         rt!!.play()
         if (shouldVibrate()) {
