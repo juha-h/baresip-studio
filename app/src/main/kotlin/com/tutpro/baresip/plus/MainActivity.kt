@@ -2798,7 +2798,7 @@ class MainActivity : ComponentActivity() {
         val stream = if (am.mode == AudioManager.MODE_RINGTONE)
             AudioManager.STREAM_RING
         else
-            AudioManager.STREAM_MUSIC
+            AudioManager.STREAM_VOICE_CALL
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
                 am.adjustStreamVolume(stream,
