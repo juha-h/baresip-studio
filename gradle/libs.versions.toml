@@ -1,23 +1,26 @@
 [versions]
 activityCompose = "1.10.1"
 coilCompose = "2.5.0"
-composeBom = "2025.04.01"
+composeBom = "2025.05.01"
 coreKtx = "1.16.0"
 exifinterface = "1.4.1"
-fragmentKtx = "1.8.6"
+fragmentKtx = "1.8.7"
 gradleVersion = "8.10.0"
 kotlin = "2.1.20"
 kotlinStdlibJdk8 = "2.1.20"
-kotlinxCoroutinesAndroid = "1.9.0"
+kotlinxCoroutinesAndroid = "1.10.2"
 lifecycleExtensions = "2.2.0"
+lifecycleViewmodelKtx = "2.9.0"
 localbroadcastmanager = "1.1.0"
 material = "1.12.0"
 media = "1.7.0"
+navigationCompose = "2.9.0"
 preferenceKtx = "1.2.1"
-ui = "1.8.0"
-foundationAndroid = "1.8.0"
-runtimeLivedata = "1.8.0"
+ui = "1.8.2"
+foundationAndroid = "1.8.2"
+runtimeLivedata = "1.8.2"
 composeMaterial3 = "1.3.2"
+navigationRuntimeAndroid = "2.9.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -27,8 +30,10 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx"
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensions" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -40,6 +45,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeMaterial3" }
+androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
