@@ -11,6 +11,7 @@ import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.Contacts.Data
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -185,6 +186,10 @@ private fun ContactScreen(
         )
         if (result)
             navController.popBackStack()
+    }
+
+    BackHandler(enabled = true) {
+        onBack()
     }
 
     Scaffold(

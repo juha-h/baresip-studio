@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils.isToday
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -166,8 +167,14 @@ private fun ChatScreen(
         }
     }
 
+    BackHandler(enabled = true) {
+        backAction(navController, account, peerUri)
+    }
+
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = LocalCustomColors.current.background,
         topBar = {
             Column(modifier = Modifier
@@ -210,11 +217,7 @@ private fun TopAppBar(
             containerColor = LocalCustomColors.current.primary
         ),
         navigationIcon = {
-            IconButton(onClick = {
-                Message.updateMessagesFromPearRead(aor, peerUri)
-                account.unreadMessages = Message.unreadMessages(aor)
-                navController.popBackStack()
-            }) {
+            IconButton(onClick = { backAction(navController, account, peerUri) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
@@ -262,7 +265,9 @@ private fun ChatContent(
     onMessageDeleted: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(contentPadding),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(contentPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
         Account(ctx, account)
@@ -331,7 +336,9 @@ private fun Messages(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 2.dp)
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
@@ -570,6 +577,13 @@ private fun NewMessage(
                 }
         )
     }
+}
+
+private fun backAction(navController: NavController, account: Account, peerUri: String) {
+    val aor = account.aor
+    Message.updateMessagesFromPearRead(aor, peerUri)
+    account.unreadMessages = Message.unreadMessages(aor)
+    navController.popBackStack()
 }
 
 private fun loadPeerMessages(aor: String, peerUri: String): List<Message> {

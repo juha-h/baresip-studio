@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -89,6 +90,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         isHistoryLoaded = true
     }
 
+    BackHandler(enabled = true) {
+        account.missedCalls = false
+        navController.popBackStack()
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = LocalCustomColors.current.background,
@@ -153,8 +159,8 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.popBackStack()
                     account.missedCalls = false
+                    navController.popBackStack()
                 }
             ) {
                 Icon(
