@@ -23,6 +23,7 @@ const val MESSAGE_REQ_CODE = 8
 const val REPLY_REQ_CODE = 9
 const val SAVE_REQ_CODE = 10
 const val DELETE_REQ_CODE = 11
+const val DIRECT_REPLY_REQ_CODE = 12
 
 const val REGISTRATION_INTERVAL = 900
 const val NO_AUTH_PASS = "t%Qa?~?J8,~6"
@@ -32,6 +33,10 @@ const val MESSAGE_UP = 2131165306
 const val MESSAGE_UP_FAIL = 2131165307
 const val MESSAGE_UP_WAIT = 2131165308
 
+val mediaEncMap = mapOf("zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND",
+    "srtp" to "SRTP", "" to "--")
+
+val mediaNatMap = mapOf("stun" to "STUN", "turn" to "TURN", "ice" to "ICE", "" to "--")
 
 
 

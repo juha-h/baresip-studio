@@ -249,6 +249,14 @@ class Account(val accp: Long) {
             return res
         }
 
+        fun saveAccounts() {
+            var accounts = ""
+            for (a in accounts()) accounts = accounts + a.print() + "\n"
+            Utils.putFileContents(BaresipService.filesPath + "/accounts",
+                accounts.toByteArray(Charsets.UTF_8))
+            // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+        }
+
         fun ofAor(aor: String): Account? {
             for (ua in BaresipService.uas.value)
                 if (ua.account.aor == aor) return ua.account

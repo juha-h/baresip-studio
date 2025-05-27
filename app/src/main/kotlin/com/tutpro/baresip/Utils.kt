@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
@@ -62,7 +61,6 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-import androidx.core.graphics.scale
 
 object Utils {
 
@@ -231,7 +229,7 @@ object Utils {
     fun checkUriUser(user: String): Boolean {
         val escaped = """%(\d|A|B|C|D|E|F|a|b|c|d|e|f){2}""".toRegex()
         escaped.replace(user, "").forEach {
-            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
+            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+$,;?/".contains(it))) return false }
         return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
     }
 
@@ -239,7 +237,7 @@ object Utils {
         val parts = domain.split(".")
         for (p in parts) {
             if (p.endsWith("-") || p.startsWith("-") ||
-                    !Regex("^[-a-zA-Z0-9]+\$").matches(p))
+                    !Regex("^[-a-zA-Z0-9]+$").matches(p))
                 return false
         }
         return true
@@ -333,7 +331,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}\$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
@@ -383,7 +381,7 @@ object Utils {
     }
 
     private fun checkToken(token: String): Boolean {
-        return Regex("^[-a-zA-Z0-9.!%*_+`'~]+\$").matches(token)
+        return Regex("^[-a-zA-Z0-9.!%*_+`'~]+$").matches(token)
     }
 
     @Suppress("unused")
@@ -583,22 +581,6 @@ object Utils {
             "$uri".substringAfterLast("/")
         else
             name
-    }
-
-    fun saveBitmap(bitmap: Bitmap, file: File): Boolean {
-        if (file.exists()) file.delete()
-        try {
-            val out = FileOutputStream(file)
-            val scaledBitmap = bitmap.scale(96, 96)
-            scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-            Log.d(TAG, "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}: $e")
-            return false
-        }
-        return true
     }
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
@@ -803,11 +785,6 @@ object Utils {
         val rnd = Random()
         return android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
                 rnd.nextInt(256))
-    }
-
-    fun addActivity(activity: String) {
-        if ((BaresipService.activities.isEmpty()) || (BaresipService.activities[0] != activity))
-            BaresipService.activities.add(0, activity)
     }
 
     fun requestDismissKeyguard(activity: Activity) {
@@ -1018,4 +995,39 @@ object Utils {
         Api.AAudio_close_stream()
 
     }
+
+    /*fun listFilesInDirectory(directoryPath: String): List<File> {
+        val directory = File(directoryPath)
+        if (!directory.exists()) {
+            Log.w(TAG, "Directory does not exist: $directoryPath")
+            return emptyList()
+        }
+        if (!directory.isDirectory) {
+            Log.w(TAG, "Path is not a directory: $directoryPath")
+            return emptyList()
+        }
+        val files = directory.listFiles()
+        if (files == null) {
+            Log.e(
+                TAG,
+                "Failed to list files in directory (listFiles returned null): $directoryPath"
+            )
+            return emptyList()
+        }
+        return files.filter { it.isFile }
+    }*/
+
+    /*@SuppressLint("RestrictedApi")
+    fun printBackStack(navController: NavController) {
+        Log.e(TAG, "---- Current Navigation Back Stack ----")
+        navController.currentBackStack.value.forEachIndexed { index, navBackStackEntry ->
+            val route = navBackStackEntry.destination.route
+            val arguments = navBackStackEntry.arguments?.let { bundle ->
+                bundle.keySet().joinToString(", ") { key -> "$key=${bundle.get(key)}" }
+            } ?: "null"
+            Log.e(TAG, "$index: Route='${route}', Args=[$arguments], ID=${navBackStackEntry.id}")
+        }
+        Log.e(TAG, "--------------------------------------")
+    }*/
+
 }

@@ -49,21 +49,19 @@ import android.provider.ContactsContract
 import android.provider.Settings
 import android.system.OsConstants
 import android.telecom.TelecomManager
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.annotation.Keep
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.MessagingStyle
+import androidx.core.app.Person
+import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -553,8 +551,13 @@ class BaresipService: Service() {
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
-                else
-                    Message.updateAorMessage(ua.account.aor, intent.getStringExtra("time")!!.toLong())
+                else {
+                    Message.updateAorMessage(
+                        ua.account.aor,
+                        intent.getStringExtra("time")!!.toLong()
+                    )
+                    ua.account.unreadMessages = Message.unreadMessages(ua.account.aor)
+                }
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -563,9 +566,50 @@ class BaresipService: Service() {
                 val ua = UserAgent.ofUap(uap)
                 if (ua == null)
                     Log.w(TAG, "onStartCommand did not find UA $uap")
-                else
-                    Message.deleteAorMessage(ua.account.aor, intent.getStringExtra("time")!!.toLong())
+                else {
+                    Message.deleteAorMessage(
+                        ua.account.aor,
+                        intent.getStringExtra("time")!!.toLong()
+                    )
+                    ua.account.unreadMessages = Message.unreadMessages(ua.account.aor)
+                }
+                nm.cancel(MESSAGE_NOTIFICATION_ID)
+            }
 
+            "Message Inline Reply" -> {
+                val remoteInputResults = RemoteInput.getResultsFromIntent(intent!!)
+                if (remoteInputResults != null) {
+                    val replyText = remoteInputResults.getCharSequence(KEY_TEXT_REPLY)?.toString()
+                    if (!replyText.isNullOrEmpty()) {
+                        val uap = intent.getLongExtra("uap", -1L)
+                        val ua = UserAgent.ofUap(uap)!!
+                        val aor = ua.account.aor
+                        var peerUri = intent.getStringExtra("peer")!!
+                        val timeStamp = intent.getLongExtra("time", 0L)
+                        if (Utils.isTelUri(peerUri)) {
+                            if (ua.account.telProvider == "") {
+                                Log.w(TAG, "No telephony provider for $aor")
+                                peerUri = ""
+                            } else
+                                peerUri = Utils.telToSip(peerUri, ua.account)
+                        }
+                        if (peerUri != "") {
+                            Log.d(TAG, "Direct Reply from $aor to $peerUri: $replyText")
+                            Message.updateAorMessage(aor, timeStamp)
+                            val time = System.currentTimeMillis()
+                            val msg = Message(aor, peerUri, replyText, time, MESSAGE_UP_WAIT, 0, "", false)
+                            msg.add()
+                            if (Api.message_send(uap, peerUri, replyText, time.toString()) != 0) {
+                                Log.w(TAG, "message_send failed")
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = getString(R.string.message_failed)
+                            }
+                            else {
+                                ua.account.unreadMessages = Message.unreadMessages(aor)
+                            }
+                        }
+                    }
+                }
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
@@ -844,15 +888,15 @@ class BaresipService: Service() {
                         if (!Utils.isVisible()) {
                             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
+                                .putExtra("action", "call show")
+                                .putExtra("callp", callp)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
-                            intent.putExtra("action", "call show")
-                                .putExtra("callp", callp)
-                            val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent,
-                                    piFlags)
+                            val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
                             val nb = NotificationCompat.Builder(this,
                                 if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account)
+                            val person = Person.Builder().setName(caller).build()
                             nb.setSmallIcon(R.drawable.ic_stat_call)
                                     .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                                     .setContentIntent(pi)
@@ -867,19 +911,15 @@ class BaresipService: Service() {
                                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                                     .setFullScreenIntent(pi, true)
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
-                            answerIntent.putExtra("action", "call answer")
+                                .putExtra("action", "call answer")
                                 .putExtra("callp", callp)
                             val api = PendingIntent.getActivity(applicationContext, ANSWER_REQ_CODE,
                                 answerIntent, piFlags)
                             val rejectIntent = Intent(this, BaresipService::class.java)
                             rejectIntent.action = "Call Reject"
                             rejectIntent.putExtra("callp", callp)
-                            val rpi = PendingIntent.getService(this, REJECT_REQ_CODE,
-                                rejectIntent, piFlags)
-                            nb.addAction(R.drawable.ic_stat_call,
-                                    getActionText(R.string.answer, R.color.colorGreen), api)
-                            nb.addAction(R.drawable.ic_stat_call_end,
-                                    getActionText(R.string.reject, R.color.colorRed), rpi)
+                            val rpi = PendingIntent.getService(this, REJECT_REQ_CODE, rejectIntent, piFlags)
+                            nb.setStyle(NotificationCompat.CallStyle.forIncomingCall(person, rpi, api))
                             nm.notify(CALL_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -938,8 +978,7 @@ class BaresipService: Service() {
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "transfer show")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
-                            val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE,
-                                intent, piFlags)
+                            val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE, intent, piFlags)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(this, ev[1], ua.account)
                             nb.setSmallIcon(R.drawable.ic_stat_call)
@@ -952,7 +991,7 @@ class BaresipService: Service() {
                             val acceptIntent = Intent(applicationContext, MainActivity::class.java)
                             acceptIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                            acceptIntent.putExtra("action","transfer accept")
+                            acceptIntent.putExtra("action", "transfer accept")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
                             val acceptPendingIntent = PendingIntent.getActivity(applicationContext,
                                 ACCEPT_REQ_CODE, acceptIntent, piFlags)
@@ -1078,16 +1117,6 @@ class BaresipService: Service() {
 
     }
 
-    private fun postServiceEvent(event: ServiceEvent) {
-        serviceEvents.add(event)
-        if (serviceEvents.size == 1) {
-            Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
-            serviceEvent.postValue(Event(event.timeStamp))
-        } else {
-            Log.d(TAG, "Added service event ${event.event}")
-        }
-    }
-
     @Suppress("unused")
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
@@ -1120,45 +1149,88 @@ class BaresipService: Service() {
         ua.account.unreadMessages = true
 
         if (!Utils.isVisible()) {
+
+            // common flags
             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+            // message show
             val intent = Intent(applicationContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("action", "message show").putExtra("uap", uap)
-                    .putExtra("peer", peerUri)
+            intent.putExtra("action", "message show").putExtra("uap", uap).putExtra("peer", peerUri)
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent, piFlags)
+
+            // message notification builder
+            val senderDisplayName = Utils.friendlyUri(this, peerUri, ua.account)
+            val senderPerson = Person.Builder()
+                .setName(senderDisplayName)
+                .setKey(peerUri)
+                .build()
+            val localUserPerson = Person.Builder()
+                .setName(getString(R.string.you))
+                .setKey(ua.account.aor)
+                .build()
+            val messagingStyle = MessagingStyle(localUserPerson)
+                .setConversationTitle(null)
+                .setGroupConversation(false)
+                .addMessage(text, timeStamp, senderPerson)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            val sender = Utils.friendlyUri(this, peerUri, ua.account)
-            nb.setSmallIcon(R.drawable.ic_stat_message)
+                .setSmallIcon(R.drawable.ic_stat_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
                 .setContentIntent(pi)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setAutoCancel(true)
-                .setContentTitle(getString(R.string.message_from) + " " + sender)
-                .setContentText(text)
-            val replyIntent = Intent(applicationContext, MainActivity::class.java)
-            replyIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_NEW_TASK
-            replyIntent.putExtra("action", "message reply")
-                .putExtra("uap", uap).putExtra("peer", peerUri)
-            val rpi = PendingIntent.getActivity(applicationContext, REPLY_REQ_CODE, replyIntent,
-                    piFlags)
+                .setStyle(messagingStyle)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+            // messafe inline reply
+            val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
+                .setLabel(getString(R.string.reply))
+                .build()
+            val directReplyIntent = Intent(this, BaresipService::class.java)
+            directReplyIntent.action = "Message Inline Reply"
+            directReplyIntent.putExtra("uap", uap).putExtra("peer", peerUri).putExtra("time", timeStamp)
+            val directReplyPendingIntent = PendingIntent.getService(
+                this,
+                DIRECT_REPLY_REQ_CODE,
+                directReplyIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+            val inlineReplyAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_stat_reply,
+                getString(R.string.reply),
+                directReplyPendingIntent
+            ).addRemoteInput(remoteInput)
+                .setAllowGeneratedReplies(true)
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).
+                build()
+
+            // message save
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
-            saveIntent.putExtra("uap", uap)
-                .putExtra("time", timeStampString)
-            val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent,
-                piFlags)
+            saveIntent.putExtra("uap", uap).putExtra("time", timeStampString)
+            val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
+            val saveAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_stat_save,
+                getString(R.string.save),
+                savePendingIntent
+            ).build()
+
+            // message delete
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
-            deleteIntent.putExtra("uap", uap)
-                .putExtra("time", timeStampString)
-            val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE,
-                deleteIntent, piFlags)
-            nb.addAction(R.drawable.ic_stat_reply, "Reply", rpi)
-            nb.addAction(R.drawable.ic_stat_save, "Save", savePendingIntent)
-            nb.addAction(R.drawable.ic_stat_delete, "Delete", deletePendingIntent)
+            deleteIntent.putExtra("uap", uap).putExtra("time", timeStampString)
+            val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
+            val deleteAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_stat_delete,
+                getString(R.string.delete),
+                deletePendingIntent
+            ).build()
+
+            nb.addAction(inlineReplyAction).addAction(saveAction).addAction(deleteAction)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
+
             return
         }
 
@@ -1295,13 +1367,6 @@ class BaresipService: Service() {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(this@BaresipService.applicationContext, message, length).show()
         }
-    }
-
-    private fun getActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int): Spannable {
-        val spannable: Spannable = SpannableString(applicationContext.getText(stringRes))
-        spannable.setSpan(
-            ForegroundColorSpan(applicationContext.getColor(colorRes)), 0, spannable.length, 0)
-        return spannable
     }
 
     private fun startRinging() {
@@ -1638,12 +1703,9 @@ class BaresipService: Service() {
         val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
-        val contactUpdate = MutableLiveData<Long>()
         val darkTheme = mutableStateOf(false)
         var messages by mutableStateOf(emptyList<Message>())
         val messageUpdate = MutableLiveData<Long>()
-        val chatTexts: MutableMap<String, String> = mutableMapOf()
-        val activities = mutableListOf<String>()
         val registrationUpdate = MutableLiveData<Long>()
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
@@ -1661,11 +1723,24 @@ class BaresipService: Service() {
         private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
         var rt: Ringtone? = null
+
         private var agc: AutomaticGainControl? = null
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var ns: NoiseSuppressor? = null
         private var btAdapter: BluetoothAdapter? = null
         private var recorderSessionId = 0
+
+        internal const val KEY_TEXT_REPLY = "key_text_reply_baresip"
+
+        fun postServiceEvent(event: ServiceEvent) {
+            serviceEvents.add(event)
+            if (serviceEvents.size == 1) {
+                Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+                serviceEvent.postValue(Event(event.timeStamp))
+            } else {
+                Log.d(TAG, "Added service event ${event.event}")
+            }
+        }
 
         fun requestAudioFocus(ctx: Context): Boolean  {
             Log.d(TAG, "Requesting audio focus")

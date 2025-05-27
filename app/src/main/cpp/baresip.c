@@ -411,8 +411,10 @@ static int runLoggingThread()
     dup2(pfd[1], 2);
 
     int ret = pthread_create(&loggingThread, NULL, loggingFunction, NULL);
-    if (ret != 0)
+    if (ret != 0) {
+        LOGE("failed to create logging thread: %d", ret);
         return ret;
+    }
 
     pthread_detach(loggingThread);
 
@@ -456,8 +458,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
     runLoggingThread();
 
     err = libre_init();
-    if (err)
+    if (err) {
+        LOGE("failed to init libre");
         goto out;
+    }
 
     if (re_thread_check(true) == 0) {
         LOGI("attaching to re thread\n");

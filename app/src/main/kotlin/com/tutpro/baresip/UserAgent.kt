@@ -45,6 +45,23 @@ class UserAgent(val uap: Long) {
         return null
     }
 
+    fun reRegister() {
+        this.status = R.drawable.circle_yellow
+        if (this.account.regint == 0)
+            Api.ua_unregister(this.uap)
+        else
+            Api.ua_register(this.uap)
+    }
+
+    fun makeDefault() {
+        val index = uas.value.indexOf(this)
+        val updatedUas = uas.value.toMutableList()
+        updatedUas.removeAt(index)
+        updatedUas.add(0, this)
+        uas.value = updatedUas.toList()
+        uasStatus.value = statusMap()
+    }
+
     companion object {
 
         fun ofAor(aor: String): UserAgent? {

@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,59 +11,61 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
 
 @Composable
 fun AppTheme(
     content: @Composable () -> Unit
 ) {
-    val darkTheme = remember { BaresipService.darkTheme }
+    val useDarkTheme by remember { BaresipService.darkTheme }
 
-    // "normal" palette, nothing change here
     val colorScheme = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme.value) dynamicDarkColorScheme(context = LocalContext.current)
-            else dynamicLightColorScheme(context = LocalContext.current)
+            if (useDarkTheme)
+                dynamicDarkColorScheme(context = LocalContext.current)
+            else
+                if (isSystemInDarkTheme())
+                    dynamicDarkColorScheme(context = LocalContext.current)
+                else
+                    dynamicLightColorScheme(context = LocalContext.current)
         }
-        darkTheme.value -> darkColorScheme()
-        else -> lightColorScheme()
+        useDarkTheme -> darkColorScheme()
+        else ->
+            if (isSystemInDarkTheme())
+                darkColorScheme()
+            else
+                lightColorScheme()
     }
 
-    // logic for which custom palette to use
     val customColorsPalette =
-        if (darkTheme.value) DarkCustomColors
+        if (useDarkTheme) DarkCustomColors
         else LightCustomColors
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            val decorView = window.decorView
+            val insetsController = WindowCompat.getInsetsController(window, view)
 
-            // Ensure insets are applied correctly
-            WindowCompat.setDecorFitsSystemWindows(window, false)
+            // A common threshold for luminance is 0.5. Colors with luminance > 0.5 are considered light.
+            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(customColorsPalette.background.toArgb()) > 0.5
 
-            // Handle the status bar appearance
-            val insetsController = WindowCompat.getInsetsController(window, decorView)
-            window.statusBarColor = customColorsPalette.background.toArgb()
-            window.navigationBarColor = customColorsPalette.background.toArgb()
-            insetsController.apply {
-                isAppearanceLightStatusBars = !darkTheme.value
-                isAppearanceLightNavigationBars = !darkTheme.value
-            }
+            insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
+            insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
         }
     }
 
-    // here is the important point, where you will expose custom objects
     CompositionLocalProvider(
-        LocalCustomColors provides customColorsPalette // our custom palette
+        LocalCustomColors provides customColorsPalette
     ) {
         MaterialTheme(
-            colorScheme = colorScheme, // the MaterialTheme still uses the "normal" palette
+            colorScheme = colorScheme, // MaterialTheme still uses the "normal" colorScheme
             content = content
         )
     }

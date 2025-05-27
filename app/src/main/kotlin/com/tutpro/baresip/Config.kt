@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets
 object Config {
 
     private val configPath = BaresipService.filesPath + "/config"
+    val audioModules = listOf("opus", "amr", "g722", "g7221", "g726", "g729", "codec2", "g711")
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
@@ -18,7 +19,7 @@ object Config {
 
         config = ctx.assets.open("config.static").bufferedReader().use { it.readText() }
         if (!File(configPath).exists()) {
-            for (module in AudioActivity.audioModules)
+            for (module in audioModules)
                 config = "${config}module ${module}.so\n"
             previousConfig = config
         } else {
@@ -149,7 +150,7 @@ object Config {
         }
 
         val previousModules = previousVariables("module")
-        for (module in AudioActivity.audioModules)
+        for (module in audioModules)
             if ("${module}.so" in previousModules)
                 config = "${config}module ${module}.so\n"
 

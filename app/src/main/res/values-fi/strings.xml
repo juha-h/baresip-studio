@@ -26,6 +26,7 @@
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
                 <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
+                <li>Audio-koodekin saa pitkällä kosketuksella käytöön/pois käytöstä.</li>
                 <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tietosuoja</h2>
@@ -69,6 +70,7 @@
                 <li>Voit lisätä puheluiden ja viestien kohteet yhteystietoihin pitkällä kosketuksella.</li>
                 <li>Pitkillä kosketuksilla voit myös poistaa puheluita, viestiketjuja, viestejä ja yhteystietoja.</li>
                 <li>Voit lisätä/poistaa yhteystiedon avatar-kuvan koskettamalla yhteystiedon ikonia lyhyesti/pitkästi.</li>
+                <li>Audio- ja video-koodekin saa pitkällä kosketuksella käytöön/pois käytöstä.</li>
                 <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tunnetut ongelmat</h2>
@@ -255,6 +257,8 @@
     <!-- Baresip Service -->
     <string name="answer">Vastaa</string>
     <string name="reject">Hylkää</string>
+    <string name="reply">Vastaa</string>
+    <string name="save">Talleta</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
     <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
     <string name="missed_calls">Vastaamattomia puheluita</string>
@@ -593,8 +597,13 @@
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audiofokus on evätty!</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
-    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten lähettämistä varten.</string>
-    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten, Kamera-luvan videopuheluita varten ja Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen havaitsemista varten ja Ilmoitukset-luvan ilmoitusten näyttämistä varten.</string>
+    <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten, Lähellä olevat laitteet -luvan
+        Bluetooth-mikrofonin/kaiuttimen havaitsemista varten, Ilmoitukset-luvan ilmoitusten lähettämistä varten
+        ja Android versiossa 9 Tallennustila-luvan Talleta/Palauta-toimintoja varten.</string>
+    <string name="audio_and_video_permissions">baresip+ tarvitsee Mikrofoni-luvan puheluita varten,
+        Kamera-luvan videopuheluita varten, Lähellä olevat laitteet -luvan Bluetooth-mikrofonin/kaiuttimen
+        havaitsemista varten, Ilmoitukset-luvan ilmoitusten näyttämistä varten ja Android versiossa 9
+        Tallennustila-luvan Talleta/Palauta-toimintoja varten.</string>
     <string name="call_recording_title">Puheluiden talletus</string>
     <string name="call_recording_tip">Jos aktivoitu, uudet soitetut ja vastatut puhelut talletetaan.
         Tallennukset voi kuunnella Puhelutiedot-sivulla.</string>
