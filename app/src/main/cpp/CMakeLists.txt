@@ -2,6 +2,8 @@ project(baresip)
 
 cmake_minimum_required(VERSION 3.4.1)
 
+add_link_options("LINKER:--build-id=none")
+
 set(distribution_DIR ${CMAKE_SOURCE_DIR}/../../../../distribution)
 
 add_library(lib_crypto STATIC IMPORTED)
