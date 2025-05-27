@@ -19,7 +19,7 @@
     <color name="colorRed">#ff0000</color>
     <color name="colorTrafficGreen">#4CAF50</color>
     <color name="colorTrafficYellow">#FFEB3B</color>
-    <color name="colorTrafficRed">#FF5722</color>
+    <color name="colorTrafficRed">#d83025</color>
     <color name="colorLight">@color/colorWhite</color>
     <color name="colorDark">#383838</color>
     <color name="colorSpinnerText">@color/colorDark</color>
