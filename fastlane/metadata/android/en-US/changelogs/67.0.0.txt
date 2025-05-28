@@ -1,0 +1,4 @@
+- Migrated baresip app from activities to Jetpack Compose navigation
+- Improved handling of calls and messages that arrive when baresip is not visible
+- Some other minor user interface improvements
+- Upstream fix of Refer-To header To/From tags
