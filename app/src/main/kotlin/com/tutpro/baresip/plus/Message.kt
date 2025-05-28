@@ -52,7 +52,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
 
         fun deleteAorMessage(aor: String, time: Long) {
             val updatedMessages = BaresipService.messages.toMutableList()
-            for (message in updatedMessages)
+            for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     updatedMessages.remove(message)
                     BaresipService.messages = updatedMessages.toList()
@@ -72,13 +72,42 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
 
         fun updateAorMessage(aor: String, time: Long) {
             val updatedMessages = BaresipService.messages.toMutableList()
-            for (message in updatedMessages)
+            for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     message.new = false
                     BaresipService.messages = updatedMessages.toList()
                     save()
                     return
                 }
+        }
+
+        fun unreadMessages(aor: String): Boolean {
+            for (message in BaresipService.messages.reversed())
+                if (message.aor == aor && message.new)
+                    return true
+            return false
+        }
+
+        fun unreadMessagesFromPeer(aor: String, peerUri: String): Boolean {
+            for (message in BaresipService.messages.reversed())
+                if (message.aor == aor && message.peerUri == peerUri && message.new)
+                    return true
+            return false
+        }
+
+        fun updateMessagesFromPearRead(aor: String, peerUri: String): Boolean {
+            val updatedMessages = BaresipService.messages.toMutableList()
+            var updated = false
+            for (message in updatedMessages)
+                if (message.aor == aor && message.peerUri == peerUri && message.new) {
+                    message.new = false
+                    updated = true
+                }
+            if (updated) {
+                BaresipService.messages = updatedMessages.toList()
+                save()
+            }
+            return updated
         }
 
         fun save() {

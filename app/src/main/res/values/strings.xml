@@ -29,6 +29,7 @@
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch on contact icon can be used to install/remove image avatar.</li>
+            <li>Long touch on an audio codec can be used to enable/disable the codec.</li>
             <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more information.</li>
         </ul>
         <h2>Privacy Policy</h2>
@@ -72,6 +73,7 @@
             <li>Peers of calls and messages can be added to contacts by long touches.</li>
             <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
             <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
+            <li>Long touch on an audio or video codec can be used to enable/disable the codec.</li>
             <li>See <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> for more
                 information.</li>
         </ul>
@@ -240,6 +242,8 @@
     <!-- Baresip Service -->
     <string name="answer">Answer</string>
     <string name="reject">Reject</string>
+    <string name="reply">Reply</string>
+    <string name="save">Save</string>
     <string name="incoming_call_from">Incoming call from</string>
     <string name="missed_call_from">Missed call from</string>
     <string name="missed_calls">Missed calls</string>
@@ -575,11 +579,13 @@
     <string name="audio_focus_denied">Audio focus denied!</string>
     <string name="permissions_rationale">Permissions rationale</string>
     <string name="audio_permissions">baresip needs \"Microphone\" permission for voice calls,
-        \"Nearby devices\" permission for Bluetooth microphone/speaker detection, and
-        \"Notifications\" permission for posting notifications.</string>
-    <string name="audio_and_video_permissions">baresip+ needs \"Microphone\" permission for voice calls,
-        \"Camera\" permission for video calls, \"Nearby devices\" permission for Bluetooth
-        microphone/speaker detection, and \"Notifications\" permission for posting notifications.</string>
+        \"Nearby devices\" permission for Bluetooth microphone/speaker detection,
+        \"Notifications\" permission for posting notifications, and in Android 9
+        \"Storage\" permission for Backup/Restore operations.</string>
+    <string name="audio_and_video_permissions">baresip+ needs \"Microphone\" permission
+        for voice calls, \"Camera\" permission for video calls, \"Nearby devices\" permission
+        for Bluetooth microphone/speaker detection, \"Notifications\" permission for posting
+        notifications, and in Android 9 \"Storage\" permissions for Backup/Restore operations.</string>
     <string name="call_recording_title">Call Recording</string>
     <string name="call_recording_tip">If activated, new incoming and outgoing calls will be recorded.
         Recordings can be played on Call Details page</string>
