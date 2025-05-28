@@ -224,7 +224,7 @@ object Utils {
     fun checkUriUser(user: String): Boolean {
         val escaped = """%(\d|A|B|C|D|E|F|a|b|c|d|e|f){2}""".toRegex()
         escaped.replace(user, "").forEach {
-            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+\$,;?/".contains(it))) return false }
+            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+$,;?/".contains(it))) return false }
         return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
     }
 
@@ -232,7 +232,7 @@ object Utils {
         val parts = domain.split(".")
         for (p in parts) {
             if (p.endsWith("-") || p.startsWith("-") ||
-                    !Regex("^[-a-zA-Z0-9]+\$").matches(p))
+                    !Regex("^[-a-zA-Z0-9]+$").matches(p))
                 return false
         }
         return true
@@ -326,7 +326,7 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}\$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
@@ -376,7 +376,7 @@ object Utils {
     }
 
     private fun checkToken(token: String): Boolean {
-        return Regex("^[-a-zA-Z0-9.!%*_+`'~]+\$").matches(token)
+        return Regex("^[-a-zA-Z0-9.!%*_+`'~]+$").matches(token)
     }
 
     @Suppress("unused")
@@ -810,7 +810,7 @@ object Utils {
     }
 
     fun addActivity(activity: String) {
-        if ((BaresipService.activities.size == 0) || (BaresipService.activities[0] != activity))
+        if ((BaresipService.activities.isEmpty()) || (BaresipService.activities[0] != activity))
             BaresipService.activities.add(0, activity)
     }
 
