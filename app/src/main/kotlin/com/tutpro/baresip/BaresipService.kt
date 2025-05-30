@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.Manifest
+import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -831,7 +832,7 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
-                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
                             // request fails if there is an active telephony call
@@ -1324,8 +1325,12 @@ class BaresipService: Service() {
             if (VERSION.SDK_INT >= 29)
                 startForeground(
                     STATUS_NOTIFICATION_ID, snb.build(),
-                    if (VERSION.SDK_INT >= 30)
-                        FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
+                    if (VERSION.SDK_INT >= 30) {
+                        if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                            FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
+                        else
+                            FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                    }
                     else
                         FOREGROUND_SERVICE_TYPE_PHONE_CALL
                 )
