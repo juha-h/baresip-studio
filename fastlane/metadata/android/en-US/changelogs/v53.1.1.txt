@@ -1,0 +1,1 @@
+- Fixed possible status notification related crash
