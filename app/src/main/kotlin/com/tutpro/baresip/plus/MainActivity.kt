@@ -477,6 +477,8 @@ class MainActivity : ComponentActivity() {
             arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
         else
             arrayOf(RECORD_AUDIO)
+        if (BaresipService.supportedCameras)
+            permissions = permissions + CAMERA
 
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {}

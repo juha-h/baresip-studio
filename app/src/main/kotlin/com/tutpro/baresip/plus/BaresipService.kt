@@ -1,6 +1,8 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.Manifest.permission.RECORD_AUDIO
+import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -863,7 +865,7 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
-                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO)))
+                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
                             // request fails if there is an active telephony call
@@ -1389,15 +1391,20 @@ class BaresipService: Service() {
         if (VERSION.SDK_INT >= 31)
             snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
         try {
-            if (VERSION.SDK_INT >= 29)
-                startForeground(
-                    STATUS_NOTIFICATION_ID, snb.build(),
-                    if (VERSION.SDK_INT >= 30)
-                        FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE or
-                                FOREGROUND_SERVICE_TYPE_CAMERA
+            if (VERSION.SDK_INT >= 29) {
+                var types = FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                if (VERSION.SDK_INT >= 30) {
+                    if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                        types = types or FOREGROUND_SERVICE_TYPE_MICROPHONE
                     else
-                        FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                )
+                        Log.w(TAG, "showStatusNotification: RECORD_AUDIO permission not granted")
+                    if (ContextCompat.checkSelfPermission(this, CAMERA) == PackageManager.PERMISSION_GRANTED)
+                        types = types or FOREGROUND_SERVICE_TYPE_CAMERA
+                    else
+                        Log.w(TAG, "showStatusNotification: CAMERA permission not granted")
+                }
+                startForeground(STATUS_NOTIFICATION_ID, snb.build(), types)
+            }
             else
                 startForeground(STATUS_NOTIFICATION_ID, snb.build())
         } catch (e: Exception) {
