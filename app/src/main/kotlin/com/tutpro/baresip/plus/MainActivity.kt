@@ -503,10 +503,14 @@ class MainActivity : ComponentActivity() {
                     }
                     negativeText.value = ""
                     showDialog.value = true
-                } else {
+                }
+                else {
                     if (shouldShow.isNotEmpty()) {
                         dialogTitle.value = getString(R.string.permissions_rationale)
-                        dialogMessage.value = getString(R.string.audio_permissions)
+                        dialogMessage.value = if (CAMERA in permissions)
+                            getString(R.string.audio_and_video_permissions)
+                        else
+                            getString(R.string.audio_permissions)
                         positiveText.value = getString(R.string.ok)
                         onPositiveClicked.value = {
                             requestPermissionsLauncher.launch(permissions)
