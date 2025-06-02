@@ -113,6 +113,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -216,6 +217,7 @@ class MainActivity : ComponentActivity() {
     private var securityIcon = mutableIntStateOf(-1)
     private var callTimer: Chronometer? = null
     private var showCallTimer = mutableStateOf(false)
+    private var callDuration = 0
     private var showSuggestions = mutableStateOf(false)
     private var showCallButton = mutableStateOf(true)
     private var showCallVideoButton = mutableStateOf(true)
@@ -1192,17 +1194,36 @@ class MainActivity : ComponentActivity() {
             }
             if (showCallTimer.value) {
                 val textColor = LocalCustomColors.current.itemText.toArgb()
+                var chronometerInstance: Chronometer? = null
                 AndroidView(
                     factory = { context ->
-                        Chronometer(context).also { callTimer = it
-                            callTimer?.textSize = 16F
-                            callTimer?.setTextColor(textColor)
+                        Chronometer(context).apply {
+                            textSize = 16F
+                            setTextColor(textColor)
+                            base = SystemClock.elapsedRealtime() - (callDuration * 1000L)
+                            chronometerInstance = this
                         }
+                    },
+                    update = { chronometerView ->
+                        val newBase = SystemClock.elapsedRealtime() - (callDuration * 1000L)
+                        if (chronometerView.base != newBase) {
+                            chronometerView.base = newBase
+                        }
+                        chronometerView.start()
+                        Log.d(TAG, "Update: Chronometer started/updated")
                     },
                     modifier = Modifier.padding(start = 6.dp,
                         top = 4.dp,
                         end = if (securityIcon.intValue != -1) 6.dp else 0.dp),
                 )
+                DisposableEffect(Unit) {
+                    onDispose {
+                        chronometerInstance?.let {
+                            it.stop()
+                            Log.d(TAG, "DisposableEffect: Chronometer stopped in onDispose")
+                        }
+                    }
+                }
             }
             if (securityIcon.intValue != -1) {
                 Icon(
@@ -3099,10 +3120,11 @@ class MainActivity : ComponentActivity() {
                 val call = ua.currentCall()
                 if (call != null) {
                     call.resume()
-                    startCallTimer(call)
+                    callDuration = call.duration()
+                    showCallTimer.value = true
                 }
                 else
-                    callTimer?.stop()
+                    showCallTimer.value = false
                 dtmfText.value = ""
                 if (aor == viewModel.selectedAor.value) {
                     ua.account.resumeUri = ""
@@ -3503,7 +3525,7 @@ class MainActivity : ComponentActivity() {
                         R.drawable.call_transfer
                     else
                         R.drawable.call_transfer_execute
-                    startCallTimer(call)
+                    callDuration = call.duration()
                     showCallTimer.value = true
                     showCallButton.value = false
                     showCallVideoButton.value = false
@@ -3639,14 +3661,6 @@ class MainActivity : ComponentActivity() {
             else
                 ua.account.resumeUri = ""
         }
-    }
-
-    private fun startCallTimer(call: Call) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            callTimer?.stop()
-            callTimer?.base = SystemClock.elapsedRealtime() - (call.duration() * 1000L)
-            callTimer?.start()
-        }, 100)
     }
 
     private fun abandonAudioFocus() {
