@@ -1209,7 +1209,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                         chronometerView.base = newBase
                     }
                     chronometerView.start()
-                    Log.d(TAG, "Update: Chronometer started/updated")
+                    Log.d(TAG, "Chronometer started/updated")
                 },
                 modifier = Modifier.padding(start = 6.dp,
                     top = 4.dp,
@@ -1219,7 +1219,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 onDispose {
                     chronometerInstance?.let {
                         it.stop()
-                        Log.d(TAG, "DisposableEffect: Chronometer stopped in onDispose")
+                        Log.d(TAG, "Chronometer stopped in onDispose")
                     }
                 }
             }
