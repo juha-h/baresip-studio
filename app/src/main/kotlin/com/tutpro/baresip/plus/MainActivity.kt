@@ -1859,6 +1859,7 @@ class MainActivity : ComponentActivity() {
                         layoutParams = prm
                         setOnClickListener {
                             Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+                            videoIcon.intValue = R.drawable.video_on
                             showVideoLayout.value = false
                         }
                     }
