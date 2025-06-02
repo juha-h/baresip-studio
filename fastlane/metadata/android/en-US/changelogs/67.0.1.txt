@@ -1,0 +1,3 @@
+- Stop call timer chronometer when call is closed
+- Add microphone to status notification only when record audio permission has been granted
+- New translations (Tamil)
