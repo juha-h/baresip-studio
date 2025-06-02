@@ -1193,20 +1193,36 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
         }
         if (showCallTimer.value) {
             val textColor = LocalCustomColors.current.itemText.toArgb()
+            var chronometerInstance: Chronometer? = null
             AndroidView(
                 factory = { context ->
-                    val chronometer = Chronometer(context).apply {
+                    Chronometer(context).apply {
                         textSize = 16F
                         setTextColor(textColor)
                         base = SystemClock.elapsedRealtime() - (callDuration * 1000L)
-                        start()
+                        chronometerInstance = this
                     }
-                    chronometer
+                },
+                update = { chronometerView ->
+                    val newBase = SystemClock.elapsedRealtime() - (callDuration * 1000L)
+                    if (chronometerView.base != newBase) {
+                        chronometerView.base = newBase
+                    }
+                    chronometerView.start()
+                    Log.d(TAG, "Update: Chronometer started/updated")
                 },
                 modifier = Modifier.padding(start = 6.dp,
                     top = 4.dp,
                     end = if (securityIcon.intValue != -1) 6.dp else 0.dp),
             )
+            DisposableEffect(Unit) {
+                onDispose {
+                    chronometerInstance?.let {
+                        it.stop()
+                        Log.d(TAG, "DisposableEffect: Chronometer stopped in onDispose")
+                    }
+                }
+            }
         }
         if (securityIcon.intValue != -1) {
             Icon(
