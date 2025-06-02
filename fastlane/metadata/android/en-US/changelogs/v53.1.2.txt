@@ -1,0 +1,4 @@
+- Select permission rationale based on camera availability
+- Use "turn video on" icon after video view is closed
+- Stop chronometer when call timer is no more visible
+- New translations (Tamil)
