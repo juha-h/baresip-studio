@@ -436,7 +436,7 @@
     <string name="user_agent_help">Benutzerdefinierter Wert für das SIP request/response User-Agent header-Feld</string>
     <string name="invalid_user_agent">Ungültiger Wert für das User-Agent header-Feld</string>
     <string name="numeric_keypad">Ziffernblock</string>"
-    <string name="numeric_keypad_help">Falls angekreuzt, wird der Ziffernblock angezeigt, sobald das \"Anruf an ...\"- Feld fokussiert wird</string>"
+    <string name="numeric_keypad_help">Falls angekreuzt, wird der Ziffernblock angezeigt, sobald das \"Anruf an ...\"- Feld fokussiert wird.</string>"
     <string name="microphone_title">Mikrofon</string>
     <string name="microphone_tip">Falls in einem Anruf aktiviert, wird das Mikrofon stummgestellt.</string>
     <string name="speakerphone_title">Lautsprecher</string>
@@ -449,4 +449,6 @@
     <string name="call_recording_title">Anrufsaufzeichnung</string>
     <string name="call_recording_tip">Falls aktiviert, werden ein-/ ausgehende Anrufe aufgenommen. Aufnahmen lassen sich unter den Anrufsdetails abspielen</string>
     <string name="playing_recording">Spiele Aufnahme ab…</string>
+    <string name="reply">Antworten</string>
+    <string name="save">Speichern</string>
 </resources>
