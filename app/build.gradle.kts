@@ -11,8 +11,8 @@ android {
         applicationId = "com.tutpro.baresip.plus"
         minSdk = 28
         targetSdk = 35
-        versionCode = 209
-        versionName = "53.1.2"
+        versionCode = 210
+        versionName = "54.0.0"
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
@@ -58,8 +58,6 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        //noinspection DataBindingWithoutKapt
-        dataBinding = true
         buildConfig = true
         compose = true
     }
@@ -101,5 +99,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.media)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }
 

@@ -1,8 +1,8 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
-import android.Manifest.permission.RECORD_AUDIO
 import android.Manifest.permission.CAMERA
+import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -53,16 +53,11 @@ import android.provider.ContactsContract
 import android.provider.Settings
 import android.system.OsConstants
 import android.telecom.TelecomManager
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.util.Size
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.annotation.Keep
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,7 +81,6 @@ import java.nio.charset.StandardCharsets
 import java.util.GregorianCalendar
 import java.util.Timer
 import java.util.TimerTask
-import kotlin.collections.listOf
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 
@@ -1177,16 +1171,6 @@ class BaresipService: Service() {
 
     }
 
-    private fun postServiceEvent(event: ServiceEvent) {
-        serviceEvents.add(event)
-        if (serviceEvents.size == 1) {
-            Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
-            serviceEvent.postValue(Event(event.timeStamp))
-        } else {
-            Log.d(TAG, "Added service event ${event.event}")
-        }
-    }
-
     @Suppress("unused")
     @SuppressLint("UnspecifiedImmutableFlag")
     @Keep
@@ -1778,19 +1762,17 @@ class BaresipService: Service() {
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
         var contacts by mutableStateOf(mutableListOf<Contact>())
-        val darkTheme = mutableStateOf(false)
-        var messages by mutableStateOf(emptyList<Message>())
-
-        val calls = ArrayList<Call>()
-        var callHistory = ArrayList<CallHistoryNew>()
-        val messageUpdate = MutableLiveData<Long>()
-        val contactUpdate = MutableLiveData<Long>()
-        val registrationUpdate = MutableLiveData<Long>()
         val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
+        val darkTheme = mutableStateOf(false)
+        var messages by mutableStateOf(emptyList<Message>())
+        val messageUpdate = MutableLiveData<Long>()
+
+        val calls = ArrayList<Call>()
+        var callHistory = ArrayList<CallHistoryNew>()
+        val registrationUpdate = MutableLiveData<Long>()
         var contactsMode = "baresip"
-        val chatTexts: MutableMap<String, String> = mutableMapOf()
         val activities = mutableListOf<String>()
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
@@ -1809,8 +1791,16 @@ class BaresipService: Service() {
         private var btAdapter: BluetoothAdapter? = null
         private var recorderSessionId = 0
 
-        internal const val KEY_TEXT_REPLY = "key_text_reply_baresip_plus"
-
+        fun postServiceEvent(event: ServiceEvent) {
+            serviceEvents.add(event)
+            if (serviceEvents.size == 1) {
+                Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+                serviceEvent.postValue(Event(event.timeStamp))
+            } else {
+                Log.d(TAG, "Added service event ${event.event}")
+            }
+        }
+        
         fun requestAudioFocus(ctx: Context): Boolean  {
             Log.d(TAG, "Requesting audio focus")
             if (audioFocusRequest != null) {

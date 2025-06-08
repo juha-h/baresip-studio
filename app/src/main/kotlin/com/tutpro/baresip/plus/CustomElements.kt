@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -117,12 +118,14 @@ object CustomElements {
         onLongClick: () -> Unit,
         modifier: Modifier = Modifier,
         shape: Shape,
+        border: BorderStroke? = null,
         color: Color,
         content: @Composable RowScope.() -> Unit
     ) {
         Surface(
             shape = shape,
             color = color,
+            border = border,
             modifier = modifier
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -491,7 +494,7 @@ object CustomElements {
         BasicAlertDialog(
             properties = DialogProperties(
                 dismissOnBackPress = false,
-                dismissOnClickOutside = false
+                dismissOnClickOutside = false,
             ),
             onDismissRequest = {
                 keyboardController?.hide()

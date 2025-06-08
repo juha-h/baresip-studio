@@ -24,10 +24,10 @@ rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
 module aaudio.so
-module vp8.so
-module vp9.so
-module av1.so
 module avcodec.so
+module vp9.so
+module vp8.so
+module av1.so
 module snapshot.so
 module stun.so
 module turn.so
