@@ -131,8 +131,7 @@ private fun AudioScreen(
     }
 }
 
-private var oldCallVolume = BaresipService.callVolume
-private var newCallVolume = oldCallVolume
+private var newCallVolume = BaresipService.callVolume
 private var oldMicGain = ""
 private var newMicGain = ""
 private var oldSpeakerPhone = BaresipService.speakerPhone
@@ -216,7 +215,7 @@ private fun CallVolume() {
         val volNames = listOf("--",  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
         val volValues = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         val itemPosition = remember {
-            mutableIntStateOf(volValues.indexOf(oldCallVolume))
+            mutableIntStateOf(volValues.indexOf(BaresipService.callVolume))
         }
         Box {
             Row(
