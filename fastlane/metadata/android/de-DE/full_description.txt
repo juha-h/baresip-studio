@@ -4,6 +4,6 @@ Aktuell unterstüzt die baresip App Anrufe mit Ton, Textnachrichten, Anrufbeantw
 
 Die Entwicklung der baresip App wurde durch das Fehlen eines sicheren, quelloffenen und SIP-basierten VoIP User Agent für Android motiviert, der nicht auf proprietäre und externe Push-Benachrichtigungsdienste angewiesen ist.
 
-Falls Sie Videoanrufe tätigen wollen und ein Gerät mit Android 7.0 oder höher besitzen, das die Camera2 API auf dem Hardware-Unterstützungslevel LEVEL 3 unterstüzt, können Sie die Schwester-App baresip+ nutzen.
+Falls Sie Videoanrufe tätigen wollen und ein Gerät mit Android 9 oder höher besitzen, das die Camera2 API auf dem Hardware-Unterstützungslevel LEVEL 3 oder FULL unterstüzt, können Sie die Schwester-App baresip+ nutzen.
 
 Der Quellcode befindet sich auf <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, dort können sie Auch Fehler/ Bugs melden.
