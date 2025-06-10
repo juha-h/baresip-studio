@@ -1,0 +1,3 @@
+- Default Call Volume audio setting bug fix
+- Backup/restore improvement and bug fix
+- New translations (German)
