@@ -1,0 +1,4 @@
+- Migrated baresip+ app from activities to Jetpack Compose navigation
+- Default Call Volume audio setting bug fix
+- Backup/restore improvement and bug fix
+- New translations (German)
