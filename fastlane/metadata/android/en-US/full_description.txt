@@ -4,7 +4,6 @@ Currently baresip app supports voice calls, text messages, voicemail Message Wai
 
 Development of baresip app is motivated by need for a secure, open source SIP based VoIP User Agent for Android that does not depend on proprietary, third party push notification services.
 
-If you need video calling and have a device with Android version 9 or
-newer that supports Camera2 API at hardware Support Level LEVEL3 or FULL, you can instead of this application install its sister application baresip+.
+If you need video calling and have a device with Android version 9 or newer that supports Camera2 API at hardware Support Level LEVEL3 or FULL, you can instead of this application install its sister application baresip+.
 
 Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, where also issues can be reported.
