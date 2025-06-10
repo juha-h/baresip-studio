@@ -2517,7 +2517,7 @@ private fun updateIcons(viewModel: ViewModel, acc: Account?) {
 
 private fun backup(ctx: Context, password: String) {
     val files = arrayListOf("accounts", "config", "contacts", "call_history",
-        "messages", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
     File(BaresipService.filesPath).walk().forEach {
         if (it.name.endsWith(".png"))
             files.add(it.name)
