@@ -198,49 +198,27 @@ private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
 
-private var oldNickname = ""
 private var newNickname = ""
-private var oldDisplayname = ""
 private var newDisplayname = ""
-private var oldAuthUser = ""
 private var newAuthUser = ""
-private var oldAuthPass = ""
 private var newAuthPass = ""
-private val oldOutbound1 = mutableStateOf("")
-private val oldOutbound2 = mutableStateOf("")
 private var newOutbound1 = ""
 private var newOutbound2 = ""
-private var oldRegister = false
 private var newRegister = false
-private var oldRegInt = ""
 private var newRegInt = ""
-private var oldMediaEnc = ""
 private var newMediaEnc = ""
-private var oldMediaNat = ""
 private var newMediaNat = ""
-private var oldStunServer = ""
 private var newStunServer = ""
-private var oldStunUser = ""
 private var newStunUser = ""
-private var oldStunPass = ""
 private var newStunPass = ""
-private var oldRtcpMux = false
 private var newRtcpMux = false
-private var old100Rel = false
 private var new100Rel = false
-private var oldDtmfMode = 0
 private var newDtmfMode = 0
-private var oldAnswerMode = 0
 private var newAnswerMode = 0
-private var oldAutoRedirect = false
 private var newAutoRedirect = false
-private var oldVmUri = ""
 private var newVmUri = ""
-private var oldCountryCode = ""
 private var newCountryCode = ""
-private var oldTelProvider = ""
 private var newTelProvider = ""
-private var oldDefaultAccount = false
 private var newDefaultAccount = false
 private var newNumericKeypad = false
 
@@ -256,29 +234,1065 @@ private fun AccountContent(
     val acc = ua.account
     val aor = acc.aor
 
-    var mediaNatState by remember { mutableStateOf(oldMediaNat) }
+    var mediaNatState by remember { mutableStateOf(acc.mediaNat) }
     val showStun by remember { derivedStateOf { mediaNatState != "" } }
 
-    LaunchedEffect(acc) {
-        if (acc.outbound.isNotEmpty()) {
-            oldOutbound1.value = acc.outbound[0]
-            newOutbound1 = oldOutbound1.value
-            if (acc.outbound.size > 1) {
-                oldOutbound2.value = acc.outbound[1]
-                newOutbound2 = oldOutbound2.value
-            } else {
-                oldOutbound2.value = ""
-                newOutbound2 = ""
-            }
-        } else {
-            oldOutbound1.value = ""
-            newOutbound1 = ""
-            oldOutbound2.value = ""
-            newOutbound2 = ""
+    @Composable
+    fun AoR() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            OutlinedTextField(
+                value = acc.luri,
+                enabled = false,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    fontSize = 18.sp,
+                    color = LocalCustomColors.current.itemText
+                ),
+                label = {
+                    LabelText(text = stringResource(R.string.sip_uri),
+                        fontWeight = FontWeight.Bold)
+                }
+            )
         }
-        oldMediaNat = acc.mediaNat
-        newMediaNat = oldMediaNat
-        mediaNatState = oldMediaNat
+    }
+
+    @Composable
+    fun Nickname() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var nickName by remember { mutableStateOf(acc.nickName.value) }
+            newNickname = nickName
+            OutlinedTextField(
+                value = nickName,
+                placeholder = { Text(stringResource(R.string.nickname)) },
+                onValueChange = {
+                    nickName = it
+                    newNickname = nickName
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.nickname)
+                        alertMessage.value = ctx.getString(R.string.account_nickname_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.nickname)) },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    keyboardType = KeyboardType.Text),
+            )
+        }
+    }
+
+    @Composable
+    fun DisplayName() {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var displayName by remember { mutableStateOf(acc.displayName) }
+            newDisplayname = displayName
+            OutlinedTextField(
+                value = displayName,
+                placeholder = { Text(stringResource(R.string.display_name)) },
+                onValueChange = {
+                    displayName = it
+                    newDisplayname = displayName
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.display_name)
+                        alertMessage.value = ctx.getString(R.string.display_name_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.display_name)) },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text),
+            )
+        }
+    }
+
+    @Composable
+    fun AuthUser() {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var authUser by remember { mutableStateOf(acc.authUser) }
+            newAuthUser = authUser
+            OutlinedTextField(
+                value = authUser,
+                placeholder = { Text(stringResource(R.string.authentication_username)) },
+                onValueChange = {
+                    authUser = it
+                    newAuthUser = authUser
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.authentication_username)
+                        alertMessage.value = ctx.getString(R.string.authentication_username_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.authentication_username)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun AuthPass() {
+        val ctx = LocalContext.current
+        val showPassword = remember { mutableStateOf(false) }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var authPass by remember { mutableStateOf(
+                if (BaresipService.aorPasswords[acc.aor] == null && acc.authPass != NO_AUTH_PASS)
+                    acc.authPass
+                else
+                    ""
+            ) }
+            newAuthPass = authPass
+            OutlinedTextField(
+                value = authPass,
+                placeholder = { Text(stringResource(R.string.authentication_password)) },
+                onValueChange = {
+                    authPass = it
+                    newAuthPass = authPass
+                },
+                singleLine = true,
+                visualTransformation = if (showPassword.value)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        showPassword.value = !showPassword.value
+                    }) {
+                        Icon(
+                            if (showPassword.value)
+                                ImageVector.vectorResource(R.drawable.visibility)
+                            else
+                                ImageVector.vectorResource(R.drawable.visibility_off),
+                            contentDescription = "Visibility",
+                            tint = LocalCustomColors.current.itemText
+
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.authentication_password)
+                        alertMessage.value = ctx.getString(R.string.authentication_password_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.authentication_password)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun AskPassword(ctx: Context, navController: NavController, ua: UserAgent) {
+        CustomElements.PasswordDialog(
+            ctx = ctx,
+            showPasswordDialog = showPasswordDialog,
+            password = password,
+            keyboardController = keyboardController,
+            title = stringResource(R.string.authentication_password),
+            okAction = {
+                if (password.value != "") {
+                    BaresipService.aorPasswords[ua.account.aor] = password.value
+                    Api.account_set_auth_pass(ua.account.accp, password.value)
+                    password.value = ""
+                    ua.reRegister()
+                    navController.popBackStack()
+                }
+            },
+            cancelAction = {
+                ua.reRegister()
+                navController.popBackStack()
+            }
+        )
+    }
+
+    @Composable
+    fun Outbound() {
+        val ctx = LocalContext.current
+        Text(text = stringResource(R.string.outbound_proxies),
+            color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable {
+                    alertTitle.value = ctx.getString(R.string.outbound_proxies)
+                    alertMessage.value = ctx.getString(R.string.outbound_proxies_help)
+                    showAlert.value = true
+                }
+        )
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var outbound1 by remember { mutableStateOf(
+                if (acc.outbound.isNotEmpty()) acc.outbound[0] else "")
+            }
+            newOutbound1 = outbound1
+            OutlinedTextField(
+                value = outbound1,
+                placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                onValueChange = {
+                    outbound1= it
+                    newOutbound1 = outbound1
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.sip_uri_of_proxy_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var outbound2 by remember { mutableStateOf(
+                if (acc.outbound.size > 1) acc.outbound[1] else "")
+            }
+            newOutbound2 = outbound2
+            OutlinedTextField(
+                value = outbound2,
+                placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                onValueChange = {
+                    outbound2 = it
+                    newOutbound2 = outbound2
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun Register() {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.register),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.register)
+                        alertMessage.value = ctx.getString(R.string.register_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var register by remember { mutableStateOf(acc.regint > 0) }
+            newRegister = register
+            Switch(
+                checked = register,
+                onCheckedChange = {
+                    register = it
+                    newRegister = register
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun RegInt() {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            var regInt by remember { mutableStateOf(acc.configuredRegInt.toString()) }
+            newRegInt = regInt
+            OutlinedTextField(
+                value = regInt,
+                placeholder = { Text(stringResource(R.string.reg_int)) },
+                onValueChange = {
+                    regInt = it
+                    newRegInt = regInt
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.reg_int)
+                        alertMessage.value = ctx.getString(R.string.reg_int_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.reg_int)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+    }
+
+    @Composable
+    fun AudioCodecs(navController: NavController, aor: String) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.audio_codecs),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        val route = "codecs/$aor/audio"
+                        navController.navigate(route)
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight. Bold
+            )
+        }
+    }
+
+    @Composable
+    fun MediaEnc() {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.media_encryption),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.media_encryption)
+                        alertMessage.value = ctx.getString(R.string.media_encryption_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember { mutableStateOf(false) }
+            var mediaEnc by remember { mutableStateOf(acc.mediaEnc) }
+            newMediaEnc = mediaEnc
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = mediaEncMap[mediaEnc]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    mediaEncMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value,
+                                color = LocalCustomColors.current.itemText)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                mediaEnc = it.key
+                                newMediaEnc = mediaEnc
+                            })
+                        if (index < 4)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun MediaNat(currentMediaNat: String, onMediaNatSelected: (String) -> Unit) {
+        val ctx = LocalContext.current
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.media_nat),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.media_nat)
+                        alertMessage.value = ctx.getString(R.string.media_nat_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember { mutableStateOf(false) }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = mediaNatMap[currentMediaNat]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    mediaNatMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                onMediaNatSelected(it.key)
+                                newMediaNat = it.key
+                            })
+                        if (index < 3)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun StunServer() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var stunServer by remember { mutableStateOf(acc.stunServer) }
+            newStunServer = stunServer
+            OutlinedTextField(
+                value = stunServer,
+                placeholder = { Text(stringResource(R.string.stun_server)) },
+                onValueChange = {
+                    stunServer = it
+                    newStunServer = stunServer
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.stun_server)
+                        alertMessage.value = ctx.getString(R.string.stun_server_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.stun_server)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun StunUser() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var stunUser by remember { mutableStateOf(acc.stunUser) }
+            newStunUser = stunUser
+            OutlinedTextField(
+                value = stunUser,
+                placeholder = { Text(stringResource(R.string.stun_username)) },
+                onValueChange = {
+                    stunUser = it
+                    newStunUser = stunUser
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.stun_username)
+                        alertMessage.value = ctx.getString(R.string.stun_username_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.stun_username)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun StunPass() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val showPassword = remember { mutableStateOf(false) }
+            var stunPass by remember { mutableStateOf(acc.stunPass) }
+            newStunPass = stunPass
+            OutlinedTextField(
+                value = stunPass,
+                placeholder = { Text(stringResource(R.string.stun_password)) },
+                onValueChange = {
+                    stunPass = it
+                    newStunPass = stunPass
+                },
+                singleLine = true,
+                visualTransformation = if (showPassword.value)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                trailingIcon = {
+                    val (icon, iconColor) = if (showPassword.value) {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility),
+                            colorResource(id = R.color.colorAccent)
+                        )
+                    } else {
+                        Pair(
+                            ImageVector.vectorResource(R.drawable.visibility_off),
+                            colorResource(id = R.color.colorWhite)
+                        )
+                    }
+                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                        Icon(
+                            icon,
+                            contentDescription = "Visibility",
+                            tint = iconColor
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.stun_password)
+                        alertMessage.value = ctx.getString(R.string.stun_password_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
+                ),
+                label = { LabelText(stringResource(R.string.stun_password)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun RtcpMux() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.rtcp_mux),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.rtcp_mux)
+                        alertMessage.value = ctx.getString(R.string.rtcp_mux_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var rtcpMux by remember { mutableStateOf(acc.rtcpMux) }
+            newRtcpMux = rtcpMux
+            Switch(
+                checked = rtcpMux,
+                onCheckedChange = {
+                    rtcpMux = it
+                    newRtcpMux = rtcpMux
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Rel100() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.rel_100),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.rel_100)
+                        alertMessage.value = ctx.getString(R.string.rel_100_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var rel100 by remember { mutableStateOf(acc.rel100Mode == Api.REL100_ENABLED) }
+            new100Rel = rel100
+            Switch(
+                checked = rel100,
+                onCheckedChange = {
+                    rel100 = it
+                    new100Rel = rel100
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Dtmf() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to ctx.getString(R.string.dtmf_inband),
+                Api.DTMFMODE_SIP_INFO to ctx.getString(R.string.dtmf_info),
+                Api.DTMFMODE_AUTO to ctx.getString(R.string.dtmf_auto))
+            Text(text = stringResource(R.string.dtmf_mode),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.dtmf_mode)
+                        alertMessage.value = ctx.getString(R.string.dtmf_mode_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val dtmfMode = remember { mutableIntStateOf(acc.dtmfMode) }
+            newDtmfMode = dtmfMode.intValue
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = dtmfModeMap[dtmfMode.intValue]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    dtmfModeMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                dtmfMode.intValue = it.key
+                                newDtmfMode = dtmfMode.intValue
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Answer() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to ctx.getString(R.string.manual),
+                Api.ANSWERMODE_AUTO to ctx.getString(R.string.auto))
+            Text(text = stringResource(R.string.answer_mode),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.answer_mode)
+                        alertMessage.value = ctx.getString(R.string.answer_mode_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            var answerMode by remember { mutableIntStateOf(acc.answerMode) }
+            newAnswerMode = answerMode
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = answerModeMap[answerMode]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    answerModeMap.forEach {
+                        DropdownMenuItem(text = { Text(text = it.value) },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                answerMode = it.key
+                                newAnswerMode = answerMode
+                            })
+                        if (index < 1)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Redirect() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val redirectModeMap = mapOf(false to ctx.getString(R.string.manual),
+                true to ctx.getString(R.string.auto))
+            Text(text = stringResource(R.string.redirect_mode),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.redirect_mode)
+                        alertMessage.value = ctx.getString(R.string.redirect_mode_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            var autoRedirect by remember { mutableStateOf(acc.autoRedirect) }
+            newAutoRedirect = autoRedirect
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = redirectModeMap[autoRedirect]!!,
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    var index = 0
+                    redirectModeMap.forEach {
+                        DropdownMenuItem(text = {
+                            Text(text = it.value)
+                        },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                autoRedirect = it.key
+                                newAutoRedirect = autoRedirect
+                            })
+                        if (index < 1)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                        index++
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Voicemail() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var vmUri by remember { mutableStateOf(acc.vmUri) }
+            newVmUri = vmUri
+            OutlinedTextField(
+                value = vmUri,
+                placeholder = { Text(stringResource(R.string.voicemail_uri)) },
+                onValueChange = {
+                    vmUri = it
+                    newVmUri = vmUri
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.voicemail_uri)
+                        alertMessage.value = ctx.getString(R.string.voicemain_uri_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.voicemail_uri)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun CountryCode() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var countryCode by remember { mutableStateOf(acc.countryCode) }
+            newCountryCode = countryCode
+            OutlinedTextField(
+                value = countryCode,
+                placeholder = { Text(stringResource(R.string.country_code)) },
+                onValueChange = {
+                    countryCode = it
+                    newCountryCode = countryCode
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.country_code)
+                        alertMessage.value = ctx.getString(R.string.country_code_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.country_code)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun TelProvider() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            var telProvider by remember { mutableStateOf(acc.telProvider) }
+            newTelProvider = telProvider
+            OutlinedTextField(
+                value = telProvider,
+                placeholder = { Text(stringResource(R.string.telephony_provider)) },
+                onValueChange = {
+                    telProvider = it
+                    newTelProvider = telProvider
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.telephony_provider)
+                        alertMessage.value = ctx.getString(R.string.telephony_provider_help)
+                        showAlert.value = true
+                    },
+                textStyle = TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.telephony_provider)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun NumericKeypad() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.numeric_keypad),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.numeric_keypad)
+                        alertMessage.value = ctx.getString(R.string.numeric_keypad_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var numericKeypad by remember { mutableStateOf(acc.numericKeypad) }
+            newNumericKeypad = numericKeypad
+            Switch(
+                checked = numericKeypad,
+                onCheckedChange = {
+                    numericKeypad = it
+                    newNumericKeypad = numericKeypad
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun DefaultAccount() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.default_account),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.default_account)
+                        alertMessage.value = ctx.getString(R.string.default_account_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+                color = LocalCustomColors.current.itemText)
+            var defaultAccount by remember { mutableStateOf(UserAgent.findAorIndex(acc.aor)!! == 0) }
+            newDefaultAccount = defaultAccount
+            Switch(
+                checked = defaultAccount,
+                onCheckedChange = {
+                    defaultAccount = it
+                    newDefaultAccount = defaultAccount
+                }
+            )
+        }
     }
 
     if (showAlert.value) {
@@ -289,52 +1303,6 @@ private fun AccountContent(
             positiveButtonText = stringResource(R.string.ok),
         )
     }
-
-    oldNickname = acc.nickName.value
-    newNickname = oldNickname
-    oldDisplayname = acc.displayName
-    newDisplayname = oldDisplayname
-    oldAuthUser = acc.authUser
-    newAuthUser = oldAuthUser
-    if (BaresipService.aorPasswords[aor] == null && acc.authPass != NO_AUTH_PASS) {
-        oldAuthPass = acc.authPass
-        newAuthPass = oldAuthPass
-    }
-    else {
-        oldAuthPass = ""
-        newAuthPass = ""
-    }
-    oldRegister = acc.regint > 0
-    newRegister = oldRegister
-    oldRegInt = acc.configuredRegInt.toString()
-    newRegInt = oldRegInt
-    oldMediaEnc = acc.mediaEnc
-    newMediaEnc = oldMediaEnc
-    oldStunServer = acc.stunServer
-    newStunServer = oldStunServer
-    oldStunUser = acc.stunUser
-    newStunUser = oldStunUser
-    oldStunPass = acc.stunPass
-    newStunPass = oldStunPass
-    oldRtcpMux = acc.rtcpMux
-    newRtcpMux = oldRtcpMux
-    old100Rel = acc.rel100Mode == Api.REL100_ENABLED
-    new100Rel = old100Rel
-    oldDtmfMode = acc.dtmfMode
-    newDtmfMode = oldDtmfMode
-    oldAnswerMode = acc.answerMode
-    newAnswerMode = oldAnswerMode
-    oldAutoRedirect = acc.autoRedirect
-    newAutoRedirect = oldAutoRedirect
-    oldVmUri = acc.vmUri
-    newVmUri = oldVmUri
-    oldCountryCode = acc.countryCode
-    newCountryCode = oldCountryCode
-    oldTelProvider = acc.telProvider
-    newTelProvider = oldTelProvider
-    newNumericKeypad = acc.numericKeypad
-    oldDefaultAccount = UserAgent.findAorIndex(aor)!! == 0
-    newDefaultAccount = oldDefaultAccount
 
     keyboardController = LocalSoftwareKeyboardController.current
 
@@ -349,7 +1317,7 @@ private fun AccountContent(
             .verticalScroll(state = scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AoR(acc)
+        AoR()
         Nickname()
         DisplayName()
         AuthUser()
@@ -381,1035 +1349,8 @@ private fun AccountContent(
         Voicemail()
         CountryCode()
         TelProvider()
-        NumericKeypad(acc)
+        NumericKeypad()
         DefaultAccount()
-    }
-}
-
-@Composable
-private fun AoR(acc: Account) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        OutlinedTextField(
-            value = acc.luri,
-            enabled = false,
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(
-                fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText
-            ),
-            label = {
-                LabelText(text = stringResource(R.string.sip_uri),
-                    fontWeight = FontWeight.Bold)
-            }
-        )
-    }
-}
-
-@Composable
-private fun Nickname() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var nickName by remember { mutableStateOf(oldNickname) }
-        OutlinedTextField(
-            value = nickName,
-            placeholder = { Text(stringResource(R.string.nickname)) },
-            onValueChange = {
-                nickName = it
-                newNickname = nickName
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.nickname)
-                    alertMessage.value = ctx.getString(R.string.account_nickname_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.nickname)) },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                keyboardType = KeyboardType.Text),
-        )
-    }
-}
-
-@Composable
-private fun DisplayName() {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var displayName by remember { mutableStateOf(oldDisplayname) }
-        OutlinedTextField(
-            value = displayName,
-            placeholder = { Text(stringResource(R.string.display_name)) },
-            onValueChange = {
-                displayName = it
-                newDisplayname = displayName
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.display_name)
-                    alertMessage.value = ctx.getString(R.string.display_name_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.display_name)) },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                keyboardType = KeyboardType.Text),
-        )
-    }
-}
-
-@Composable
-private fun AuthUser() {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var authUser by remember { mutableStateOf(oldAuthUser) }
-        OutlinedTextField(
-            value = authUser,
-            placeholder = { Text(stringResource(R.string.authentication_username)) },
-            onValueChange = {
-                authUser = it
-                newAuthUser = authUser
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.authentication_username)
-                    alertMessage.value = ctx.getString(R.string.authentication_username_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.authentication_username)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun AuthPass() {
-    val ctx = LocalContext.current
-    val showPassword = remember { mutableStateOf(false) }
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var authPass by remember { mutableStateOf(oldAuthPass) }
-        OutlinedTextField(
-            value = authPass,
-            placeholder = { Text(stringResource(R.string.authentication_password)) },
-            onValueChange = {
-                authPass = it
-                newAuthPass = authPass
-            },
-            singleLine = true,
-            visualTransformation = if (showPassword.value)
-                VisualTransformation.None
-            else
-                PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = {
-                    showPassword.value = !showPassword.value
-                }) {
-                    Icon(
-                        if (showPassword.value)
-                            ImageVector.vectorResource(R.drawable.visibility)
-                        else
-                            ImageVector.vectorResource(R.drawable.visibility_off),
-                        contentDescription = "Visibility",
-                        tint = LocalCustomColors.current.itemText
-
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.authentication_password)
-                    alertMessage.value = ctx.getString(R.string.authentication_password_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.authentication_password)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun AskPassword(ctx: Context, navController: NavController, ua: UserAgent) {
-    CustomElements.PasswordDialog(
-        ctx = ctx,
-        showPasswordDialog = showPasswordDialog,
-        password = password,
-        keyboardController = keyboardController,
-        title = stringResource(R.string.authentication_password),
-        okAction = {
-            if (password.value != "") {
-                BaresipService.aorPasswords[ua.account.aor] = password.value
-                Api.account_set_auth_pass(ua.account.accp, password.value)
-                password.value = ""
-                ua.reRegister()
-                navController.popBackStack()
-            }
-        },
-        cancelAction = {
-            ua.reRegister()
-            navController.popBackStack()
-        }
-    )
-}
-
-@Composable
-private fun Outbound() {
-    val ctx = LocalContext.current
-    Text(text = stringResource(R.string.outbound_proxies),
-        color = LocalCustomColors.current.itemText,
-        fontSize = 18.sp,
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .clickable {
-                alertTitle.value = ctx.getString(R.string.outbound_proxies)
-                alertMessage.value = ctx.getString(R.string.outbound_proxies_help)
-                showAlert.value = true
-            }
-    )
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var outbound1 by remember { mutableStateOf(oldOutbound1) }
-        OutlinedTextField(
-            value = outbound1.value,
-            placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
-            onValueChange = {
-                outbound1.value = it
-                newOutbound1 = outbound1.value
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.sip_uri_of_proxy_server)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var outbound2 by remember { mutableStateOf(oldOutbound2) }
-        OutlinedTextField(
-            value = outbound2.value,
-            placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
-            onValueChange = {
-                outbound2.value = it
-                newOutbound2 = outbound2.value
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.sip_uri_of_another_proxy_server)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun Register() {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(text = stringResource(R.string.register),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.register)
-                    alertMessage.value = ctx.getString(R.string.register_help)
-                    showAlert.value = true
-                },
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText)
-        var register by remember { mutableStateOf(oldRegister) }
-        Switch(
-            checked = register,
-            onCheckedChange = {
-                register = it
-                newRegister = register
-            }
-        )
-    }
-}
-
-@Composable
-private fun RegInt() {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        var regInt by remember { mutableStateOf(oldRegInt) }
-        OutlinedTextField(
-            value = regInt,
-            placeholder = { Text(stringResource(R.string.reg_int)) },
-            onValueChange = {
-                regInt = it
-                newRegInt = regInt
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.reg_int)
-                    alertMessage.value = ctx.getString(R.string.reg_int_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.reg_int)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-    }
-}
-
-@Composable
-private fun AudioCodecs(navController: NavController, aor: String) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = stringResource(R.string.audio_codecs),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    val route = "codecs/$aor/audio"
-                    navController.navigate(route)
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp,
-            fontWeight = FontWeight. Bold
-        )
-    }
-}
-
-@Composable
-private fun MediaEnc() {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(text = stringResource(R.string.media_encryption),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.media_encryption)
-                    alertMessage.value = ctx.getString(R.string.media_encryption_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember { mutableStateOf(false) }
-        val mediaEnc = remember { mutableStateOf(oldMediaEnc) }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = mediaEncMap[mediaEnc.value]!!,
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                var index = 0
-                mediaEncMap.forEach {
-                    DropdownMenuItem(text = {
-                        Text(text = it.value,
-                            color = LocalCustomColors.current.itemText)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            mediaEnc.value = it.key
-                            newMediaEnc = mediaEnc.value
-                        })
-                    if (index < 4)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                    index++
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MediaNat(currentMediaNat: String, onMediaNatSelected: (String) -> Unit) {
-    val ctx = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(text = stringResource(R.string.media_nat),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.media_nat)
-                    alertMessage.value = ctx.getString(R.string.media_nat_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember { mutableStateOf(false) }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = mediaNatMap[currentMediaNat]!!,
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                var index = 0
-                mediaNatMap.forEach {
-                    DropdownMenuItem(text = {
-                        Text(text = it.value)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            onMediaNatSelected(it.key)
-                            newMediaNat = it.key
-                        })
-                    if (index < 3)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                    index++
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StunServer() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var stunServer by remember { mutableStateOf(oldStunServer) }
-        OutlinedTextField(
-            value = stunServer,
-            placeholder = { Text(stringResource(R.string.stun_server)) },
-            onValueChange = {
-                stunServer = it
-                newStunServer = stunServer
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.stun_server)
-                    alertMessage.value = ctx.getString(R.string.stun_server_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.stun_server)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun StunUser() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var stunUser by remember { mutableStateOf(oldStunUser) }
-        OutlinedTextField(
-            value = stunUser,
-            placeholder = { Text(stringResource(R.string.stun_username)) },
-            onValueChange = {
-                stunUser = it
-                newStunUser = stunUser
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.stun_username)
-                    alertMessage.value = ctx.getString(R.string.stun_username_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.stun_username)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun StunPass() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        val showPassword = remember { mutableStateOf(false) }
-        var stunPass by remember { mutableStateOf(oldStunPass) }
-        OutlinedTextField(
-            value = stunPass,
-            placeholder = { Text(stringResource(R.string.stun_password)) },
-            onValueChange = {
-                stunPass = it
-                newStunPass = stunPass
-            },
-            singleLine = true,
-            visualTransformation = if (showPassword.value)
-                VisualTransformation.None
-            else
-                PasswordVisualTransformation(),
-            trailingIcon = {
-                val (icon, iconColor) = if (showPassword.value) {
-                    Pair(
-                        ImageVector.vectorResource(R.drawable.visibility),
-                        colorResource(id = R.color.colorAccent)
-                    )
-                } else {
-                    Pair(
-                        ImageVector.vectorResource(R.drawable.visibility_off),
-                        colorResource(id = R.color.colorWhite)
-                    )
-                }
-                IconButton(onClick = { showPassword.value = !showPassword.value }) {
-                    Icon(
-                        icon,
-                        contentDescription = "Visibility",
-                        tint = iconColor
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.stun_password)
-                    alertMessage.value = ctx.getString(R.string.stun_password_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText
-            ),
-            label = { LabelText(stringResource(R.string.stun_password)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun RtcpMux() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.rtcp_mux),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.rtcp_mux)
-                    alertMessage.value = ctx.getString(R.string.rtcp_mux_help)
-                    showAlert.value = true
-                },
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText)
-        var rtcpMux by remember { mutableStateOf(oldRtcpMux) }
-        Switch(
-            checked = rtcpMux,
-            onCheckedChange = {
-                rtcpMux = it
-                newRtcpMux = rtcpMux
-            }
-        )
-    }
-}
-
-@Composable
-private fun Rel100() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.rel_100),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.rel_100)
-                    alertMessage.value = ctx.getString(R.string.rel_100_help)
-                    showAlert.value = true
-                },
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText)
-        var rel100 by remember { mutableStateOf(old100Rel) }
-        Switch(
-            checked = rel100,
-            onCheckedChange = {
-                rel100 = it
-                new100Rel = rel100
-            }
-        )
-    }
-}
-
-@Composable
-private fun Dtmf() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to ctx.getString(R.string.dtmf_inband),
-            Api.DTMFMODE_SIP_INFO to ctx.getString(R.string.dtmf_info),
-            Api.DTMFMODE_AUTO to ctx.getString(R.string.dtmf_auto))
-        Text(text = stringResource(R.string.dtmf_mode),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.dtmf_mode)
-                    alertMessage.value = ctx.getString(R.string.dtmf_mode_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val dtmfMode = remember { mutableIntStateOf(oldDtmfMode) }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = dtmfModeMap[dtmfMode.intValue]!!,
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                var index = 0
-                dtmfModeMap.forEach {
-                    DropdownMenuItem(text = {
-                        Text(text = it.value)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            dtmfMode.intValue = it.key
-                            newDtmfMode = dtmfMode.intValue
-                        })
-                    if (index < 2)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                    index++
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Answer() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to ctx.getString(R.string.manual),
-            Api.ANSWERMODE_AUTO to ctx.getString(R.string.auto))
-        Text(text = stringResource(R.string.answer_mode),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.answer_mode)
-                    alertMessage.value = ctx.getString(R.string.answer_mode_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val answerMode = remember { mutableIntStateOf(oldAnswerMode) }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = answerModeMap[answerMode.intValue]!!,
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                var index = 0
-                answerModeMap.forEach {
-                    DropdownMenuItem(text = { Text(text = it.value) },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            answerMode.intValue = it.key
-                            newAnswerMode = answerMode.intValue
-                        })
-                    if (index < 1)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                    index++
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Redirect() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        val redirectModeMap = mapOf(false to ctx.getString(R.string.manual),
-            true to ctx.getString(R.string.auto))
-        Text(text = stringResource(R.string.redirect_mode),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.redirect_mode)
-                    alertMessage.value = ctx.getString(R.string.redirect_mode_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val autoRedirect = remember { mutableStateOf(oldAutoRedirect) }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = redirectModeMap[autoRedirect.value]!!,
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                var index = 0
-                redirectModeMap.forEach {
-                    DropdownMenuItem(text = {
-                        Text(text = it.value)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            autoRedirect.value = it.key
-                            newAutoRedirect = autoRedirect.value
-                        })
-                    if (index < 1)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                    index++
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Voicemail() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var vmUri by remember { mutableStateOf(oldVmUri) }
-        OutlinedTextField(
-            value = vmUri,
-            placeholder = { Text(stringResource(R.string.voicemail_uri)) },
-            onValueChange = {
-                vmUri = it
-                newVmUri = vmUri
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.voicemail_uri)
-                    alertMessage.value = ctx.getString(R.string.voicemain_uri_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.voicemail_uri)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun CountryCode() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var countryCode by remember { mutableStateOf(oldCountryCode) }
-        OutlinedTextField(
-            value = countryCode,
-            placeholder = { Text(stringResource(R.string.country_code)) },
-            onValueChange = {
-                countryCode = it
-                newCountryCode = countryCode
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.country_code)
-                    alertMessage.value = ctx.getString(R.string.country_code_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.country_code)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun TelProvider() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var telProvider by remember { mutableStateOf(oldTelProvider) }
-        OutlinedTextField(
-            value = telProvider,
-            placeholder = { Text(stringResource(R.string.telephony_provider)) },
-            onValueChange = {
-                telProvider = it
-                newTelProvider = telProvider
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.telephony_provider)
-                    alertMessage.value = ctx.getString(R.string.telephony_provider_help)
-                    showAlert.value = true
-                },
-            textStyle = TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.telephony_provider)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun NumericKeypad(acc: Account) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.numeric_keypad),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.numeric_keypad)
-                    alertMessage.value = ctx.getString(R.string.numeric_keypad_help)
-                    showAlert.value = true
-                },
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText)
-        var numericKeypad by remember { mutableStateOf(acc.numericKeypad) }
-        Switch(
-            checked = numericKeypad,
-            onCheckedChange = {
-                numericKeypad = it
-                newNumericKeypad = numericKeypad
-            }
-        )
-    }
-}
-
-@Composable
-private fun DefaultAccount() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.default_account),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.default_account)
-                    alertMessage.value = ctx.getString(R.string.default_account_help)
-                    showAlert.value = true
-                },
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText)
-        var defaultAccount by remember { mutableStateOf(oldDefaultAccount) }
-        Switch(
-            checked = defaultAccount,
-            onCheckedChange = {
-                defaultAccount = it
-                newDefaultAccount = defaultAccount
-            }
-        )
     }
 }
 
@@ -1418,7 +1359,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     val acc = ua.account
 
     val nn = newNickname.trim()
-    if (nn != oldNickname) {
+    if (nn != acc.nickName.value) {
         if (Account.checkDisplayName(nn)) {
             if (nn == "" || Account.uniqueNickName(nn)) {
                 acc.nickName.value = nn
@@ -1458,7 +1399,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     }
 
     val au = newAuthUser.trim()
-    if (au != oldAuthUser) {
+    if (au != acc.authUser) {
         if (Account.checkAuthUser(au)) {
             if (Api.account_set_auth_user(acc.accp, au) == 0) {
                 acc.authUser = Api.account_auth_user(acc.accp)
@@ -1480,7 +1421,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
 
     val ap = newAuthPass.trim()
     if (ap != "") {
-        if (ap != oldAuthPass) {
+        if (ap != acc.authPass) {
             if (Account.checkAuthPass(ap)) {
                 if (Api.account_set_auth_pass(acc.accp, ap) == 0) {
                     acc.authPass = Api.account_auth_pass(acc.accp)
@@ -1575,28 +1516,28 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             Log.d(TAG, "New regint is ${acc.regint}")
             reRegister = true
         }
-    } else {
-        if (regInt != acc.configuredRegInt) {
+    }
+    else {
+        if (regInt != acc.configuredRegInt)
             acc.configuredRegInt = regInt
-        }
     }
 
     if (newMediaEnc != acc.mediaEnc) {
         if (Api.account_set_mediaenc(acc.accp, newMediaEnc) == 0) {
             acc.mediaEnc = Api.account_mediaenc(acc.accp)
             Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
-        } else {
-            Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
         }
+        else
+            Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
     }
 
     if (newMediaNat != acc.mediaNat) {
         if (Api.account_set_medianat(acc.accp, newMediaNat) == 0) {
             acc.mediaNat = Api.account_medianat(acc.accp)
             Log.d(TAG, "New medianat is ${acc.mediaNat}")
-        } else {
-            Log.e(TAG, "Setting of medianat $newMediaNat failed")
         }
+        else
+            Log.e(TAG, "Setting of medianat $newMediaNat failed")
     }
 
     newStunServer = newStunServer.trim()
