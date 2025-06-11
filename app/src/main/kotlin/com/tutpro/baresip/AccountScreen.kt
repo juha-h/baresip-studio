@@ -289,6 +289,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.account_nickname_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.nickname)) },
@@ -325,6 +326,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.display_name_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.display_name)) },
@@ -579,6 +581,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.reg_int_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.reg_int)) },
@@ -1155,6 +1158,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.voicemain_uri_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.voicemail_uri)) },
@@ -1189,6 +1193,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.country_code_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.country_code)) },
@@ -1223,6 +1228,7 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.telephony_provider_help)
                         showAlert.value = true
                     },
+                singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.telephony_provider)) },
