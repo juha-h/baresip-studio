@@ -229,13 +229,8 @@ private fun CallsContent(
 
 @Composable
 private fun Account(account: Account) {
-    val headerText = stringResource(R.string.account) + " " +
-            if (account.nickName.value != "")
-                account.nickName.value
-            else
-                account.aor.split(":")[1]
     Text(
-        text = headerText,
+        text = stringResource(R.string.account) + " " + account.text(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),

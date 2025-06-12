@@ -144,10 +144,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
             for (ua in BaresipService.uas.value) {
                 val account = ua.account
                 val aor = account.aor
-                val text = if (account.nickName.value != "")
-                    account.nickName.value
-                else
-                    account.aor.substringAfter(":")
+                val text = account.text()
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
