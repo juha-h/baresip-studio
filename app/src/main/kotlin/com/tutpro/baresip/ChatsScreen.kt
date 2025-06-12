@@ -167,13 +167,7 @@ private fun TopAppBar(
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
-        message = String.format(
-            stringResource(R.string.delete_chats_alert),
-            if (account.nickName.value != "")
-                account.nickName.value
-            else
-                account.aor.substringAfter(":")
-        ),
+        message = String.format(stringResource(R.string.delete_chats_alert), account.text()),
         positiveButtonText = stringResource(R.string.delete),
         onPositiveClicked = positiveAction.value,
         negativeButtonText = stringResource(R.string.cancel),
@@ -254,13 +248,8 @@ private fun ChatsContent(
 
 @Composable
 private fun Account(account: Account) {
-    val headerText = stringResource(R.string.account) + " " +
-            if (account.nickName.value != "")
-                account.nickName.value
-            else
-                account.aor.substringAfter(":")
     Text(
-        text = headerText,
+        text = stringResource(R.string.account) + " " + account.text(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 8.dp),

@@ -128,11 +128,6 @@ private fun AccountScreen(
             isConfigLoaded = true
     }
 
-    val title = if (acc.nickName.value != "")
-        acc.nickName.value
-    else
-        acc.aor.substringAfter(":")
-
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = LocalCustomColors.current.background,
@@ -148,7 +143,7 @@ private fun AccountScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = title,
+                            text = acc.text(),
                             color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
@@ -273,7 +268,7 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            var nickName by remember { mutableStateOf(acc.nickName.value) }
+            var nickName by remember { mutableStateOf(acc.nickName) }
             newNickname = nickName
             OutlinedTextField(
                 value = nickName,
@@ -1365,11 +1360,11 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     val acc = ua.account
 
     val nn = newNickname.trim()
-    if (nn != acc.nickName.value) {
+    if (nn != acc.nickName) {
         if (Account.checkDisplayName(nn)) {
             if (nn == "" || Account.uniqueNickName(nn)) {
-                acc.nickName.value = nn
-                Log.d(TAG, "New nickname is ${acc.nickName.value}")
+                acc.nickName = nn
+                Log.d(TAG, "New nickname is ${acc.nickName}")
             }
             else {
                 alertTitle.value = ctx.getString(R.string.notice)

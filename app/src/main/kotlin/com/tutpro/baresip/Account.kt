@@ -10,7 +10,7 @@ import java.net.URLDecoder
 
 class Account(val accp: Long) {
 
-    val nickName: MutableState<String> = mutableStateOf("")
+    var nickName = ""
     var displayName = Api.account_display_name(accp)
     val aor = Api.account_aor(accp)
     val luri = Api.account_luri(accp)
@@ -71,7 +71,7 @@ class Account(val accp: Long) {
 
         val extra = Api.account_extra(accp)
         if (Utils.paramExists(extra, "nickname"))
-            nickName.value = Utils.paramValue(extra, "nickname")
+            nickName = Utils.paramValue(extra, "nickname")
         if (Utils.paramExists(extra, "regint"))
             configuredRegInt = Utils.paramValue(extra, "regint").toInt()
         callHistory = Utils.paramValue(extra, "call_history") == ""
@@ -155,8 +155,8 @@ class Account(val accp: Long) {
 
         var extra = ""
 
-        if (nickName.value != "")
-            extra += ";nickname=${nickName.value}"
+        if (nickName != "")
+            extra += ";nickname=${nickName}"
 
         if (!callHistory)
             extra += ";call_history=no"
@@ -215,8 +215,8 @@ class Account(val accp: Long) {
     }
 
     fun text(): String {
-        return if (nickName.value != "")
-            nickName.value
+        return if (nickName != "")
+            nickName
         else
             aor.split(":")[1].substringBefore(";")
     }
@@ -286,7 +286,7 @@ class Account(val accp: Long) {
 
         fun uniqueNickName(nickName: String): Boolean {
             for (ua in BaresipService.uas.value)
-                if (ua.account.nickName.value == nickName)
+                if (ua.account.nickName == nickName)
                     return false
             return true
         }

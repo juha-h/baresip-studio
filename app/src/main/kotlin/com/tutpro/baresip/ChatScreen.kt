@@ -278,13 +278,8 @@ private fun ChatContent(
 
 @Composable
 private fun Account(ctx: Context, account: Account) {
-    val headerText = ctx.getString(R.string.account) + " " +
-            if (account.nickName.value != "")
-                account.nickName.value
-            else
-                account.aor.substringAfter(":")
     Text(
-        text = headerText,
+        text = ctx.getString(R.string.account) + " " + account.text(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 8.dp),
