@@ -88,12 +88,24 @@ private var restart = false
 private val showRestartDialog = mutableStateOf(false)
 private var save = false
 
+private var oldBatteryOptimizations = false
+private var oldDarkTheme = false
+private var oldDefaultDialer = false
+
 fun NavGraphBuilder.settingsScreenRoute(
     navController: NavController,
     onRestartApp: () -> Unit
 ) {
     composable("settings") {
         val ctx = LocalContext.current
+
+        oldDarkTheme = Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES
+
+        if (VERSION.SDK_INT >= 29) {
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+            oldDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+        }
+
         SettingsScreen(
             navController = navController,
             onBack = { navController.popBackStack() },
@@ -207,35 +219,34 @@ private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
 
-private var oldAutoStart = false
 private var newAutoStart = false
-private var oldListenAddr = ""
 private var newListenAddr = ""
-private var oldAddressFamily = ""
 private var newAddressFamily = ""
+
 private var oldDnsServers = ""
 private var newDnsServers = ""
-private var oldTlsCertificateFile = false
+
 private var newTlsCertificateFile = false
-private var oldVerifyServer = false
+
 private var newVerifyServer = false
-private var oldCaFile = false
+
 private var newCaFile = false
-private var oldUserAgent = ""
+
 private var newUserAgent = ""
-private var oldRingtoneUri = ""
-private var newRingtoneUri = ""
-private var oldBatteryOptimizations = false
-private var newBatteryOptimizations = false
-private var oldDefaultDialer = false
-private var newDefaultDialer = false
+
 private var oldContactsMode = ""
 private var newContactsMode = ""
-private var oldDarkTheme = false
+
+private var newRingtoneUri = ""
+
+private var newBatteryOptimizations = false
+
 private var newDarkTheme = false
-private var oldDebug = false
+
+private var newDefaultDialer = false
+
 private var newDebug = false
-private var oldSipTrace = false
+
 private var newSipTrace = false
 
 @Composable
@@ -268,63 +279,11 @@ private fun SettingsContent(
 
     val ctx = LocalContext.current
 
-    oldAutoStart = Config.variable("auto_start") == "yes"
-    if (oldAutoStart && !isAppearOnTopPermissionGranted(LocalContext.current)) {
+    if (Config.variable("auto_start") == "yes" &&
+            !isAppearOnTopPermissionGranted(LocalContext.current)) {
         Config.replaceVariable("auto_start", "no")
-        oldAutoStart = false
         save = true
     }
-    newAutoStart = oldAutoStart
-
-    oldListenAddr = Config.variable("sip_listen")
-
-    oldAddressFamily = Config.variable("net_af").lowercase()
-    newAddressFamily = oldAddressFamily
-
-    val dynamicDns = Config.variable("dyn_dns")
-    if (dynamicDns == "yes") {
-        oldDnsServers = ""
-    } else {
-        val servers = Config.variables("dns_server")
-        var serverList = ""
-        for (server in servers)
-            serverList += ", $server"
-        oldDnsServers = serverList.trimStart(',').trimStart(' ')
-    }
-
-    val certFile = File(BaresipService.filesPath + "/cert.pem")
-    oldTlsCertificateFile = certFile.exists()
-
-    oldVerifyServer = Config.variable("sip_verify_server") == "yes"
-    newVerifyServer = oldVerifyServer
-
-    val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
-    oldCaFile = caCertsFile.exists()
-
-    oldUserAgent = Config.variable("user_agent")
-    newUserAgent = oldUserAgent
-
-    val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
-    oldBatteryOptimizations = powerManager
-        .isIgnoringBatteryOptimizations(ctx.packageName) == false
-    newBatteryOptimizations = oldBatteryOptimizations
-
-    if (VERSION.SDK_INT >= 29) {
-        val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
-        oldDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-    }
-
-    oldContactsMode = Config.variable("contacts_mode").lowercase()
-    newContactsMode = oldContactsMode
-
-    oldDarkTheme = Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES
-    newDarkTheme = oldDarkTheme
-
-    oldDebug = Config.variable("log_level") == "0"
-    newDebug = oldDebug
-
-    oldSipTrace = BaresipService.sipTrace
-    newSipTrace = oldSipTrace
 
     val scrollState = rememberScrollState()
 
@@ -347,7 +306,7 @@ private fun SettingsContent(
         UserAgent()
         AudioSettings(navController)
         Contacts(activity)
-        Ringtone()
+        Ringtone(ctx)
         BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 29)
@@ -378,7 +337,8 @@ private fun StartAutomatically() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var startAutomatically by remember { mutableStateOf(oldAutoStart) }
+        var startAutomatically by remember { mutableStateOf(Config.variable("auto_start") == "yes") }
+        newAutoStart = startAutomatically
         Switch(
             checked = startAutomatically,
             onCheckedChange = {
@@ -419,7 +379,7 @@ private fun ListenAddress() {
         horizontalArrangement = Arrangement.Start,
     ) {
         val ctx = LocalContext.current
-        var listenAddr by remember { mutableStateOf(oldListenAddr) }
+        var listenAddr by remember { mutableStateOf(Config.variable("sip_listen")) }
         newListenAddr = listenAddr
         OutlinedTextField(
             value = listenAddr,
@@ -435,6 +395,7 @@ private fun ListenAddress() {
                     alertMessage.value = ctx.getString(R.string.listen_address_help)
                     showAlert.value = true
                 },
+            singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
                 fontSize = 18.sp, color = LocalCustomColors.current.itemText),
             label = { LabelText(stringResource(R.string.listen_address)) },
@@ -470,8 +431,9 @@ private fun AddressFamily() {
         val familyNames = listOf("--",  "IPv4", "IPv6")
         val familyValues = listOf("",  "ipv4", "ipv6")
         val itemPosition = remember {
-            mutableIntStateOf(familyValues.indexOf(oldAddressFamily))
+            mutableIntStateOf(familyValues.indexOf(Config.variable("net_af").lowercase()))
         }
+        newAddressFamily = familyValues[itemPosition.intValue]
         Box {
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -520,6 +482,15 @@ private fun DnsServers() {
         horizontalArrangement = Arrangement.Start
     ) {
         val ctx = LocalContext.current
+        oldDnsServers = if (Config.variable("dyn_dns") == "yes")
+            ""
+        else {
+            val servers = Config.variables("dns_server")
+            var serverList = ""
+            for (server in servers)
+                serverList += ", $server"
+            serverList.trimStart(',').trimStart(' ')
+        }
         var dnsServers by remember { mutableStateOf(oldDnsServers) }
         newDnsServers = dnsServers
         OutlinedTextField(
@@ -565,6 +536,7 @@ private fun TlsCertificateFile(activity: Activity) {
                     certFile.copyInputStreamToFile(inputStream)
                     inputStream.close()
                     Config.replaceVariable("sip_certificate", certPath)
+                    newTlsCertificateFile = true
                     save = true
                     restart = true
                 } catch (e: Error) {
@@ -601,7 +573,10 @@ private fun TlsCertificateFile(activity: Activity) {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var tlsCertificateFile by remember { mutableStateOf(oldTlsCertificateFile) }
+        var tlsCertificateFile by remember { mutableStateOf(
+            File(BaresipService.filesPath + "/cert.pem").exists()
+        ) }
+        newTlsCertificateFile = tlsCertificateFile
         Switch(
             checked = tlsCertificateFile,
             onCheckedChange = {
@@ -680,7 +655,8 @@ private fun VerifyServer() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var verifyServer by remember { mutableStateOf(oldVerifyServer) }
+        var verifyServer by remember { mutableStateOf(Config.variable("sip_verify_server") == "yes") }
+        newVerifyServer = verifyServer
         Switch(
             checked = verifyServer,
             onCheckedChange = {
@@ -741,7 +717,9 @@ private fun CaFile(activity: Activity) {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var caFile by remember { mutableStateOf(oldCaFile) }
+        var caFile by remember { mutableStateOf(
+            File(BaresipService.filesPath + "/ca_certs.crt").exists()
+        ) }
         Switch(
             checked = caFile,
             onCheckedChange = {
@@ -802,7 +780,7 @@ private fun UserAgent() {
         horizontalArrangement = Arrangement.Start
     ) {
         val ctx = LocalContext.current
-        var userAgent by remember { mutableStateOf(oldUserAgent) }
+        var userAgent by remember { mutableStateOf(Config.variable("user_agent")) }
         newUserAgent = userAgent
         OutlinedTextField(
             value = userAgent,
@@ -850,13 +828,11 @@ private fun AudioSettings(navController: NavController) {
 }
 
 @Composable
-private fun Ringtone() {
-    val ctx = LocalContext.current
-    oldRingtoneUri = if (Preferences(ctx).ringtoneUri == "")
+private fun Ringtone(ctx: Context) {
+    newRingtoneUri = if (Preferences(ctx).ringtoneUri == "")
         RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
     else
         Preferences(ctx).ringtoneUri!!
-    newRingtoneUri = oldRingtoneUri
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
@@ -932,7 +908,10 @@ private fun BatteryOptimizations() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
+        val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
+        oldBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(ctx.packageName) == false
         var battery by remember { mutableStateOf(oldBatteryOptimizations) }
+        newBatteryOptimizations = battery
         Switch(
             checked = battery,
             onCheckedChange = {
@@ -970,9 +949,11 @@ private fun Contacts(activity: Activity) {
         }
         val contactNames = listOf("baresip",  "Android", "Both")
         val contactValues = listOf("baresip",  "android", "both")
+        oldContactsMode = Config.variable("contacts_mode").lowercase()
         val itemPosition = remember {
             mutableIntStateOf(contactValues.indexOf(oldContactsMode))
         }
+        newContactsMode = contactValues[itemPosition.intValue]
         val requestPermissionsLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
         ) {}
@@ -1093,6 +1074,7 @@ private fun DarkTheme() {
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
         var darkTheme by remember { mutableStateOf(oldDarkTheme) }
+        newDarkTheme = darkTheme
         Switch(
             checked = darkTheme,
             onCheckedChange = {
@@ -1132,6 +1114,7 @@ private fun DefaultDialer() {
             newDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
         }
         var defaultDialer by remember { mutableStateOf(oldDefaultDialer) }
+        newDefaultDialer = defaultDialer
         Switch(
             checked = defaultDialer,
             onCheckedChange = {
@@ -1178,7 +1161,8 @@ private fun Debug() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var db by remember { mutableStateOf(oldDebug) }
+        var db by remember { mutableStateOf(Config.variable("log_level") == "0") }
+        newDebug = db
         Switch(
             checked = db,
             onCheckedChange = {
@@ -1209,7 +1193,8 @@ private fun SipTrace() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        var sipTrace by remember { mutableStateOf(oldSipTrace) }
+        var sipTrace by remember { mutableStateOf(BaresipService.sipTrace) }
+        newSipTrace = sipTrace
         Switch(
             checked = sipTrace,
             onCheckedChange = {
@@ -1264,7 +1249,7 @@ private fun Reset(onRestartApp: () -> Unit) {
 
 private fun checkOnClick(ctx: Context) {
 
-    if (oldAutoStart != newAutoStart) {
+    if ((Config.variable("auto_start") == "yes") != newAutoStart) {
         Config.replaceVariable(
             "auto_start",
             if (newAutoStart) "yes" else "no"
@@ -1273,7 +1258,7 @@ private fun checkOnClick(ctx: Context) {
     }
 
     val listenAddr = newListenAddr.trim()
-    if (listenAddr != oldListenAddr) {
+    if (listenAddr != Config.variable("sip_listen")) {
         if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_listen_address)}: $listenAddr"
@@ -1285,7 +1270,7 @@ private fun checkOnClick(ctx: Context) {
         restart = true
     }
 
-    if (oldAddressFamily != newAddressFamily) {
+    if (Config.variable("net_af").lowercase() != newAddressFamily) {
         Config.replaceVariable("net_af", newAddressFamily)
         save = true
         restart = true
@@ -1319,14 +1304,14 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    if (oldVerifyServer != newVerifyServer) {
+    if ((Config.variable("sip_verify_server") == "yes") != newVerifyServer) {
         Config.replaceVariable("sip_verify_server", if (newVerifyServer) "yes" else "no")
         Api.config_verify_server_set(newVerifyServer)
         save = true
     }
 
     newUserAgent = newUserAgent.trim()
-    if (newUserAgent != oldUserAgent) {
+    if (newUserAgent != Config.variable("user_agent")) {
         if ((newUserAgent != "") && !Utils.checkServerVal(newUserAgent)) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: $newUserAgent"
@@ -1341,11 +1326,9 @@ private fun checkOnClick(ctx: Context) {
         restart = true
     }
 
-    Log.d(TAG, "Old/new ringtone: $oldRingtoneUri / $newRingtoneUri")
-    if (newRingtoneUri != oldRingtoneUri) {
-        Preferences(ctx).ringtoneUri = newRingtoneUri
-        BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
-    }
+    Preferences(ctx).ringtoneUri = newRingtoneUri
+    BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
+
     if (oldContactsMode != newContactsMode) {
         Config.replaceVariable("contacts_mode", newContactsMode)
         BaresipService.contactsMode = newContactsMode
@@ -1385,7 +1368,7 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    if (oldDebug != newDebug) {
+    if ((Config.variable("log_level") == "0") != newDebug) {
         val logLevelString = if (newDebug) "0" else "2"
         Config.replaceVariable("log_level", logLevelString)
         Api.log_level_set(logLevelString.toInt())
@@ -1393,7 +1376,7 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    if (oldSipTrace != newSipTrace) {
+    if (BaresipService.sipTrace != newSipTrace) {
         BaresipService.sipTrace = newSipTrace
         Api.uag_enable_sip_trace(newSipTrace)
     }
