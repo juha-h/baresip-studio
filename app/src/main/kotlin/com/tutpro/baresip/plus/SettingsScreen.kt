@@ -99,6 +99,9 @@ fun NavGraphBuilder.settingsScreenRoute(
     composable("settings") {
         val ctx = LocalContext.current
 
+        val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
+        oldBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(ctx.packageName) == false
+
         oldDarkTheme = Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES
 
         if (VERSION.SDK_INT >= 29) {
@@ -1021,8 +1024,6 @@ private fun BatteryOptimizations() {
                 },
             color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
-        val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
-        oldBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(ctx.packageName) == false
         var battery by remember { mutableStateOf(oldBatteryOptimizations) }
         newBatteryOptimizations = battery
         Switch(
