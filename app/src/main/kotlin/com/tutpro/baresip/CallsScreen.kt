@@ -439,7 +439,10 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
         if (h.aor == aor) {
             val direction: Int = if (h.direction == "in") {
                 if (h.startTime != null) {
-                    R.drawable.call_down_green
+                    if (h.startTime != h.stopTime)
+                        R.drawable.call_down_green
+                    else
+                        R.drawable.call_down_blue
                 } else {
                     if (h.rejected)
                         R.drawable.call_down_red

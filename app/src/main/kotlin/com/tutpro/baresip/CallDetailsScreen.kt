@@ -203,7 +203,7 @@ private fun startTime(detail: Details): String {
         startTimeText = stopText
         durationText = "?"
     } else {
-        if (startTime == null) {
+        if (startTime == null  || detail.direction == R.drawable.call_down_blue) {
             startTimeText = stopText
             durationText = ""
         } else {

@@ -1017,7 +1017,7 @@ class BaresipService: Service() {
                             return
                     }
                     "call closed" -> {
-                        Log.d(TAG, "AoR $aor call $callp is closed")
+                        Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
                         if (call != null) {
                             nm.cancel(CALL_NOTIFICATION_ID)
                             stopRinging()
@@ -1055,10 +1055,11 @@ class BaresipService: Service() {
                                         !reason.startsWith("480") &&
                                         !reason.startsWith("Connection reset by")
                             val missed = call.dir == "in" && call.startTime == null && !call.rejected
+                            val completedElsewhere = missed && ev[2].startsWith("SIP;cause=200")
                             if (ua.account.callHistory) {
                                 val history = CallHistoryNew(aor, call.peerUri, call.dir)
-                                history.startTime = call.startTime
                                 history.stopTime = GregorianCalendar()
+                                history.startTime = if (completedElsewhere) history.stopTime else call.startTime
                                 history.rejected = call.rejected
                                 if (call.startTime != null && call.dumpfiles[0] != "")
                                     history.recording = call.dumpfiles

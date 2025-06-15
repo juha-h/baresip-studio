@@ -11,7 +11,8 @@ import java.util.GregorianCalendar
 
 class CallHistoryNew(val aor: String, val peerUri: String, val direction: String) : Serializable {
 
-    var startTime: GregorianCalendar? = null  // Set to time when call is established (if ever)
+    // Set to time when call is established (if ever) or stopTime if call was completed elsewhere
+    var startTime: GregorianCalendar? = null
     var stopTime = GregorianCalendar()        // Set to time when call is closed
     var rejected = false
     var recording = arrayOf("", "")           // Encoder and decoder recording files
