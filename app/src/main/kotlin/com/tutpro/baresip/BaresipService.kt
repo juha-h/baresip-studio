@@ -1055,7 +1055,8 @@ class BaresipService: Service() {
                                         !reason.startsWith("480") &&
                                         !reason.startsWith("Connection reset by")
                             val missed = call.dir == "in" && call.startTime == null && !call.rejected
-                            val completedElsewhere = missed && ev[2].startsWith("SIP;cause=200")
+                            val completedElsewhere = missed && ev[2].startsWith("SIP") &&
+                                    ev[2].contains(";cause=200")
                             if (ua.account.callHistory) {
                                 val history = CallHistoryNew(aor, call.peerUri, call.dir)
                                 history.stopTime = GregorianCalendar()
