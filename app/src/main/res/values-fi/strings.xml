@@ -287,6 +287,10 @@
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
+    <string name="call_answered">Puheluun vastattu</string>
+    <string name="call_answered_elsewhere">Puheluun vastattu muualla</string>
+    <string name="call_missed">Puheluun ei vastattu</string>
+    <string name="call_rejected">Puhelu hylätty</string>
     <!-- Chat Activity -->
     <string name="chat">Viestiketju</string>
     <string name="chat_with">Viestiketju %1$s</string>

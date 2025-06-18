@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.format.DateUtils
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -176,6 +177,21 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
                     painter = painterResource(detail.direction),
                     contentDescription = "Direction",
                     modifier = Modifier.width(64.dp)
+                        .clickable {
+                            Toast.makeText(ctx,
+                                when (detail.direction) {
+                                    R.drawable.call_down_green,
+                                    R.drawable.call_up_green-> ctx.getString(R.string.call_answered)
+                                    R.drawable.call_down_blue -> ctx.getString(R.string.call_answered_elsewhere)
+                                    R.drawable.call_missed_in,
+                                    R.drawable.call_missed_out -> ctx.getString(R.string.call_missed)
+                                    R.drawable.call_down_red,
+                                    R.drawable.call_up_red-> ctx.getString(R.string.call_rejected)
+                                    else -> ""
+                                },
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                 )
                 Spacer(modifier = Modifier.width(38.dp))
                 val durationText = startTime(detail)
@@ -203,7 +219,7 @@ private fun startTime(detail: Details): String {
         startTimeText = stopText
         durationText = "?"
     } else {
-        if (startTime == null) {
+        if (startTime == null  || detail.direction == R.drawable.call_down_blue) {
             startTimeText = stopText
             durationText = ""
         } else {
