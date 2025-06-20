@@ -1,9 +1,9 @@
 Tämä on <a href="https://github.com/baresip/baresip">baresip</a>-pohjainen SIP-käyttäjäagenttisovellus Androidille.
 
-Tällä hetkellä baresip-sovellus tukee äänipuheluita. tekstiviestejä, vastaajaviestin odotusilmoitus sekä sokeat ja osallistuneet puhelunsiirrot. Ääni voidaan koodata Opus-, AMR-, Codec2-, G.729-, G.722-, G.722.1-, G.726- tai PCMU/PCMA-koodekeilla. Turvallisuus saavutetaan TLS- tai WSS-SIP-signalointikuljetuksella ja ZRTP- tai (DTLS) SRTP-mediakapseloinnilla.
+Tällä hetkellä baresip-sovellus tukee äänipuheluita. tekstiviestejä, vastaajaviestin odotusilmoituksia sekä sokeita ja osallistuvia puhelunsiirtoja. Ääni voidaan koodata Opus, AMR, Codec2, G.729, G.722, G.722.1, G.726 tai PCMU/PCMA koodekeilla. Video voidaan koodata VP9, VP8, H.265, H.264, ja AV1 koodekeilla. Turvallisuus saavutetaan TLS tai WSS SIP-signalointikuljetuksella ja ZRTP tai (DTLS) SRTP mediakapsuloinnilla.
 
 Baresip-sovelluksen kehitystä motivoi tarve turvalliselle, avoimen lähdekoodin SIP-pohjaiselle VoIP-käyttäjäagentille Androidille, joka ei ole riippuvainen patentoiduista, kolmannen osapuolen työntö-ilmoituspalveluista.
 
-Jos tarvitset videopuheluita ja sinulla on Android-versio 7.0 tai uudempi laite, joka tukee Camera2 API:ta laitteistotukitasolla 3, voit tämän sovelluksen sijaan asentaa sen sisarsovelluksen baresip+.
+Tämä sovellus voidaan asentaa Android-laitteille, joiden Android-versio on 9 tai uudempi.  Videopuhelut vaativat, että Android-laite tukee tukee Camera2 API:a laitteistotukitasolla LEVEL3 tao FULL.
 
 Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHubissa</a>, jossa myös ongelmista voi ilmoittaa.
