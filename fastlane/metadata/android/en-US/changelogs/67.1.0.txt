@@ -1,0 +1,2 @@
+- In call history, use blue arrow down icon to indicate that call has been answered elsewhere
+- Added on-click help texts to call details arrow icons
