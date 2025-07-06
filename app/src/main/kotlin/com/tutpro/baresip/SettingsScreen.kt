@@ -1409,8 +1409,11 @@ private fun checkOnClick(ctx: Context) {
             if (newColorblind) "yes" else "no"
         )
         BaresipService.colorblind = newColorblind
+        UserAgent.updateColorblindStatus()
+        val baresipService = Intent(ctx, BaresipService::class.java)
+        baresipService.action = "Update Notification"
+        ctx.startService(baresipService)
         save = true
-        restart = true
     }
 
     if ((Config.variable("log_level") == "0") != newDebug) {

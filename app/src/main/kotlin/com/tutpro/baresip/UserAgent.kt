@@ -105,6 +105,28 @@ class UserAgent(val uap: Long) {
             }
         }
 
+        fun updateColorblindStatus() {
+            val updatedUas = uas.value.toMutableList()
+            for (ua in updatedUas)
+                ua.status =
+                    if (BaresipService.colorblind)
+                        when (ua.status) {
+                            R.drawable.circle_green -> R.drawable.circle_green_blind
+                            R.drawable.circle_yellow -> R.drawable.circle_yellow_blind
+                            R.drawable.circle_red -> R.drawable.circle_red_blind
+                            else -> R.drawable.circle_white
+                        }
+                    else
+                        when (ua.status) {
+                            R.drawable.circle_green_blind -> R.drawable.circle_green
+                            R.drawable.circle_yellow_blind -> R.drawable.circle_yellow
+                            R.drawable.circle_red_blind -> R.drawable.circle_red
+                            else -> R.drawable.circle_white
+                        }
+            uas.value = updatedUas.toList()
+            uasStatus.value = statusMap()
+        }
+
         fun statusMap(): Map<String, Int> {
             val result = emptyMap<String, Int>().toMutableMap()
             for (ua in uas.value)
