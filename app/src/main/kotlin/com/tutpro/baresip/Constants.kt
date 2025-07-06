@@ -2,7 +2,7 @@ package com.tutpro.baresip
 
 const val TAG = "Baresip"
 
-const val DEFAULT_CHANNEL_ID = "com.tutpro.baresip.default"
+const val LOW_CHANNEL_ID = "com.tutpro.baresip.low"
 const val MEDIUM_CHANNEL_ID = "com.tutpro.baresip.medium"
 const val HIGH_CHANNEL_ID = "com.tutpro.baresip.high"
 

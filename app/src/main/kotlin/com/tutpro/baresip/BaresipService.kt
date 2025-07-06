@@ -138,7 +138,7 @@ class BaresipService: Service() {
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
-        snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+        snb = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
 
         pm = getSystemService(POWER_SERVICE) as PowerManager
 
@@ -899,18 +899,18 @@ class BaresipService: Service() {
                             val caller = Utils.friendlyUri(this, peerUri, ua.account)
                             val person = Person.Builder().setName(caller).build()
                             nb.setSmallIcon(R.drawable.ic_stat_call)
-                                    .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
-                                    .setContentIntent(pi)
-                                    .setCategory(Notification.CATEGORY_CALL)
-                                    .setAutoCancel(false)
-                                    .setOngoing(true)
-                                    .setContentTitle(getString(R.string.incoming_call_from))
-                                    .setContentText(caller)
-                                    .setWhen(System.currentTimeMillis())
-                                    .setShowWhen(true)
-                                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                    .setFullScreenIntent(pi, true)
+                                .setColor(ContextCompat.getColor(this, R.color.colorBaresip))
+                                .setContentIntent(pi)
+                                .setCategory(Notification.CATEGORY_CALL)
+                                .setAutoCancel(false)
+                                .setOngoing(true)
+                                .setContentTitle(getString(R.string.incoming_call_from))
+                                .setContentText(caller)
+                                .setWhen(System.currentTimeMillis())
+                                .setShowWhen(true)
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setFullScreenIntent(pi, true)
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                                 .putExtra("action", "call answer")
                                 .putExtra("callp", callp)
@@ -1291,16 +1291,18 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
+        val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound or vibrate",
             NotificationManager.IMPORTANCE_LOW)
-        defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        nm.createNotificationChannel(defaultChannel)
-        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
+        lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        nm.createNotificationChannel(lowChannel)
+
+        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "Sound and vibrate",
             NotificationManager.IMPORTANCE_HIGH)
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(true)
         nm.createNotificationChannel(highChannel)
-        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Medium",
+
+        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound",
             NotificationManager.IMPORTANCE_HIGH)
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(false)
