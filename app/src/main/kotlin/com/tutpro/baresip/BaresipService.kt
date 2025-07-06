@@ -676,7 +676,7 @@ class BaresipService: Service() {
             ua.status = if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
-                R.drawable.circle_yellow
+                Utils.circleYellow()
             ua.add()
 
             val acc = ua.account
@@ -773,7 +773,7 @@ class BaresipService: Service() {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
                         updateStatusNotification()
-                        ua.uaUpdateStatus(R.drawable.circle_yellow)
+                        ua.uaUpdateStatus(Utils.circleYellow())
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
@@ -783,7 +783,7 @@ class BaresipService: Service() {
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
                             else
-                                R.drawable.circle_green)
+                                Utils.circleGreen())
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -793,7 +793,7 @@ class BaresipService: Service() {
                         ua.uaUpdateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
-                            R.drawable.circle_red)
+                            Utils.circleRed())
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -1725,6 +1725,7 @@ class BaresipService: Service() {
         var contactsMode = "baresip"
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
+        var colorblind = false
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null

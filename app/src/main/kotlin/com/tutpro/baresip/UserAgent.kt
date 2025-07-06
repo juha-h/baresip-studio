@@ -46,7 +46,7 @@ class UserAgent(val uap: Long) {
     }
 
     fun reRegister() {
-        this.status = R.drawable.circle_yellow
+        this.status = Utils.circleYellow()
         if (this.account.regint == 0)
             Api.ua_unregister(this.uap)
         else

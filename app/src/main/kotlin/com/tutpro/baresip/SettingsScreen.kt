@@ -246,6 +246,8 @@ private var newBatteryOptimizations = false
 
 private var newDarkTheme = false
 
+private var newColorblind = false
+
 private var newDefaultDialer = false
 
 private var newDebug = false
@@ -312,6 +314,7 @@ private fun SettingsContent(
         Ringtone(ctx)
         BatteryOptimizations()
         DarkTheme()
+        ColorBlind()
         if (VERSION.SDK_INT >= 29)
             DefaultDialer()
         Debug()
@@ -1085,6 +1088,37 @@ private fun DarkTheme() {
         )
     }
 }
+@Composable
+private fun ColorBlind() {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val ctx = LocalContext.current
+        Text(text = stringResource(R.string.colorblind),
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    alertTitle.value = ctx.getString(R.string.colorblind)
+                    alertMessage.value = ctx.getString(R.string.colorblind_help)
+                    showAlert.value = true
+                },
+            color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp)
+        var colorblind by remember { mutableStateOf(Config.variable("colorblind") == "yes") }
+        newColorblind = colorblind
+        Switch(
+            checked = colorblind,
+            onCheckedChange = {
+                colorblind = it
+                newColorblind = colorblind
+            }
+        )
+    }
+}
 
 @RequiresApi(29)
 @Composable
@@ -1367,6 +1401,16 @@ private fun checkOnClick(ctx: Context) {
         Config.replaceVariable("dark_theme",
             if (newDarkTheme) "yes" else "no")
         save = true
+    }
+
+    if ((Config.variable("colorblind") == "yes") != newColorblind) {
+        Config.replaceVariable(
+            "colorblind",
+            if (newColorblind) "yes" else "no"
+        )
+        BaresipService.colorblind = newColorblind
+        save = true
+        restart = true
     }
 
     if ((Config.variable("log_level") == "0") != newDebug) {
