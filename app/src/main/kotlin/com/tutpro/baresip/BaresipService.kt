@@ -873,19 +873,19 @@ class BaresipService: Service() {
                         Call(callp, ua, peerUri, "in", "incoming").add()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                        if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                            Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                            if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                                startRinging()
-                        } else {
+                        if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                             val newIntent = Intent(this, MainActivity::class.java)
-                            newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                            newIntent.flags =
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
                             newIntent.putExtra("action", "call answer")
                             newIntent.putExtra("callp", callp)
                             startActivity(newIntent)
                             return
                         }
+                        val channelId = if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID
+                        if (shouldStartRinging(channelId))
+                            startRinging()
                         if (!Utils.isVisible()) {
                             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
@@ -894,8 +894,7 @@ class BaresipService: Service() {
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                         Intent.FLAG_ACTIVITY_NEW_TASK
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
-                            val nb = NotificationCompat.Builder(this,
-                                if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
+                            val nb = NotificationCompat.Builder(this, channelId)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account)
                             val person = Person.Builder().setName(caller).build()
                             nb.setSmallIcon(R.drawable.ic_stat_call)
@@ -1293,6 +1292,7 @@ class BaresipService: Service() {
     private fun createNotificationChannels() {
         val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound or vibrate",
             NotificationManager.IMPORTANCE_LOW)
+        lowChannel.enableVibration(false)
         lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         nm.createNotificationChannel(lowChannel)
 
@@ -1304,8 +1304,8 @@ class BaresipService: Service() {
 
         val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound",
             NotificationManager.IMPORTANCE_HIGH)
-        highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        highChannel.enableVibration(false)
+        mediumChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        mediumChannel.enableVibration(false)
         nm.createNotificationChannel(mediumChannel)
     }
 
@@ -1397,21 +1397,29 @@ class BaresipService: Service() {
         }
     }
 
+
+    private fun shouldStartRinging(channelId: String): Boolean {
+        val currentFilter = nm.currentInterruptionFilter
+        val dndAllowsRinging = currentFilter == NotificationManager.INTERRUPTION_FILTER_ALL ||
+                currentFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        if (dndAllowsRinging)
+            return true
+        val channel = nm.getNotificationChannel(channelId)
+        return channel != null && channel.canBypassDnd()
+    }
+
     private fun shouldVibrate(): Boolean {
-        return if (am.ringerMode != RINGER_MODE_SILENT) {
-            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
+        return if (am.ringerMode != RINGER_MODE_SILENT)
+            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE)
                 true
-            } else {
-                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
+            else
+                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0)
                     @Suppress("DEPRECATION")
-                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
-                } else {
+                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
+                else
                     false
-                }
-            }
-        } else {
+        else
             false
-        }
     }
 
     private fun stopRinging() {
