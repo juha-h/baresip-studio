@@ -46,7 +46,7 @@ class UserAgent(val uap: Long) {
     }
 
     fun reRegister() {
-        this.status = R.drawable.circle_yellow
+        this.status = Utils.circleYellow()
         if (this.account.regint == 0)
             Api.ua_unregister(this.uap)
         else
@@ -103,6 +103,28 @@ class UserAgent(val uap: Long) {
                         Log.d(TAG, "Failed to register ${ua.account.aor}")
                 }
             }
+        }
+
+        fun updateColorblindStatus() {
+            val updatedUas = uas.value.toMutableList()
+            for (ua in updatedUas)
+                ua.status =
+                    if (BaresipService.colorblind)
+                        when (ua.status) {
+                            R.drawable.circle_green -> R.drawable.circle_green_blind
+                            R.drawable.circle_yellow -> R.drawable.circle_yellow_blind
+                            R.drawable.circle_red -> R.drawable.circle_red_blind
+                            else -> R.drawable.circle_white
+                        }
+                    else
+                        when (ua.status) {
+                            R.drawable.circle_green_blind -> R.drawable.circle_green
+                            R.drawable.circle_yellow_blind -> R.drawable.circle_yellow
+                            R.drawable.circle_red_blind -> R.drawable.circle_red
+                            else -> R.drawable.circle_white
+                        }
+            uas.value = updatedUas.toList()
+            uasStatus.value = statusMap()
         }
 
         fun statusMap(): Map<String, Int> {

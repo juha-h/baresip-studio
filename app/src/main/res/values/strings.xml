@@ -387,6 +387,8 @@
     <string name="tone_country_help">Country of call ringing, waiting, and callee busy tones</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="dark_theme_help">Force dark display theme</string>
+    <string name="colorblind">Colorblind</string>
+    <string name="colorblind_help">Use colorblind friendly registration status icons</string>
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height)</string>
     <string name="video_fps">Video Frames Per Second</string>
