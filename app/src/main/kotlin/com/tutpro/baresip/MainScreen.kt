@@ -20,7 +20,6 @@ import android.widget.Chronometer
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -240,7 +239,6 @@ private fun MainScreen(
         }
     }
 
-    @RequiresApi(29)
     fun launchBackupRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
@@ -284,7 +282,6 @@ private fun MainScreen(
         }
     }
     
-    @RequiresApi(29)
     fun launchRestoreRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
@@ -1308,7 +1305,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 onClick = {
                     showSuggestions.value = false
                     abandonAudioFocus(ctx)
-                    var ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    val ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
                     val call = ua.currentCall()
                     if (call != null) {
                         val callp = call.callp
@@ -2418,7 +2415,7 @@ fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
     Log.d(TAG, "Action $action to $uri")
     if (uri != null) {
         var uriStr: String
-        var uap = 0L
+        var uap: Long
         when (uri.scheme) {
             "sip" -> {
                 uriStr = Utils.uriUnescape(uri.toString())

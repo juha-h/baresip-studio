@@ -712,9 +712,9 @@ class BaresipService: Service() {
                 if (aecAvailable) {
                     aec = AcousticEchoCanceler.create(recorderSessionId)
                     if (aec != null) {
-                        if (!aec!!.getEnabled()) {
-                            aec!!.setEnabled(true)
-                            if (aec!!.getEnabled())
+                        if (!aec!!.enabled) {
+                            aec!!.enabled = true
+                            if (aec!!.enabled)
                                 Log.d(TAG, "AEC is enabled")
                             else
                                 Log.w(TAG, "Failed to enable AEC")
@@ -727,9 +727,9 @@ class BaresipService: Service() {
                 if (agcAvailable) {
                     agc = AutomaticGainControl.create(recorderSessionId)
                     if (agc != null) {
-                        if (!agc!!.getEnabled()) {
-                            agc!!.setEnabled(true)
-                            if (agc!!.getEnabled())
+                        if (!agc!!.enabled) {
+                            agc!!.enabled = true
+                            if (agc!!.enabled)
                                 Log.d(TAG, "AGC is enabled")
                         }
                     } else
@@ -738,9 +738,9 @@ class BaresipService: Service() {
                 if (nsAvailable) {
                     ns = NoiseSuppressor.create(recorderSessionId)
                     if (ns != null) {
-                        if (!ns!!.getEnabled()) {
-                            ns!!.setEnabled(true)
-                            if (ns!!.getEnabled())
+                        if (!ns!!.enabled) {
+                            ns!!.enabled = true
+                            if (ns!!.enabled)
                                 Log.d(TAG, "NS is enabled")
                         }
                     } else
