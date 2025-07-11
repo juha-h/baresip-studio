@@ -676,7 +676,7 @@ class BaresipService: Service() {
             ua.status = if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
-                Utils.circleYellow()
+                circleYellow.getValue(colorblind)
             ua.add()
 
             val acc = ua.account
@@ -773,7 +773,7 @@ class BaresipService: Service() {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
                         updateStatusNotification()
-                        ua.uaUpdateStatus(Utils.circleYellow())
+                        ua.uaUpdateStatus(circleYellow.getValue(colorblind))
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
@@ -783,7 +783,8 @@ class BaresipService: Service() {
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
                             else
-                                Utils.circleGreen())
+                                circleGreen.getValue(colorblind)
+                        )
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -793,7 +794,8 @@ class BaresipService: Service() {
                         ua.uaUpdateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
-                            Utils.circleRed())
+                            circleRed.getValue(colorblind)
+                        )
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -1733,7 +1735,6 @@ class BaresipService: Service() {
         var contactsMode = "baresip"
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
-        var colorblind = false
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null
@@ -1741,6 +1742,14 @@ class BaresipService: Service() {
         private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
         var rt: Ringtone? = null
+
+        var colorblind = false
+        val circleGreen = mapOf(true to R.drawable.circle_green_blind,
+            false to R.drawable.circle_green)
+        val circleYellow = mapOf(true to R.drawable.circle_yellow_blind,
+            false to R.drawable.circle_yellow)
+        val circleRed = mapOf(true to R.drawable.circle_red_blind,
+            false to R.drawable.circle_red)
 
         private var agc: AutomaticGainControl? = null
         private val nsAvailable = NoiseSuppressor.isAvailable()

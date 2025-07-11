@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import com.tutpro.baresip.BaresipService.Companion.circleYellow
+import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
 
@@ -46,7 +48,7 @@ class UserAgent(val uap: Long) {
     }
 
     fun reRegister() {
-        this.status = Utils.circleYellow()
+        this.status = circleYellow.getValue(colorblind)
         if (this.account.regint == 0)
             Api.ua_unregister(this.uap)
         else
@@ -109,7 +111,7 @@ class UserAgent(val uap: Long) {
             val updatedUas = uas.value.toMutableList()
             for (ua in updatedUas)
                 ua.status =
-                    if (BaresipService.colorblind)
+                    if (colorblind)
                         when (ua.status) {
                             R.drawable.circle_green -> R.drawable.circle_green_blind
                             R.drawable.circle_yellow -> R.drawable.circle_yellow_blind

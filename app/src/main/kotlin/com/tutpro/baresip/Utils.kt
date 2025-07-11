@@ -996,27 +996,6 @@ object Utils {
 
     }
 
-    fun circleGreen(): Int {
-        return if (BaresipService.colorblind)
-            R.drawable.circle_green_blind
-        else
-            R.drawable.circle_green
-    }
-
-    fun circleYellow(): Int {
-        return if (BaresipService.colorblind)
-            R.drawable.circle_yellow_blind
-        else
-            R.drawable.circle_yellow
-    }
-
-    fun circleRed(): Int {
-        return if (BaresipService.colorblind)
-            R.drawable.circle_red_blind
-        else
-            R.drawable.circle_red
-    }
-
     /*fun listFilesInDirectory(directoryPath: String): List<File> {
         val directory = File(directoryPath)
         if (!directory.exists()) {
