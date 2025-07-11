@@ -416,6 +416,8 @@
     <string name="tone_country_help">Soitto-, odotus- ja varattuäänien maa</string>
     <string name="dark_theme">Tumma teema</string>
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
+    <string name="colorblind">Värisokea</string>
+    <string name="colorblind_help">Käytä värisokealle ystävällisiä rekisteröintitilaikoineita</string>
     <string name="video_size">Videon kehyskoko</string>
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus)</string>
     <string name="video_fps">Videokehysten lähetystaajuus</string>

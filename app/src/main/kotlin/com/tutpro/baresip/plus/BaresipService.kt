@@ -143,7 +143,7 @@ class BaresipService: Service() {
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannels()
-        snb = NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+        snb = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
 
         pm = getSystemService(POWER_SERVICE) as PowerManager
 
@@ -683,7 +683,7 @@ class BaresipService: Service() {
             ua.status = if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
-                R.drawable.circle_yellow
+                circleYellow.getValue(colorblind)
             ua.add()
 
             val acc = ua.account
@@ -800,7 +800,7 @@ class BaresipService: Service() {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
                         updateStatusNotification()
-                        ua.uaUpdateStatus(R.drawable.circle_yellow)
+                        ua.uaUpdateStatus(circleYellow.getValue(colorblind))
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
@@ -810,7 +810,8 @@ class BaresipService: Service() {
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
                             else
-                                R.drawable.circle_green)
+                                circleGreen.getValue(colorblind)
+                        )
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -820,7 +821,8 @@ class BaresipService: Service() {
                         ua.uaUpdateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
-                            R.drawable.circle_red)
+                            circleRed.getValue(colorblind)
+                        )
                         updateStatusNotification()
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
@@ -900,19 +902,19 @@ class BaresipService: Service() {
                         Call(callp, ua, peerUri, "in", "incoming").add()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                        if (ua.account.answerMode == Api.ANSWERMODE_MANUAL) {
-                            Log.d(TAG, "CurrentInterruptionFilter ${nm.currentInterruptionFilter}")
-                            if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-                                startRinging()
-                        } else {
+                        if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                             val newIntent = Intent(this, MainActivity::class.java)
-                            newIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                            newIntent.flags =
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
                             newIntent.putExtra("action", "call answer")
                             newIntent.putExtra("callp", callp)
                             startActivity(newIntent)
                             return
                         }
+                        val channelId = if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID
+                        if (shouldStartRinging(channelId))
+                            startRinging()
                         if (!Utils.isVisible()) {
                             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
@@ -921,8 +923,7 @@ class BaresipService: Service() {
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                                     Intent.FLAG_ACTIVITY_NEW_TASK
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
-                            val nb = NotificationCompat.Builder(this,
-                                if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID)
+                            val nb = NotificationCompat.Builder(this, channelId)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account)
                             val person = Person.Builder().setName(caller).build()
                             nb.setSmallIcon(R.drawable.ic_stat_call)
@@ -1344,19 +1345,22 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        val defaultChannel = NotificationChannel(DEFAULT_CHANNEL_ID, "Default",
+        val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound or vibrate",
             NotificationManager.IMPORTANCE_LOW)
-        defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        nm.createNotificationChannel(defaultChannel)
-        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "High",
+        lowChannel.enableVibration(false)
+        lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        nm.createNotificationChannel(lowChannel)
+
+        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "Sound and vibrate",
             NotificationManager.IMPORTANCE_HIGH)
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(true)
         nm.createNotificationChannel(highChannel)
-        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Medium",
+
+        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound",
             NotificationManager.IMPORTANCE_HIGH)
-        highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        highChannel.enableVibration(false)
+        mediumChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        mediumChannel.enableVibration(false)
         nm.createNotificationChannel(mediumChannel)
     }
 
@@ -1450,21 +1454,29 @@ class BaresipService: Service() {
         }
     }
 
+
+    private fun shouldStartRinging(channelId: String): Boolean {
+        val currentFilter = nm.currentInterruptionFilter
+        val dndAllowsRinging = currentFilter == NotificationManager.INTERRUPTION_FILTER_ALL ||
+                currentFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        if (dndAllowsRinging)
+            return true
+        val channel = nm.getNotificationChannel(channelId)
+        return channel != null && channel.canBypassDnd()
+    }
+
     private fun shouldVibrate(): Boolean {
-        return if (am.ringerMode != RINGER_MODE_SILENT) {
-            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
+        return if (am.ringerMode != RINGER_MODE_SILENT)
+            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE)
                 true
-            } else {
-                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0) {
+            else
+                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0)
                     @Suppress("DEPRECATION")
-                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) == 1
-                } else {
+                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
+                else
                     false
-                }
-            }
-        } else {
+        else
             false
-        }
     }
 
     private fun stopRinging() {
@@ -1787,6 +1799,15 @@ class BaresipService: Service() {
         private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
         var rt: Ringtone? = null
+
+        var colorblind = false
+        val circleGreen = mapOf(true to R.drawable.circle_green_blind,
+            false to R.drawable.circle_green)
+        val circleYellow = mapOf(true to R.drawable.circle_yellow_blind,
+            false to R.drawable.circle_yellow)
+        val circleRed = mapOf(true to R.drawable.circle_red_blind,
+            false to R.drawable.circle_red)
+
         private var agc: AutomaticGainControl? = null
         private val nsAvailable = NoiseSuppressor.isAvailable()
         private var ns: NoiseSuppressor? = null

@@ -124,6 +124,13 @@ object Config {
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
+        val colorblind = previousVariable("colorblind")
+        config = if (colorblind != "")
+            "${config}colorblind $colorblind\n"
+        else
+            "${config}colorblind no\n"
+        BaresipService.colorblind = colorblind == "yes"
+
         var contactsMode = previousVariable("contacts_mode").lowercase()
         if (contactsMode != "") {
             if (contactsMode != "baresip" &&
