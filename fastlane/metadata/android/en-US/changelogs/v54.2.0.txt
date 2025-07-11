@@ -1,0 +1,2 @@
+- Added Colorblind setting that currently affects registration status icons
+- Improved names of notification channels
