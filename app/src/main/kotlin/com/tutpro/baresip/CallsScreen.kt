@@ -82,7 +82,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     val account = Account.ofAor(aor)!!
 
-    val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList<CallRow>()) }
+    val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
 
     var isHistoryLoaded by remember { mutableStateOf(false) }
     LaunchedEffect(aor) {
