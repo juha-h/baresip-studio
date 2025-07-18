@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.app.Service
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.IBinder
 
