@@ -470,7 +470,7 @@ private fun NewMessage(
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
 
-    var newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+    val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
     var textFieldLoaded by remember { mutableStateOf(false) }
