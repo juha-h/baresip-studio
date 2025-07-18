@@ -107,7 +107,7 @@ private fun ChatsScreen(navController: NavController, aor: String) {
     val ctx = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList<Message>()) }
+    val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList()) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
