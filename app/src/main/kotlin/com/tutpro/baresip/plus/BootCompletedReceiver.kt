@@ -15,7 +15,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
         val configPath = context.filesDir.absolutePath + "/config"
         val config = Utils.getFileContents(configPath) ?: return
         val asCv = Utils.getNameValue(String(config, StandardCharsets.ISO_8859_1), "auto_start")
-        if ((asCv.size > 0) && (asCv[0] == "yes")) {
+        if ((asCv.isNotEmpty()) && (asCv[0] == "yes")) {
             Log.i(TAG, "Start baresip+ upon boot completed")
             val i = Intent(context, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
