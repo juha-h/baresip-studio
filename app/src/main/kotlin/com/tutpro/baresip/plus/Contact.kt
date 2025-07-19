@@ -216,7 +216,7 @@ sealed class Contact {
             val contacts = String(content)
             var contactNo = 0
             val baseId = System.currentTimeMillis()
-            BaresipService.baresipContacts.value = mutableListOf<BaresipContact>()
+            BaresipService.baresipContacts.value = mutableListOf()
             contacts.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
@@ -256,7 +256,7 @@ sealed class Contact {
         }
 
         fun contactsUpdate() {
-            BaresipService.contacts = mutableListOf<Contact>()
+            BaresipService.contacts = mutableListOf()
             if (BaresipService.contactsMode != "android")
                 for (c in BaresipService.baresipContacts.value)
                     BaresipService.contacts.add(c.copy())
