@@ -951,7 +951,11 @@ private fun Contacts(activity: Activity) {
         val isDropDownExpanded = remember {
             mutableStateOf(false)
         }
-        val contactNames = listOf("baresip",  "Android", "Both")
+        val contactNames = listOf(
+            "baresip",
+            "Android",
+            ctx.getString(R.string.both)
+        )
         val contactValues = listOf("baresip",  "android", "both")
         oldContactsMode = Config.variable("contacts_mode").lowercase()
         val itemPosition = remember {
@@ -982,9 +986,8 @@ private fun Contacts(activity: Activity) {
                     isDropDownExpanded.value = false
                 }) {
                 contactNames.forEachIndexed { index, name ->
-                    DropdownMenuItem(text = {
-                        Text(text = name)
-                    },
+                    DropdownMenuItem(
+                        text = { Text(text = name) },
                         onClick = {
                             isDropDownExpanded.value = false
                             val mode = contactValues[index]
@@ -1004,11 +1007,15 @@ private fun Contacts(activity: Activity) {
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
                                         Log.d(TAG, "Contacts permissions already granted")
-                                    } else {
+                                    }
+                                    else {
                                         if (shouldShowRequestPermissionRationale(
-                                                activity, Manifest.permission.READ_CONTACTS) ||
+                                                activity, Manifest.permission.READ_CONTACTS
+                                            ) ||
                                             shouldShowRequestPermissionRationale(
-                                                activity, Manifest.permission.WRITE_CONTACTS))
+                                                activity, Manifest.permission.WRITE_CONTACTS
+                                            )
+                                        )
                                             showAlertDialog.value = true
                                         else
                                             requestPermissionsLauncher.launch(
