@@ -23,9 +23,11 @@
     <string name="your_name">Vaše jméno</string>
     <string name="about_text_plus"><![CDATA[
         <h1>SIP klient založený na knihovně Baresip s podporou video hovorů</h1> 
-        <p>Juha Heinanen <jh@tutpro.com></p>
-        <p>Verze %1$s</p>
-        <h2>Nápověda k používání</h2> 
+       <br>
+       <p>Juha Heinanen <jh@tutpro.com></p>
+       <p>Verze %1$s</p>
+       <br>
+       <h2>Nápověda k používání</h2> 
         <ul>
                  <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám 
                         (nápovědu získáte ťuknutím na názvy položek).</li>
@@ -33,7 +35,8 @@
                  <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace 
                         proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
                         nezačala).</li> 
-                 <li>Ťuknutí na tečku spustí konfiguraci účtu.</li> 
+                 <li>Ťuknutí na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>
+                 <li>Dlouhým dotykem na ikony na liště baresip (úplně nahoře v v záhlaví) se zobrazí informace o ikonách.</li>
                  <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
                  <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>
                  <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li> 
@@ -41,6 +44,7 @@
                  <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li>
                  <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> 
                  <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
+                 <li>Dlouhým dotykem na zvukový nebo video kodek lze kodek zapnout/vypnout.</li>
                  <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> pro více 
                         informací.</li>
          </ul> 
@@ -51,11 +55,13 @@
                 <li>Vlastní náhled volajícího se nezobrazuje správně, když je videoproud pouze v režimu odesílání (sendonly).</li>
         </ul>
         <h2>Zásady ochrany osobních údajů</h2>
-                Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt>zde</a>. 
+                <p>Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt>zde</a>.</p>
+        <br>
         <h2>Zdrojový kód</h2>
-                Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, 
-                kde lze také hlásit problémy.
-        <h2>Licence</h2>
+        <p>Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, 
+        kde lze také hlásit problémy.</p>
+        <br>
+       <h2>Licence</h2>
          <ul>
                 <li><b>BSD-3-Clause</b> kromě následujících:</li>
                 <li><b>Apache 2.0</b> kodeky AMR a zabezpečení TLS</li>
@@ -68,39 +74,44 @@
         ]]></string>
     <string name="about_text"><![CDATA[
         <h1>SIP klient založený na knihovně Baresip</h1>
+        <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Verze %1$s</p>
+        <br>
         <h2>Nápověda</h2>
         <ul>
-            <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám 
-                (nápovědu získáte ťuknutím na názvy položek).</li>
-            <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li>
-            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace 
-                proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
-                nezačala).</li>
-            <li>Ťuknutí na tečku spustí konfiguraci účtu.</li>
-            <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
-            <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>
-            <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li>
-            <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Číslo nebo adresa prázdné.</li>
-            <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li>
-            <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> 
-            <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
-            <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> 
-                pro více informací.</li>
+                 <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám 
+                      (nápovědu získáte ťuknutím na názvy položek).</li>
+                 <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li>
+                 <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace 
+                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
+                      nezačala).</li>
+                 <li>Ťuknutí na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>
+                 <li>Dlouhým dotykem na ikony na liště baresip (úplně nahoře v v záhlaví) se zobrazí informace o ikonách.</li>
+                 <li>Gesto přejetí prstem dolů zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
+                 <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>
+                 <li>Mezi účty se přepíná gestem přejetí vlevo/vpravo.</li>
+                 <li>Naposledy volaný kontakt lze znovu vybrat dotykem na ikonu hovoru, pokud je pole Číslo nebo adresa prázdné.</li>
+                 <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhými dotyky.</li>
+                 <li>Dlouhými dotyky lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> 
+                 <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
+                 <li>Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.</li>
+                 <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> pro více informací.</li>
         </ul>
         <h2>Zásady ochrany osobních údajů</h2>
-           Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt>zde</a>.
+                <p>Zásady ochrany osobních údajů jsou k dispozici <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt>zde</a>.</p>
+        <br>
         <h2>Zdrojový kód</h2>
-            Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>, 
-            kde lze také hlásit problémy.
+               <p>Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>,
+                kde lze také hlásit problémy.</p>
+        <br>
         <h2>Licence</h2>
         <ul>
-            <li><b>BSD-3-Clause</b> kromě následujících:</li>
-            <li><b>Apache 2.0</b> AMR codecs a TLS security</li>
-            <li><b>AGPLv4</b> šifrování médií ZRTP</li>
-            <li><b>GNU LGPL 2.1</b> kodeky G.722, G.726 a Codec2</li>
-            <li><b>GNU GPLv3</b> kodek G.729 </li>
+                 <li><b>BSD-3-Clause</b> kromě následujících:</li>
+                 <li><b>Apache 2.0</b> AMR codecs a TLS security</li>
+                 <li><b>AGPLv4</b> šifrování médií ZRTP</li>
+                 <li><b>GNU LGPL 2.1</b> kodeky G.722, G.726 a Codec2</li>
+                 <li><b>GNU GPLv3</b> kodek G.729 </li>
         </ul>
         ]]></string>
     <string name="account_nickname">Přezdívka účtu</string>
@@ -122,7 +133,7 @@
     <string name="register_help">Pokud je zatrženo, registrace je povolena a požadavky REGISTER jsou odesílány v intervalu určeném parametrem Interval registrace.</string>
     <string name="reg_int">Interval registrace</string>
     <string name="answer_mode_help">Vybírá způsob přijímání příchozích hovorů.</string>
-    <string name="media_nat">průchod médií skrze NAT</string>
+    <string name="media_nat">Průchod médií skrze NAT</string>
     <string name="invalid_stun_server">Neplatná URI serveru STUN/TURN \'%1$s\'</string>
     <string name="media_nat_help">Vybírá protokol pro průchod médií skrze NAT (pokud existuje). Možné volby jsou STUN (Session Traversal Utilities for NAT, RFC 5389) a ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server">Server STUN/TURN</string>
@@ -166,13 +177,13 @@
     <string name="chats">Historie chatu</string>
     <string name="today">Dnes</string>
     <string name="message_failed">Nepodařilo se</string>
-    <string name="audio_codecs_help">Seznam zvukových kodeků v prioritním pořadí. Přetažením změníte pořadí, přejetím doprava je povolíte nebo zakážete.</string>
+    <string name="audio_codecs_help">Seznam zvukových kodeků v prioritním pořadí. Přetažením změníte pořadí, dlouhým dotykem je povolíte nebo zakážete.</string>
     <string name="invalid_dns_servers">Neplatné servery DNS</string>
     <string name="invalid_chat_peer_uri">Neplatné URI účastníka chatu</string>
     <string name="delete_chats_alert">Chcete odstranit historii chatu účtu \'%1$s\'\?</string>
     <string name="audio_codecs">Zvukové kodeky</string>
     <string name="tls_certificate_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzi systému Android 9 se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
-    <string name="video_codecs_help">Seznam kodeků videa v prioritním pořadí. Přetažením změníte pořadí, přejetím doprava je povolíte nebo zakážete.</string>
+    <string name="video_codecs_help">Seznam kodeků videa v prioritním pořadí. Přetažením změníte pořadí, dlouhým dotykem je povolíte nebo zakážete.</string>
     <string name="invalid_listen_address">Neplatná naslouchací adresa</string>
     <string name="codec_action">Uspořádat</string>
     <string name="configuration">Nastavení</string>
@@ -181,7 +192,7 @@
     <string name="start_automatically">Spustit automaticky</string>
     <string name="start_automatically_help">Pokud je zaškrtnuto, baresip se spustí automaticky po (opětovném) spuštění zařízení.</string>
     <string name="battery_optimizations_help">Pokud chcete snížit pravděpodobnost, že systém Android omezí přístup zařízení baresip k síti nebo jej přepne do pohotovostního režimu, zakažte optimalizace baterie (doporučeno).</string>
-    <string name="listen_address_help">IP adresa a port ve tvaru \"address:port\", na kterém baresip naslouchá příchozím požadavkům SIP. Pokud je IP adresa IPv6, musí být zapsána v závorce []. IPv4 adresa 0.0.0.0 nebo IPv6 adresa [::] způsobí, že baresip bude naslouchat na všech dostupných adresách. Pokud zůstane prázdné (výchozí nastavení), bude baresip naslouchat na portu 5060 všech dostupných adres.</string>
+    <string name="listen_address_help">IP adresa a port ve tvaru \"address:port\", na kterém baresip naslouchá příchozím požadavkům SIP. Pokud je IP adresa IPv6, musí být zapsána v závorce []. IPv4 adresa 0.0.0.0 nebo IPv6 adresa [::] způsobí, že baresip bude naslouchat na všech dostupných adresách. Pokud zůstane prázdné (výchozí nastavení), bude baresip naslouchat na libovolném portu na všech dostupných adresách.</string>
     <string name="dns_servers">Servery DNS</string>
     <string name="dns_servers_help">Seznam adres serverů DNS oddělených čárkou. Pokud nejsou zadány, adresy serverů DNS jsou získávány dynamicky ze systému. Každá adresa DNS má tvar \'ip:port\' nebo \'ip\'. Pokud je port vynechán, je výchozí hodnota 53. Pokud je ip adresa IPv6 a je zadán i port, musí být ip zapsáno v závorkách []. Příklad: seznam \'8.8.8.8:53,[2001:4860:4860::8888]:53\' ukazuje na adresy IPv4 a IPv6 veřejných serverů Google DNS.</string>
     <string name="tls_ca_file">Soubor TLS CA</string>
@@ -215,14 +226,14 @@
     <string name="default_account_help">Pokud je zatrženo, je tento účet vybrán při spuštění baresipu.</string>
     <string name="telephony_provider_hint">Hostitelská část SIP URI</string>
     <string name="invalid_sip_uri_hostpart">Neplatná část hostitelského URI SIP \'%1$s\'</string>
-    <string name="new_account">Nový účet</string>
+    <string name="new_account">SIP URI nového účtu</string>
     <string name="accounts">Účty</string>
     <string name="account_exists">Účet \'%1$s\' již existuje.</string>
     <string name="decrypt_password">Dešifrovat heslo</string>
-    <string name="accounts_help">Při vytváření nového účtu lze volitelně zadat číslo portu účtu a přenosový protokol: &lt;uživatel&gt;@&lt;doména&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Pokud je zadán &lt;port&gt; a transportní protokol není zadán, je výchozí transportní protokol udp. Pokud není zadán &lt;port&gt; a je zadán transportní protokol, je výchozí hodnota &lt;port&gt; 5060 nebo 5061 (TLS). Pokud není zadán ani jeden z těchto parametrů a není zadán žádný odchozí proxy server, je registrátor účtu (pokud existuje) určen pouze na základě DNS informací o doméně.</string>
-    <string name="answer">Odpovědět</string>
+    <string name="accounts_help">SIP URI nového účtu v následující podobě: &lt;uživatel&gt;@&lt;doména&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Pokud je zadán &lt;port&gt; a transportní protokol není zadán, je výchozí transportní protokol UDP. Pokud není zadán &lt;port&gt; a je zadán transportní protokol, je výchozí hodnota &lt;port&gt; 5060 nebo 5061 (TLS). Pokud není zadán ani jeden z těchto parametrů a není zadán žádný odchozí proxy server, je registrátor účtu (pokud existuje) určen pouze na základě DNS informací o doméně.</string>
+    <string name="answer">Přijmout</string>
     <string name="reject">Odmítnout</string>
-    <string name="account_allocation_failure">Nepodařilo se přiřadit nový účet.</string>
+    <string name="account_allocation_failure">Nepodařilo se vytvořit nový účet.</string>
     <string name="delete_account">Chcete odstranit účet \'%1$s\'\?</string>
     <string name="incoming_call_from">Příchozí hovor od</string>
     <string name="missed_call_from">Zmeškaný hovor od</string>
@@ -341,7 +352,7 @@
     <string name="transfer_failed">Přepojení selhalo</string>
     <string name="dialpad">Číselník</string>
     <string name="call_closed">Volání ukončeno</string>
-    <string name="no_cameras">Nemáte žádné podporované kamery.</string>
+    <string name="no_cameras">Žádná podporovaná videokamera!</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info_not_available">Žádné dostupné informace</string>
     <string name="jitter">Zpoždění paketů (Jitter:) %1$s (ms)</string>
@@ -380,10 +391,10 @@
     <string name="no_backup">Zálohu nelze vytvořit bez oprávnění pro přístup k \"Úložišti\".</string>
     <string name="no_restore">Bez oprávnění pro přístup k \"Úložišti\" nelze zálohu obnovit.</string>
     <string name="audio_focus_denied">Zaměření zvuku zamítnuto!</string>
-    <string name="audio_and_video_permissions">baresip+ potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Kamera\" pro videohovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth a oprávnění \"Oznámení\" pro odesílání oznámení.</string>
+    <string name="audio_and_video_permissions">baresip+ potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Kamera\" pro videohovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth, oprávnění \"Oznámení\" pro odesílání oznámení a na Androidu 9 oprávnění „Úložiště“ pro operace zálohování a obnovení.</string>
     <string name="show_password">Zobrazit heslo</string>
     <string name="no_network">Bez připojení k síti!</string>
-    <string name="audio_permissions">baresip potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth a oprávnění \"Oznámení\" pro odesílání oznámení.</string>
+    <string name="audio_permissions">baresip potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth, oprávnění \"Oznámení\" pro odesílání oznámení a na Androidu 9 oprávnění „Úložiště“ pro operace zálohování a obnovení.</string>
     <string name="address_family_help">Vybírá, které IP adresy baresip používá. Pokud je vybráno IPv4 nebo IPv6, baresip používá pouze IPv4 nebo IPv6 adresy. Pokud není vybrána žádná z těchto možností, používá baresip jak IPv4, tak IPv6 adresy.</string>
     <string name="address_family">Rodina adres</string>
     <string name="invalid_audio_delay">Neplatná hodnota zpoždění zvuku \'%1$s\'. Platné hodnoty jsou od 100 do 3000 ms.</string>
@@ -419,4 +430,26 @@
     <string name="microphone_gain">Zesílení mikrofonu</string>
     <string name="microphone_gain_help">Vynásobte hlasitost mikrofonu tímto desetinným číslem. Minimální hodnota je 1,0 (výchozí hodnota), která vypne zesílení mikrofonu. Vyšší hodnoty mohou negativně ovlivnit kvalitu zvuku.</string>
     <string name="invalid_microphone_gain">Neplatná hodnota zesílení mikrofonu</string>
+    <string name="ringtone">Vyzvánění</string>
+    <string name="select_ringtone">Vybrat vyzvánění</string>
+    <string name="numeric_keypad">Numerická klávesnice</string>"
+    <string name="numeric_keypad_help">Pokud je zatrženo, zobrazí se při zaměření pole \"Zavolat na ...\" numerická klávesnice.</string>"
+    <string name="reply">Odpovědět</string>
+    <string name="save">Uložit</string>
+    <string name="playing_recording">Přehrávání nahrávky …</string>
+    <string name="call_answered">Hovor byl přijat</string>
+    <string name="call_answered_elsewhere">Hovor byl přijat jinde</string>
+    <string name="call_missed">Zmeškaný hovor</string>
+    <string name="call_rejected">Odmítnutý hovor</string>
+    <string name="no_read_permission">Aplikace nemá oprávnění k externímu úložišti</string>
+    <string name="colorblind">Barvoslepost</string>
+    <string name="colorblind_help">Používat ikony stavu registrace přizpůsobené barvosleposti</string>
+    <string name="favorite_help">Je-li zaškrtnuto, kontakt se zobrazí mezi oblíbenými v horní části seznamu kontaktů.</string>
+    <string name="no_aec">Hardwarové potlačení ozvěny není dostupné!</string>
+    <string name="call_recording_title">Nahrávání hovoru</string>
+    <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání</string>
+    <string name="microphone_title">Mikrofon</string>
+    <string name="microphone_tip">Při aktivaci během hovoru se mikrofon ztlumí.</string>
+    <string name="speakerphone_title">Reproduktor</string>
+    <string name="speakerphone_tip">Po aktivaci se zvuk přehrává přes reproduktor zařízení.</string>
 </resources>
