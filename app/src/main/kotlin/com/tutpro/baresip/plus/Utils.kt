@@ -584,22 +584,6 @@ object Utils {
             name
     }
 
-    fun saveBitmap(bitmap: Bitmap, file: File): Boolean {
-        if (file.exists()) file.delete()
-        try {
-            val out = FileOutputStream(file)
-            val scaledBitmap = bitmap.scale(96, 96)
-            scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-            Log.d(TAG, "Saved bitmap to ${file.absolutePath} of length ${file.length()}")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to save bitmap to ${file.absolutePath}: ${e.message}")
-            return false
-        }
-        return true
-    }
-
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
             private const val serialVersionUID: Long = -29238082928391L
@@ -807,11 +791,6 @@ object Utils {
         val rnd = Random()
         return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
                 rnd.nextInt(256))
-    }
-
-    fun addActivity(activity: String) {
-        if ((BaresipService.activities.isEmpty()) || (BaresipService.activities[0] != activity))
-            BaresipService.activities.add(0, activity)
     }
 
     fun supportedCameras(ctx: Context): Map<String, Int> {
