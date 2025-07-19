@@ -2986,7 +2986,7 @@ fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
     Log.d(TAG, "Action $action to $uri")
     if (uri != null) {
         var uriStr: String
-        var uap = 0L
+        var uap: Long
         when (uri.scheme) {
             "sip" -> {
                 uriStr = Utils.uriUnescape(uri.toString())
