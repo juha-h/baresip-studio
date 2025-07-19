@@ -2260,12 +2260,11 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 }
 
 private fun videoSecurityIcon(security: Int): Int {
-    return if (security == R.drawable.unlocked)
-        R.drawable.unlocked_video
-    else if (security == R.drawable.locked_video_yellow)
-        R.drawable.locked_video_yellow
-    else
-        R.drawable.locked_video_green
+    return when (security) {
+        R.drawable.unlocked -> R.drawable.unlocked_video
+        R.drawable.locked_video_yellow -> R.drawable.locked_video_yellow
+        else -> R.drawable.locked_video_green
+    }
 }
 
 private fun spinToAor(viewModel: ViewModel, aor: String) {
