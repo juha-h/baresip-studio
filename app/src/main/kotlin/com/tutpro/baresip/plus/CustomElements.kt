@@ -617,20 +617,4 @@ object CustomElements {
         }
     }
 
-    @Composable
-    fun EventListener(onEvent : (event: Lifecycle.Event) -> Unit) {
-        val eventHandler = rememberUpdatedState(newValue = onEvent)
-        val lifecycleOwner = rememberUpdatedState(newValue = LocalLifecycleOwner.current)
-        DisposableEffect(lifecycleOwner.value ){
-            val lifecycle = lifecycleOwner.value.lifecycle
-            val observer = LifecycleEventObserver{source, event ->
-                eventHandler.value(event)
-            }
-            lifecycle.addObserver(observer)
-            onDispose {
-                lifecycle.removeObserver(observer)
-            }
-        }
-    }
-
 }
