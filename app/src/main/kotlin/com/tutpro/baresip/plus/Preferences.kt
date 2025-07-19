@@ -13,9 +13,9 @@ class Preferences(context: Context) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     var displayTheme = preferences.getInt(DISPLAY_THEME, -1)
-        set(value) = preferences.edit() { putInt(DISPLAY_THEME, value) }
+        set(value) = preferences.edit { putInt(DISPLAY_THEME, value) }
 
     var ringtoneUri = preferences.getString("ringtone_uri", "")
-        set(value) = preferences.edit() { putString("ringtone_uri", value) }
+        set(value) = preferences.edit { putString("ringtone_uri", value) }
 
 }
