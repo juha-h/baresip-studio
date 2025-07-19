@@ -1390,7 +1390,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 onClick = {
                     showSuggestions.value = false
                     abandonAudioFocus(ctx)
-                    var ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    val ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
                     val call = ua.currentCall()
                     if (call != null) {
                         val callp = call.callp
