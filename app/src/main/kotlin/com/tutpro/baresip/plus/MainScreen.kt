@@ -409,7 +409,6 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
         }
     }
 
-    @RequiresApi(29)
     fun launchBackupRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
@@ -454,7 +453,6 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
         }
     }
 
-    @RequiresApi(29)
     fun launchRestoreRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
