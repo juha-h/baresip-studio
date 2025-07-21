@@ -131,6 +131,13 @@ object Config {
             "${config}colorblind no\n"
         BaresipService.colorblind = colorblind == "yes"
 
+        val proximitySensing = previousVariable("proximity_sensing")
+        config = if (proximitySensing != "")
+            "${config}proximity_sensing $proximitySensing\n"
+        else
+            "${config}proximity_sensing yes\n"
+        BaresipService.proximitySensing = proximitySensing != "no"
+
         var contactsMode = previousVariable("contacts_mode").lowercase()
         if (contactsMode != "") {
             if (contactsMode != "baresip" &&
