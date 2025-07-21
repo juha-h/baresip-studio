@@ -248,6 +248,8 @@ private var newDarkTheme = false
 
 private var newColorblind = false
 
+private var newProximitySensing = true
+
 private var newDefaultDialer = false
 
 private var newDebug = false
@@ -315,6 +317,7 @@ private fun SettingsContent(
         BatteryOptimizations()
         DarkTheme()
         ColorBlind()
+        ProximitySensing()
         if (VERSION.SDK_INT >= 29)
             DefaultDialer()
         Debug()
@@ -1095,6 +1098,7 @@ private fun DarkTheme() {
         )
     }
 }
+
 @Composable
 private fun ColorBlind() {
     Row(
@@ -1122,6 +1126,39 @@ private fun ColorBlind() {
             onCheckedChange = {
                 colorblind = it
                 newColorblind = colorblind
+            }
+        )
+    }
+}
+@Composable
+private fun ProximitySensing() {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val ctx = LocalContext.current
+        Text(text = stringResource(R.string.proximity_sensing),
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    alertTitle.value = ctx.getString(R.string.proximity_sensing)
+                    alertMessage.value = ctx.getString(R.string.proximity_sensing_help)
+                    showAlert.value = true
+                },
+            color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp)
+        var proximitySensing by remember {
+            mutableStateOf(Config.variable("proximity_sensing") == "yes")
+        }
+        newProximitySensing = proximitySensing
+        Switch(
+            checked = proximitySensing,
+            onCheckedChange = {
+                proximitySensing= it
+                newProximitySensing = proximitySensing
             }
         )
     }
@@ -1420,6 +1457,15 @@ private fun checkOnClick(ctx: Context) {
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
         ctx.startService(baresipService)
+        save = true
+    }
+
+    if ((Config.variable("proximity_sensing") == "yes") != newProximitySensing) {
+        Config.replaceVariable(
+            "proximity_sensing",
+            if (newProximitySensing) "yes" else "no"
+        )
+        BaresipService.proximitySensing = newProximitySensing
         save = true
     }
 

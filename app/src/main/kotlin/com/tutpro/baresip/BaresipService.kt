@@ -519,7 +519,7 @@ class BaresipService: Service() {
                 stopMediaPlayer()
                 am.mode = MODE_IN_COMMUNICATION
                 setCallVolume()
-                proximitySensing(true)
+                proximitySensing(proximitySensing)
                 Api.ua_answer(uap, callp, vidMode)
             }
 
@@ -818,7 +818,7 @@ class BaresipService: Service() {
                         setCallVolume()
                         if (speakerPhone && !Utils.isSpeakerPhoneOn(am))
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(this), am)
-                        proximitySensing(true)
+                        proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
                         playRingBack()
@@ -1715,6 +1715,7 @@ class BaresipService: Service() {
         var isMicMuted = false
         var isRecOn = false
         var toneCountry = "us"
+        var proximitySensing = true
 
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
