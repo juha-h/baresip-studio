@@ -131,7 +131,7 @@ object Config {
             "${config}proximity_sensing $proximitySensing\n"
         else
             "${config}proximity_sensing yes\n"
-        BaresipService.proximitySensing = proximitySensing == "yes"
+        BaresipService.proximitySensing = proximitySensing != "no"
 
         var contactsMode = previousVariable("contacts_mode").lowercase()
         if (contactsMode != "") {
