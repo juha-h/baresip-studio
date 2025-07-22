@@ -1,0 +1,4 @@
+- Targeting Android 16 API level 36
+- Added Proximity Sensing setting
+- Fixed Contacts setting Both value
+- New translations (Czech)
