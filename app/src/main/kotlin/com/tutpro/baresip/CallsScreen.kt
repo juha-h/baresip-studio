@@ -407,26 +407,23 @@ private fun Calls(
                         )
                     }
                 }
-                Box(modifier = Modifier.width(56.dp)) {
-                    Text(
-                        text = Utils.relativeTime(ctx, callRow.stopTime),
-                        fontSize = 12.sp,
-                        minLines = 2, maxLines = 2,
-                        lineHeight = 16.sp,
-                        textAlign = TextAlign.End,
-                        color = if (recordings)
-                            LocalCustomColors.current.accent
-                        else
-                            LocalCustomColors.current.itemText,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .width(64.dp)
-                            .clickable(onClick = {
-                                viewModel.selectCallRow(callRow)
-                                navController.navigate("call_details")
-                            })
-                    )
-                }
+                Text(
+                    text = Utils.relativeTime(ctx, callRow.stopTime),
+                    fontSize = 12.sp,
+                    minLines = 2, maxLines = 2,
+                    lineHeight = 16.sp,
+                    textAlign = TextAlign.End,
+                    color = if (recordings)
+                        LocalCustomColors.current.accent
+                    else
+                        LocalCustomColors.current.itemText,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .clickable(onClick = {
+                            viewModel.selectCallRow(callRow)
+                            navController.navigate("call_details")
+                        })
+                )
             }
         }
     }

@@ -61,6 +61,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.text.replaceFirstChar
 
 object Utils {
 
@@ -804,7 +805,8 @@ object Utils {
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
             ctx.getString(R.string.today) + "\n" + fmt.format(time.time)
         } else {
-            val month = time.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+            val month = time.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())!!
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
             val day = time.get(Calendar.DAY_OF_MONTH)
             val currentYear = Calendar.getInstance().get(Calendar.YEAR)
             if (time.get(Calendar.YEAR) == currentYear) {
