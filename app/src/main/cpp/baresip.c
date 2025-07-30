@@ -150,18 +150,18 @@ static void ua_exit_handler(void *arg)
     re_cancel();
 }
 
-static const char *ua_event_reg_str(enum ua_event ev)
+static const char *bevent_reg_str(enum bevent_ev ev)
 {
     switch (ev) {
-        case UA_EVENT_REGISTERING:
+        case BEVENT_REGISTERING:
             return "registering";
-        case UA_EVENT_REGISTER_OK:
-        case UA_EVENT_FALLBACK_OK:
+        case BEVENT_REGISTER_OK:
+        case BEVENT_FALLBACK_OK:
             return "registered";
-        case UA_EVENT_REGISTER_FAIL:
-        case UA_EVENT_FALLBACK_FAIL:
+        case BEVENT_REGISTER_FAIL:
+        case BEVENT_FALLBACK_FAIL:
             return "registering failed";
-        case UA_EVENT_UNREGISTERING:
+        case BEVENT_UNREGISTERING:
             return "unregistering";
         default:
             return "?";
@@ -183,7 +183,7 @@ static const char *translate_errorcode(uint16_t scode)
     }
 }
 
-static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
+static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
 {
     (void)arg;
     const char *prm  = bevent_get_text(event);
@@ -199,49 +199,49 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
     struct sdp_media *media;
     int remote_has_video;
 
-    LOGD("ua event (%s) %s\n", uag_event_str(ev), prm);
+    LOGD("ua event (%s) %s\n", bevent_str(ev), prm);
 
     switch (ev) {
-        case UA_EVENT_CREATE:
+        case BEVENT_CREATE:
             len = re_snprintf(event_buf, sizeof event_buf, "create", "");
             break;
-        case UA_EVENT_REGISTERING:
-        case UA_EVENT_UNREGISTERING:
-        case UA_EVENT_REGISTER_OK:
-        case UA_EVENT_FALLBACK_OK:
-            len = re_snprintf(event_buf, sizeof event_buf, "%s", ua_event_reg_str(ev));
+        case BEVENT_REGISTERING:
+        case BEVENT_UNREGISTERING:
+        case BEVENT_REGISTER_OK:
+        case BEVENT_FALLBACK_OK:
+            len = re_snprintf(event_buf, sizeof event_buf, "%s", bevent_reg_str(ev));
             break;
-        case UA_EVENT_REGISTER_FAIL:
-        case UA_EVENT_FALLBACK_FAIL:
+        case BEVENT_REGISTER_FAIL:
+        case BEVENT_FALLBACK_FAIL:
             len = re_snprintf(event_buf, sizeof event_buf, "registering failed,%s", prm);
             break;
-        case UA_EVENT_SIPSESS_CONN:
+        case BEVENT_SIPSESS_CONN:
             ua = uag_find_msg(msg);
             // There is no call yet and call is thus used to hold SIP message
             call = (struct call *)msg;
             len = re_snprintf(event_buf, sizeof event_buf, "%s,%r,%ld", prm, &msg->from.auri, (long)event);
             break;
-        case UA_EVENT_CALL_INCOMING:
+        case BEVENT_CALL_INCOMING:
             len = re_snprintf(event_buf, sizeof event_buf, "call incoming,%s", prm);
             break;
-        case UA_EVENT_CALL_OUTGOING:
+        case BEVENT_CALL_OUTGOING:
             len = re_snprintf(event_buf, sizeof event_buf, "call outgoing", "");
             break;
-        case UA_EVENT_CALL_ANSWERED:
+        case BEVENT_CALL_ANSWERED:
             len = re_snprintf(event_buf, sizeof event_buf, "call answered", "");
             break;
-        case UA_EVENT_CALL_REDIRECT:
+        case BEVENT_CALL_REDIRECT:
             if (sdp_media_ldir(stream_sdpmedia(video_strm(call_video(call)))) != SDP_INACTIVE)
                 len = re_snprintf(event_buf, sizeof event_buf, "video call redirect,%s", prm + 4);
             else
                 len = re_snprintf(event_buf, sizeof event_buf, "call redirect,%s", prm + 4);
             break;
-        case UA_EVENT_CALL_LOCAL_SDP:
+        case BEVENT_CALL_LOCAL_SDP:
             if (strcmp(prm, "offer") == 0)
                 return;
             len = re_snprintf(event_buf, sizeof event_buf, "call %sed", prm);
             break;
-        case UA_EVENT_CALL_REMOTE_SDP:
+        case BEVENT_CALL_REMOTE_SDP:
             media = stream_sdpmedia(video_strm(call_video(call)));
             remote_has_video = sdp_media_rport(media) != 0
                                && list_head(sdp_media_format_lst(media, false)) != NULL;
@@ -254,17 +254,17 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
             len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d,%d", prm,
                     call_has_video(call), remote_has_video, ldir, rdir, ardir);
             break;
-        case UA_EVENT_CALL_RINGING:
+        case BEVENT_CALL_RINGING:
             len = re_snprintf(event_buf, sizeof event_buf, "call ringing", "");
             break;
-        case UA_EVENT_CALL_PROGRESS:
+        case BEVENT_CALL_PROGRESS:
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
             len = re_snprintf(event_buf, sizeof event_buf, "call progress,%d", ardir);
             break;
-        case UA_EVENT_CALL_ESTABLISHED:
+        case BEVENT_CALL_ESTABLISHED:
             len = re_snprintf(event_buf, sizeof event_buf, "call established", "");
             break;
-        case UA_EVENT_CALL_MENC:
+        case BEVENT_CALL_MENC:
             if (prm[0] == '0')
                 len = re_snprintf(event_buf, sizeof event_buf, "call secure", "");
             else if (prm[0] == '1')
@@ -274,21 +274,21 @@ static void event_handler(enum ua_event ev, struct bevent *event, void *arg)
             else
                 len = re_snprintf(event_buf, sizeof event_buf, "unknown menc event", "");
             break;
-        case UA_EVENT_CALL_TRANSFER:
+        case BEVENT_CALL_TRANSFER:
             len = re_snprintf(event_buf, sizeof event_buf, "call transfer,%s", prm);
             break;
-        case UA_EVENT_CALL_TRANSFER_FAILED:
+        case BEVENT_CALL_TRANSFER_FAILED:
             call_hold(call, false);
             len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
             break;
-        case UA_EVENT_CALL_CLOSED:
+        case BEVENT_CALL_CLOSED:
             tone = call_scode(call) ? translate_errorcode(call_scode(call)) : "";
             len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s,%s", prm, tone);
             break;
-        case UA_EVENT_MWI_NOTIFY:
+        case BEVENT_MWI_NOTIFY:
             len = re_snprintf(event_buf, sizeof event_buf, "mwi notify,%s", prm);
             break;
-        case UA_EVENT_MODULE:
+        case BEVENT_MODULE:
             err = re_regex(prm, strlen(prm), "[^,]*,[^,]*,[~]*", &module, &module_event, &data);
             if (err)
                 return;
