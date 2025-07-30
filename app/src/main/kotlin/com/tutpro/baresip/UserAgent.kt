@@ -28,7 +28,7 @@ class UserAgent(val uap: Long) {
         uasStatus.value = statusMap()
     }
 
-    fun uaUpdateStatus(status: Int) {
+    fun updateStatus(status: Int) {
         uas.value.find { it.uap == this.uap }?.status = status
         uasStatus.value = statusMap()
     }

@@ -772,14 +772,14 @@ class BaresipService: Service() {
             if (uas.value[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
+                        ua.updateStatus(circleYellow.getValue(colorblind))
                         updateStatusNotification()
-                        ua.uaUpdateStatus(circleYellow.getValue(colorblind))
                         if (isMainVisible)
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
                     "registered" -> {
-                        ua.uaUpdateStatus(
+                        ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
                             else
@@ -791,7 +791,7 @@ class BaresipService: Service() {
                         return
                     }
                     "registering failed" -> {
-                        ua.uaUpdateStatus(if (Api.account_regint(ua.account.accp) == 0)
+                        ua.updateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
                             circleRed.getValue(colorblind)
