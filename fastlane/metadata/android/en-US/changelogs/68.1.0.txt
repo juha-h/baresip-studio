@@ -1,0 +1,3 @@
+- Improved display of call history time
+- Changed background color of colorblind status icons
+- Fixed update of status notification
