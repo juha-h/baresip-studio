@@ -1498,7 +1498,11 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             reRegister = true
     }
 
-    val regInt = newRegInt.trim().toInt()
+    val regInt = try {
+        newRegInt.trim().toInt()
+    } catch (_: NumberFormatException) {
+        0
+    }
     if (regInt < 60 || regInt > 3600) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_reg_int), "$regInt")
