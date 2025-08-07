@@ -145,7 +145,7 @@
     <string name="reg_int">Registration Interval</string>
     <string name="reg_int_help">Tells how often (in seconds) baresip sends REGISTER requests.
         Valid values are from 60 to 3600.</string>
-    <string name="invalid_reg_int">Invalid Registration Interval\'%1$s\'</string>
+    <string name="invalid_reg_int">Invalid Registration Interval \'%1$s\'</string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
