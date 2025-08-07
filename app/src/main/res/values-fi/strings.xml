@@ -418,7 +418,7 @@
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
     <string name="colorblind">Värisokea</string>
     <string name="colorblind_help">Käytä värisokealle ystävällisiä rekisteröintitilaikoineita</string>
-    <string name="proximity_sensing">Läheisyyden tunnistus</string>">
+    <string name="proximity_sensing">Läheisyyden tunnistus</string>
     <string name="proximity_sensing_help">Jos merkitty, läheisyyden tunnistus on aktiivinen
         puhelun aikana.</string>
     <string name="video_size">Videon kehyskoko</string>
