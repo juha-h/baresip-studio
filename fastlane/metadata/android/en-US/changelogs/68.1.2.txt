@@ -1,0 +1,4 @@
+- Improved display of call history time
+- Changed background color of colorblind status icons
+- Fixed possible crash related to Registration interval account setting
+- Fixed update of status notification
