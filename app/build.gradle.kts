@@ -12,7 +12,7 @@ android {
         minSdk = 28
         targetSdk = 36
         versionCode = 444
-        versionName = "68.1.0"
+        versionName = "68.1.1"
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
@@ -29,9 +29,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.7"
@@ -70,6 +67,10 @@ android {
         }
     }
     namespace = "com.tutpro.baresip"
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 composeCompiler {
