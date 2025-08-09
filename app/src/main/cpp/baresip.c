@@ -1366,7 +1366,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_call_1start_1audio(
     re_thread_enter();
     struct audio *a = call_audio((struct call *)call);
     if (!audio_started(a))
-        audio_start(a);
+        audio_update(a);
     re_thread_leave();
 }
 
