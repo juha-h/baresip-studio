@@ -372,7 +372,7 @@
     <string name="video_fps">Кадровая частота</string>
     <string name="numeric_keypad">Цифровая клавиатура</string>"
     <string name="user_agent">Юзер агент</string>
-    <string name="speaker_phone">Телефон с громкой связью</string>
+    <string name="speaker_phone">Громкоговоритель</string>
     <string name="speaker_phone_help">Если этот флажок установлен, громкоговоритель автоматически включается при начале вызова.</string>
     <string name="invalid_fps">Недопустимые кадры В секунду \'%1$d\'</string>
     <string name="invalid_user_agent">Недопустимое значение поля заголовка User-Agent</string>
