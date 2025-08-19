@@ -1402,8 +1402,7 @@ class BaresipService: Service() {
 
     private fun shouldStartRinging(channelId: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
-        val dndAllowsRinging = currentFilter == NotificationManager.INTERRUPTION_FILTER_ALL ||
-                currentFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        val dndAllowsRinging = currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL
         if (dndAllowsRinging)
             return true
         val channel = nm.getNotificationChannel(channelId)
