@@ -1454,11 +1454,9 @@ class BaresipService: Service() {
         }
     }
 
-
     private fun shouldStartRinging(channelId: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
-        val dndAllowsRinging = currentFilter == NotificationManager.INTERRUPTION_FILTER_ALL ||
-                currentFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        val dndAllowsRinging = currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL
         if (dndAllowsRinging)
             return true
         val channel = nm.getNotificationChannel(channelId)
@@ -1788,7 +1786,6 @@ class BaresipService: Service() {
         var callHistory = ArrayList<CallHistoryNew>()
         val registrationUpdate = MutableLiveData<Long>()
         var contactsMode = "baresip"
-        val activities = mutableListOf<String>()
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
         val serviceEvent = MutableLiveData<Event<Long>>()
