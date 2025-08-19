@@ -90,7 +90,7 @@
     <string name="you_have">Вы имеете</string>
     <string name="your_name">Ваше имя</string>
     <string name="about_title">О baresip</string>
-    <string name="audio_codecs_help">Список аудиокодеков в порядке приоритета. Перетащите для изменения порядка, смахните вправо для включения или отключения.</string>
+    <string name="audio_codecs_help">Список аудиокодеков в порядке приоритета. Перетащите, чтобы изменить порядок, щелкните длинным щелчком, чтобы включить или выключить.</string>
     <string name="audio_modules_title">Аудио модули</string>
     <string name="authentication_password_help">Пароль аутентификации до 64 символов. Если указано имя пользователя для аутентификации, но нет пароля, он будет запрошен при запуске baresip.</string>
     <string name="backup">Резервное копирование</string>
@@ -137,7 +137,7 @@
     <string name="and">и</string>
     <string name="answer_mode">Режим ответа</string>
     <string name="answer_mode_help">Выберите как отвечать на входящие вызовы.</string>
-    <string name="backed_up">Данные приложения сохранены в файл \'%1$s\'. В Android версии 9 и ниже файл находится в каталоге загрузок.</string>
+    <string name="backed_up">Данные приложения (за исключением записей) сохранены в файле \'%1$s\'. В Android версии 9 этот файл находится в папке Download.</string>
     <string name="call_not_secure">Вызов не безопасен!</string>
     <string name="listen_address">Прослушивать адрес</string>
     <string name="outbound_proxies">Исходящие прокси</string>
@@ -155,7 +155,7 @@
     <string name="show_password">Показать пароль</string>
     <string name="no_cameras">У вас нет поддерживаемых камер!</string>
     <string name="no_video_calls">Выдайте разрешение доступа к камере для совершения видеозвонков или ответа на них.</string>
-    <string name="restore_failed">Не удалось восстановить данные приложения. Проверьте, что ввели правильный пароль и файл резервной копии от этого приложения. В Android версии 9 и ниже также проверьте Приложения → baresip → Разрешения → Хранилище и убедитесь, что файл \'%1$s\' существует в каталоге загрузок.</string>
+    <string name="restore_failed">Не удалось восстановить данные приложения. Проверьте, что вы указали правильный пароль и что файл резервной копии принадлежит этому приложению. В Android версии 9 также проверьте Apps → baresip → Permissions → Storage и наличие файла \'%1$s\' в папке Download.</string>
     <string name="restart_request">Запрос на перезапуск</string>
     <string name="backup_failed">Не удалось создать резервную копию данных приложения в файл \'%1$s\'. Проверьте Приложения → baresip → Разрешения → Хранилище.</string>
     <string name="peer_not_verified">Этот вызов БЕЗОПАСНЫЙ, но собеседник НЕ проверен!</string>
@@ -181,11 +181,11 @@
     <string name="opus_bit_rate_help">Средняя максимальная скорость передачи данных, используемая в аудиопотоке Opus. Допустимые значения: 6000-510000. Значение по умолчанию - 28000.</string>
     <string name="opus_bit_rate">Скорость передачи данных Opus</string>
     <string name="audio_modules_help">Аудиокодеки, предоставленные выбранными модулями, доступны для использования в аккаунтах.</string>
-    <string name="tls_ca_file_help">При отметке файл с TLS-сертификатами необходимых центров сертификации был или будет загружен. В Android версии 9 и ниже файл называется \'ca_certs.crt\' и берётся из каталога загрузок.</string>
+    <string name="tls_ca_file_help">Если флажок установлен, то был или будет загружен файл, содержащий TLS-сертификаты таких центров сертификации, которые не включены в ОС Android. В Android версии 9 файл под названием \'ca_certs.crt\' загружается из папки Download.</string>
     <string name="tls_ca_file">Файл TLS CA</string>
-    <string name="tls_certificate_file_help">При отметке файл с TLS-сертификатом и закрытым ключом этого экземпляра baresip, был или будет загружен. В Android версии 9 и ниже файл называется \'cert.pem\' и берётся из каталога загрузок. В целях безопасности удалите файл после загрузки.</string>
+    <string name="tls_certificate_file_help">Если флажок установлен, загружен или будет загружен файл, содержащий TLS-сертификат и закрытый ключ данного экземпляра baresip. В Android версии 9 файл под названием \'cert.pem\' загружается из папки Download. В целях безопасности удалите этот файл после загрузки.</string>
     <string name="tls_certificate_file">Файл сертификата TLS</string>
-    <string name="listen_address_help">IP-адрес и порт в форме «адрес:порт», на котором baresip прослушивает входящие SIP-запросы. Если IP-адрес является IPv6-адресом, он должен быть написан в квадратных скобках []. IPv4-адрес 0.0.0.0 или IPv6-адрес [::] заставляет baresip прослушивать все доступные адреса. Если оставить пустым (установка по умолчанию), baresip прослушивает порт 5060 всех доступных адресов.</string>
+    <string name="listen_address_help">IP-адрес и порт вида \'адрес:порт\', по которым baresip прослушивает входящие SIP-запросы. Если IP-адрес является IPv6-адресом, он должен быть написан в скобках []. IPv4-адрес 0.0.0.0 или IPv6-адрес [::] заставляет baresip прослушивать все доступные адреса. Если оставить пустым (заводское значение по умолчанию), baresip будет прослушивать произвольный порт на всех доступных адресах.</string>
     <string name="long_chat_question">Вы хотите удалить чат с собеседником \'%1$s\' или добавить собеседника в контакты\?</string>
     <string name="invalid_aor">Недействительный user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="user_domain">пользователь@домен</string>
@@ -204,13 +204,13 @@
     <string name="invalid_stun_server">Недействительный URI сервера STUN/TURN \'%1$s\'</string>
     <string name="stun_server_help">URI сервера STUN/TURN в виде схема:хост[:порт][\?transport=udp|tcp], где схема — \'stun\', \'turn\' или \'turns\'. STUN-сервер по умолчанию для протоколов STUN и ICE — \'stun:stun.l.google.com:19302\' — общедоступный STUN-сервер Google. TURN-сервер по умолчанию не используется.</string>
     <string name="stun_server">STUN/TURN сервер</string>
-    <string name="video_codecs_help">Список видеокодеков в порядке приоритета. Перетащите для изменения порядка, смахните вправо для включения или отключения.</string>
+    <string name="video_codecs_help">Список видеокодеков в порядке приоритета. Перетащите его, чтобы изменить порядок, щелкните длинным щелчком, чтобы включить или выключить.</string>
     <string name="video_codecs">Видео кодеки</string>
     <string name="register_help">При отметке включается регистрация и REGISTER-запросы отправляются с указанным интервалом.</string>
     <string name="invalid_proxy_server_uri">Недействительный URI прокси-сервера \'%1$s\'</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI другого прокси-сервера</string>
     <string name="sip_uri_of_proxy_server">SIP URI прокси-сервера</string>
-    <string name="about_text">&lt;h1&gt;SIP-клиент на основе библиотеки Baresip&lt;/h1&gt;\n&lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt;\n&lt;p&gt;Версия %1$s&lt;/p&gt;\n&lt;h2&gt;Подсказки по использованию&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;Убедитесь, что значения параметров по умолчанию соответствуют вашим потребностям (касайтесь их названий для получения справки).&lt;/li&gt;\n&lt;li&gt;Затем создайте одну или несколько учётных записей (опять же касайтесь заголовков элементов для получения справки).&lt;/li&gt;\n&lt;li&gt;Новая учётная запись может частично настраиваться автоматически. Смотрите подробности в &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;вики&lt;/a&gt;.&lt;/li&gt;\n&lt;li&gt;Состояние регистрации учётной записи отображается цветной точкой: зелёной (регистрация успешна), жёлтой (регистрация выполняется), красной (регистрация не удалась), белой (регистрация отключена).&lt;/li&gt;\n&lt;li&gt;Касание точки открывает параметры учётной записи.&lt;/li&gt;\n&lt;li&gt;Жест смахивания вниз вызывает повторную регистрацию текущей учётной записи.&lt;/li&gt;\n&lt;li&gt;Долгое нажатие на текущей учётной записи включает или отключет её регистрацию.&lt;/li&gt;\n&lt;li&gt;Смахивание влево или вправо переключает между учётными записями.&lt;/li&gt;\n&lt;li&gt;Значок сверху основного экрана переключает динамик.&lt;/li&gt;\n&lt;li&gt;Значки снизу основного экрана открывают голосовую почту (если её URI указан в учётной записи), контакты, сообщения и историю вызовов, а также позволяют переключаться между цифровой и буквенно-цифровой клавиатурами.&lt;/li&gt;\n&lt;li&gt;Предыдущего собеседника можно выбрать касанием значка вызова при пустом поле «Вызываемый».&lt;/li&gt;\n&lt;li&gt;Собеседников в вызовах и сообщениях можно добавлять в контакты долгими нажатиями.&lt;/li&gt;\n&lt;li&gt;Также долгие нажатия можно использовать для удаления вызовов, чатов, сообщений и контактов.&lt;/li&gt;\n&lt;li&gt;Касание / долгое нажатие значка контакта можно использовать для установки/удаления изображения аватара.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;Политика конфиденциальности&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;Политика конфиденциальности доступна &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;здесь&lt;/a&gt;.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;Исходный код&lt;/h2&gt; Исходный код доступен на &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, там же можно сообщить о проблемах.\n&lt;h2&gt;Лицензии&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt;, за исключением:&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; Кодеки AMR и защита TLS&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP-шифрофание&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; Кодеки G.722, G.726 и Codec2&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; Кодек G.729&lt;/li&gt;\n&lt;/ul&gt;</string>
+    <string name="about_text">&lt;h1&gt;SIP-клиент на основе библиотеки Baresip&lt;/h1&gt;\n&lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt;\n&lt;p&gt;Версия %1$s&lt;/p&gt;\n&lt;h2&gt;Подсказки по использованию&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;Убедитесь, что значения параметров по умолчанию соответствуют вашим потребностям (касайтесь их названий для получения справки).&lt;/li&gt;\n&lt;li&gt;Затем создайте одну или несколько учётных записей (опять же касайтесь заголовков элементов для получения справки).&lt;/li&gt;\n&lt;li&gt;Новая учётная запись может частично настраиваться автоматически. Смотрите подробности в &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;вики&lt;/a&gt;.&lt;/li&gt;\n&lt;li&gt;Состояние регистрации учётной записи отображается цветной точкой: зелёной (регистрация успешна), жёлтой (регистрация выполняется), красной (регистрация не удалась), белой (регистрация отключена).&lt;/li&gt;\n&lt;li&gt;Касание точки состояния открывает параметры учётной записи.&lt;/li&gt;\n&lt;li&gt;Долгое нажатие на значках панели baresip показывает информацию про значки.&lt;/li&gt;\n&lt;li&gt;Жест смахивания вниз вызывает повторную регистрацию текущей учётной записи.&lt;/li&gt;\n&lt;li&gt;Долгое нажатие на текущей учётной записи включает или отключет её регистрацию.&lt;/li&gt;\n&lt;li&gt;Смахивание влево или вправо переключает между учётными записями.&lt;/li&gt;\n&lt;li&gt;Значок сверху основного экрана переключает динамик.&lt;/li&gt;\n&lt;li&gt;Значки снизу основного экрана открывают голосовую почту (если её URI указан в учётной записи), контакты, сообщения и историю вызовов, а также позволяют переключаться между цифровой и буквенно-цифровой клавиатурами.&lt;/li&gt;\n&lt;li&gt;Предыдущего собеседника можно выбрать касанием значка вызова при пустом поле «Вызываемый».&lt;/li&gt;\n&lt;li&gt;Собеседников в вызовах и сообщениях можно добавлять в контакты долгими нажатиями.&lt;/li&gt;\n&lt;li&gt;Также долгие нажатия можно использовать для удаления вызовов, чатов, сообщений и контактов.&lt;/li&gt;\n&lt;li&gt;Долгое нажатие на аудио кодеке позволяет включать или отключать его.&lt;/li&gt;\n&lt;li&gt;Долгое нажатие значка контакта можно использовать для установки/удаления изображения аватара.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;Политика конфиденциальности&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;Политика конфиденциальности доступна &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt&gt;здесь&lt;/a&gt;.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;Исходный код&lt;/h2&gt; Исходный код доступен на &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt;, там же можно сообщить о проблемах.\n&lt;h2&gt;Лицензии&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt;, за исключением:&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; Кодеки AMR и защита TLS&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP-шифрофание&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; Кодеки G.722, G.726 и Codec2&lt;/li&gt;\n&lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; Кодек G.729&lt;/li&gt;\n&lt;/ul&gt;</string>
     <string name="outbound_proxies_help">SIP URI одного или двух прокси, которые необходимо использовать при отправке запросов. Если задано два, запросы РЕГИСТРАЦИИ отправляются обоим, а другие запросы отправляются тому, кто отвечает. Если исходящий прокси-сервер не указан, запросы отправляются на основе поиска записи DNS NAPTR/SRV/A для URI хоста вызываемого объекта. Если hostpart SIP URI является адресом IPv6, адрес должен быть записан в скобках [].
 \nПримеры:
 \n • sip:fooexample.com:50601;transport=tls
@@ -289,7 +289,7 @@
     <string name="missed_call_from">Пропущенный вызов от</string>
     <string name="call_details">Детали вызовов</string>
     <string name="time">Время</string>
-    <string name="verify_server_help">Если флажок установлен - baresip проверяет сертификаты TLS User Agent\'а SIP и прокси-серверов SIP при использовании транспорта TLS. Если флажок установлен, также должен быть загружен файл TLS CA.</string>
+    <string name="verify_server_help">Если флажок установлен, baresip проверяет TLS-сертификаты SIP User Agent и SIP Proxy Servers, когда используется транспорт TLS.</string>
     <string name="dark_theme_help">Принудительное отображение темной темы</string>
     <string name="reset_config_alert">Вы уверены, что хотите сбросить настройки до значений по умолчанию\?</string>
     <string name="sip_trace_help">Если флажок установлен и если установлен флажок Отладка, сообщения Logcat также включают трассировку запросов и ответов SIP. Автоматически снимается при запуске baresip.</string>
@@ -302,7 +302,7 @@
     <string name="country_code">Код страны</string>
     <string name="nickname">Никнейм</string>
     <string name="reg_int">Интервал регистрации</string>
-    <string name="invalid_reg_int">Недопустимый интервал регистрации\'%1$s\'</string>
+    <string name="invalid_reg_int">Неверный интервал регистрации \'%1$s\'</string>
     <string name="reg_int_help">Указывает baresip как часто (в секундах) отправлять REGISTER-запросы. Допустимы значения от 60 до 3600.</string>
     <string name="invalid_sip_uri_hostpart">Неверная хостовая часть SIP URI \'%1$s\'</string>
     <string name="allow_video_recv">Разрешить приём видео с сайта \'%1$s\'\?</string>
@@ -328,7 +328,7 @@
     <string name="average_rate">Средняя скорость: %1$s (кбит/с)</string>
     <string name="anonymous">Анонимно</string>
     <string name="unknown">Неизвестно</string>
-    <string name="audio_permissions">baresip требуются разрешения: «Микрофон» для голосовых вызовов, «Устройства поблизости» для обнаружения Bluetooth-микрофона/динамика, «Уведомления» для отправки уведомлений.</string>
+    <string name="audio_permissions">baresip необходимо разрешение \"Микрофон\" для голосовых вызовов, разрешение \"Близлежащие устройства\" для обнаружения микрофона/динамика Bluetooth, разрешение \"Уведомления\" для отправки уведомлений, а в Android 9 - разрешение \"Хранилище\" для операций резервного копирования/восстановления.</string>
     <string name="contacts_consent">Если выбраны контакты Android, они могут быть использованы в звонках и сообщениях как ссылки для SIP и tel URI. Приложение baresip не хранит контакты Android и никому их не передаёт. Чтобы контакты Android стали доступны в baresip, Google требует вашего согласия на их использование в соответствии с этим описанием и <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">политикой конфиденциальности</a> . </string>
     <string name="country_code_help">Код страны в формате E.164 для данной учетной записи. Если пользовательская часть URI инициатора входящего вызова или отправителя сообщения содержит телефонный номер, не начинающийся со знака \'+\', и контакт не найден, к номеру добавляется префикс с этим кодом страны и повторяется поиск контакта. Если номер телефона начинается с одной цифры \'0\', она удаляется перед добавления номеру префикса.</string>
     <string name="address_family">Семейство адресов</string>
@@ -341,9 +341,9 @@
     <string name="user_domain_or_number">пользователь@домен или номер телефона</string>
     <string name="rtcp_mux_help">При отметке RTP- и RTCP-пакеты мультиплексируются на единственном порту (RFC 5761).</string>
     <string name="telephony_provider_help">Хостовая часть SIP URI используется при звонках на телефонные номера. По умолчанию это домен учётной записи. Если не указана, эта учётная запись не сможет использоваться для телефонных вызовов.</string>
-    <string name="contacts_help">Определяет, будут ли использоваться контакты baresip, контакты Android или и то, и другое. Если оба и контакт существует в обоих с одинаковым именем, используется контакт baresip.</string>
+    <string name="contacts_help">Выбирает, будут ли использоваться контакты baresip, контакты Android или оба контакта. Если используется и то, и другое, и контакт с одинаковым именем существует в обоих контактах, будет выбран контакт baresip.</string>
     <string name="address_family_help">Определяет, какие IP-адреса использует baresip. Если выбрано IPv4 или IPv6, baresip использует либо IPv4, либо IPv6 адреса. Если ничего не выбрано, baresip использует оба типа.</string>
-    <string name="audio_and_video_permissions">baresip+ требуются разрешения: «Микрофон» для голосовых вызовов, «Камера» для видезвонков, «Устройства поблизости» для обнаружения Bluetooth-микрофона/динамика и «Уведомления» для отправки уведомлений.</string>
+    <string name="audio_and_video_permissions">baresip+ необходимо разрешение \"Микрофон\" для голосовых вызовов, разрешение \"Камера\" для видеозвонков, разрешение \"Близлежащие устройства\" для обнаружения микрофона/динамика Bluetooth, разрешение \"Уведомления\" для отправки уведомлений, а в Android 9 - разрешение \"Хранилище\" для операций резервного копирования/восстановления.</string>
     <string name="telephony_provider">Поставщик услуг телефонии</string>
     <string name="android_contact_help">При отметке этот контакт будет добавлен в контакты Android.</string>
     <string name="blind">Вслепую</string>
@@ -372,7 +372,7 @@
     <string name="video_fps">Кадровая частота</string>
     <string name="numeric_keypad">Цифровая клавиатура</string>"
     <string name="user_agent">Юзер агент</string>
-    <string name="speaker_phone">Телефон с громкой связью</string>
+    <string name="speaker_phone">Громкоговоритель</string>
     <string name="speaker_phone_help">Если этот флажок установлен, громкоговоритель автоматически включается при начале вызова.</string>
     <string name="invalid_fps">Недопустимые кадры В секунду \'%1$d\'</string>
     <string name="invalid_user_agent">Недопустимое значение поля заголовка User-Agent</string>
@@ -382,7 +382,7 @@
     <string name="speakerphone_title">Громкоговоритель</string>
     <string name="speakerphone_tip">Если активирован, звук воспроизводится через громкоговоритель устройства.</string>
     <string name="call_recording_title">Запись звонков</string>
-    <string name="call_recording_tip">Если активирован, будут записываться новые входящие и исходящие вызовы. Записи можно воспроизвести на странице Сведений о вызове.</string>
+    <string name="call_recording_tip">Если активирован, будут записываться новые входящие и исходящие вызовы. Записи можно воспроизвести на странице Сведений о вызове</string>
     <string name="numeric_keypad_help">Если флажок установлен, цифровая клавиатура отображается, когда выделено поле \'Позвонить на ...\'.</string>"
     <string name="microphone_gain_help">Умножить громкость микрофона на это десятичное число. Минимальное значение равно 1.0 (заводское значение по умолчанию), которое отключает усиление микрофона. Большие значения могут негативно повлиять на качество звука.</string>
     <string name="no_read_permission">Нет разрешения на чтение из внешнего хранилища</string>
@@ -398,4 +398,14 @@
     <string name="dtmf_auto">In-band RTP или SIP INFO</string>
     <string name="playing_recording">Воспроизведение записи …</string>
     <string name="invalid_microphone_gain">Недопустимое значение усиления микрофона</string>
+    <string name="reply">Ответить</string>
+    <string name="save">Сохранить</string>
+    <string name="call_answered">Звонок принят</string>
+    <string name="call_answered_elsewhere">Ответ на звонок в другом месте</string>
+    <string name="call_missed">Пропущенный звонок</string>
+    <string name="call_rejected">Звонок отклонен</string>
+    <string name="colorblind">Цвет для слепых</string>
+    <string name="colorblind_help">Используйте удобные для слепых значки состояния регистрации</string>
+    <string name="proximity_sensing">Датчик приближения</string>"&gt;
+    <string name="proximity_sensing_help">Если флажок установлен, функция определения приближения активна во время вызовов.</string>
 </resources>
