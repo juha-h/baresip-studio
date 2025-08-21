@@ -10,12 +10,13 @@ ausrc_format s16
 auplay_format s16
 auenc_format s16
 audec_format s16
-audio_buffer 20-300
+audio_buffer 20-200
 audio_buffer_mode adaptive
 audio_silence -35.0
 audio_telev_pt 101
 audio_jitter_buffer_type adaptive
-audio_jitter_buffer_delay 0-20
+audio_jitter_buffer_ms 100-200
+audio_jitter_buffer_size 50
 rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
