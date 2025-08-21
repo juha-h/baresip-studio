@@ -10,7 +10,7 @@ ausrc_format s16
 auplay_format s16
 auenc_format s16
 audec_format s16
-audio_buffer 20-200
+audio_buffer 20-160
 audio_buffer_mode adaptive
 audio_silence -35.0
 audio_telev_pt 101
