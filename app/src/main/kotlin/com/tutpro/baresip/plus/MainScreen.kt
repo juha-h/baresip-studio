@@ -2841,8 +2841,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 callDuration = call.duration()
                 showCallTimer.value = true
             }
-            else
+            else {
                 showCallTimer.value = false
+                securityIcon.intValue = -1
+            }
             if (aor == viewModel.selectedAor.value) {
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
