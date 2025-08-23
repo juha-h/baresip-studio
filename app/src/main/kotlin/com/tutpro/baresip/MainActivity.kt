@@ -61,9 +61,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
+
+        super.onCreate(savedInstanceState)
 
         val extraAction = intent.getStringExtra("action")
         Log.e(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
