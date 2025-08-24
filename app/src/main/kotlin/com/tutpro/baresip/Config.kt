@@ -170,9 +170,6 @@ object Config {
 
         Utils.aecAgcCheck()
 
-        if (!BaresipService.aecAvailable)
-            config = "${config}module webrtc_aecm.so\n"
-
         val micGain = previousVariable("augain")
         config = if (BaresipService.agcAvailable || micGain == ""  || micGain == "1.0")
             "${config}augain 1.0\n"
