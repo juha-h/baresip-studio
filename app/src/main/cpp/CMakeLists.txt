@@ -110,10 +110,6 @@ add_library(lib_amrwbenc STATIC IMPORTED)
 set_target_properties(lib_amrwbenc PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/amr/lib/${ANDROID_ABI}/libamrwbenc.a)
 
-add_library(lib_webrtc STATIC IMPORTED)
-set_target_properties(lib_webrtc PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/webrtc/lib/${ANDROID_ABI}/libwebrtc.a)
-
 add_library(lib_zrtpcppcore STATIC IMPORTED)
 set_target_properties(lib_zrtpcppcore PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/gzrtp/lib/${ANDROID_ABI}/libzrtpcppcore.a)
@@ -169,7 +165,6 @@ target_link_libraries(baresip
         lib_amrnb
         lib_amrwb
         lib_amrwbenc
-        lib_webrtc
         lib_zrtpcppcore
         lib_sndfile
         z
