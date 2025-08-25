@@ -857,7 +857,9 @@ private val showCallTimer = mutableStateOf(false)
 private var callDuration = 0
 private val showSuggestions = mutableStateOf(false)
 private val showCallButton = mutableStateOf(true)
+private val callButtonEnabled = mutableStateOf(true)
 private var showCallVideoButton = mutableStateOf(true)
+private var callVideoButtonEnabled = mutableStateOf(true)
 private val showCancelButton = mutableStateOf(false)
 private var videoIcon = mutableIntStateOf(-1)
 private val showAnswerRejectButtons = mutableStateOf(false)
@@ -1355,6 +1357,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     showSuggestions.value = false
                     callClick(ctx, viewModel, false)
                 },
+                enabled=callButtonEnabled.value
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.call),
@@ -1371,6 +1374,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     showSuggestions.value = false
                     callClick(ctx, viewModel, true)
                 },
+                enabled=callVideoButtonEnabled.value
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.call_video),
@@ -2279,6 +2283,8 @@ private fun callClick(ctx: Context, viewModel: ViewModel, video: Boolean) {
                 return
             val uriText = callUri.value.trim()
             if (uriText.isNotEmpty()) {
+                callButtonEnabled.value = false
+                callVideoButtonEnabled.value = false
                 val uris = Contact.contactUris(uriText)
                 if (uris.isEmpty())
                     makeCall(ctx, viewModel, uriText, video)
@@ -2383,6 +2389,8 @@ private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: Stri
         if (!call(ctx, viewModel, ua, uri, video)) {
             BaresipService.abandonAudioFocus(ctx)
             showCallButton.value = true
+            callButtonEnabled.value = true
+            callVideoButtonEnabled.value = true
             showCancelButton.value = false
         }
         else {
@@ -2522,7 +2530,9 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         dtmfEnabled.value = false
         focusDtmf.value = false
         showCallButton.value = true
+        callButtonEnabled.value = true
         showCallVideoButton.value = true
+        callVideoButtonEnabled.value = true
         showCancelButton.value = false
         showAnswerRejectButtons.value = false
         showOnHoldNotice.value = false
