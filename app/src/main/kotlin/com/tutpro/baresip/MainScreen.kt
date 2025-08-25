@@ -762,6 +762,7 @@ private val showCallTimer = mutableStateOf(false)
 private var callDuration = 0
 private val showSuggestions = mutableStateOf(false)
 private val showCallButton = mutableStateOf(true)
+private val callButtonEnabled = mutableStateOf(true)
 private val showCancelButton = mutableStateOf(false)
 private val showAnswerRejectButtons = mutableStateOf(false)
 private val showHangupButton = mutableStateOf(false)
@@ -1289,6 +1290,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     showSuggestions.value = false
                     callClick(ctx, viewModel)
                 },
+                enabled=callButtonEnabled.value
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.call),
@@ -1792,6 +1794,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel) {
                 return
             val uriText = callUri.value.trim()
             if (uriText.isNotEmpty()) {
+                callButtonEnabled.value = false
                 val uris = Contact.contactUris(uriText)
                 if (uris.isEmpty())
                     makeCall(ctx, viewModel, uriText)
@@ -1880,6 +1883,7 @@ private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: Stri
         if (!call(ctx, viewModel, ua, uri)) {
             BaresipService.abandonAudioFocus(ctx)
             showCallButton.value = true
+            callButtonEnabled.value = true
             showCancelButton.value = false
         }
         else {
@@ -2001,6 +2005,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         dtmfEnabled.value = false
         focusDtmf.value = false
         showCallButton.value = true
+        callButtonEnabled.value = true
         showCancelButton.value = false
         showAnswerRejectButtons.value = false
         showOnHoldNotice.value = false
