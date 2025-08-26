@@ -1293,7 +1293,10 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 enabled=callButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                    imageVector = if (callButtonEnabled.value)
+                        ImageVector.vectorResource(id = R.drawable.call)
+                    else
+                        ImageVector.vectorResource(id = R.drawable.call_yellow),
                     modifier = Modifier.size(48.dp),
                     tint = Color.Unspecified,
                     contentDescription = null,
@@ -1794,7 +1797,6 @@ private fun callClick(ctx: Context, viewModel: ViewModel) {
                 return
             val uriText = callUri.value.trim()
             if (uriText.isNotEmpty()) {
-                callButtonEnabled.value = false
                 val uris = Contact.contactUris(uriText)
                 if (uris.isEmpty())
                     makeCall(ctx, viewModel, uriText)
@@ -1847,6 +1849,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
     else {
+        callButtonEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
