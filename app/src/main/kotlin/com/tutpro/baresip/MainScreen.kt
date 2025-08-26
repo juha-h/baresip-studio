@@ -136,8 +136,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private var dialpadButtonEnabled by mutableStateOf(true)
-private var pullToRefreshEnabled by mutableStateOf(true)
+private val dialpadButtonEnabled = mutableStateOf(true)
+private var pullToRefreshEnabled = mutableStateOf(true)
 
 private var downloadsInputUri: Uri? = null
 private var downloadsOutputUri: Uri? = null
@@ -741,7 +741,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize),
-            enabled = dialpadButtonEnabled
+            enabled = dialpadButtonEnabled.value
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(dialpadIcon),
@@ -768,11 +768,11 @@ private val showAnswerRejectButtons = mutableStateOf(false)
 private val showHangupButton = mutableStateOf(false)
 private val showOnHoldNotice = mutableStateOf(false)
 private var holdIcon = mutableIntStateOf(R.drawable.call_hold)
-private var transferButtonEnabled = mutableStateOf(false)
+private val transferButtonEnabled = mutableStateOf(false)
 private val transferIcon = mutableIntStateOf(R.drawable.call_transfer)
 private var dtmfText = mutableStateOf("")
 private val dtmfEnabled = mutableStateOf(false)
-private var focusDtmf = mutableStateOf(false)
+private val focusDtmf = mutableStateOf(false)
 
 private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
@@ -850,7 +850,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                             Api.ua_register(ua.uap)
                     }
                 },
-                enabled = pullToRefreshEnabled,
+                enabled = pullToRefreshEnabled.value,
             )
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
@@ -1992,7 +1992,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         return
     val call = showCall ?: ua.currentCall()
     if (call == null) {
-        pullToRefreshEnabled = true
+        pullToRefreshEnabled.value = true
         if (ua.account.resumeUri != "")
             callUri.value = ua.account.resumeUri
         else
@@ -2012,13 +2012,13 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         showCancelButton.value = false
         showAnswerRejectButtons.value = false
         showOnHoldNotice.value = false
-        dialpadButtonEnabled = true
+        dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(R.drawable.mic_on)
         }
     } else {
-        pullToRefreshEnabled = false
+        pullToRefreshEnabled.value = false
         callUriEnabled.value = false
         when (call.status) {
             "outgoing", "transferring", "answered" -> {
@@ -2034,7 +2034,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showHangupButton.value = !showCancelButton.value
                 showAnswerRejectButtons.value = false
                 showOnHoldNotice.value = false
-                dialpadButtonEnabled = false
+                dialpadButtonEnabled.value = false
             }
             "incoming" -> {
                 showCallTimer.value = false
@@ -2053,7 +2053,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showHangupButton.value = false
                 showAnswerRejectButtons.value = true
                 showOnHoldNotice.value = false
-                dialpadButtonEnabled = false
+                dialpadButtonEnabled.value = false
             }
             "connected" -> {
                 if (call.referTo != "") {
