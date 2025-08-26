@@ -850,7 +850,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 }
 
 private val callUri = mutableStateOf("")
-private var callUriEnabled = mutableStateOf(true)
+private val callUriEnabled = mutableStateOf(true)
 private val callUriLabel = mutableStateOf("")
 private var securityIcon = mutableIntStateOf(-1)
 private val showCallTimer = mutableStateOf(false)
@@ -858,19 +858,19 @@ private var callDuration = 0
 private val showSuggestions = mutableStateOf(false)
 private val showCallButton = mutableStateOf(true)
 private val callButtonEnabled = mutableStateOf(true)
-private var showCallVideoButton = mutableStateOf(true)
-private var callVideoButtonEnabled = mutableStateOf(true)
+private val showCallVideoButton = mutableStateOf(true)
+private val callVideoButtonEnabled = mutableStateOf(true)
 private val showCancelButton = mutableStateOf(false)
 private var videoIcon = mutableIntStateOf(-1)
 private val showAnswerRejectButtons = mutableStateOf(false)
 private val showHangupButton = mutableStateOf(false)
 private val showOnHoldNotice = mutableStateOf(false)
 private var holdIcon = mutableIntStateOf(R.drawable.call_hold)
-private var transferButtonEnabled = mutableStateOf(false)
+private val transferButtonEnabled = mutableStateOf(false)
 private val transferIcon = mutableIntStateOf(R.drawable.call_transfer)
 private var dtmfText = mutableStateOf("")
 private val dtmfEnabled = mutableStateOf(false)
-private var focusDtmf = mutableStateOf(false)
+private val focusDtmf = mutableStateOf(false)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1360,29 +1360,38 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 enabled=callButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                    imageVector = if (callButtonEnabled.value)
+                        ImageVector.vectorResource(id = R.drawable.call)
+                    else
+                        ImageVector.vectorResource(id = R.drawable.call_yellow),
                     modifier = Modifier.size(48.dp),
                     tint = Color.Unspecified,
                     contentDescription = null,
                 )
             }
 
-        if (showCallVideoButton.value)
+        if (showCallVideoButton.value) {
+            Spacer(modifier = Modifier.width(48.dp))
             IconButton(
                 modifier = Modifier.size(48.dp),
                 onClick = {
                     showSuggestions.value = false
                     callClick(ctx, viewModel, true)
                 },
-                enabled=callVideoButtonEnabled.value
+                enabled = callVideoButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call_video),
+                    imageVector = if (callButtonEnabled.value)
+                        ImageVector.vectorResource(id = R.drawable.call_video)
+                    else
+                        ImageVector.vectorResource(id = R.drawable.call_video_yellow),
                     modifier = Modifier.size(48.dp),
                     tint = Color.Unspecified,
                     contentDescription = null,
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+        }
 
         if (showCancelButton.value) {
             Spacer(modifier = Modifier.weight(1f))
@@ -2283,8 +2292,6 @@ private fun callClick(ctx: Context, viewModel: ViewModel, video: Boolean) {
                 return
             val uriText = callUri.value.trim()
             if (uriText.isNotEmpty()) {
-                callButtonEnabled.value = false
-                callVideoButtonEnabled.value = false
                 val uris = Contact.contactUris(uriText)
                 if (uris.isEmpty())
                     makeCall(ctx, viewModel, uriText, video)
@@ -2353,6 +2360,8 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video:
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
     else {
+        callButtonEnabled.value = false
+        callVideoButtonEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
