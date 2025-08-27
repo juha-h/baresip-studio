@@ -179,6 +179,18 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
             ua = uag_find_msg(msg);
             // There is no call yet and call is thus used to hold SIP message
             call = (struct call *)msg;
+            /*if (account_regint(ua_account(ua)) > 0) {
+                struct uri ruri;
+                uri_decode(&ruri, &msg->ruri);
+                if (pl_strcmp(&ruri.user, ua_local_cuser(ua)) != 0) {
+                    char user_buf[256];
+                    len = re_snprintf(user_buf, sizeof user_buf, "%r", &ruri.user);
+                    LOGW("ruri user mismatch: %s != %s\n", user_buf, ua_local_cuser(ua));
+                    sip_treply(NULL, uag_sip(), msg, 404, "Not Found");
+                    bevent_stop(event);
+                    return;
+                }
+            }*/
             len = re_snprintf(event_buf, sizeof event_buf, "%s,%r,%ld", prm, &msg->from.auri, (long)event);
             break;
         case BEVENT_CALL_INCOMING:
