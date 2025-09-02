@@ -2536,6 +2536,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         securityIcon.intValue = -1
         showHangupButton.value = false
         transferIcon.intValue = R.drawable.call_transfer
+        dtmfText.value = ""
         dtmfEnabled.value = false
         focusDtmf.value = false
         showCallButton.value = true
