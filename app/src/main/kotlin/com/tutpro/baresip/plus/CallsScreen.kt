@@ -282,6 +282,7 @@ private fun Calls(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(items = callHistory.value, key = { callRow -> callRow.stopTime }) { callRow ->
+            val peerUri = callRow.peerUri
             var recordings = false
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -294,7 +295,6 @@ private fun Calls(
                             onClick = {
                                 val aor = account.aor
                                 val ua = UserAgent.ofAor(aor)
-                                val peerUri = callRow.peerUri
                                 val intent = Intent(ctx, MainActivity::class.java)
                                 if (ua != null) {
                                     intent.putExtra("uap", ua.uap)
@@ -321,7 +321,6 @@ private fun Calls(
                                 showDialog.value = true
                             },
                             onLongClick = {
-                                val peerUri = callRow.peerUri
                                 val peerName = Utils.friendlyUri(ctx, peerUri, account)
                                 val callText: String = if (callRow.details.size > 1)
                                     ctx.getString(R.string.calls_calls)
@@ -346,7 +345,7 @@ private fun Calls(
                                     )
                                     positiveButtonText.value = ctx.getString(R.string.add_contact)
                                     positiveAction.value = {
-                                        navController.navigate("baresip_contact/${callRow.peerUri}/new")
+                                        navController.navigate("baresip_contact/$peerUri/new")
                                     }
                                     neutralButtonText.value = ctx.getString(R.string.delete)
                                     neutralAction.value = {
@@ -357,8 +356,7 @@ private fun Calls(
                             }
                         )
                     ) {
-                        val uri = callRow.peerUri
-                        when (val contact = Contact.findContact(uri)) {
+                        when (val contact = Contact.findContact(peerUri)) {
                             is Contact.BaresipContact -> {
                                 val avatarImage = contact.avatarImage
                                 if (avatarImage != null)
@@ -398,7 +396,7 @@ private fun Calls(
                         }
                         if (count > 3)
                             Text("...", color = LocalCustomColors.current.itemText)
-                        Text(text = Utils.friendlyUri(ctx, callRow.peerUri, account),
+                        Text(text = Utils.friendlyUri(ctx, peerUri, account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
