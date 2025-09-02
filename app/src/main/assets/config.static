@@ -25,6 +25,7 @@ video_jitter_buffer_size 250
 rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
+cuser_random yes
 module aaudio.so
 module avcodec.so
 module vp9.so
