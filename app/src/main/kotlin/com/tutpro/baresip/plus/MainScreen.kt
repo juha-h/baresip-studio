@@ -158,8 +158,8 @@ import kotlin.concurrent.schedule
 private val showVideoLayout = mutableStateOf(false)
 private var orientation = 0
 
-private var dialpadButtonEnabled by mutableStateOf(true)
-private var pullToRefreshEnabled by mutableStateOf(true)
+private val dialpadButtonEnabled = mutableStateOf(true)
+private var pullToRefreshEnabled = mutableStateOf(true)
 
 private var downloadsInputUri: Uri? = null
 private var downloadsOutputUri: Uri? = null
@@ -836,7 +836,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize),
-            enabled = dialpadButtonEnabled
+            enabled = dialpadButtonEnabled.value
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(dialpadIcon),
@@ -917,7 +917,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
                             Api.ua_register(ua.uap)
                     }
                 },
-                enabled = pullToRefreshEnabled,
+                enabled = pullToRefreshEnabled.value,
             )
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
@@ -2523,7 +2523,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         return
     val call = showCall ?: ua.currentCall()
     if (call == null) {
-        pullToRefreshEnabled = true
+        pullToRefreshEnabled.value = true
         showVideoLayout.value = false
         if (ua.account.resumeUri != "")
             callUri.value = ua.account.resumeUri
@@ -2545,14 +2545,14 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         showCancelButton.value = false
         showAnswerRejectButtons.value = false
         showOnHoldNotice.value = false
-        dialpadButtonEnabled = true
+        dialpadButtonEnabled.value = true
         videoIcon.intValue = -1
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(R.drawable.mic_on)
         }
     } else {
-        pullToRefreshEnabled = false
+        pullToRefreshEnabled.value = false
         callUriEnabled.value = false
         when (call.status) {
             "outgoing", "transferring", "answered" -> {
@@ -2570,7 +2570,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showHangupButton.value = !showCancelButton.value
                 showAnswerRejectButtons.value = false
                 showOnHoldNotice.value = false
-                dialpadButtonEnabled = false
+                dialpadButtonEnabled.value = false
             }
             "incoming" -> {
                 showCallTimer.value = false
@@ -2591,7 +2591,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showHangupButton.value = false
                 showAnswerRejectButtons.value = true
                 showOnHoldNotice.value = false
-                dialpadButtonEnabled = false
+                dialpadButtonEnabled.value = false
             }
             "connected" -> {
                 if (call.referTo != "") {
