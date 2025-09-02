@@ -20,6 +20,7 @@ audio_jitter_buffer_size 50
 rtp_stats yes
 rtp_timeout 60
 rtp_rxmode thread
+cuser_random yes
 module aaudio.so
 module stun.so
 module turn.so
