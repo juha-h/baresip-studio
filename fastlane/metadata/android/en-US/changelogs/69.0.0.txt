@@ -1,0 +1,6 @@
+- Change color of call button to yellow when call button has been touched, but call has not been made yet
+- Do not activate useless software based echo canceling if hardware based is not available
+- Always clear security icon and DTMF field when call is closed
+- For registered accounts, check that user part of incoming Request URI matches user part of REGISTER request contact URI
+- Upstream audio jitter buffer improvements
+- New translations (French)
