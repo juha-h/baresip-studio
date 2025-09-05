@@ -1,0 +1,4 @@
+- Ein Anruflisten-menü wurde hinzugefügt welches Löschen, Deaktivieren und Aktivieren 
+des Konto Anrufverlaufes erlaubt.
+-Spanische "Sprach-Strings" wurden hinzugefügt (Dank an Javier Falbo).
+-Das automatische Starten von Baresip ist jetzt Grundeinstellung auf neuen Installationen.
