@@ -5,7 +5,8 @@
     <string name="about_title_plus">baresip+ sovelluksesta</string>
     <string name="about_text">
         <![CDATA[
-            <h1>Baresip-kirjastoon perustuva, äänipuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva äänipuhelut ja
+                pikaviestit mahdollistava SIP-sovellus</h1>
             <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
@@ -30,11 +31,15 @@
                 <li>Katso lisätietoja <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a>-sivulta.</li>
             </ul>
             <h2>Tietosuoja</h2>
-                <p>Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.</p>
+            <p>Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">täältä</a>.</p>
             <br>
             <h2>Lähdekoodi</h2>
-                <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
+            <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
                 missä voi myös raportoida virheistä.</p>
+            <br>
+            <h2>Kielikäännökset</h2>
+            <p>Kielikäännöksiä varten on olemassa baresip
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> projekti.</p>
             <br>
             <h2>Lisenssit</h2>
                 <ul>
@@ -49,7 +54,8 @@
     </string>
     <string name="about_text_plus">
         <![CDATA[
-            <h1>Baresip-kirjastoon perustuva, videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva
+                 videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
             <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
@@ -80,10 +86,15 @@
                 <li>Oman videokuvan näyttö ei toimi, jos video on vain lähetyssuuntainen.</li>
             </ul>
             <h2>Tietosuoja</h2>
-                <p>Sovelluksen tietosuojakäytäntö on luettavissa <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">täältä</a>.</p>
+            <p>Sovelluksen tietosuojakäytäntö on luettavissa
+                <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">täältä</a>.</p>
             <h2>Lähdekoodi</h2>
-                <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
+            <p>Lähdekoodi on saatavilla <a href=https://github.com/juha-h/baresip-studio>GitHub</a>:ssa,
                 missä voi myös raportoida virheistä.</p>
+            <br>
+            <h2>Kielikäännökset</h2>
+            <p>Kielikäännöksiä varten on olemassa baresip
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> projekti.</p>
             <br>
             <h2>Lisenssit</h2>
             <ul>
