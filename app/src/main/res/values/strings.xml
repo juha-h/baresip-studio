@@ -7,7 +7,7 @@
     <string name="about_title_plus">About baresip+</string>
     <string name="about_text">
         <![CDATA[
-        <h1>Baresip library based SIP User Agent</h1>
+        <h1>SIP User Agent based on <a href="https://github.com/baresip/baresip">baresip</a> library</h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
@@ -35,9 +35,13 @@
         <h2>Privacy Policy</h2>
             <p>Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.</p>
         <br>
-        <h2>Source code</h2>
+        <h2>Source Code</h2>
             <p>Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
             where also issues can be reported.</p>
+        <br>
+        <h2>Language Translations</h2>
+            <p>Language translations are managed via baresip
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> project.</p>
         <br>
         <h2>Licenses</h2>
         <ul>
@@ -51,7 +55,7 @@
     </string>
     <string name="about_text_plus">
         <![CDATA[
-        <h1>Baresip library based SIP User Agent with video calls</h1>
+        <h1>SIP User Agent with video calls based on <a href="https://github.com/baresip/baresip">baresip</a> library</h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>
@@ -84,11 +88,16 @@
             <li>Selfview is not properly shown when video stream is sendonly.</li>
         </ul>
         <h2>Privacy Policy</h2>
-        <p>Privacy policy is available <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">here</a>.</p>
+        <p>Privacy policy is available
+            <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">here</a>.</p>
         <br>
         <h2>Source code</h2>
         <p>Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        where also issues can be reported.</p>
+            where also issues can be reported.</p>
+        <br>
+        <h2>Language translations</h2>
+        <p>Language translations are managed via baresip
+            <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> project.</p>
         <br>
         <h2>Licenses</h2>
         <ul>
