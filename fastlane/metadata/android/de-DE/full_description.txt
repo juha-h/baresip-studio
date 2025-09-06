@@ -1,8 +1,8 @@
-baresip ist eine SIP User Agent App für Android, die auf <a href="https://github.com/baresip/baresip">baresip</a> basiert.
+baresip ist eine SIP "User Agent" App für Android, die auf <a href="https://github.com/baresip/baresip">baresip</a> basiert.
 
-Aktuell unterstüzt die baresip App Anrufe mit Ton, Textnachrichten, Anrufbeantworter (mit Anzeige für nicht abgehörte Nachrichten) und Anrufsweiterleitungen (direkt/ mit Zusatzinformationen). Zudem werden Opus, AMR, Codec2, G.729, G.722, G.722.1, G.726, oder PCMU/PCMA Codecs unterstüzt. Eine sichere Verbindung wird mit TLS oder WSS SIP und ZRTP oder (DTLS) SRTP Medienverkapselung sichergestellt.
+Aktuell unterstüzt die Baresip App Anrufe mit Ton, Textnachrichten, Anrufbeantworter (mit Anzeige für nicht abgehörte Nachrichten) und Anrufsweiterleitungen (direkt/ mit Zusatzinformationen). Zudem werden Opus, AMR, Codec2, G.729, G.722, G.722.1, G.726, oder PCMU/PCMA Codecs unterstüzt. Eine sichere Verbindung wird mit TLS oder WSS SIP und ZRTP oder (DTLS) SRTP Medienverkapselung sichergestellt.
 
-Die Entwicklung der baresip App wurde durch das Fehlen eines sicheren, quelloffenen und SIP-basierten VoIP User Agent für Android motiviert, der nicht auf proprietäre und externe Push-Benachrichtigungsdienste angewiesen ist.
+Die Entwicklung der Baresip App wurde durch das Fehlen eines sicheren, quelloffenen und SIP-basierten VoIP "User Agent" für Android motiviert, der nicht auf proprietäre und externe Push-Benachrichtigungsdienste angewiesen ist.
 
 Falls Sie Videoanrufe tätigen wollen und ein Gerät mit Android 9 oder höher besitzen, das die Camera2 API auf dem Hardware-Unterstützungslevel LEVEL 3 oder FULL unterstüzt, können Sie die Schwester-App baresip+ nutzen.
 

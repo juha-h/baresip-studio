@@ -1,0 +1,2 @@
+-Kompatibilität wurde für den G.726 codec hinzugefügt.
+- Die Grund-Rangliste der codecs wurde verbessert.

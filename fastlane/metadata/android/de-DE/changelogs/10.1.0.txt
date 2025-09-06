@@ -1,0 +1,2 @@
+-Kompatibilität wurde für den G722 codec hinzugefügt.
+- Das Speichern von Accounts wurde repariert.
