@@ -4,6 +4,6 @@ Tällä hetkellä baresip-sovellus tukee äänipuheluita. tekstiviestejä, vasta
 
 Baresip-sovelluksen kehitystä motivoi tarve turvalliselle, avoimen lähdekoodin SIP-pohjaiselle VoIP-käyttäjäagentille Androidille, joka ei ole riippuvainen patentoiduista, kolmannen osapuolen työntö-ilmoituspalveluista.
 
-Jos tarvitset videopuheluita ja sinulla on Android-versio 7.0 tai uudempi laite, joka tukee Camera2 API:ta laitteistotukitasolla 3, voit tämän sovelluksen sijaan asentaa sen sisarsovelluksen baresip+.
+Jos tarvitset videopuheluita ja sinulla on Android-versio 9.0 tai uudempi laite, joka tukee Camera2 API:a laitteistotukitasolla LEVEL 3 tai FULL, voit tämän sovelluksen sijaan asentaa sen sisarsovelluksen baresip+.
 
 Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHubissa</a>, jossa myös ongelmista voi ilmoittaa.
