@@ -352,4 +352,93 @@
     <string name="microphone_tip">如果在通话期间激活，麦克风将静音。</string>
     <string name="speakerphone_title">扬声器</string>
     <string name="speakerphone_tip">如果激活，音频将通过设备扬声器播放。</string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>基于 <a href="https://github.com/baresip/baresip">baresip</a> 库的带视频通话功能的 SIP 用户代理</h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>版本 %1$s</p>
+        <br>
+        <h2>使用提示</h2>
+        <ul>
+            <li>检查 baresip+ 设置中的默认值是否满足您的需求（触摸项目标题获取帮助）。</li>
+            <li>然后在“账号”中，创建一个或多个账号（再次触摸项目标题以获取帮助）。</li>
+            <li>账号的注册状态用彩色圆点显示：绿色（注册成功）、黄色（注册正在进行）、红色（注册失败）、白色（注册尚未激活）。</li>
+            <li>触摸状态点可直接进入账号配置。</li>
+            <li>长按 baresip 栏图标可显示有关图标的信息。</li>
+            <li>向下滑动手势会导致当前显示的账号重新注册。</li>
+            <li>长按当前显示的账号可启用或禁用账号的注册。</li>
+            <li>向左/向右滑动手势可在账号之间切换。</li>
+            <li>当被叫方为空时，可以通过触摸通话图标来重新选择先前的呼叫方。</li>
+            <li>长按即可将通话和消息联系人添加到联系人中。</li>
+            <li>长按也可用于移除通话、聊天、消息和联系人。</li>
+            <li>触摸/长按联系人图标可用于设置/移除头像。</li>
+            <li>长按音频或视频编解码器可以启用/禁用该编解码器。</li>
+            <li>如需更多信息，请参阅 <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a>。</li>
+        </ul>
+        <h2>已知问题</h2>
+        <ul>
+            <li>在视频通话中，设备需要保持横屏模式，即从纵向向左旋转 90 度。</li>
+            <li>当视频流处于仅发送模式时，自显画面无法正常显示。</li>
+        </ul>
+        <h2>隐私政策</h2>
+        <p>隐私政策可在<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">此处</a>获取。</p>
+        <br>
+        <h2>源代码</h2>
+        <p>源代码可在 <a href="https://github.com/juha-h/baresip-studio">GitHub</a> 上找到，您也可以在此报告问题。</p>
+        <br>
+        <h2>语言翻译</h2>
+        <p>语言翻译通过 baresip <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> 项目进行管理。</p>
+        <br>
+        <h2>许可</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b>，但以下内容除外：</li>
+            <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>
+            <li><b>AGPLv4</b> ZRTP 媒体加密</li>
+            <li><b>GNU LGPL 2.1</b> G.722、G.726 和 Codec2 编解码器</li>
+            <li><b>GNU GPLv3</b> G.729 编解码器</li>
+            <li><b>GNU GPLv2</b> H.264 和 H.265 编解码器</li>
+            <li><b>AOMedia</b> AV1 编解码器</li>
+        </ul>
+        ]]></string>
+    <string name="about_text"><![CDATA[
+        <h1>基于 <a href="https://github.com/baresip/baresip">baresip</a> 库的 SIP 用户代理</h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>版本 %1$s</p>
+        <br>
+        <h2>使用提示</h2>
+        <ul>
+            <li>检查 baresip 设置中的默认值是否满足您的需求（触摸项目标题获取帮助）。</li>
+            <li>然后在“账号”中，创建一个或多个账号（再次触摸项目标题以获取帮助）。</li>
+            <li>账号的注册状态用彩色圆点显示：绿色（注册成功）、黄色（注册正在进行）、红色（注册失败）、白色（注册尚未激活）。</li>
+            <li>触摸状态点可直接进入账号配置。</li>
+            <li>长按 baresip 栏图标可显示有关图标的信息。</li>
+            <li>向下滑动手势会导致当前显示的账号重新注册。</li>
+            <li>长按当前显示的账号可启用或禁用账号的注册。</li>
+            <li>向左/向右滑动手势可在账号之间切换。</li>
+            <li>当被叫方为空时，可以通过触摸通话图标来重新选择先前的呼叫方。</li>
+            <li>长按即可将通话和消息联系人添加到联系人中。</li>
+            <li>长按也可用于移除通话、聊天、消息和联系人。</li>
+            <li>触摸/长按联系人图标可用于设置/移除头像。</li>
+            <li>长按音频编解码器可以启用/禁用该编解码器。</li>
+            <li>如需更多信息，请参阅 <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a>。</li>
+        </ul>
+        <h2>隐私政策</h2>
+            <p>隐私政策可在<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">此处</a>获取。</p>
+        <br>
+        <h2>源代码</h2>
+            <p>源代码可在 <a href="https://github.com/juha-h/baresip-studio">GitHub</a> 上找到，您也可以在此报告问题。</p>
+        <br>
+        <h2>语言翻译</h2>
+            <p>语言翻译通过 baresip <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> 项目进行管理。</p>
+        <br>
+        <h2>许可</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b>，但以下内容除外：</li>
+            <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>
+            <li><b>AGPLv4</b> ZRTP 媒体加密</li>
+            <li><b>GNU LGPL 2.1</b> G.722、G.726 和 Codec2 编解码器</li>
+            <li><b>GNU GPLv3</b> G.729 编解码器</li>
+        </ul>
+        ]]></string>
 </resources>
