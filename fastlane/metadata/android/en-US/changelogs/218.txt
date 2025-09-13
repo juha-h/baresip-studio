@@ -1,0 +1,3 @@
+- Added Weblate note to About text
+- New translations (Chinese)
+- Baresip lib logging macro fix
