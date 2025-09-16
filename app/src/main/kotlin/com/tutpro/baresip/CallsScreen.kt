@@ -308,7 +308,10 @@ private fun Calls(
                                 positiveAction.value = {
                                     if (ua != null) {
                                         handleIntent(ctx, viewModel, intent, "call")
-                                        navController.popBackStack()
+                                        navController.navigate("main") {
+                                            popUpTo("main")
+                                            launchSingleTop = true
+                                        }
                                     }
                                 }
                                 neutralButtonText.value = ctx.getString(R.string.send_message)
