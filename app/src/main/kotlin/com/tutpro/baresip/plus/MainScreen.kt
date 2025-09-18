@@ -1381,7 +1381,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 enabled = callVideoButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = if (callButtonEnabled.value)
+                    imageVector = if (callVideoButtonEnabled.value)
                         ImageVector.vectorResource(id = R.drawable.call_video)
                     else
                         ImageVector.vectorResource(id = R.drawable.call_video_yellow),
@@ -2360,8 +2360,14 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video:
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
     else {
-        callButtonEnabled.value = false
-        callVideoButtonEnabled.value = false
+        if (video) {
+            showCallButton.value = false
+            callVideoButtonEnabled.value = false
+        }
+        else {
+            showCallVideoButton.value = false
+            callButtonEnabled.value = false
+        }
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
