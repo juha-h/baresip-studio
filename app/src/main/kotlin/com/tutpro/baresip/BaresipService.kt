@@ -910,7 +910,7 @@ class BaresipService: Service() {
                                 .setWhen(System.currentTimeMillis())
                                 .setShowWhen(true)
                                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setFullScreenIntent(pi, true)
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                                 .putExtra("action", "call answer")
