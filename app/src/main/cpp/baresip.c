@@ -1744,8 +1744,11 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1source
     (void)obj;
     int err;
     re_thread_enter();
-    char *dev = front ? "android_camera,1" : "android_camera,0";
-    err = video_set_source(call_video((struct call *)call), "avformat", dev);
+//    char *dev = front ? "android_camera,1" : "android_camera,0";
+    // android_camera2 Switch camera implementation, preferably change to dynamic implementation, it should be possible
+    char *dev = front ? "1" : "0";
+//    err = video_set_source(call_video((struct call *)call), "avformat", dev);
+    err = video_set_source(call_video((struct call *)call), "android_camera2", dev);
     re_thread_leave();
     return err;
 }

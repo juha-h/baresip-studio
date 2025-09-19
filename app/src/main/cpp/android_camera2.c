@@ -158,6 +158,7 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
     struct vidsrc_st *st;
     unsigned x;
     int err;
+    char *dev_direct;
 
     (void)fmt;
     (void)dev;
@@ -171,6 +172,8 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
     st = mem_zalloc(sizeof(*st), android_camera2_destructor);
     if (!st)
         return ENOMEM;
+
+    dev_direct = (char *)dev;
 
     st->fps = prm->fps;
     st->frameh = frameh;
@@ -204,7 +207,7 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
         goto out;
     }
     (*jni_env)->CallVoidMethod(jni_env, st->jcam, jobjs.cam2.m_start, NULL, /* Preview */
-            0 /* Camera */);
+            atoi(dev_direct) /* Camera */);
 
     err = vidframe_alloc(&st->frame, prm->fmt, size);
     if (err)
@@ -219,7 +222,6 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
 
 out:
     jni_detach_env(with_attach);
-    LOGD("android_camera2_alloc err:%d",err);
     if (err)
         mem_deref(st);
     else
