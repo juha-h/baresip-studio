@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
@@ -80,7 +81,6 @@
             android:name=".BaresipService"
             android:enabled="true"
             android:foregroundServiceType="microphone|phoneCall"
-            android:permission="android.permission.FOREGROUND_SERVICE"
             android:stopWithTask="false" >
         </service>
 
