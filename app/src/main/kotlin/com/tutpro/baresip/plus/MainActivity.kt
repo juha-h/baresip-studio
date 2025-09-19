@@ -18,6 +18,7 @@ import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.IntentFilter
+import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -61,6 +62,9 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // Set up the camera manager
+        Camera2.SetCameraManager( getSystemService(Context.CAMERA_SERVICE) as CameraManager);
 
         enableEdgeToEdge()
 
