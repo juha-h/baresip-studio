@@ -183,6 +183,7 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
     st->rotate = 270; // Here you can read the configuration items
     st->frameSize = size->w * size->h * 3 / 2;
     st->buf = malloc(st->frameSize);
+    st->ts = tmr_jiffies_usec();
 
     if (!jni_init_ids()) {
         return ENOMEM;
@@ -234,7 +235,15 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
         jint rowStride0, jint pixStride0, jobject plane1, jint rowStride1, jint pixStride1,
         jobject plane2, jint rowStride2, jint pixStride2)
 {
+    struct timespec t1, t2;
+    clock_gettime(CLOCK_MONOTONIC, &t1);   // 起始时间
     struct vidsrc_st *st = (struct vidsrc_st *)(intptr_t)user_data;
+
+    if (tmr_jiffies_usec() < st->ts) {
+        sys_msleep(1);
+        LOGD("OnGetFrame sleep");
+        goto out;
+    }
 
     int width = st->size->w;
     int height = st->size->h;
@@ -293,9 +302,10 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
         uint8_t *dst_uv = dst_y + dst_w * dst_h;
 
         // Step1: YUV_420_888 → I420 (rotate 270)
-        Android420ToI420Rotate((const uint8_t *)plane0, rowStride0, (const uint8_t *)plane1,
-                rowStride1, (const uint8_t *)plane2, rowStride2, pixStride1, i420_y, dst_w, i420_u,
-                dst_w / 2, i420_v, dst_w / 2, width, height, st->rotate);
+        Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
+                (const uint8_t *)srcV, rowStride2,
+                pixStride1, // UV pixel stride (usually 2, but must use the actual value)
+                i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height, st->rotate);
 
         // Step2: I420 → NV12
         I420ToNV12(i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, dst_y, dst_w, dst_uv, dst_w,
@@ -315,4 +325,9 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
 
     // Send data to the encoder
     process_frame(st);
+out:
+    clock_gettime(CLOCK_MONOTONIC, &t2);   // 结束时间
+    long cost_us = (t2.tv_sec - t1.tv_sec) * 1000000L +
+                   (t2.tv_nsec - t1.tv_nsec) / 1000L;
+    LOGI("OnGetFrame cost = %ld us", cost_us);
 }
