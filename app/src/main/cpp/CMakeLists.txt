@@ -122,7 +122,11 @@ add_library(lib_baresip STATIC IMPORTED)
 set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/baresip/lib/${ANDROID_ABI}/libbaresip.a)
 
-add_library(baresip SHARED baresip.c vidisp.c)
+add_library(lib_yuv STATIC IMPORTED)
+set_target_properties(lib_yuv PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/libyuv/lib/${ANDROID_ABI}/libyuv.a)
+
+add_library(baresip SHARED baresip.c common.c vidisp.c android_camera2.c)
 
 #set(CMAKE_SHARED_LINKER_FLAGS
 #        "${CMAKE_SHARED_LINKER_FLAGS} -u AImageReader_new")
@@ -131,7 +135,8 @@ target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include
         ${distribution_DIR}/ffmpeg/include
         ${distribution_DIR}/re/include
-        ${distribution_DIR}/baresip/include)
+        ${distribution_DIR}/baresip/include
+        ${distribution_DIR}/libyuv/include)
 
 add_definitions(-DHAVE_PTHREAD)
 
@@ -141,6 +146,7 @@ target_link_libraries(baresip
         GLESv2
         GLESv1_CM
         aaudio
+        lib_yuv
         lib_baresip
         lib_re
         lib_ssl
