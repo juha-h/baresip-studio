@@ -23,9 +23,8 @@ struct vidsrc_st
     int fmt;
     int rotate;
     jobject jcam;
-    size_t frameSize;
     void *buf;
-
+    size_t buf_size;
     uint8_t *rotate_buf;
     size_t rotate_buf_size;
 };

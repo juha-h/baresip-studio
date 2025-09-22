@@ -136,7 +136,7 @@ void android_camera2_destructor(void *arg)
     if (st->buf) {
         free(st->buf);
         st->buf = NULL;
-        st->frameSize = 0;
+        st->buf_size = 0;
     }
 
     jni_detach_env(with_attach);
@@ -180,10 +180,9 @@ int android_camera2_alloc(struct vidsrc_st **stp, const struct vidsrc *vs, struc
     st->arg = arg;
     st->size = size;
     st->fmt = prm->fmt;
-    st->rotate = 270; // Here you can read the configuration items
-    st->frameSize = size->w * size->h * 3 / 2;
-    st->buf = malloc(st->frameSize);
-    st->ts = tmr_jiffies_usec();
+    st->rotate = 0; // Here you can read the configuration items
+    st->buf_size = size->w * size->h * 3 / 2;
+    st->buf = malloc(st->buf_size);
 
     if (!jni_init_ids()) {
         return ENOMEM;
@@ -235,14 +234,14 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
         jint rowStride0, jint pixStride0, jobject plane1, jint rowStride1, jint pixStride1,
         jobject plane2, jint rowStride2, jint pixStride2)
 {
-    struct timespec t1, t2;
-    clock_gettime(CLOCK_MONOTONIC, &t1);   // 起始时间
     struct vidsrc_st *st = (struct vidsrc_st *)(intptr_t)user_data;
-
+    if (!st->ts) {
+        st->ts = tmr_jiffies_usec();
+    }
+    // Limit the frequency of sending
     if (tmr_jiffies_usec() < st->ts) {
-        sys_msleep(1);
-        LOGD("OnGetFrame sleep");
-        goto out;
+        sys_msleep(4);
+        return;
     }
 
     int width = st->size->w;
@@ -258,36 +257,43 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
     uint8_t *srcU = (uint8_t *)(*env)->GetDirectBufferAddress(env, plane1);
     uint8_t *srcV = (uint8_t *)(*env)->GetDirectBufferAddress(env, plane2);
 
+    int dst_w = width; // After rotation, the width and height are reversed
+    int dst_h = height;
+    if (st->rotate > 0 && (st->rotate / 90) % 2) {
+        dst_w = height;
+        dst_h = width;
+        size.w = dst_w;
+        size.h = dst_h;
+    }
+
+    // Make sure the buffer is sufficient
+    int buf_size = dst_w * dst_h * 3 / 2;
+    if (st->buf_size < buf_size) {
+        free(st->buf);
+        st->buf = malloc(buf_size);
+        st->buf_size = buf_size;
+    }
+
     if (st->fmt == VID_FMT_YUV420P) {
-        int dst_w = height; // After rotation, the width and height are reversed
-        int dst_h = width;
-
-        // Make sure the buffer is sufficient
-        int buf_size = dst_w * dst_h * 3 / 2;
-        if (st->rotate_buf_size < buf_size) {
-            free(st->rotate_buf);
-            st->rotate_buf = malloc(buf_size);
-            st->rotate_buf_size = buf_size;
-        }
-
-        uint8_t *dst_y = st->rotate_buf;
+        uint8_t *dst_y = st->buf;
         uint8_t *dst_u = dst_y + dst_w * dst_h;
         uint8_t *dst_v = dst_u + (dst_w / 2) * (dst_h / 2);
 
-        // 一步完成: YUV_420_888 → I420 (rotate 270)
-        Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
-                (const uint8_t *)srcV, rowStride2,
-                pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2, width, height, st->rotate);
-        memcpy(st->buf, st->rotate_buf, st->rotate_buf_size);
-        size.w = dst_w;
-        size.h = dst_h;
+        if (st->rotate == 0) {
+            // YUV_420_888 → I420
+            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
+                    (const uint8_t *)srcV, rowStride2,
+                    pixStride1, // UV pixel stride (usually 2, but must use the actual value)
+                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2, width, height);
+        } else {
+            // YUV_420_888 → I420 (rotate)
+            Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
+                    rowStride1, (const uint8_t *)srcV, rowStride2,
+                    pixStride1, // UV pixel stride (usually 2, but must use the actual value)
+                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2, width, height, st->rotate);
+        }
     } else if (st->fmt == VID_FMT_NV12) {
-        int dst_w = height; // After rotation, the width and height are reversed
-        int dst_h = width;
-
         int i420_size = dst_w * dst_h * 3 / 2;
-
         if (!st->rotate_buf || st->rotate_buf_size < i420_size) {
             free(st->rotate_buf);
             st->rotate_buf = malloc(i420_size);
@@ -301,18 +307,23 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
         uint8_t *dst_y = st->buf;
         uint8_t *dst_uv = dst_y + dst_w * dst_h;
 
-        // Step1: YUV_420_888 → I420 (rotate 270)
-        Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
-                (const uint8_t *)srcV, rowStride2,
-                pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height, st->rotate);
+        if (st->rotate == 0) {
+            // Step1: YUV_420_888 → I420
+            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
+                    (const uint8_t *)srcV, rowStride2,
+                    pixStride1, // UV pixel stride (usually 2, but must use the actual value)
+                    i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height);
+        } else {
+            // Step1: YUV_420_888 → I420 (rotate)
+            Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
+                    rowStride1, (const uint8_t *)srcV, rowStride2,
+                    pixStride1, // UV pixel stride (usually 2, but must use the actual value)
+                    i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height, st->rotate);
+        }
 
         // Step2: I420 → NV12
         I420ToNV12(i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, dst_y, dst_w, dst_uv, dst_w,
                 dst_w, dst_h);
-
-        size.w = dst_w;
-        size.h = dst_h;
     } else {
         // If the format is not supported, the black screen data will be output by default
         isWrite = false;
@@ -325,9 +336,4 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
 
     // Send data to the encoder
     process_frame(st);
-out:
-    clock_gettime(CLOCK_MONOTONIC, &t2);   // 结束时间
-    long cost_us = (t2.tv_sec - t1.tv_sec) * 1000000L +
-                   (t2.tv_nsec - t1.tv_nsec) / 1000L;
-    LOGI("OnGetFrame cost = %ld us", cost_us);
 }
