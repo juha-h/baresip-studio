@@ -11,6 +11,8 @@
 #include <libavcodec/jni.h>
 #include "logger.h"
 #include "vidisp.h"
+#include "android_camera2.h"
+#include "common.h"
 
 enum
 {
@@ -481,6 +483,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
     g_ctx.mainActivityClz = NULL;
     g_ctx.mainActivityObj = NULL;
 
+    jni_set_jvm(vm);
     av_jni_set_java_vm(vm, NULL);
 
     return JNI_VERSION_1_6;
@@ -597,6 +600,13 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
             &vid, baresip_vidispl(), "opengles", opengles_alloc, NULL, opengles_display, NULL);
     if (err) {
         LOGW("vidisp_register failed (%d)\n", err);
+        goto out;
+    }
+
+    err = vidsrc_register(
+                &vid_android_camera2, baresip_vidsrcl(), "android_camera2", android_camera2_alloc, NULL);
+    if (err) {
+        LOGW("vidsrc_register failed (%d)\n", err);
         goto out;
     }
 
@@ -1734,8 +1744,11 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1set_1video_1source
     (void)obj;
     int err;
     re_thread_enter();
-    char *dev = front ? "android_camera,1" : "android_camera,0";
-    err = video_set_source(call_video((struct call *)call), "avformat", dev);
+//    char *dev = front ? "android_camera,1" : "android_camera,0";
+    // android_camera2 Switch camera implementation, preferably change to dynamic implementation, it should be possible
+    char *dev = front ? "1" : "0";
+//    err = video_set_source(call_video((struct call *)call), "avformat", dev);
+    err = video_set_source(call_video((struct call *)call), "android_camera2", dev);
     re_thread_leave();
     return err;
 }
