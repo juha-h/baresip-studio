@@ -78,8 +78,6 @@ class MainActivity : ComponentActivity() {
         this.setTurnScreenOn( true)
         Utils.requestDismissKeyguard(this)
 
-        BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
-
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
