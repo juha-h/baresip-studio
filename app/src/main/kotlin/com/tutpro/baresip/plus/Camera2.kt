@@ -163,7 +163,7 @@ class Camera2(
     }
 
     external fun PushFrame(
-        userData_: Long,
+        userData: Long,
         plane0: ByteBuffer, rowStride0: Int, pixStride0: Int,
         plane1: ByteBuffer?, rowStride1: Int, pixStride1: Int,
         plane2: ByteBuffer?, rowStride2: Int, pixStride2: Int
@@ -173,13 +173,9 @@ class Camera2(
         private var cameraManager: CameraManager? = null
 
         @JvmStatic
-        fun SetCameraManager(cm: CameraManager) {
+        fun setCameraManager(cm: CameraManager) {
             cameraManager = cm
         }
 
-        @JvmStatic
-        fun GetCameraManager(): CameraManager? {
-            return cameraManager
-        }
     }
 }
