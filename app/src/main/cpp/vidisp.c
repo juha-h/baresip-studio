@@ -43,7 +43,7 @@ static bool resize = false;
 
 struct vidisp *vid;
 
-struct vidisp_st *gst = NULL;
+//struct vidisp_st *gst = NULL;
 
 static void renderer_destroy(struct vidisp_st *st)
 {
@@ -63,7 +63,7 @@ static void renderer_destroy(struct vidisp_st *st)
         st->display = EGL_NO_DISPLAY;
     }
     eglReleaseThread();
-    gst = NULL;
+//    gst = NULL;
 }
 
 static void destructor(void *arg)
@@ -107,9 +107,9 @@ static int context_initialize(struct vidisp_st *st)
         return eglGetError();
     }
 
-    ANativeWindow_setBuffersGeometry(st->window, 0, 0, format);
+    ANativeWindow_setBuffersGeometry(window, 0, 0, format);
 
-    if (!(surface = eglCreateWindowSurface(display, config, st->window, NULL))) {
+    if (!(surface = eglCreateWindowSurface(display, config, window, NULL))) {
         LOGW("eglCreateWindowSurface() returned error %s\n", egl_error(eglGetError()));
         renderer_destroy(st);
         return eglGetError();
@@ -170,28 +170,30 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 
     LOGD("At opengles_alloc() on thread %li\n", (long)pthread_self());
 
-    if (gst)
-        renderer_destroy(gst);
+//    if (gst)
+//        renderer_destroy(gst);
 
+    struct vidisp_st *gst = NULL;
     gst = mem_zalloc(sizeof(*gst), destructor);
     if (!gst)
         return ENOMEM;
 
     gst->vd = vd;
-    gst->window = window;
+//    gst->window = window;
 
-    if (gst->window == NULL) {
-        LOGW("Window is NULL\n");
-        err = EINVAL;
-    }
+    // You can initialize it first, as assigning the window might have some delay.
+//    if (gst->window == NULL) {
+//        LOGW("Window is NULL\n");
+//        err = EINVAL;
+//    }
 
     // context should be initialized here and not in opengles_display
     // err = context_initialize(gst);
 
-    if (err)
-        mem_deref(gst);
-    else
-        *stp = gst;
+//    if (err)
+//        mem_deref(gst);
+//    else
+    *stp = gst;
 
     return err;
 }
@@ -382,10 +384,14 @@ int opengles_display(
 {
     (void)title;
     (void)timestamp;
-    int err;
+    int err = 0;
 
     // LOGD("At opengles_display() on thread %li\n", (long)pthread_self());
 
+    // If the window hasn’t been assigned, the video should not be rendered.
+    if (!window) {
+        return err;
+    }
     /* This is hack to make sure that context is initialised on the same thread */
     if (!st->context) {
         err = context_initialize(st);
@@ -459,5 +465,6 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
     } else {
         LOGI("Releasing window");
         ANativeWindow_release(window);
+        window = NULL;
     }
 }

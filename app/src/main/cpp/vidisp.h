@@ -13,7 +13,7 @@ struct vidisp_st
     GLuint texture_id;
     GLfloat vertices[4 * 3];
 
-    ANativeWindow *window;
+//    ANativeWindow *window;
 
     EGLDisplay display;
     EGLSurface surface;
