@@ -1,193 +1,185 @@
-package com.tutpro.baresip.plus;
+package com.tutpro.baresip.plus
 
-import android.graphics.ImageFormat;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CaptureRequest;
-import android.media.Image;
-import android.media.ImageReader;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.util.Range;
-import android.view.Surface;
+import android.Manifest
+import android.graphics.ImageFormat
+import android.hardware.camera2.*
+import android.media.ImageReader
+import android.os.Handler
+import android.os.HandlerThread
+import android.util.Range
+import android.view.Surface
+import androidx.annotation.RequiresPermission
+import java.nio.ByteBuffer
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+class Camera2(
+    private val w: Int,
+    private val h: Int,
+    private val fps: Int,
+    private val userData: Long
+) {
 
-public class Camera2 {
-    private CameraDevice cameraDevice;
-    private CameraCaptureSession captureSession;
-    private HandlerThread bgThread;
-    private Handler bgHandler;
-    private ImageReader imageReader;
-    private Surface previewSurface;
-    private static CameraManager cameraManager = null;
+    private var cameraDevice: CameraDevice? = null
+    private var captureSession: CameraCaptureSession? = null
+    private var bgThread: HandlerThread? = null
+    private var bgHandler: Handler? = null
+    private var imageReader: ImageReader? = null
+    private var previewSurface: Surface? = null
+    private var isRunning = false
 
-
-    private boolean isRunning = false;
-    private final long userData;
-    private final int fps;
-    private final int w;
-    private final int h;
-
-    public static void SetCameraManager(CameraManager cm) {
-        cameraManager = cm;
+    fun startBackground() {
+        bgThread = HandlerThread("CameraBg").apply { start() }
+        bgHandler = Handler(bgThread!!.looper)
     }
 
-    public static CameraManager GetCameraManager() {
-        return cameraManager;
-    }
-
-    public Camera2(int w_, int h_, int fps_, long userData_) {
-        w = w_;
-        h = h_;
-        userData = userData_;
-        fps = fps_;
-    }
-
-    public void startBackground() {
-        bgThread = new HandlerThread("CameraBg");
-        bgThread.start();
-        bgHandler = new Handler(bgThread.getLooper());
-    }
-
-    public void stopBackground() {
-        if (bgThread != null) {
-            bgThread.quitSafely();
+    fun stopBackground() {
+        bgThread?.let {
+            it.quitSafely()
             try {
-                bgThread.join();
-            } catch (InterruptedException e) {
+                it.join()
+            } catch (_: InterruptedException) {
             }
-            bgThread = null;
-            bgHandler = null;
         }
+        bgThread = null
+        bgHandler = null
+        Log.d("Camera2", "stopBackground")
     }
 
-    public void startCamera(Surface previewSurface, int facing) {
-        this.previewSurface = previewSurface;
-        startBackground();
-        imageReader = ImageReader.newInstance(w, h, ImageFormat.YUV_420_888, 3);
-        imageReader.setOnImageAvailableListener(imageAvailListener, bgHandler);
-        isRunning = true;
+    @RequiresPermission(Manifest.permission.CAMERA)
+    @Suppress("unused")
+    fun startCamera(previewSurface: Surface?, facing: Int) {
+        this.previewSurface = previewSurface
+        startBackground()
+        imageReader = ImageReader.newInstance(w, h, ImageFormat.YUV_420_888, 3).apply {
+            setOnImageAvailableListener(imageAvailListener, bgHandler)
+        }
+        isRunning = true
         try {
-            String cameraId = getCameraId(facing);
-            cameraManager.openCamera(cameraId, camStateCallback, bgHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
+            val cameraId = getCameraId(facing)
+            cameraId?.let  {
+                cameraManager?.openCamera(it, camStateCallback, bgHandler)
+            }
+        } catch (e: CameraAccessException) {
+            e.printStackTrace()
         }
     }
 
-    private String getCameraId(int facing) throws CameraAccessException {
-        for (String id : cameraManager.getCameraIdList()) {
-            CameraCharacteristics c = cameraManager.getCameraCharacteristics(id);
-            Integer lensFacing = c.get(CameraCharacteristics.LENS_FACING);
-            if (lensFacing != null && lensFacing == facing) return id;
+    @Throws(CameraAccessException::class)
+    private fun getCameraId(facing: Int): String? {
+        cameraManager?.cameraIdList?.forEach { id ->
+            val c = cameraManager!!.getCameraCharacteristics(id)
+            val lensFacing = c.get(CameraCharacteristics.LENS_FACING)
+            if (lensFacing != null && lensFacing == facing) return id
         }
-        return null;
+        return null
     }
 
-    public void stopCamera() {
-        if (!isRunning) return;
-
-        isRunning = false;
-        if (captureSession != null) {
-            captureSession.close();
-            captureSession = null;
-        }
-        if (cameraDevice != null) {
-            cameraDevice.close();
-            cameraDevice = null;
-        }
-        if (imageReader != null) {
-            imageReader.close();
-            imageReader = null;
-        }
-        stopBackground();
+    fun stopCamera() {
+        Log.d("Camera2", "stopCamera")
+        if (!isRunning) return
+        isRunning = false
+        captureSession?.close()
+        captureSession = null
+        cameraDevice?.close()
+        cameraDevice = null
+        imageReader?.close()
+        imageReader = null
     }
 
+    private val imageAvailListener = ImageReader.OnImageAvailableListener { reader ->
+        if (!isRunning) return@OnImageAvailableListener
+        val image = reader.acquireLatestImage() ?: return@OnImageAvailableListener
 
-    ImageReader.OnImageAvailableListener imageAvailListener = new ImageReader.OnImageAvailableListener() {
+        val planes = image.planes
+        val plane0: ByteBuffer = planes[0].buffer
+        val plane1: ByteBuffer? = if (planes.size > 1) planes[1].buffer else null
+        val plane2: ByteBuffer? = if (planes.size > 2) planes[2].buffer else null
 
-        @Override
-        public void onImageAvailable(ImageReader reader) {
-            if (!isRunning) return;
+        PushFrame(
+            userData,
+            plane0,
+            planes[0].rowStride,
+            planes[0].pixelStride,
+            plane1,
+            plane1?.let { planes[1].rowStride } ?: 0,
+            plane1?.let { planes[1].pixelStride } ?: 0,
+            plane2,
+            plane2?.let { planes[2].rowStride } ?: 0,
+            plane2?.let { planes[2].pixelStride } ?: 0
+        )
 
-            Image image = reader.acquireLatestImage();
-            if (image == null) return;
+        image.close()
+    }
 
-            /* Get planes buffers. According to the docs, the buffers are always direct buffers */
-            Image.Plane[] planes = image.getPlanes();
-            ByteBuffer plane0 = planes[0].getBuffer();
-            ByteBuffer plane1 = planes.length > 1 ? planes[1].getBuffer() : null;
-            ByteBuffer plane2 = planes.length > 2 ? planes[2].getBuffer() : null;
-            assert plane0.isDirect();
-
-            //for (Image.Plane p: planes) {
-            //  Log.d(TAG, String.format("size=%d bytes, getRowStride()=%d getPixelStride()=%d", p.getBuffer().remaining(), p.getRowStride(), p.getPixelStride()));
-            //}
-
-            PushFrame(userData, plane0, planes[0].getRowStride(), planes[0].getPixelStride(), plane1, plane1 != null ? planes[1].getRowStride() : 0, plane1 != null ? planes[1].getPixelStride() : 0, plane2, plane2 != null ? planes[2].getRowStride() : 0, plane2 != null ? planes[2].getPixelStride() : 0);
-
-            image.close();
-        }
-    };
-
-    private final CameraDevice.StateCallback camStateCallback = new CameraDevice.StateCallback() {
-        @Override
-        public void onOpened(CameraDevice camera) {
-            cameraDevice = camera;
+    private val camStateCallback = object : CameraDevice.StateCallback() {
+        override fun onOpened(camera: CameraDevice) {
+            cameraDevice = camera
             try {
-                CaptureRequest.Builder builder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                val builder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                val targets = mutableListOf<Surface>()
 
-                // There is a previewSurface to add
-                List<Surface> targets = new ArrayList<>();
-                if (previewSurface != null) {
-                    builder.addTarget(previewSurface);
-                    targets.add(previewSurface);
+                previewSurface?.let {
+                    builder.addTarget(it)
+                    targets.add(it)
                 }
 
-                // ImageReader must be added
-                builder.addTarget(imageReader.getSurface());
-                targets.add(imageReader.getSurface());
+                imageReader?.surface?.let {
+                    builder.addTarget(it)
+                    targets.add(it)
+                }
 
-                builder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range<>(fps, fps));
+                builder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, Range(fps, fps))
 
-                camera.createCaptureSession(targets, new CameraCaptureSession.StateCallback() {
-                    @Override
-                    public void onConfigured(CameraCaptureSession session) {
-                        captureSession = session;
+                camera.createCaptureSession(targets, object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        captureSession = session
                         try {
-                            session.setRepeatingRequest(builder.build(), null, bgHandler);
-                        } catch (CameraAccessException e) {
-                            e.printStackTrace();
+                            session.setRepeatingRequest(builder.build(), null, bgHandler)
+                        } catch (e: CameraAccessException) {
+                            e.printStackTrace()
                         }
                     }
 
-                    @Override
-                    public void onConfigureFailed(CameraCaptureSession session) {
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
                         // You can add callbacks or logs
                     }
-                }, bgHandler);
-            } catch (CameraAccessException e) {
-                e.printStackTrace();
+                }, bgHandler)
+            } catch (e: CameraAccessException) {
+                e.printStackTrace()
             }
         }
 
-        @Override
-        public void onDisconnected(CameraDevice camera) {
-            camera.close();
+        override fun onDisconnected(camera: CameraDevice) {
+            camera.close()
         }
 
-        @Override
-        public void onError(CameraDevice camera, int error) {
-            camera.close();
+        override fun onError(camera: CameraDevice, error: Int) {
+            camera.close()
         }
-    };
 
-    native void PushFrame(long userData_, ByteBuffer plane0, int rowStride0, int pixStride0, ByteBuffer plane1, int rowStride1, int pixStride1, ByteBuffer plane2, int rowStride2, int pixStride2);
+        override fun onClosed(camera: CameraDevice) {
+            Log.d("Camera2", "onClosed")
+            stopBackground()
+        }
+    }
 
+    external fun PushFrame(
+        userData_: Long,
+        plane0: ByteBuffer, rowStride0: Int, pixStride0: Int,
+        plane1: ByteBuffer?, rowStride1: Int, pixStride1: Int,
+        plane2: ByteBuffer?, rowStride2: Int, pixStride2: Int
+    )
+
+    companion object {
+        private var cameraManager: CameraManager? = null
+
+        @JvmStatic
+        fun SetCameraManager(cm: CameraManager) {
+            cameraManager = cm
+        }
+
+        @JvmStatic
+        fun GetCameraManager(): CameraManager? {
+            return cameraManager
+        }
+    }
 }
