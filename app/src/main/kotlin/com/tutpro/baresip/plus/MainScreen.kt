@@ -2468,6 +2468,10 @@ private fun answer(ctx: Context, viewModel: ViewModel, video: Boolean) {
             else
                 Api.SDP_RECVONLY
             call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
+            if (call.videoEnabled()) {
+                Log.d(TAG, "Enabling video layout at answer")
+                showVideoLayout.value = true
+            }
         }
         else {
             call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
@@ -2477,7 +2481,6 @@ private fun answer(ctx: Context, viewModel: ViewModel, video: Boolean) {
         intent.action = "Call Answer"
         intent.putExtra("uap", ua.uap)
         intent.putExtra("callp", call.callp)
-        intent.putExtra("video", Api.VIDMODE_OFF)
         ctx.startService(intent)
     }
 }
@@ -2706,12 +2709,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua, Call.ofCallp(callp))
         }
         "call answered" -> {
-            val callp = params[1] as Long
-            val call = Call.ofCallp(callp)!!
-            if (call.videoEnabled()) {
-                Log.d(TAG, "Enabling video layout at call answered")
-                showVideoLayout.value = true
-            }
             showCall(ctx, viewModel, ua)
         }
         "call redirect", "video call redirect" -> {
@@ -2939,10 +2936,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             }
             val ua = call.ua
             spinToAor(viewModel, ua.account.aor)
-            if (ev[0] == "call answer") {
+            if (ev[0] == "call answer")
                 answer(ctx, viewModel, false)
-                showCall(ctx, viewModel, ua, call)
-            }
             else
                 BaresipService.postServiceEvent(ServiceEvent(
                     "call incoming",
