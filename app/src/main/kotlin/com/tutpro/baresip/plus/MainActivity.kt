@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // Set up the camera manager
-        Camera2.SetCameraManager( getSystemService(Context.CAMERA_SERVICE) as CameraManager);
+        Camera2.setCameraManager(getSystemService(Context.CAMERA_SERVICE) as CameraManager)
 
         enableEdgeToEdge()
 
