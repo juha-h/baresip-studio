@@ -23,6 +23,7 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.content.res.Configuration
 import android.database.ContentObserver
 import android.graphics.BitmapFactory
+import android.hardware.camera2.CameraManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
@@ -154,6 +155,9 @@ class BaresipService: Service() {
             @Suppress("DEPRECATION")
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
+
+        // Set up the camera manager
+        Camera2.setCameraManager(getSystemService(Context.CAMERA_SERVICE) as CameraManager)
 
         // This is needed to keep service running also in Doze Mode
         partialWakeLock = pm.run {

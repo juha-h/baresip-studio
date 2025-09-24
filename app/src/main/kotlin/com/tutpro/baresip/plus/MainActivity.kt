@@ -63,9 +63,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // Set up the camera manager
-        Camera2.setCameraManager(getSystemService(Context.CAMERA_SERVICE) as CameraManager)
-
         enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
