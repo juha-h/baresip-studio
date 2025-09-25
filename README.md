@@ -2,7 +2,7 @@ This branch adds video calling capability to baresip app and provides its sister
 
 Static libraries and include files need to be generated to distribution directory using video branch of <a href="https://github.com/juha-h/libbaresip-android">libbaresip-android</a>.  Video codecs and support of android_camera input device are provided by FFmpeg libraries and need at least Android API level 24.
 
-Video calling is possible only on devices that include Camera2 API at hardware support level LEVEL 3. For example, many Samsung devices only have support level LIMITED. Use Camera2 Probe app to check yours.
+Video calling is possible on devices that include Camera2 API at hardware support level LIMITED or higher.
 
 Ready to be installed baresip+ app is available from <a href="https://f-droid.org/en/packages/com.tutpro.baresip.plus">F-Droid</a> and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.
 
