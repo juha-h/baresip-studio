@@ -160,6 +160,7 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 {
     int err = 0;
 
+    (void)vd;
     (void)prm;
     (void)dev;
     (void)resizeh;
@@ -172,7 +173,6 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
     if (!gst)
         return ENOMEM;
 
-    gst->vd = vd;
     *stp = gst;
 
     return err;

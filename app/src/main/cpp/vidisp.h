@@ -7,7 +7,6 @@
 
 struct vidisp_st
 {
-    const struct vidisp *vd;
     struct vidframe *vf;
 
     GLuint texture_id;
