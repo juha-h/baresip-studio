@@ -1,0 +1,5 @@
+- Camera can now be used when Camera2 API level is LIMITED or higher
+- Fixed video display related crash
+- Avoid "flash" when calling from contacts or call history
+- Do not show call button when call video button has been touched
+- New translations (Czech)
