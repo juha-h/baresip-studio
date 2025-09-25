@@ -10,10 +10,6 @@ void jni_set_jvm(JavaVM *jvm)
     jni_jvm = jvm;
 }
 
-JavaVM *jni_get_jvm(void) {
-    return jni_jvm;
-}
-
 bool jni_attach_jvm(void **jni_env)
 {
     if (!jni_jvm)
