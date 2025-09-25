@@ -73,6 +73,7 @@ class Camera2(
         return null
     }
 
+    @Suppress("unused")
     fun stopCamera() {
         Log.d("Camera2", "stopCamera")
         if (!isRunning) return
