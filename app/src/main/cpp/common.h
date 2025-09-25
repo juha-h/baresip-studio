@@ -13,8 +13,6 @@
 
 void jni_set_jvm(JavaVM *jvm);
 
-JavaVM *jni_get_jvm(void);
-
 bool jni_attach_jvm(void **jni_env);
 
 void jni_detach_jvm(bool attached);
