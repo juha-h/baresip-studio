@@ -13,8 +13,6 @@
 struct vidsrc_st
 {
     struct vidframe *frame;
-//    thrd_t thread;
-//    RE_ATOMIC bool run;
     uint64_t ts;
     double fps;
     vidsrc_frame_h *frameh;
