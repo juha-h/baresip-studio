@@ -43,8 +43,6 @@ static bool resize = false;
 
 struct vidisp *vid;
 
-//struct vidisp_st *gst = NULL;
-
 static void renderer_destroy(struct vidisp_st *st)
 {
     LOGD("At renderer_destroy() on thread %li\n", (long)pthread_self());
@@ -63,7 +61,6 @@ static void renderer_destroy(struct vidisp_st *st)
         st->display = EGL_NO_DISPLAY;
     }
     eglReleaseThread();
-//    gst = NULL;
 }
 
 static void destructor(void *arg)
@@ -170,29 +167,12 @@ int opengles_alloc(struct vidisp_st **stp, const struct vidisp *vd, struct vidis
 
     LOGD("At opengles_alloc() on thread %li\n", (long)pthread_self());
 
-//    if (gst)
-//        renderer_destroy(gst);
-
     struct vidisp_st *gst = NULL;
     gst = mem_zalloc(sizeof(*gst), destructor);
     if (!gst)
         return ENOMEM;
 
     gst->vd = vd;
-//    gst->window = window;
-
-    // You can initialize it first, as assigning the window might have some delay.
-//    if (gst->window == NULL) {
-//        LOGW("Window is NULL\n");
-//        err = EINVAL;
-//    }
-
-    // context should be initialized here and not in opengles_display
-    // err = context_initialize(gst);
-
-//    if (err)
-//        mem_deref(gst);
-//    else
     *stp = gst;
 
     return err;
