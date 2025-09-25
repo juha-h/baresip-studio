@@ -157,7 +157,7 @@ class BaresipService: Service() {
         }
 
         // Set up the camera manager
-        Camera2.setCameraManager(getSystemService(Context.CAMERA_SERVICE) as CameraManager)
+        Camera2.setCameraManager(getSystemService(CAMERA_SERVICE) as CameraManager)
 
         // This is needed to keep service running also in Doze Mode
         partialWakeLock = pm.run {
