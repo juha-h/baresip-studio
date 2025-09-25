@@ -167,7 +167,7 @@ private fun AccountScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = LocalCustomColors.current.primary
                     )
                 )

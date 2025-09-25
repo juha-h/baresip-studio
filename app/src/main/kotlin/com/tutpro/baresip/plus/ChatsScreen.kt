@@ -221,7 +221,7 @@ private fun TopAppBar(
                 }
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = LocalCustomColors.current.primary
         )
     )

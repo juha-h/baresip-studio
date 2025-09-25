@@ -213,7 +213,7 @@ private fun TopAppBar(
                 fontWeight = FontWeight.Bold
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = LocalCustomColors.current.primary
         ),
         navigationIcon = {
