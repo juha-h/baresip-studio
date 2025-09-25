@@ -3,6 +3,8 @@ package com.tutpro.baresip.plus
 import android.Manifest
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
+import android.hardware.camera2.params.OutputConfiguration
+import android.hardware.camera2.params.SessionConfiguration
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
@@ -10,6 +12,7 @@ import android.util.Range
 import android.view.Surface
 import androidx.annotation.RequiresPermission
 import java.nio.ByteBuffer
+import java.util.concurrent.Executor
 
 class Camera2(
     private val w: Int,
@@ -114,6 +117,7 @@ class Camera2(
     private val camStateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
+
             try {
                 val builder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 val targets = mutableListOf<Surface>()
@@ -130,20 +134,29 @@ class Camera2(
 
                 builder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, Range(fps, fps))
 
-                camera.createCaptureSession(targets, object : CameraCaptureSession.StateCallback() {
-                    override fun onConfigured(session: CameraCaptureSession) {
-                        captureSession = session
-                        try {
-                            session.setRepeatingRequest(builder.build(), null, bgHandler)
-                        } catch (e: CameraAccessException) {
-                            e.printStackTrace()
+                val outputConfigs = targets.map { OutputConfiguration(it) }
+                val executor = Executor { command -> bgHandler?.post(command) }
+                val sessionConfig = SessionConfiguration(
+                    SessionConfiguration.SESSION_REGULAR,
+                    outputConfigs,
+                    executor,
+                    object : CameraCaptureSession.StateCallback() {
+                        override fun onConfigured(session: CameraCaptureSession) {
+                            captureSession = session
+                            try {
+                                session.setRepeatingRequest(builder.build(), null, bgHandler)
+                            } catch (e: CameraAccessException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        override fun onConfigureFailed(session: CameraCaptureSession) {
+                            // You can add callbacks or logs
                         }
                     }
+                )
 
-                    override fun onConfigureFailed(session: CameraCaptureSession) {
-                        // You can add callbacks or logs
-                    }
-                }, bgHandler)
+                camera.createCaptureSession(sessionConfig)
+
             } catch (e: CameraAccessException) {
                 e.printStackTrace()
             }
