@@ -1940,7 +1940,6 @@ private fun answer(ctx: Context, viewModel: ViewModel) {
         intent.action = "Call Answer"
         intent.putExtra("uap", ua.uap)
         intent.putExtra("callp", call.callp)
-        intent.putExtra("video", Api.VIDMODE_OFF)
         ctx.startService(intent)
     }
 }
@@ -2355,10 +2354,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             }
             val ua = call.ua
             spinToAor(viewModel, ua.account.aor)
-            if (ev[0] == "call answer") {
+            if (ev[0] == "call answer")
                 answer(ctx, viewModel)
-                showCall(ctx, viewModel, ua, call)
-            }
             else
                 BaresipService.postServiceEvent(ServiceEvent(
                     "call incoming",

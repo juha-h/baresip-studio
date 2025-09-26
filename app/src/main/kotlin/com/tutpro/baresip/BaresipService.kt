@@ -514,13 +514,12 @@ class BaresipService: Service() {
             "Call Answer" -> {
                 val uap = intent!!.getLongExtra("uap", 0L)
                 val callp = intent.getLongExtra("callp", 0L)
-                val vidMode = intent.getIntExtra("video", Api.VIDMODE_OFF)
                 stopRinging()
                 stopMediaPlayer()
                 am.mode = MODE_IN_COMMUNICATION
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                Api.ua_answer(uap, callp, vidMode)
+                Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
             }
 
             "Call Reject" -> {
