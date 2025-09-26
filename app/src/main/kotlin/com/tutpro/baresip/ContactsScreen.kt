@@ -96,7 +96,7 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
                             fontWeight = FontWeight.Bold
                         )
                     },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = LocalCustomColors.current.primary
                     ),
                     navigationIcon = {

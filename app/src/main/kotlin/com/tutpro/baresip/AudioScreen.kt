@@ -120,7 +120,7 @@ private fun AudioScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = LocalCustomColors.current.primary
                     )
                 )

@@ -152,7 +152,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                 fontWeight = FontWeight.Bold
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = LocalCustomColors.current.primary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
