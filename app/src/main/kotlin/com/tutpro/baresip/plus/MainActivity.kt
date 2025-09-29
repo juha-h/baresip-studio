@@ -215,6 +215,9 @@ class MainActivity : ComponentActivity() {
                 arrayOf(RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
             else
                 arrayOf(RECORD_AUDIO)
+
+        BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
+
         if (BaresipService.supportedCameras)
             permissions = permissions + CAMERA
 

@@ -477,8 +477,6 @@ class BaresipService: Service() {
 
                 Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
-                supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
-
                 val userAgent = Config.variable("user_agent")
 
                 Thread {
