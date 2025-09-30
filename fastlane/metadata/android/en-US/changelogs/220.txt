@@ -1,0 +1,1 @@
+- Ask also Camera permission when app is started the first time
