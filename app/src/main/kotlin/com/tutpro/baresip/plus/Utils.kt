@@ -800,11 +800,13 @@ object Utils {
             for (id in cm.cameraIdList) {
                 val chars = cm.getCameraCharacteristics(id)
                 val level = chars.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
-                if (level in setOf(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
-                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3,
-                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)) {
-                    val dir = chars.get(CameraCharacteristics.LENS_FACING)
-                    if (dir != null) cameras[id] = dir
+                if (level in setOf(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3,
+                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
+                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY)
+                    ) {
+                        val dir = chars.get(CameraCharacteristics.LENS_FACING)
+                        if (dir != null) cameras[id] = dir
                 }
             }
         } catch (e: CameraAccessException) {
