@@ -9,6 +9,7 @@
 
 # Add any project specific keep options here:
 -keepattributes LineNumberTable,SourceFile
+-keep class com.tutpro.baresip.plus.Camera2 { *; }
 -dontobfuscate
 
 # If your project uses WebView with JS, uncomment the following
