@@ -2,7 +2,7 @@ This is a bare-bones Android Studio project implementing <a href="https://github
 
 Currently the application supports voice calling and messaging, UDP, TCP, TLS, and WSS signaling transports, voicemail Message Waiting Indication, call transfers (REFER), PCMU/PCMA, Codec2, G.722, G.722.1, G.726, G.729, AMR, and Opus voice codecs, as well as ZRTP and (DTLS) SRTP media encapsulation. Minimum supported Android version is 9 (API level 28).
 
-If you need video calling and have a device that supports Camera2 API at level LIMITED or higher, you can instead of this application install its sister application baresip+ from video branch.
+If you need video calling and have a device that supports Camera2 API, you can instead of this application install its sister application baresip+ from video branch.
 
 After cloning the project, generate static libraries and include files to distribution directory using master branch of <a href="https://github.com/juha-h/libbaresip-android">libbaresip-android</a>.
 
