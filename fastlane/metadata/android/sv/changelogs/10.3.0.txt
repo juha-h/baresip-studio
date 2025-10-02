@@ -1,0 +1,4 @@
+- Lagt till menyn Samtalshistorik som gör det möjligt att radera, inaktivera och aktivera
+  av kontots samtalshistorik.
+- Spanska språksträngar tillagda (tack till Javier Falbo).
+- Automatisk start av baresip är nu standard i nya installationer.

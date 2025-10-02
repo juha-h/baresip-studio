@@ -1,0 +1,4 @@
+- Lagt till kontoinställningar för numeriskt tangentbord
+- Lagt till verktygstips till ikonerna i huvudaktivitetens övre appfält
+- Visa kontots fullständiga SIP URI på kontosidan
+- Nya översättningar (japanska och tamilska)

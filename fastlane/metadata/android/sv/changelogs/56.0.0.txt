@@ -1,0 +1,6 @@
+- Tillåt att baresip väljs som standardtelefonapp (välj inte om du också använder telefonitjänster)
+- Stöd för både CALL- och DIAL-åtgärder från andra appar
+- Åtgärdat fel vid inställning av kontots telefonileverantör
+- I meddelanden, stöd även för andra teckenuppsättningar än UTF-8
+- Använd standardvärden för audio_buffer och jitter_buffer_delay
+- Nya översättningar till tjeckiska och ryska

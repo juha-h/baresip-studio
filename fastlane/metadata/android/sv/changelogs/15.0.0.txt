@@ -1,0 +1,2 @@
+- Bildbaserade kontaktavatarer har lagts till som alternativ till karaktärsavatarer.
+- Små förbättringar och korrigeringar av användargränssnittet.

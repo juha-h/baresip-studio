@@ -1,0 +1,7 @@
+- Ersatte export och import av konton och kontakter med säkerhetskopiering
+  och återställning av all applikationsdata.
+- Förbättrad säkerhet genom att inte tillåta säkerhetskopiering av Android-baserade applikationer och
+  installation av applikationer till extern lagring.
+- När ett konto raderas kommer även kontots samtals- och chatthistorik raderas.
+- Fast radering av meddelanden och chattar.
+- Mindre förbättringar av användargränssnitt och strängar.

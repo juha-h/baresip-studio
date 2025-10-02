@@ -1,0 +1,8 @@
+- Fixat sparande av ett konto som har ;transportparameter i sin AoR.
+- Fixat aktivering av meddelanden när samtal stängs.
+- Använd vit statusikon när kontots registrering inte har aktiverats.
+- Standardvolymen för samtal påverkar nu både röstsamtal och musikströmmar.
+- Förbättrad layout och implementering av kontoaktivitet.
+- Visa inte debug-meddelanden från Baresip Lib om Debug inte har aktiverats.
+- Skapa inte om aktiviteter när skärmens orientering ändras.
+- Visa chattinformation som inte ryms på en rad på rätt sätt

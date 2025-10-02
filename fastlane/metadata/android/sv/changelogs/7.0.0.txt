@@ -1,0 +1,4 @@
+- Lagt till stöd för IPv6 (ej testat på grund av bristande tillgång till IPv6-nätverk).
+- Konfigurationsalternativet "Prefer IPv6" har lagts till.
+- Lagt till konfigurationsalternativet "Reset to Factory Default".
+- Vid Avsluta, se till att även baresip-aktiviteten stoppas.

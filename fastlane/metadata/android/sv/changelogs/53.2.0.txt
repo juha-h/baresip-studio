@@ -1,0 +1,2 @@
+- Förbättringar av meddelanden om registreringsstatus
+- Flera ikonbilder har ersatts med vektorritningar i materialdesign

@@ -1,0 +1,1 @@
+- Undvik eventuella kontaktrelaterade krascher vid start av Baresip

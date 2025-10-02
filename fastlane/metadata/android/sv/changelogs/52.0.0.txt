@@ -1,0 +1,5 @@
+- Lagt till stöd för att välja från flera tel:/sip: URI:er i Android
+- kontakter
+- Ett aktivt konto måste nu ha en telefoniprovider konfigurerad för att kunna
+  ringa eller skicka ett meddelande till tel: URI
+- Nya översättningar till portugisiska (Brasilien), spanska, svenska och finska

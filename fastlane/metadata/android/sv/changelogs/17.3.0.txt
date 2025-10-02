@@ -1,0 +1,3 @@
+- Lagt till kryssrutan "Visa lösenord" i meddelandet om autentiseringslösenord.
+- Be om mikrofontillstånd som det första när baresip startar.
+- Tillåt inte " tecken i kontots autentiseringslösenord.

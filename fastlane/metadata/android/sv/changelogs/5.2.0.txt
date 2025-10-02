@@ -1,0 +1,4 @@
+- Meddela användaren om misslyckad registrering.
+- Lagt till knapp för samtalsinfo för ett aktivt samtal.
+- Kräver inte "sip:"-schema i URI för utgående proxy.
+- Tillåt att domänetiketten börjar med en siffra.

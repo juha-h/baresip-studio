@@ -1,0 +1,2 @@
+- Lagt till information om baresip, CPU och Android i User-Agent-huvudet
+- Tidpunkten för det inspelade samtalet visas nu i accentfärg

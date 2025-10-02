@@ -1,0 +1,6 @@
+- Lagt till stöd för AMR-codec Bandwidth Efficient Mode
+- Tillåt undangömda tecken i SIP URI-användardelen och autentiseringsanvändarnamnet
+- Använd coroutine istället för async task för att hämta kontokonfiguration från nätverket
+- I Android 10+ använd väljare för att välja TLS-certifikat och TLS CA-filer
+- Be om bekräftelse för att återställa inställningar till fabriksinställningar
+- Nya översättningar (portugisiska och portugisiska (Brasilien))

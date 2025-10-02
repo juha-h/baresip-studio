@@ -1,0 +1,6 @@
+- Ersatte den globala inställningen "Prefer IPv6" med den kontospecifika inställningen "Prefer IPv6 Media".
+- Förbättrad hantering av förändringar i nätverksanslutningen.
+- Kräver inte port i utgående URI för IPv6.
+- Övergav ljudfokus även vid avslutning om det inte redan gjorts tidigare.
+- Lagt till initialt stöd för ryska språket.
+- Uppdaterade vissa norska strängar.

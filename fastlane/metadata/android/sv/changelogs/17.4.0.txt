@@ -1,0 +1,3 @@
+- Lagt till stöd för Android 10 (API-nivå 29).
+- Förbättrad fråga om mikrofontillstånd när baresip startas för första gången.
+- Undvik krasch om samtalsknappen vidrörs utan konton.

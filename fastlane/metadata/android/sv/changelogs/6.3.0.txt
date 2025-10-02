@@ -1,0 +1,2 @@
+- Lagt till Debug Config-alternativ för att slå på och av adb logcat debug.
+- Lagt till möjlighet att exportera och importera konton till/från fil i Download-katalogen.

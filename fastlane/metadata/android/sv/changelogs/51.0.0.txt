@@ -1,0 +1,4 @@
+- Vibrera och vibrera medan du ringer enligt inställningarna för ljud och vibrationer
+- Bluetooth-fixar och förbättringar för Android 12+-enheter
+- Visa behörighetsinformation när baresip startas för första gången
+- Nya översättningar till svenska och portugisiska (Brasilien)

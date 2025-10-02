@@ -1,0 +1,3 @@
+- Visa nummerplatta automatiskt endast när enheten är orienterad i stående läge
+- Spela inte upp samtalsvänteljudet när ett andra samtal kommer in
+- Förbättrad Om-text

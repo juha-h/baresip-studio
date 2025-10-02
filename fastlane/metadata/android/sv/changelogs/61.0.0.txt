@@ -1,0 +1,6 @@
+- Inställningen User Agent har lagts till och kan användas för att ange värdet för User-Agent-fältet i SIP-begäran/-svaret
+- Tillåt , och #-tecken i telefonnumret (till exempel när du ringer Teams)
+- Använd accentfärg i stället för fetstil i kolumnen Samtalshistorik om ett samtal i den samtalsraden har spelats in
+- Inkludera inte uuid i backupfilen (förhindrar att många baresip UAs har samma identitet)
+- Som standard inkluderas datum och tid i backupfilens namn
+- Nya översättningar till spanska och portugisiska (Brasilien)

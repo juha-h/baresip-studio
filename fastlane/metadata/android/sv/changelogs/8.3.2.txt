@@ -1,0 +1,5 @@
+- Om kontot nås från AoR spinner, gå direkt tillbaka till Main
+Aktivitet.
+- Använd HtmlCompat för att konvertera About HTML till text (bör fungera på alla
+Android API-nivåer).
+- Använd ringsignalens loopingfunktion på Android P+.

@@ -1,0 +1,4 @@
+- Protokollet SRTP-MANDF för kryptering av media har lagts till.
+- Säkerhetsknappens färg ändras nu från rött till gult även när samtalet är
+skyddas av ett SRTP*-protokoll för mediekryptering.
+- Fast inställning av kontomediakryptering till DTLS-SRTPF.

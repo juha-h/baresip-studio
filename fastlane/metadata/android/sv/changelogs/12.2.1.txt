@@ -1,0 +1,1 @@
+- Förbättrad och fixerad hantering av dynamiska nätverksförändringar.

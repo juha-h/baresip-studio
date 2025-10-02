@@ -1,0 +1,3 @@
+- Spela upp autosvarsljud vid autosvar
+- Borttagen iLBC-codec (borttagen från uppströms)
+- Tog bort oanvända ljudfiler

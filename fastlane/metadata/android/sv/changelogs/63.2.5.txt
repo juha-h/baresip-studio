@@ -1,0 +1,2 @@
+- Varning om AEC för hårdvara inte är tillgängligt när AEC för mjukvara är inaktiverat i ljudinställningarna
+- Nya översättningar (portugisiska Brasilien)

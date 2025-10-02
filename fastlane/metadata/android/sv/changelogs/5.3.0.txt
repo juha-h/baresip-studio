@@ -1,0 +1,2 @@
+- Lagt till popup-meddelande som berättar varför samtalet avslutades.
+- Fixat visning av URI för anropande part om den innehåller portnummer eller parametrar.

@@ -1,0 +1,4 @@
+- Förbättrad Om-text
+- Återställer chattlistans position när du återvänder från chatten
+- Fixad krasch när man frågar efter kontots lösenord
+- Försök inte ladda iLBC-modulen

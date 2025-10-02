@@ -1,0 +1,3 @@
+- Fixad hantering av DTMF backspace-tecken
+- Förbättringar i användargränssnittet för chatt och kontakt
+- Använd bakgrundsfärg även i systemfält

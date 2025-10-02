@@ -1,0 +1,2 @@
+- Ljudinställningen "Audio Delay" har lagts till
+- Förbättrat test för anslutning av Bluetooth-headset

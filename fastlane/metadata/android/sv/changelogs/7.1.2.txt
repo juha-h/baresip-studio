@@ -1,0 +1,2 @@
+- Försökte se till att även kontospinnarvyn uppdateras när
+kontospinnaren uppdateras.

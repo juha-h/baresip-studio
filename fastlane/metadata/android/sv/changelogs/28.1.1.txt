@@ -1,0 +1,2 @@
+- Fixad färgning av inställningen för ljudmoduler
+- Fixad krasch och utseende relaterad till samtalslista

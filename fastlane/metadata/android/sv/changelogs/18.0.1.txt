@@ -1,0 +1,1 @@
+- Ökning av det maximala antalet ljudcodecs för kontot från 8 till 16.

@@ -1,0 +1,3 @@
+- Be om POST_NOTIFICATIONS-behörighet på Android 13+-enheter
+- Använd grå mikrofonikon när mikrofonen inte är avstängd
+- Använd svarsmeddelandet "Upptagen här" när ett samtal avvisas

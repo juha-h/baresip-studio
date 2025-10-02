@@ -1,0 +1,2 @@
+- Fixad krasch vid nätverksändringar
+- Nya översättningar till portugisiska (Brasilien)

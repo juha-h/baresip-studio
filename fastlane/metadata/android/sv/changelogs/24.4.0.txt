@@ -1,0 +1,1 @@
+- Ange inte STUN/TURN-serverns användarnamn/lösenord som standard till Authentication Username/Password

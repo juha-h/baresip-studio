@@ -1,0 +1,1 @@
+- Korrigerad krasch när man klickar på spinnern för tomma konton.

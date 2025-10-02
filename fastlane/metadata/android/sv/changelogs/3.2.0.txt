@@ -1,0 +1,2 @@
+- Lagt till knapp för att välja mellan telefonnummer och mjukt tangentbord för text.
+- Fixat automatisk komplettering av callee baserat på kontakter.

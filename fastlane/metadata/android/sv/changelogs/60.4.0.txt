@@ -1,0 +1,3 @@
+- Korrekt hantering av överföringsbegäran när det ursprungliga samtalet redan är avslutat
+- Korrigerad hantering av stateless TLS SIP-begäranden
+- Nya översättningar till portugisiska, portugisiska (Brasilien), spanska, franska, ryska, engelska, finska, svenska, tyska och tjeckiska

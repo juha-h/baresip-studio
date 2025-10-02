@@ -1,0 +1,3 @@
+- Förbättringar av processen Avsluta/omstarta
+- Försök att stödja växling av SpeakerPhone på API-nivåer 31+
+- Nya översättningar till portugisiska (Brasilien)

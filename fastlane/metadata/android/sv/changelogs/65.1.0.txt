@@ -1,0 +1,2 @@
+- Återställd svep vänster/höger för att växla mellan konton
+- Fixar och förbättringar i användargränssnittet för Konto och Inställningar

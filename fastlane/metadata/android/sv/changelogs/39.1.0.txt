@@ -1,0 +1,6 @@
+- Förbättrad och korrigerad hantering av meddelanden och samtalsöverföring
+- Toastregistrering misslyckas med alla aktuella aktiviteter
+- Automatisk kapitalisering av meddelandemeningar
+- Ersatte föråldrade lokala sändningar med LiveData-händelser
+- Fixat några buggar relaterade till hantering av externa samtalsåtgärder
+- Nya översättningar till portugisiska (Brasilien)

@@ -1,0 +1,3 @@
+- Lagt till mer vertikal utfyllnad i kontokonfigurationen
+- Hack för att fixa felaktigt escaped URI när samtal eller uppringningsbegäran kommer från utsidan
+- Nya tjeckiska översättningar

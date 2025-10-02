@@ -1,0 +1,2 @@
+- Flyttad inställning för standardvolym för samtal under Ljudinställningar
+- Nytt språk (tyska)

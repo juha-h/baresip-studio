@@ -1,0 +1,2 @@
+- Uppströmsfix av bugg som kan orsaka att Baresip-appen slutar svara
+- Nya tjeckiska översättningar

@@ -1,0 +1,2 @@
+- Förbättring av akustisk ekoundertryckning uppströms.
+- Nya översättningar: el, nb_NO, ro.

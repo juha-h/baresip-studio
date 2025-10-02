@@ -1,0 +1,3 @@
+- Tog bort oanvända baresip-moduler från konfiguration och bibliotek.
+- Baresip-tjänsten låter nu baresip-aktiviteten dö på egen hand efter att ha
+efter att ha fått en dödsavsikt från den.

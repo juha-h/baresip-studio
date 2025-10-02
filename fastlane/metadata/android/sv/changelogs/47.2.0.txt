@@ -1,0 +1,4 @@
+- Fördröj uppringning med 1 sek efter att samtalsikonen har tryckts på eftersom ljudläget
+  inte omedelbart ändras till kommunikation
+- Uppströmsfix av PRACK-hantering
+- Nya svenska översättningar

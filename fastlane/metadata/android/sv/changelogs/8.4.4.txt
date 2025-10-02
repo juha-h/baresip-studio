@@ -1,0 +1,4 @@
+- Uppströmsfix i opus codec-implementering.
+- Fixar för volymkontrollström.
+- Fixat automatiskt avvisande av nytt inkommande samtal.
+- Mindre förbättringar av strängar.

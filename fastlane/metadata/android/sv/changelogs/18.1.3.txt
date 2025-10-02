@@ -1,0 +1,1 @@
+- Förenklad styrning av närhetsavkänning.

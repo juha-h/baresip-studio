@@ -1,0 +1,1 @@
+- Fixat visning av kontostatus när standardkonto ändras.

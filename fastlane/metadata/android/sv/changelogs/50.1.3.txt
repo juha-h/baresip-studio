@@ -1,0 +1,3 @@
+- Förbättringar av processen Avsluta/omstarta
+- Fixar och förbättringar relaterade till högtalartelefon och samtal för API 31+
+- Nya översättningar till portugisiska (Brasilien)

@@ -1,0 +1,1 @@
+- Uppströmsfix av felet Media NAT Traversal (STUN/TURN/ICE)

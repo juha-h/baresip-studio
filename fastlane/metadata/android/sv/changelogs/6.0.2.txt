@@ -1,0 +1,1 @@
+- Korrigerad krasch när STUN-servern definieras utan portnummer.

@@ -1,0 +1,3 @@
+- Lagt till AMR-WB (Adaptive Multi-Rate Wideband) talkodek.
+- Avsnittet Licenser har lagts till i texten Om.
+- Nya översättningar till portugisiska (Brasilien).

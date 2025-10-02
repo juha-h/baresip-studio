@@ -1,0 +1,3 @@
+- Förhindra att baresip-tjänsten startas mer än en gång
+- Förbättringar av färger
+- Nya översättningar till spanska, ryska, portugisiska (Brasilien), svenska och tjeckiska

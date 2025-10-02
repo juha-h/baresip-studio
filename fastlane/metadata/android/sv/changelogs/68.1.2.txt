@@ -1,0 +1,4 @@
+- Förbättrad visning av tid för samtalshistorik
+- Ändrad bakgrundsfärg på statusikoner för färgblinda
+- Åtgärdat möjlig krasch relaterad till kontoinställning för registreringsintervall
+- Fixad uppdatering av statusmeddelanden

@@ -1,0 +1,1 @@
+- Åtgärdat flera problem med ljudfokus/routing/volymkontroll

@@ -1,0 +1,2 @@
+- NAT-protokollet för kontomedia kan nu väljas mellan STUN, ICE eller inget.
+- Sätt kontostatus till gult omedelbart när kontots registrering är avstängd.

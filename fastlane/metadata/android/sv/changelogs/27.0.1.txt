@@ -1,0 +1,1 @@
+- Fixad krasch när baresip startas första gången

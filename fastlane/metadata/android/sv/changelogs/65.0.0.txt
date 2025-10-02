@@ -1,0 +1,3 @@
+- Slutförd konvertering av användargränssnittet till Jetpack Compose
+- Fixat inställningen Verifiera servercertifikat
+- Nya portugisiska översättningar

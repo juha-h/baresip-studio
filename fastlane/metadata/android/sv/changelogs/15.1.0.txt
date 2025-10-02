@@ -1,0 +1,2 @@
+- Lagt till möjlighet att ange transportprotokoll för kontots AoR.
+- Visa inte kontots port eller transportprotokoll förutom i Account Activity.

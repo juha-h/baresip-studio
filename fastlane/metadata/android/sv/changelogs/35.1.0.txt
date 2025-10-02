@@ -1,0 +1,5 @@
+- När aec är aktiverat/inaktiverat, ladda/avladda webrtc_aecm-modulen
+- Använd BaresipService för att spela upp alla ljud
+- Korrekt hantering av svar på sessionsförlopp
+- Under samtal styr volymknapparna nu medievolymen
+- Använd kommunikationsljudläge när du inte är i ringljudläge

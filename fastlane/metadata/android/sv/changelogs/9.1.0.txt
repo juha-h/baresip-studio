@@ -1,0 +1,2 @@
+- Avvisa inkommande samtal automatiskt om telefonen inte är i viloläge.
+- Undertryck ringsignalen för inkommande samtal om enheten är i läget "Stör ej".

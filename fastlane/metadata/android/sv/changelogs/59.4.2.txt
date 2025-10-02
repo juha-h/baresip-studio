@@ -1,0 +1,2 @@
+- Upstream nekade som standard inkommande meddelanden.  Kan tillåtas igen
+  genom att göra någon ändring i konfigurationen av ett konto.

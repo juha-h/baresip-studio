@@ -1,0 +1,4 @@
+- Använd switchar istället för kryssrutor i alla aktiviteter
+- Varning vid start om Acoustic Echo Cancellation för nätverk eller hårdvara inte är tillgänglig
+- Åtgärdat fel som orsakade trunkering av uppringt telefonnummer
+- Undvik krasch relaterad till att använda baresip som uppringningsapp

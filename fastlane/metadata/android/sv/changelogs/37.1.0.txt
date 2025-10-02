@@ -1,0 +1,5 @@
+- Lagt till uppgifter om genomsnittlig bithastighet, jitter, antal paket och antal förlorade paket i samtalsinfo
+- Använd pausikonen med accentfärg för att indikera att användaren har satt samtalet på vänt
+- Informera användaren när den andra parten har satt samtalet i vänteläge
+- Mindre förbättringar relaterade till mjuk inmatning
+- Nya översättningar till portugisiska (Brasilien)

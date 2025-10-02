@@ -1,0 +1,3 @@
+- Spela upptagetton när svaret "486 Upptagen här" eller "603 Avböj" tas emot
+- Undvik onödig omregistrering när nätverkskapaciteten ändras
+- Förenklat övergivande av ljudfokus

@@ -1,0 +1,4 @@
+- Riktar sig mot Android 16 API-nivå 36
+- Lagt till inställning för närhetsavkänning
+- Fast inställning för kontakter Båda värdena
+- Nya översättningar (tjeckiska)

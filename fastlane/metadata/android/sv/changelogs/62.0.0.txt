@@ -1,0 +1,4 @@
+- Om tillgängligt, använd akustisk ekoreducering, automatisk förstärkningskontroll och
+  Brusreducerare som tillhandahålls av enheten
+
+- Android 9 (API-nivå 28) är nu den version som stöds minst

@@ -1,0 +1,3 @@
+- Använde nya API-funktioner 'net_set_address' och 'net_set_af' för att implementera
+  Prefer IPv6-funktionalitet.
+- Tog bort Bind Address från Inställningar (det fungerade inte som förväntat).

@@ -1,0 +1,4 @@
+- Större omskrivning av inställningsimplementeringen genom att separera statiska och dynamiska inställningar
+- Återgå till ursprungliga jitterbuffertfördröjningar nu när libre-buggen är fixad
+- Konfigurationen kan inte laddas om i farten när opus-inställningarna ändras
+- Nya översättningar till spanska och portugisiska (Brasilien)

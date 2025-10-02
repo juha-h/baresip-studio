@@ -1,0 +1,9 @@
+Detta är en <a href="https://github.com/baresip/baresip">baresip-baserad</a> SIP User Agent-applikation för Android.
+
+För närvarande stöder baresip-appen röstsamtal, textmeddelanden, röstbrevlåda Message Waiting Indication samt blinda och uppvaktade samtalsöverföringar.  Röst kan kodas med Opus, AMR, Codec2, G.729, G.722, G.722.1, G.726 eller PCMU/PCMA-codecs. Säkerhet uppnås via TLS- eller WSS SIP-signaltransport och ZRTP- eller (DTLS) SRTP-mediekapsling.
+
+Utvecklingen av baresip-appen motiveras av behovet av en säker SIP-baserad VoIP-användaragent med öppen källkod för Android som inte är beroende av proprietära push-notifikationstjänster från tredje part.
+
+Om du behöver videosamtal och har en enhet med Android version 9 eller nyare som stöder Camera2 API på hårdvarusupportnivå LEVEL3 eller FULL, kan du istället för den här applikationen installera dess systerapplikation baresip+.
+
+Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, där även problem kan rapporteras.

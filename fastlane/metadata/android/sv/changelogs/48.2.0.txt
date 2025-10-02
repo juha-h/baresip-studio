@@ -1,0 +1,2 @@
+- Inaktivera PRACK (RFC 3262)-funktionen på grund av ett allvarligt uppströmsfel
+- Nya översättningar till portugisiska (Brasilien) och ryska

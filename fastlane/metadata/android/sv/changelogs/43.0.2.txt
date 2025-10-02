@@ -1,0 +1,4 @@
+- Inledande stöd för överföring av samtal med uppvaktning har lagts till
+- I chattaktivitet ersattes långklick med kortklick
+- Gjorde meddelandetexten valbar
+- Använd fetstil i AoR-spinnertexten när samtalet är aktivt

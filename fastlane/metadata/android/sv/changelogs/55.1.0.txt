@@ -1,0 +1,2 @@
+- Förbättringar av färger i mörkt tema
+- Förbättrat automatiskt avvisande av samtal

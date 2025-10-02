@@ -1,0 +1,4 @@
+- Nytt stöd för kant-till-kant-visning av innehåll för kompatibilitet med Android 15
+- Rundade hörn i dialogrutan för varningar
+- Visa inte automatiskt mjukt tangentbord när konfigurationen ändras
+- Lagt till nytt språk (tamil)

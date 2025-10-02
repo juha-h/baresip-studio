@@ -1,0 +1,7 @@
+- Autentiseringens användarnamn är nu standard för kontots användarnamn.
+- Fråga om autentiseringslösenord vid baresip-start om autentiserings
+  användarnamn har angetts, men inte lösenordet.
+- Initialisera kontots statuspunkt till gul, när Register är markerat
+  i kontoaktivitet.
+- Åtgärdat fel i samband med skapandet av första kontot på äldre Android-versioner.
+- Mindre förbättringar av strängar.

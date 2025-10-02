@@ -1,0 +1,6 @@
+- Tillåt radering av kontots chatthistorik via menyalternativet Chattaktivitet.
+- Be om bekräftelse innan du raderar chatt- och samtalshistorik.
+- Förbättrad uppdatering av ikonerna för röstbrevlåda, chatt och samtal i huvudaktiviteten.
+- Gå direkt till aktiviteten Konton när baresip startas utan några konton.
+- Ombytta positioner för knapparna för att acceptera och avvisa samtal.
+- Tillåt inte att avsluta utgående samtal innan samtalsförsöket har påbörjats.

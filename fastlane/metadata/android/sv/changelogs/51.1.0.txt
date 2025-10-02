@@ -1,0 +1,6 @@
+- Lagt till kontoinställning för registreringsintervall
+- Använd telefoniprovider även när du skickar meddelanden till tel URI:er
+- Nu accepteras även ( och ) tecken i telefonnummer
+- Fixade aviseringar om inlägg i senare Android-versioner
+- Förbättrad behörighetshantering i senare Android-versioner
+- Nya översättningar till spanska, portugisiska (Brasilien) och svenska

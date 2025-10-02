@@ -1,0 +1,1 @@
+- Lagt till möjlighet att delvis autokonfigurera ett nytt konto från en webbsida (se https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration för detaljer)

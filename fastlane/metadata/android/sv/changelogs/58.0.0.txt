@@ -1,0 +1,5 @@
+- Lagt till konfigurationsalternativ för konto för tillförlitliga provisoriska svar
+- Lagt till alternativet Tone Country Audio Configuration (tack till Robert Averbeck för att han tillhandahöll tonfilerna)
+- Fixat AudioManager-relaterat SDK-versionstest
+- Nya översättningar till spanska, portugisiska och portugisiska (Brasilien)
+- Uppströms buggfixar och förbättringar

@@ -1,0 +1,6 @@
+- Lagt till möjlighet att ange ett konto som standardkonto.
+- Visa röd meddelandeikon när det finns olästa meddelanden.
+- Fråga PIN för att släppa nyckelvakten när Callee URI klickas.
+- Fixat åtgärder för samtal, meddelande och samtalsöverföring när de initieras från meddelanden.
+- Fixat att skicka ett meddelande från kontakter eller samtalshistorik.
+- Använde SingleTask istället för SingleTop som startläge för huvudaktivitet.

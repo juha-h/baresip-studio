@@ -1,0 +1,2 @@
+- Migrerat användargränssnitt till Jetpack Compose (kan innehålla buggar)
+- Försök alltid använda Acoustic Echo Canceler i hårdvara om det finns tillgängligt

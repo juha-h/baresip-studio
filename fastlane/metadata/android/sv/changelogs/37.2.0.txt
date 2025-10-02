@@ -1,0 +1,2 @@
+- Bättre skydd för baresip-appen när enheten är låst med secure keyguard
+- Nya översättningar till portugisiska (Brasilien)

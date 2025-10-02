@@ -1,0 +1,3 @@
+- Alla data som inte är relaterade till användargränssnittet sparas nu i baresip-tjänsten.
+vilket möjliggör korrekt återställning om Android dödar andra baresip-aktiviteter.
+- Många andra förbättringar och buggfixar.

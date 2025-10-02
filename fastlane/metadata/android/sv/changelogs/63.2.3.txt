@@ -1,0 +1,1 @@
+- Tillåt användning av mjukvaru-AEC även om hårdvaru-AEC skulle vara tillgänglig

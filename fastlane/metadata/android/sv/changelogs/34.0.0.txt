@@ -1,0 +1,2 @@
+- Lagt till begränsat stöd för flera samtidigt aktiva nätverksgränssnitt
+- Visa meddelande när baresip startas utan nätverksåtkomst

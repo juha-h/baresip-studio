@@ -1,0 +1,5 @@
+- Ställ inte in ljudet på kommunikationsläge när samtalet är etablerat,
+eftersom det på vissa enheter ger 3-4 sekunders fördröjning av uppspelningen av ljudet.
+- Gjorde akustisk ekoreducering konfigurerbar.
+- Aktivera knappen för samtalsinformation när den blir synlig.
+- Använd standardtema för enheten när spinners visas.

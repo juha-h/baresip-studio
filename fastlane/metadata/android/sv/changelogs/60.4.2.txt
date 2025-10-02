@@ -1,0 +1,4 @@
+- Fast samtalsinspelning
+- Skicka inte "180 Ringing"-svar om inkommande samtal avvisas automatiskt
+- Ta även bort %20 (mellanslag) från URI för tel-samtal
+- Nya tyska översättningar

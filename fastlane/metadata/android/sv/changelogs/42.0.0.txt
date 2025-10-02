@@ -1,0 +1,3 @@
+- Ersatt inställningen ”Visa Android-kontakter” med inställningen ”Kontakter” som gör det möjligt att välja om baresip-kontakter, Android-kontakter eller båda ska användas
+- Korrigeringar och förbättringar av mappningen mellan kontaktnamn och kontakt-URI
+- Undvik krasch när Android tvingar baresip-appen att starta om

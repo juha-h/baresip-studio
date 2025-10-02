@@ -1,0 +1,6 @@
+- Lagt till konfigurationsvariabeln "Bind Address" som gör det möjligt att välja vilket
+  nätverksgränssnitt eller IP-adress som baresip använder.
+- Uppdatera alltid statusikonen för konton när du återupptar huvudaktiviteten.
+- Fixad krasch när man återupptar en tidigare förstörd huvudaktivitet.
+- Visar korrekt aktivt inkommande samtal när du återupptar huvudaktiviteten.
+- Uppdaterade spanska strängar.

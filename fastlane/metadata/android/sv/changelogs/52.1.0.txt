@@ -1,0 +1,4 @@
+- Lagt till preliminärt stöd för samtalsinspelning
+- Många korrigeringar relaterade till att fråga efter lösenord
+- Förhindrar att vissa dialogrutor avfärdas utifrån
+- Nya översättningar till spanska, portugisiska och brasilianska

@@ -1,0 +1,6 @@
+- Ändra färgen på samtalsknappen till gul när samtalsknappen har vidrörts, men samtalet ännu inte har ringts
+- Aktivera inte värdelös mjukvarubaserad ekosläckning om hårdvarubaserad inte är tillgänglig
+- Ta alltid bort säkerhetsikonen och DTMF-fältet när samtalet avslutas
+- För registrerade konton, kontrollera att användardelen av inkommande Request URI matchar användardelen av REGISTER request contact URI
+- Förbättringar av jitterbufferten för uppströms ljud
+- Nya översättningar (franska)

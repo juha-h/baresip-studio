@@ -1,0 +1,3 @@
+- Lagt till konfigurationsalternativ för landskodskonto
+- Ljudrelaterade förbättringar från uppströms
+- Nya översättningar till portugisiska (Brasilien) och finska
