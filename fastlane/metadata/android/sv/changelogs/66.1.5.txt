@@ -1,0 +1,1 @@
+- Fixad initiering av konto från nätverk

@@ -1,0 +1,5 @@
+- Lagt till kronometer för samtalstimer i raden "Samtal till .../Samtal från ..."
+- Lagt till möjlighet att använda Android-kontakter
+- Lagt till inställningen "Visa Android-kontakter" för att välja om Android-kontakter ska visas när du trycker på kontaktknappen
+- Kontrollera att återställningsfilen har skapats av Baresip-appen
+- Nya översättningar till svenska och portugisiska (Brasilien)

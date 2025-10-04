@@ -1,0 +1,4 @@
+- Lagt till karaktärsbaserade avatarer i kontakter, chattar och samtalshistorik.
+- Fixat sparande/återställning av kontakter med icke-ASCII-kontaktnamn.
+- Förbättrad formatering av datum och klockslag.
+- Lagt till anmärkning om begränsning av flera nätverksgränssnitt.

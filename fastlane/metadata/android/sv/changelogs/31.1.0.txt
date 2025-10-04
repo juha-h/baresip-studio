@@ -1,0 +1,3 @@
+- Uppströmsfix av websocket-transport
+- Nya översättningar till portugisiska (Brasilien)
+- Kontrollera utgående proxy URI-transport

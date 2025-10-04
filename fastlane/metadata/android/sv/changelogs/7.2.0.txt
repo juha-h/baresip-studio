@@ -1,0 +1,2 @@
+- Lagt till ny konfigurationsvariabel Listen Address som gör det möjligt att ange en IP-adress
+adress (eller alla adresser) och en port som baresip lyssnar på för SIP-begäranden.

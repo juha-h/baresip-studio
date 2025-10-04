@@ -1,0 +1,8 @@
+- Lagt till kontoinställningar för numeriskt tangentbord
+- Lagt till verktygstips till ikonerna i huvudaktivitetens övre appfält
+- Visa kontots fullständiga SIP URI på kontosidan
+- Återställde osänt nytt meddelande efter paus/återupptagning
+- I chattaktivitet, fixat att lägga till chattkollega till kontakt
+- Lagt till avbryt-knapp för att avbryta utgående samtal
+- Fixat visning av förslag på mål för överföring av samtal
+- Nya översättningar (japanska och tamilska)

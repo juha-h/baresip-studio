@@ -1,0 +1,1 @@
+- Åtgärdat fel i lagring av konton i filsystemet.

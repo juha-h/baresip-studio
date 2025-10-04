@@ -1,0 +1,2 @@
+- Lång tryckning på aktuellt konto aktiverar eller inaktiverar registrering av kontot
+- Lagt till möjlighet att ge konton smeknamn

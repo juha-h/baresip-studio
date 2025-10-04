@@ -1,0 +1,2 @@
+- Visa automatiskt DTMF soft keyboard när samtalet är anslutet
+- Undvik krasch som orsakas av att du trycker på volymkontrollknapparna när du inte är i samtal

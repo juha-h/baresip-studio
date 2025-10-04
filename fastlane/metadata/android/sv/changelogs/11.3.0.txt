@@ -1,0 +1,4 @@
+- Lagt till möjligheten att välja vilka ljudmoduler som ska laddas i Settings
+  laddas. Ljudcodecs som tillhandahålls av de laddade modulerna är tillgängliga för
+  konton att använda.
+- Mindre förbättringar av koden.

@@ -1,0 +1,2 @@
+- Använd elliptisk kurvkryptografi baserad på DTLS Key Establishment Protocol
+- Nya svenska översättningar

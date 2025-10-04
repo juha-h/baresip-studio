@@ -1,0 +1,4 @@
+- Lagt till separata jitterbuffertfördröjningar för ljud och video
+- I samtalsinformation visas paket, förlorade paket och jitter som ?/? om informationen inte är tillgänglig
+- Uppströmsfix som nu tillåter escape-tecken i kontots <user>-del
+- Ny tjeckisk översättning

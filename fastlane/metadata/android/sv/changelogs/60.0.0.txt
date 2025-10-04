@@ -1,0 +1,3 @@
+- Använd Android 14-kompatibelt filformat för säkerhetskopiering. Säkerhetskopiera igen innan du uppgraderar Android till version 14.
+- Förbättrad trådhantering
+- Nya tyska översättningar

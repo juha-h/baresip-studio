@@ -1,0 +1,5 @@
+- I samtalshistoriken, Visa missade (inte avvisade) samtal med gula upp-/nerpilar
+- Använd audio_buffer size 20-300 (ms) och jitter_buffer delay 0-20 (frames)
+- Undvik potentiell krasch relaterad till getNetworkInterfaces()
+- Förenklad "Om"-text och länk till "mer information" i Wiki
+- Nya översättningar till spanska, portugisiska (Brasilien) och tjeckiska

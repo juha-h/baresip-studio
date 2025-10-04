@@ -1,0 +1,4 @@
+- Spela inte upptaget- eller felljud när samtalet är avslutat
+- Förbättrad tillförlitlighet vid användning av Bluetooth
+- Bättre hantering av händelser från baresip-kärnan
+- Nya översättningar till portugisiska (Brasilien)

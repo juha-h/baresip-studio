@@ -1,0 +1,4 @@
+- Andra appar kan nu se baresip som en telefonapp för sip: och tel: URI:er
+- Förbättrat sparande/återställning av samtals-URI-text när huvudaktiviteten pausas
+- Introducerad japansk översättning
+- Förbättringar av färger

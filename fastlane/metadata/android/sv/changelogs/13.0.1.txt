@@ -1,0 +1,2 @@
+- Meddela alltid user agent spinner om eventuell ändring av datauppsättning när
+  återuppta huvudaktivitet utan avsikt.

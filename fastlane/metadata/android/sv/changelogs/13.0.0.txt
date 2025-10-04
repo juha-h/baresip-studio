@@ -1,0 +1,9 @@
+- Spela upp aviseringsljud även när meddelandet anländer och baresip är synligt.
+- Om kontaktens namn är tomt, använd kontaktens SIP URI AoR som kontaktens namn.
+- Avslappnad kontroll av kontaktens namn.
+- Undvik enstaka krascher när du väljer ett konto i spinnern.
+- Be om tillstånd att spela in ljud (mikrofon) när baresip startar (om det inte
+  redan beviljats eller permanent nekats).
+- Förbättrad hantering av skriv-/läsbehörighet för extern lagring (lagringsutrymme)
+  vid säkerhetskopiering/återställning.
+- Behörigheten Read Phone State (Phone) behövs inte längre.

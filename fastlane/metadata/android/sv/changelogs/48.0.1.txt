@@ -1,0 +1,5 @@
+- Använd låsikoner för säkerhetsindikering av samtal
+- När du ringer till Android-kontakt, använd den senaste peer URI om Android-kontakten har den
+- Använd ZRTPCPP lib för ZRTP-mediekryptering (peers måste verifieras på nytt)
+- Aktivera DNS-cachelagring
+- Nya översättningar till portugisiska (Brasilien)

@@ -1,0 +1,1 @@
+- Återuppta baresip till pausad aktivitet istället för huvudaktivitet.

@@ -1,0 +1,3 @@
+- Aktiverat svep vänster/höger för att växla mellan konton
+- Lagt till kontoinställning för DTMF-läge
+- Uppdatering av översättningar från Weblate (franska)

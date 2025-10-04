@@ -1,0 +1,2 @@
+- Använda RTP-mottagningsläge för tråd
+- Nya översättningar till tjeckiska och portugisiska

@@ -1,0 +1,2 @@
+- Åtgärdat en sällsynt krasch som kan inträffa när det första kontot skapas och
+meddelande eller samtal kommer in innan användaren har återgått till huvudaktiviteten.

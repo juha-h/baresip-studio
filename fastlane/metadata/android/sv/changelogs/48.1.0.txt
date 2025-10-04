@@ -1,0 +1,2 @@
+- Lade till GSM-codec
+- Gjorde fönstret orörbart och startade 5 sekunders timer vid Avsluta eller Starta om

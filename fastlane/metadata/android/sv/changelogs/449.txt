@@ -1,0 +1,3 @@
+- Fixat tillägg av nytt samtal till historik
+- Undvik "flash" på skärmen när du ringer från kontakter eller samtalshistorik
+- Nya översättningar (tjeckiska)

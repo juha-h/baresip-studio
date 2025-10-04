@@ -1,0 +1,4 @@
+- Vertikala rullningslister har lagts till i aktiviteterna Inställningar, Konto och Ljud
+- Fixat hantering av URI-förslag för samtal och överföring
+- Förbättringar av dialogstil
+- Nya översättningar (portugisiska)

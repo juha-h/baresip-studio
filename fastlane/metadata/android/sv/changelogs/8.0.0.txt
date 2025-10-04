@@ -1,0 +1,3 @@
+- Lagt till stöd för ljudkodek G.722.1.
+- Stöd för WebRTC-baserad ekosläckning för ljud har lagts till (gäller inte Opus-codec).
+- Mindre ändringar av samtalsmeddelanden.

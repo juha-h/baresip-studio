@@ -1,0 +1,4 @@
+- Lagt till möjlighet att omregistrera valt konto genom att svepa nedåt.
+- Automatisk fokus och visning av mjukt tangentbord när lösenord eller överförings
+destination frågas.
+- Olika strängrelaterade korrigeringar.

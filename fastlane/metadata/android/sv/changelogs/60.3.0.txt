@@ -1,0 +1,4 @@
+- Stöd för autentisering med SHA-256 digest har lagts till
+- Inställningarna för Verifiera servercertifikat kan nu ändras utan omstart
+- Nya översättningar till tjeckiska, tyska, spanska och portugisiska (Brasilien)
+- Fixade format för vissa strängar på vissa språk

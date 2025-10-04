@@ -1,0 +1,2 @@
+- Mindre buggfixar uppströms
+- Nya tyska översättningar

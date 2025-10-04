@@ -1,0 +1,3 @@
+- Korrigerade inställningar för jitterbuffert som förhindrade att inkommande ljud hördes
+- Avsluta samtal om ingen media har tagits emot inom 60 sekunder
+- Nya spanska översättningar

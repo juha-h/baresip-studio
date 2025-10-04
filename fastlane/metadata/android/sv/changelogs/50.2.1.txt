@@ -1,0 +1,2 @@
+- Problem med ljudrouting åtgärdat för Android 12+-enheter
+- Använd sekundär mörk färg i codec-namnet när du är i mörkt läge

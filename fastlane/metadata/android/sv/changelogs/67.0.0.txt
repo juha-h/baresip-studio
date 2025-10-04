@@ -1,0 +1,4 @@
+- Migrerade baresip-appen från aktiviteter till Jetpack Compose-navigering
+- Förbättrad hantering av samtal och meddelanden som kommer när baresip inte är synlig
+- Några andra mindre förbättringar av användargränssnittet
+- Uppströmsfix av Refer-To-rubrikernas Till/Från-taggar

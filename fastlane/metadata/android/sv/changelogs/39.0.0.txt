@@ -1,0 +1,6 @@
+- Förbättrad visning av tidsvärdet i samtalshistoriken i samtalshistoriklistan
+- Lagt till aktivitet för samtalsinformation som kan nås genom att trycka på tid i
+samtalshistoriklistan
+- Fixat visning av avatarer i kontakt-, samtals- och chattlistor
+- Tillåt avbrytande av besvarat samtal som väntar på att etableras
+- Nya översättningar till portugisiska, portugisiska Brasilien, svenska och norska

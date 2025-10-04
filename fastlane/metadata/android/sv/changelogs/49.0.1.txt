@@ -1,0 +1,4 @@
+- Fixat uppströmsbugg som orsakade lång avslutningsfördröjning om röstbrevlådekontroll var
+  aktiverad för ett konto
+- Förenklad Avsluta/omstarta-process och undvikit krasch vid avslutning
+- Nya översättningar till portugisiska (Brasilien)

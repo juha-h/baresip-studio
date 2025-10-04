@@ -1,0 +1,7 @@
+- Lagt till synlighetsknapp för kontots autentiserings- och STUN/TURN-lösenord
+- Föredrar VPN-gränssnitt (om det finns något) när du väljer bland tillgängliga nätverksgränssnitt
+- Lagt till en anmärkning i About-texten om preferensordning för gränssnitt
+- Förbättrad konfiguration av kontots Media NAT Traversal
+- Standard till Googles STUN-server även när protokollet Media NAT Traversal är ICE
+- Ökat maxlängden för Kontots autentiserings- och STUN/TURN-användarnamn samt visningsnamn till 64 tecken
+- Lagt till/uppdaterat översättningar av FR-, NO- och FI-strängar

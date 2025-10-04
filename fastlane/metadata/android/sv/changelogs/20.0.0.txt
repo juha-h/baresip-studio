@@ -1,0 +1,3 @@
+- Förbättringar av akustisk ekoavstörning.
+- Flyttat ljudinställningar från Inställningar till ny aktivitet.
+- Lagt till inställningen AEC Extented Filter.

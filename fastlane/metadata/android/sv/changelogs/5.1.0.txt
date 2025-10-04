@@ -1,0 +1,4 @@
+- Lagt till möjlighet att exportera/importera kontakter till/från mappen "Download".
+Om du vill använda den här funktionen ska du ge baresip lagringsbehörighet
+i Inställningar → Appar → baresip → Behörigheter.
+- Fixat långsam avslutning av baresip när det inte finns någon nätverksanslutning.

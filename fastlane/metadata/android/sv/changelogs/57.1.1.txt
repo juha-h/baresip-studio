@@ -1,0 +1,1 @@
+- Korrigerat skrivfel i hjälptexten för standardtelefonappen

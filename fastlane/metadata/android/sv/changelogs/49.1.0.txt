@@ -1,0 +1,1 @@
+- Anledning till skål när inkommande samtal stängs av baresip lib

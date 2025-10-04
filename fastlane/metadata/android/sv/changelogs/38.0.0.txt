@@ -1,0 +1,4 @@
+- Förbättrad hantering av låsning/upplåsning av enheter
+- I Inställningar har en länk till Android-inställningar lagts till
+- Kontrollera korrekt om inställningen för batterioptimering har ändrats
+- Nya översättningar till svenska och portugisiska (Brasilien)

@@ -1,0 +1,4 @@
+- Välj bort kant-till-kant-implementering för Android 15-kompatibilitet
+- Undvik krascher i BootCompletedReceiver och vid kontroll av utgående proxy-URI
+- Nya översättningar till finska, bulgariska, japanska, portugisiska (Brasilien), spanska, tjeckiska
+och polska översättningar

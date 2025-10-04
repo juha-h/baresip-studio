@@ -1,0 +1,4 @@
+- Lagt till kontoinställningen Redirect Mode för att välja om begäran om vidarekoppling av samtal
+  (3xx-svar) ska följas automatiskt eller om bekräftelse behöver
+  att bli tillfrågad
+- Nya översättningar till spanska och portugisiska (Brasilien)

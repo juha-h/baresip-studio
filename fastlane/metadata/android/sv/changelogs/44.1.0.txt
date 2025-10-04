@@ -1,0 +1,2 @@
+-  På grund av Googles krav, be användarens samtycke om Android-kontakter väljs i Inställningar
+- Nya översättningar till portugisiska (Brasilien)

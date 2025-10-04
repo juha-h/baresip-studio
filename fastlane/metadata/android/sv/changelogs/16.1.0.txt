@@ -1,0 +1,5 @@
+- Omregistrera inte konton när länkens egenskaper ändras, men IP-adresserna
+  förblir desamma.
+- Om baresip inte startar, låt användaren ändra de inställningar som kan
+  ha orsakat problemet.
+- String-uppdateringar och korrigeringar.

@@ -1,0 +1,2 @@
+- Lagt till mörkt tema och inställning för mörkt tema.
+- Förbättringar av kontospinnare.

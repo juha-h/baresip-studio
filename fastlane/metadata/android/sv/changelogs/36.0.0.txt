@@ -1,0 +1,5 @@
+- Migrerade baresip till API-nivå 31 (Android 12)
+- Förbättrad detektering av tillgängliga nätverk
+- Förbättrade behörighetsförfrågningar
+- Tog bort kontoinställningen Föredra IPv6 Media
+- Ny översättning till portugisiska (Brasilien)

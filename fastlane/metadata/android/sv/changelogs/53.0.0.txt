@@ -1,0 +1,4 @@
+- Lagt till inställning för att välja IP-adressfamilj
+- Lagt till monokrom lanseringsikon
+- Tog bort ikon och text från statusmeddelande när Android-versionen är 13+
+- Nya översättningar till spanska, ryska, portugisiska (Brasilien) och tjeckiska

@@ -1,0 +1,2 @@
+- Lättare kontroll av visningsnamn och autentiseringsnamn
+- Lagt till versionsnamn på sidan Om

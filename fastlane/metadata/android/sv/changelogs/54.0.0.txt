@@ -1,0 +1,3 @@
+- Kräver minst Android version 6 (API-nivå 23)
+- I Android-versioner under 12, lägg till 1,5 sekunders fördröjning innan du ringer ett samtal
+för att undvika att missa ljud från den som ringer

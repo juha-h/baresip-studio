@@ -1,0 +1,3 @@
+- Uppgraderad mål SDK-version till API-nivå 30
+- I Android-versioner 10 och högre, låt användaren välja filen i
+  säkerhetskopiering, återställning, TLS-certifikatrelaterade operationer

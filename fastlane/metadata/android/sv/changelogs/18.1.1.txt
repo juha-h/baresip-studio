@@ -1,0 +1,1 @@
+- Fixad krasch när du ringer från samtalshistoriken.

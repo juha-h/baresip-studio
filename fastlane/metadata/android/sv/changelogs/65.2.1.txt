@@ -1,0 +1,4 @@
+- Förbättrad utseende och implementering av pull-to-register
+- Se till att bluetoothreceiver är registrerad innan du avregistrerar den
+- Fixad back-press-åtgärd för API < 33-kompatibilitet
+- Fixad ZRTP-verifieringsfråga

@@ -1,0 +1,4 @@
+- Förhindra att mjukt tangentbord döljer inmatningstextfältet i vissa aktiviteter
+- Fixat typnummer för nyttolast för telefonhändelse
+- Förhindra krasch när backupfilen är stor
+- Nya översättningar (tyska)

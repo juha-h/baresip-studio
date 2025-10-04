@@ -1,0 +1,4 @@
+- Flyttat knappen för att stänga av samtal från samtalskontrollen till åtgärdsfältet
+- Lagt till inställning för batterioptimering
+- Be om tillstånd att spela in ljud när baresip startas
+- Nya översättningar till portugisiska (Brasilien), franska och svenska

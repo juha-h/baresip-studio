@@ -1,0 +1,5 @@
+- Lagt till stöd för Opus Forward Error Correction (FEC) via konfigurationsvariabeln Opus
+  Konfigurationsvariabeln Förväntad paketförlust.
+- Försök att uppdatera dynamisk DNS-information om registreringen misslyckas på grund av
+  felet "Ogiltigt argument".
+- Använd översättningsbar sträng i alla konfigurationsrelaterade varningsmeddelanden.

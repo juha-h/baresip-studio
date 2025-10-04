@@ -1,0 +1,3 @@
+- Förbättringar av konto STUN/TURN URI
+- Diverse ljudrelaterade förbättringar
+- Nya översättningar till portugisiska (Brasilien) och slovenska

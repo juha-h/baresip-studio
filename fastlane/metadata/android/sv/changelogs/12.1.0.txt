@@ -1,0 +1,3 @@
+- Tillåt portnummer i kontots Address of Record (AoR).
+- Fixat kontroll av om konto redan finns.
+- Uppdaterade NO- och BG-strängar.

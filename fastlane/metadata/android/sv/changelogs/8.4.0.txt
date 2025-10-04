@@ -1,0 +1,1 @@
+- Ekoavstängning tillämpas nu även på samtal som använder Opus-codec.

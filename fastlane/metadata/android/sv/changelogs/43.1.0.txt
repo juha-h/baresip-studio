@@ -1,0 +1,2 @@
+- Fixat 32 bitars armeabi-v7a arkitekturrelaterad bugg
+- Visa Anonym eller Okänd om URI-värden är anonymous.invalid eller unknown.invalid

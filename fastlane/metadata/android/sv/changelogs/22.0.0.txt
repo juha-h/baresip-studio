@@ -1,0 +1,1 @@
+- Websocket-transport för SIP har lagts till (RFC 7118).

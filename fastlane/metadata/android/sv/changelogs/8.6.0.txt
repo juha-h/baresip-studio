@@ -1,0 +1,1 @@
+- Lagt till stöd för SIP-registratorer som inte hanterar återanvändning av nonce på rätt sätt.

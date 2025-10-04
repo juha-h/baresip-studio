@@ -41,7 +41,7 @@
     <string name="account_exists">Kontot \'%1$s\' finns redan.</string>
     <string name="invalid_aor">Ogiltig användare@domän[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="user_domain">användare@domän</string>
-    <string name="new_account">Nytt konto</string>
+    <string name="new_account">SIP URI för nytt konto</string>
     <string name="accounts">Konton</string>
     <string name="default_account">Förvalt konto</string>
     <string name="dtmf_info">SIP INFO-förfrågningar</string>
@@ -108,9 +108,9 @@
     <string name="show_password">Visa lösenord</string>
     <string name="stun_username">STUN/TURN-användarnamn</string>
     <string name="stun_server">STUN/TURN-server</string>
-    <string name="video_codecs_help">Lista över videokodekar i prioritetsordning. Dra för att ändra ordning, svep höger för att slå på eller av.</string>
+    <string name="video_codecs_help">Lista över videokodekar i prioritetsordning. Dra för att ordna om, tryck länge för att aktivera eller inaktivera.</string>
     <string name="video_codecs">Videokodekar</string>
-    <string name="audio_codecs_help">Lista över ljudkodekar i prioritetsordning. Dra för att ändra ordning, svep höger för att slå på eller av.</string>
+    <string name="audio_codecs_help">Lista över ljudkodekar i prioritetsordning. Dra för att ändra ordningen, tryck länge för att aktivera eller inaktivera.</string>
     <string name="audio_codecs">Ljudkodekar</string>
     <string name="register_help">Kryssa i för att aktivera registrering och att REGISTER-förfrågningar skickas periodiskt enligt angett registreringsintervall.</string>
     <string name="register">Registrera</string>
@@ -136,7 +136,52 @@
     <string name="account">Konto</string>
     <string name="about_title_plus">Om baresip+</string>
     <string name="about_title">Om baresip</string>
-    <string name="about_text">&lt;h1&gt;SIP-klient baserad på baresip-biblioteket&lt;/h1&gt; &lt;p&gt;Juha Heinanen &lt;jh@tutpro.com&gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Användartips&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Anpassa baresips inställningar efter dina behov (tryck på en inställnings titel för hjälp).&lt;/li&gt; &lt;li&gt;Skapa sedan ett eller flera konton (igen, tryck på en inställnings titel för hjälp).&lt;/li&gt; &lt;li&gt;Ett nytt konto kan delvis konfigureras automatiskt. Se &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;Wiki&lt;/a&gt; för mer information.&lt;/li&gt; &lt;li&gt;Registreringsstatus för ett konto visas med en färgad prick: grön (registrering lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering är inte aktiverad).&lt;/li&gt; &lt;li&gt;Om du trycker på den färgade pricken tas du till kontots konfiguration.&lt;/li&gt; &lt;li&gt;Om du sveper ner över skärmen registrerar det valda kontot om sig.&lt;/li&gt; &lt;li&gt;Långt tryck på det valda kontot aktiverar eller inaktiverar registrering för kontot.&lt;/li&gt; &lt;li&gt;Svepningar åt vänster/höger växlar mellan konton.&lt;/li&gt; &lt;li&gt;Ikonen överst på startsidan slår på/av högtalartelefonfunktionen.&lt;/li&gt; &lt;li&gt;Ikonerna längst ner på startsidan tar dig till röstbrevlådan (om URI för röstbrevlåda har angetts för kontot), dina kontakter, meddelanden, samtalshistorik och låter dig växla mellan numeriskt och alfanumeriskt tangentbord.&lt;/li&gt; &lt;li&gt;Senast uppringda nummer kan fyllas i igen genom att trycka på ring upp-ikonen när inget nummer att ringa har angetts.&lt;/li&gt; &lt;li&gt;Samtal- och meddelandemotparter kan läggas till i dina kontakter genom ett långt tryck på motparten.&lt;/li&gt; &lt;li&gt;Långa tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.&lt;/li&gt; &lt;li&gt;Genom tryck/långt tryck på en kontakts ikon kan en bild läggas till/tas bort för kontakten.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Källkod&lt;/h2&gt; Källkoden finns tillgänglig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt; där även fel och problem kan rapporteras. &lt;h2&gt;Licenser&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; förutom följande:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR-kodek, TLS-säkerhet och ZRTP-mediakryptering&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; G.722- och G.726-kodekar&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729-kodek&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="about_text"><![CDATA[
+<h1>SIP-användaragent baserad på <a href="https://github.com/baresip/baresip">baresip</a>-biblioteket</h1>
+<br>
+<p>Juha Heinanen &lt;jh@tutpro.com></p>
+<p>Version %1$s</p>
+<br>
+<h2>Användningstips</h2>
+<ul>
+<li>Kontrollera att standardvärdena i baresips inställningar uppfyller dina behov
+(tryck på objektets titel för hjälp).</li>
+<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>
+<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering
+lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering
+har inte aktiverats).</li>
+<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.
+<li>Långt tryck på baresip-ikonerna visar information om ikonerna.
+<li>Svep nedåt för att omregistrera det aktuella kontot.
+<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.
+<li>Svep åt vänster/höger för att växla mellan kontona.
+<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.
+<li>Samtal och meddelanden kan läggas till i kontakter genom att trycka länge på dem.
+<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.
+<li>Tryck/långtryck på kontaktikonen kan användas för att installera/ta bort bildavatar.
+<li>Långtryck på en ljudkodek kan användas för att aktivera/inaktivera kodeken.
+<li>Se <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> för mer information.
+</ul>
+<h2>Integritet</h2>
+<p>Integritetspolicyn finns tillgänglig <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">här</a>.</p>
+<br>
+<h2>Källkod</h2>
+<p>Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+där även problem kan rapporteras.</p>
+<br>
+<h2>Språköversättningar</h2>
+<p>Språköversättningar hanteras via baresip
+<a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>-projektet.</p>
+<br>
+<h2>Licenser</h2>
+<ul>
+<li><b>BSD-3-klausul</b> med undantag för följande:</li>
+<li><b>Apache 2.0</b> AMR-kodekter och TLS-säkerhet</li>
+<li><b>AGPLv4</b> ZRTP-mediekryptering</li>
+<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>
+<li><b>GNU GPLv3</b> G.729-kodeken</li>
+</ul>
+]]></string>
     <string name="transfer_request_query">Accepterar du att koppla det här samtalet till \'%1$s\'\?</string>
     <string name="audio_modules_title">Ljudmoduler</string>
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
@@ -194,7 +239,7 @@
     <string name="failed_to_set_dns_servers">Kunde inte ställa in DNS-servrar</string>
     <string name="dns_servers_help">Kommaseparerad lista med adresser på DNS-servrar. Om listan lämnas tom hämtas DNS-serveradresser automatiskt från systemet. Varje DNS-adress skrivs på formatet \'ip:port\' eller \'ip\'. Om port utelämnas används port 53. Om ip är en IPv6-adress och en port anges då måste ip skrivas inom hakparenteser []. Som exempel, i listan \'8.8.8.8:53,[2001:4860:4860::8888]:53\' anges IPv4- och IPv6-adresser för Googles publika DNS-servrar.</string>
     <string name="invalid_listen_address">Ogiltig adress att lyssna på</string>
-    <string name="listen_address_help">IP-adress och port på formatet \'adress:port\' där baresip lyssnar efter inkommande SIP-förfrågningar. Om IP-adressen är en IPv6-adress måste den skrivas inom hakparenteser []. IPv4-adressen 0.0.0.0 eller IPv6-adressen [::] betyder att baresip lyssnar på alla tillgängliga adresser. Om fältet lämnas tomt (grundinställning) lyssnar baresip på port 5060 på alla tillgängliga adresser.</string>
+    <string name="listen_address_help">IP-adress och port i formatet ”adress:port” där baresip lyssnar efter inkommande SIP-förfrågningar. Om IP-adressen är en IPv6-adress måste den skrivas inom hakparenteser []. IPv4-adressen 0.0.0.0 eller IPv6-adressen [::] gör att baresip lyssnar på alla tillgängliga adresser. Om fältet lämnas tomt (fabriksinställning) lyssnar baresip på en godtycklig port på alla tillgängliga adresser.</string>
     <string name="listen_address">Adress att lyssna på</string>
     <string name="start_automatically_help">Kryssa i för att starta baresip automatiskt när enheten startat.</string>
     <string name="delete_chats_alert">Vill du ta bort chatt-historiken för kontot \'%1$s\'\?</string>
@@ -207,11 +252,68 @@
     <string name="long_message_question">Vill du ta bort meddelandet eller lägga till motparten \'%1$s\' till dina kontakter\?</string>
     <string name="decrypt_password">Lösenord för avkryptering</string>
     <string name="encrypt_password">Lösenord för kryptering</string>
-    <string name="accounts_help">När ett nytt konto skapas är det möjligt, men inte nödvändigt, att ange port och transportprotokoll för kontot: &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Om &lt;port&gt; anges men transportprotokoll utelämnas kommer UDP användas som transportprotokoll. Om &lt;port&gt; utelämnas, men transportprotokoll anges används port 5060 eller 5061 (TLS). Om ingendera anges och ingen utgående proxy är angiven kommer registreringsserver för kontot bestämmas enbart baserat på domänens DNS-information.</string>
-    <string name="about_text_plus">&lt;h1&gt;SIP-klient med videostöd baserad på baresip-biblioteket&lt;/h1&gt; &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt; &lt;p&gt;Version %1$s&lt;/p&gt; &lt;h2&gt;Användartips&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;Anpassa baresip+:s inställningar efter dina behov (tryck på en inställnings titel för hjälp).&lt;/li&gt; &lt;li&gt;Skapa sedan ett eller flera konton (igen, tryck på en inställnings titel för hjälp).&lt;/li&gt; &lt;li&gt;Ett nytt konto kan delvis konfigureras automatiskt. Se &lt;a href=https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration&gt;Wiki&lt;/a&gt; för mer information.&lt;/li&gt; &lt;li&gt;Registreringsstatus för ett konto visas med en färgad prick: grön (registrering lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering är inte aktiverad).&lt;/li&gt; &lt;li&gt;Om du trycker på den färgade pricken tas du till kontots konfiguration.&lt;/li&gt; &lt;li&gt;Om du sveper ner över skärmen registrerar det valda kontot om sig.&lt;/li&gt; &lt;li&gt;Långt tryck på det valda kontot aktiverar eller inaktiverar registrering för kontot.&lt;/li&gt; &lt;li&gt;Svepningar åt vänster/höger växlar mellan konton.&lt;/li&gt; &lt;li&gt;Ikonen överst på startsidan slår på/av högtalartelefonfunktionen.&lt;/li&gt; &lt;li&gt;Ikonerna längst ner på startsidan tar dig till röstbrevlådan (om URI för röstbrevlåda har angetts för kontot), dina kontakter, meddelanden, samtalshistorik och låter dig växla mellan numeriskt och alfanumeriskt tangentbord.&lt;/li&gt; &lt;li&gt;Senast uppringda nummer kan fyllas i igen genom att trycka på ring upp-ikonen när inget nummer att ringa har angetts.&lt;/li&gt; &lt;li&gt;Samtal- och meddelandemotparter kan läggas till i dina kontakter genom ett långt tryck på motparten.&lt;/li&gt; &lt;li&gt;Långa tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.&lt;/li&gt; &lt;li&gt;Genom tryck/långt tryck på en kontakts ikon kan en bild läggas till/tas bort för kontakten.&lt;/li&gt; &lt;/ul&gt; &lt;h2&gt;Kända problem&lt;/h2&gt; &lt;ul&gt;&lt;li&gt;Under videosamtal måste enheten och skärmen hållas i liggande läge; roterad 90 grader åt vänster från stående läge.&lt;/li&gt; &lt;li&gt;Du ser inte din egen video korrekt om du skickar video medan motparten inte skickar video.&lt;/li&gt; &lt;h2&gt;Integritetspolicy&lt;/h2&gt; Integritetspolicy finns tillgänglig &lt;a href=https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt&gt;här&lt;/a&gt;.&lt;/ul&gt; &lt;h2&gt;Källkod&lt;/h2&gt; Källkoden finns tillgänglig på &lt;a href=https://github.com/juha-h/baresip-studio&gt;GitHub&lt;/a&gt; där även fel och problem kan rapporteras. &lt;h2&gt;Licenser&lt;/h2&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; förutom följande:&lt;/li&gt; &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR-kodek och TLS-kryptering&lt;/li&gt; &lt;li&gt;&lt;b&gt;LGPL 2.1&lt;/b&gt; G.722- och G.726-kodekar&lt;/li&gt; &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP mediakryptering&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv2&lt;/b&gt; H.264- och H.265-kodekar&lt;/li&gt; &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729-kodek&lt;/li&gt;&lt;li&gt;&lt;b&gt;AOMedia&lt;/b&gt; AV1-kodek&lt;/li&gt; &lt;/ul&gt;</string>
+    <string name="accounts_help">SIP URI för nytt konto i formatet &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Om &lt;port&gt; anges och transportprotokollet inte anges, är standardtransportprotokollet UDP. Om &lt;port&gt; inte anges och transportprotokollet anges, är standardporten 5060 eller 5061 (TLS). Om varken det ena eller det andra anges och ingen utgående proxy specificeras, bestäms kontots registrator (om sådan finns) enbart utifrån domänens DNS-information.</string>
+    <string name="about_text_plus"><![CDATA[
+<h1>SIP-användaragent med videosamtal baserat på <a href="https://github.com/baresip/baresip">baresip</a>-biblioteket</h1>
+<br>
+<p>Juha Heinanen &lt;jh@tutpro.com></p>
+<p>Version %1$s</p>
+<br>
+<h2>Användningstips</h2>
+<ul>
+<li>Kontrollera att standardvärdena i baresip+\'s Inställningar uppfyller dina behov
+(tryck på objektets titel för hjälp).</li>
+<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>
+<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering
+lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering
+har inte aktiverats).</li>
+<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.
+<li>Långt tryck på baresip-ikonerna visar information om ikonerna.
+<li>Svep nedåt för att omregistrera det aktuella kontot.
+<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.
+<li>Svep åt vänster/höger för att växla mellan kontona.
+<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.
+<li>Samtalspartner och meddelanden kan läggas till i kontakter genom att trycka länge på dem.
+<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.
+<li>Tryck/långt tryck på kontaktikonen kan användas för att installera/ta bort bildavatar.
+<li>Långt tryck på en ljud- eller videokodek kan användas för att aktivera/inaktivera kodeken.
+<li>Se <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> för mer
+information.
+</li>
+</ul>
+<h2>Kända problem
+<ul>
+<li>Vid videosamtal måste enheten hållas i liggande
+ 
+läge, roterat 90 grader åt vänster från stående läge.
+<li>Självbilden visas inte korrekt när videoströmmen är sendonly. </li>
+</ul>
+<h2>Integritet</h2>
+<p>Integritet finns
+<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">här</a>.</p>
+<br>
+<h2>Källkod</h2>
+<p>Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+där även problem kan rapporteras.</p>
+<br>
+<h2>Språköversättningar</h2>
+<p>Språköversättningar hanteras via baresip
+<a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>-projektet.</p>
+<br>
+<h2>Licenser</h2>
+<ul>
+<li><b>BSD-3-klausul</b> med undantag för följande:</li>
+<li><b>Apache 2.0</b> AMR-kodeken och TLS-säkerhet</li>
+<li><b>AGPLv4</b> ZRTP-mediekryptering</li>
+<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>
+<li><b>GNU GPLv3</b> G.729-kodeken</li>
+<li><b>GNU GPLv2</b> H.264- och H.265-kodeken</li>
+<li><b>AOMedia</b> AV1-kodeken</li>
+</ul>
+]]></string>
     <string name="default_call_volume">Förvald samtalsvolym</string>
     <string name="invalid_opus_packet_loss">Ogiltig procentuell paketförlust för Opus</string>
-    <string name="opus_packet_loss_help">Förväntad procentuell paketförlust för Opus-ljudström. Giltiga värden mellan 0-100. Förvalt värde är 0, vilket stänger av föregripande felkorrigering.</string>
+    <string name="opus_packet_loss_help">Förväntad procentuell förlust av Opus-ljudströmspaket, från 0 till 100. Fabriksinställt standardvärde är 1. Värdet 0 tur inaktiverar även Opus Forward Error Correction (FEC).</string>
     <string name="opus_bit_rate_help">Genomsnittlig maximal bitrate för Opus-ljudström. Giltiga värden är 6000-510000. Förvalt värde är 28000.</string>
     <string name="restart_request">Omstartsbegäran</string>
     <string name="verify">Verifikationsbegäran</string>
@@ -222,9 +324,9 @@
     <string name="android_contact_help">Kryssa i för att lägga till kontakten till dina Android-kontakter.</string>
     <string name="sip_trace_help">Kryssa i för att inkludera SIP-meddelanden i Logcat-meddelanden när Felsökning är aktiverat. Funktionen inaktiveras automatiskt när baresip startar.</string>
     <string name="debug_help">Kryssa i för att skicka felsöknings- och info-meddelanden till Logcat.</string>
-    <string name="tls_ca_file_help">Kryssa i för att ladda TLS-certifikat för certifikatauktoriteter från fil. I Android 9 och tidigare versioner laddas en fil med namnet \'ca_certs.crt\' från katalogen Nedladdningar.</string>
-    <string name="verify_server_help">Kryssa i om baresip ska verifiera TLS-certifikat för SIP user agent och SIP proxyserver när transportprotokollet TLS används. TLS CA-fil måste då också laddas.</string>
-    <string name="tls_certificate_file_help">Kryssa i för att ladda TLS-certifikat och privat nyckel för den här baresip-instansen från fil. I Android 9 och tidigare versioner laddas en fil med namnet \'cert.pem\' från katalogen Nedladdningar. Av säkerhetsskäl tas filen bort efter att den lästs in.</string>
+    <string name="tls_ca_file_help">Om denna ruta är markerad har en fil läst in eller kommer att läst in som innehåller TLS-certifikat från certifikatutfärdare som inte ingår i Android OS. I Android version 9 läst in en fil med namnet ”ca_certs.crt” från mappen Hämtningar.</string>
+    <string name="verify_server_help">Om denna ruta är markerad verifierar baresip TLS-certifikat för SIP-användaragenter och SIP-proxyservrar när TLS-transport används.</string>
+    <string name="tls_certificate_file_help">Om denna ruta är markerad har en fil som innehåller TLS-certifikatet och den privata nyckeln för denna baresip-instans läsas in eller kommer att läsas in. I Android version 9 läses in en fil med namnet ”cert.pem” från mappen Download. Av säkerhetsskäl bör du radera filen efter läsin.</string>
     <string name="prefer_ipv6_media_help">Kryssa i för att erbjuda media via IPv6 (om tillgängligt) när mediaprotokoll för motparten inte kan avgöras automatiskt.</string>
     <string name="confirmation">Bekräftelse</string>
     <string name="user_id">Användar-ID</string>
@@ -236,13 +338,13 @@
     <string name="debug">Felsökning</string>
     <string name="video_size_help">Storlek på bildrutorna i skickad video (bredd x höjd)</string>
     <string name="video_size">Storlek på bildrutor</string>
-    <string name="no_cameras">Du har ingen videokamera som stöds.</string>
+    <string name="no_cameras">Du har ingen videokamera som stöds!</string>
     <string name="no_video_calls">Aktivera behörigheten \"Kamera\" för att ringa eller ta emot samtal.</string>
     <string name="no_calls">baresip behöver behörigheten \"Mikrofon\" för röstsamtal.</string>
-    <string name="restore_failed">Kunde inte återställa programdata. Kontrollera att du angav rätt lösenord och att backup-filen skapats av den här appen. I Android 9 och tidigare versioner, kontrollera Appar → baresip → Behörigheter → Lagring och att filen \'%1$s\' finns i katalogen Nedladdningar.</string>
+    <string name="restore_failed">Det gick inte att återställa programdata. Kontrollera att du har angett rätt lösenord och att säkerhetskopian kommer från det här programmet. I Android version 9 ska du också kontrollera Appar → baresip → Behörighet → Lagring och att filen ’%1$s’ finns i mappen Nedladdningar.</string>
     <string name="restored">Programdata återställd. baresip behöver startas om. Starta om nu\?</string>
     <string name="backup_failed">Kunde inte säkerhetskopiera programdata till filen \'%1$s\'. Kontrollera Appar → baresip → Behörigheter → Lagring.</string>
-    <string name="backed_up">Programdata har säkerhetskopierats till filen \'%1$s\'. I Android 9 och tidigare versioner återfinns filen i katalogen Nedladdningar.</string>
+    <string name="backed_up">Applikationsdata (exklusive inspelningar) säkerhetskopierade till filen ’%1$s’. I Android version 9 finns filen i mappen Hämtningar.</string>
     <string name="callee">Motpart</string>
     <string name="no_network">Inget nätverk tillgängligt!</string>
     <string name="missed_calls">Missade samtal</string>
@@ -270,7 +372,7 @@
     <string name="user_domain_or_number">användare@domän eller telefonnummer</string>
     <string name="lost">Tappade</string>
     <string name="invalid_sip_or_tel_uri">Ogiltig SIP- eller tel-URI \'%1$s\'</string>
-    <string name="contacts_help">Välj om baresips kontakter, Androids kontakter eller båda ska användas. Om du väljer båda och en kontakt med samma namn finns i båda, då används baresips kontakt.</string>
+    <string name="contacts_help">Väljer om baresip-kontakter, Android-kontakter eller båda ska användas. Om båda används och en kontakt med samma namn finns i båda kontakterna, väljs baresip-kontakten.</string>
     <string name="both">Båda</string>
     <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>
     <string name="country_code">Landsnummer</string>
@@ -290,7 +392,7 @@
     <string name="rtcp_mux">RTCP-multiplex</string>
     <string name="no_notifications">Det går inte att använda den här appen utan behörigheten \"Aviseringar\".</string>
     <string name="account_nickname_help">Namn (valfritt) som används för att identifiera det här kontot i baresip-appen.</string>
-    <string name="nickname">Namn</string>
+    <string name="nickname">Smeknamn</string>
     <string name="invalid_account_nickname">Ogiltigt kontonamn \'%1$s\'</string>
     <string name="non_unique_account_nickname">Namnet \'%1$s\' används redan</string>
     <string name="audio_focus_denied">Ljudfokus nekad!</string>
@@ -301,12 +403,66 @@
     <string name="address_family">Adresstyp</string>
     <string name="rec_in_call">Inspelning kan bara slås på/av när inget samtal pågår</string>
     <string name="choose_destination_uri">Välj destinations-URI</string>
-    <string name="audio_permissions">baresip behöver behörigheten \"Mikrofon\" för röstsamtal, behörigheten \"Enheter i närheten\" för upptäckt av mikrofon/högtalare via blåtand och behörigheten \"Aviseringar\" för att skicka aviseringar.</string>
+    <string name="audio_permissions">baresip behöver behörighet för ”Mikrofon” för röstsamtal, behörighet för ”Närliggande enheter” för Bluetooth-mikrofon-/högtalardetektering, behörighet för ’Meddelanden’ för att publicera meddelanden och i Android 9 behörighet för ”Lagring” för säkerhetskopierings-/återställningsåtgärder.</string>
     <string name="audio_delay">Fördröjt ljud</string>
     <string name="invalid_audio_delay">Ogiltigt värde för fördröjt ljud \'%1$s\'. Giltiga värden är från 100 till 3000.</string>
     <string name="no_bluetooth">baresip kan inte upptäcka blåtandsanslutningar utan behörigheten \"Enheter i närheten\".</string>
     <string name="permissions_rationale">Behörigheters motivering</string>
     <string name="reg_int_help">Avgör hur ofta (i sekunder) baresip skickar REGISTER-förfrågningar. Giltiga värden är från 60 till 3600.</string>
     <string name="audio_delay_help">Tid (i millisekunder) att vänta på ljud från motparten när ett samtal upprättats. Sätt till ett högre värde om du saknar ljud från motparten i början av samtalet.</string>
-    <string name="audio_and_video_permissions">baresip+ behöver behörigheten \"Mikrofon\" för röstsamtal, behörigheten \"Kamera\" för videosamtal, behörigheten \"Enheter i närheten\" för upptäckt av mikrofon/högtalare via blåtand och behörigheten \"Aviseringar\" för att skicka aviseringar.</string>
+    <string name="audio_and_video_permissions">baresip+ behöver behörighet för ”Mikrofon” för röstsamtal, behörighet för ”Kamera” för videosamtal, behörighet för ”Närliggande enheter” för Bluetooth-mikrofon-/högtalardetektering, behörighet för ’Meddelanden’ för att publicera meddelanden och i Android 9 behörighet för ”Lagring” för säkerhetskopierings-/återställningsåtgärder.</string>
+    <string name="call_answered">Samtal besvarat</string>
+    <string name="call_answered_elsewhere">Samtal besvarat någon annanstans</string>
+    <string name="call_missed">Samtal missat</string>
+    <string name="call_rejected">Samtal nekat</string>
+    <string name="call_recording_title">Samtalsinspelning</string>
+    <string name="microphone_title">Mikrofon</string>
+    <string name="speakerphone_title">Högtalartelefon</string>
+    <string name="redirect_mode_help">Väljer om begäran om vidarekoppling av samtal ska följas automatiskt eller om bekräftelse ska begäras.</string>
+    <string name="redirect_mode">Vidarekopplingsläge</string>
+    <string name="numeric_keypad">Numeriskt tangentbord</string>"
+    <string name="numeric_keypad_help">Om denna ruta är markerad visas det numeriska tangentbordet när fältet ”Ring till …” är markerat.</string>"
+    <string name="reply">Svara</string>
+    <string name="save">Spara</string>
+    <string name="call_auto_rejected">Automatiskt avvisat samtal från %1$s</string>
+    <string name="playing_recording">Spelar upp inspelning …</string>
+    <string name="appear_on_top_permission">Automatisk start kräver behörighet för att visas överst.</string>
+    <string name="default_phone_app">Telefonapp som standard</string>
+    <string name="dialer_role_not_available">Uppringningsrollen är inte tillgänglig</string>
+    <string name="default_phone_app_help">Om denna ruta är markerad är baresip standardappen för telefoni. Markera inte denna ruta om din enhet kan behöva hantera andra samtal eller meddelanden än SIP-samtal.</string>
+    <string name="no_read_permission">Ingen läsbehörighet för extern lagring</string>
+    <string name="speaker_phone">Högtalartelefon</string>
+    <string name="speaker_phone_help">Om denna ruta är markerad aktiveras högtalartelefonen automatiskt när samtalet inleds.</string>
+    <string name="microphone_gain_help">Multiplicera mikrofonvolymen med detta decimaltal. Minsta värde är 1,0 (fabriksinställning) som inaktiverar mikrofonförstärkningen. Högre värden kan påverka ljudkvaliteten negativt.</string>
+    <string name="microphone_gain">Mikrofonförstärkning</string>
+    <string name="invalid_microphone_gain">Ogiltigt värde för mikrofonförstärkning</string>
+    <string name="tone_country_help">Land för ringsignal, vänteläge och upptaget-signaler</string>
+    <string name="colorblind">Färgblind</string>
+    <string name="colorblind_help">Använd vänliga ikoner för registreringsstatus för färgblinda</string>
+    <string name="proximity_sensing">Närhetssensor</string>"&gt;
+    <string name="proximity_sensing_help">Om denna ruta är markerad är närhetssensorn aktiv under samtal.</string>
+    <string name="video_fps">Bildfrekvens för video</string>
+    <string name="video_fps_help">Videobildfrekvens som kommer att erbjudas under SDP-handskakningen. Giltiga värden är mellan 10 och 30.</string>
+    <string name="invalid_fps">Ogiltig bildfrekvens \'%1$d\'</string>
+    <string name="ringtone">Ringsignal</string>
+    <string name="select_ringtone">Välj ringsignal</string>
+    <string name="user_agent">User Agent</string>
+    <string name="user_agent_help">Anpassat värde för SIP-begäran/svar User-Agent-rubrikfält</string>
+    <string name="invalid_user_agent">Ogiltigt värde i fältet User-Agent-header</string>
+    <string name="favorite">Favorit</string>
+    <string name="favorite_help">Om denna ruta är markerad visas kontakten bland andra favoriter högst upp i kontaktlistan.</string>
+    <string name="call_request">Samtalsbegäran</string>
+    <string name="call_request_query">Accepterar du begäran om att ringa ’%1$s’?</string>
+    <string name="redirect_notice">Automatisk omkoppling till ’%1$s’\\</string>
+    <string name="redirect_request">Omkopplingsbegäran</string>
+    <string name="redirect_request_query">Accepterar du vidarekoppling av samtal till ’%1$s’?</string>
+    <string name="restore_unzip_failed">Det gick inte att återställa applikationsdata. Android version 14 och senare tillåter inte återställning av data som säkerhetskopierats före %1$s version %2$s.</string>
+    <string name="no_aec">Ingen hårdvara för akustisk ekokompensering!</string>
+    <string name="call_recording_tip">Om funktionen är aktiverad kommer nya inkommande och utgående samtal att spelas in. Inspelningarna kan spelas upp på sidan Samtalsdetaljer</string>
+    <string name="microphone_tip">Om funktionen aktiveras under samtalet stängs mikrofonen av.</string>
+    <string name="speakerphone_tip">Om funktionen är aktiverad spelas ljudet upp via enhetens högtalartelefon.</string>
+    <string name="rel_100">Reliable Provisional Responses</string>
+    <string name="rel_100_help">Om detta är markerat, ange stöd för tillförlitliga provisoriska svar (RFC 3262).</string>
+    <string name="dtmf_auto">In-band RTP eller SIP INFO</string>
+    <string name="tone_country">Signalland</string>
 </resources>

@@ -1,0 +1,2 @@
+- Nya översättningar till spanska och portugisiska (Brasilien)
+- Mindre förbättringar relaterade till AudioManager

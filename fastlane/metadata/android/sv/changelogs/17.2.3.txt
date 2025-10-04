@@ -1,0 +1,4 @@
+- Förhindra krascher till följd av dubbelklick på olika ikoner och
+  listobjekt.
+- Ändra färgen på kontots meddelandeikon till vit när kontot är
+  avregistrerat.

@@ -1,0 +1,3 @@
+- Förbättrat urval och ordning av kontots ljudcodecs
+- På grund av problem inaktiverades DNS-frågans cache
+- Migrering till Android API 33

@@ -1,0 +1,3 @@
+- Lagt till kontoinställningen "RTCP Multiplexing"
+- Fördelar åtgärdsknappar jämnt längst ner i huvudaktiviteten
+- Använde colorSecondaryDark som ledtrådsfärg i textvyn

@@ -1,0 +1,2 @@
+- Uppströmsfix för samtal som ligger kvar i aktiv lista även när det stängs
+- Bättre hantering av händelser för aktivering/inaktivering av WiFi-hotspot

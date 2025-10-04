@@ -1,0 +1,2 @@
+- Lagt till stöd för tillförlitliga provisoriska svarsmeddelanden (RFC 3262)
+- Lagt till QUIT-åtgärd för avsiktsmottagare

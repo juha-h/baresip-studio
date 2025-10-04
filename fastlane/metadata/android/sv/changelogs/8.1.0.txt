@@ -1,0 +1,4 @@
+- Hämta DNS-serveradresser dynamiskt från systemet om DNS-servrar
+inte anges i Konfiguration.
+- Om det bara finns ett konto, lägg till kontots domän till kontakt-URI
+som anges utan hostpart.

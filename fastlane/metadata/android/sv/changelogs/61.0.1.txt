@@ -1,0 +1,5 @@
+- Om DTMF är aktiverat, behåll fokus när skärmen ändrar orientering
+- Ändrade kontaktens URI för "The Test Call" till "sip:thetestcall@sip2sip.info
+- När du visar URI i vänlig form, visa URI-parametrar utom ';transport=udp'
+- Tog bort suffixet ".bs" från backupfilens namn
+- Nya översättningar (ryska)

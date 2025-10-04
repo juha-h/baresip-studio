@@ -1,0 +1,6 @@
+- Ersatte textläget EditConfigActivity med en grafisk konfigurationsaktivitet.
+- Aktuella konfigurationsobjekt är automatisk start, DNS-servrar, Opus bithastighet,
+och ICE-Lite.
+- Lagt till kontoalternativ för ICE- och STUN-server.
+- Fixat fel vid borttagning av konto.
+- Ej skickade meddelanden går inte förlorade när chattaktiviteten avbryts.

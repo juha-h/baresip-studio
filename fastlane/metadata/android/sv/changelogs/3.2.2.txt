@@ -1,0 +1,5 @@
+- Lagt till hantering av händelsen "Samtalsöverföring misslyckades".
+- Undvikit krasch vid (åter)start av enhet.
+- Undvikit krasch när man för första gången kommer tillbaka från konton till huvudaktivitet.
+- Använd "textEmailAddress"-inmatningstyp för konto-URI:er.
+- Ändrade betydelsen av standardmeddelandekanal till låg.

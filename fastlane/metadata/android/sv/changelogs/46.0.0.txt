@@ -1,0 +1,5 @@
+- Lagt till möjlighet att aktivera/avaktivera registrering av konto via
+  sändningsintentioner (se Wiki för detaljer)
+- Uppströms tillägg av cachelagring av DNS-förfrågningar
+- Uppströmsfix av ICE-kandidatprioriteringar
+- Höjd API-nivå för Android-mål till 32 (Android 12L)

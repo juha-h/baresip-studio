@@ -1,0 +1,2 @@
+- Lagt till Colorblind-inställning som för närvarande påverkar ikoner för registreringsstatus
+- Förbättrade namn på meddelandekanaler

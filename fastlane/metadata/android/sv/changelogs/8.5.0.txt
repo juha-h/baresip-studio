@@ -1,0 +1,1 @@
+- Preliminär användning av närhetssensor för att stänga av pekskärmen under samtal.

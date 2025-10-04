@@ -1,0 +1,1 @@
+- Lagt till möjlighet att exportera Baresip-kontakter till Android-kontakter

@@ -1,0 +1,5 @@
+- Uppgraderade målnivån för Android API till 28 (Android 9).
+- Flyttat viss icke-UI-funktionalitet från huvudaktiviteten till baresip-tjänsten.
+- Förenklad implementering av samtalsöverföring.
+- Uppdaterade bilderna för baresip-startprogrammet och statusfältet.
+- Avregistrerat UA när konto raderas.

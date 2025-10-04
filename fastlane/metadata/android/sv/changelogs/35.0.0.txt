@@ -1,0 +1,6 @@
+- Använd WebRTC Acoustic Echo Cancellation Mobile Mode-filter
+- Visa antalet missade samtal i meddelandet om det är fler än ett
+- När standardinställningen för samtalsvolym är inställd, ställ in både media- och samtalsvolym
+- Avbryt aviseringar när huvudaktiviteten återupptas
+- Fixat stopp för ringning i äldre Android-versioner
+- Nya översättningar till svenska och portugisiska (Brasilien)

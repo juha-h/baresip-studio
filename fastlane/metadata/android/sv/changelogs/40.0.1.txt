@@ -1,0 +1,5 @@
+- Konfigurationsobjekt för konto för telefonileverantör har lagts till
+- Lagt till stöd för tel URI som Callee-värde och Contact URI
+- Fråga användaren efter Telephony Provider-konto om det behövs för att ringa samtalet
+- Visar kontots STUN-konfigurationsobjekt endast om det behövs
+- Förbättrad hantering av CALL-åtgärder från andra program

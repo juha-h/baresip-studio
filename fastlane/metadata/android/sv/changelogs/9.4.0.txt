@@ -1,0 +1,4 @@
+- Lagt till menyalternativet "Starta om" för huvudaktivitet.
+- När registreringen misslyckas på grund av fel i DNS-uppslagningen, försök registrera
+  en gång till efter uppdatering av DNS-servrar.
+- Små förbättringar av loggning.

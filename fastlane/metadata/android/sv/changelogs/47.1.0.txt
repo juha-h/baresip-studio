@@ -1,0 +1,2 @@
+- Lagt till stöd för SIP UPDATE-metoden (RFC 3311)
+- Uppströmsfix av tidig ljudrelaterad bugg (183 Session Progress)

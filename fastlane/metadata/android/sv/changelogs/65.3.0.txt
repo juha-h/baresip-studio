@@ -1,0 +1,5 @@
+- Lagt till inställning för ringsignal
+- Förbättrat utseende och implementering av pull-to-register
+- Se till att bluetoothreceiver är registrerad innan du avregistrerar den
+- Fixat back-tryck-åtgärd för API < 33-kompatibilitet
+- Fixat ZRTP-verifieringsfråga

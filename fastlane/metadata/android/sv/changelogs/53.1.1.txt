@@ -1,0 +1,4 @@
+- Förbättringar av ikonen för startprogrammet
+- Försök inte att registrera ett nytt konto om Register inte har markerats
+- Lagt till hjälptext för registreringsintervall
+- Nya ryska översättningar

@@ -1,0 +1,1 @@
+- Omge kontakt-URI:er med < och > endast när kontakterna sparas i en fil.

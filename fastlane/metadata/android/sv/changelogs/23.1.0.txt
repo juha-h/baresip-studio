@@ -1,0 +1,4 @@
+- Ljudkodek G.729 har lagts till.
+- Lagt till en inställning för att slå på/av spårning av SIP-meddelanden till logcat.
+- STUN/TURN Server URI-scheman "stuns" och "turns" stöds inte för närvarande.
+- Nya portugisiska (Brasilien) strängöversättningar.

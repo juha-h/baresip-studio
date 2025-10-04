@@ -1,0 +1,1 @@
+- Lösenordsdialog och inmatning av kontolösenord har förbättrats.

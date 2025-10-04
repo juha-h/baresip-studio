@@ -1,0 +1,4 @@
+- Riktar sig nu mot API-nivå 34 (Android 14)
+- Lagt till stöd för Codec2 ljudkodek
+- Inspelning av nästa samtal rensas inte när samtalet avslutas
+- Inkluderade även Dark Theme-inställning i backup-fil

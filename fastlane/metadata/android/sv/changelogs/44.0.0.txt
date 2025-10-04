@@ -1,0 +1,4 @@
+- Visa vidarekoppling om inkommande samtal har vidarekopplats
+- Backup-relaterade korrigeringar i äldre Android-versioner
+- Förbättrad matchning av URI till kontakt
+- Nya översättningar till portugisiska (Brasilien)

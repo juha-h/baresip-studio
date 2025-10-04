@@ -1,0 +1,3 @@
+- Åtgärdat en kritisk bugg i kontrollen av inspelningstillstånd för ljud som
+förhindrade ny baresip-installation från att starta.
+- Små förbättringar.

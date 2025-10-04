@@ -1,0 +1,2 @@
+- Tillåt *- och #-tecken i telefonnummer
+- Nya översättningar (portugisiska (Brasilien))

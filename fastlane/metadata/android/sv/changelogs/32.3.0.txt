@@ -1,0 +1,4 @@
+- Förvärva WiFi-lås medan baresip använder WiFi-nätverk
+- Återställde oavsiktligt borttagen ringsignal
+- Lagt till en notis om att stänga av batterioptimering
+- Svenska språköversättningar

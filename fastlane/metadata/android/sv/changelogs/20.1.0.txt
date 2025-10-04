@@ -1,0 +1,2 @@
+- Lagt till bidragande RU-strängar.
+- Uppströmsfix av möjlig krasch.

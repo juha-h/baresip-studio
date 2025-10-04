@@ -1,0 +1,3 @@
+- Fixad radering av avatarfilen när avataren tas bort från kontakten eller när kontakten med avataren tas bort
+- Fixat sparande av kontots DTMF-läge
+- Nya översättningar av spanska, portugisiska och portugisiska (Brasilien)

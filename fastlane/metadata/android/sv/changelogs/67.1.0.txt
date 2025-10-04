@@ -1,0 +1,2 @@
+- Använd den blå nedåtpilen i samtalshistoriken för att ange att samtalet har besvarats någon annanstans
+- Lagt till hjälptexter vid klick på pilikonerna för samtalsinformation

@@ -1,0 +1,3 @@
+- Buggfixar relaterade till chatt, samtalshistorik och kontakter
+- Fixade buggar i URI-komplettering och förbättrade URI-relaterade kontroller
+- Översättningar från Weblate (franska, portugisiska (Brasilien))

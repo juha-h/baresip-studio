@@ -1,0 +1,4 @@
+- Använd användningstyp istället för strömtyp vid begäran om ljudfokus.
+- Fixad formatering av engelsk hjälptext för konton.
+- Visa inte möjlig port för en AoR när du får frågan om att radera AoR.
+- Fyllde ikonen för icke-registerstatus med vit färg.

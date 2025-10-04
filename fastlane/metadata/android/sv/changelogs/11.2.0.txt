@@ -1,0 +1,3 @@
+- Lagt till stöd för AMR narrowband codec.
+- Bulgariska strängar har lagts till.
+- Konfigurationsobjektet i huvudmenyn har bytt namn till Inställningar.

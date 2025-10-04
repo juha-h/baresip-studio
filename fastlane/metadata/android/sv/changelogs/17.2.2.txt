@@ -1,0 +1,2 @@
+- Prenumerera inte på indikering av väntande meddelande när konto skapas
+  och URI för röstbrevlåda inte är inställd.

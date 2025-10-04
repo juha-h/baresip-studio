@@ -1,0 +1,2 @@
+- Fixat två chattrelaterade krascher.
+- Mindre förbättringar av koden.

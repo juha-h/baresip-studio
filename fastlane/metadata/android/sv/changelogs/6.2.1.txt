@@ -1,0 +1,8 @@
+- Använder ConnectivityManager NetworkCallbacks för att upptäcka när nätverks
+nätverksanslutning blir tillgänglig eller förloras.
+- Lagt till Android 8.1+ sätt att hantera skärmen.
+- Ställ in volymkontroller så att de gäller för aktuell ljudström (kanske inte alltid
+fungerar).
+- Fixade möjlig krasch när förstörd baresip-app startas igen.
+- Visar meddelande när kontot som ska skapas redan existerar.
+- Lagt till en notis i "Om"-texten om medievolym.

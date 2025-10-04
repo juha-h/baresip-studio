@@ -1,0 +1,4 @@
+- Lagt till alternativet TURN-konto medianat.
+- Lagt till möjlighet att ange användarnamn/lösenord för STUN/TURN-servern.
+- STUN/TURN-relaterade strängar för vissa språk har inte uppdaterats ännu.
+- Fler förbättringar av dialogrutan.
