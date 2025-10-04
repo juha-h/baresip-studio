@@ -4,18 +4,17 @@
 #include <string.h>
 #include <re.h>
 #include <rem.h>
-#include <baresip.h>
-#include "codec.h"
-#include "../logger.h"
 #include "re_h265.h"
+#include <baresip.h>
 #include <jni.h>
 #include <android/native_window_jni.h>
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaFormat.h>
 #include <media/NdkMediaCodecInfo.h>
 #include <err.h>
+#include "android_mediacodec.h"
+#include "../logger.h"
 
-#define ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 
 struct videnc_state
 {
@@ -33,21 +32,6 @@ struct videnc_state
     int width;
     int height;
     bool codec_started;
-};
-
-enum
-{
-    COLOR_FormatYUV420Planar = 0x13,
-    COLOR_FormatYUV420SemiPlanar = 0x15,
-};
-
-static const struct
-{
-    int color_format;
-    enum vidfmt pix_fmt;
-} color_formats[] = {
-        {COLOR_FormatYUV420Planar, VID_FMT_YUV420P},
-        {COLOR_FormatYUV420SemiPlanar, VID_FMT_NV12},
 };
 
 static void copy_frame_to_buffer(const struct vidframe *frame, uint8_t *dst, size_t *dst_size)
