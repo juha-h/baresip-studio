@@ -42,7 +42,6 @@ module uuid.so
 module_app account.so
 module_app debug_cmd.so
 module_app mwi.so
-evdev_device /dev/input/event0
 opus_samplerate 16000
 opus_stereo no
 opus_sprop_stereo no
