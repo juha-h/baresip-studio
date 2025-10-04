@@ -27,4 +27,13 @@ static struct vidcodec mediacodec_h264 = {
         .packetizeh = mediacodec_encode_packetize,
 };
 
+static struct vidcodec mediacodec_h265 = {
+        .name = "H265",
+        .encupdh = mediacodec_encode_update,
+        .ench = mediacodec_encode_packet,
+        .decupdh = NULL,
+        .dech = NULL,
+        .packetizeh = mediacodec_encode_packetize,
+};
+
 #endif //BARESIP_STUDIO_ANDROID_MEDIACODEC_H

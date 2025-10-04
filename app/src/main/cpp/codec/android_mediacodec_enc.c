@@ -7,13 +7,15 @@
 #include <baresip.h>
 #include "codec.h"
 #include "../logger.h"
+#include "re_h265.h"
 #include <jni.h>
 #include <android/native_window_jni.h>
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaFormat.h>
 #include <media/NdkMediaCodecInfo.h>
-//#include <media/NdkMediaCodecList.h>
 #include <err.h>
+
+#define ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 
 struct videnc_state
 {
@@ -32,6 +34,44 @@ struct videnc_state
     int height;
     bool codec_started;
 };
+
+enum
+{
+    COLOR_FormatYUV420Planar = 0x13,
+    COLOR_FormatYUV420SemiPlanar = 0x15,
+};
+
+static const struct
+{
+    int color_format;
+    enum vidfmt pix_fmt;
+} color_formats[] = {
+        {COLOR_FormatYUV420Planar, VID_FMT_YUV420P},
+        {COLOR_FormatYUV420SemiPlanar, VID_FMT_NV12},
+};
+
+static void copy_frame_to_buffer(const struct vidframe *frame, uint8_t *dst, size_t *dst_size)
+{
+    size_t frame_size = 0;
+    int y_size = (int)frame->size.w * (int)frame->size.h;
+    if (frame->fmt == VID_FMT_YUV420P) {
+        int uv_size = y_size / 4; // Each U, V plane is w*h/4
+
+        // I420 Memory Layout = Y (W*H) + U (W*H/4) + V (W*H/4)
+        memcpy(dst, frame->data[0], y_size);                     // Y
+        memcpy(dst + y_size, frame->data[1], uv_size);           // U
+        memcpy(dst + y_size + uv_size, frame->data[2], uv_size); // V
+        frame_size = y_size + (uv_size * 2);
+    } else if (frame->fmt == VID_FMT_NV12) {
+        int uv_size = y_size / 2; // NV12 interleaved UV
+
+        // NV12 Memory Layout = Y (W*H) + UV (W*H/2)
+        memcpy(dst, frame->data[0], y_size);
+        memcpy(dst + y_size, frame->data[1], uv_size);
+        frame_size = y_size + uv_size;
+    }
+    *dst_size = frame_size;
+}
 
 static void android_mediacodec_destructor(void *arg)
 {
@@ -89,7 +129,13 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
 {
     AMediaFormat *format = AMediaFormat_new();
     AMediaFormat_setString(format, "mime", ves->mime);
-    AMediaFormat_setInt32(format, "color-format", 0x7f420888);
+    for (int i = 0; i < ARRAY_ELEMS(color_formats); i++) {
+        if (frame->fmt == color_formats[i].pix_fmt) {
+            AMediaFormat_setInt32(format, "color-format", color_formats[i].color_format);
+            break;
+        }
+    }
+    //    AMediaFormat_setInt32(format, "color-format", 0x7f420888);
     AMediaFormat_setInt32(format, "width", frame->size.w);
     AMediaFormat_setInt32(format, "height", frame->size.h);
     AMediaFormat_setInt32(format, "frame-rate", (int)ves->fps);
@@ -103,7 +149,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
 
     LOGD("open_encoder format:%s", AMediaFormat_toString(format));
 
-    ves->codec = AMediaCodec_createEncoderByType("video/avc");
+    ves->codec = AMediaCodec_createEncoderByType(ves->mime);
     if (!ves->codec) {
         warning("mediacodec: create encoder failed\n");
         return ENODEV;
@@ -145,28 +191,10 @@ int mediacodec_encode_packet(
         size_t bufsize;
         uint8_t *buf = AMediaCodec_getInputBuffer(ves->codec, idx, &bufsize);
         if (buf) {
-            int frame_size = 0;
-            if (frame->fmt == VID_FMT_NV12) {
-                int y_size = frame->size.w * frame->size.h;
-                int uv_size = y_size / 2; // NV12 interleaved UV
-
-                // NV12 Memory Layout = Y (W*H) + UV (W*H/2)
-                memcpy(buf, frame->data[0], y_size);
-                memcpy(buf + y_size, frame->data[1], uv_size);
-                frame_size = y_size + uv_size;
-            } else {
-                int y_size = frame->size.w * frame->size.h;
-                int uv_size = y_size / 4; // Each U, V plane is w*h/4
-
-                // I420 Memory Layout = Y (W*H) + U (W*H/4) + V (W*H/4)
-                memcpy(buf, frame->data[0], y_size);                     // Y
-                memcpy(buf + y_size, frame->data[1], uv_size);           // U
-                memcpy(buf + y_size + uv_size, frame->data[2], uv_size); // V
-                frame_size = y_size + (uv_size * 2);
-            }
-
+            size_t frame_size;
+            copy_frame_to_buffer(frame, buf, &frame_size);
             AMediaCodec_queueInputBuffer(ves->codec, idx, 0, frame_size,
-                    (int64_t)(ves->frame_counter * 1000000 / ves->fps), 0);
+                    (int64_t)(ves->frame_counter * 1000000 / (int)ves->fps), 0);
         }
     }
 
@@ -182,8 +210,15 @@ int mediacodec_encode_packet(
             LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
 
             uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
-            h264_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
-                    (h264_packet_h *)ves->pkth, (void *)ves->vid);
+
+            if (0 == str_casecmp(ves->mime, "video/avc")) {
+                h264_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
+                        (h264_packet_h *)ves->pkth, (void *)ves->vid);
+            } else if (0 == str_casecmp(ves->mime, "video/hevc")) {
+                h265_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
+                        (h265_packet_h *)ves->pkth, (void *)ves->vid);
+            }
+
             ves->frame_counter++;
             size += (info.size - info.offset);
         }
@@ -197,14 +232,20 @@ int mediacodec_encode_packet(
 int mediacodec_encode_packetize(struct videnc_state *ves, const struct vidpacket *packet)
 {
     uint64_t ts;
-    int err;
+    int err = 0;
 
     if (!ves || !packet)
         return EINVAL;
 
     ts = video_calc_rtp_timestamp_fix(packet->timestamp);
 
-    err = h264_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
-            (h264_packet_h *)ves->pkth, (void *)ves->vid);
+    if (0 == str_casecmp(ves->mime, "video/avc")) {
+        err = h264_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
+                (h264_packet_h *)ves->pkth, (void *)ves->vid);
+    } else if (0 == str_casecmp(ves->mime, "video/hevc")) {
+        err = h265_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
+                (h265_packet_h *)ves->pkth, (void *)ves->vid);
+    }
+
     return err;
 }
