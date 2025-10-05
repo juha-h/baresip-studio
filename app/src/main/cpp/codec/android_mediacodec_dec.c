@@ -23,9 +23,6 @@ enum
 
 struct viddec_state
 {
-    //    const AVCodec *codec;
-    //    AVCodecContext *ctx;
-    //    AVFrame *pict;
     AMediaCodec *codec;
     AMediaFormat *format;
     struct mbuf *mb;
@@ -49,7 +46,7 @@ static void destructor(void *arg)
 {
     struct viddec_state *st = arg;
 
-    debug("avcodec: decoder stats"
+    debug("mediacodec: decoder stats"
           " (keyframes:%u, lost_fragments:%u)\n",
             st->stats.n_key, st->stats.n_lost);
 
@@ -134,11 +131,11 @@ int mediacodec_decode_update(struct viddec_state **vdsp, const struct vidcodec *
 
     err = init_decoder(st, vc->name);
     if (err) {
-        warning("avcodec: %s: could not init decoder\n", vc->name);
+        warning("mediacodec: %s: could not init decoder\n", vc->name);
         goto out;
     }
 
-    debug("avcodec: video decoder %s (%s)\n", vc->name, fmtp);
+    debug("mediacodec: video decoder %s (%s)\n", vc->name, fmtp);
 
 out:
     if (err)
@@ -174,8 +171,6 @@ static int decode(
         AMediaFormat *format = AMediaCodec_getOutputFormat(st->codec);
         LOGD("decode format:%s", AMediaFormat_toString(format));
         int32_t w = 0, h = 0;
-        // 进行解码操作了
-        // nv12 需要宽高，但是首次传入的sps后面分辨率变化会导致解析错误
         AMediaFormat_getInt32(st->format, "width", &w);
         AMediaFormat_getInt32(st->format, "height", &h);
         if (w > 0 && h > 0) {
@@ -185,7 +180,6 @@ static int decode(
             };
             vidframe_init_buf(frame, VID_FMT_NV12, &size, out_buf);
         }
-        // out_buf 是解码后的 YUV420P 数据，可渲染或保存
         AMediaCodec_releaseOutputBuffer(st->codec, out_idx, false);
         //        out_idx = AMediaCodec_dequeueOutputBuffer(st->codec, &info, 0);
     } else {
@@ -212,7 +206,7 @@ int mediacodec_decode_h264(
         return err;
 
 #if 0
-	re_printf("avcodec: decode: %s %s type=%2d %s  \n",
+	re_printf("mediacodec: decode: %s %s type=%2d %s  \n",
 		  marker ? "[M]" : "   ",
 		  h264_is_keyframe(h264_hdr.type) ? "<KEY>" : "     ",
 		  h264_hdr.type,
@@ -220,17 +214,17 @@ int mediacodec_decode_h264(
 #endif
 
     if (h264_hdr.type == H264_NALU_SLICE && !st->got_keyframe) {
-        debug("avcodec: decoder waiting for keyframe\n");
+        debug("mediacodec: decoder waiting for keyframe\n");
         return EPROTO;
     }
 
     if (h264_hdr.f) {
-        info("avcodec: H264 forbidden bit set!\n");
+        info("mediacodec: H264 forbidden bit set!\n");
         return EBADMSG;
     }
 
     if (st->frag && h264_hdr.type != H264_NALU_FU_A) {
-        debug("avcodec: lost fragments; discarding previous NAL\n");
+        debug("mediacodec: lost fragments; discarding previous NAL\n");
         fragment_rewind(st);
         st->frag = false;
         ++st->stats.n_lost;
@@ -257,7 +251,7 @@ int mediacodec_decode_h264(
 
         if (fu.s) {
             if (st->frag) {
-                debug("avcodec: start: lost fragments;"
+                debug("mediacodec: start: lost fragments;"
                       " ignoring previous NAL\n");
                 fragment_rewind(st);
                 ++st->stats.n_lost;
@@ -275,7 +269,7 @@ int mediacodec_decode_h264(
                 goto out;
         } else {
             if (!st->frag) {
-                debug("avcodec: ignoring fragment"
+                debug("mediacodec: ignoring fragment"
                       " (nal=%u)\n",
                         fu.type);
                 ++st->stats.n_lost;
@@ -283,7 +277,7 @@ int mediacodec_decode_h264(
             }
 
             if (rtp_seq_diff(st->frag_seq, pkt->hdr->seq) != 1) {
-                debug("avcodec: lost fragments detected\n");
+                debug("mediacodec: lost fragments detected\n");
                 fragment_rewind(st);
                 st->frag = false;
                 ++st->stats.n_lost;
@@ -305,14 +299,14 @@ int mediacodec_decode_h264(
         if (err)
             goto out;
     } else {
-        warning("avcodec: decode: unknown NAL type %u\n", h264_hdr.type);
+        warning("mediacodec: decode: unknown NAL type %u\n", h264_hdr.type);
         return EBADMSG;
     }
 
     if (!pkt->hdr->m) {
 
         if (st->mb->end > DECODE_MAXSZ) {
-            warning("avcodec: decode buffer size exceeded\n");
+            warning("mediacodec: decode buffer size exceeded\n");
             err = ENOMEM;
             goto out;
         }
@@ -349,7 +343,7 @@ int mediacodec_decode_h264(
         int ret = h264_get_sps_pps(
                 st->mb->buf, (int)st->mb->pos, sps_data, &sps_len, pps_data, &pps_len);
         if (ret) {
-            warning("avcodec: decode: "
+            warning("mediacodec: "
                     "h264_get_sps_pps error %d\n",
                     ret);
             goto out;
@@ -357,7 +351,7 @@ int mediacodec_decode_h264(
         int w, h;
         ret = h264_decode_sps_with_width_and_height(sps_data + 3, sps_len - 3, &w, &h);
         if (ret) {
-            warning("avcodec: decode: "
+            warning("mediacodec: "
                     "h264_decode_sps_"
                     "with_width_and_height error %d\n",
                     ret);
@@ -368,7 +362,7 @@ int mediacodec_decode_h264(
         AMediaFormat_setBuffer(st->format, "csd-0", sps_data, sps_len);
         AMediaFormat_setBuffer(st->format, "csd-1", pps_data, pps_len);
         st->open = true;
-        debug("avcodec: decode: init decoder H264\n");
+        debug("mediacodec: init decoder H264\n");
         init_decoder(st, "H264");
     }
 
@@ -435,7 +429,7 @@ int mediacodec_decode_h265(
     mbuf_advance(mb, H265_HDR_SIZE);
 
 #if 0
-	debug("avcodec: h265: decode:  [%s]  %s  type=%2d  %s\n",
+	debug("mediacodec: h265: decode:  [%s]  %s  type=%2d  %s\n",
 	      marker ? "M" : " ",
 	      h265_is_keyframe(hdr.nal_unit_type) ? "<KEY>" : "     ",
 	      hdr.nal_unit_type,
@@ -519,7 +513,7 @@ int mediacodec_decode_h265(
             mb->pos += len;
         }
     } else {
-        warning("avcodec: unknown H265 NAL type %u (%s) [%zu bytes]\n", hdr.nal_unit_type,
+        warning("mediacodec: unknown H265 NAL type %u (%s) [%zu bytes]\n", hdr.nal_unit_type,
                 h265_nalunit_name(hdr.nal_unit_type), mbuf_get_left(mb));
         return EPROTO;
     }
@@ -527,7 +521,7 @@ int mediacodec_decode_h265(
     if (!pkt->hdr->m) {
 
         if (vds->mb->end > DECODE_MAXSZ) {
-            warning("avcodec: h265 decode buffer size exceeded\n");
+            warning("mediacodec: h265 decode buffer size exceeded\n");
             err = ENOMEM;
             goto out;
         }
@@ -565,7 +559,7 @@ int mediacodec_decode_h265(
         int ret = h265_get_vps_sps_pps(vds->mb->buf, (int)vds->mb->pos, vps_data, &vps_len,
                 sps_data, &sps_len, pps_data, &pps_len);
         if (ret) {
-            warning("avcodec: decode: "
+            warning("mediacodec: "
                     "h265_get_vps_sps_pps error %d\n",
                     ret);
             goto out;
@@ -573,7 +567,7 @@ int mediacodec_decode_h265(
         int w, h;
         ret = h265_decode_sps_with_width_and_height(sps_data + 3, sps_len - 3, &w, &h);
         if (ret) {
-            warning("avcodec: decode: "
+            warning("mediacodec: "
                     "h265_decode_sps_"
                     "with_width_and_height error %d\n",
                     ret);
@@ -585,7 +579,7 @@ int mediacodec_decode_h265(
         AMediaFormat_setBuffer(vds->format, "csd-1", sps_data, sps_len);
         AMediaFormat_setBuffer(vds->format, "csd-2", pps_data, pps_len);
         vds->open = true;
-        debug("avcodec: decode: init decoder H265\n");
+        debug("mediacodec: init decoder H265\n");
         init_decoder(vds, "H265");
     }
 

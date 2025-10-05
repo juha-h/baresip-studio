@@ -8,7 +8,7 @@
 int h265_get_vps_sps_pps(const uint8_t *data, size_t len, uint8_t *vps, size_t *vps_len,
         uint8_t *sps, size_t *sps_len, uint8_t *pps, size_t *pps_len)
 {
-    const uint8_t nal_seq[3] = { 0, 0, 1};
+    const uint8_t nal_seq[3] = {0, 0, 1};
     int nal_seq_size = 3;
     uint8_t nalu_t;
     int nalu_len;
@@ -26,21 +26,21 @@ int h265_get_vps_sps_pps(const uint8_t *data, size_t len, uint8_t *vps, size_t *
         nalu_t = nal.nal_unit_type;
         nalu_len = (int)(r1 - r);
         if (nalu_t == H265_NAL_VPS_NUT) {
-            if (MAX_VPS < nalu_len) {
+            if (MAX_VPS < nalu_len + nal_seq_size) {
                 continue;
             }
             memcpy(vps, nal_seq, nal_seq_size);
             memcpy(vps + nal_seq_size, r, nalu_len);
             *vps_len = nalu_len + nal_seq_size;
         } else if (nalu_t == H265_NAL_SPS_NUT) {
-            if (MAX_SPS < nalu_len) {
+            if (MAX_SPS < nalu_len + nal_seq_size) {
                 continue;
             }
             memcpy(sps, nal_seq, nal_seq_size);
             memcpy(sps + nal_seq_size, r, nalu_len);
             *sps_len = nalu_len + nal_seq_size;
         } else if (nalu_t == H265_NAL_PPS_NUT) {
-            if (MAX_PPS < nalu_len) {
+            if (MAX_PPS < nalu_len + nal_seq_size) {
                 continue;
             }
             memcpy(pps, nal_seq, nal_seq_size);

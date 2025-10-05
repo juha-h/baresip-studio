@@ -156,7 +156,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
 }
 
 
-int mediacodec_encode_packet(
+int mediacodec_encode_packet_h264(
         struct videnc_state *ves, bool update, const struct vidframe *frame, uint64_t timestamp)
 {
     int err;
@@ -177,8 +177,7 @@ int mediacodec_encode_packet(
         if (buf) {
             size_t frame_size;
             copy_frame_to_buffer(frame, buf, &frame_size);
-            AMediaCodec_queueInputBuffer(ves->codec, idx, 0, frame_size,
-                    (int64_t)(ves->frame_counter * 1000000 / (int)ves->fps), 0);
+            AMediaCodec_queueInputBuffer(ves->codec, idx, 0, frame_size, timestamp, 0);
         }
     }
 
@@ -189,19 +188,12 @@ int mediacodec_encode_packet(
         size_t out_size;
         const uint8_t *out_buf = AMediaCodec_getOutputBuffer(ves->codec, out_idx, &out_size);
         if (out_buf && info.size > 0) {
-            //            mbuf_reset(ves->mb);
-            //            mbuf_write_mem(ves->mb, out_buf, out_size);
             LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
 
             uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
 
-            if (0 == str_casecmp(ves->mime, "video/avc")) {
-                h264_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
-                        (h264_packet_h *)ves->pkth, (void *)ves->vid);
-            } else if (0 == str_casecmp(ves->mime, "video/hevc")) {
-                h265_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
-                        (h265_packet_h *)ves->pkth, (void *)ves->vid);
-            }
+            h264_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
+                    (h264_packet_h *)ves->pkth, (void *)ves->vid);
 
             ves->frame_counter++;
             size += (info.size - info.offset);
@@ -213,7 +205,57 @@ int mediacodec_encode_packet(
     return 0;
 }
 
-int mediacodec_encode_packetize(struct videnc_state *ves, const struct vidpacket *packet)
+int mediacodec_encode_packet_h265(
+        struct videnc_state *ves, bool update, const struct vidframe *frame, uint64_t timestamp)
+{
+    int err;
+    if (!ves || !frame || (frame->fmt != VID_FMT_NV12 && frame->fmt != VID_FMT_YUV420P))
+        return EINVAL;
+    if (!ves->codec_started) {
+        err = open_encoder(ves, frame);
+        if (err) {
+            LOGD("open_encoder failed:%d", err);
+            return err;
+        }
+    }
+
+    ssize_t idx = AMediaCodec_dequeueInputBuffer(ves->codec, 0);
+    if (idx >= 0) {
+        size_t bufsize;
+        uint8_t *buf = AMediaCodec_getInputBuffer(ves->codec, idx, &bufsize);
+        if (buf) {
+            size_t frame_size;
+            copy_frame_to_buffer(frame, buf, &frame_size);
+            AMediaCodec_queueInputBuffer(ves->codec, idx, 0, frame_size, timestamp, 0);
+        }
+    }
+
+    AMediaCodecBufferInfo info;
+    ssize_t out_idx = AMediaCodec_dequeueOutputBuffer(ves->codec, &info, 0);
+    int size = 0;
+    while (out_idx >= 0) {
+        size_t out_size;
+        const uint8_t *out_buf = AMediaCodec_getOutputBuffer(ves->codec, out_idx, &out_size);
+        if (out_buf && info.size > 0) {
+            LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
+
+            uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
+
+            h265_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
+                    (h265_packet_h *)ves->pkth, (void *)ves->vid);
+
+            ves->frame_counter++;
+            size += (info.size - info.offset);
+        }
+        AMediaCodec_releaseOutputBuffer(ves->codec, out_idx, false);
+        out_idx = AMediaCodec_dequeueOutputBuffer(ves->codec, &info, 0);
+    }
+    LOGD("mediacodec_encode_packet size: %d", size);
+    return 0;
+}
+
+
+int mediacodec_encode_packetize_h264(struct videnc_state *ves, const struct vidpacket *packet)
 {
     uint64_t ts;
     int err = 0;
@@ -223,13 +265,24 @@ int mediacodec_encode_packetize(struct videnc_state *ves, const struct vidpacket
 
     ts = video_calc_rtp_timestamp_fix(packet->timestamp);
 
-    if (0 == str_casecmp(ves->mime, "video/avc")) {
-        err = h264_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
-                (h264_packet_h *)ves->pkth, (void *)ves->vid);
-    } else if (0 == str_casecmp(ves->mime, "video/hevc")) {
-        err = h265_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
-                (h265_packet_h *)ves->pkth, (void *)ves->vid);
-    }
+    err = h264_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
+            (h264_packet_h *)ves->pkth, (void *)ves->vid);
+
+    return err;
+}
+
+int mediacodec_encode_packetize_h265(struct videnc_state *ves, const struct vidpacket *packet)
+{
+    uint64_t ts;
+    int err = 0;
+
+    if (!ves || !packet)
+        return EINVAL;
+
+    ts = video_calc_rtp_timestamp_fix(packet->timestamp);
+
+    err = h265_packetize(ts, packet->buf, packet->size, ves->encprm.pktsize,
+            (h265_packet_h *)ves->pkth, (void *)ves->vid);
 
     return err;
 }

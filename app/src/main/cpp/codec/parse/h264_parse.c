@@ -8,6 +8,7 @@ int h264_get_sps_pps(const uint8_t *data, size_t len, uint8_t *sps, size_t *sps_
         size_t *pps_len)
 {
     const uint8_t nal_seq[3] = {0, 0, 1};
+    int nal_seq_size = 3;
     uint8_t nalu_t;
     int nalu_len;
     const uint8_t *r, *end = data + len;
@@ -22,19 +23,19 @@ int h264_get_sps_pps(const uint8_t *data, size_t len, uint8_t *sps, size_t *sps_
         nalu_t = r[0] & 0x1f;
         nalu_len = (int)(r1 - r);
         if (nalu_t == H264_NALU_SPS) {
-            if (MAX_SPS < nalu_len + 3) {
+            if (MAX_SPS < nalu_len + nal_seq_size) {
                 continue;
             }
-            memcpy(sps, nal_seq, 3);
-            memcpy(sps + 3, r, nalu_len);
-            *sps_len = nalu_len;
+            memcpy(sps, nal_seq, nal_seq_size);
+            memcpy(sps + nal_seq_size, r, nalu_len);
+            *sps_len = nalu_len + nal_seq_size;
         } else if (nalu_t == H264_NALU_PPS) {
-            if (MAX_PPS < nalu_len) {
+            if (MAX_PPS < nalu_len + nal_seq_size) {
                 continue;
             }
-            memcpy(pps, nal_seq, 3);
-            memcpy(pps + 3, r, nalu_len);
-            *pps_len = nalu_len;
+            memcpy(pps, nal_seq, nal_seq_size);
+            memcpy(pps + nal_seq_size, r, nalu_len);
+            *pps_len = nalu_len + nal_seq_size;
         }
         if ((*sps_len > 0 && *pps_len > 0))
             break;
