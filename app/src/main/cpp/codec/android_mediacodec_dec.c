@@ -167,18 +167,26 @@ static int decode(
     ssize_t out_idx = AMediaCodec_dequeueOutputBuffer(st->codec, &info, 0);
     if (out_idx >= 0) {
         uint8_t *out_buf = AMediaCodec_getOutputBuffer(st->codec, out_idx, NULL);
-        LOGI("Got decoded HEVC frame, size=%d", info.size);
+        LOGD("Got decoded frame, size=%d", info.size);
         AMediaFormat *format = AMediaCodec_getOutputFormat(st->codec);
         LOGD("decode format:%s", AMediaFormat_toString(format));
-        int32_t w = 0, h = 0;
-        AMediaFormat_getInt32(st->format, "width", &w);
-        AMediaFormat_getInt32(st->format, "height", &h);
+        int32_t w = 0, h = 0, fmt = 0;
+        AMediaFormat_getInt32(format, "width", &w);
+        AMediaFormat_getInt32(format, "height", &h);
+        AMediaFormat_getInt32(format, "color-format", &fmt);
+        AMediaFormat_delete(format);
         if (w > 0 && h > 0) {
             struct vidsz size = {
                     .w = w,
                     .h = h,
             };
-            vidframe_init_buf(frame, VID_FMT_NV12, &size, out_buf);
+            for (int i = 0; i < ARRAY_ELEMS(color_formats); i++) {
+                if (fmt == color_formats[i].color_format) {
+                    vidframe_init_buf(frame, color_formats[i].pix_fmt, &size, out_buf);
+                    break;
+                }
+            }
+            pkt->intra = (info.flags & AMEDIACODEC_BUFFER_FLAG_KEY_FRAME);
         }
         AMediaCodec_releaseOutputBuffer(st->codec, out_idx, false);
         //        out_idx = AMediaCodec_dequeueOutputBuffer(st->codec, &info, 0);

@@ -25,7 +25,7 @@ struct videnc_state
     struct videnc_param encprm;
     char *mime;
     AMediaCodec *codec;
-    AMediaFormat *format;
+    //    AMediaFormat *format;
     uint64_t frame_counter;
     struct mbuf *mb;
 
@@ -66,10 +66,10 @@ static void android_mediacodec_destructor(void *arg)
         AMediaCodec_delete(ves->codec);
         ves->codec = NULL;
     }
-    if (ves->format) {
-        AMediaFormat_delete(ves->format);
-        ves->format = NULL;
-    }
+    //    if (ves->format) {
+    //        AMediaFormat_delete(ves->format);
+    //        ves->format = NULL;
+    //    }
     mem_deref(ves->mb);
 }
 
@@ -119,17 +119,28 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
             break;
         }
     }
+    int32_t w = (int32_t)frame->size.w;
+    int32_t h = (int32_t)frame->size.h;
+    int32_t fps = (int32_t)ves->fps;
+    float factor = 0.08f; // 80% 比特率系数
+    int32_t frame_bits = (int32_t)(w * h * factor);
+    int bitrate = frame_bits * fps; // 平均码率
     //    AMediaFormat_setInt32(format, "color-format", 0x7f420888);
-    AMediaFormat_setInt32(format, "width", frame->size.w);
-    AMediaFormat_setInt32(format, "height", frame->size.h);
-    AMediaFormat_setInt32(format, "frame-rate", (int)ves->fps);
-    AMediaFormat_setInt32(format, "bitrate", (ves->bitrate * 9) / 10); // take a margin
+    AMediaFormat_setInt32(format, "width", w);
+    AMediaFormat_setInt32(format, "height", h);
+    AMediaFormat_setInt32(format, "frame-rate", fps);
+    AMediaFormat_setInt32(format, "bitrate", bitrate); // take a margin
     AMediaFormat_setInt32(format, "bitrate-mode", 1);
-    AMediaFormat_setInt32(format, "i-frame-interval", 10);
+    //    AMediaFormat_setInt32(format, "i-frame-interval", 10);
     AMediaFormat_setInt32(format, "latency", 1);
     AMediaFormat_setInt32(format, "priority", 0);
 
-    ves->format = format;
+    AMediaFormat_setInt32(format, "i-frame-interval", 1);
+    AMediaFormat_setInt32(format, "intra-refresh-period", (int)ves->fps);
+    AMediaFormat_setInt32(format, "prepend-sps-pps-to-idr-frames", 1);
+
+
+    //    ves->format = format;
 
     LOGD("open_encoder format:%s", AMediaFormat_toString(format));
 
@@ -140,7 +151,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
     }
 
     media_status_t status = AMediaCodec_configure(
-            ves->codec, ves->format, NULL, NULL, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
+            ves->codec, format, NULL, NULL, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
     if (status != AMEDIA_OK) {
         warning("mediacodec: configure failed\n");
         return ENODEV;
@@ -151,6 +162,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
         warning("mediacodec: start failed\n");
         return ENODEV;
     }
+    AMediaFormat_delete(format);
     ves->codec_started = true;
     return 0;
 }
@@ -188,21 +200,21 @@ int mediacodec_encode_packet_h264(
         size_t out_size;
         const uint8_t *out_buf = AMediaCodec_getOutputBuffer(ves->codec, out_idx, &out_size);
         if (out_buf && info.size > 0) {
-            LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
-
-            uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
-
-            h264_packetize(rtp_ts, out_buf + info.offset, info.size, ves->encprm.pktsize,
-                    (h264_packet_h *)ves->pkth, (void *)ves->vid);
-
-            ves->frame_counter++;
+            mbuf_write_mem(ves->mb, out_buf + info.offset, info.size);
+            if (!(info.flags & AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG)) {
+                ves->frame_counter++;
+                uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
+                err |= h264_packetize(rtp_ts, ves->mb->buf, ves->mb->pos, ves->encprm.pktsize,
+                        (h264_packet_h *)ves->pkth, (void *)ves->vid);
+                mbuf_reset(ves->mb);
+            }
             size += (info.size - info.offset);
         }
         AMediaCodec_releaseOutputBuffer(ves->codec, out_idx, false);
         out_idx = AMediaCodec_dequeueOutputBuffer(ves->codec, &info, 0);
     }
     LOGD("mediacodec_encode_packet size: %d", size);
-    return 0;
+    return err;
 }
 
 int mediacodec_encode_packet_h265(
@@ -237,7 +249,7 @@ int mediacodec_encode_packet_h265(
         size_t out_size;
         const uint8_t *out_buf = AMediaCodec_getOutputBuffer(ves->codec, out_idx, &out_size);
         if (out_buf && info.size > 0) {
-            LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
+            //            LOGD("mediacodec_encode_packet out_size: %d", info.size - info.offset);
 
             uint32_t rtp_ts = (uint32_t)(ves->frame_counter * 90000 / ves->fps);
 
