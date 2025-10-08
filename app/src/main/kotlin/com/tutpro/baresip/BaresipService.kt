@@ -36,6 +36,7 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build.VERSION
 import android.os.CountDownTimer
@@ -885,7 +886,8 @@ class BaresipService: Service() {
                             return
                         }
                         val channelId = if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID
-                        if (shouldStartRinging(channelId))
+                        val callerNumber = peerUri.split(":")[1].split("@")[0]
+                        if (shouldStartRinging(channelId, callerNumber))
                             startRinging()
                         if (!Utils.isVisible()) {
                             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -1399,13 +1401,14 @@ class BaresipService: Service() {
     }
 
 
-    private fun shouldStartRinging(channelId: String): Boolean {
+    private fun shouldStartRinging(channelId: String, callerNumber: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
-        val dndAllowsRinging = currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL
-        if (dndAllowsRinging)
+        if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
             return true
         val channel = nm.getNotificationChannel(channelId)
-        return channel != null && channel.canBypassDnd()
+        if (channel != null && channel.canBypassDnd())
+            return true
+        return isStarredContact(callerNumber)
     }
 
     private fun shouldVibrate(): Boolean {
@@ -1420,6 +1423,31 @@ class BaresipService: Service() {
                     false
         else
             false
+    }
+
+    private fun isStarredContact(callerNumber: String): Boolean {
+        if (contactsMode == "baresip" || callerNumber.isBlank())
+            return false
+        val phoneUri = Uri.withAppendedPath(
+            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+            Uri.encode(callerNumber)
+        )
+        val projection = arrayOf(ContactsContract.PhoneLookup.STARRED)
+        try {
+            val cursor = contentResolver.query(phoneUri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val isStarred = it.getInt(0) == 1
+                    if (isStarred) {
+                        Log.d(TAG, "Caller '$callerNumber' is a starred contact.")
+                    }
+                    return isStarred
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not query contacts for starred status: ${e.message}")
+        }
+        return false
     }
 
     private fun stopRinging() {
