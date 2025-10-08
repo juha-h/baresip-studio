@@ -7,7 +7,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Context.AUDIO_SERVICE
 import android.content.Intent
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.content.res.Configuration
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
@@ -118,6 +118,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -156,7 +157,6 @@ import java.util.Timer
 import kotlin.concurrent.schedule
 
 private val showVideoLayout = mutableStateOf(false)
-private var orientation = 0
 
 private val dialpadButtonEnabled = mutableStateOf(true)
 private var pullToRefreshEnabled = mutableStateOf(true)
@@ -221,7 +221,9 @@ private fun MainScreen(
     val ctx = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val configuration = LocalConfiguration.current
-    val currentOrientation = configuration.orientation
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val ua = uas.value.find { it.account.aor == viewModel.selectedAor.value }
+    val call = ua?.currentCall()
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -366,19 +368,18 @@ private fun MainScreen(
         }
     }
 
-    LaunchedEffect(currentOrientation) {
-        if (orientation == 0)
-            orientation = currentOrientation
-        else
-            if (orientation != currentOrientation) {
-                orientation = currentOrientation
-                if (showVideoLayout.value) {
-                    showVideoLayout.value = false
-                    Timer().schedule(50) {
-                        showVideoLayout.value = true
-                    }
-                }
+    LaunchedEffect(key1 = call?.status, key2 = configuration.orientation, key3 = showVideoLayout.value) {
+        val isConnected = call != null && call.status == "connected" && !call.held
+        if (isConnected) {
+            val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            val shouldShowKeyboard = isPortrait && !showVideoLayout.value
+            if (shouldShowKeyboard) {
+                focusDtmf.value = true
+                keyboardController?.show()
             }
+            else
+                keyboardController?.hide()
+        }
     }
 
     if (showVideoLayout.value)
@@ -1928,7 +1929,10 @@ private fun OnHoldNotice() {
 fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     Surface(
-        modifier = Modifier.fillMaxSize().navigationBarsPadding().background(Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .background(Color.Black),
         color = LocalCustomColors.current.background
     ) {
         val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
@@ -2646,12 +2650,16 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     keyboardController?.hide()
                     dtmfEnabled.value = false
                     focusDtmf.value = false
-                } else {
-                    dtmfEnabled.value = true
-                    focusDtmf.value = true
-                    if (ctx.resources.configuration.orientation == ORIENTATION_PORTRAIT)
-                        keyboardController?.show()
                 }
+                else {
+                    dtmfEnabled.value = true
+                    if (!showVideoLayout.value &&
+                            ctx.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        focusDtmf.value = true
+                        keyboardController?.show()
+                    }
+                }
+
             }
         }
     }
