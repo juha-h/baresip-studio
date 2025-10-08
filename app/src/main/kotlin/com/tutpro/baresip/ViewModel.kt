@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.State
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,6 +20,8 @@ sealed class NavigationCommand {
     // Add other navigation commands as needed
 }
 
+data class AorPeer(val aor: String, val peer: String)
+
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _selectedAor = MutableStateFlow("")
@@ -26,6 +29,20 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateSelectedAor(newValue: String) {
         _selectedAor.value = newValue
+    }
+
+    private val _aorPeerMessage = MutableStateFlow(mutableMapOf<AorPeer, TextFieldValue>())
+    val aorPeerMessage: StateFlow<Map<AorPeer, TextFieldValue>> = _aorPeerMessage.asStateFlow()
+
+    fun updateAorPeerMessage(aor: String, peerUri: String, value: TextFieldValue) {
+        val key = AorPeer(aor, peerUri)
+        val newMap = _aorPeerMessage.value.toMutableMap()
+
+        if (value.text.isEmpty())
+            newMap.remove(key)
+        else
+            newMap[key] = value
+        _aorPeerMessage.value = newMap
     }
 
     private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)

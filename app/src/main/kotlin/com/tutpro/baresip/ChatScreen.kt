@@ -48,11 +48,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,6 +124,8 @@ private fun ChatScreen(
     val aor = account.aor
 
     var chatMessages by remember(aor, peerUri) { mutableStateOf<List<Message>>(emptyList()) }
+    val allDrafts by viewModel.aorPeerMessage.collectAsState()
+    val currentDraft = allDrafts.getOrDefault(AorPeer(aor, peerUri), TextFieldValue(""))
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -185,10 +187,27 @@ private fun ChatScreen(
                 TopAppBar(ctx, navController, viewModel, account, peerUri)
             }
         },
-        bottomBar = { NewMessage(ctx, account, peerUri, addMessage) },
+        bottomBar = {
+            NewMessage(
+                ctx = ctx,
+                account = account,
+                peerUri = peerUri,
+                newMessage = currentDraft,
+                onNewMessageChange = { newTextFieldValue ->
+                    viewModel.updateAorPeerMessage(aor, peerUri, newTextFieldValue)
+                },
+                addMessage = addMessage
+            )
+        },
         content = { contentPadding ->
             if (areMessagesLoaded)
-                ChatContent(ctx, navController, contentPadding, account, peerUri, chatMessages, reloadMessages)
+                ChatContent(ctx,
+                    navController,
+                    contentPadding,
+                    account, peerUri,
+                    chatMessages,
+                    reloadMessages
+                )
         }
     )
 }
@@ -464,15 +483,14 @@ private fun NewMessage(
     ctx: Context,
     account: Account,
     peerUri: String,
+    newMessage: TextFieldValue,
+    onNewMessageChange: (TextFieldValue) -> Unit,
     addMessage: (message: Message) -> Unit
 ) {
 
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
 
-    val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
     var textFieldLoaded by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
@@ -494,9 +512,11 @@ private fun NewMessage(
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
-            value = newMessage.value,
+            value = newMessage,
             placeholder = { Text(stringResource(R.string.new_message)) },
-            onValueChange = { newMessage.value = it },
+            onValueChange = { newValue ->
+                onNewMessageChange(newValue)
+            },
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp)
@@ -508,11 +528,13 @@ private fun NewMessage(
                 },
             singleLine = false,
             trailingIcon = {
-                if (newMessage.value.text.isNotEmpty()) {
+                if (newMessage.text.isNotEmpty()) {
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = "Clear",
-                        modifier = Modifier.clickable { newMessage.value = TextFieldValue("") }
+                        modifier = Modifier.clickable {
+                            onNewMessageChange(TextFieldValue(""))
+                        }
                     )
                 } },
             label = { LabelText(stringResource(R.string.new_message)) },
@@ -524,7 +546,7 @@ private fun NewMessage(
             )
         )
         LaunchedEffect(Unit) {
-            if (newMessage.value.text.isNotEmpty())
+            if (newMessage.text.isNotEmpty())
                 focusRequester.requestFocus()
         }
         Image(
@@ -534,12 +556,20 @@ private fun NewMessage(
             modifier = Modifier
                 .size(36.dp)
                 .clickable {
-                    val msgText = newMessage.value.text
+                    val msgText = newMessage.text
                     if (msgText.isNotEmpty()) {
                         keyboardController?.hide()
                         val time = System.currentTimeMillis()
-                        val msg =
-                            Message(aor, peerUri, msgText, time, MESSAGE_UP_WAIT, 0, "", true)
+                        val msg = Message(
+                            aor,
+                            peerUri,
+                            msgText,
+                            time,
+                            MESSAGE_UP_WAIT,
+                            0,
+                            "",
+                            true
+                        )
                         msg.add()
                         var msgUri = ""
                         addMessage(msg)
@@ -565,7 +595,7 @@ private fun NewMessage(
                                 msg.direction = MESSAGE_UP_FAIL
                                 msg.responseReason = ctx.getString(R.string.message_failed)
                             } else {
-                                newMessage.value = TextFieldValue("")
+                                onNewMessageChange(TextFieldValue(""))
                                 keyboardController?.hide()
                             }
                     }
