@@ -1,0 +1,3 @@
+- Exclude starred Android contacts from Do Not Disturb
+- Don't loose content of new message that has not been sent yet
+- New translations (Swedish)
