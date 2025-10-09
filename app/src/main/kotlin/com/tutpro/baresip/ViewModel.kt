@@ -45,6 +45,20 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _aorPeerMessage.value = newMap
     }
 
+    private val _showKeyboard = mutableStateOf(0)
+    val showKeyboard: State<Int> = _showKeyboard
+
+    fun requestShowKeyboard() {
+        _showKeyboard.value++
+    }
+
+    private val _hideKeyboard = mutableStateOf(0)
+    val hideKeyboard: State<Int> = _hideKeyboard
+
+    fun requestHideKeyboard() {
+        _hideKeyboard.value++
+    }
+
     private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)
     val speakerIcon: StateFlow<Int> = _speakerIcon.asStateFlow()
 
