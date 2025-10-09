@@ -46,7 +46,7 @@ static void destructor(void *arg)
 {
     struct viddec_state *st = arg;
 
-    debug("mediacodec: decoder stats"
+    debug("android_mediacodec: decoder stats"
           " (keyframes:%u, lost_fragments:%u)\n",
             st->stats.n_key, st->stats.n_lost);
 
@@ -60,6 +60,10 @@ static void destructor(void *arg)
         AMediaFormat_delete(st->format);
         st->format = NULL;
     }
+    if (st->mime) {
+        mem_deref(st->mime);
+        st->mime = NULL;
+    }
     mem_deref(st->mb);
 }
 
@@ -72,9 +76,9 @@ static inline void fragment_rewind(struct viddec_state *vds)
 static int init_decoder(struct viddec_state *st, const char *name)
 {
     if (0 == str_casecmp(name, "H264"))
-        st->mime = "video/avc";
+        str_dup(&st->mime, "video/avc");
     else if (0 == str_casecmp(name, "H265"))
-        st->mime = "video/hevc";
+        str_dup(&st->mime, "video/hevc");
 
     if (!st->format) {
         AMediaFormat *format = AMediaFormat_new();
@@ -84,18 +88,18 @@ static int init_decoder(struct viddec_state *st, const char *name)
     if (st->open) {
         AMediaCodec *codec = AMediaCodec_createDecoderByType(st->mime);
         if (!codec) {
-            warning("mediacodec: create encoder failed\n");
+            warning("android_mediacodec: create encoder failed\n");
             return ENODEV;
         }
         st->codec = codec;
         media_status_t status = AMediaCodec_configure(st->codec, st->format, NULL, NULL, 0);
         if (status != AMEDIA_OK) {
-            warning("mediacodec: configure failed\n");
+            warning("android_mediacodec: configure failed\n");
             return ENODEV;
         }
         status = AMediaCodec_start(st->codec);
         if (status != AMEDIA_OK) {
-            warning("mediacodec: start failed\n");
+            warning("android_mediacodec: start failed\n");
             return ENODEV;
         }
         st->codec_started = true;
@@ -131,11 +135,11 @@ int mediacodec_decode_update(struct viddec_state **vdsp, const struct vidcodec *
 
     err = init_decoder(st, vc->name);
     if (err) {
-        warning("mediacodec: %s: could not init decoder\n", vc->name);
+        warning("android_mediacodec: %s: could not init decoder\n", vc->name);
         goto out;
     }
 
-    debug("mediacodec: video decoder %s (%s)\n", vc->name, fmtp);
+    debug("android_mediacodec: video decoder %s (%s)\n", vc->name, fmtp);
 
 out:
     if (err)
@@ -167,9 +171,7 @@ static int decode(
     ssize_t out_idx = AMediaCodec_dequeueOutputBuffer(st->codec, &info, 0);
     if (out_idx >= 0) {
         uint8_t *out_buf = AMediaCodec_getOutputBuffer(st->codec, out_idx, NULL);
-        LOGD("Got decoded frame, size=%d", info.size);
         AMediaFormat *format = AMediaCodec_getOutputFormat(st->codec);
-        LOGD("decode format:%s", AMediaFormat_toString(format));
         int32_t w = 0, h = 0, fmt = 0;
         AMediaFormat_getInt32(format, "width", &w);
         AMediaFormat_getInt32(format, "height", &h);
@@ -214,7 +216,7 @@ int mediacodec_decode_h264(
         return err;
 
 #if 0
-	re_printf("mediacodec: decode: %s %s type=%2d %s  \n",
+	re_printf("android_mediacodec: decode: %s %s type=%2d %s  \n",
 		  marker ? "[M]" : "   ",
 		  h264_is_keyframe(h264_hdr.type) ? "<KEY>" : "     ",
 		  h264_hdr.type,
@@ -222,17 +224,17 @@ int mediacodec_decode_h264(
 #endif
 
     if (h264_hdr.type == H264_NALU_SLICE && !st->got_keyframe) {
-        debug("mediacodec: decoder waiting for keyframe\n");
+        debug("android_mediacodec: decoder waiting for keyframe\n");
         return EPROTO;
     }
 
     if (h264_hdr.f) {
-        info("mediacodec: H264 forbidden bit set!\n");
+        info("android_mediacodec: H264 forbidden bit set!\n");
         return EBADMSG;
     }
 
     if (st->frag && h264_hdr.type != H264_NALU_FU_A) {
-        debug("mediacodec: lost fragments; discarding previous NAL\n");
+        debug("android_mediacodec: lost fragments; discarding previous NAL\n");
         fragment_rewind(st);
         st->frag = false;
         ++st->stats.n_lost;
@@ -259,7 +261,7 @@ int mediacodec_decode_h264(
 
         if (fu.s) {
             if (st->frag) {
-                debug("mediacodec: start: lost fragments;"
+                debug("android_mediacodec: start: lost fragments;"
                       " ignoring previous NAL\n");
                 fragment_rewind(st);
                 ++st->stats.n_lost;
@@ -277,7 +279,7 @@ int mediacodec_decode_h264(
                 goto out;
         } else {
             if (!st->frag) {
-                debug("mediacodec: ignoring fragment"
+                debug("android_mediacodec: ignoring fragment"
                       " (nal=%u)\n",
                         fu.type);
                 ++st->stats.n_lost;
@@ -285,7 +287,7 @@ int mediacodec_decode_h264(
             }
 
             if (rtp_seq_diff(st->frag_seq, pkt->hdr->seq) != 1) {
-                debug("mediacodec: lost fragments detected\n");
+                debug("android_mediacodec: lost fragments detected\n");
                 fragment_rewind(st);
                 st->frag = false;
                 ++st->stats.n_lost;
@@ -307,20 +309,17 @@ int mediacodec_decode_h264(
         if (err)
             goto out;
     } else {
-        warning("mediacodec: decode: unknown NAL type %u\n", h264_hdr.type);
+        warning("android_mediacodec: decode: unknown NAL type %u\n", h264_hdr.type);
         return EBADMSG;
     }
 
     if (!pkt->hdr->m) {
 
         if (st->mb->end > DECODE_MAXSZ) {
-            warning("mediacodec: decode buffer size exceeded\n");
+            warning("android_mediacodec: decode buffer size exceeded\n");
             err = ENOMEM;
             goto out;
         }
-        /* You need to decode the cache of the previous
-		frame as soon as possible to avoid
-		accumulation Especially when using mediacodec */
         if (st->open) {
             decode(st, frame, pkt, false);
         }
@@ -333,16 +332,6 @@ int mediacodec_decode_h264(
         goto out;
     }
 
-    /*	When using MediaCodec hardware decoding,
-		you must set width, height,
-		and SPS/PPS parameters before decoding the first frame,
-		otherwise decoding will fail.
-	 	Here, width, height, and extradata are set
-		by parsing the SPS/PPS.
-	 	This is only required when using MediaCodec hardware
-		decoding—other software decoders do not need this.
-	 	Additionally, the extradata format must be:
-		0x00 0x00 0x01 sps 0x00 0x00 0x01 pps */
     if (!st->open) {
         uint8_t sps_data[MAX_SPS];
         size_t sps_len;
@@ -351,7 +340,7 @@ int mediacodec_decode_h264(
         int ret = h264_get_sps_pps(
                 st->mb->buf, (int)st->mb->pos, sps_data, &sps_len, pps_data, &pps_len);
         if (ret) {
-            warning("mediacodec: "
+            warning("android_mediacodec: "
                     "h264_get_sps_pps error %d\n",
                     ret);
             goto out;
@@ -359,7 +348,7 @@ int mediacodec_decode_h264(
         int w, h;
         ret = h264_decode_sps_with_width_and_height(sps_data + 3, sps_len - 3, &w, &h);
         if (ret) {
-            warning("mediacodec: "
+            warning("android_mediacodec: "
                     "h264_decode_sps_"
                     "with_width_and_height error %d\n",
                     ret);
@@ -370,7 +359,7 @@ int mediacodec_decode_h264(
         AMediaFormat_setBuffer(st->format, "csd-0", sps_data, sps_len);
         AMediaFormat_setBuffer(st->format, "csd-1", pps_data, pps_len);
         st->open = true;
-        debug("mediacodec: init decoder H264\n");
+        debug("android_mediacodec: init decoder H264\n");
         init_decoder(st, "H264");
     }
 
@@ -437,7 +426,7 @@ int mediacodec_decode_h265(
     mbuf_advance(mb, H265_HDR_SIZE);
 
 #if 0
-	debug("mediacodec: h265: decode:  [%s]  %s  type=%2d  %s\n",
+	debug("android_mediacodec: h265: decode:  [%s]  %s  type=%2d  %s\n",
 	      marker ? "M" : " ",
 	      h265_is_keyframe(hdr.nal_unit_type) ? "<KEY>" : "     ",
 	      hdr.nal_unit_type,
@@ -445,7 +434,7 @@ int mediacodec_decode_h265(
 #endif
 
     if (vds->frag && hdr.nal_unit_type != H265_NAL_FU) {
-        debug("h265: lost fragments; discarding previous NAL\n");
+        debug("android_mediacodec: lost fragments; discarding previous NAL\n");
         fragment_rewind(vds);
         vds->frag = false;
     }
@@ -469,7 +458,7 @@ int mediacodec_decode_h265(
 
         if (fu.s) {
             if (vds->frag) {
-                debug("h265: lost fragments; ignoring NAL\n");
+                debug("android_mediacodec: lost fragments; ignoring NAL\n");
                 fragment_rewind(vds);
             }
 
@@ -484,12 +473,12 @@ int mediacodec_decode_h265(
                 goto out;
         } else {
             if (!vds->frag) {
-                debug("h265: ignoring fragment\n");
+                debug("android_mediacodec: ignoring fragment\n");
                 return 0;
             }
 
             if (rtp_seq_diff(vds->frag_seq, pkt->hdr->seq) != 1) {
-                debug("h265: lost fragments detected\n");
+                debug("android_mediacodec: lost fragments detected\n");
                 fragment_rewind(vds);
                 vds->frag = false;
                 return 0;
@@ -521,21 +510,18 @@ int mediacodec_decode_h265(
             mb->pos += len;
         }
     } else {
-        warning("mediacodec: unknown H265 NAL type %u (%s) [%zu bytes]\n", hdr.nal_unit_type,
-                h265_nalunit_name(hdr.nal_unit_type), mbuf_get_left(mb));
+        warning("android_mediacodec: unknown H265 NAL type %u (%s) [%zu bytes]\n",
+                hdr.nal_unit_type, h265_nalunit_name(hdr.nal_unit_type), mbuf_get_left(mb));
         return EPROTO;
     }
 
     if (!pkt->hdr->m) {
 
         if (vds->mb->end > DECODE_MAXSZ) {
-            warning("mediacodec: h265 decode buffer size exceeded\n");
+            warning("android_mediacodec: h265 decode buffer size exceeded\n");
             err = ENOMEM;
             goto out;
         }
-        /* You need to decode the cache of the previous
-		frame as soon as possible to avoid
-		accumulation Especially when using mediacodec*/
         if (vds->open) {
             decode(vds, frame, pkt, false);
         }
@@ -548,15 +534,6 @@ int mediacodec_decode_h265(
         goto out;
     }
 
-    /* When using MediaCodec hardware decoding, you must set width, height,
-		and SPS/PPS parameters before decoding the first frame,
-		otherwise decoding will fail.
-		Here, width, height, and extradata are set
-		by parsing the SPS/PPS.
-		This is only required when using MediaCodec hardware
-		decoding—other software decoders do not need this.
-		Additionally, the extradata format must be:
-		0x00 0x00 0x01 vps 0x00 0x00 0x01 sps 0x00 0x00 0x01 pps */
     if (!vds->open) {
         uint8_t vps_data[MAX_VPS];
         size_t vps_len = 0;
@@ -567,7 +544,7 @@ int mediacodec_decode_h265(
         int ret = h265_get_vps_sps_pps(vds->mb->buf, (int)vds->mb->pos, vps_data, &vps_len,
                 sps_data, &sps_len, pps_data, &pps_len);
         if (ret) {
-            warning("mediacodec: "
+            warning("android_mediacodec: "
                     "h265_get_vps_sps_pps error %d\n",
                     ret);
             goto out;
@@ -575,7 +552,7 @@ int mediacodec_decode_h265(
         int w, h;
         ret = h265_decode_sps_with_width_and_height(sps_data + 3, sps_len - 3, &w, &h);
         if (ret) {
-            warning("mediacodec: "
+            warning("android_mediacodec: "
                     "h265_decode_sps_"
                     "with_width_and_height error %d\n",
                     ret);
@@ -587,7 +564,7 @@ int mediacodec_decode_h265(
         AMediaFormat_setBuffer(vds->format, "csd-1", sps_data, sps_len);
         AMediaFormat_setBuffer(vds->format, "csd-2", pps_data, pps_len);
         vds->open = true;
-        debug("mediacodec: init decoder H265\n");
+        debug("android_mediacodec: init decoder H265\n");
         init_decoder(vds, "H265");
     }
 

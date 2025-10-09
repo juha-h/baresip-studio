@@ -25,12 +25,9 @@ static const struct
 /* Encode */
 int mediacodec_encode_update(struct videnc_state **vesp, const struct vidcodec *vc,
         struct videnc_param *prm, const char *fmtp, videnc_packet_h *pkth, const struct video *vid);
-int mediacodec_encode_packet_h264(
+int mediacodec_encode_packet(
         struct videnc_state *ves, bool update, const struct vidframe *frame, uint64_t timestamp);
-int mediacodec_encode_packet_h265(
-        struct videnc_state *ves, bool update, const struct vidframe *frame, uint64_t timestamp);
-int mediacodec_encode_packetize_h264(struct videnc_state *ves, const struct vidpacket *packet);
-int mediacodec_encode_packetize_h265(struct videnc_state *ves, const struct vidpacket *packet);
+int mediacodec_encode_packetize(struct videnc_state *ves, const struct vidpacket *packet);
 
 /* Decode */
 int mediacodec_decode_update(struct viddec_state **vdsp, const struct vidcodec *vc,
@@ -43,19 +40,19 @@ int mediacodec_decode_h265(
 static struct vidcodec mediacodec_h264 = {
         .name = "H264",
         .encupdh = mediacodec_encode_update,
-        .ench = mediacodec_encode_packet_h264,
+        .ench = mediacodec_encode_packet,
         .decupdh = mediacodec_decode_update,
         .dech = mediacodec_decode_h264,
-        .packetizeh = mediacodec_encode_packetize_h264,
+        .packetizeh = mediacodec_encode_packetize,
 };
 
 static struct vidcodec mediacodec_h265 = {
         .name = "H265",
         .encupdh = mediacodec_encode_update,
-        .ench = mediacodec_encode_packet_h265,
+        .ench = mediacodec_encode_packet,
         .decupdh = mediacodec_decode_update,
         .dech = mediacodec_decode_h265,
-        .packetizeh = mediacodec_encode_packetize_h265,
+        .packetizeh = mediacodec_encode_packetize,
 };
 
 #endif //BARESIP_STUDIO_ANDROID_MEDIACODEC_H
