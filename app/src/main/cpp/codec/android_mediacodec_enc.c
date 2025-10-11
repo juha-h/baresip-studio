@@ -112,9 +112,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
     int32_t w = (int32_t)frame->size.w;
     int32_t h = (int32_t)frame->size.h;
     int32_t fps = (int32_t)ves->fps;
-    float factor = 0.08f; // 90% bitrate factor
-    int32_t frame_bits = (int32_t)(w * h * factor);
-    int bitrate = frame_bits * fps; // Average bit rate
+    int bitrate = ves->bitrate;
     //    AMediaFormat_setInt32(format, "color-format", 0x7f420888);
     AMediaFormat_setInt32(format, "width", w);
     AMediaFormat_setInt32(format, "height", h);
@@ -123,6 +121,7 @@ static int open_encoder(struct videnc_state *ves, const struct vidframe *frame)
     AMediaFormat_setInt32(format, "bitrate-mode", 1);
     AMediaFormat_setInt32(format, "latency", 1);
     AMediaFormat_setInt32(format, "priority", 0);
+    // IDR intervals can be defined using a configuration file
     AMediaFormat_setInt32(format, "i-frame-interval", 1);
     AMediaFormat_setInt32(format, "intra-refresh-period", (int)ves->fps);
     AMediaFormat_setInt32(format, "prepend-sps-pps-to-idr-frames", 1);
