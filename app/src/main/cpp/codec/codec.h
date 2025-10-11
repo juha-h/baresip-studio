@@ -9,6 +9,7 @@
 #include <rem.h>
 #include <baresip.h>
 #include "android_mediacodec.h"
+#include "x264.h"
 
 int codec_module_init(void);
 

@@ -128,7 +128,8 @@ set_target_properties(lib_yuv PROPERTIES IMPORTED_LOCATION
 
 add_library(baresip SHARED baresip.c common.c vidisp.c android_camera2.c
         codec/codec.c codec/android_mediacodec_enc.c codec/android_mediacodec_dec.c
-        codec/parse/h2645_util.c codec/parse/h264_parse.c codec/parse/h265_parse.c)
+        codec/parse/h2645_util.c codec/parse/h264_parse.c codec/parse/h265_parse.c
+        codec/x264_enc.c)
 
 #set(CMAKE_SHARED_LINKER_FLAGS
 #        "${CMAKE_SHARED_LINKER_FLAGS} -u AImageReader_new")
@@ -138,7 +139,8 @@ target_include_directories(baresip PRIVATE
         ${distribution_DIR}/ffmpeg/include
         ${distribution_DIR}/re/include
         ${distribution_DIR}/baresip/include
-        ${distribution_DIR}/libyuv/include)
+        ${distribution_DIR}/libyuv/include
+        ${distribution_DIR}/x264/include)
 
 add_definitions(-DHAVE_PTHREAD)
 
