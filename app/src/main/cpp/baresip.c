@@ -13,6 +13,7 @@
 #include "vidisp.h"
 #include "android_camera2.h"
 #include "common.h"
+#include "codec/codec.h"
 
 enum
 {
@@ -609,6 +610,8 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
         LOGW("vidsrc_register failed (%d)\n", err);
         goto out;
     }
+
+    codec_module_init();
 
     err = conf_modules();
     if (err) {
