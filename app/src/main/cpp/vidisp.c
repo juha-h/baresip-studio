@@ -74,7 +74,7 @@ static void destructor(void *arg)
 static int context_initialize(struct vidisp_st *st)
 {
     const EGLint attribs[] = {
-            EGL_SURFACE_TYPE,EGL_WINDOW_BIT,
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
             EGL_BLUE_SIZE, 8,
             EGL_GREEN_SIZE, 8,
             EGL_RED_SIZE, 8,
@@ -193,15 +193,8 @@ static int texture_init(struct vidisp_st *st)
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
     glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-    uint8_t* p = st->vf->data[0];
-    int size = st->vf->size.w * st->vf->size.h;
-    for (int i = 0; i < size; i++) {
-        uint8_t tmp = p[i*4 + 0];   // B
-        p[i*4 + 0] = p[i*4 + 2];    // swap R
-        p[i*4 + 2] = tmp;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, st->vf->size.w, st->vf->size.h,
-            0, GL_RGBA,GL_UNSIGNED_BYTE, st->vf->data[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, st->vf->size.w,
+            st->vf->size.h, 0, GL_RGB,GL_UNSIGNED_SHORT_5_6_5, st->vf->data[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -217,15 +210,8 @@ static void texture_render(struct vidisp_st *st)
 
     glBindTexture(GL_TEXTURE_2D, st->texture_id);
 
-    uint8_t* p = st->vf->data[0];
-    int size = st->vf->size.w * st->vf->size.h;
-    for (int i = 0; i < size; i++) {
-        uint8_t tmp = p[i*4 + 0];    // B
-        p[i*4 + 0] = p[i*4 + 2];    // swap R
-        p[i*4 + 2] = tmp;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, st->vf->size.w, st->vf->size.h,
-            0, GL_RGBA,GL_UNSIGNED_BYTE, st->vf->data[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, st->vf->size.w,st->vf->size.h,
+            0, GL_RGB,GL_UNSIGNED_SHORT_5_6_5, st->vf->data[0]);
 
     glClientActiveTexture(GL_TEXTURE0);
 
@@ -405,7 +391,7 @@ int opengles_display(
             return EINVAL;
         }
 
-        err = vidframe_alloc(&st->vf, VID_FMT_RGB32, &frame->size);
+        err = vidframe_alloc(&st->vf, VID_FMT_RGB565, &frame->size);
         if (err) {
             LOGW("opengles_display: vidframe_alloc failed: %d\n", err);
             return err;
@@ -425,27 +411,36 @@ int opengles_display(
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1start(JNIEnv *env, jclass thiz)
 {
+    (void)env;
+    (void)thiz;
     LOGI("VideoView on_start");
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1resume(JNIEnv *env, jclass thiz)
 {
+    (void)env;
+    (void)thiz;
     LOGI("VideoView on_resume");
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1pause(JNIEnv *env, jclass thiz)
 {
+    (void)env;
+    (void)thiz;
     LOGI("VideoView on_pause");
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_on_1stop(JNIEnv *env, jclass thiz)
 {
+    (void)env;
+    (void)thiz;
     LOGI("VideoView on_stop");
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
         JNIEnv *env, jclass thiz, jobject surface)
 {
+    (void)thiz;
     int w, h;
 
     LOGD("At set_surface() on thread %li\n", (long)pthread_self());
