@@ -44,8 +44,11 @@ fun AppTheme(
     }
 
     val customColorsPalette =
-        if (useDarkTheme) DarkCustomColors
-        else LightCustomColors
+        (if (useDarkTheme) DarkCustomColors else LightCustomColors).copy(
+            background = colorScheme.background,
+            cardBackground = colorScheme.surfaceVariant,
+            textFieldBackground = colorScheme.surfaceVariant
+        )
 
     val view = LocalView.current
     if (!view.isInEditMode) {
