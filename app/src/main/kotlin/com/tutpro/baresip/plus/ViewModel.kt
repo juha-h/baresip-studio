@@ -19,6 +19,8 @@ sealed class NavigationCommand {
     // Add other navigation commands as needed
 }
 
+data class AorPeer(val aor: String, val peer: String)
+
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _selectedAor = MutableStateFlow("")
@@ -26,6 +28,21 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateSelectedAor(newValue: String) {
         _selectedAor.value = newValue
+    }
+
+    private val _aorPeerMessage = MutableStateFlow(mutableMapOf<AorPeer, String>())
+
+    fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
+        val key = AorPeer(aor, peerUri)
+        if (message == "")
+            _aorPeerMessage.value.remove(key)
+        else
+            _aorPeerMessage.value[key] = message
+    }
+
+    fun getAorPeerMessage(aor: String, peerUri: String): String {
+        val key = AorPeer(aor, peerUri)
+        return _aorPeerMessage.value.getOrDefault(key, "")
     }
 
     private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)

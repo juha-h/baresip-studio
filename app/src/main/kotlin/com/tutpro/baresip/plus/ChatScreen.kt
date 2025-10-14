@@ -185,10 +185,24 @@ private fun ChatScreen(
                 TopAppBar(ctx, navController, viewModel, account, peerUri)
             }
         },
-        bottomBar = { NewMessage(ctx, account, peerUri, addMessage) },
+        bottomBar = {
+            NewMessage(
+                ctx = ctx,
+                viewModel,
+                account = account,
+                peerUri = peerUri,
+                addMessage = addMessage
+            )
+        },
         content = { contentPadding ->
             if (areMessagesLoaded)
-                ChatContent(ctx, navController, contentPadding, account, peerUri, chatMessages, reloadMessages)
+                ChatContent(ctx,
+                    navController,
+                    contentPadding,
+                    account, peerUri,
+                    chatMessages,
+                    reloadMessages
+                )
         }
     )
 }
@@ -462,6 +476,7 @@ private fun Messages(
 @Composable
 private fun NewMessage(
     ctx: Context,
+    viewModel: ViewModel,
     account: Account,
     peerUri: String,
     addMessage: (message: Message) -> Unit
@@ -471,8 +486,9 @@ private fun NewMessage(
     val ua = UserAgent.ofAor(aor)!!
 
     val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
+        mutableStateOf(TextFieldValue(viewModel.getAorPeerMessage(aor, peerUri)))
     }
+
     var textFieldLoaded by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
@@ -496,7 +512,10 @@ private fun NewMessage(
         OutlinedTextField(
             value = newMessage.value,
             placeholder = { Text(stringResource(R.string.new_message)) },
-            onValueChange = { newMessage.value = it },
+            onValueChange = {
+                newMessage.value = it
+                viewModel.updateAorPeerMessage(aor, peerUri, it.text)
+            },
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp)
@@ -512,7 +531,10 @@ private fun NewMessage(
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = "Clear",
-                        modifier = Modifier.clickable { newMessage.value = TextFieldValue("") }
+                        modifier = Modifier.clickable {
+                            newMessage.value = TextFieldValue("")
+                            viewModel.updateAorPeerMessage(aor, peerUri, "")
+                        }
                     )
                 } },
             label = { LabelText(stringResource(R.string.new_message)) },
@@ -538,8 +560,16 @@ private fun NewMessage(
                     if (msgText.isNotEmpty()) {
                         keyboardController?.hide()
                         val time = System.currentTimeMillis()
-                        val msg =
-                            Message(aor, peerUri, msgText, time, MESSAGE_UP_WAIT, 0, "", true)
+                        val msg = Message(
+                            aor,
+                            peerUri,
+                            msgText,
+                            time,
+                            MESSAGE_UP_WAIT,
+                            0,
+                            "",
+                            true
+                        )
                         msg.add()
                         var msgUri = ""
                         addMessage(msg)
@@ -566,6 +596,7 @@ private fun NewMessage(
                                 msg.responseReason = ctx.getString(R.string.message_failed)
                             } else {
                                 newMessage.value = TextFieldValue("")
+                                viewModel.updateAorPeerMessage(aor, peerUri, "")
                                 keyboardController?.hide()
                             }
                     }
