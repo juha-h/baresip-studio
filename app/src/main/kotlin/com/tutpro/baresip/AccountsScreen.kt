@@ -82,22 +82,22 @@ fun AccountsScreen(navController: NavController) {
                     title = {
                         Text(
                             text = stringResource(R.string.accounts),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = LocalCustomColors.current.primary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
+                        titleContentColor = LocalCustomColors.current.onPrimary,
+                    ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
-                    ),
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 )
             }

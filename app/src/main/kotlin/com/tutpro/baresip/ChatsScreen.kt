@@ -177,16 +177,20 @@ private fun TopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.chats),
-                color = LocalCustomColors.current.light,
                 fontWeight = FontWeight.Bold
             )
         },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = LocalCustomColors.current.primary,
+            navigationIconContentColor = LocalCustomColors.current.onPrimary,
+            titleContentColor = LocalCustomColors.current.onPrimary,
+            actionIconContentColor = LocalCustomColors.current.onPrimary
+        ),
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
-                    tint = LocalCustomColors.current.light
                 )
             }
         },
@@ -198,7 +202,6 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu",
-                    tint = LocalCustomColors.current.light
                 )
             }
             DropdownMenu (
@@ -221,9 +224,6 @@ private fun TopAppBar(
                 }
             )
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary
-        )
     )
 }
 

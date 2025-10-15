@@ -92,19 +92,19 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
                     title = {
                         Text(
                             text = stringResource(R.string.contacts),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = LocalCustomColors.current.primary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
+                        titleContentColor = LocalCustomColors.current.onPrimary
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },

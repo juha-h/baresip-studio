@@ -222,20 +222,21 @@ private fun TopAppBar(
         title = {
             Text(
                 text = format(ctx.getString(R.string.chat_with), Utils.friendlyUri(ctx, peerUri, account)),
-                color = LocalCustomColors.current.light,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary
+            containerColor = LocalCustomColors.current.primary,
+            navigationIconContentColor = LocalCustomColors.current.onPrimary,
+            titleContentColor = LocalCustomColors.current.onPrimary,
+            actionIconContentColor = LocalCustomColors.current.onPrimary
         ),
         navigationIcon = {
             IconButton(onClick = { backAction(navController, account, peerUri) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = LocalCustomColors.current.light
                 )
             }
         },
@@ -261,7 +262,6 @@ private fun TopAppBar(
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.call_small),
                     contentDescription = "Call",
-                    tint = LocalCustomColors.current.light
                 )
             }
         }

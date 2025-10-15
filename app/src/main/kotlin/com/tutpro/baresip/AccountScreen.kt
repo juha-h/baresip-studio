@@ -144,16 +144,20 @@ private fun AccountScreen(
                     title = {
                         Text(
                             text = acc.text(),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = LocalCustomColors.current.primary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
+                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        actionIconContentColor = LocalCustomColors.current.onPrimary
+                    ),
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
@@ -162,14 +166,10 @@ private fun AccountScreen(
                         IconButton(onClick = checkOnClick) {
                             Icon(
                                 imageVector = Icons.Filled.Check,
-                                tint = LocalCustomColors.current.light,
                                 contentDescription = "Check"
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
-                    )
                 )
             }
         }
