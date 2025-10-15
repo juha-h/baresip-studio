@@ -1750,6 +1750,7 @@ class BaresipService: Service() {
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
         val darkTheme = mutableStateOf(false)
+        val dynamicColors = mutableStateOf(false)
         var messages by mutableStateOf(emptyList<Message>())
         val messageUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()

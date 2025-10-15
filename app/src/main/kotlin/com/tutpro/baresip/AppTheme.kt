@@ -1,7 +1,7 @@
 package com.tutpro.baresip
 
 import android.app.Activity
-import android.os.Build
+import android.os.Build.VERSION
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -23,31 +23,40 @@ import androidx.core.view.WindowCompat
 fun AppTheme(
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
     val useDarkTheme by remember { BaresipService.darkTheme }
+    val useDynamicColors by remember { BaresipService.dynamicColors }
+
+    val useActualDynamicColors = useDynamicColors && VERSION.SDK_INT >= 31
+    Log.d(TAG, "Use actual dynamic colors: $useActualDynamicColors")
 
     val colorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (useDarkTheme)
-                dynamicDarkColorScheme(context = LocalContext.current)
+        useActualDynamicColors -> {
+            if (useDarkTheme || isSystemInDarkTheme())
+                dynamicDarkColorScheme(context)
             else
-                if (isSystemInDarkTheme())
-                    dynamicDarkColorScheme(context = LocalContext.current)
-                else
-                    dynamicLightColorScheme(context = LocalContext.current)
+                dynamicLightColorScheme(context)
         }
-        useDarkTheme -> darkColorScheme()
-        else ->
-            if (isSystemInDarkTheme())
-                darkColorScheme()
-            else
-                lightColorScheme()
+        useDarkTheme || isSystemInDarkTheme() -> darkColorScheme()
+        else -> lightColorScheme()
     }
 
-    val customColorsPalette =
-        (if (useDarkTheme) DarkCustomColors else LightCustomColors).copy(
+    val basePalette = if (useDarkTheme) DarkCustomColors else LightCustomColors
+
+    val customColorsPalette = basePalette.copy(
             background = colorScheme.background,
             cardBackground = colorScheme.surfaceVariant,
-            textFieldBackground = colorScheme.surfaceVariant
+            textFieldBackground = colorScheme.surfaceVariant,
+            primary = if (useActualDynamicColors) {
+                colorScheme.primary
+            } else {
+                basePalette.primary
+            },
+            onPrimary = if (useActualDynamicColors) {
+                colorScheme.onPrimary
+            } else {
+                basePalette.onPrimary
+            }
         )
 
     val view = LocalView.current

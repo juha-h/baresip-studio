@@ -90,6 +90,8 @@ private var save = false
 
 private var oldBatteryOptimizations = false
 private var oldDarkTheme = false
+
+private var oldDynamicColors = false
 private var oldDefaultDialer = false
 
 fun NavGraphBuilder.settingsScreenRoute(
@@ -103,6 +105,8 @@ fun NavGraphBuilder.settingsScreenRoute(
         oldBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(ctx.packageName) == false
 
         oldDarkTheme = Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES
+
+        oldDynamicColors = BaresipService.dynamicColors.value
 
         if (VERSION.SDK_INT >= 29) {
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
@@ -246,6 +250,8 @@ private var newBatteryOptimizations = false
 
 private var newDarkTheme = false
 
+private var newDynamicColors = false
+
 private var newColorblind = false
 
 private var newProximitySensing = true
@@ -316,6 +322,8 @@ private fun SettingsContent(
         Ringtone(ctx)
         BatteryOptimizations()
         DarkTheme()
+        if (VERSION.SDK_INT >= 31)
+            DynamicColors()
         ColorBlind()
         ProximitySensing()
         if (VERSION.SDK_INT >= 29)
@@ -1100,6 +1108,38 @@ private fun DarkTheme() {
 }
 
 @Composable
+private fun DynamicColors() {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val ctx = LocalContext.current
+        Text(text = stringResource(R.string.dynamic_colors),
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    alertTitle.value = ctx.getString(R.string.dynamic_colors)
+                    alertMessage.value = ctx.getString(R.string.dynamic_colors_help)
+                    showAlert.value = true
+                },
+            color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp)
+        var dynamicColors by remember { mutableStateOf(oldDynamicColors) }
+        newDynamicColors = dynamicColors
+        Switch(
+            checked = dynamicColors,
+            onCheckedChange = {
+                dynamicColors = it
+                newDynamicColors = dynamicColors
+            }
+        )
+    }
+}
+
+@Composable
 private fun ColorBlind() {
     Row(
         Modifier
@@ -1444,6 +1484,13 @@ private fun checkOnClick(ctx: Context) {
         AppCompatDelegate.setDefaultNightMode(newDisplayTheme)
         Config.replaceVariable("dark_theme",
             if (newDarkTheme) "yes" else "no")
+        save = true
+    }
+
+    if (oldDynamicColors != newDynamicColors) {
+        BaresipService.dynamicColors.value = newDynamicColors
+        Config.replaceVariable("dynamic_colors",
+            if (newDynamicColors) "yes" else "no")
         save = true
     }
 
