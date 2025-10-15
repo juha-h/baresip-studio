@@ -556,7 +556,10 @@ private fun TopAppBar(
                             showAlert.value = true
                         }
                     ),
-                tint = Color.Unspecified,
+                tint = if (BaresipService.isRecOn)
+                    LocalCustomColors.current.accent
+                else
+                    LocalCustomColors.current.onPrimary,
                 contentDescription = null
             )
 
@@ -585,7 +588,10 @@ private fun TopAppBar(
                             showAlert.value = true
                         },
                     ),
-                tint = Color.Unspecified,
+                tint = if (BaresipService.isMicMuted)
+                    LocalCustomColors.current.accent
+                else
+                    LocalCustomColors.current.onPrimary,
                 contentDescription = null
             )
 
@@ -616,7 +622,10 @@ private fun TopAppBar(
                             showAlert.value = true
                         },
                     ),
-                tint = Color.Unspecified,
+                tint = if (Utils.isSpeakerPhoneOn(am))
+                    LocalCustomColors.current.accent
+                else
+                    LocalCustomColors.current.onPrimary,
                 contentDescription = null
             )
 
@@ -628,7 +637,7 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu",
-                    tint = LocalCustomColors.current.light
+                    tint = LocalCustomColors.current.onPrimary
                 )
             }
 
@@ -705,7 +714,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     imageVector = ImageVector.vectorResource(vmIcon),
                     contentDescription = null,
                     Modifier.size(buttonSize),
-                    tint = Color.Unspecified
+                    tint = if (vmIcon == R.drawable.voicemail)
+                        LocalCustomColors.current.onBackground
+                    else
+                        LocalCustomColors.current.accent
                 )
             }
 
@@ -719,7 +731,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(R.drawable.contacts),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = LocalCustomColors.current.secondary
+                tint = LocalCustomColors.current.onBackground
             )
         }
 
@@ -736,7 +748,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(messagesIcon),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = Color.Unspecified
+                tint = if (messagesIcon == R.drawable.messages)
+                    LocalCustomColors.current.onBackground
+                else
+                    LocalCustomColors.current.accent
             )
         }
 
@@ -753,7 +768,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(callsIcon),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = Color.Unspecified
+                tint = if (callsIcon == R.drawable.calls)
+                    LocalCustomColors.current.onBackground
+                else
+                    LocalCustomColors.current.accent
             )
         }
 
@@ -773,7 +791,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(dialpadIcon),
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
-                tint = Color.Unspecified
+                tint = if (dialpadIcon == R.drawable.dialpad_off)
+                    LocalCustomColors.current.onBackground
+                else
+                    LocalCustomColors.current.accent
             )
         }
     }

@@ -45,18 +45,20 @@ fun AppTheme(
 
     val customColorsPalette = basePalette.copy(
             background = colorScheme.background,
+            onBackground = if (useActualDynamicColors)
+                colorScheme.onBackground
+            else
+                basePalette.onBackground,
             cardBackground = colorScheme.surfaceVariant,
             textFieldBackground = colorScheme.surfaceVariant,
-            primary = if (useActualDynamicColors) {
+            primary = if (useActualDynamicColors)
                 colorScheme.primary
-            } else {
-                basePalette.primary
-            },
-            onPrimary = if (useActualDynamicColors) {
+            else
+                basePalette.primary,
+            onPrimary = if (useActualDynamicColors)
                 colorScheme.onPrimary
-            } else {
+            else
                 basePalette.onPrimary
-            }
         )
 
     val view = LocalView.current
