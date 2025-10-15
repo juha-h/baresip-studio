@@ -7,6 +7,7 @@ import androidx.compose.runtime.compositionLocalOf
 @Immutable
 data class CustomColors(
     val primary: Color = Color.Unspecified,
+    val onPrimary: Color = Color.Unspecified,
     val primaryDark: Color = Color.Unspecified,
     val primaryLight: Color = Color.Unspecified,
     val secondary: Color = Color.Unspecified,
@@ -39,9 +40,10 @@ data class CustomColors(
     val popupBackground: Color = Color.Unspecified,
     val alert: Color = Color.Unspecified,
     val actionbar: Color = Color.Unspecified,
-    )
+)
 
 val light_primary = Color(0xff0ca1fd)
+val light_on_primary = Color(0xffe0e0e0)
 val light_primary_dark = Color(0xff0073c9)
 val light_primary_light = Color(0xff6ad2ff)
 val light_secondary = Color(0xFF00B9A1)
@@ -62,6 +64,7 @@ val light_popup_background = light_secondary_dark
 val light_alert = light_primary
 
 val dark_primary = Color(0xff0073c9)
+val dark_on_primary = Color(0xffe0e0e0)
 val dark_primary_dark = Color(0xff00008b)
 val dark_primary_light = Color(0xff0ca1fd)
 val dark_secondary = Color(0xFF00B9A1)
@@ -83,6 +86,7 @@ val dark_alert = dark_primary_light
 
 val LightCustomColors = CustomColors(
     primary = light_primary,
+    onPrimary = light_on_primary,
     primaryDark = light_primary_dark,
     primaryLight = light_primary_light,
     secondary = light_secondary,
@@ -105,6 +109,7 @@ val LightCustomColors = CustomColors(
 
 val DarkCustomColors = CustomColors(
     primary = dark_primary,
+    onPrimary = dark_on_primary,
     primaryDark = dark_primary_dark,
     primaryLight = dark_primary_light,
     secondary = dark_secondary,
