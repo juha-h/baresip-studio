@@ -520,13 +520,13 @@ private fun TopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.baresip),
-                color = LocalCustomColors.current.light,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary
+            containerColor = LocalCustomColors.current.primary,
+            titleContentColor = LocalCustomColors.current.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
