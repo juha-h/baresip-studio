@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -43,6 +44,20 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun getAorPeerMessage(aor: String, peerUri: String): String {
         val key = AorPeer(aor, peerUri)
         return _aorPeerMessage.value.getOrDefault(key, "")
+    }
+
+    private val _showKeyboard = mutableIntStateOf(0)
+    val showKeyboard: State<Int> = _showKeyboard
+
+    fun requestShowKeyboard() {
+        _showKeyboard.intValue++
+    }
+
+    private val _hideKeyboard = mutableIntStateOf(0)
+    val hideKeyboard: State<Int> = _hideKeyboard
+
+    fun requestHideKeyboard() {
+        _hideKeyboard.intValue++
     }
 
     private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)

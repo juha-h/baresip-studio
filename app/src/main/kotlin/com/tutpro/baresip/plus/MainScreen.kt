@@ -119,7 +119,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -187,7 +186,6 @@ private val selectItems = mutableStateOf(listOf<String>())
 private val selectItemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
 private val showSelectItemDialog = mutableStateOf(false)
 
-private var keyboardController: SoftwareKeyboardController? = null
 private var callRunnable: Runnable? = null
 private var callHandler: Handler = Handler(Looper.getMainLooper())
 private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
@@ -220,10 +218,7 @@ private fun MainScreen(
 ) {
     val ctx = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val configuration = LocalConfiguration.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val ua = uas.value.find { it.account.aor == viewModel.selectedAor.value }
-    val call = ua?.currentCall()
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -368,20 +363,6 @@ private fun MainScreen(
         }
     }
 
-    LaunchedEffect(key1 = call?.status, key2 = configuration.orientation, key3 = showVideoLayout.value) {
-        val isConnected = call != null && call.status == "connected" && !call.held
-        if (isConnected) {
-            val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-            val shouldShowKeyboard = isPortrait && !showVideoLayout.value
-            if (shouldShowKeyboard) {
-                focusDtmf.value = true
-                keyboardController?.show()
-            }
-            else
-                keyboardController?.hide()
-        }
-    }
-
     if (showVideoLayout.value)
         VideoLayout(ctx = ctx, viewModel= viewModel,
             onCloseVideo = {
@@ -406,6 +387,34 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
                 passwordTitle.value = ctx.getString(R.string.encrypt_password)
                 showPasswordDialog.value = true
             }
+        }
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(viewModel.showKeyboard.value) {
+        if (viewModel.showKeyboard.value > 0)
+            keyboardController?.show()
+    }
+
+    LaunchedEffect(viewModel.hideKeyboard.value) {
+        if (viewModel.hideKeyboard.value > 0)
+            keyboardController?.hide()
+    }
+
+    val configuration = LocalConfiguration.current
+    val ua = uas.value.find { it.account.aor == viewModel.selectedAor.value }
+    val call = ua?.currentCall()
+
+    LaunchedEffect(key1 = call?.status, key2 = configuration.orientation) {
+        val isConnected = call != null && call.status == "connected" && !call.held
+        if (isConnected) {
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                focusDtmf.value = true
+                keyboardController?.show()
+            }
+            else
+                keyboardController?.hide()
         }
     }
 
@@ -1538,7 +1547,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 if (showDialog.value)
                     BasicAlertDialog(
                         onDismissRequest = {
-                            keyboardController?.hide()
+                            viewModel.requestHideKeyboard()
                             showDialog.value = false
                             showTransferDialog = false
                         }
@@ -1702,7 +1711,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                 ) {
                                     TextButton(
                                         onClick = {
-                                            keyboardController?.hide()
+                                            viewModel.requestHideKeyboard()
                                             showDialog.value = false
                                             showTransferDialog = false
                                         },
@@ -1744,7 +1753,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                         !blindChecked.value
                                                     )
                                                 }
-                                                keyboardController?.hide()
+                                                viewModel.requestHideKeyboard()
                                                 showDialog.value = false
                                                 showTransferDialog = false
                                             }
@@ -1937,6 +1946,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     ) {
         val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
         var videoSecurityButtonInstance: ImageButton? = null
+
+        LocalSoftwareKeyboardController.current?.hide()
 
         AndroidView(
             modifier = Modifier.fillMaxSize(),
@@ -2544,7 +2555,6 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             callUri.value = ""
         callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
         callUriEnabled.value = true
-        keyboardController?.hide()
         showCallTimer.value = false
         securityIcon.intValue = -1
         showHangupButton.value = false
@@ -2568,6 +2578,20 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     } else {
         pullToRefreshEnabled.value = false
         callUriEnabled.value = false
+        val isLandscape = ctx.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (showVideoLayout.value || isLandscape || call.held || call.status != "connected") {
+            focusDtmf.value = false
+            dtmfEnabled.value = !call.held
+            Handler(Looper.getMainLooper()).postDelayed({
+                viewModel.requestHideKeyboard()
+            }, 25)
+        }
+        else {
+            dtmfEnabled.value = true
+            focusDtmf.value = true
+            viewModel.requestShowKeyboard()
+        }
+
         when (call.status) {
             "outgoing", "transferring", "answered" -> {
                 callUriLabel.value = if (call.status == "answered")
@@ -2646,20 +2670,6 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 Handler(Looper.getMainLooper()).postDelayed({
                     showOnHoldNotice.value = call.held
                 }, 100)
-                if (call.held) {
-                    keyboardController?.hide()
-                    dtmfEnabled.value = false
-                    focusDtmf.value = false
-                }
-                else {
-                    dtmfEnabled.value = true
-                    if (!showVideoLayout.value &&
-                            ctx.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        focusDtmf.value = true
-                        keyboardController?.show()
-                    }
-                }
-
             }
         }
     }
