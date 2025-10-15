@@ -1,0 +1,3 @@
+- Added initial support for dynamic colors on many screens
+- Improved showing and hiding of soft keyboard
+- New translations (Chinese (Simplified Han script))
