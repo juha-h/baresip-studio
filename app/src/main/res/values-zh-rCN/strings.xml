@@ -441,4 +441,6 @@
             <li><b>GNU GPLv3</b> G.729 编解码器</li>
         </ul>
         ]]></string>
+    <string name="dynamic_colors">动态配色</string>
+    <string name="dynamic_colors_help">如果在 Android 设置中启用，则使用动态配色</string>
 </resources>
