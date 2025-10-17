@@ -1006,7 +1006,7 @@ object Utils {
         Api.AAudio_close_stream()
     }
 
-    fun readUrlWithCustomCas(url: URL, caFile: File): String? {
+    fun readUrlWithCustomCAs(url: URL, caFile: File): String? {
         if (!caFile.exists()) {
             Log.d("Utils", "Custom CA file not found at ${caFile.path}")
             return null
