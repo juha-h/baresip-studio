@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ContentResolver
@@ -48,7 +49,9 @@ import java.net.SocketException
 import java.net.URL
 import java.security.KeyStore
 import java.security.SecureRandom
+import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Enumeration
@@ -67,6 +70,7 @@ import javax.crypto.spec.SecretKeySpec
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 import kotlin.text.replaceFirstChar
 
 object Utils {
@@ -1008,36 +1012,74 @@ object Utils {
             return null
         }
 
-        // 1. Create a CertificateFactory and load the user's certificate
-        val certificateFactory = CertificateFactory.getInstance("X.509")
-        val certificateInputStream = caFile.inputStream()
-        val userCertificate = certificateFactory.generateCertificate(certificateInputStream)
-        certificateInputStream.close()
+        try {
+            // 1. Create a TrustManager that trusts the CAs in the user-provided file
+            val customTrustManager = fun(): X509TrustManager {
+                val certificateFactory = CertificateFactory.getInstance("X.509")
+                val certificateInputStream = caFile.inputStream()
+                // generateCertificates (plural) is crucial for loading all certs from the file
+                val certificates = certificateFactory.generateCertificates(certificateInputStream)
+                certificateInputStream.close()
 
-        // 2. Create a KeyStore containing our trusted CAs
-        val keyStoreType = KeyStore.getDefaultType()
-        val keyStore = KeyStore.getInstance(keyStoreType)
-        keyStore.load(null, null)
-        keyStore.setCertificateEntry("user_ca", userCertificate)
+                val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+                keyStore.load(null, null)
+                certificates.forEachIndexed { index, certificate ->
+                    keyStore.setCertificateEntry("user_ca_$index", certificate)
+                }
 
-        // 3. Create a TrustManager that trusts the CAs in our KeyStore
-        val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
-        val tmf = TrustManagerFactory.getInstance(tmfAlgorithm)
-        tmf.init(keyStore)
+                val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+                tmf.init(keyStore)
+                return tmf.trustManagers.find { it is X509TrustManager } as X509TrustManager
+            }()
 
-        // 4. Create an SSLContext that uses our TrustManager
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, tmf.trustManagers, null)
+            // 2. Create a TrustManager that trusts the default system CAs
+            val systemTrustManager = fun(): X509TrustManager {
+                val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+                factory.init(null as KeyStore?) // A null keystore loads the system's default CAs
+                return factory.trustManagers.find { it is X509TrustManager } as X509TrustManager
+            }()
 
-        // 5. Tell HttpsURLConnection to use our custom SSLContext
-        val urlConnection = url.openConnection() as HttpsURLConnection
-        urlConnection.sslSocketFactory = sslContext.socketFactory
+            // 3. Create a composite TrustManager that delegates to both system and custom CAs
+            @SuppressLint("CustomX509TrustManager")
+            val compositeTrustManager = object : X509TrustManager {
+                override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+                    // This is for client certificate authentication, which you are not using.
+                    // It's safe to just delegate to the system manager by default.
+                    systemTrustManager.checkClientTrusted(chain, authType)
+                }
 
-        // 6. Proceed with the connection
-        return try {
-            urlConnection.inputStream.bufferedReader().use { it.readText() }
-        } finally {
-            urlConnection.disconnect()
+                override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+                    try {
+                        // First, try to validate the chain with the system's default TrustManager.
+                        systemTrustManager.checkServerTrusted(chain, authType)
+                    } catch (_: CertificateException) {
+                        // If that fails, and only if that fails, try to validate with our custom TrustManager.
+                        // This will throw the final CertificateException if it also fails, which is the correct behavior.
+                        customTrustManager.checkServerTrusted(chain, authType)
+                    }
+                }
+
+                override fun getAcceptedIssuers(): Array<X509Certificate> {
+                    // Return a combined list of issuers from both trust managers.
+                    return systemTrustManager.acceptedIssuers + customTrustManager.acceptedIssuers
+                }
+            }
+
+            // 4. Create an SSLContext that uses our new composite TrustManager
+            val sslContext = SSLContext.getInstance("TLS")
+            sslContext.init(null, arrayOf(compositeTrustManager), null)
+
+            // 5. Tell HttpsURLConnection to use our custom SSLContext for this connection
+            val urlConnection = url.openConnection() as HttpsURLConnection
+            urlConnection.sslSocketFactory = sslContext.socketFactory
+
+            // 6. Proceed with the connection and return the result
+            return urlConnection.inputStream.bufferedReader().use { it.readText() }
+
+        } catch (e: Exception) {
+            // Catch any exception from certificate loading or from the network connection and log it
+            Log.e("Utils", "readUrlWithCustomCa failed: ${e.message}")
+            return null
         }
     }
 
