@@ -45,7 +45,10 @@ import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
+import java.net.URL
+import java.security.KeyStore
 import java.security.SecureRandom
+import java.security.cert.CertificateFactory
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Enumeration
@@ -61,6 +64,9 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
 import kotlin.text.replaceFirstChar
 
 object Utils {
@@ -961,7 +967,6 @@ object Utils {
     }
 
     fun aecAgcCheck() {
-
         val sessionId = Api.AAudio_open_stream()
         if (sessionId == -1) {
             Log.e(TAG, "Failed to open AAudio stream")
@@ -995,7 +1000,45 @@ object Utils {
             Log.i(TAG, "Hardware AGC is NOT available")
 
         Api.AAudio_close_stream()
+    }
 
+    fun readUrlWithCustomCas(url: URL, caFile: File): String? {
+        if (!caFile.exists()) {
+            Log.d("Utils", "Custom CA file not found at ${caFile.path}")
+            return null
+        }
+
+        // 1. Create a CertificateFactory and load the user's certificate
+        val certificateFactory = CertificateFactory.getInstance("X.509")
+        val certificateInputStream = caFile.inputStream()
+        val userCertificate = certificateFactory.generateCertificate(certificateInputStream)
+        certificateInputStream.close()
+
+        // 2. Create a KeyStore containing our trusted CAs
+        val keyStoreType = KeyStore.getDefaultType()
+        val keyStore = KeyStore.getInstance(keyStoreType)
+        keyStore.load(null, null)
+        keyStore.setCertificateEntry("user_ca", userCertificate)
+
+        // 3. Create a TrustManager that trusts the CAs in our KeyStore
+        val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
+        val tmf = TrustManagerFactory.getInstance(tmfAlgorithm)
+        tmf.init(keyStore)
+
+        // 4. Create an SSLContext that uses our TrustManager
+        val sslContext = SSLContext.getInstance("TLS")
+        sslContext.init(null, tmf.trustManagers, null)
+
+        // 5. Tell HttpsURLConnection to use our custom SSLContext
+        val urlConnection = url.openConnection() as HttpsURLConnection
+        urlConnection.sslSocketFactory = sslContext.socketFactory
+
+        // 6. Proceed with the connection
+        return try {
+            urlConnection.inputStream.bufferedReader().use { it.readText() }
+        } finally {
+            urlConnection.disconnect()
+        }
     }
 
     /*fun listFilesInDirectory(directoryPath: String): List<File> {

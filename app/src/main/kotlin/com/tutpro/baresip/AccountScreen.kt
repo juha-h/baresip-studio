@@ -73,6 +73,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
+import java.io.File
 import java.io.StringReader
 import java.net.URL
 import java.util.Locale
@@ -1538,8 +1539,12 @@ private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
     val scope = CoroutineScope(Job() + Dispatchers.Main)
     scope.launch(Dispatchers.IO) {
         val url = "https://${Utils.uriHostPart(acc.aor)}/baresip/account_config.xml"
+        val caFile = File(BaresipService.filesPath + "/ca_certs.crt")
         val config = try {
-            URL(url).readText()
+            if (caFile.exists())
+                Utils.readUrlWithCustomCas(URL(url), caFile)
+            else
+                URL(url).readText()
         } catch (e: java.lang.Exception) {
             Log.d(TAG, "Failed to get account configuration from network: ${e.message}")
             null
