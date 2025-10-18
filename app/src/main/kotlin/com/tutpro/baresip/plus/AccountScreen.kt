@@ -1564,7 +1564,7 @@ private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
         val caFile = File(BaresipService.filesPath + "/ca_certs.crt")
         val config = try {
             if (caFile.exists())
-                Utils.readUrlWithCustomCas(URL(url), caFile)
+                Utils.readUrlWithCustomCAs(URL(url), caFile)
             else
                 URL(url).readText()
         } catch (e: java.lang.Exception) {
