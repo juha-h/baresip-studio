@@ -1,0 +1,8 @@
+- Added intial support for dynamic colors including Dynamic Colors setting
+- Exclude starred Android contacts from Do Not Disturb
+- Fixed adding of new call to call history
+- When new account is created, include all video codecs to the account
+- Retain account and settings modifications until check or back button is clicked
+- Use TLS CA File certificates also when pre-configuring account from network
+- Do not leave Settings in case of input error
+- Improved showing/hiding of soft keyboard
