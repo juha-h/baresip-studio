@@ -1,8 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -62,13 +59,16 @@ fun NavGraphBuilder.audioScreenRoute(
     navController: NavController,
 ) {
     composable("audio") {
-        val activity = LocalActivity.current
-        val viewModel: ViewModel = viewModel(activity as ComponentActivity)
         val ctx = LocalContext.current
         AudioScreen(
-            onBack = { navController.popBackStack() },
+            onBack = {
+                navController.popBackStack()
+            },
             checkOnClick = {
-                viewModel.setAudioSettingsResult(checkOnClick(ctx))
+                val result = checkOnClick(ctx) // Your existing logic that returns true/false
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("audio_settings_result", result)
                 navController.popBackStack()
             },
         )

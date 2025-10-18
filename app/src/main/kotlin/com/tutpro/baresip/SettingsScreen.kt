@@ -15,7 +15,6 @@ import android.net.Uri
 import android.os.Build.VERSION
 import android.os.PowerManager
 import android.provider.Settings
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -56,7 +55,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -88,36 +89,20 @@ private var restart = false
 private val showRestartDialog = mutableStateOf(false)
 private var save = false
 
-private var oldBatteryOptimizations = false
-private var oldDarkTheme = false
-
-private var oldDynamicColors = false
-private var oldDefaultDialer = false
-
 fun NavGraphBuilder.settingsScreenRoute(
     navController: NavController,
     onRestartApp: () -> Unit
 ) {
     composable("settings") {
         val ctx = LocalContext.current
-
-        val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
-        oldBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(ctx.packageName) == false
-
-        oldDarkTheme = Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES
-
-        oldDynamicColors = BaresipService.dynamicColors.value
-
-        if (VERSION.SDK_INT >= 29) {
-            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
-            oldDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-        }
-
+        val viewModel = viewModel<SettingsViewModel>()
         SettingsScreen(
+            ctx = ctx,
             navController = navController,
+            settingsViewModel = viewModel,
             onBack = { navController.popBackStack() },
             checkOnClick = {
-                checkOnClick(ctx)
+                checkOnClick(ctx, viewModel)
                 if (restart)
                     showRestartDialog.value = true
                 else
@@ -131,20 +116,34 @@ fun NavGraphBuilder.settingsScreenRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsScreen(
+    ctx: Context,
     navController: NavController,
+    settingsViewModel: SettingsViewModel,
     onBack: () -> Unit,
     checkOnClick: () -> Unit,
     onRestartApp: () -> Unit
 ) {
     val activity = LocalActivity.current
-    val viewModel: ViewModel = viewModel(activity as ComponentActivity)
-    val audioResult by viewModel.audioSettingsResult
-    LaunchedEffect(audioResult) {
-        audioResult?.let { result ->
-            Log.d("SettingsScreen", "Got result from AudioSettings: $result")
-            restart = restart || result
-            viewModel.clearAudioSettingsResult()
+    var areSettingsLoaded by remember { mutableStateOf(false) }
+
+    val audioResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<Boolean>("audio_settings_result")
+        ?.observeAsState()
+
+    LaunchedEffect(audioResult?.value) {
+        if (audioResult?.value == true) {
+            Log.d(TAG, "Got result from AudioSettings: true")
+            restart = true
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("audio_settings_result")
         }
+    }
+
+    LaunchedEffect(null) {
+        settingsViewModel.loadSettings(ctx)
+        areSettingsLoaded = true
     }
 
     Scaffold(
@@ -210,7 +209,8 @@ private fun SettingsScreen(
             )
         }
 
-        SettingsContent(contentPadding, navController, activity, onRestartApp)
+        if (areSettingsLoaded && activity != null)
+            SettingsContent(settingsViewModel, contentPadding, navController, activity, onRestartApp)
     }
 }
 
@@ -226,44 +226,9 @@ private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
 
-private var newAutoStart = false
-private var newListenAddr = ""
-private var newAddressFamily = ""
-
-private var oldDnsServers = ""
-private var newDnsServers = ""
-
-private var newTlsCertificateFile = false
-
-private var newVerifyServer = false
-
-private var newCaFile = false
-
-private var newUserAgent = ""
-
-private var oldContactsMode = ""
-private var newContactsMode = ""
-
-private var newRingtoneUri = ""
-
-private var newBatteryOptimizations = false
-
-private var newDarkTheme = false
-
-private var newDynamicColors = false
-
-private var newColorblind = false
-
-private var newProximitySensing = true
-
-private var newDefaultDialer = false
-
-private var newDebug = false
-
-private var newSipTrace = false
-
 @Composable
 private fun SettingsContent(
+    viewModel: SettingsViewModel,
     contentPadding: PaddingValues,
     navController: NavController,
     activity: Activity,
@@ -289,6 +254,989 @@ private fun SettingsContent(
             negativeButtonText = negativeText.value,
             onNegativeClicked = onNegativeClicked.value,
         )
+
+    @Composable
+    fun StartAutomatically() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.start_automatically),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.start_automatically)
+                        alertMessage.value = ctx.getString(R.string.start_automatically_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val startAutomatically by viewModel.autoStart.collectAsState()
+            Switch(
+                checked = startAutomatically,
+                onCheckedChange = {
+                    if (it) {
+                        if (!isAppearOnTopPermissionGranted(ctx)) {
+                            dialogTitle.value = ctx.getString(R.string.notice)
+                            dialogMessage.value = ctx.getString(R.string.appear_on_top_permission)
+                            positiveText.value = ctx.getString(R.string.ok)
+                            onPositiveClicked.value = {
+                                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                                ctx.startActivity(intent)
+                            }
+                            negativeText.value = ctx.getString(R.string.cancel)
+                            onNegativeClicked.value = {
+                                negativeText.value = ""
+                            }
+                            showDialog.value = true
+                            viewModel.autoStart.value = false
+                        }
+                        else
+                            viewModel.autoStart.value = true
+                    }
+                    else
+                        viewModel.autoStart.value = false
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun ListenAddress() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            val ctx = LocalContext.current
+            val listenAddress by viewModel.listenAddress.collectAsState()
+            OutlinedTextField(
+                value = listenAddress,
+                placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
+                onValueChange = {
+                    viewModel.listenAddress.value = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.listen_address)
+                        alertMessage.value = ctx.getString(R.string.listen_address_help)
+                        showAlert.value = true
+                    },
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.listen_address)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun AddressFamily() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val addressFamily by viewModel.addressFamily.collectAsState()
+            Text(text = stringResource(R.string.address_family),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.address_family)
+                        alertMessage.value = ctx.getString(R.string.address_family_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val familyNames = listOf("--",  "IPv4", "IPv6")
+            val familyValues = listOf("",  "ipv4", "ipv6")
+            val itemPosition = remember { mutableIntStateOf(familyValues.indexOf(addressFamily)) }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = familyNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    familyNames.forEachIndexed { index, family ->
+                        DropdownMenuItem(
+                            text = { Text(text = family) },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                viewModel.addressFamily.value = familyValues[index]
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun DnsServers() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val dnsServers by viewModel.dnsServers.collectAsState()
+            OutlinedTextField(
+                value = dnsServers,
+                onValueChange = {
+                    viewModel.dnsServers.value = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.dns_servers)
+                        alertMessage.value = ctx.getString(R.string.dns_servers_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
+                ),
+                label = { LabelText(stringResource(R.string.dns_servers)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun TlsCertificateFile(activity: Activity) {
+
+        val ctx = LocalContext.current
+
+        val requestPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) {}
+
+        val certificateRequest = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            val certPath = BaresipService.filesPath + "/cert.pem"
+            val certFile = File(certPath)
+            if (it.resultCode == RESULT_OK) {
+                it.data?.data?.also { uri ->
+                    try {
+                        val inputStream = ctx.contentResolver.openInputStream(uri) as FileInputStream
+                        certFile.copyInputStreamToFile(inputStream)
+                        inputStream.close()
+                        Config.replaceVariable("sip_certificate", certPath)
+                        viewModel.tlsCertificateFile.value = true
+                        save = true
+                        restart = true
+                    } catch (e: Error) {
+                        alertTitle.value = ctx.getString(R.string.error)
+                        alertMessage.value = ctx.getString(R.string.read_cert_error) + ": " + e.message
+                        showAlert.value = true
+                        viewModel.tlsCertificateFile.value = false
+                    }
+                }
+            }
+            else
+                viewModel.tlsCertificateFile.value = false
+            if (!viewModel.tlsCertificateFile.value)
+                Utils.deleteFile(certFile)
+        }
+
+        val showAlertDialog = remember { mutableStateOf(false) }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.tls_certificate_file),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.tls_certificate_file)
+                        alertMessage.value = ctx.getString(R.string.tls_certificate_file_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val tlsCertificateFile by viewModel.tlsCertificateFile.collectAsState()
+            Switch(
+                checked = tlsCertificateFile,
+                onCheckedChange = {
+                    viewModel.tlsCertificateFile.value = it
+                    if (it)
+                        if (VERSION.SDK_INT < 29) {
+                            viewModel.tlsCertificateFile.value = false
+                            val permission = Manifest.permission.READ_EXTERNAL_STORAGE
+                            when {
+                                ContextCompat.checkSelfPermission(ctx, permission) ==
+                                        PackageManager.PERMISSION_GRANTED -> {
+                                    Log.d(TAG, "Read External Storage permission granted")
+                                    val downloadsPath = Utils.downloadsPath("cert.pem")
+                                    val content = Utils.getFileContents(downloadsPath)
+                                    if (content == null) {
+                                        alertTitle.value = ctx.getString(R.string.error)
+                                        alertMessage.value = ctx.getString(R.string.read_cert_error)
+                                        showAlert.value = true
+                                        return@Switch
+                                    }
+                                    val certPath = BaresipService.filesPath + "/cert.pem"
+                                    Utils.putFileContents(certPath, content)
+                                    Config.replaceVariable("sip_certificate", certPath)
+                                    viewModel.tlsCertificateFile.value = true
+                                    save = true
+                                    restart = true
+                                }
+                                shouldShowRequestPermissionRationale(activity, permission) ->
+                                    showAlertDialog.value = true
+                                else ->
+                                    requestPermissionLauncher.launch(permission)
+                            }
+                        }
+                        else
+                            Utils.selectInputFile(certificateRequest)
+                    else {
+                        Config.removeVariable("sip_certificate")
+                        Utils.deleteFile(File(BaresipService.filesPath + "/cert.pem"))
+                        save = true
+                        restart = true
+                    }
+                }
+            )
+        }
+
+        if (showAlertDialog.value)
+            AlertDialog(
+                showDialog = showAlertDialog,
+                title = stringResource(R.string.notice),
+                message = stringResource(R.string.no_read_permission),
+                positiveButtonText = stringResource(R.string.ok),
+                onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
+                negativeButtonText = "",
+                onNegativeClicked = {},
+            )
+    }
+
+    @Composable
+    fun VerifyServer() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.verify_server),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.verify_server)
+                        alertMessage.value = ctx.getString(R.string.verify_server_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val verifyServer by viewModel.verifyServer.collectAsState()
+            Switch(
+                checked = verifyServer,
+                onCheckedChange = {
+                    viewModel.verifyServer.value = it
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun CaFile(activity: Activity) {
+
+        val ctx = LocalContext.current
+
+        val requestPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) {}
+
+        val caCertsRequest = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
+            if (it.resultCode == RESULT_OK)
+                it.data?.data?.also { uri ->
+                    try {
+                        val inputStream = ctx.contentResolver.openInputStream(uri) as FileInputStream
+                        caCertsFile.copyInputStreamToFile(inputStream)
+                        inputStream.close()
+                        restart = true
+                    } catch (e: Error) {
+                        alertTitle.value = ctx.getString(R.string.error)
+                        alertMessage.value = ctx.getString(R.string.read_ca_certs_error) + ": " + e.message
+                        showAlert.value = true
+                        viewModel.caFile.value = false
+                    }
+                }
+            else
+                viewModel.caFile.value = false
+            if (!viewModel.caFile.value) caCertsFile.delete()
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.tls_ca_file),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.tls_ca_file)
+                        alertMessage.value = ctx.getString(R.string.tls_ca_file_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val caFile by viewModel.caFile.collectAsState()
+            Switch(
+                checked = caFile,
+                onCheckedChange = {
+                    viewModel.caFile.value = it
+                    if (it) {
+                        if (VERSION.SDK_INT < 29) {
+                            viewModel.caFile.value = false
+                            val permission = Manifest.permission.READ_EXTERNAL_STORAGE
+                            when {
+                                ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED -> {
+                                    Log.d(TAG, "Read External Storage permission granted")
+                                    val downloadsPath = Utils.downloadsPath("ca_certs.crt")
+                                    val content = Utils.getFileContents(downloadsPath)
+                                    if (content == null) {
+                                        alertTitle.value = ctx.getString(R.string.error)
+                                        alertMessage.value = ctx.getString(R.string.read_ca_certs_error)
+                                        showAlert.value = true
+                                        return@Switch
+                                    }
+                                    File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
+                                    viewModel.caFile.value = true
+                                    restart = true
+                                }
+                                shouldShowRequestPermissionRationale(activity, permission) -> {
+                                    dialogTitle.value = ctx.getString(R.string.notice)
+                                    dialogMessage.value = ctx.getString(R.string.no_read_permission)
+                                    positiveText.value = ctx.getString(R.string.ok)
+                                    onPositiveClicked.value = {
+                                        requestPermissionLauncher.launch(permission)
+                                    }
+                                    negativeText.value = ""
+                                    showDialog.value = true
+                                }
+                                else ->
+                                    requestPermissionLauncher.launch(permission)
+                            }
+                        }
+                        else
+                            Utils.selectInputFile(caCertsRequest)
+                    }
+                    else {
+                        Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
+                        restart = true
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun UserAgent() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val userAgent by viewModel.userAgent.collectAsState()
+            OutlinedTextField(
+                value = userAgent,
+                placeholder = { Text(stringResource(R.string.user_agent)) },
+                onValueChange = {
+                    viewModel.userAgent.value = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.user_agent)
+                        alertMessage.value = ctx.getString(R.string.user_agent_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                label = { LabelText(stringResource(R.string.user_agent)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
+    fun AudioSettings(navController: NavController) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.audio_settings),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        navController.navigate("audio")
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight. Bold
+            )
+        }
+    }
+
+    @Composable
+    fun Contacts(activity: Activity) {
+        val showAlertDialog = remember { mutableStateOf(false) }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.contacts),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.contacts)
+                        alertMessage.value = ctx.getString(R.string.contacts_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val isDropDownExpanded = remember {
+                mutableStateOf(false)
+            }
+            val contactNames = listOf(
+                "baresip",
+                "Android",
+                ctx.getString(R.string.both)
+            )
+            val contactsMode by viewModel.contactsMode.collectAsState()
+            val contactValues = listOf("baresip",  "android", "both")
+            val itemPosition = remember {
+                mutableIntStateOf(contactValues.indexOf(contactsMode))
+            }
+            val requestPermissionsLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestMultiplePermissions()
+            ) {}
+            val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS)
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        isDropDownExpanded.value = true
+                    }
+                ) {
+                    Text(text = contactNames[itemPosition.intValue],
+                        color = LocalCustomColors.current.itemText)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
+                        tint = LocalCustomColors.current.itemText)
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
+                    contactNames.forEachIndexed { index, name ->
+                        DropdownMenuItem(
+                            text = { Text(text = name) },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                val mode = contactValues[index]
+                                if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
+                                    dialogTitle.value = ctx.getString(R.string.consent_request)
+                                    dialogMessage.value = ctx.getString(R.string.contacts_consent)
+                                    positiveText.value = ctx.getString(R.string.accept)
+                                    onPositiveClicked.value = {
+                                        showDialog.value = false
+                                        viewModel.contactsMode.value = mode
+                                        if (ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.READ_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.WRITE_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            Log.d(TAG, "Contacts permissions already granted")
+                                        }
+                                        else {
+                                            if (shouldShowRequestPermissionRationale(
+                                                    activity, Manifest.permission.READ_CONTACTS
+                                                ) ||
+                                                shouldShowRequestPermissionRationale(
+                                                    activity, Manifest.permission.WRITE_CONTACTS
+                                                )
+                                            )
+                                                showAlertDialog.value = true
+                                            else
+                                                requestPermissionsLauncher.launch(
+                                                    arrayOf(
+                                                        Manifest.permission.READ_CONTACTS,
+                                                        Manifest.permission.WRITE_CONTACTS
+                                                    )
+                                                )
+                                        }
+                                    }
+                                    negativeText.value = ctx.getString(R.string.deny)
+                                    onNegativeClicked.value = {
+                                        itemPosition.intValue = contactValues.indexOf(contactsMode)
+                                        negativeText.value = ""
+                                    }
+                                    showDialog.value = true
+                                }
+                                else {
+                                    itemPosition.intValue = index
+                                    viewModel.contactsMode.value = contactValues[index]
+                                }
+                            })
+                        if (index < 2)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = LocalCustomColors.current.itemText
+                            )
+                    }
+                }
+            }
+            if (showAlertDialog.value)
+                AlertDialog(
+                    showDialog = showAlertDialog,
+                    title = stringResource(R.string.notice),
+                    message = stringResource(R.string.no_android_contacts),
+                    positiveButtonText = stringResource(R.string.ok),
+                    onPositiveClicked = { requestPermissionsLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS
+                        )
+                    )},
+                    negativeButtonText = "",
+                    onNegativeClicked = {},
+                )
+        }
+    }
+
+    @Composable
+    fun Ringtone(ctx: Context) {
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                val uri: Uri? = if (VERSION.SDK_INT >= 33)
+                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+                else
+                    @Suppress("DEPRECATION")
+                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                if (uri != null)
+                    viewModel.ringtoneUri.value = uri.toString()
+            }
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.ringtone),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                        intent.putExtra(
+                            RingtoneManager.EXTRA_RINGTONE_TYPE,
+                            RingtoneManager.TYPE_RINGTONE
+                        )
+                        intent.putExtra(
+                            RingtoneManager.EXTRA_RINGTONE_TITLE,
+                            ctx.getString(R.string.select_ringtone)
+                        )
+                        intent.putExtra(
+                            RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                            viewModel.ringtoneUri.value.toUri()
+                        )
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                        launcher.launch(intent)
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+
+    @Composable
+    fun BatteryOptimizations() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val batterySettingsLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
+                viewModel.batteryOptimizations.value =
+                    !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
+            }
+            Text(text = stringResource(R.string.battery_optimizations),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.battery_optimizations)
+                        alertMessage.value = ctx.getString(R.string.battery_optimizations_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val battery by viewModel.batteryOptimizations.collectAsState()
+            Switch(
+                checked = battery,
+                onCheckedChange = {
+                    viewModel.batteryOptimizations.value = it
+                    batterySettingsLauncher.launch(
+                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun DarkTheme() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.dark_theme),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.dark_theme)
+                        alertMessage.value = ctx.getString(R.string.dark_theme_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val darkTheme by viewModel.darkTheme.collectAsState()
+            Switch(
+                checked = darkTheme,
+                onCheckedChange = {
+                    viewModel.darkTheme.value = it
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun DynamicColors() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.dynamic_colors),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.dynamic_colors)
+                        alertMessage.value = ctx.getString(R.string.dynamic_colors_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val dynamicColors by viewModel.dynamicColors.collectAsState()
+            Switch(
+                checked = dynamicColors,
+                onCheckedChange = {
+                    viewModel.dynamicColors.value = it
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun ColorBlind() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.colorblind),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.colorblind)
+                        alertMessage.value = ctx.getString(R.string.colorblind_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val colorblind by viewModel.colorblind.collectAsState()
+            Switch(
+                checked = colorblind,
+                onCheckedChange = {
+                    viewModel.colorblind.value = it
+                }
+            )
+        }
+    }
+    @Composable
+    fun ProximitySensing() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.proximity_sensing),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.proximity_sensing)
+                        alertMessage.value = ctx.getString(R.string.proximity_sensing_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val proximitySensing by viewModel.proximitySensing.collectAsState()
+            Switch(
+                checked = proximitySensing,
+                onCheckedChange = {
+                    viewModel.proximitySensing.value = it
+                }
+            )
+        }
+    }
+
+    @RequiresApi(29)
+    @Composable
+    fun DefaultDialer() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.default_phone_app),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.default_phone_app)
+                        alertMessage.value = ctx.getString(R.string.default_phone_app_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val defaultDialer by viewModel.defaultDialer.collectAsState()
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+            val dialerRoleRequest = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                Log.d(TAG, "dialerRoleRequest result: $result")
+                viewModel.defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            }
+            Switch(
+                checked = defaultDialer,
+                onCheckedChange = {
+                    viewModel.defaultDialer.value = it
+                    if (it) {
+                        if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
+                            alertTitle.value = ctx.getString(R.string.alert)
+                            alertMessage.value = ctx.getString(R.string.dialer_role_not_available)
+                            showAlert.value = true
+                        }
+                        else
+                            if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
+                                dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
+                    } else {
+                        try {
+                            dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                        } catch (e: ActivityNotFoundException) {
+                            Log.e(TAG, "ActivityNotFound exception: ${e.message}")
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Debug() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.debug),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.debug)
+                        alertMessage.value = ctx.getString(R.string.debug_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val debug by viewModel.debug.collectAsState()
+            Switch(
+                checked = debug,
+                onCheckedChange = {
+                    viewModel.debug.value = it
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun SipTrace() {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.sip_trace),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.sip_trace)
+                        alertMessage.value = ctx.getString(R.string.sip_trace_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            val sipTrace by viewModel.sipTrace.collectAsState()
+            Switch(
+                checked = sipTrace,
+                onCheckedChange = {
+                    viewModel.sipTrace.value = it
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Reset(onRestartApp: () -> Unit) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = stringResource(R.string.reset_config),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.reset_config)
+                        alertMessage.value = ctx.getString(R.string.reset_config_help)
+                        showAlert.value = true
+                    },
+                color = LocalCustomColors.current.itemText,
+                fontSize = 18.sp)
+            var reset by remember { mutableStateOf(false) }
+            Switch(
+                checked = reset,
+                onCheckedChange = {
+                    dialogTitle.value = ctx.getString(R.string.confirmation)
+                    dialogMessage.value = ctx.getString(R.string.reset_config_alert)
+                    positiveText.value = ctx.getString(R.string.reset)
+                    onPositiveClicked.value = {
+                        Config.reset()
+                        onRestartApp()
+                    }
+                    negativeText.value = ctx.getString(R.string.cancel)
+                    onNegativeClicked.value = {
+                        reset = false
+                        negativeText.value = ""
+                    }
+                    showDialog.value = true
+                }
+            )
+        }
+    }
 
     val ctx = LocalContext.current
 
@@ -334,1049 +1282,17 @@ private fun SettingsContent(
     }
 }
 
-@Composable
-private fun StartAutomatically() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.start_automatically),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.start_automatically)
-                    alertMessage.value = ctx.getString(R.string.start_automatically_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var startAutomatically by remember { mutableStateOf(Config.variable("auto_start") == "yes") }
-        newAutoStart = startAutomatically
-        Switch(
-            checked = startAutomatically,
-            onCheckedChange = {
-                if (it) {
-                    if (!isAppearOnTopPermissionGranted(ctx)) {
-                        dialogTitle.value = ctx.getString(R.string.notice)
-                        dialogMessage.value = ctx.getString(R.string.appear_on_top_permission)
-                        positiveText.value = ctx.getString(R.string.ok)
-                        onPositiveClicked.value = {
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                            ctx.startActivity(intent)
-                        }
-                        negativeText.value = ctx.getString(R.string.cancel)
-                        onNegativeClicked.value = {
-                            negativeText.value = ""
-                        }
-                        showDialog.value = true
-                        startAutomatically = false
-                    }
-                    else
-                        startAutomatically = true
-                }
-                else
-                    startAutomatically = false
-                newAutoStart = startAutomatically
-            }
-        )
-    }
-}
+private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
 
-@Composable
-private fun ListenAddress() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-    ) {
-        val ctx = LocalContext.current
-        var listenAddr by remember { mutableStateOf(Config.variable("sip_listen")) }
-        newListenAddr = listenAddr
-        OutlinedTextField(
-            value = listenAddr,
-            placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
-            onValueChange = {
-                listenAddr = it
-                newListenAddr = listenAddr
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.listen_address)
-                    alertMessage.value = ctx.getString(R.string.listen_address_help)
-                    showAlert.value = true
-                },
-            singleLine = true,
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.listen_address)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun AddressFamily() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp)
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.address_family),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.address_family)
-                    alertMessage.value = ctx.getString(R.string.address_family_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val familyNames = listOf("--",  "IPv4", "IPv6")
-        val familyValues = listOf("",  "ipv4", "ipv6")
-        val itemPosition = remember {
-            mutableIntStateOf(familyValues.indexOf(Config.variable("net_af").lowercase()))
-        }
-        newAddressFamily = familyValues[itemPosition.intValue]
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = familyNames[itemPosition.intValue],
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                familyNames.forEachIndexed { index, family ->
-                    DropdownMenuItem(text = {
-                        Text(text = family)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            itemPosition.intValue = index
-                            newAddressFamily = familyValues[index]
-                        })
-                    if (index < 2)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DnsServers() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        oldDnsServers = if (Config.variable("dyn_dns") == "yes")
-            ""
-        else {
-            val servers = Config.variables("dns_server")
-            var serverList = ""
-            for (server in servers)
-                serverList += ", $server"
-            serverList.trimStart(',').trimStart(' ')
-        }
-        var dnsServers by remember { mutableStateOf(oldDnsServers) }
-        newDnsServers = dnsServers
-        OutlinedTextField(
-            value = dnsServers,
-            onValueChange = {
-                dnsServers = it
-                newDnsServers = dnsServers
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.dns_servers)
-                    alertMessage.value = ctx.getString(R.string.dns_servers_help)
-                    showAlert.value = true
-                },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText
-            ),
-            label = { LabelText(stringResource(R.string.dns_servers)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun TlsCertificateFile(activity: Activity) {
-
-    val ctx = LocalContext.current
-
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) {}
-
-    val certificateRequest = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        val certPath = BaresipService.filesPath + "/cert.pem"
-        val certFile = File(certPath)
-        if (it.resultCode == RESULT_OK) {
-            it.data?.data?.also { uri ->
-                try {
-                    val inputStream = ctx.contentResolver.openInputStream(uri) as FileInputStream
-                    certFile.copyInputStreamToFile(inputStream)
-                    inputStream.close()
-                    Config.replaceVariable("sip_certificate", certPath)
-                    newTlsCertificateFile = true
-                    save = true
-                    restart = true
-                } catch (e: Error) {
-                    alertTitle.value = ctx.getString(R.string.error)
-                    alertMessage.value = ctx.getString(R.string.read_cert_error) + ": " + e.message
-                    showAlert.value = true
-                    newTlsCertificateFile = false
-                }
-            }
-        }
-        else
-            newTlsCertificateFile = false
-        if (!newTlsCertificateFile)
-            Utils.deleteFile(certFile)
-    }
-
-    val showAlertDialog = remember { mutableStateOf(false) }
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.tls_certificate_file),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.tls_certificate_file)
-                    alertMessage.value = ctx.getString(R.string.tls_certificate_file_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var tlsCertificateFile by remember { mutableStateOf(
-            File(BaresipService.filesPath + "/cert.pem").exists()
-        ) }
-        newTlsCertificateFile = tlsCertificateFile
-        Switch(
-            checked = tlsCertificateFile,
-            onCheckedChange = {
-                tlsCertificateFile = it
-                newTlsCertificateFile = tlsCertificateFile
-                if (it)
-                    if (VERSION.SDK_INT < 29) {
-                        tlsCertificateFile = false
-                        val permission = Manifest.permission.READ_EXTERNAL_STORAGE
-                        when {
-                            ContextCompat.checkSelfPermission(ctx, permission) ==
-                                    PackageManager.PERMISSION_GRANTED -> {
-                                Log.d(TAG, "Read External Storage permission granted")
-                                val downloadsPath = Utils.downloadsPath("cert.pem")
-                                val content = Utils.getFileContents(downloadsPath)
-                                if (content == null) {
-                                    alertTitle.value = ctx.getString(R.string.error)
-                                    alertMessage.value = ctx.getString(R.string.read_cert_error)
-                                    showAlert.value = true
-                                    return@Switch
-                                }
-                                val certPath = BaresipService.filesPath + "/cert.pem"
-                                Utils.putFileContents(certPath, content)
-                                Config.replaceVariable("sip_certificate", certPath)
-                                tlsCertificateFile = true
-                                save = true
-                                restart = true
-                            }
-                            shouldShowRequestPermissionRationale(activity, permission) ->
-                                showAlertDialog.value = true
-                            else ->
-                                requestPermissionLauncher.launch(permission)
-                        }
-                    }
-                    else
-                        Utils.selectInputFile(certificateRequest)
-                else {
-                    Config.removeVariable("sip_certificate")
-                    Utils.deleteFile(File(BaresipService.filesPath + "/cert.pem"))
-                    save = true
-                    restart = true
-                }
-            }
-        )
-    }
-
-    if (showAlertDialog.value)
-        AlertDialog(
-            showDialog = showAlertDialog,
-            title = stringResource(R.string.notice),
-            message = stringResource(R.string.no_read_permission),
-            positiveButtonText = stringResource(R.string.ok),
-            onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
-            negativeButtonText = "",
-            onNegativeClicked = {},
-        )
-}
-
-@Composable
-private fun VerifyServer() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.verify_server),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.verify_server)
-                    alertMessage.value = ctx.getString(R.string.verify_server_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var verifyServer by remember { mutableStateOf(Config.variable("sip_verify_server") == "yes") }
-        newVerifyServer = verifyServer
-        Switch(
-            checked = verifyServer,
-            onCheckedChange = {
-                verifyServer = it
-                newVerifyServer = verifyServer
-            }
-        )
-    }
-}
-
-@Composable
-private fun CaFile(activity: Activity) {
-
-    val ctx = LocalContext.current
-
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) {}
-
-    val caCertsRequest = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        val caCertsFile = File(BaresipService.filesPath + "/ca_certs.crt")
-        if (it.resultCode == RESULT_OK)
-            it.data?.data?.also { uri ->
-                try {
-                    val inputStream = ctx.contentResolver.openInputStream(uri) as FileInputStream
-                    caCertsFile.copyInputStreamToFile(inputStream)
-                    inputStream.close()
-                    restart = true
-                } catch (e: Error) {
-                    alertTitle.value = ctx.getString(R.string.error)
-                    alertMessage.value = ctx.getString(R.string.read_ca_certs_error) + ": " + e.message
-                    showAlert.value = true
-                    newCaFile = false
-                }
-            }
-        else
-            newCaFile = false
-        if (!newCaFile) caCertsFile.delete()
-    }
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.tls_ca_file),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.tls_ca_file)
-                    alertMessage.value = ctx.getString(R.string.tls_ca_file_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var caFile by remember { mutableStateOf(
-            File(BaresipService.filesPath + "/ca_certs.crt").exists()
-        ) }
-        Switch(
-            checked = caFile,
-            onCheckedChange = {
-                caFile = it
-                newCaFile = caFile
-                if (it) {
-                    if (VERSION.SDK_INT < 29) {
-                        caFile = false
-                        val permission = Manifest.permission.READ_EXTERNAL_STORAGE
-                        when {
-                            ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED -> {
-                                Log.d(TAG, "Read External Storage permission granted")
-                                val downloadsPath = Utils.downloadsPath("ca_certs.crt")
-                                val content = Utils.getFileContents(downloadsPath)
-                                if (content == null) {
-                                    alertTitle.value = ctx.getString(R.string.error)
-                                    alertMessage.value = ctx.getString(R.string.read_ca_certs_error)
-                                    showAlert.value = true
-                                    return@Switch
-                                }
-                                File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
-                                caFile = true
-                                restart = true
-                            }
-                            shouldShowRequestPermissionRationale(activity, permission) -> {
-                                dialogTitle.value = ctx.getString(R.string.notice)
-                                dialogMessage.value = ctx.getString(R.string.no_read_permission)
-                                positiveText.value = ctx.getString(R.string.ok)
-                                onPositiveClicked.value = {
-                                    requestPermissionLauncher.launch(permission)
-                                }
-                                negativeText.value = ""
-                                showDialog.value = true
-                            }
-                            else ->
-                                requestPermissionLauncher.launch(permission)
-                        }
-                    }
-                    else
-                        Utils.selectInputFile(caCertsRequest)
-                }
-                else {
-                    Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
-                    restart = true
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun UserAgent() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        var userAgent by remember { mutableStateOf(Config.variable("user_agent")) }
-        newUserAgent = userAgent
-        OutlinedTextField(
-            value = userAgent,
-            placeholder = { Text(stringResource(R.string.user_agent)) },
-            onValueChange = {
-                userAgent = it
-                newUserAgent = userAgent
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.user_agent)
-                    alertMessage.value = ctx.getString(R.string.user_agent_help)
-                    showAlert.value = true
-                },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.user_agent)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-    }
-}
-
-@Composable
-private fun AudioSettings(navController: NavController) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = stringResource(R.string.audio_settings),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navController.navigate("audio")
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp,
-            fontWeight = FontWeight. Bold
-        )
-    }
-}
-
-@Composable
-private fun Ringtone(ctx: Context) {
-    newRingtoneUri = if (Preferences(ctx).ringtoneUri == "")
-        RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
-    else
-        Preferences(ctx).ringtoneUri!!
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == RESULT_OK) {
-            val uri: Uri? = if (VERSION.SDK_INT >= 33)
-                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
-            else
-                @Suppress("DEPRECATION")
-                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            if (uri != null)
-                newRingtoneUri = uri.toString()
-        }
-    }
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = stringResource(R.string.ringtone),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_TYPE,
-                        RingtoneManager.TYPE_RINGTONE
-                    )
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_TITLE,
-                        ctx.getString(R.string.select_ringtone)
-                    )
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                        newRingtoneUri.toUri()
-                    )
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                    launcher.launch(intent)
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun BatteryOptimizations() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        val batterySettingsLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
-            newBatteryOptimizations = !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
-        }
-        Text(text = stringResource(R.string.battery_optimizations),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.battery_optimizations)
-                    alertMessage.value = ctx.getString(R.string.battery_optimizations_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var battery by remember { mutableStateOf(oldBatteryOptimizations) }
-        newBatteryOptimizations = battery
-        Switch(
-            checked = battery,
-            onCheckedChange = {
-                battery = it
-                newBatteryOptimizations = battery
-                batterySettingsLauncher.launch(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-            }
-        )
-    }
-}
-@Composable
-private fun Contacts(activity: Activity) {
-    val showAlertDialog = remember { mutableStateOf(false) }
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp)
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.contacts),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.contacts)
-                    alertMessage.value = ctx.getString(R.string.contacts_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val contactNames = listOf(
-            "baresip",
-            "Android",
-            ctx.getString(R.string.both)
-        )
-        val contactValues = listOf("baresip",  "android", "both")
-        oldContactsMode = Config.variable("contacts_mode").lowercase()
-        val itemPosition = remember {
-            mutableIntStateOf(contactValues.indexOf(oldContactsMode))
-        }
-        newContactsMode = contactValues[itemPosition.intValue]
-        val requestPermissionsLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestMultiplePermissions()
-        ) {}
-        val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS,
-            Manifest.permission.WRITE_CONTACTS)
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = contactNames[itemPosition.intValue],
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                contactNames.forEachIndexed { index, name ->
-                    DropdownMenuItem(
-                        text = { Text(text = name) },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            val mode = contactValues[index]
-                            if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
-                                dialogTitle.value = ctx.getString(R.string.consent_request)
-                                dialogMessage.value = ctx.getString(R.string.contacts_consent)
-                                positiveText.value = ctx.getString(R.string.accept)
-                                onPositiveClicked.value = {
-                                    showDialog.value = false
-                                    newContactsMode = mode
-                                    if (ContextCompat.checkSelfPermission(
-                                            ctx,
-                                            Manifest.permission.READ_CONTACTS
-                                        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                                            ctx,
-                                            Manifest.permission.WRITE_CONTACTS
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    ) {
-                                        Log.d(TAG, "Contacts permissions already granted")
-                                    }
-                                    else {
-                                        if (shouldShowRequestPermissionRationale(
-                                                activity, Manifest.permission.READ_CONTACTS
-                                            ) ||
-                                            shouldShowRequestPermissionRationale(
-                                                activity, Manifest.permission.WRITE_CONTACTS
-                                            )
-                                        )
-                                            showAlertDialog.value = true
-                                        else
-                                            requestPermissionsLauncher.launch(
-                                                arrayOf(
-                                                    Manifest.permission.READ_CONTACTS,
-                                                    Manifest.permission.WRITE_CONTACTS
-                                                )
-                                            )
-                                    }
-                                }
-                                negativeText.value = ctx.getString(R.string.deny)
-                                onNegativeClicked.value = {
-                                    itemPosition.intValue = contactValues.indexOf(oldContactsMode)
-                                    negativeText.value = ""
-                                }
-                                showDialog.value = true
-                            }
-                            else {
-                                itemPosition.intValue = index
-                                newContactsMode = contactValues[index]
-                            }
-                        })
-                    if (index < 2)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
-                }
-            }
-        }
-        if (showAlertDialog.value)
-            AlertDialog(
-                showDialog = showAlertDialog,
-                title = stringResource(R.string.notice),
-                message = stringResource(R.string.no_android_contacts),
-                positiveButtonText = stringResource(R.string.ok),
-                onPositiveClicked = { requestPermissionsLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.WRITE_CONTACTS
-                    )
-                )},
-                negativeButtonText = "",
-                onNegativeClicked = {},
-            )
-    }
-}
-
-@Composable
-private fun DarkTheme() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.dark_theme),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.dark_theme)
-                    alertMessage.value = ctx.getString(R.string.dark_theme_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var darkTheme by remember { mutableStateOf(oldDarkTheme) }
-        newDarkTheme = darkTheme
-        Switch(
-            checked = darkTheme,
-            onCheckedChange = {
-                darkTheme = it
-                newDarkTheme = darkTheme
-            }
-        )
-    }
-}
-
-@Composable
-private fun DynamicColors() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.dynamic_colors),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.dynamic_colors)
-                    alertMessage.value = ctx.getString(R.string.dynamic_colors_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var dynamicColors by remember { mutableStateOf(oldDynamicColors) }
-        newDynamicColors = dynamicColors
-        Switch(
-            checked = dynamicColors,
-            onCheckedChange = {
-                dynamicColors = it
-                newDynamicColors = dynamicColors
-            }
-        )
-    }
-}
-
-@Composable
-private fun ColorBlind() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.colorblind),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.colorblind)
-                    alertMessage.value = ctx.getString(R.string.colorblind_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var colorblind by remember { mutableStateOf(Config.variable("colorblind") == "yes") }
-        newColorblind = colorblind
-        Switch(
-            checked = colorblind,
-            onCheckedChange = {
-                colorblind = it
-                newColorblind = colorblind
-            }
-        )
-    }
-}
-@Composable
-private fun ProximitySensing() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.proximity_sensing),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.proximity_sensing)
-                    alertMessage.value = ctx.getString(R.string.proximity_sensing_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var proximitySensing by remember {
-            mutableStateOf(Config.variable("proximity_sensing") == "yes")
-        }
-        newProximitySensing = proximitySensing
-        Switch(
-            checked = proximitySensing,
-            onCheckedChange = {
-                proximitySensing= it
-                newProximitySensing = proximitySensing
-            }
-        )
-    }
-}
-
-@RequiresApi(29)
-@Composable
-private fun DefaultDialer() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.default_phone_app),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.default_phone_app)
-                    alertMessage.value = ctx.getString(R.string.default_phone_app_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
-        val dialerRoleRequest = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            Log.d(TAG, "dialerRoleRequest result: $result")
-            newDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-        }
-        var defaultDialer by remember { mutableStateOf(oldDefaultDialer) }
-        newDefaultDialer = defaultDialer
-        Switch(
-            checked = defaultDialer,
-            onCheckedChange = {
-                defaultDialer = it
-                newDefaultDialer = defaultDialer
-                if (it) {
-                    if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
-                        alertTitle.value = ctx.getString(R.string.alert)
-                        alertMessage.value = ctx.getString(R.string.dialer_role_not_available)
-                        showAlert.value = true
-                    }
-                    else
-                        if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
-                            dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
-                } else {
-                    try {
-                        dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
-                    } catch (e: ActivityNotFoundException) {
-                        Log.e(TAG, "ActivityNotFound exception: ${e.message}")
-                    }
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun Debug() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.debug),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.debug)
-                    alertMessage.value = ctx.getString(R.string.debug_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var db by remember { mutableStateOf(Config.variable("log_level") == "0") }
-        newDebug = db
-        Switch(
-            checked = db,
-            onCheckedChange = {
-                db = it
-                newDebug = db
-            }
-        )
-    }
-}
-
-@Composable
-private fun SipTrace() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.sip_trace),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.sip_trace)
-                    alertMessage.value = ctx.getString(R.string.sip_trace_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var sipTrace by remember { mutableStateOf(BaresipService.sipTrace) }
-        newSipTrace = sipTrace
-        Switch(
-            checked = sipTrace,
-            onCheckedChange = {
-                sipTrace = it
-                newSipTrace = sipTrace
-            }
-        )
-    }
-}
-
-@Composable
-private fun Reset(onRestartApp: () -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.reset_config),
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.reset_config)
-                    alertMessage.value = ctx.getString(R.string.reset_config_help)
-                    showAlert.value = true
-                },
-            color = LocalCustomColors.current.itemText,
-            fontSize = 18.sp)
-        var reset by remember { mutableStateOf(false) }
-        Switch(
-            checked = reset,
-            onCheckedChange = {
-                dialogTitle.value = ctx.getString(R.string.confirmation)
-                dialogMessage.value = ctx.getString(R.string.reset_config_alert)
-                positiveText.value = ctx.getString(R.string.reset)
-                onPositiveClicked.value = {
-                    Config.reset()
-                    onRestartApp()
-                }
-                negativeText.value = ctx.getString(R.string.cancel)
-                onNegativeClicked.value = {
-                    reset = false
-                    negativeText.value = ""
-                }
-                showDialog.value = true
-            }
-        )
-    }
-}
-
-private fun checkOnClick(ctx: Context) {
-
-    if ((Config.variable("auto_start") == "yes") != newAutoStart) {
+    if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
         Config.replaceVariable(
             "auto_start",
-            if (newAutoStart) "yes" else "no"
+            if (viewModel.autoStart.value) "yes" else "no"
         )
         save = true
     }
 
-    val listenAddr = newListenAddr.trim()
+    val listenAddr = viewModel.listenAddress.value.trim()
     if (listenAddr != Config.variable("sip_listen")) {
         if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
             alertTitle.value = ctx.getString(R.string.notice)
@@ -1389,15 +1305,15 @@ private fun checkOnClick(ctx: Context) {
         restart = true
     }
 
-    if (Config.variable("net_af").lowercase() != newAddressFamily) {
-        Config.replaceVariable("net_af", newAddressFamily)
+    if (Config.variable("net_af").lowercase() != viewModel.addressFamily.value) {
+        Config.replaceVariable("net_af", viewModel.addressFamily.value)
         save = true
         restart = true
     }
 
-    var dnsServers = newDnsServers.lowercase(Locale.ROOT).replace(" ", "")
-    dnsServers = addMissingPorts(dnsServers)
-    if (dnsServers != oldDnsServers.replace(" ", "")) {
+    val dnsServers = addMissingPorts(viewModel.dnsServers.value
+        .lowercase(Locale.ROOT).replace(" ", ""))
+    if (dnsServers != viewModel.oldDnsServers) {
         if (!checkDnsServers(dnsServers)) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_dns_servers)}: $dnsServers"
@@ -1423,36 +1339,40 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    if ((Config.variable("sip_verify_server") == "yes") != newVerifyServer) {
-        Config.replaceVariable("sip_verify_server", if (newVerifyServer) "yes" else "no")
-        Api.config_verify_server_set(newVerifyServer)
+    if ((Config.variable("sip_verify_server") == "yes") != viewModel.verifyServer.value) {
+        Config.replaceVariable("sip_verify_server",
+            if (viewModel.verifyServer.value) "yes" else "no")
+        Api.config_verify_server_set(viewModel.verifyServer.value)
         save = true
     }
 
-    newUserAgent = newUserAgent.trim()
-    if (newUserAgent != Config.variable("user_agent")) {
-        if ((newUserAgent != "") && !Utils.checkServerVal(newUserAgent)) {
+    val userAgent = viewModel.userAgent.value.trim()
+    if (userAgent != Config.variable("user_agent")) {
+        if (userAgent != "" && !Utils.checkServerVal(userAgent)) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: $newUserAgent"
+            alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: " +
+                    userAgent
             showAlert.value = true
             return
         }
-        if (newUserAgent != "")
-            Config.replaceVariable("user_agent", newUserAgent)
+        if (userAgent != "")
+            Config.replaceVariable("user_agent", userAgent)
         else
             Config.removeVariable("user_agent")
         save = true
         restart = true
     }
 
-    Preferences(ctx).ringtoneUri = newRingtoneUri
-    BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
+    val ringtoneUri = viewModel.ringtoneUri.value
+    Preferences(ctx).ringtoneUri = ringtoneUri
+    BaresipService.rt = RingtoneManager.getRingtone(ctx, ringtoneUri.toUri())
 
-    if (oldContactsMode != newContactsMode) {
-        Config.replaceVariable("contacts_mode", newContactsMode)
-        BaresipService.contactsMode = newContactsMode
+    val contactsMode = viewModel.contactsMode.value
+    if (Config.variable("contacts_mode").lowercase() != contactsMode) {
+        Config.replaceVariable("contacts_mode", contactsMode)
+        BaresipService.contactsMode = contactsMode
         val baresipService = Intent(ctx, BaresipService::class.java)
-        when (newContactsMode) {
+        when (contactsMode) {
             "baresip" -> {
                 BaresipService.androidContacts.value = listOf()
                 Contact.restoreBaresipContacts()
@@ -1474,32 +1394,35 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    val newDisplayTheme = if (newDarkTheme)
+    val darkTheme = viewModel.darkTheme.value
+    val newDisplayTheme = if (darkTheme)
         AppCompatDelegate.MODE_NIGHT_YES
     else
         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-    if (oldDarkTheme != newDarkTheme) {
+    if (Preferences(ctx).displayTheme == AppCompatDelegate.MODE_NIGHT_YES != darkTheme) {
         Preferences(ctx).displayTheme = newDisplayTheme
-        BaresipService.darkTheme.value = newDarkTheme
+        BaresipService.darkTheme.value = darkTheme
         AppCompatDelegate.setDefaultNightMode(newDisplayTheme)
         Config.replaceVariable("dark_theme",
-            if (newDarkTheme) "yes" else "no")
+            if (darkTheme) "yes" else "no")
         save = true
     }
 
-    if (oldDynamicColors != newDynamicColors) {
-        BaresipService.dynamicColors.value = newDynamicColors
+    val dynamicColors = viewModel.dynamicColors.value
+    if (BaresipService.dynamicColors.value != dynamicColors) {
+        BaresipService.dynamicColors.value = dynamicColors
         Config.replaceVariable("dynamic_colors",
-            if (newDynamicColors) "yes" else "no")
+            if (dynamicColors) "yes" else "no")
         save = true
     }
 
-    if ((Config.variable("colorblind") == "yes") != newColorblind) {
+    val colorblind = viewModel.colorblind.value
+    if ((Config.variable("colorblind") == "yes") != colorblind) {
         Config.replaceVariable(
             "colorblind",
-            if (newColorblind) "yes" else "no"
+            if (colorblind) "yes" else "no"
         )
-        BaresipService.colorblind = newColorblind
+        BaresipService.colorblind = colorblind
         UserAgent.updateColorblindStatus()
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
@@ -1507,26 +1430,29 @@ private fun checkOnClick(ctx: Context) {
         save = true
     }
 
-    if ((Config.variable("proximity_sensing") == "yes") != newProximitySensing) {
+    val proximitySensing = viewModel.proximitySensing.value
+    if ((Config.variable("proximity_sensing") == "yes") != proximitySensing) {
         Config.replaceVariable(
             "proximity_sensing",
-            if (newProximitySensing) "yes" else "no"
+            if (proximitySensing) "yes" else "no"
         )
-        BaresipService.proximitySensing = newProximitySensing
+        BaresipService.proximitySensing = proximitySensing
         save = true
     }
 
-    if ((Config.variable("log_level") == "0") != newDebug) {
-        val logLevelString = if (newDebug) "0" else "2"
+    val debug = viewModel.debug.value
+    if ((Config.variable("log_level") == "0") != debug) {
+        val logLevelString = if (debug) "0" else "2"
         Config.replaceVariable("log_level", logLevelString)
         Api.log_level_set(logLevelString.toInt())
         Log.logLevelSet(logLevelString.toInt())
         save = true
     }
 
-    if (BaresipService.sipTrace != newSipTrace) {
-        BaresipService.sipTrace = newSipTrace
-        Api.uag_enable_sip_trace(newSipTrace)
+    val sipTrace = viewModel.sipTrace.value
+    if (BaresipService.sipTrace != sipTrace) {
+        BaresipService.sipTrace = sipTrace
+        Api.uag_enable_sip_trace(sipTrace)
     }
 
     if (save) Config.save()

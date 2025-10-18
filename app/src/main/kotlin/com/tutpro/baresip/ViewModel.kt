@@ -1,16 +1,15 @@
 package com.tutpro.baresip
 
 import android.app.Application
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 sealed class NavigationCommand {
@@ -107,17 +106,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateDialpadIcon(newIcon: Int) {
         _dialpadIcon.value = newIcon
-    }
-
-    private val _audioSettingsResult = mutableStateOf<Boolean?>(null)
-    val audioSettingsResult: State<Boolean?> get() = _audioSettingsResult
-
-    fun setAudioSettingsResult(result: Boolean) {
-        _audioSettingsResult.value = result
-    }
-
-    fun clearAudioSettingsResult() {
-        _audioSettingsResult.value = null
     }
 
     private val _selectedCallRow = MutableStateFlow<CallRow?>(null)
