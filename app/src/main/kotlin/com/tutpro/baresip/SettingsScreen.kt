@@ -102,11 +102,12 @@ fun NavGraphBuilder.settingsScreenRoute(
             settingsViewModel = viewModel,
             onBack = { navController.popBackStack() },
             checkOnClick = {
-                checkOnClick(ctx, viewModel)
-                if (restart)
-                    showRestartDialog.value = true
-                else
-                    navController.popBackStack()
+                if (checkOnClick(ctx, viewModel)) {
+                    if (restart)
+                        showRestartDialog.value = true
+                    else
+                        navController.popBackStack()
+                }
             },
             onRestartApp = onRestartApp
         )
@@ -1282,7 +1283,7 @@ private fun SettingsContent(
     }
 }
 
-private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
+private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
         Config.replaceVariable(
@@ -1298,7 +1299,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_listen_address)}: $listenAddr"
             showAlert.value = true
-            return
+            return false
         }
         Config.replaceVariable("sip_listen", listenAddr)
         save = true
@@ -1318,7 +1319,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_dns_servers)}: $dnsServers"
             showAlert.value = true
-            return
+            return false
         }
         Config.removeVariable("dns_server")
         if (dnsServers.isNotEmpty()) {
@@ -1329,7 +1330,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
                 alertTitle.value = ctx.getString(R.string.notice)
                 alertMessage.value = "${ctx.getString(R.string.failed_to_set_dns_servers)}: $dnsServers"
                 showAlert.value = true
-                return
+                return false
             }
         } else {
             Config.replaceVariable("dyn_dns", "yes")
@@ -1353,7 +1354,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
             alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: " +
                     userAgent
             showAlert.value = true
-            return
+            return false
         }
         if (userAgent != "")
             Config.replaceVariable("user_agent", userAgent)
@@ -1456,6 +1457,8 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel) {
     }
 
     if (save) Config.save()
+
+    return true
 }
 
 private fun isAppearOnTopPermissionGranted(ctx: Context): Boolean {
