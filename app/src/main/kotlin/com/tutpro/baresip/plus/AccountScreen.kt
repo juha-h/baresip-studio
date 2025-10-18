@@ -36,9 +36,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -59,6 +58,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -86,14 +86,16 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
         )
     ) { backStackEntry ->
         val ctx = LocalContext.current
+        val viewModel = viewModel<AccountViewModel>()
         val aor = backStackEntry.arguments?.getString("aor")!!
         val kind = backStackEntry.arguments?.getString("kind")!!
         val ua = UserAgent.ofAor(aor)!!
         AccountScreen(
+            viewModel = viewModel,
             navController = navController,
             onBack = { navController.popBackStack() },
             checkOnClick = {
-                val ok = checkOnClick(ctx, ua)
+                val ok = checkOnClick(ctx, viewModel, ua)
                 if (ok) {
                     if (reRegister) ua.reRegister()
                     navController.popBackStack()
@@ -110,6 +112,7 @@ private var keyboardController: SoftwareKeyboardController? = null
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountScreen(
+    viewModel: AccountViewModel,
     navController: NavController,
     onBack: () -> Unit,
     checkOnClick: () -> Unit,
@@ -119,14 +122,21 @@ private fun AccountScreen(
     val ua = UserAgent.ofAor(aor)!!
     val acc = ua.account
 
-    var isConfigLoaded by remember { mutableStateOf(false) }
+    var isAccountAvailable by remember { mutableStateOf(false) }
+    var isAccountLoaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(kind, acc) {
         if (kind == "new")
-            initAccountFromConfig(acc) { isConfigLoaded = true }
+            initAccountFromConfig(acc) { isAccountAvailable = true }
         else
-            isConfigLoaded = true
+            isAccountAvailable = true
     }
+
+    if (isAccountAvailable)
+        LaunchedEffect(acc) {
+            viewModel.loadAccount(acc)
+            isAccountLoaded = true
+        }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -174,8 +184,8 @@ private fun AccountScreen(
             }
         }
     ) { contentPadding ->
-        if (isConfigLoaded)
-            AccountContent(navController, contentPadding, ua)
+        if (isAccountLoaded)
+            AccountContent(viewModel, navController, contentPadding, ua)
         else
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -193,44 +203,21 @@ private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
 
-private var newNickname = ""
-private var newDisplayname = ""
-private var newAuthUser = ""
-private var newAuthPass = ""
-private var newOutbound1 = ""
-private var newOutbound2 = ""
-private var newRegister = false
-private var newRegInt = ""
-private var newMediaEnc = ""
-private var newMediaNat = ""
-private var newStunServer = ""
-private var newStunUser = ""
-private var newStunPass = ""
-private var newRtcpMux = false
-private var new100Rel = false
-private var newDtmfMode = 0
-private var newAnswerMode = 0
-private var newAutoRedirect = false
-private var newVmUri = ""
-private var newCountryCode = ""
-private var newTelProvider = ""
-private var newDefaultAccount = false
-private var newNumericKeypad = false
-
 private var reRegister = false
 
 @Composable
 private fun AccountContent(
+    viewModel: AccountViewModel,
     navController: NavController,
     contentPadding: PaddingValues,
     ua: UserAgent
 ) {
     val ctx = LocalContext.current
-    val acc = ua.account
-    val aor = acc.aor
+    val aor = ua.account.aor
+    val luri = ua.account.luri
 
-    var mediaNatState by remember { mutableStateOf(acc.mediaNat) }
-    val showStun by remember { derivedStateOf { mediaNatState != "" } }
+    val mediaNat by viewModel.mediaNat.collectAsState()
+    val showStun by remember { derivedStateOf { mediaNat.isNotEmpty() } }
 
     @Composable
     fun AoR() {
@@ -242,7 +229,7 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             OutlinedTextField(
-                value = acc.luri,
+                value = luri,
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
@@ -261,22 +248,15 @@ private fun AccountContent(
     @Composable
     fun Nickname() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var nickName by remember { mutableStateOf(acc.nickName) }
-            newNickname = nickName
+            val nickName by viewModel.nickName.collectAsState()
             OutlinedTextField(
                 value = nickName,
                 placeholder = { Text(stringResource(R.string.nickname)) },
-                onValueChange = {
-                    nickName = it
-                    newNickname = nickName
-                },
+                onValueChange = { viewModel.nickName.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -299,21 +279,15 @@ private fun AccountContent(
     fun DisplayName() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var displayName by remember { mutableStateOf(acc.displayName) }
-            newDisplayname = displayName
+            val displayName by viewModel.displayName.collectAsState()
             OutlinedTextField(
                 value = displayName,
                 placeholder = { Text(stringResource(R.string.display_name)) },
-                onValueChange = {
-                    displayName = it
-                    newDisplayname = displayName
-                },
+                onValueChange = { viewModel.displayName.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -336,21 +310,15 @@ private fun AccountContent(
     fun AuthUser() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var authUser by remember { mutableStateOf(acc.authUser) }
-            newAuthUser = authUser
+            val authUser by viewModel.authUser.collectAsState()
             OutlinedTextField(
                 value = authUser,
                 placeholder = { Text(stringResource(R.string.authentication_username)) },
-                onValueChange = {
-                    authUser = it
-                    newAuthUser = authUser
-                },
+                onValueChange = { viewModel.authUser.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -371,26 +339,15 @@ private fun AccountContent(
         val ctx = LocalContext.current
         val showPassword = remember { mutableStateOf(false) }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var authPass by remember { mutableStateOf(
-                if (BaresipService.aorPasswords[acc.aor] == null && acc.authPass != NO_AUTH_PASS)
-                    acc.authPass
-                else
-                    ""
-            ) }
-            newAuthPass = authPass
+            val authPass by viewModel.authPass.collectAsState()
             OutlinedTextField(
                 value = authPass,
                 placeholder = { Text(stringResource(R.string.authentication_password)) },
-                onValueChange = {
-                    authPass = it
-                    newAuthPass = authPass
-                },
+                onValueChange = { viewModel.authPass.value = it },
                 singleLine = true,
                 visualTransformation = if (showPassword.value)
                     VisualTransformation.None
@@ -407,7 +364,6 @@ private fun AccountContent(
                                 ImageVector.vectorResource(R.drawable.visibility_off),
                             contentDescription = "Visibility",
                             tint = LocalCustomColors.current.itemText
-
                         )
                     }
                 },
@@ -465,23 +421,15 @@ private fun AccountContent(
                 }
         )
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var outbound1 by remember { mutableStateOf(
-                if (acc.outbound.isNotEmpty()) acc.outbound[0] else "")
-            }
-            newOutbound1 = outbound1
+            val outbound1 by viewModel.outbound1.collectAsState()
             OutlinedTextField(
                 value = outbound1,
                 placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
-                onValueChange = {
-                    outbound1= it
-                    newOutbound1 = outbound1
-                },
+                onValueChange = { viewModel.outbound1.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 textStyle = TextStyle(
@@ -491,23 +439,15 @@ private fun AccountContent(
             )
         }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var outbound2 by remember { mutableStateOf(
-                if (acc.outbound.size > 1) acc.outbound[1] else "")
-            }
-            newOutbound2 = outbound2
+            val outbound2 by viewModel.outbound2.collectAsState()
             OutlinedTextField(
                 value = outbound2,
                 placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
-                onValueChange = {
-                    outbound2 = it
-                    newOutbound2 = outbound2
-                },
+                onValueChange = { viewModel.outbound2.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 textStyle = TextStyle(
@@ -522,9 +462,7 @@ private fun AccountContent(
     fun Register() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -538,14 +476,10 @@ private fun AccountContent(
                     },
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
-            var register by remember { mutableStateOf(acc.regint > 0) }
-            newRegister = register
+            val register by viewModel.register.collectAsState()
             Switch(
                 checked = register,
-                onCheckedChange = {
-                    register = it
-                    newRegister = register
-                }
+                onCheckedChange = { viewModel.register.value = it }
             )
         }
     }
@@ -554,21 +488,15 @@ private fun AccountContent(
     fun RegInt() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            var regInt by remember { mutableStateOf(acc.configuredRegInt.toString()) }
-            newRegInt = regInt
+            val regInt by viewModel.regInt.collectAsState()
             OutlinedTextField(
                 value = regInt,
                 placeholder = { Text(stringResource(R.string.reg_int)) },
-                onValueChange = {
-                    regInt = it
-                    newRegInt = regInt
-                },
+                onValueChange = { viewModel.regInt.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -578,7 +506,8 @@ private fun AccountContent(
                     },
                 singleLine = true,
                 textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
+                    fontSize = 18.sp,
+                    color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.reg_int)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
@@ -604,7 +533,7 @@ private fun AccountContent(
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp,
-                fontWeight = FontWeight. Bold
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -634,9 +563,7 @@ private fun AccountContent(
     fun MediaEnc() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -651,8 +578,7 @@ private fun AccountContent(
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             val isDropDownExpanded = remember { mutableStateOf(false) }
-            var mediaEnc by remember { mutableStateOf(acc.mediaEnc) }
-            newMediaEnc = mediaEnc
+            val mediaEnc by viewModel.mediaEnc.collectAsState()
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -679,8 +605,7 @@ private fun AccountContent(
                         },
                             onClick = {
                                 isDropDownExpanded.value = false
-                                mediaEnc = it.key
-                                newMediaEnc = mediaEnc
+                                viewModel.mediaEnc.value = it.key
                             })
                         if (index < 4)
                             HorizontalDivider(
@@ -695,12 +620,10 @@ private fun AccountContent(
     }
 
     @Composable
-    fun MediaNat(currentMediaNat: String, onMediaNatSelected: (String) -> Unit) {
+    fun MediaNat() {
         val ctx = LocalContext.current
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -715,6 +638,7 @@ private fun AccountContent(
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
             val isDropDownExpanded = remember { mutableStateOf(false) }
+            val mediaNat by viewModel.mediaNat.collectAsState()
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -723,7 +647,7 @@ private fun AccountContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = mediaNatMap[currentMediaNat]!!,
+                    Text(text = mediaNatMap[mediaNat]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
                         tint = LocalCustomColors.current.itemText)
@@ -740,8 +664,7 @@ private fun AccountContent(
                         },
                             onClick = {
                                 isDropDownExpanded.value = false
-                                onMediaNatSelected(it.key)
-                                newMediaNat = it.key
+                                viewModel.mediaNat.value = it.key
                             })
                         if (index < 3)
                             HorizontalDivider(
@@ -758,22 +681,15 @@ private fun AccountContent(
     @Composable
     fun StunServer() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var stunServer by remember { mutableStateOf(acc.stunServer) }
-            newStunServer = stunServer
+            val stunServer by viewModel.stunServer.collectAsState()
             OutlinedTextField(
                 value = stunServer,
                 placeholder = { Text(stringResource(R.string.stun_server)) },
-                onValueChange = {
-                    stunServer = it
-                    newStunServer = stunServer
-                },
+                onValueChange = { viewModel.stunServer.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -792,22 +708,15 @@ private fun AccountContent(
     @Composable
     fun StunUser() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var stunUser by remember { mutableStateOf(acc.stunUser) }
-            newStunUser = stunUser
+            val stunUser by viewModel.stunUser.collectAsState()
             OutlinedTextField(
                 value = stunUser,
                 placeholder = { Text(stringResource(R.string.stun_username)) },
-                onValueChange = {
-                    stunUser = it
-                    newStunUser = stunUser
-                },
+                onValueChange = { viewModel.stunUser.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -825,46 +734,31 @@ private fun AccountContent(
 
     @Composable
     fun StunPass() {
+        val showPassword = remember { mutableStateOf(false) }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            val showPassword = remember { mutableStateOf(false) }
-            var stunPass by remember { mutableStateOf(acc.stunPass) }
-            newStunPass = stunPass
+            val stunPass by viewModel.stunPass.collectAsState()
             OutlinedTextField(
                 value = stunPass,
                 placeholder = { Text(stringResource(R.string.stun_password)) },
-                onValueChange = {
-                    stunPass = it
-                    newStunPass = stunPass
-                },
+                onValueChange = { viewModel.stunPass.value = it },
                 singleLine = true,
                 visualTransformation = if (showPassword.value)
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
                 trailingIcon = {
-                    val (icon, iconColor) = if (showPassword.value) {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility),
-                            colorResource(id = R.color.colorAccent)
-                        )
-                    } else {
-                        Pair(
-                            ImageVector.vectorResource(R.drawable.visibility_off),
-                            colorResource(id = R.color.colorWhite)
-                        )
-                    }
                     IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
-                            icon,
+                            if (showPassword.value)
+                                ImageVector.vectorResource(R.drawable.visibility)
+                            else
+                                ImageVector.vectorResource(R.drawable.visibility_off),
                             contentDescription = "Visibility",
-                            tint = iconColor
+                            tint = LocalCustomColors.current.itemText
                         )
                     }
                 },
@@ -876,8 +770,7 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
-                ),
+                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
                 label = { LabelText(stringResource(R.string.stun_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
@@ -887,13 +780,11 @@ private fun AccountContent(
     @Composable
     fun RtcpMux() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
+            val rtcpMux by viewModel.rtcpMux.collectAsState()
             Text(text = stringResource(R.string.rtcp_mux),
                 modifier = Modifier
                     .weight(1f)
@@ -904,14 +795,9 @@ private fun AccountContent(
                     },
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
-            var rtcpMux by remember { mutableStateOf(acc.rtcpMux) }
-            newRtcpMux = rtcpMux
             Switch(
                 checked = rtcpMux,
-                onCheckedChange = {
-                    rtcpMux = it
-                    newRtcpMux = rtcpMux
-                }
+                onCheckedChange = { viewModel.rtcpMux.value = it }
             )
         }
     }
@@ -919,13 +805,11 @@ private fun AccountContent(
     @Composable
     fun Rel100() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
+            val rel100 by viewModel.rel100.collectAsState()
             Text(text = stringResource(R.string.rel_100),
                 modifier = Modifier
                     .weight(1f)
@@ -936,28 +820,21 @@ private fun AccountContent(
                     },
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
-            var rel100 by remember { mutableStateOf(acc.rel100Mode == Api.REL100_ENABLED) }
-            new100Rel = rel100
             Switch(
                 checked = rel100,
-                onCheckedChange = {
-                    rel100 = it
-                    new100Rel = rel100
-                }
+                onCheckedChange = { viewModel.rel100.value = it }
             )
         }
     }
 
     @Composable
     fun Dtmf() {
+        val dtmfMode by viewModel.dtmfMode.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to ctx.getString(R.string.dtmf_inband),
                 Api.DTMFMODE_SIP_INFO to ctx.getString(R.string.dtmf_info),
                 Api.DTMFMODE_AUTO to ctx.getString(R.string.dtmf_auto))
@@ -971,11 +848,7 @@ private fun AccountContent(
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
-            val isDropDownExpanded = remember {
-                mutableStateOf(false)
-            }
-            val dtmfMode = remember { mutableIntStateOf(acc.dtmfMode) }
-            newDtmfMode = dtmfMode.intValue
+            val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -984,7 +857,7 @@ private fun AccountContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = dtmfModeMap[dtmfMode.intValue]!!,
+                    Text(text = dtmfModeMap[dtmfMode]!!,
                         color = LocalCustomColors.current.itemText)
                     CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
                         tint = LocalCustomColors.current.itemText)
@@ -1001,8 +874,7 @@ private fun AccountContent(
                         },
                             onClick = {
                                 isDropDownExpanded.value = false
-                                dtmfMode.intValue = it.key
-                                newDtmfMode = dtmfMode.intValue
+                                viewModel.dtmfMode.value = it.key
                             })
                         if (index < 2)
                             HorizontalDivider(
@@ -1018,14 +890,12 @@ private fun AccountContent(
 
     @Composable
     fun Answer() {
+        val answerMode by viewModel.answerMode.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to ctx.getString(R.string.manual),
                 Api.ANSWERMODE_AUTO to ctx.getString(R.string.auto))
             Text(text = stringResource(R.string.answer_mode),
@@ -1038,11 +908,7 @@ private fun AccountContent(
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
-            val isDropDownExpanded = remember {
-                mutableStateOf(false)
-            }
-            var answerMode by remember { mutableIntStateOf(acc.answerMode) }
-            newAnswerMode = answerMode
+            val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -1066,8 +932,7 @@ private fun AccountContent(
                         DropdownMenuItem(text = { Text(text = it.value) },
                             onClick = {
                                 isDropDownExpanded.value = false
-                                answerMode = it.key
-                                newAnswerMode = answerMode
+                                viewModel.answerMode.value = it.key
                             })
                         if (index < 1)
                             HorizontalDivider(
@@ -1083,14 +948,12 @@ private fun AccountContent(
 
     @Composable
     fun Redirect() {
+        val autoRedirect by viewModel.autoRedirect.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val redirectModeMap = mapOf(false to ctx.getString(R.string.manual),
                 true to ctx.getString(R.string.auto))
             Text(text = stringResource(R.string.redirect_mode),
@@ -1103,11 +966,7 @@ private fun AccountContent(
                     },
                 color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp)
-            val isDropDownExpanded = remember {
-                mutableStateOf(false)
-            }
-            var autoRedirect by remember { mutableStateOf(acc.autoRedirect) }
-            newAutoRedirect = autoRedirect
+            val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -1133,8 +992,7 @@ private fun AccountContent(
                         },
                             onClick = {
                                 isDropDownExpanded.value = false
-                                autoRedirect = it.key
-                                newAutoRedirect = autoRedirect
+                                viewModel.autoRedirect.value = it.key
                             })
                         if (index < 1)
                             HorizontalDivider(
@@ -1150,23 +1008,16 @@ private fun AccountContent(
 
     @Composable
     fun Voicemail() {
+        val vmUri by viewModel.vmUri.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var vmUri by remember { mutableStateOf(acc.vmUri) }
-            newVmUri = vmUri
             OutlinedTextField(
                 value = vmUri,
                 placeholder = { Text(stringResource(R.string.voicemail_uri)) },
-                onValueChange = {
-                    vmUri = it
-                    newVmUri = vmUri
-                },
+                onValueChange = { viewModel.vmUri.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -1185,23 +1036,16 @@ private fun AccountContent(
 
     @Composable
     fun CountryCode() {
+        val countryCode by viewModel.countryCode.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var countryCode by remember { mutableStateOf(acc.countryCode) }
-            newCountryCode = countryCode
             OutlinedTextField(
                 value = countryCode,
                 placeholder = { Text(stringResource(R.string.country_code)) },
-                onValueChange = {
-                    countryCode = it
-                    newCountryCode = countryCode
-                },
+                onValueChange = { viewModel.countryCode.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -1220,23 +1064,16 @@ private fun AccountContent(
 
     @Composable
     fun TelProvider() {
+        val telProvider by viewModel.telProvider.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            var telProvider by remember { mutableStateOf(acc.telProvider) }
-            newTelProvider = telProvider
             OutlinedTextField(
                 value = telProvider,
                 placeholder = { Text(stringResource(R.string.telephony_provider)) },
-                onValueChange = {
-                    telProvider = it
-                    newTelProvider = telProvider
-                },
+                onValueChange = { viewModel.telProvider.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -1255,14 +1092,12 @@ private fun AccountContent(
 
     @Composable
     fun NumericKeypad() {
+        val numericKeypad by viewModel.numericKeypad.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             Text(text = stringResource(R.string.numeric_keypad),
                 modifier = Modifier
                     .weight(1f)
@@ -1273,28 +1108,21 @@ private fun AccountContent(
                     },
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
-            var numericKeypad by remember { mutableStateOf(acc.numericKeypad) }
-            newNumericKeypad = numericKeypad
             Switch(
                 checked = numericKeypad,
-                onCheckedChange = {
-                    numericKeypad = it
-                    newNumericKeypad = numericKeypad
-                }
+                onCheckedChange = { viewModel.numericKeypad.value = it }
             )
         }
     }
 
     @Composable
     fun DefaultAccount() {
+        val defaultAccount by viewModel.defaultAccount.collectAsState()
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             Text(text = stringResource(R.string.default_account),
                 modifier = Modifier
                     .weight(1f)
@@ -1305,14 +1133,9 @@ private fun AccountContent(
                     },
                 fontSize = 18.sp,
                 color = LocalCustomColors.current.itemText)
-            var defaultAccount by remember { mutableStateOf(UserAgent.findAorIndex(acc.aor)!! == 0) }
-            newDefaultAccount = defaultAccount
             Switch(
                 checked = defaultAccount,
-                onCheckedChange = {
-                    defaultAccount = it
-                    newDefaultAccount = defaultAccount
-                }
+                onCheckedChange = { viewModel.defaultAccount.value = it }
             )
         }
     }
@@ -1352,13 +1175,7 @@ private fun AccountContent(
         AudioCodecs(navController, aor)
         VideoCodecs(navController, aor)
         MediaEnc()
-        MediaNat(
-            currentMediaNat = mediaNatState,
-            onMediaNatSelected = { selectedMediaNat ->
-                mediaNatState = selectedMediaNat
-                newMediaNat = selectedMediaNat
-            }
-        )
+        MediaNat()
         if (showStun) {
             StunServer()
             StunUser()
@@ -1377,11 +1194,10 @@ private fun AccountContent(
     }
 }
 
-private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
-
+private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgent): Boolean {
     val acc = ua.account
 
-    val nn = newNickname.trim()
+    val nn = viewModel.nickName.value.trim()
     if (nn != acc.nickName) {
         if (Account.checkDisplayName(nn)) {
             if (nn == "" || Account.uniqueNickName(nn)) {
@@ -1403,7 +1219,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
     }
 
-    val dn = newDisplayname.trim()
+    val dn = viewModel.displayName.value.trim()
     if (dn != acc.displayName) {
         if (Account.checkDisplayName(dn)) {
             if (Api.account_set_display_name(acc.accp, dn) == 0) {
@@ -1421,7 +1237,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
     }
 
-    val au = newAuthUser.trim()
+    val au = viewModel.authUser.value.trim()
     if (au != acc.authUser) {
         if (Account.checkAuthUser(au)) {
             if (Api.account_set_auth_user(acc.accp, au) == 0) {
@@ -1442,7 +1258,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
     }
 
-    val ap = newAuthPass.trim()
+    val ap = viewModel.authPass.value.trim()
     if (ap != "") {
         if (ap != acc.authPass) {
             if (Account.checkAuthPass(ap)) {
@@ -1474,7 +1290,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     }
 
     val ob = ArrayList<String>()
-    var ob1 = newOutbound1.trim().replace(" ", "")
+    var ob1 = viewModel.outbound1.value.trim().replace(" ", "")
     if (ob1 != "") {
         if (!ob1.startsWith("sip:"))
             ob1 = "sip:$ob1"
@@ -1488,7 +1304,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             return false
         }
     }
-    var ob2 = newOutbound2.trim().replace(" ", "")
+    var ob2 = viewModel.outbound2.value.trim().replace(" ", "")
     if (ob2 != "") {
         if (!ob2.startsWith("sip:"))
             ob2 = "sip:$ob2"
@@ -1521,7 +1337,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     }
 
     val regInt = try {
-        newRegInt.trim().toInt()
+        viewModel.regInt.value.trim().toInt()
     } catch (_: NumberFormatException) {
         0
     }
@@ -1531,11 +1347,11 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         showAlert.value = true
         return false
     }
-    val reReg = (newRegister != acc.regint > 0) ||
-            (newRegister && regInt != acc.configuredRegInt)
+    val reReg = (viewModel.register.value != acc.regint > 0) ||
+            (viewModel.register.value && regInt != acc.configuredRegInt)
     if (reReg) {
         if (Api.account_set_regint(acc.accp,
-                if (newRegister) regInt else 0) != 0) {
+                if (viewModel.register.value) regInt else 0) != 0) {
             Log.e(TAG, "Setting of regint failed")
         } else {
             acc.regint = Api.account_regint(acc.accp)
@@ -1549,6 +1365,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             acc.configuredRegInt = regInt
     }
 
+    val newMediaEnc = viewModel.mediaEnc.value
     if (newMediaEnc != acc.mediaEnc) {
         if (Api.account_set_mediaenc(acc.accp, newMediaEnc) == 0) {
             acc.mediaEnc = Api.account_mediaenc(acc.accp)
@@ -1558,6 +1375,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
     }
 
+    val newMediaNat = viewModel.mediaNat.value
     if (newMediaNat != acc.mediaNat) {
         if (Api.account_set_medianat(acc.accp, newMediaNat) == 0) {
             acc.mediaNat = Api.account_medianat(acc.accp)
@@ -1567,16 +1385,16 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             Log.e(TAG, "Setting of medianat $newMediaNat failed")
     }
 
-    newStunServer = newStunServer.trim()
-
+    var newStunServer = viewModel.stunServer.value.trim()
     if (newMediaNat != "") {
-        if (((newMediaNat == "stun") || (newMediaNat == "ice")) && (newStunServer == ""))
+        if ((newMediaNat == "stun" || newMediaNat == "ice") && newStunServer == "")
             newStunServer = ctx.getString(R.string.stun_server_default)
         if (!Utils.checkStunUri(newStunServer) ||
             (newMediaNat == "turn" &&
                     newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_server), newStunServer)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_server),
+                newStunServer)
             showAlert.value = true
             return false
         }
@@ -1587,11 +1405,11 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             acc.stunServer = Api.account_stun_uri(acc.accp)
             Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
         } else {
-            Log.e(TAG, "Setting of STUN/TURN URI server failed")
+            Log.e(TAG, "Setting of STUN/TURN URI server $newStunServer failed")
         }
     }
 
-    newStunUser = newStunUser.trim()
+    val newStunUser = viewModel.stunUser.value.trim()
     if (acc.stunUser != newStunUser) {
         if (Account.checkAuthUser(newStunUser)) {
             if (Api.account_set_stun_user(acc.accp, newStunUser) == 0) {
@@ -1599,17 +1417,18 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
                 Log.d(TAG, "New STUN/TURN user is ${acc.stunUser}")
             }
             else
-                Log.e(TAG, "Setting of STUN/TURN user failed")
+                Log.e(TAG, "Setting of STUN/TURN user $newStunUser failed")
         }
         else {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_username), newStunUser)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_username),
+                newStunUser)
             showAlert.value = true
             return false
         }
     }
 
-    val newStunPass = newStunPass.trim()
+    val newStunPass = viewModel.stunPass.value.trim()
     if (acc.stunPass != newStunPass) {
         if (newStunPass.isEmpty() || Account.checkAuthPass(newStunPass)) {
             if (Api.account_set_stun_pass(acc.accp, newStunPass) == 0)
@@ -1619,12 +1438,14 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
         else {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_password), newStunPass)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_password),
+                newStunPass)
             showAlert.value = true
             return false
         }
     }
 
+    val newRtcpMux = viewModel.rtcpMux.value
     if (newRtcpMux != acc.rtcpMux)
         if (Api.account_set_rtcp_mux(acc.accp, newRtcpMux) == 0) {
             acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
@@ -1633,6 +1454,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             Log.e(TAG, "Setting of account_rtc_mux $newRtcpMux failed")
         }
 
+    val new100Rel = viewModel.rel100.value
     if (new100Rel != (acc.rel100Mode == Api.REL100_ENABLED)) {
         val mode = if (new100Rel) Api.REL100_ENABLED else Api.REL100_DISABLED
         if (Api.account_set_rel100_mode(acc.accp, mode) == 0) {
@@ -1640,10 +1462,11 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
             Api.ua_update_account(ua.uap)
             Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
         } else {
-            Log.e(TAG, "Setting of account_rel100Mode failed")
+            Log.e(TAG, "Setting of account_rel100Mode $mode failed")
         }
     }
 
+    val newDtmfMode = viewModel.dtmfMode.value
     if (newDtmfMode != acc.dtmfMode) {
         if (Api.account_set_dtmfmode(acc.accp, newDtmfMode) == 0) {
             acc.dtmfMode = Api.account_dtmfmode(acc.accp)
@@ -1653,6 +1476,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
     }
 
+    val newAnswerMode = viewModel.answerMode.value
     if (newAnswerMode != acc.answerMode) {
         if (Api.account_set_answermode(acc.accp, newAnswerMode) == 0) {
             acc.answerMode = Api.account_answermode(acc.accp)
@@ -1662,20 +1486,22 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         }
     }
 
+    val newAutoRedirect = viewModel.autoRedirect.value
     if (newAutoRedirect != acc.autoRedirect) {
         Api.account_set_sip_autoredirect(acc.accp, newAutoRedirect)
         acc.autoRedirect = newAutoRedirect
         Log.d(TAG, "New autoRedirect is ${acc.autoRedirect}")
     }
 
-    newVmUri = newVmUri.trim()
+    var newVmUri = viewModel.vmUri.value.trim()
     if (newVmUri != acc.vmUri) {
         if (newVmUri != "") {
             if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
             if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
             if (!Utils.checkUri(newVmUri)) {
                 alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), newVmUri)
+                alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri),
+                    newVmUri)
                 showAlert.value = true
                 return false
             }
@@ -1687,11 +1513,12 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         Log.d(TAG, "New voicemail URI is ${acc.vmUri}")
     }
 
-    newCountryCode = newCountryCode.trim()
+    val newCountryCode = viewModel.countryCode.value.trim()
     if (newCountryCode != acc.countryCode) {
         if (newCountryCode != "" && !Utils.checkCountryCode(newCountryCode)) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_country_code), newCountryCode)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_country_code),
+                newCountryCode)
             showAlert.value = true
             return false
         }
@@ -1699,7 +1526,7 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         Log.d(TAG, "New country code is ${acc.countryCode}")
     }
 
-    val hostPart = newTelProvider.trim()
+    val hostPart = viewModel.telProvider.value.trim()
     if (hostPart != acc.telProvider) {
         if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
             alertTitle.value = ctx.getString(R.string.notice)
@@ -1711,12 +1538,13 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
         Log.d(TAG, "New tel provider is ${acc.telProvider}")
     }
 
+    val newNumericKeypad = viewModel.numericKeypad.value
     if (newNumericKeypad != acc.numericKeypad) {
         acc.numericKeypad = newNumericKeypad
         Log.d(TAG, "New numericKeyboard is ${acc.numericKeypad}")
     }
 
-    if (newDefaultAccount) ua.makeDefault()
+    if (viewModel.defaultAccount.value) ua.makeDefault()
 
     Account.saveAccounts()
 
@@ -1726,11 +1554,6 @@ private fun checkOnClick(ctx: Context, ua: UserAgent): Boolean {
     }
     else
         return true
-}
-
-private fun checkOutboundUri(uri: String): Boolean {
-    if (!uri.startsWith("sip:")) return false
-    return Utils.checkHostPortParams(uri.substring(4))
 }
 
 private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
@@ -1850,4 +1673,9 @@ private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
         }
         onConfigLoaded()
     }
+}
+
+private fun checkOutboundUri(uri: String): Boolean {
+    if (!uri.startsWith("sip:")) return false
+    return Utils.checkHostPortParams(uri.substring(4))
 }
