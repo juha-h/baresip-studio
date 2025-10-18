@@ -103,12 +103,13 @@ private fun TopAppBar(title: String, navController: NavController) {
         title = {
             Text(
                 text = title,
-                color = LocalCustomColors.current.light,
                 fontWeight = FontWeight.Bold
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary
+            containerColor = LocalCustomColors.current.primary,
+            navigationIconContentColor = LocalCustomColors.current.onPrimary,
+            titleContentColor = LocalCustomColors.current.onPrimary,
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -116,7 +117,6 @@ private fun TopAppBar(title: String, navController: NavController) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = LocalCustomColors.current.light
                 )
             }
         }

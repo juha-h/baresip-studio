@@ -427,6 +427,9 @@
     <string name="tone_country_help">Soitto-, odotus- ja varattuäänien maa</string>
     <string name="dark_theme">Tumma teema</string>
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
+    <string name="dynamic_colors">Dynaamiset värit</string>
+    <string name="dynamic_colors_help">Käytä dynaamisia värejä, jos ne on otettu käyttöön
+        Android-asetuksissa</string>
     <string name="colorblind">Värisokea</string>
     <string name="colorblind_help">Käytä värisokealle ystävällisiä rekisteröintitilaikoineita</string>
     <string name="proximity_sensing">Läheisyyden tunnistus</string>

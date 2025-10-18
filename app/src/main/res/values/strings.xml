@@ -396,6 +396,8 @@
     <string name="tone_country_help">Country of call ringing, waiting, and callee busy tones</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="dark_theme_help">Force dark display theme</string>
+    <string name="dynamic_colors">Dynamic Colors</string>
+    <string name="dynamic_colors_help">Use dynamic colors if enabled in Android Settings</string>
     <string name="colorblind">Colorblind</string>
     <string name="colorblind_help">Use colorblind friendly registration status icons</string>
     <string name="proximity_sensing">Proximity Sensing</string>">

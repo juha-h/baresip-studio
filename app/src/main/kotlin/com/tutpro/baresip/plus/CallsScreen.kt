@@ -148,12 +148,14 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
         title = {
             Text(
                 text = stringResource(R.string.call_history),
-                color = LocalCustomColors.current.light,
                 fontWeight = FontWeight.Bold
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary
+            containerColor = LocalCustomColors.current.primary,
+            navigationIconContentColor = LocalCustomColors.current.onPrimary,
+            titleContentColor = LocalCustomColors.current.onPrimary,
+            actionIconContentColor = LocalCustomColors.current.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -166,7 +168,6 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = LocalCustomColors.current.light
                 )
             }
         },
@@ -177,7 +178,6 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu",
-                    tint = LocalCustomColors.current.light
                 )
             }
             CustomElements.DropdownMenu(

@@ -82,12 +82,13 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                     title = {
                         Text(
                             text = stringResource(R.string.call_details),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = LocalCustomColors.current.primary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
+                        titleContentColor = LocalCustomColors.current.onPrimary,
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
@@ -95,7 +96,6 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },

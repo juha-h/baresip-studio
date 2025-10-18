@@ -124,6 +124,15 @@ object Config {
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
+        val dynamicColors = previousVariable("dynamic_colors")
+        BaresipService.dynamicColors.value = if (dynamicColors == "yes") {
+            config = "${config}dynamic_colors yes\n"
+            true
+        } else {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            false
+        }
+
         val colorblind = previousVariable("colorblind")
         config = if (colorblind != "")
             "${config}colorblind $colorblind\n"

@@ -148,7 +148,7 @@ object CustomElements {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
-            containerColor = LocalCustomColors.current.grayLight,
+            containerColor = LocalCustomColors.current.onPrimary,
             modifier = Modifier.background(
                 LocalCustomColors.current.popupBackground.copy(alpha = 0.95f)
             )
