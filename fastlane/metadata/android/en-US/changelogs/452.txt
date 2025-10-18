@@ -1,0 +1,3 @@
+- Retain account and settings modifications until check or back button is clicked
+- Use TLS CA File certificates also when pre-configuring account from network
+- Do not leave Settings in case of input error
