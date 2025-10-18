@@ -61,20 +61,21 @@ class Account(val accp: Long) {
             if (ac != "") {
                 audioCodec.add(ac)
                 i++
-            } else {
-                break
             }
+            else
+                break
         }
 
         i = 0
         while (true) {
             val vc = Api.account_video_codec(accp, i)
-            if (vc != "" && !videoCodec.contains(vc)) {
-                videoCodec.add(vc)
+            if (vc != "") {
+                if (!videoCodec.contains(vc))
+                    videoCodec.add(vc)
                 i++
-            } else {
-                break
             }
+            else
+                break
         }
 
         val extra = Api.account_extra(accp)
