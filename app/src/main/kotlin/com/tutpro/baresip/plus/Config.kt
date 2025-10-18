@@ -220,7 +220,7 @@ object Config {
                 ?: continue
             val sizes = streamConfigurationMap.getOutputSizes(ImageFormat.YUV_420_888)
             for (size in sizes)
-                if (size.toString() in defaultSizes)
+                if (size.toString() in defaultSizes && size.toString() !in videoSizes)
                     videoSizes.add(size.toString())
         }
 

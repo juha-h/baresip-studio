@@ -96,8 +96,7 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
             navController = navController,
             onBack = { navController.popBackStack() },
             checkOnClick = {
-                val ok = checkOnClick(ctx, viewModel, ua)
-                if (ok) {
+                if (checkOnClick(ctx, viewModel, ua)) {
                     if (reRegister) ua.reRegister()
                     navController.popBackStack()
                 }
