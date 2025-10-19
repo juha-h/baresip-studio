@@ -13,8 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -66,12 +71,12 @@ fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
 fun AccountsScreen(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -84,9 +89,9 @@ fun AccountsScreen(navController: NavController) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -128,17 +133,23 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
     val showAccounts = remember { mutableStateOf(true) }
 
     if (showAccounts.value && BaresipService.uas.value.isNotEmpty()) {
-        val scrollState = rememberScrollState()
-        Column(
+
+        val lazyListState = rememberLazyListState()
+
+        LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                .verticalScrollbar(scrollState)
-                .verticalScroll(state = scrollState),
+                .verticalScrollbar(
+                    state = lazyListState,
+                    width = 4.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                ),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            for (ua in BaresipService.uas.value) {
+            items(BaresipService.uas.value) { ua ->
                 val account = ua.account
                 val aor = account.aor
                 val text = account.text()
@@ -148,13 +159,16 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                     Text(
                         text = text,
                         fontSize = 20.sp,
-                        color = LocalCustomColors.current.itemText,
-                        modifier = Modifier.weight(1f).padding(start = 10.dp)
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
                             .clickable {
                                 navController.navigate("account/$aor/old")
                             }
                     )
                     SmallFloatingActionButton(
+                        modifier = Modifier.padding(end = 8.dp),
                         onClick = {
                             message.value = String.format(
                                 ctx.getString(R.string.delete_account),
@@ -280,6 +294,7 @@ fun NewAccount(navController: NavController) {
             )
         )
         SmallFloatingActionButton(
+            modifier = Modifier.offset(y = 2.dp),
             onClick = {
                 val account = createNew(ctx, newAor.trim())
                 if (account != null) {
@@ -293,6 +308,7 @@ fun NewAccount(navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
+                modifier = Modifier.size(36.dp),
                 contentDescription = stringResource(R.string.add)
             )
         }

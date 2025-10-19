@@ -2,6 +2,7 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.os.Build.VERSION
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,7 +10,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,6 +28,7 @@ fun AppTheme(
     val useDynamicColors by remember { BaresipService.dynamicColors }
 
     val useActualDynamicColors = useDynamicColors && VERSION.SDK_INT >= 31
+
     Log.d(TAG, "Use actual dynamic colors: $useActualDynamicColors")
 
     val colorScheme = when {
@@ -37,51 +38,71 @@ fun AppTheme(
             else
                 dynamicLightColorScheme(context)
         }
-        useDarkTheme || isSystemInDarkTheme() -> darkColorScheme()
-        else -> lightColorScheme()
-    }
-
-    val basePalette = if (useDarkTheme) DarkCustomColors else LightCustomColors
-
-    val customColorsPalette = basePalette.copy(
-            background = colorScheme.background,
-            onBackground = if (useActualDynamicColors)
-                colorScheme.onBackground
-            else
-                basePalette.onBackground,
-            cardBackground = colorScheme.surfaceVariant,
-            textFieldBackground = colorScheme.surfaceVariant,
-            primary = if (useActualDynamicColors)
-                colorScheme.primary
-            else
-                basePalette.primary,
-            onPrimary = if (useActualDynamicColors)
-                colorScheme.onPrimary
-            else
-                basePalette.onPrimary
+        useDarkTheme || isSystemInDarkTheme() -> darkColorScheme(
+            primary = dark_primary,
+            onPrimary = dark_on_primary,
+            primaryContainer = dark_primary_container,
+            onPrimaryContainer = dark_on_primary_container,
+            secondary = dark_secondary,
+            onSecondary = dark_on_secondary,
+            secondaryContainer = dark_secondary_container,
+            onSecondaryContainer = dark_on_secondary_container,
+            tertiary = dark_tertiary,
+            onTertiary = dark_on_tertiary,
+            tertiaryContainer = dark_tertiary_container,
+            onTertiaryContainer = dark_on_tertiary_container,
+            error = dark_error,
+            onError = dark_on_error,
+            errorContainer = dark_error_container,
+            onErrorContainer = dark_on_error_container,
+            background = dark_background,
+            onBackground = dark_on_background,
+            surface = dark_surface,
+            onSurface = dark_on_surface,
+            surfaceVariant = dark_surfaceVariant,
+            onSurfaceVariant = dark_on_surfaceVariant,
+            outline = dark_outline
         )
+        else -> lightColorScheme(
+            primary = light_primary,
+            onPrimary = light_on_primary,
+            primaryContainer = light_primary_container,
+            onPrimaryContainer = light_on_primary_container,
+            secondary = light_secondary,
+            onSecondary = light_on_secondary,
+            secondaryContainer = light_secondary_container,
+            onSecondaryContainer = light_on_secondary_container,
+            tertiary = light_tertiary,
+            onTertiary = light_on_tertiary,
+            tertiaryContainer = light_tertiary_container,
+            onTertiaryContainer = light_on_tertiary_container,
+            error = light_error,
+            onError = light_on_error,
+            errorContainer = light_error_container,
+            onErrorContainer = light_on_error_container,
+            background = light_background,
+            onBackground = light_on_background,
+            surface = light_surface,
+            onSurface = light_on_surface,
+            surfaceVariant = light_surfaceVariant,
+            onSurfaceVariant = light_on_surfaceVariant,
+            outline = light_outline
+        )
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
-
-            // A common threshold for luminance is 0.5. Colors with luminance > 0.5 are considered light.
-            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(customColorsPalette.background.toArgb()) > 0.5
-
+            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
             insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
             insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
         }
     }
 
-    CompositionLocalProvider(
-        LocalCustomColors provides customColorsPalette
-    ) {
-        MaterialTheme(
-            colorScheme = colorScheme, // MaterialTheme still uses the "normal" colorScheme
-            content = content
-        )
-    }
-
+    MaterialTheme(
+        colorScheme = colorScheme,
+        content = content
+    )
 }

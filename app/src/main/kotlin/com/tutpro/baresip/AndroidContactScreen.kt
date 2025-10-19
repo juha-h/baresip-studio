@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -53,6 +54,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.androidContactScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable(
@@ -79,12 +81,12 @@ private fun ContactScreen(ctx: Context, viewModel: ViewModel, navController: Nav
     }
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(name, navController)
@@ -107,9 +109,9 @@ private fun TopAppBar(title: String, navController: NavController) {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -134,7 +136,7 @@ private fun ContactContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LocalCustomColors.current.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -192,7 +194,7 @@ private fun ContactName(name: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        Text(name, fontSize = 24.sp, color = LocalCustomColors.current.itemText)
+        Text(name, fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
@@ -208,7 +210,7 @@ private fun Uris(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 4.dp)
-            .background(LocalCustomColors.current.background),
+            .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -220,11 +222,11 @@ private fun Uris(
                     text = uri.substringAfter(":"),
                     modifier = Modifier.weight(1f),
                     fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 Image(
                     painter = painterResource(R.drawable.message),
-                    colorFilter = ColorFilter.tint(LocalCustomColors.current.itemText),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                     contentDescription = "Send Message",
                     modifier = Modifier.padding(end = 24.dp).clickable {
                         val aor = viewModel.selectedAor.value
@@ -245,7 +247,7 @@ private fun Uris(
                 )
                 Image(
                     painter = painterResource(R.drawable.call_small),
-                    colorFilter = ColorFilter.tint(LocalCustomColors.current.itemText),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                     contentDescription = "Call",
                     modifier = Modifier.clickable {
                         val aor = viewModel.selectedAor.value

@@ -35,6 +35,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -47,6 +49,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -148,13 +151,15 @@ private fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -167,10 +172,10 @@ private fun SettingsScreen(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
-                        actionIconContentColor = LocalCustomColors.current.onPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     navigationIcon = {
                         IconButton(onClick = onBack) {
@@ -1247,39 +1252,45 @@ private fun SettingsContent(
         save = true
     }
 
-    val scrollState = rememberScrollState()
+    val lazyListState = rememberLazyListState()
 
-    Column(
+    LazyColumn(
+        state = lazyListState,
         modifier = Modifier
             .fillMaxWidth()
             .padding(contentPadding)
             .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
-            .verticalScrollbar(scrollState)
-            .verticalScroll(state = scrollState),
+            .verticalScrollbar(
+                state = lazyListState,
+                width = 4.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            ),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        StartAutomatically()
-        ListenAddress()
-        AddressFamily()
-        DnsServers()
-        TlsCertificateFile(activity)
-        VerifyServer()
-        CaFile(activity)
-        UserAgent()
-        AudioSettings(navController)
-        Contacts(activity)
-        Ringtone(ctx)
-        BatteryOptimizations()
-        DarkTheme()
-        if (VERSION.SDK_INT >= 31)
-            DynamicColors()
-        ColorBlind()
-        ProximitySensing()
-        if (VERSION.SDK_INT >= 29)
-            DefaultDialer()
-        Debug()
-        SipTrace()
-        Reset(onRestartApp)
+        item { StartAutomatically() }
+        item { ListenAddress() }
+        item { AddressFamily() }
+        item { DnsServers() }
+        item { TlsCertificateFile(activity) }
+        item { VerifyServer() }
+        item { CaFile(activity) }
+        item { UserAgent() }
+        item { AudioSettings(navController) }
+        item { Contacts(activity) }
+        item { Ringtone(ctx) }
+        item { BatteryOptimizations() }
+        item { DarkTheme() }
+        if (VERSION.SDK_INT >= 31) {
+            item { DynamicColors() }
+        }
+        item { ColorBlind() }
+        item { ProximitySensing() }
+        if (VERSION.SDK_INT >= 29) {
+            item { DefaultDialer() }
+        }
+        item { Debug() }
+        item { SipTrace() }
+        item { Reset(onRestartApp) }
     }
 }
 

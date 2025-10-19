@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -152,10 +153,10 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
-            actionIconContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -275,9 +276,9 @@ private fun Calls(
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
-                color = LocalCustomColors.current.gray
+                color = MaterialTheme.colorScheme.outlineVariant
             )
-            .background(LocalCustomColors.current.background),
+            .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -398,13 +399,13 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text("...", color = LocalCustomColors.current.itemText)
+                            Text("...", color = MaterialTheme.colorScheme.onPrimaryContainer)
                         Text(text = Utils.friendlyUri(ctx, peerUri, account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            color = LocalCustomColors.current.itemText
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
@@ -415,9 +416,9 @@ private fun Calls(
                     lineHeight = 16.sp,
                     textAlign = TextAlign.End,
                     color = if (recordings)
-                        LocalCustomColors.current.accent
+                        MaterialTheme.colorScheme.error
                     else
-                        LocalCustomColors.current.itemText,
+                        MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable(onClick = {

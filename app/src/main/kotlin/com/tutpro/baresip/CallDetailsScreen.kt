@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -86,9 +87,9 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
@@ -164,8 +165,7 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
         modifier = Modifier.fillMaxWidth()
             .verticalScrollbar(
                 state = lazyListState,
-                width = 4.dp,
-                color = LocalCustomColors.current.gray
+                width = 4.dp
             )
             .background(LocalCustomColors.current.background),
         state = lazyListState,

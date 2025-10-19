@@ -42,6 +42,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -196,12 +197,12 @@ private fun ContactScreen(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(title, onBack = onBack, onCheck = onCheck)
@@ -235,10 +236,10 @@ private fun TopAppBar(title: String, onBack: () -> Unit, onCheck: () -> Unit) {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
-            actionIconContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -285,7 +286,7 @@ private fun ContactContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LocalCustomColors.current.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -438,7 +439,7 @@ private fun Avatar(
 
 @Composable
 private fun ContactName(name: String, new: Boolean, onNameChange: (String) -> Unit) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     OutlinedTextField(
         value = name,
         placeholder = { Text(stringResource(R.string.contact_name)) },
@@ -447,7 +448,7 @@ private fun ContactName(name: String, new: Boolean, onNameChange: (String) -> Un
             .fillMaxWidth()
             .focusRequester(focusRequester),
         textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 18.sp, color = LocalCustomColors.current.itemText
+            fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground
         ),
         label = { Text(stringResource(R.string.contact_name)) },
         keyboardOptions = KeyboardOptions(
@@ -469,7 +470,7 @@ private fun ContactUri(uri: String, onUriChange: (String) -> Unit) {
         onValueChange = onUriChange,
         modifier = Modifier.fillMaxWidth(),
         textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 18.sp, color = LocalCustomColors.current.itemText
+            fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground
         ),
         label = { Text(stringResource(R.string.sip_or_tel_uri)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -492,7 +493,7 @@ private fun Favorite(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean
                     alertMessage.value = ctx.getString(R.string.favorite_help)
                     showAlert.value = true
                 },
-            color = LocalCustomColors.current.itemText,
+            color = MaterialTheme.colorScheme.onBackground,
         )
         Switch(
             checked = favorite,
@@ -511,7 +512,7 @@ private fun Android(android: Boolean, onAndroidChange: (Boolean) -> Unit) {
         Text(
             text = stringResource(R.string.android),
             modifier = Modifier.weight(1f),
-            color = LocalCustomColors.current.itemText
+            color = MaterialTheme.colorScheme.onBackground
         )
         Switch(
             checked = android,

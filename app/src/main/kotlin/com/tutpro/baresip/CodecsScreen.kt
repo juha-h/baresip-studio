@@ -234,8 +234,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
             .padding(end = 4.dp)
             .verticalScrollbar(
                 state = draggableState.listState,
-                width = 4.dp,
-                color = LocalCustomColors.current.gray
+                width = 4.dp
             ),
         state = draggableState.listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp),

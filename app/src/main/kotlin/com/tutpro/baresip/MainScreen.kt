@@ -65,8 +65,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -456,12 +458,12 @@ private fun MainScreen(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -525,8 +527,9 @@ private fun TopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            titleContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
@@ -542,11 +545,13 @@ private fun TopAppBar(
                                 recImage = if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
                                     recOnImage
-                                } else {
+                                }
+                                else {
                                     Api.module_unload("sndfile")
                                     recOffImage
                                 }
-                            } else
+                            }
+                            else
                                 Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT)
                                     .show()
                         },
@@ -557,9 +562,9 @@ private fun TopAppBar(
                         }
                     ),
                 tint = if (BaresipService.isRecOn)
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -576,7 +581,8 @@ private fun TopAppBar(
                                 if (BaresipService.isMicMuted) {
                                     viewModel.updateMicIcon(R.drawable.mic_off)
                                     Api.calls_mute(true)
-                                } else {
+                                }
+                                else {
                                     viewModel.updateMicIcon(R.drawable.mic_on)
                                     Api.calls_mute(false)
                                 }
@@ -589,9 +595,9 @@ private fun TopAppBar(
                         },
                     ),
                 tint = if (BaresipService.isMicMuted)
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -623,9 +629,9 @@ private fun TopAppBar(
                         },
                     ),
                 tint = if (Utils.isSpeakerPhoneOn(am))
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -637,7 +643,7 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu",
-                    tint = LocalCustomColors.current.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -715,9 +721,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     contentDescription = null,
                     Modifier.size(buttonSize),
                     tint = if (vmIcon == R.drawable.voicemail)
-                        LocalCustomColors.current.onBackground
+                        MaterialTheme.colorScheme.secondary
                     else
-                        LocalCustomColors.current.accent
+                        MaterialTheme.colorScheme.error
                 )
             }
 
@@ -731,7 +737,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(R.drawable.contacts),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = LocalCustomColors.current.onBackground
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
 
@@ -749,9 +755,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (messagesIcon == R.drawable.messages)
-                    LocalCustomColors.current.onBackground
+                    MaterialTheme.colorScheme.secondary
                 else
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
             )
         }
 
@@ -769,9 +775,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (callsIcon == R.drawable.calls)
-                    LocalCustomColors.current.onBackground
+                    MaterialTheme.colorScheme.secondary
                 else
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
             )
         }
 
@@ -792,9 +798,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
                 tint = if (dialpadIcon == R.drawable.dialpad_off)
-                    LocalCustomColors.current.onBackground
+                    MaterialTheme.colorScheme.secondary
                 else
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
             )
         }
     }
@@ -916,7 +922,8 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        } else if (offset > swipeThreshold) {
+                        }
+                        else if (offset > swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                 val newPos = when (curPos) {
@@ -1013,7 +1020,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1027,8 +1035,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     )
                 },
             colors = ButtonColors(
-                containerColor = LocalCustomColors.current.grayLight,
-                contentColor = LocalCustomColors.current.dark,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 disabledContainerColor = LocalCustomColors.current.grayLight,
                 disabledContentColor = LocalCustomColors.current.dark
             ),
@@ -1064,7 +1072,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1087,8 +1096,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             androidx.compose.material3.DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
             ) {
-                uas.value.forEachIndexed { _, ua ->
+                uas.value.forEachIndexed { index, ua ->
                     val acc = ua.account
                     DropdownMenuItem(
                         onClick = {
@@ -1110,6 +1120,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             )
                         }
                     )
+                    if (index < uas.value.size - 1) {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    }
                 }
             }
         }
@@ -1204,8 +1217,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .verticalScrollbar(
-                                    state = lazyListState,
-                                    color = LocalCustomColors.current.gray
+                                    state = lazyListState
                                 ),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
@@ -1494,7 +1506,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                 Text(
                                     text = stringResource(R.string.call_transfer),
                                     fontSize = 20.sp,
-                                    color = LocalCustomColors.current.alert,
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                                 var transferUri by remember { mutableStateOf("") }
                                 val suggestions by remember { contactNames }
@@ -1569,8 +1581,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .verticalScrollbar(
-                                                        state = lazyListState,
-                                                        color = LocalCustomColors.current.gray
+                                                        state = lazyListState
                                                     ),
                                                 horizontalAlignment = Alignment.Start,
                                                 state = lazyListState,
@@ -1696,7 +1707,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                 else
                                                     R.string.call
                                             ).uppercase(),
-                                            color = LocalCustomColors.current.primary
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 }
@@ -1819,7 +1830,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 private fun OnHoldNotice() {
     OutlinedButton(
         onClick = {},
-        border = BorderStroke(1.dp, LocalCustomColors.current.accent),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
         modifier = Modifier.padding(16.dp),
         shape = RoundedCornerShape(20)
     ) {
