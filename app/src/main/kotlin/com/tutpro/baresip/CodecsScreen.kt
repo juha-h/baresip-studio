@@ -118,12 +118,14 @@ private fun CodecsScreen(
                                 stringResource(R.string.audio_codecs)
                             else
                                 stringResource(R.string.video_codecs),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = LocalCustomColors.current.primary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
+                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        actionIconContentColor = LocalCustomColors.current.onPrimary
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
@@ -131,7 +133,6 @@ private fun CodecsScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
@@ -141,7 +142,6 @@ private fun CodecsScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Check,
-                                tint = LocalCustomColors.current.light,
                                 contentDescription = "Check"
                             )
                         }

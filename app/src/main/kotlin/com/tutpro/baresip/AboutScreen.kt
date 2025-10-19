@@ -58,7 +58,6 @@ private fun AboutScreen(onBack: () -> Unit) {
                     title = {
                         Text(
                             text = stringResource(R.string.about_title),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -67,12 +66,13 @@ private fun AboutScreen(onBack: () -> Unit) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = LocalCustomColors.current.primary,
+                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 )
