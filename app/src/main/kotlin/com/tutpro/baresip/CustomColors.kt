@@ -1,59 +1,9 @@
 package com.tutpro.baresip
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.runtime.compositionLocalOf
 
-@Immutable
-data class CustomColors(
-    // standard colors
-    val primary: Color = Color.Unspecified,
-    val onPrimary: Color = Color.Unspecified,
-    val primaryContainer: Color = Color.Unspecified,
-    val onPrimaryContainer: Color = Color.Unspecified,
-    val secondary: Color = Color.Unspecified,
-    val onSecondary: Color = Color.Unspecified,
-    val secondaryContainer: Color = Color.Unspecified,
-    val onSecondaryContainer: Color = Color.Unspecified,
-    val tertiary: Color = Color.Unspecified,
-    val onTertiary: Color = Color.Unspecified,
-    val tertiaryContainer: Color = Color.Unspecified,
-    val onTertiaryContainer: Color = Color.Unspecified,
-    val error: Color = Color.Unspecified,
-    val onError: Color = Color.Unspecified,
-    val errorContainer: Color = Color.Unspecified,
-    val onErrorContainer: Color = Color.Unspecified,
-    val background: Color = Color.Unspecified,
-    val onBackground: Color = Color.Unspecified,
-    val surface: Color = Color.Unspecified,
-    val onSurface: Color = Color.Unspecified,
-    val surfaceVariant: Color = Color.Unspecified,
-    val onSurfaceVariant: Color = Color.Unspecified,
-    val outline: Color = Color.Unspecified,
-    // custom colors
-    val primaryDark: Color = Color.Unspecified,
-    val primaryLight: Color = Color.Unspecified,
-    val secondaryDark: Color = Color.Unspecified,
-    val secondaryLight: Color = Color.Unspecified,
-    val grayDark: Color = Color.Unspecified,
-    val grayLight: Color = Color.Unspecified,
-    val accent: Color = Color.Unspecified,
-    val baresip: Color = Color.Unspecified,
-    val trafficGreen: Color = Color.Unspecified,
-    val trafficYellow: Color = Color.Unspecified,
-    val trafficRed: Color = Color.Unspecified,
-    val light: Color = Color.Unspecified,
-    val dark: Color = Color.Unspecified,
-    val spinnerText: Color = Color.Unspecified,
-    val spinnerDropdown: Color = Color.Unspecified,
-    val itemText: Color = Color.Unspecified,
-    val alertText: Color = Color.Unspecified,
-    val codec: Color = Color.Unspecified,
-    val cardBackground: Color = Color.Unspecified,
-    val textFieldBackground: Color = Color.Unspecified,
-    val popupBackground: Color = Color.Unspecified,
-    val alert: Color = Color.Unspecified
-)
+// App's color palette is defined by these values, which are used to build
+// the MaterialTheme in AppTheme.kt
 
 val light_primary = Color(0xff0ca1fd)
 val light_on_primary = Color(0xFFFFFFFF)
@@ -67,7 +17,7 @@ val light_tertiary = Color(0xFF9885B5)
 val light_on_tertiary = Color(0xffe0e0e0)
 val light_tertiary_container = Color(0xFFDAD2E6)
 val light_on_tertiary_container = Color(0xFF2B2533)
-val light_error = Color(0xFFB3261E) // Color(0xFFF77445)
+val light_error = Color(0xFFB3261E)
 val light_on_error = Color(0xffe0e0e0)
 val light_error_container = Color(0xFFE6BFB1)
 val light_on_error_container = Color(0xFF33180E)
@@ -78,20 +28,6 @@ val light_on_surface = Color(0xFF313233)
 val light_surfaceVariant = Color(0xFFd8e0e6)
 val light_on_surfaceVariant = Color(0xFF535f66)
 val light_outline = Color(0xFF7c8e99)
-val light_primary_dark = Color(0xff0073c9)
-val light_primary_light = Color(0xff6ad2ff)
-val light_secondary_dark = Color(0xFF008873)
-val light_secondary_light = Color(0xff5cecd2)
-val light_gray_dark = Color(0xFF424242)
-val light_gray_light = Color(0xffe0e0e0)
-val light_accent = Color(0xFFF77445)
-val light_light = Color(0xfffcfcfc)
-val light_dark = Color(0xFF383838)
-val light_item_text = light_dark
-val light_textfield_background = light_gray_light
-val light_card_background = light_gray_light
-val light_popup_background = light_secondary_dark
-val light_alert = light_primary
 
 val dark_primary = Color(0xFF84C1E6)
 val dark_on_primary = Color(0xFF04314C)
@@ -116,102 +52,3 @@ val dark_on_surface = Color(0xFFe2e4e6)
 val dark_surfaceVariant = Color(0xFF535f66)
 val dark_on_surfaceVariant = Color(0xFFd2dee6)
 val dark_outline = Color(0xFF9daab3)
-val dark_primary_dark = Color(0xff00008b)
-val dark_primary_light = Color(0xff0ca1fd)
-val dark_secondary_dark = Color(0xFF008873)
-val dark_secondary_light = Color(0xff5cecd2)
-val dark_gray = Color(0xff9e9e9e)
-val dark_gray_dark = Color(0xFF424242)
-val dark_gray_light = Color(0xffe0e0e0)
-val dark_accent = Color(0xFFF77445)
-val dark_light = dark_gray_light
-val dark_dark = Color(0xFF121212)
-val dark_item_text = dark_gray_light
-val dark_textfield_background = dark_gray
-val dark_card_background = dark_gray_dark
-val dark_popup_background = dark_secondary_dark
-val dark_alert = dark_primary_light
-
-val LightCustomColors = CustomColors(
-    primary = light_primary,
-    onPrimary = light_on_primary,
-    primaryContainer = light_primary_container,
-    onPrimaryContainer = light_on_primary_container,
-    secondary = light_secondary,
-    onSecondary = light_on_secondary,
-    secondaryContainer = light_secondary_container,
-    onSecondaryContainer = light_on_secondary_container,
-    tertiary = light_tertiary,
-    onTertiary = light_on_tertiary,
-    tertiaryContainer = light_tertiary_container,
-    onTertiaryContainer = light_on_tertiary_container,
-    error = light_error,
-    onError = light_on_error,
-    errorContainer = light_error_container,
-    onErrorContainer = light_on_error_container,
-    background = light_background,
-    onBackground = light_on_background,
-    surface = light_surface,
-    onSurface = light_on_surface,
-    surfaceVariant = light_surfaceVariant,
-    onSurfaceVariant = light_on_surfaceVariant,
-    outline = light_outline,
-
-    primaryDark = light_primary_dark,
-    primaryLight = light_primary_light,
-    secondaryDark = light_secondary_dark,
-    secondaryLight = light_secondary_light,
-    grayDark = light_gray_dark,
-    grayLight = light_gray_light,
-    accent = light_accent,
-    light = light_light,
-    dark = light_dark,
-    itemText = light_item_text,
-    cardBackground = light_card_background,
-    textFieldBackground = light_textfield_background,
-    popupBackground = light_popup_background,
-    alert = light_alert,
-)
-
-val DarkCustomColors = CustomColors(
-    primary = dark_primary,
-    onPrimary = dark_on_primary,
-    primaryContainer = dark_primary_container,
-    onPrimaryContainer = dark_on_primary_container,
-    secondary = dark_secondary,
-    onSecondary = dark_on_secondary,
-    secondaryContainer = dark_secondary_container,
-    onSecondaryContainer = dark_on_secondary_container,
-    tertiary = dark_tertiary,
-    onTertiary = dark_on_tertiary,
-    tertiaryContainer = dark_tertiary_container,
-    onTertiaryContainer = dark_on_tertiary_container,
-    error = dark_error,
-    onError = dark_on_error,
-    errorContainer = dark_error_container,
-    onErrorContainer = dark_on_error_container,
-    background = dark_background,
-    onBackground = dark_on_background,
-    surface = dark_surface,
-    onSurface = dark_on_surface,
-    surfaceVariant = dark_surfaceVariant,
-    onSurfaceVariant = dark_on_surfaceVariant,
-    outline = dark_outline,
-
-    primaryDark = dark_primary_dark,
-    primaryLight = dark_primary_light,
-    secondaryDark = dark_secondary_dark,
-    secondaryLight = dark_secondary_light,
-    grayDark = dark_gray_dark,
-    grayLight = dark_gray_light,
-    accent = dark_accent,
-    light = dark_light,
-    dark = dark_dark,
-    itemText = dark_item_text,
-    cardBackground = dark_card_background,
-    textFieldBackground = dark_textfield_background,
-    popupBackground = dark_popup_background,
-    alert = dark_alert,
-)
-
-val LocalCustomColors = compositionLocalOf { CustomColors() }
