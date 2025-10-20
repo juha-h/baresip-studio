@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="colorBackground">#fcfcfc</color>
     <color name="colorPrimary">#0ca1fd</color>
     <color name="colorPrimaryDark">#0073c9</color>
     <color name="colorPrimaryLight">#6ad2ff</color>
@@ -25,10 +24,4 @@
     <color name="colorSpinnerText">@color/colorDark</color>
     <color name="colorSpinnerDropdown">@color/colorGrayLight</color>
     <color name="colorSpinnerDivider">@color/colorGray</color>
-    <color name="colorItemText">@color/colorBlack</color>
-    <color name="colorAlertText">@color/colorBlack</color>
-    <color name="colorCodec">@color/colorBlack</color>
-    <color name="colorCardBackground">@color/colorGrayLight</color>
-    <color name="colorPopupBackground">@color/colorSecondaryDark</color>
-    <color name="colorAlert">@color/colorPrimary</color>
 </resources>

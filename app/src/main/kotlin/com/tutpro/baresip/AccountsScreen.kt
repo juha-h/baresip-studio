@@ -57,7 +57,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
@@ -283,11 +282,12 @@ fun NewAccount(navController: NavController) {
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = "Clear",
-                        modifier = Modifier.clickable { newAor = "" }
+                        modifier = Modifier.clickable { newAor = "" },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
-            label = { LabelText(stringResource(R.string.new_account)) },
+            label = { Text(stringResource(R.string.new_account)) },
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -303,8 +303,8 @@ fun NewAccount(navController: NavController) {
                     focusManager.clearFocus()
                 }
             },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,

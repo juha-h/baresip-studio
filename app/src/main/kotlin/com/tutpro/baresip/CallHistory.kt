@@ -19,7 +19,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
 
     fun add() {
         BaresipService.callHistory.add(this)
-        var aorSpecificHistory = BaresipService.callHistory.filter { it.aor == this.aor }
+        val aorSpecificHistory = BaresipService.callHistory.filter { it.aor == this.aor }
         if (aorSpecificHistory.size > CALL_HISTORY_SIZE) {
             val oldestToRemove = aorSpecificHistory.first()
             if (oldestToRemove.recording[0].isNotEmpty())

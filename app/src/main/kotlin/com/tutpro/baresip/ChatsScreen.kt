@@ -85,7 +85,6 @@ import coil.compose.AsyncImage
 import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.DropdownMenu
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.text.DateFormat
@@ -252,10 +251,7 @@ private fun ChatsContent(
 private fun Account(account: Account) {
     Text(
         text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 8.dp),
-        color = LocalCustomColors.current.itemText,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -345,7 +341,7 @@ private fun Chats(
                     RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp)
                 }
                 val borderStroke = if (account.unreadMessages && Message.unreadMessagesFromPeer(aor, message.peerUri)) {
-                    BorderStroke(width = 2.dp, color = LocalCustomColors.current.alert)
+                    BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
                 } else {
                     null
                 }
@@ -506,21 +502,20 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                     modifier = Modifier
                         .shadow(8.dp, RoundedCornerShape(8.dp))
                         .background(
-                            LocalCustomColors.current.grayLight,
+                            color = MaterialTheme.colorScheme.surfaceContainer,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .animateContentSize()
                 ) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 150.dp)
+                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)
                     ) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(max = 180.dp)
                                 .verticalScrollbar(
-                                    state = lazyListState
+                                    state = lazyListState,
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 ),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
@@ -541,7 +536,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                                     Text(
                                         text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = LocalCustomColors.current.grayDark,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -577,22 +572,17 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                         Icon(
                             Icons.Outlined.Clear,
                             contentDescription = null,
-                            modifier = Modifier
-                                .clickable {
-                                    if (showSuggestions)
-                                        showSuggestions = false
-                                    else
-                                        newPeer = ""
-                                }
+                            modifier = Modifier.clickable {
+                                if (showSuggestions)
+                                    showSuggestions = false
+                                else
+                                    newPeer = ""
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 },
-                label = {
-                    LabelText(stringResource(R.string.new_chat_peer))
-                },
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText
-                ),
+                label = { Text(stringResource(R.string.new_chat_peer)) },
+                textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
@@ -622,8 +612,8 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 newPeer = ""
                 focusManager.clearFocus()
             },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,

@@ -447,9 +447,7 @@ private fun ContactName(name: String, new: Boolean, onNameChange: (String) -> Un
         modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground
-        ),
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
         label = { Text(stringResource(R.string.contact_name)) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
@@ -469,9 +467,7 @@ private fun ContactUri(uri: String, onUriChange: (String) -> Unit) {
         placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
         onValueChange = onUriChange,
         modifier = Modifier.fillMaxWidth(),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground
-        ),
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
         label = { Text(stringResource(R.string.sip_or_tel_uri)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
     )
@@ -486,8 +482,7 @@ private fun Favorite(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean
     ) {
         Text(
             text = stringResource(R.string.favorite),
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = ctx.getString(R.string.favorite)
                     alertMessage.value = ctx.getString(R.string.favorite_help)
@@ -512,7 +507,7 @@ private fun Android(android: Boolean, onAndroidChange: (Boolean) -> Unit) {
         Text(
             text = stringResource(R.string.android),
             modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.onBackground
+            //color = MaterialTheme.colorScheme.onBackground
         )
         Switch(
             checked = android,

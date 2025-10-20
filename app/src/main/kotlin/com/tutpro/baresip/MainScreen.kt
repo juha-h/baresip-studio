@@ -71,7 +71,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -129,7 +128,6 @@ import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.DropdownMenu
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.PasswordDialog
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -988,10 +986,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 .height(50.dp)
                 .fillMaxWidth(),
             colors = ButtonColors(
-                containerColor = LocalCustomColors.current.grayLight,
-                contentColor = LocalCustomColors.current.dark,
-                disabledContainerColor = LocalCustomColors.current.grayLight,
-                disabledContentColor = LocalCustomColors.current.dark
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(12.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
@@ -1037,8 +1035,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledContainerColor = LocalCustomColors.current.grayLight,
-                disabledContentColor = LocalCustomColors.current.dark
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(12.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
@@ -1149,8 +1147,10 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 value = callUri.value,
                 enabled = callUriEnabled.value,
                 singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = OutlinedTextFieldDefaults.colors().unfocusedIndicatorColor),
+                //colors = OutlinedTextFieldDefaults.colors(
+                //    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                //    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                //),
                 onValueChange = {
                     if (it != callUri.value) {
                         callUri.value = it
@@ -1164,13 +1164,13 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     if (callUriEnabled.value && callUri.value.isNotEmpty())
                         Icon(Icons.Outlined.Clear,
                             contentDescription = null,
-                            modifier = Modifier
-                                .clickable {
-                                    if (showSuggestions.value)
-                                        showSuggestions.value = false
-                                    else
-                                        callUri.value = ""
-                                }
+                            modifier = Modifier.clickable {
+                                if (showSuggestions.value)
+                                    showSuggestions.value = false
+                                else
+                                    callUri.value = ""
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 },
                 modifier = Modifier
@@ -1183,16 +1183,8 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             if (account.numericKeypad)
                                 viewModel.updateDialpadIcon(R.drawable.dialpad_on)
                     },
-                label = {
-                    LabelText(
-                        text = callUriLabel.value,
-                        fontSize = 18.sp,
-                    )
-                },
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText
-                ),
+                label = { Text(text = callUriLabel.value, fontSize = 18.sp) },
+                textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
                     KeyboardOptions(keyboardType = KeyboardType.Phone)
                 else
@@ -1204,7 +1196,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(8.dp))
                     .background(
-                        LocalCustomColors.current.grayLight,
+                        color = MaterialTheme.colorScheme.surfaceContainer,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .animateContentSize()
@@ -1217,7 +1209,8 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .verticalScrollbar(
-                                    state = lazyListState
+                                    state = lazyListState,
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 ),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
@@ -1238,7 +1231,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                     Text(
                                         text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = LocalCustomColors.current.grayDark,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -1249,7 +1242,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             }
         }
         if (showCallTimer.value) {
-            val textColor = LocalCustomColors.current.itemText.toArgb()
+            val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
             var chronometerInstance: Chronometer? = null
             AndroidView(
                 factory = { context ->
@@ -1499,7 +1492,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = LocalCustomColors.current.cardBackground
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -1540,23 +1533,16 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                         showSuggestions.value = false
                                                     else
                                                         transferUri = ""
-                                                }
+                                                },
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            start = 4.dp,
-                                            end = 4.dp,
-                                            top = 12.dp,
-                                            bottom = 2.dp
-                                        )
+                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                                         .focusRequester(focusRequester),
-                                    label = { LabelText(stringResource(R.string.transfer_destination)) },
-                                    textStyle = TextStyle(
-                                        fontSize = 18.sp,
-                                        color = LocalCustomColors.current.itemText
-                                    ),
+                                    label = { Text(stringResource(R.string.transfer_destination)) },
+                                    textStyle = TextStyle(fontSize = 18.sp),
                                     keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
                                         KeyboardOptions(keyboardType = KeyboardType.Phone)
                                     else
@@ -1568,7 +1554,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         .fillMaxWidth()
                                         .shadow(8.dp, RoundedCornerShape(8.dp))
                                         .background(
-                                            LocalCustomColors.current.grayLight,
+                                            color = MaterialTheme.colorScheme.surfaceContainer,
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .animateContentSize()
@@ -1581,7 +1567,8 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .verticalScrollbar(
-                                                        state = lazyListState
+                                                        state = lazyListState,
+                                                        color = MaterialTheme.colorScheme.outlineVariant
                                                     ),
                                                 horizontalAlignment = Alignment.Start,
                                                 state = lazyListState,
@@ -1602,7 +1589,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                         Text(
                                                             text = suggestion,
                                                             modifier = Modifier.fillMaxWidth(),
-                                                            color = LocalCustomColors.current.grayDark,
+                                                            color = MaterialTheme.colorScheme.onSurface,
                                                             fontSize = 18.sp
                                                         )
                                                     }
@@ -1619,7 +1606,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.blind),
-                                                color = LocalCustomColors.current.alert,
+                                                color = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1633,7 +1620,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.attended),
-                                                color = LocalCustomColors.current.alert,
+                                                color = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1659,7 +1646,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                     ) {
                                         Text(
                                             text = stringResource(R.string.cancel),
-                                            color = LocalCustomColors.current.gray
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                     TextButton(
@@ -1737,7 +1724,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     .focusRequester(focusRequester),
                 enabled = dtmfEnabled.value,
                 textStyle = TextStyle(fontSize = 16.sp),
-                label = { LabelText(stringResource(R.string.dtmf)) },
+                label = { Text(stringResource(R.string.dtmf)) },
                 singleLine = true
             )
             LaunchedEffect(shouldRequestFocus) {
@@ -1836,8 +1823,7 @@ private fun OnHoldNotice() {
     ) {
         Text(
             text = stringResource(R.string.call_is_on_hold),
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText,
+            fontSize = 18.sp
         )
     }
 }

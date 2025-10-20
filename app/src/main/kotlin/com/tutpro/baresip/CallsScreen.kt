@@ -98,12 +98,12 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(navController, account, callHistory)
@@ -237,7 +237,6 @@ private fun Account(account: Account) {
             .padding(top = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
-        color = LocalCustomColors.current.itemText,
         textAlign = TextAlign.Center
     )
 }
@@ -399,13 +398,12 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text("...", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text("...", color = MaterialTheme.colorScheme.onBackground)
                         Text(text = Utils.friendlyUri(ctx, peerUri, account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -418,7 +416,7 @@ private fun Calls(
                     color = if (recordings)
                         MaterialTheme.colorScheme.error
                     else
-                        MaterialTheme.colorScheme.onPrimaryContainer,
+                        MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable(onClick = {

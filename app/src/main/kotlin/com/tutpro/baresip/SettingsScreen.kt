@@ -37,9 +37,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -81,7 +79,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
 import java.io.File
@@ -151,14 +148,11 @@ private fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -264,9 +258,7 @@ private fun SettingsContent(
     @Composable
     fun StartAutomatically() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -279,8 +271,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.start_automatically_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val startAutomatically by viewModel.autoStart.collectAsState()
             Switch(
                 checked = startAutomatically,
@@ -314,9 +306,7 @@ private fun SettingsContent(
     @Composable
     fun ListenAddress() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
@@ -336,9 +326,8 @@ private fun SettingsContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.listen_address)) },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.listen_address)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -347,10 +336,7 @@ private fun SettingsContent(
     @Composable
     fun AddressFamily() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -364,8 +350,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.address_family_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember {
                 mutableStateOf(false)
             }
@@ -380,10 +366,8 @@ private fun SettingsContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = familyNames[itemPosition.intValue],
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = familyNames[itemPosition.intValue])
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -399,10 +383,7 @@ private fun SettingsContent(
                                 viewModel.addressFamily.value = familyValues[index]
                             })
                         if (index < 2)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                     }
                 }
             }
@@ -412,9 +393,7 @@ private fun SettingsContent(
     @Composable
     fun DnsServers() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -432,10 +411,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.dns_servers_help)
                         showAlert.value = true
                     },
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
-                ),
-                label = { LabelText(stringResource(R.string.dns_servers)) },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.dns_servers)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -482,9 +459,7 @@ private fun SettingsContent(
         val showAlertDialog = remember { mutableStateOf(false) }
 
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -497,8 +472,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.tls_certificate_file_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val tlsCertificateFile by viewModel.tlsCertificateFile.collectAsState()
             Switch(
                 checked = tlsCertificateFile,
@@ -560,29 +535,24 @@ private fun SettingsContent(
     @Composable
     fun VerifyServer() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
             Text(text = stringResource(R.string.verify_server),
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
                     .clickable {
                         alertTitle.value = ctx.getString(R.string.verify_server)
                         alertMessage.value = ctx.getString(R.string.verify_server_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val verifyServer by viewModel.verifyServer.collectAsState()
             Switch(
                 checked = verifyServer,
-                onCheckedChange = {
-                    viewModel.verifyServer.value = it
-                }
+                onCheckedChange = { viewModel.verifyServer.value = it }
             )
         }
     }
@@ -620,23 +590,20 @@ private fun SettingsContent(
         }
 
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
             Text(text = stringResource(R.string.tls_ca_file),
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
                     .clickable {
                         alertTitle.value = ctx.getString(R.string.tls_ca_file)
                         alertMessage.value = ctx.getString(R.string.tls_ca_file_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val caFile by viewModel.caFile.collectAsState()
             Switch(
                 checked = caFile,
@@ -690,9 +657,7 @@ private fun SettingsContent(
     @Composable
     fun UserAgent() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -701,9 +666,7 @@ private fun SettingsContent(
             OutlinedTextField(
                 value = userAgent,
                 placeholder = { Text(stringResource(R.string.user_agent)) },
-                onValueChange = {
-                    viewModel.userAgent.value = it
-                },
+                onValueChange = { viewModel.userAgent.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -711,9 +674,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.user_agent_help)
                         showAlert.value = true
                     },
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.user_agent)) },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.user_agent)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -722,20 +684,14 @@ private fun SettingsContent(
     @Composable
     fun AudioSettings(navController: NavController) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
                 text = stringResource(R.string.audio_settings),
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        navController.navigate("audio")
-                    },
-                color = LocalCustomColors.current.itemText,
+                modifier = Modifier.weight(1f)
+                    .clickable { navController.navigate("audio") },
                 fontSize = 18.sp,
                 fontWeight = FontWeight. Bold
             )
@@ -746,10 +702,7 @@ private fun SettingsContent(
     fun Contacts(activity: Activity) {
         val showAlertDialog = remember { mutableStateOf(false) }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -762,8 +715,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.contacts_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember {
                 mutableStateOf(false)
             }
@@ -790,10 +743,8 @@ private fun SettingsContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = contactNames[itemPosition.intValue],
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = contactNames[itemPosition.intValue])
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -854,10 +805,7 @@ private fun SettingsContent(
                                 }
                             })
                         if (index < 2)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                     }
                 }
             }
@@ -895,9 +843,7 @@ private fun SettingsContent(
             }
         }
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -923,7 +869,6 @@ private fun SettingsContent(
                         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
                         launcher.launch(intent)
                     },
-                color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -933,9 +878,7 @@ private fun SettingsContent(
     @Composable
     fun BatteryOptimizations() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -955,8 +898,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.battery_optimizations_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val battery by viewModel.batteryOptimizations.collectAsState()
             Switch(
                 checked = battery,
@@ -972,9 +915,7 @@ private fun SettingsContent(
     @Composable
     fun DarkTheme() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -987,14 +928,12 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.dark_theme_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val darkTheme by viewModel.darkTheme.collectAsState()
             Switch(
                 checked = darkTheme,
-                onCheckedChange = {
-                    viewModel.darkTheme.value = it
-                }
+                onCheckedChange = { viewModel.darkTheme.value = it }
             )
         }
     }
@@ -1002,29 +941,24 @@ private fun SettingsContent(
     @Composable
     fun DynamicColors() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
             Text(text = stringResource(R.string.dynamic_colors),
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
                     .clickable {
                         alertTitle.value = ctx.getString(R.string.dynamic_colors)
                         alertMessage.value = ctx.getString(R.string.dynamic_colors_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val dynamicColors by viewModel.dynamicColors.collectAsState()
             Switch(
                 checked = dynamicColors,
-                onCheckedChange = {
-                    viewModel.dynamicColors.value = it
-                }
+                onCheckedChange = { viewModel.dynamicColors.value = it }
             )
         }
     }
@@ -1032,9 +966,7 @@ private fun SettingsContent(
     @Composable
     fun ColorBlind() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1047,23 +979,19 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.colorblind_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val colorblind by viewModel.colorblind.collectAsState()
             Switch(
                 checked = colorblind,
-                onCheckedChange = {
-                    viewModel.colorblind.value = it
-                }
+                onCheckedChange = { viewModel.colorblind.value = it }
             )
         }
     }
     @Composable
     fun ProximitySensing() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1076,14 +1004,12 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.proximity_sensing_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val proximitySensing by viewModel.proximitySensing.collectAsState()
             Switch(
                 checked = proximitySensing,
-                onCheckedChange = {
-                    viewModel.proximitySensing.value = it
-                }
+                onCheckedChange = { viewModel.proximitySensing.value = it }
             )
         }
     }
@@ -1092,9 +1018,7 @@ private fun SettingsContent(
     @Composable
     fun DefaultDialer() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1107,8 +1031,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.default_phone_app_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
             val dialerRoleRequest = rememberLauncherForActivityResult(
@@ -1145,29 +1069,24 @@ private fun SettingsContent(
     @Composable
     fun Debug() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
             Text(text = stringResource(R.string.debug),
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
                     .clickable {
                         alertTitle.value = ctx.getString(R.string.debug)
                         alertMessage.value = ctx.getString(R.string.debug_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val debug by viewModel.debug.collectAsState()
             Switch(
                 checked = debug,
-                onCheckedChange = {
-                    viewModel.debug.value = it
-                }
+                onCheckedChange = { viewModel.debug.value = it }
             )
         }
     }
@@ -1175,9 +1094,7 @@ private fun SettingsContent(
     @Composable
     fun SipTrace() {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1190,14 +1107,12 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.sip_trace_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val sipTrace by viewModel.sipTrace.collectAsState()
             Switch(
                 checked = sipTrace,
-                onCheckedChange = {
-                    viewModel.sipTrace.value = it
-                }
+                onCheckedChange = { viewModel.sipTrace.value = it }
             )
         }
     }
@@ -1205,9 +1120,7 @@ private fun SettingsContent(
     @Composable
     fun Reset(onRestartApp: () -> Unit) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1220,8 +1133,8 @@ private fun SettingsContent(
                         alertMessage.value = ctx.getString(R.string.reset_config_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             var reset by remember { mutableStateOf(false) }
             Switch(
                 checked = reset,
@@ -1256,8 +1169,7 @@ private fun SettingsContent(
 
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .padding(contentPadding)
             .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
             .verticalScrollbar(

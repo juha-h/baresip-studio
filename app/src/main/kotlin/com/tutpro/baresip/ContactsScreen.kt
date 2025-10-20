@@ -118,8 +118,8 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
             SmallFloatingActionButton(
                 modifier = Modifier.offset(x = 2.dp),
                 onClick = { navController.navigate("baresip_contact//new") },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ) {
                 Icon(imageVector = Icons.Filled.Add,
                     modifier = Modifier.size(36.dp),
@@ -147,8 +147,6 @@ private fun ContactsContent(
     val positiveAction = remember { mutableStateOf({}) }
     val neutralText = remember { mutableStateOf("") }
     val neutralAction = remember { mutableStateOf({}) }
-
-    Log.d("THEME_TEST", "ContactsScreen Primary: ${MaterialTheme.colorScheme.primary}")
 
     if (showDialog.value)
         AlertDialog(
@@ -225,7 +223,6 @@ private fun ContactsContent(
                         Text(text = name,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            color = LocalCustomColors.current.itemText,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 10.dp)
@@ -309,7 +306,6 @@ private fun ContactsContent(
                         Text(text = name,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            color = LocalCustomColors.current.itemText,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)

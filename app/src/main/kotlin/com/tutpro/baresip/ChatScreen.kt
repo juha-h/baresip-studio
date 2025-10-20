@@ -85,7 +85,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
 import java.lang.String.format
@@ -521,10 +520,12 @@ private fun NewMessage(
                         modifier = Modifier.clickable {
                             newMessage.value = TextFieldValue("")
                             viewModel.updateAorPeerMessage(aor, peerUri, "")
-                        }
+                        },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                } },
-            label = { LabelText(stringResource(R.string.new_message)) },
+                }
+            },
+            label = { Text(stringResource(R.string.new_message)) },
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
@@ -589,8 +590,8 @@ private fun NewMessage(
                         }
                 }
             },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,

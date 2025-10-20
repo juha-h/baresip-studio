@@ -72,39 +72,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 
 object CustomElements {
-
-    @Composable
-    fun LabelText(
-        text: String,
-        modifier: Modifier = Modifier,
-        color: Color = LocalCustomColors.current.itemText,
-        fontSize: TextUnit = 16.sp,
-        fontWeight: FontWeight = FontWeight.Normal,
-        textAlign: TextAlign? = null,
-        maxLines: Int = 1,
-    ) {
-        Text(
-            text = text,
-            modifier = modifier,
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            textAlign = textAlign,
-            maxLines = maxLines
-        )
-    }
 
     @Composable
     fun Button(
@@ -214,7 +191,7 @@ object CustomElements {
         state: ScrollState,
         scrollbarWidth: Dp = 4.dp,
         alwaysShow: Boolean = true,
-        color: Color = LocalCustomColors.current.gray
+        color: Color = MaterialTheme.colorScheme.outlineVariant
     ): Modifier {
         val alpha by animateFloatAsState(
             targetValue = if(state.isScrollInProgress || alwaysShow) 1f else 0f,
@@ -242,7 +219,7 @@ object CustomElements {
         state: LazyListState,
         width: Dp = 8.dp,
         alwaysShow: Boolean = true,
-        color: Color = LocalCustomColors.current.gray
+        color: Color = MaterialTheme.colorScheme.outlineVariant
     ): Modifier {
         val targetAlpha = if (state.isScrollInProgress || alwaysShow) 1f else 0f
         val duration = if (state.isScrollInProgress) 150 else 500

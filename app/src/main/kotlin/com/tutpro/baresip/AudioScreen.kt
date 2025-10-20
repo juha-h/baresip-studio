@@ -28,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -52,7 +53,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.audioScreenRoute(
@@ -83,12 +83,12 @@ private fun AudioScreen(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -101,10 +101,10 @@ private fun AudioScreen(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
-                        actionIconContentColor = LocalCustomColors.current.onPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     navigationIcon = {
                         IconButton(onClick = onBack) {
@@ -200,14 +200,12 @@ private fun CallVolume() {
     ) {
         val ctx = LocalContext.current
         Text(text = stringResource(R.string.default_call_volume),
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = ctx.getString(R.string.default_call_volume)
                     alertMessage.value = ctx.getString(R.string.default_call_volume_help)
                     showAlert.value = true
                 },
-            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
         val isDropDownExpanded = remember {
             mutableStateOf(false)
@@ -225,10 +223,8 @@ private fun CallVolume() {
                     isDropDownExpanded.value = true
                 }
             ) {
-                Text(text = volNames[itemPosition.intValue],
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
+                Text(text = volNames[itemPosition.intValue])
+                CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
@@ -245,10 +241,7 @@ private fun CallVolume() {
                             newCallVolume = volValues[index]
                         })
                     if (index < 10)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
+                        HorizontalDivider(thickness = 1.dp)
                 }
             }
         }
@@ -280,10 +273,8 @@ private fun MicGain() {
                         alertMessage.value = ctx.getString(R.string.microphone_gain_help)
                         showAlert.value = true
                     },
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText
-                ),
-                label = { LabelText(stringResource(R.string.microphone_gain)) },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.microphone_gain)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -298,14 +289,12 @@ private fun SpeakerPhone() {
     ) {
         val ctx = LocalContext.current
         Text(text = stringResource(R.string.speaker_phone),
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = ctx.getString(R.string.speaker_phone)
                     alertMessage.value = ctx.getString(R.string.speaker_phone_help)
                     showAlert.value = true
                 },
-            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
         var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
         Switch(
@@ -326,7 +315,6 @@ private fun AudioModules() {
     ) {
         val ctx = LocalContext.current
         Text(text = stringResource(R.string.audio_modules_title),
-            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp,
             modifier = Modifier.clickable {
                 alertTitle.value = ctx.getString(R.string.audio_modules_title)
@@ -338,9 +326,7 @@ private fun AudioModules() {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 18.dp, end = 10.dp)
             ) {
-                Text(text = String.format(ctx.getString(R.string.bullet_item), module),
-                    color = LocalCustomColors.current.itemText,
-                    fontSize = 18.sp)
+                Text(text = String.format(ctx.getString(R.string.bullet_item), module), fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 var checked by remember { mutableStateOf(oldAudioModules.contains("${module}.so")) }
                 Switch(
@@ -379,9 +365,8 @@ private fun OpusBitRate() {
                     alertMessage.value = ctx.getString(R.string.opus_bit_rate_help)
                     showAlert.value = true
                 },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.opus_bit_rate)) },
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+            label = { Text(stringResource(R.string.opus_bit_rate)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -411,9 +396,8 @@ private fun OpusPacketLoss() {
                     alertMessage.value = ctx.getString(R.string.opus_packet_loss_help)
                     showAlert.value = true
                 },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.opus_packet_loss)) },
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+            label = { Text(stringResource(R.string.opus_packet_loss)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -443,9 +427,8 @@ private fun AudioDelay() {
                     alertMessage.value = ctx.getString(R.string.audio_delay_help)
                     showAlert.value = true
                 },
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-            label = { LabelText(stringResource(R.string.audio_delay)) },
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+            label = { Text(stringResource(R.string.audio_delay)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -460,14 +443,12 @@ private fun ToneCountry() {
     ) {
         val ctx = LocalContext.current
         Text(text = stringResource(R.string.tone_country),
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = ctx.getString(R.string.tone_country)
                     alertMessage.value = ctx.getString(R.string.tone_country_help)
                     showAlert.value = true
                 },
-            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp)
         val isDropDownExpanded = remember {
             mutableStateOf(false)
@@ -485,10 +466,8 @@ private fun ToneCountry() {
                     isDropDownExpanded.value = true
                 }
             ) {
-                Text(text = countryNames[itemPosition.intValue],
-                    color = LocalCustomColors.current.itemText)
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                    tint = LocalCustomColors.current.itemText)
+                Text(text = countryNames[itemPosition.intValue])
+                CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
@@ -505,10 +484,7 @@ private fun ToneCountry() {
                             newToneCountry = countryValues[index]
                         })
                     if (index < 10)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = LocalCustomColors.current.itemText
-                        )
+                        HorizontalDivider(thickness = 1.dp)
                 }
             }
         }

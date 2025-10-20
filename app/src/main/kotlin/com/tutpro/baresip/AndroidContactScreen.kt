@@ -54,7 +54,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.androidContactScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable(

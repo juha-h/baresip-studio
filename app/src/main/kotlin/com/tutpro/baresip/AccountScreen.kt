@@ -28,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -65,7 +66,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.LabelText
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -141,12 +141,12 @@ private fun AccountScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -159,10 +159,10 @@ private fun AccountScreen(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
-                        actionIconContentColor = LocalCustomColors.current.onPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     navigationIcon = {
                         IconButton(onClick = onBack) {
@@ -234,13 +234,9 @@ private fun AccountContent(
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText
-                ),
+                textStyle = TextStyle(fontSize = 18.sp),
                 label = {
-                    LabelText(text = stringResource(R.string.sip_uri),
-                        fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.sip_uri), fontWeight = FontWeight.Bold)
                 }
             )
         }
@@ -266,9 +262,8 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.nickname)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.nickname)) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text),
@@ -297,12 +292,12 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.display_name)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.display_name)) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
-                    keyboardType = KeyboardType.Text),
+                    keyboardType = KeyboardType.Text
+                ),
             )
         }
     }
@@ -327,9 +322,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.authentication_username_help)
                         showAlert.value = true
                     },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.authentication_username)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.authentication_username)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -364,7 +358,7 @@ private fun AccountContent(
                             else
                                 ImageVector.vectorResource(R.drawable.visibility_off),
                             contentDescription = "Visibility",
-                            tint = LocalCustomColors.current.itemText
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
@@ -375,9 +369,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.authentication_password_help)
                         showAlert.value = true
                     },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.authentication_password)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.authentication_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -411,7 +404,6 @@ private fun AccountContent(
     fun Outbound() {
         val ctx = LocalContext.current
         Text(text = stringResource(R.string.outbound_proxies),
-            color = LocalCustomColors.current.itemText,
             fontSize = 18.sp,
             modifier = Modifier
                 .padding(top = 8.dp)
@@ -433,9 +425,8 @@ private fun AccountContent(
                 onValueChange = { viewModel.outbound1.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.sip_uri_of_proxy_server)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -451,9 +442,8 @@ private fun AccountContent(
                 onValueChange = { viewModel.outbound2.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -476,7 +466,7 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText)
+            )
             val register by viewModel.register.collectAsState()
             Switch(
                 checked = register,
@@ -506,10 +496,8 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.reg_int)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.reg_int)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
@@ -532,7 +520,6 @@ private fun AccountContent(
                         val route = "codecs/$aor/audio"
                         navController.navigate(route)
                     },
-                color = LocalCustomColors.current.itemText,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -555,8 +542,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.media_encryption_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember { mutableStateOf(false) }
             val mediaEnc by viewModel.mediaEnc.collectAsState()
             Box {
@@ -567,10 +554,8 @@ private fun AccountContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = mediaEncMap[mediaEnc]!!,
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = mediaEncMap[mediaEnc]!!)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -579,19 +564,14 @@ private fun AccountContent(
                     }) {
                     var index = 0
                     mediaEncMap.forEach {
-                        DropdownMenuItem(text = {
-                            Text(text = it.value,
-                                color = LocalCustomColors.current.itemText)
-                        },
+                        DropdownMenuItem(text = { Text(text = it.value) },
                             onClick = {
                                 isDropDownExpanded.value = false
                                 viewModel.mediaEnc.value = it.key
-                            })
+                            }
+                        )
                         if (index < 4)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -615,8 +595,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.media_nat_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember { mutableStateOf(false) }
             val mediaNat by viewModel.mediaNat.collectAsState()
             Box {
@@ -627,30 +607,25 @@ private fun AccountContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = mediaNatMap[mediaNat]!!,
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = mediaNatMap[mediaNat]!!)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
                     onDismissRequest = {
                         isDropDownExpanded.value = false
-                    }) {
+                    }
+                ) {
                     var index = 0
                     mediaNatMap.forEach {
-                        DropdownMenuItem(text = {
-                            Text(text = it.value)
-                        },
+                        DropdownMenuItem(text = { Text(text = it.value) },
                             onClick = {
                                 isDropDownExpanded.value = false
                                 viewModel.mediaNat.value = it.key
-                            })
+                            }
+                        )
                         if (index < 3)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -677,9 +652,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.stun_server_help)
                         showAlert.value = true
                     },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_server)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.stun_server)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -704,9 +678,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.stun_username_help)
                         showAlert.value = true
                     },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_username)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.stun_username)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -738,7 +711,7 @@ private fun AccountContent(
                             else
                                 ImageVector.vectorResource(R.drawable.visibility_off),
                             contentDescription = "Visibility",
-                            tint = LocalCustomColors.current.itemText
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
@@ -749,9 +722,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.stun_password_help)
                         showAlert.value = true
                     },
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.stun_password)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.stun_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -773,8 +745,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.rtcp_mux_help)
                         showAlert.value = true
                     },
-                fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText)
+                fontSize = 18.sp
+            )
             Switch(
                 checked = rtcpMux,
                 onCheckedChange = { viewModel.rtcpMux.value = it }
@@ -798,8 +770,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.rel_100_help)
                         showAlert.value = true
                     },
-                fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText)
+                fontSize = 18.sp
+            )
             Switch(
                 checked = rel100,
                 onCheckedChange = { viewModel.rel100.value = it }
@@ -826,8 +798,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.dtmf_mode_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
@@ -837,10 +809,8 @@ private fun AccountContent(
                         isDropDownExpanded.value = true
                     }
                 ) {
-                    Text(text = dtmfModeMap[dtmfMode]!!,
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = dtmfModeMap[dtmfMode]!!)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -849,18 +819,14 @@ private fun AccountContent(
                     }) {
                     var index = 0
                     dtmfModeMap.forEach {
-                        DropdownMenuItem(text = {
-                            Text(text = it.value)
-                        },
+                        DropdownMenuItem(text = { Text(text = it.value) },
                             onClick = {
                                 isDropDownExpanded.value = false
                                 viewModel.dtmfMode.value = it.key
-                            })
+                            }
+                        )
                         if (index < 2)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -886,27 +852,22 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.answer_mode_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
-                    Text(text = answerModeMap[answerMode]!!,
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = answerModeMap[answerMode]!!)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = {
-                        isDropDownExpanded.value = false
-                    }) {
+                    onDismissRequest = { isDropDownExpanded.value = false }
+                ) {
                     var index = 0
                     answerModeMap.forEach {
                         DropdownMenuItem(text = { Text(text = it.value) },
@@ -915,10 +876,7 @@ private fun AccountContent(
                                 viewModel.answerMode.value = it.key
                             })
                         if (index < 1)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -944,41 +902,33 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.redirect_mode_help)
                         showAlert.value = true
                     },
-                color = LocalCustomColors.current.itemText,
-                fontSize = 18.sp)
+                fontSize = 18.sp
+            )
             val isDropDownExpanded = remember { mutableStateOf(false) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
-                    Text(text = redirectModeMap[autoRedirect]!!,
-                        color = LocalCustomColors.current.itemText)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down,
-                        tint = LocalCustomColors.current.itemText)
+                    Text(text = redirectModeMap[autoRedirect]!!)
+                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = {
-                        isDropDownExpanded.value = false
-                    }) {
+                    onDismissRequest = { isDropDownExpanded.value = false }
+                ) {
                     var index = 0
                     redirectModeMap.forEach {
-                        DropdownMenuItem(text = {
-                            Text(text = it.value)
-                        },
+                        DropdownMenuItem(
+                            text = { Text(text = it.value) },
                             onClick = {
                                 isDropDownExpanded.value = false
                                 viewModel.autoRedirect.value = it.key
-                            })
+                            }
+                        )
                         if (index < 1)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = LocalCustomColors.current.itemText
-                            )
+                            HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -1006,9 +956,8 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.voicemail_uri)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.voicemail_uri)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1034,9 +983,8 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.country_code)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.country_code)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1062,9 +1010,8 @@ private fun AccountContent(
                         showAlert.value = true
                     },
                 singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp, color = LocalCustomColors.current.itemText),
-                label = { LabelText(stringResource(R.string.telephony_provider)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.telephony_provider)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1086,8 +1033,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.numeric_keypad_help)
                         showAlert.value = true
                     },
-                fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText)
+                fontSize = 18.sp
+            )
             Switch(
                 checked = numericKeypad,
                 onCheckedChange = { viewModel.numericKeypad.value = it }
@@ -1111,8 +1058,8 @@ private fun AccountContent(
                         alertMessage.value = ctx.getString(R.string.default_account_help)
                         showAlert.value = true
                     },
-                fontSize = 18.sp,
-                color = LocalCustomColors.current.itemText)
+                fontSize = 18.sp
+            )
             Switch(
                 checked = defaultAccount,
                 onCheckedChange = { viewModel.defaultAccount.value = it }
