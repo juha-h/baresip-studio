@@ -245,7 +245,6 @@ object CustomElements {
             }
         }
     }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AlertDialog(
@@ -289,44 +288,94 @@ object CustomElements {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.height(16.dp))
+
+                            // New logic starts here
                             if (positiveButtonText.isNotEmpty()) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    if (negativeButtonText.isNotEmpty()) {
+                                val buttonCount = listOf(positiveButtonText, negativeButtonText, neutralButtonText)
+                                    .count { it.isNotEmpty() }
+
+                                if (buttonCount >= 3) {
+                                    // Use a Column for 3 buttons, aligned to the end (right)
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalAlignment = Alignment.End
+                                    ) {
+                                        // The positive button is usually last for emphasis
+                                        if (negativeButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNegativeClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = negativeButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                        if (neutralButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNeutralClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = neutralButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        }
                                         TextButton(onClick = {
-                                            onNegativeClicked()
+                                            onPositiveClicked()
                                             showDialog.value = false
                                         }) {
                                             Text(
-                                                text = negativeButtonText.uppercase(),
+                                                text = positiveButtonText.uppercase(),
                                                 fontSize = 14.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                color = MaterialTheme.colorScheme.primary,
                                             )
                                         }
                                     }
-                                    if (neutralButtonText.isNotEmpty()) {
+                                } else {
+                                    // Use the existing Row for 1 or 2 buttons
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        if (negativeButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNegativeClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = negativeButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                        if (neutralButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNeutralClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = neutralButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        }
                                         TextButton(onClick = {
-                                            onNeutralClicked()
+                                            onPositiveClicked()
                                             showDialog.value = false
                                         }) {
                                             Text(
-                                                text = neutralButtonText.uppercase(),
+                                                text = positiveButtonText.uppercase(),
                                                 fontSize = 14.sp,
-                                                color = MaterialTheme.colorScheme.primary
+                                                color = MaterialTheme.colorScheme.primary,
                                             )
                                         }
-                                    }
-                                    TextButton(onClick = {
-                                        onPositiveClicked()
-                                        showDialog.value = false
-                                    }) {
-                                        Text(
-                                            text = positiveButtonText.uppercase(),
-                                            fontSize = 14.sp,
-                                            color = MaterialTheme.colorScheme.primary,
-                                        )
                                     }
                                 }
                             }
