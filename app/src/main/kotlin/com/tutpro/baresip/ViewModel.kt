@@ -30,6 +30,13 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _selectedAor.value = newValue
     }
 
+    private val _accountUpdate = MutableStateFlow(0)
+    val accountUpdate: StateFlow<Int> = _accountUpdate
+
+    fun triggerAccountUpdate() {
+        _accountUpdate.value++
+    }
+
     private val _aorPeerMessage = MutableStateFlow(mutableMapOf<AorPeer, String>())
 
     fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
@@ -73,32 +80,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _micIcon.value = iconResId
     }
 
-    private val _vmIcon = MutableStateFlow(R.drawable.voicemail)
-    val vmIcon: StateFlow<Int> = _vmIcon.asStateFlow()
-
-    fun updateVmIcon(newIcon: Int) {
-        _vmIcon.value = newIcon
-    }
-
     private val _showVmIcon = MutableStateFlow(false)
     val showVmIcon: StateFlow<Boolean> = _showVmIcon.asStateFlow()
 
     fun updateShowVmIcon(show: Boolean) {
         _showVmIcon.value = show
-    }
-
-    private val _messagesIcon = MutableStateFlow(R.drawable.messages)
-    val messagesIcon: StateFlow<Int> = _messagesIcon.asStateFlow()
-
-    fun updateMessagesIcon(newIcon: Int) {
-        _messagesIcon.value = newIcon
-    }
-
-    private val _callsIcon = MutableStateFlow(R.drawable.calls)
-    val callsIcon: StateFlow<Int> = _callsIcon.asStateFlow()
-
-    fun updateCallsIcon(newIcon: Int) {
-        _callsIcon.value = newIcon
     }
 
     private val _dialpadIcon = MutableStateFlow(R.drawable.dialpad_off)

@@ -223,7 +223,7 @@ private fun MainScreen(
                     val ua = UserAgent.ofAor(viewModel.selectedAor.value)
                     if (ua != null) {
                         showCall(ctx, viewModel, ua)
-                        updateIcons(viewModel, ua.account)
+                        viewModel.triggerAccountUpdate()
                     }
                 }
                 Lifecycle.Event.ON_PAUSE -> {
@@ -447,8 +447,7 @@ private fun MainScreen(
     LaunchedEffect(currentRoute, viewModel.selectedAor.collectAsState()) {
         if (currentRoute == "main") {
             Log.d(TAG, "Updating icons for AOR: ${viewModel.selectedAor.value}")
-            val account = Account.ofAor(viewModel.selectedAor.value)
-            updateIcons(viewModel, account)
+            viewModel.triggerAccountUpdate()
         }
     }
 
@@ -673,41 +672,56 @@ private fun TopAppBar(
 @Composable
 private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
-    val vmIcon by viewModel.vmIcon.collectAsState()
-    val showVmIcon by viewModel.showVmIcon.collectAsState()
-    val messagesIcon by viewModel.messagesIcon.collectAsState()
-    val callsIcon by viewModel.callsIcon.collectAsState()
+    // ... (the top part of your function is the same) ...
     val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val aor by viewModel.selectedAor.collectAsState()
+    val accountUpdate by viewModel.accountUpdate.collectAsState()
+
+    val showVmIcon = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.vmUri?.isNotEmpty() ?: false else false
+    }
+    val hasNewVoicemail = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
+    }
+    val hasUnreadMessages = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
+    }
+    val hasMissedCalls = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
+    }
 
     val buttonSize = 48.dp
 
-    Row( modifier = Modifier
-        .fillMaxWidth()
-        .navigationBarsPadding()
-        .padding(bottom = 16.dp),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         if (showVmIcon)
             IconButton(
+                // Disable the button if no account is selected
+                enabled = aor.isNotEmpty(),
                 onClick = {
-                    if (viewModel.selectedAor.value != "") {
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val acc = ua.account
-                        if (acc.vmUri != "") {
-                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                            dialogMessage.value = acc.vmMessages(ctx)
-                            positiveText.value = ctx.getString(R.string.listen)
-                            onPositiveClicked.value = {
-                                val intent = Intent(ctx, MainActivity::class.java)
-                                intent.putExtra("uap", ua.uap)
-                                intent.putExtra("peer", acc.vmUri)
-                                handleIntent(ctx, viewModel, intent, "call")
-                            }
-                            negativeText.value = ctx.getString(R.string.cancel)
-                            onNegativeClicked.value = {}
-                            showDialog.value = true
+                    // No need for an 'if' check here anymore
+                    val ua = UserAgent.ofAor(aor)!!
+                    val acc = ua.account
+                    if (acc.vmUri.isNotEmpty()) {
+                        dialogTitle.value = ctx.getString(R.string.voicemail_messages)
+                        dialogMessage.value = acc.vmMessages(ctx)
+                        positiveText.value = ctx.getString(R.string.listen)
+                        onPositiveClicked.value = {
+                            val intent = Intent(ctx, MainActivity::class.java)
+                            intent.putExtra("uap", ua.uap)
+                            intent.putExtra("peer", acc.vmUri)
+                            handleIntent(ctx, viewModel, intent, "call")
                         }
+                        negativeText.value = ctx.getString(R.string.cancel)
+                        onNegativeClicked.value = {}
+                        showDialog.value = true
                     }
                 },
                 modifier = Modifier
@@ -715,13 +729,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     .size(buttonSize)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(vmIcon),
+                    imageVector = ImageVector.vectorResource(R.drawable.voicemail),
                     contentDescription = null,
                     Modifier.size(buttonSize),
-                    tint = if (vmIcon == R.drawable.voicemail)
-                        MaterialTheme.colorScheme.secondary
-                    else
-                        MaterialTheme.colorScheme.error
+                    tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -740,52 +751,49 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         }
 
         IconButton(
+            // Disable the button if no account is selected
+            enabled = aor.isNotEmpty(),
             onClick = {
-                if (viewModel.selectedAor.value != "")
-                    navController.navigate("chats/${viewModel.selectedAor.value}")
+                // No need for an 'if' check here anymore
+                navController.navigate("chats/$aor")
             },
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(messagesIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.messages),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = if (messagesIcon == R.drawable.messages)
-                    MaterialTheme.colorScheme.secondary
-                else
-                    MaterialTheme.colorScheme.error
+                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
         }
 
         IconButton(
+            // Disable the button if no account is selected
+            enabled = aor.isNotEmpty(),
             onClick = {
-                if (viewModel.selectedAor.value != "")
-                    navController.navigate("calls/${viewModel.selectedAor.value}")
+                // No need for an 'if' check here anymore
+                navController.navigate("calls/$aor")
             },
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(callsIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.calls),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = if (callsIcon == R.drawable.calls)
-                    MaterialTheme.colorScheme.secondary
-                else
-                    MaterialTheme.colorScheme.error
+                tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
         }
 
         IconButton(
-            onClick = { viewModel.updateDialpadIcon(
-                if (dialpadIcon == R.drawable.dialpad_off)
-                    R.drawable.dialpad_on
-                else
-                    R.drawable.dialpad_off
-            ) },
+            onClick = {
+                viewModel.updateDialpadIcon(
+                    if (dialpadIcon == R.drawable.dialpad_off) R.drawable.dialpad_on else R.drawable.dialpad_off
+                )
+            },
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize),
@@ -795,14 +803,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(dialpadIcon),
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
-                tint = if (dialpadIcon == R.drawable.dialpad_off)
-                    MaterialTheme.colorScheme.secondary
-                else
-                    MaterialTheme.colorScheme.error
+                tint = if (dialpadIcon == R.drawable.dialpad_off) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
             )
         }
     }
-
 }
 
 private val callUri = mutableStateOf("")
@@ -973,8 +977,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         }
 
     showCall(ctx, viewModel, UserAgent.ofAor(selected))
-
-    updateIcons(viewModel, Account.ofAor(selected))
+    viewModel.triggerAccountUpdate()
 
     if (selected == "") {
         OutlinedButton(
@@ -1103,7 +1106,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             expanded = false
                             viewModel.updateSelectedAor(acc.aor)
                             showCall(ctx, viewModel, ua)
-                            updateIcons(viewModel, acc)
+                            viewModel.triggerAccountUpdate()
                         },
                         text = { Text(
                             text = acc.text(),
@@ -1831,7 +1834,7 @@ private fun OnHoldNotice() {
 private fun spinToAor(viewModel: ViewModel, aor: String) {
     if (aor != viewModel.selectedAor.value)
         viewModel.updateSelectedAor(aor)
-    updateIcons(viewModel, Account.ofAor(aor))
+    viewModel.triggerAccountUpdate()
 }
 
 private fun callClick(ctx: Context, viewModel: ViewModel) {
@@ -2193,7 +2196,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     when (ev[0]) {
         "call rejected" -> {
             if (aor == viewModel.selectedAor.value)
-                viewModel.updateCallsIcon(R.drawable.calls_missed)
+                viewModel.triggerAccountUpdate()
         }
         "call incoming", "call outgoing" -> {
             val callp = params[1] as Long
@@ -2336,7 +2339,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
                 if (acc.missedCalls)
-                    viewModel.updateCallsIcon(R.drawable.calls_missed)
+                    viewModel.triggerAccountUpdate()
             }
             //if (kgm.isDeviceLocked)
             //    this.setShowWhenLocked(false)
@@ -2356,13 +2359,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     break
                 }
             }
-            if (aor == viewModel.selectedAor.value) {
-                viewModel.updateVmIcon(if (acc.vmNew > 0)
-                    R.drawable.voicemail_new
-                else
-                    R.drawable.voicemail
-                )
-            }
+            if (aor == viewModel.selectedAor.value)
+                viewModel.triggerAccountUpdate()
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
@@ -2533,36 +2531,6 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
     } else {
         Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
         call.notifySipfrag(500, "Call Error")
-    }
-}
-
-private fun updateIcons(viewModel: ViewModel, acc: Account?) {
-    if (acc == null) {
-        viewModel.updateShowVmIcon(false)
-        viewModel.updateMessagesIcon(R.drawable.messages)
-        viewModel.updateCallsIcon(R.drawable.calls)
-    }
-    else {
-
-        if (acc.vmUri != "") {
-            viewModel.updateShowVmIcon(true)
-            viewModel.updateVmIcon(if (acc.vmNew > 0)
-                R.drawable.voicemail_new
-            else
-                R.drawable.voicemail
-            )
-        } else
-            viewModel.updateShowVmIcon(false)
-
-        viewModel.updateMessagesIcon(if (acc.unreadMessages)
-            R.drawable.messages_unread
-        else
-            R.drawable.messages)
-
-        viewModel.updateCallsIcon(if (acc.missedCalls)
-            R.drawable.calls_missed
-        else
-            R.drawable.calls)
     }
 }
 
