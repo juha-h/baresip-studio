@@ -28,17 +28,16 @@ fun AppTheme(
     val useDynamicColors by remember { BaresipService.dynamicColors }
 
     val useActualDynamicColors = useDynamicColors && VERSION.SDK_INT >= 31
+    val isDark = useDarkTheme || isSystemInDarkTheme()
 
-    Log.d(TAG, "Use actual dynamic colors: $useActualDynamicColors")
-
-    val colorScheme = when {
+    val baseColorScheme = when {
         useActualDynamicColors -> {
-            if (useDarkTheme || isSystemInDarkTheme())
+            if (isDark)
                 dynamicDarkColorScheme(context)
             else
                 dynamicLightColorScheme(context)
         }
-        useDarkTheme || isSystemInDarkTheme() -> darkColorScheme(
+        isDark -> darkColorScheme(
             primary = PrimaryDark,
             onPrimary = OnPrimaryDark,
             primaryContainer = PrimaryContainerDark,
@@ -90,19 +89,27 @@ fun AppTheme(
         )
     }
 
+    val finalColorScheme = baseColorScheme.copy(
+        surfaceContainer = if (isDark) TertiaryContainerDark else TertiaryContainer,
+        surfaceContainerLow = if (isDark) TertiaryContainerDark else TertiaryContainer,
+        surfaceContainerHigh = if (isDark) TertiaryContainerDark else TertiaryContainer,
+        surfaceContainerLowest = if (isDark) TertiaryContainerDark else TertiaryContainer,
+        surfaceContainerHighest = if (isDark) TertiaryContainerDark else TertiaryContainer
+    )
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
-            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
+            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(finalColorScheme.background.toArgb()) > 0.5
             insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
             insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
         }
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = finalColorScheme,
         content = content
     )
 }
