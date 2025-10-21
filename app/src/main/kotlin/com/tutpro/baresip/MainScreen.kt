@@ -1175,10 +1175,9 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     .focusRequester(focusRequester)
                     .onFocusChanged {
                         val account = Account.ofAor(viewModel.selectedAor.value)
-                        if (account != null)
-                            if (account.numericKeypad)
-                                if (isDialpadVisible)
-                                    viewModel.toggleDialpadVisibility()
+                        if (account != null && account.numericKeypad)
+                            if (!isDialpadVisible)
+                                viewModel.toggleDialpadVisibility()
                     },
                 label = { Text(text = callUriLabel.value, fontSize = 18.sp) },
                 textStyle = TextStyle(fontSize = 18.sp),
