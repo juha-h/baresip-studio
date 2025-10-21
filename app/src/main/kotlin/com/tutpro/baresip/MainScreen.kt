@@ -672,8 +672,6 @@ private fun TopAppBar(
 @Composable
 private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
-    // ... (the top part of your function is the same) ...
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
     val aor by viewModel.selectedAor.collectAsState()
     val accountUpdate by viewModel.accountUpdate.collectAsState()
 
@@ -689,6 +687,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val hasMissedCalls = remember(aor, accountUpdate) {
         if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
     }
+
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     val buttonSize = 48.dp
 
@@ -751,10 +751,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         }
 
         IconButton(
-            // Disable the button if no account is selected
             enabled = aor.isNotEmpty(),
             onClick = {
-                // No need for an 'if' check here anymore
                 navController.navigate("chats/$aor")
             },
             modifier = Modifier
@@ -770,10 +768,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         }
 
         IconButton(
-            // Disable the button if no account is selected
             enabled = aor.isNotEmpty(),
             onClick = {
-                // No need for an 'if' check here anymore
                 navController.navigate("calls/$aor")
             },
             modifier = Modifier
@@ -789,21 +785,18 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         }
 
         IconButton(
-            onClick = {
-                viewModel.updateDialpadIcon(
-                    if (dialpadIcon == R.drawable.dialpad_off) R.drawable.dialpad_on else R.drawable.dialpad_off
-                )
-            },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize),
+            onClick = { viewModel.toggleDialpadVisibility() },
+            modifier = Modifier.weight(1f).size(buttonSize),
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(dialpadIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.dialpad),
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
-                tint = if (dialpadIcon == R.drawable.dialpad_off) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+                tint = if (isDialpadVisible)
+                    MaterialTheme.colorScheme.error
+                else
+                    MaterialTheme.colorScheme.secondary
             )
         }
     }
@@ -1136,7 +1129,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
     var filteredSuggestions by remember { mutableStateOf(suggestions) }
     val focusRequester = remember { FocusRequester() }
     val lazyListState = rememberLazyListState()
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -1184,11 +1177,12 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                         val account = Account.ofAor(viewModel.selectedAor.value)
                         if (account != null)
                             if (account.numericKeypad)
-                                viewModel.updateDialpadIcon(R.drawable.dialpad_on)
+                                if (isDialpadVisible)
+                                    viewModel.toggleDialpadVisibility()
                     },
                 label = { Text(text = callUriLabel.value, fontSize = 18.sp) },
                 textStyle = TextStyle(fontSize = 18.sp),
-                keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
+                keyboardOptions = if (isDialpadVisible)
                     KeyboardOptions(keyboardType = KeyboardType.Phone)
                 else
                     KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -1330,7 +1324,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
 @Composable
 private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row( modifier = Modifier
         .fillMaxWidth()
@@ -1546,7 +1540,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         .focusRequester(focusRequester),
                                     label = { Text(stringResource(R.string.transfer_destination)) },
                                     textStyle = TextStyle(fontSize = 18.sp),
-                                    keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
+                                    keyboardOptions = if (isDialpadVisible)
                                         KeyboardOptions(keyboardType = KeyboardType.Phone)
                                     else
                                         KeyboardOptions(keyboardType = KeyboardType.Text)

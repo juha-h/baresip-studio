@@ -80,18 +80,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _micIcon.value = iconResId
     }
 
-    private val _showVmIcon = MutableStateFlow(false)
-    val showVmIcon: StateFlow<Boolean> = _showVmIcon.asStateFlow()
+    private val _isDialpadVisible = MutableStateFlow(false)
+    val isDialpadVisible: StateFlow<Boolean> = _isDialpadVisible
 
-    fun updateShowVmIcon(show: Boolean) {
-        _showVmIcon.value = show
-    }
-
-    private val _dialpadIcon = MutableStateFlow(R.drawable.dialpad_off)
-    val dialpadIcon: StateFlow<Int> = _dialpadIcon.asStateFlow()
-
-    fun updateDialpadIcon(newIcon: Int) {
-        _dialpadIcon.value = newIcon
+    fun toggleDialpadVisibility() {
+        _isDialpadVisible.value = !_isDialpadVisible.value
     }
 
     private val _selectedCallRow = MutableStateFlow<CallRow?>(null)
