@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.os.Build.VERSION
-import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -30,7 +29,7 @@ fun AppTheme(
     val useActualDynamicColors = useDynamicColors && VERSION.SDK_INT >= 31
     val isDark = useDarkTheme || isSystemInDarkTheme()
 
-    val baseColorScheme = when {
+    val colorScheme = when {
         useActualDynamicColors -> {
             if (isDark)
                 dynamicDarkColorScheme(context)
@@ -60,7 +59,13 @@ fun AppTheme(
             onSurface = OnSurfaceDark,
             surfaceVariant = SurfaceVariantDark,
             onSurfaceVariant = OnSurfaceVariantDark,
-            outline = OutlineDark
+            surfaceContainer = SurfaceContainerDark,
+            surfaceContainerLow = SurfaceContainerLowDark,
+            surfaceContainerHigh = SurfaceContainerHighDark,
+            surfaceContainerLowest = SurfaceContainerLowestDark,
+            surfaceContainerHighest = SurfaceContainerHighestDark,
+            outline = OutlineDark,
+            outlineVariant = OutlineVariantDark
         )
         else -> lightColorScheme(
             primary = Primary,
@@ -85,31 +90,29 @@ fun AppTheme(
             onSurface = OnSurface,
             surfaceVariant = SurfaceVariant,
             onSurfaceVariant = OnSurfaceVariant,
-            outline = Outline
+            surfaceContainer = SurfaceContainer,
+            surfaceContainerLow = SurfaceContainerLow,
+            surfaceContainerHigh = SurfaceContainerHigh,
+            surfaceContainerLowest = SurfaceContainerLowest,
+            surfaceContainerHighest = SurfaceContainerHighest,
+            outline = Outline,
+            outlineVariant = OutlineVariant
         )
     }
-
-    val finalColorScheme = baseColorScheme.copy(
-        surfaceContainer = if (isDark) TertiaryContainerDark else TertiaryContainer,
-        surfaceContainerLow = if (isDark) TertiaryContainerDark else TertiaryContainer,
-        surfaceContainerHigh = if (isDark) TertiaryContainerDark else TertiaryContainer,
-        surfaceContainerLowest = if (isDark) TertiaryContainerDark else TertiaryContainer,
-        surfaceContainerHighest = if (isDark) TertiaryContainerDark else TertiaryContainer
-    )
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
-            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(finalColorScheme.background.toArgb()) > 0.5
+            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
             insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
             insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
         }
     }
 
     MaterialTheme(
-        colorScheme = finalColorScheme,
+        colorScheme = colorScheme,
         content = content
     )
 }
