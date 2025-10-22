@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -101,12 +103,12 @@ private fun CodecsScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -118,12 +120,14 @@ private fun CodecsScreen(
                                 stringResource(R.string.audio_codecs)
                             else
                                 stringResource(R.string.video_codecs),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
@@ -131,7 +135,6 @@ private fun CodecsScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
@@ -141,7 +144,6 @@ private fun CodecsScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Check,
-                                tint = LocalCustomColors.current.light,
                                 contentDescription = "Check"
                             )
                         }
@@ -207,7 +209,7 @@ private fun CodecsContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LocalCustomColors.current.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
             .padding(bottom = 16.dp),
     ) {
@@ -234,8 +236,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
             .padding(end = 4.dp)
             .verticalScrollbar(
                 state = draggableState.listState,
-                width = 4.dp,
-                color = LocalCustomColors.current.gray
+                width = 4.dp
             ),
         state = draggableState.listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp),
@@ -249,9 +250,9 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
             ListItem(
                 colors = ListItemDefaults.colors(
                     containerColor = if (isDragging)
-                        LocalCustomColors.current.grayLight
+                        MaterialTheme.colorScheme.surfaceContainer
                     else
-                        LocalCustomColors.current.background
+                        Color.Transparent
                 ),
                 headlineContent = {
                     Text(text = item.name,
@@ -290,7 +291,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
             )
             if (codecs.indexOf(item) > 0)
                 HorizontalDivider(
-                    color = LocalCustomColors.current.gray,
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     modifier = Modifier.padding(horizontal = 12.dp),
                     thickness = 1.dp
                 )

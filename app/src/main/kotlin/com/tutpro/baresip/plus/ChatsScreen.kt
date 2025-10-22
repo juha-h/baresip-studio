@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -41,6 +42,7 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
@@ -83,7 +85,6 @@ import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.BaresipService.Companion.contactNames
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.DropdownMenu
-import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import java.text.DateFormat
@@ -132,12 +133,12 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(navController, account, uaMessages)
@@ -181,10 +182,10 @@ private fun TopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
-            actionIconContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
@@ -250,10 +251,7 @@ private fun ChatsContent(
 private fun Account(account: Account) {
     Text(
         text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 8.dp),
-        color = LocalCustomColors.current.itemText,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -297,9 +295,9 @@ private fun Chats(
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
-                color = LocalCustomColors.current.gray
+                color = MaterialTheme.colorScheme.outlineVariant
             )
-            .background(LocalCustomColors.current.background),
+            .background(MaterialTheme.colorScheme.background),
         reverseLayout = true,
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -343,7 +341,7 @@ private fun Chats(
                     RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp)
                 }
                 val borderStroke = if (account.unreadMessages && Message.unreadMessagesFromPeer(aor, message.peerUri)) {
-                    BorderStroke(width = 2.dp, color = LocalCustomColors.current.alert)
+                    BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
                 } else {
                     null
                 }
@@ -380,24 +378,13 @@ private fun Chats(
                         }
                         showDialog.value = true
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(end = 6.dp),
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(end = 6.dp),
                     shape = buttonShape,
                     border = borderStroke,
-                    color =
-                        if (message.direction == MESSAGE_DOWN) {
-                            if (BaresipService.darkTheme.value)
-                                LocalCustomColors.current.secondaryDark
-                            else
-                                LocalCustomColors.current.secondaryLight
-                        } else {
-                            if (BaresipService.darkTheme.value)
-                                LocalCustomColors.current.primaryDark
-                            else
-                                LocalCustomColors.current.primaryLight
-                        },
+                    color = if (message.direction == MESSAGE_DOWN)
+                        MaterialTheme.colorScheme.secondaryContainer
+                    else
+                        MaterialTheme.colorScheme.primaryContainer
                 ) {
                     val peer = Utils.friendlyUri(ctx, message.peerUri, account)
                     val cal = GregorianCalendar()
@@ -408,19 +395,11 @@ private fun Chats(
                         DateFormat.getDateInstance(DateFormat.SHORT)
                     val info = fmt.format(cal.time)
                     Column {
+                        val textColor = if (message.direction == MESSAGE_DOWN)
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        else
+                            MaterialTheme.colorScheme.onPrimaryContainer
                         Row {
-                            val textColor =
-                                if (message.direction == MESSAGE_DOWN) {
-                                    if (BaresipService.darkTheme.value)
-                                        LocalCustomColors.current.secondaryLight
-                                    else
-                                        LocalCustomColors.current.secondaryDark
-                                } else {
-                                    if (BaresipService.darkTheme.value)
-                                        LocalCustomColors.current.primaryLight
-                                    else
-                                        LocalCustomColors.current.primaryDark
-                                }
                             Text(text = peer, color = textColor, fontSize = 12.sp)
                             Spacer(modifier = Modifier.weight(1f))
                             Text(text = info, color = textColor, fontSize = 12.sp)
@@ -431,7 +410,7 @@ private fun Chats(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 style = TextStyle(
-                                    color = LocalCustomColors.current.itemText,
+                                    color = textColor,
                                     fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
                                         FontWeight.Bold else FontWeight.Normal,
                                     fontSize = 16.sp
@@ -523,14 +502,12 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                     modifier = Modifier
                         .shadow(8.dp, RoundedCornerShape(8.dp))
                         .background(
-                            LocalCustomColors.current.grayLight,
+                            color = MaterialTheme.colorScheme.surfaceContainer,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .animateContentSize()
                 ) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 150.dp)
+                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)
                     ) {
                         LazyColumn(
                             modifier = Modifier
@@ -538,7 +515,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                                 .heightIn(max = 180.dp)
                                 .verticalScrollbar(
                                     state = lazyListState,
-                                    color = LocalCustomColors.current.gray
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 ),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
@@ -559,7 +536,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                                     Text(
                                         text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = LocalCustomColors.current.grayDark,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -595,22 +572,17 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                         Icon(
                             Icons.Outlined.Clear,
                             contentDescription = null,
-                            modifier = Modifier
-                                .clickable {
-                                    if (showSuggestions)
-                                        showSuggestions = false
-                                    else
-                                        newPeer = ""
-                                }
+                            modifier = Modifier.clickable {
+                                if (showSuggestions)
+                                    showSuggestions = false
+                                else
+                                    newPeer = ""
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 },
-                label = {
-                    LabelText(stringResource(R.string.new_chat_peer))
-                },
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText
-                ),
+                label = { Text(stringResource(R.string.new_chat_peer)) },
+                textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
@@ -619,7 +591,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
         }
         Spacer(Modifier.width(4.dp))
         SmallFloatingActionButton(
-            modifier = Modifier.padding(end = 4.dp),
+            modifier = Modifier.padding(end = 4.dp).offset(y = 2.dp),
             onClick = {
                 showSuggestions = false
                 val peerText = newPeer.trim()
@@ -640,8 +612,8 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 newPeer = ""
                 focusManager.clearFocus()
             },
-            containerColor = LocalCustomColors.current.accent,
-            contentColor = LocalCustomColors.current.background
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,

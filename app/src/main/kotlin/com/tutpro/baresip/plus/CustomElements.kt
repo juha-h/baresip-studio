@@ -9,7 +9,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,10 +21,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,6 +38,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -72,40 +72,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat.getString
 
 object CustomElements {
-
-    @Composable
-    fun LabelText(
-        text: String,
-        modifier: Modifier = Modifier,
-        color: Color = LocalCustomColors.current.itemText,
-        fontSize: TextUnit = 16.sp,
-        fontWeight: FontWeight = FontWeight.Normal,
-        textAlign: TextAlign? = null,
-        maxLines: Int = 1,
-    ) {
-        Text(
-            text = text,
-            modifier = modifier,
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            textAlign = textAlign,
-            maxLines = maxLines
-        )
-    }
 
     @Composable
     fun Button(
@@ -148,10 +124,7 @@ object CustomElements {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
-            containerColor = LocalCustomColors.current.onPrimary,
-            modifier = Modifier.background(
-                LocalCustomColors.current.popupBackground.copy(alpha = 0.95f)
-            )
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ) {
             val itemsIterator = items.iterator()
             while (itemsIterator.hasNext()) {
@@ -160,13 +133,13 @@ object CustomElements {
                     text = {
                         Text(
                             text = item,
-                            color = LocalCustomColors.current.light,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
                         ) },
                     onClick = { onItemClick(item) }
                 )
                 if (itemsIterator.hasNext())
-                    HorizontalDivider(color = LocalCustomColors.current.spinnerDivider)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
     }
@@ -218,7 +191,7 @@ object CustomElements {
         state: ScrollState,
         scrollbarWidth: Dp = 4.dp,
         alwaysShow: Boolean = true,
-        color: Color = LocalCustomColors.current.gray
+        color: Color = MaterialTheme.colorScheme.outlineVariant
     ): Modifier {
         val alpha by animateFloatAsState(
             targetValue = if(state.isScrollInProgress || alwaysShow) 1f else 0f,
@@ -246,7 +219,7 @@ object CustomElements {
         state: LazyListState,
         width: Dp = 8.dp,
         alwaysShow: Boolean = true,
-        color: Color = LocalCustomColors.current.gray
+        color: Color = MaterialTheme.colorScheme.outlineVariant
     ): Modifier {
         val targetAlpha = if (state.isScrollInProgress || alwaysShow) 1f else 0f
         val duration = if (state.isScrollInProgress) 150 else 500
@@ -272,7 +245,6 @@ object CustomElements {
             }
         }
     }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AlertDialog(
@@ -288,9 +260,7 @@ object CustomElements {
     ) {
         if (showDialog.value) {
             BasicAlertDialog(
-                onDismissRequest = {
-                    showDialog.value = false
-                },
+                onDismissRequest = { showDialog.value = false },
                 content = {
                     Card(
                         modifier = Modifier
@@ -298,66 +268,40 @@ object CustomElements {
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = LocalCustomColors.current.cardBackground
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = title,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start,
                                 fontSize = 20.sp,
-                                color = LocalCustomColors.current.alert,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = message,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start,
                                 fontSize = 16.sp,
-                                color = LocalCustomColors.current.itemText,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            if (negativeButtonText.isNotEmpty() && neutralButtonText.isNotEmpty()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalAlignment = Alignment.End
-                                ) {
-                                    TextButton(onClick = {
-                                        onPositiveClicked()
-                                        showDialog.value = false
-                                    }) {
-                                        Text(
-                                            text = positiveButtonText.uppercase(),
-                                            fontSize = 14.sp,
-                                            color = LocalCustomColors.current.alert,
-                                        )
-                                    }
-                                    TextButton(onClick = {
-                                        onNeutralClicked()
-                                        showDialog.value = false
-                                    }) {
-                                        Text(
-                                            text = neutralButtonText.uppercase(),
-                                            fontSize = 14.sp,
-                                            color = LocalCustomColors.current.alert
-                                        )
-                                    }
-                                    TextButton(onClick = {
-                                        onNegativeClicked()
-                                        showDialog.value = false
-                                    }) {
-                                        Text(
-                                            text = negativeButtonText.uppercase(),
-                                            fontSize = 14.sp,
-                                            color = LocalCustomColors.current.gray
-                                        )
-                                    }
-                                }
-                            }
-                            else
-                                if (positiveButtonText.isNotEmpty())
-                                    Row(
+
+                            // New logic starts here
+                            if (positiveButtonText.isNotEmpty()) {
+                                val buttonCount = listOf(positiveButtonText, negativeButtonText, neutralButtonText)
+                                    .count { it.isNotEmpty() }
+
+                                if (buttonCount >= 3) {
+                                    // Use a Column for 3 buttons, aligned to the end (right)
+                                    Column(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
+                                        horizontalAlignment = Alignment.End
                                     ) {
-                                        if (negativeButtonText.isNotEmpty())
+                                        // The positive button is usually last for emphasis
+                                        if (negativeButtonText.isNotEmpty()) {
                                             TextButton(onClick = {
                                                 onNegativeClicked()
                                                 showDialog.value = false
@@ -365,10 +309,11 @@ object CustomElements {
                                                 Text(
                                                     text = negativeButtonText.uppercase(),
                                                     fontSize = 14.sp,
-                                                    color = LocalCustomColors.current.gray
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
-                                        if (neutralButtonText.isNotEmpty())
+                                        }
+                                        if (neutralButtonText.isNotEmpty()) {
                                             TextButton(onClick = {
                                                 onNeutralClicked()
                                                 showDialog.value = false
@@ -376,9 +321,10 @@ object CustomElements {
                                                 Text(
                                                     text = neutralButtonText.uppercase(),
                                                     fontSize = 14.sp,
-                                                    color = LocalCustomColors.current.alert
+                                                    color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
+                                        }
                                         TextButton(onClick = {
                                             onPositiveClicked()
                                             showDialog.value = false
@@ -386,10 +332,53 @@ object CustomElements {
                                             Text(
                                                 text = positiveButtonText.uppercase(),
                                                 fontSize = 14.sp,
-                                                color = LocalCustomColors.current.alert,
+                                                color = MaterialTheme.colorScheme.primary,
                                             )
                                         }
                                     }
+                                } else {
+                                    // Use the existing Row for 1 or 2 buttons
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        if (negativeButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNegativeClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = negativeButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                        if (neutralButtonText.isNotEmpty()) {
+                                            TextButton(onClick = {
+                                                onNeutralClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = neutralButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        }
+                                        TextButton(onClick = {
+                                            onPositiveClicked()
+                                            showDialog.value = false
+                                        }) {
+                                            Text(
+                                                text = positiveButtonText.uppercase(),
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -419,23 +408,21 @@ object CustomElements {
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = LocalCustomColors.current.cardBackground
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = title,
                                 fontSize = 20.sp,
-                                color = LocalCustomColors.current.alert,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Start,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            val lazyListState = rememberLazyListState()
                             LazyColumn(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.End,
-                                state = lazyListState,
+                                horizontalAlignment = Alignment.End
                             ) {
                                 itemsIndexed(items) { index, item ->
                                     TextButton(
@@ -443,26 +430,33 @@ object CustomElements {
                                             onItemClicked(index)
                                             openDialog.value = false
                                         },
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Text(
                                             text = item,
-                                            color = LocalCustomColors.current.itemText,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.Start
                                         )
                                     }
                                 }
                             }
                             if (neutralButtonText.isNotEmpty()) {
-                                TextButton(
-                                    onClick = {
-                                        onNeutralClicked()
-                                        openDialog.value = false
-                                    },
-                                    modifier = Modifier.align(Alignment.End)){
-                                    Text(
-                                        text = neutralButtonText.uppercase(),
-                                        color = LocalCustomColors.current.gray,
-                                    )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            onNeutralClicked()
+                                            openDialog.value = false
+                                        }
+                                    ) {
+                                        Text(
+                                            text = neutralButtonText.uppercase(),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -486,130 +480,127 @@ object CustomElements {
     ) {
         val showPassword = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
-        BasicAlertDialog(
-            properties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false,
-            ),
-            onDismissRequest = {
-                keyboardController?.hide()
-                showPasswordDialog.value = false
-            }
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = LocalCustomColors.current.cardBackground
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = title,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                        color = LocalCustomColors.current.alert,
-                    )
-                    if (message != "")
-                        Text(
-                            text = message,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(16.dp),
-                            color = LocalCustomColors.current.itemText,
-                        )
-                    OutlinedTextField(
-                        value = password.value,
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = LocalCustomColors.current.textFieldBackground,
-                            unfocusedContainerColor = LocalCustomColors.current.textFieldBackground,
-                            cursorColor = LocalCustomColors.current.primary,
-                        ),
-                        onValueChange = {
-                            password.value = it
-                        },
-                        visualTransformation = if (showPassword.value)
-                            VisualTransformation.None
-                        else
-                            PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                showPassword.value = !showPassword.value
-                                showPasswordDialog.value = true
-                            }) {
-                                Icon(
-                                    if (showPassword.value)
-                                        ImageVector.vectorResource(R.drawable.visibility)
-                                    else
-                                        ImageVector.vectorResource(R.drawable.visibility_off),
-                                    contentDescription = "Visibility",
-                                    tint = LocalCustomColors.current.grayDark
 
+        if (showPasswordDialog.value) {
+            BasicAlertDialog(
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+                onDismissRequest = {
+                    keyboardController?.hide()
+                    showPasswordDialog.value = false
+                }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = title,
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        if (message.isNotEmpty())
+                            Text(
+                                text = message,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(16.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        OutlinedTextField(
+                            value = password.value,
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                cursorColor = MaterialTheme.colorScheme.primary,
+                            ),
+                            onValueChange = {
+                                password.value = it
+                            },
+                            visualTransformation = if (showPassword.value)
+                                VisualTransformation.None
+                            else
+                                PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    showPassword.value = !showPassword.value
+                                }) {
+                                    Icon(
+                                        imageVector = if (showPassword.value)
+                                            ImageVector.vectorResource(R.drawable.visibility)
+                                        else
+                                            ImageVector.vectorResource(R.drawable.visibility_off),
+                                        contentDescription = "Visibility",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
+                                .focusRequester(focusRequester),
+                            textStyle = TextStyle(
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
+                        LaunchedEffect(key1 = Unit) {
+                            focusRequester.requestFocus()
+                            keyboardController?.show()
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    keyboardController?.hide()
+                                    showPasswordDialog.value = false
+                                    cancelAction()
+                                },
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.cancel),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
-                            .focusRequester(focusRequester),
-                        textStyle = TextStyle(
-                            fontSize = 18.sp,
-                            color = LocalCustomColors.current.dark
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                    )
-                    LaunchedEffect(key1 = Unit) {
-                        focusRequester.requestFocus()
-                        keyboardController?.show()
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        TextButton(
-                            onClick = {
-                                keyboardController?.hide()
-                                showPasswordDialog.value = false
-                                cancelAction()
-                            },
-                        ) {
-                            Text(
-                                text = stringResource(R.string.cancel),
-                                color = LocalCustomColors.current.gray
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        TextButton(
-                            onClick = {
-                                keyboardController?.hide()
-                                showPasswordDialog.value = false
-                                password.value = password.value.trim()
-                                if (!Account.checkAuthPass(password.value)) {
-                                    Toast.makeText(
-                                        ctx,
-                                        String.format(
-                                            getString(
-                                                ctx,
-                                                R.string.invalid_authentication_password
-                                            ), password.value
-                                        ),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    password.value = ""
-                                }
-                                okAction()
-                            },
-                        ) {
-                            Text(
-                                text = stringResource(R.string.ok),
-                                color = LocalCustomColors.current.alert
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            TextButton(
+                                onClick = {
+                                    keyboardController?.hide()
+                                    showPasswordDialog.value = false
+                                    password.value = password.value.trim()
+                                    if (!Account.checkAuthPass(password.value)) {
+                                        Toast.makeText(
+                                            ctx,
+                                            String.format(
+                                                ctx.getString(R.string.invalid_authentication_password),
+                                                password.value
+                                            ),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        password.value = ""
+                                    }
+                                    okAction()
+                                },
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.ok),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
-
 }

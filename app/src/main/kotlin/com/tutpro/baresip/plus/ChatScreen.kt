@@ -6,7 +6,6 @@ import android.text.format.DateUtils.isToday
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -34,14 +34,17 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -59,11 +62,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -84,7 +85,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
-import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
 import java.lang.String.format
@@ -175,11 +175,11 @@ private fun ChatScreen(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .background(LocalCustomColors.current.background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(ctx, navController, viewModel, account, peerUri)
@@ -227,10 +227,10 @@ private fun TopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
-            actionIconContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
             IconButton(onClick = { backAction(navController, account, peerUri) }) {
@@ -351,8 +351,9 @@ private fun Messages(
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
-                color = LocalCustomColors.current.gray
-            ),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+            .background(MaterialTheme.colorScheme.background),
         reverseLayout = true,
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -417,17 +418,10 @@ private fun Messages(
                         RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor =
-                            if (message.direction == MESSAGE_DOWN) {
-                                if (BaresipService.darkTheme.value)
-                                    LocalCustomColors.current.secondaryDark
-                                else
-                                    LocalCustomColors.current.secondaryLight
-                            } else {
-                                if (BaresipService.darkTheme.value)
-                                    LocalCustomColors.current.primaryDark
-                                else
-                                    LocalCustomColors.current.primaryLight
-                            }
+                            if (message.direction == MESSAGE_DOWN)
+                                MaterialTheme.colorScheme.secondaryContainer
+                            else
+                                MaterialTheme.colorScheme.primaryContainer
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -438,19 +432,11 @@ private fun Messages(
                         )
                 ) {
                     Column {
+                        val textColor = if (message.direction == MESSAGE_DOWN)
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        else
+                            MaterialTheme.colorScheme.onPrimaryContainer
                         Row {
-                            val textColor =
-                                if (message.direction == MESSAGE_DOWN) {
-                                    if (BaresipService.darkTheme.value)
-                                        LocalCustomColors.current.secondaryLight
-                                    else
-                                        LocalCustomColors.current.secondaryDark
-                                } else {
-                                    if (BaresipService.darkTheme.value)
-                                        LocalCustomColors.current.primaryLight
-                                    else
-                                        LocalCustomColors.current.primaryDark
-                                }
                             Text(text = sender, fontSize = 12.sp, color = textColor)
                             Spacer(modifier = Modifier.weight(1f))
                             Text(text = info, fontSize = 12.sp, color = textColor)
@@ -459,7 +445,7 @@ private fun Messages(
                             SelectionContainer {
                                 Text(
                                     text = message.message,
-                                    color = LocalCustomColors.current.itemText,
+                                    color = textColor,
                                     fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
                                         FontWeight.Bold else FontWeight.Normal
                                 )
@@ -534,10 +520,12 @@ private fun NewMessage(
                         modifier = Modifier.clickable {
                             newMessage.value = TextFieldValue("")
                             viewModel.updateAorPeerMessage(aor, peerUri, "")
-                        }
+                        },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                } },
-            label = { LabelText(stringResource(R.string.new_message)) },
+                }
+            },
+            label = { Text(stringResource(R.string.new_message)) },
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
@@ -549,59 +537,68 @@ private fun NewMessage(
             if (newMessage.value.text.isNotEmpty())
                 focusRequester.requestFocus()
         }
-        Image(
-            painter = painterResource(id = R.drawable.send),
-            contentDescription = "Send",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(36.dp)
-                .clickable {
-                    val msgText = newMessage.value.text
-                    if (msgText.isNotEmpty()) {
-                        keyboardController?.hide()
-                        val time = System.currentTimeMillis()
-                        val msg = Message(
-                            aor,
-                            peerUri,
-                            msgText,
-                            time,
-                            MESSAGE_UP_WAIT,
-                            0,
-                            "",
-                            true
-                        )
-                        msg.add()
-                        var msgUri = ""
-                        addMessage(msg)
-                        if (Utils.isTelUri(peerUri))
-                            if (ua.account.telProvider == "") {
-                                dialogMessage.value = String.format(
-                                    ctx.getString(R.string.no_telephony_provider),
-                                    Utils.plainAor(aor)
-                                )
-                                showDialog.value = true
-                            } else {
-                                msgUri = Utils.telToSip(peerUri, ua.account)
-                            }
-                        else
-                            msgUri = peerUri
-                        if (msgUri != "")
-                            if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0
-                            ) {
-                                Toast.makeText(
-                                    ctx, "${ctx.getString(R.string.message_failed)}!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = ctx.getString(R.string.message_failed)
-                            } else {
-                                newMessage.value = TextFieldValue("")
-                                viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                keyboardController?.hide()
-                            }
-                    }
+        SmallFloatingActionButton(
+            modifier = Modifier.offset(y = 2.dp),
+            onClick = {
+                val msgText = newMessage.value.text
+                if (msgText.isNotEmpty()) {
+                    keyboardController?.hide()
+                    val time = System.currentTimeMillis()
+                    val msg = Message(
+                        aor,
+                        peerUri,
+                        msgText,
+                        time,
+                        MESSAGE_UP_WAIT,
+                        0,
+                        "",
+                        true
+                    )
+                    msg.add()
+                    var msgUri = ""
+                    addMessage(msg)
+                    if (Utils.isTelUri(peerUri))
+                        if (ua.account.telProvider == "") {
+                            dialogMessage.value = String.format(
+                                ctx.getString(R.string.no_telephony_provider),
+                                Utils.plainAor(aor)
+                            )
+                            showDialog.value = true
+                        }
+                        else {
+                            msgUri = Utils.telToSip(peerUri, ua.account)
+                        }
+                    else
+                        msgUri = peerUri
+                    if (msgUri != "")
+                        if (Api.message_send(ua.uap,
+                                msgUri,
+                                msgText,
+                                time.toString()
+                        ) != 0) {
+                            Toast.makeText(
+                                ctx, "${ctx.getString(R.string.message_failed)}!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            msg.direction = MESSAGE_UP_FAIL
+                            msg.responseReason = ctx.getString(R.string.message_failed)
+                        }
+                        else {
+                            newMessage.value = TextFieldValue("")
+                            viewModel.updateAorPeerMessage(aor, peerUri, "")
+                            keyboardController?.hide()
+                        }
                 }
-        )
+            },
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                modifier = Modifier.size(28.dp),
+                contentDescription = stringResource(R.string.add)
+            )
+        }
     }
 }
 

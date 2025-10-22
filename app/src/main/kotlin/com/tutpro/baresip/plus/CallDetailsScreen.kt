@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -70,12 +71,12 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(
@@ -86,9 +87,9 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
@@ -131,7 +132,6 @@ private fun Peer(ctx: Context, callRow: CallRow) {
         modifier = Modifier.fillMaxWidth(),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
-        color = LocalCustomColors.current.itemText,
         textAlign = TextAlign.Center
     )
 }
@@ -140,21 +140,18 @@ private fun Peer(ctx: Context, callRow: CallRow) {
 private fun Details(ctx: Context, details: ArrayList<Details>) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = stringResource(R.string.direction),
-            color = LocalCustomColors.current.itemText,
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.width(96.dp)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(text = stringResource(R.string.time),
-            color = LocalCustomColors.current.itemText,
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(text = stringResource(R.string.calls_duration),
             modifier = Modifier.padding(end = 12.dp),
-            color = LocalCustomColors.current.itemText,
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -164,10 +161,9 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
         modifier = Modifier.fillMaxWidth()
             .verticalScrollbar(
                 state = lazyListState,
-                width = 4.dp,
-                color = LocalCustomColors.current.gray
+                width = 4.dp
             )
-            .background(LocalCustomColors.current.background),
+            .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -235,7 +231,7 @@ private fun startTime(detail: Details): String {
             durationText = DateUtils.formatElapsedTime(duration)
         }
     }
-    Text(text = startTimeText, color = LocalCustomColors.current.itemText)
+    Text(text = startTimeText)
     return durationText
 }
 
@@ -256,7 +252,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
     if (recording[0] != "") {
         Text(
             text = durationText,
-            color = LocalCustomColors.current.accent,
+            color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(end = 12.dp)
                 .clickable(onClick = {
                     if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
@@ -334,9 +330,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                 })
         )
     } else {
-        Text(text = durationText,
-            modifier = Modifier.padding(end = 12.dp),
-            color = LocalCustomColors.current.itemText)
+        Text(text = durationText, modifier = Modifier.padding(end = 12.dp))
     }
 }
 

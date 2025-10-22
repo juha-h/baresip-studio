@@ -36,7 +36,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,7 +64,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -79,17 +77,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -124,7 +123,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -143,7 +141,6 @@ import com.tutpro.baresip.plus.BaresipService.Companion.uas
 import com.tutpro.baresip.plus.BaresipService.Companion.uasStatus
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.DropdownMenu
-import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.PasswordDialog
 import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
@@ -242,7 +239,7 @@ private fun MainScreen(
                     val ua = UserAgent.ofAor(viewModel.selectedAor.value)
                     if (ua != null) {
                         showCall(ctx, viewModel, ua)
-                        updateIcons(viewModel, ua.account)
+                        viewModel.triggerAccountUpdate()
                     }
                 }
 
@@ -358,8 +355,7 @@ private fun MainScreen(
     LaunchedEffect(currentRoute, viewModel.selectedAor.collectAsState()) {
         if (currentRoute == "main") {
             Log.d(TAG, "Updating icons for AOR: ${viewModel.selectedAor.value}")
-            val account = Account.ofAor(viewModel.selectedAor.value)
-            updateIcons(viewModel, account)
+            viewModel.triggerAccountUpdate()
         }
     }
 
@@ -529,15 +525,13 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        modifier = Modifier.fillMaxSize().imePadding(),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         WindowInsets.statusBars
                             .union(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
@@ -604,8 +598,9 @@ private fun TopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            titleContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
@@ -621,7 +616,8 @@ private fun TopAppBar(
                                 recImage = if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
                                     recOnImage
-                                } else {
+                                }
+                                else {
                                     Api.module_unload("sndfile")
                                     recOffImage
                                 }
@@ -636,9 +632,9 @@ private fun TopAppBar(
                         }
                     ),
                 tint = if (BaresipService.isRecOn)
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -655,7 +651,8 @@ private fun TopAppBar(
                                 if (BaresipService.isMicMuted) {
                                     viewModel.updateMicIcon(R.drawable.mic_off)
                                     Api.calls_mute(true)
-                                } else {
+                                }
+                                else {
                                     viewModel.updateMicIcon(R.drawable.mic_on)
                                     Api.calls_mute(false)
                                 }
@@ -668,9 +665,9 @@ private fun TopAppBar(
                         },
                     ),
                 tint = if (BaresipService.isMicMuted)
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -702,9 +699,9 @@ private fun TopAppBar(
                         },
                     ),
                 tint = if (Utils.isSpeakerPhoneOn(am))
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.onPrimary,
+                    MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
 
@@ -716,7 +713,7 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu",
-                    tint = LocalCustomColors.current.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -748,41 +745,53 @@ private fun TopAppBar(
 @Composable
 private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
-    val vmIcon by viewModel.vmIcon.collectAsState()
-    val showVmIcon by viewModel.showVmIcon.collectAsState()
-    val messagesIcon by viewModel.messagesIcon.collectAsState()
-    val callsIcon by viewModel.callsIcon.collectAsState()
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val aor by viewModel.selectedAor.collectAsState()
+    val accountUpdate by viewModel.accountUpdate.collectAsState()
+
+    val showVmIcon = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.vmUri?.isNotEmpty() ?: false else false
+    }
+    val hasNewVoicemail = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
+    }
+    val hasUnreadMessages = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
+    }
+    val hasMissedCalls = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
+    }
+
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     val buttonSize = 48.dp
 
-    Row( modifier = Modifier
-        .fillMaxWidth()
-        .navigationBarsPadding()
-        .padding(bottom = 16.dp),
+    Row(
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         if (showVmIcon)
             IconButton(
+                // Disable the button if no account is selected
+                enabled = aor.isNotEmpty(),
                 onClick = {
-                    if (viewModel.selectedAor.value != "") {
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val acc = ua.account
-                        if (acc.vmUri != "") {
-                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                            dialogMessage.value = acc.vmMessages(ctx)
-                            positiveText.value = ctx.getString(R.string.listen)
-                            onPositiveClicked.value = {
-                                val intent = Intent(ctx, MainActivity::class.java)
-                                intent.putExtra("uap", ua.uap)
-                                intent.putExtra("peer", acc.vmUri)
-                                handleIntent(ctx, viewModel, intent, "call")
-                            }
-                            negativeText.value = ctx.getString(R.string.cancel)
-                            onNegativeClicked.value = {}
-                            showDialog.value = true
+                    // No need for an 'if' check here anymore
+                    val ua = UserAgent.ofAor(aor)!!
+                    val acc = ua.account
+                    if (acc.vmUri.isNotEmpty()) {
+                        dialogTitle.value = ctx.getString(R.string.voicemail_messages)
+                        dialogMessage.value = acc.vmMessages(ctx)
+                        positiveText.value = ctx.getString(R.string.listen)
+                        onPositiveClicked.value = {
+                            val intent = Intent(ctx, MainActivity::class.java)
+                            intent.putExtra("uap", ua.uap)
+                            intent.putExtra("peer", acc.vmUri)
+                            handleIntent(ctx, viewModel, intent, "call")
                         }
+                        negativeText.value = ctx.getString(R.string.cancel)
+                        onNegativeClicked.value = {}
+                        showDialog.value = true
                     }
                 },
                 modifier = Modifier
@@ -790,13 +799,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     .size(buttonSize)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(vmIcon),
+                    imageVector = ImageVector.vectorResource(R.drawable.voicemail),
                     contentDescription = null,
                     Modifier.size(buttonSize),
-                    tint = if (vmIcon == R.drawable.voicemail)
-                        LocalCustomColors.current.onBackground
-                    else
-                        LocalCustomColors.current.accent
+                    tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -810,74 +816,60 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 imageVector = ImageVector.vectorResource(R.drawable.contacts),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = LocalCustomColors.current.onBackground
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
 
         IconButton(
+            enabled = aor.isNotEmpty(),
             onClick = {
-                if (viewModel.selectedAor.value != "")
-                    navController.navigate("chats/${viewModel.selectedAor.value}")
+                navController.navigate("chats/$aor")
             },
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(messagesIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.messages),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = if (messagesIcon == R.drawable.messages)
-                    LocalCustomColors.current.onBackground
-                else
-                    LocalCustomColors.current.accent
+                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
         }
 
         IconButton(
+            enabled = aor.isNotEmpty(),
             onClick = {
-                if (viewModel.selectedAor.value != "")
-                    navController.navigate("calls/${viewModel.selectedAor.value}")
+                navController.navigate("calls/$aor")
             },
             modifier = Modifier
                 .weight(1f)
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(callsIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.calls),
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = if (callsIcon == R.drawable.calls)
-                    LocalCustomColors.current.onBackground
-                else
-                    LocalCustomColors.current.accent
+                tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
         }
 
         IconButton(
-            onClick = { viewModel.updateDialpadIcon(
-                if (dialpadIcon == R.drawable.dialpad_off)
-                    R.drawable.dialpad_on
-                else
-                    R.drawable.dialpad_off
-            ) },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize),
+            onClick = { viewModel.toggleDialpadVisibility() },
+            modifier = Modifier.weight(1f).size(buttonSize),
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(dialpadIcon),
+                imageVector = ImageVector.vectorResource(R.drawable.dialpad),
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
-                tint = if (dialpadIcon == R.drawable.dialpad_off)
-                    LocalCustomColors.current.onBackground
+                tint = if (isDialpadVisible)
+                    MaterialTheme.colorScheme.error
                 else
-                    LocalCustomColors.current.accent
+                    MaterialTheme.colorScheme.secondary
             )
         }
     }
-
 }
 
 private val callUri = mutableStateOf("")
@@ -967,7 +959,8 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        } else if (offset > swipeThreshold) {
+                        }
+                        else if (offset > swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                 val newPos = when (curPos) {
@@ -1019,8 +1012,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         }
 
     showCall(ctx, viewModel, UserAgent.ofAor(selected))
-
-    updateIcons(viewModel, Account.ofAor(selected))
+    viewModel.triggerAccountUpdate()
 
     if (selected == "") {
         OutlinedButton(
@@ -1032,10 +1024,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 .height(50.dp)
                 .fillMaxWidth(),
             colors = ButtonColors(
-                containerColor = LocalCustomColors.current.grayLight,
-                contentColor = LocalCustomColors.current.dark,
-                disabledContainerColor = LocalCustomColors.current.grayLight,
-                disabledContentColor = LocalCustomColors.current.dark
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(12.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
@@ -1064,7 +1056,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1078,10 +1071,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     )
                 },
             colors = ButtonColors(
-                containerColor = LocalCustomColors.current.grayLight,
-                contentColor = LocalCustomColors.current.dark,
-                disabledContainerColor = LocalCustomColors.current.grayLight,
-                disabledContentColor = LocalCustomColors.current.dark
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(12.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
@@ -1115,7 +1108,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1139,14 +1133,14 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
             ) {
-                uas.value.forEachIndexed { _, ua ->
+                uas.value.forEachIndexed { index, ua ->
                     val acc = ua.account
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
                             viewModel.updateSelectedAor(acc.aor)
                             showCall(ctx, viewModel, ua)
-                            updateIcons(viewModel, acc)
+                            viewModel.triggerAccountUpdate()
                         },
                         text = { Text(
                             text = acc.text(),
@@ -1161,6 +1155,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             )
                         }
                     )
+                    if (index < uas.value.size - 1) {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant) }
                 }
             }
         }
@@ -1173,7 +1169,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
     var filteredSuggestions by remember { mutableStateOf(suggestions) }
     val focusRequester = remember { FocusRequester() }
     val lazyListState = rememberLazyListState()
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -1187,8 +1183,6 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 value = callUri.value,
                 enabled = callUriEnabled.value,
                 singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = OutlinedTextFieldDefaults.colors().unfocusedIndicatorColor),
                 onValueChange = {
                     if (it != callUri.value) {
                         callUri.value = it
@@ -1202,13 +1196,13 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     if (callUriEnabled.value && callUri.value.isNotEmpty())
                         Icon(Icons.Outlined.Clear,
                             contentDescription = null,
-                            modifier = Modifier
-                                .clickable {
-                                    if (showSuggestions.value)
-                                        showSuggestions.value = false
-                                    else
-                                        callUri.value = ""
-                                }
+                            modifier = Modifier.clickable {
+                                if (showSuggestions.value)
+                                    showSuggestions.value = false
+                                else
+                                    callUri.value = ""
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 },
                 modifier = Modifier
@@ -1217,21 +1211,13 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     .focusRequester(focusRequester)
                     .onFocusChanged {
                         val account = Account.ofAor(viewModel.selectedAor.value)
-                        if (account != null)
-                            if (account.numericKeypad)
-                                viewModel.updateDialpadIcon(R.drawable.dialpad_on)
+                        if (account != null && account.numericKeypad)
+                            if (!isDialpadVisible)
+                                viewModel.toggleDialpadVisibility()
                     },
-                label = {
-                    LabelText(
-                        text = callUriLabel.value,
-                        fontSize = 18.sp,
-                    )
-                },
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = LocalCustomColors.current.itemText
-                ),
-                keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
+                label = { Text(text = callUriLabel.value, fontSize = 18.sp) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                keyboardOptions = if (isDialpadVisible)
                     KeyboardOptions(keyboardType = KeyboardType.Phone)
                 else
                     KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -1242,7 +1228,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(8.dp))
                     .background(
-                        LocalCustomColors.current.grayLight,
+                        color = MaterialTheme.colorScheme.surfaceContainer,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .animateContentSize()
@@ -1256,7 +1242,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                 .fillMaxWidth()
                                 .verticalScrollbar(
                                     state = lazyListState,
-                                    color = LocalCustomColors.current.gray
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 ),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
@@ -1277,7 +1263,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                     Text(
                                         text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = LocalCustomColors.current.grayDark,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -1288,7 +1274,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             }
         }
         if (showCallTimer.value) {
-            val textColor = LocalCustomColors.current.itemText.toArgb()
+            val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
             var chronometerInstance: Chronometer? = null
             AndroidView(
                 factory = { context ->
@@ -1373,7 +1359,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
 @Composable
 private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
-    val dialpadIcon by viewModel.dialpadIcon.collectAsState()
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row( modifier = Modifier
         .fillMaxWidth()
@@ -1574,19 +1560,18 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         }
                     ) {
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = LocalCustomColors.current.cardBackground
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = stringResource(R.string.call_transfer),
                                     fontSize = 20.sp,
-                                    color = LocalCustomColors.current.alert,
+                                    color = MaterialTheme.colorScheme.error
                                 )
                                 var transferUri by remember { mutableStateOf("") }
                                 val suggestions by remember { contactNames }
@@ -1620,24 +1605,17 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                         showSuggestions.value = false
                                                     else
                                                         transferUri = ""
-                                                }
+                                                },
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            start = 4.dp,
-                                            end = 4.dp,
-                                            top = 12.dp,
-                                            bottom = 2.dp
-                                        )
+                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                                         .focusRequester(focusRequester),
-                                    label = { LabelText(stringResource(R.string.transfer_destination)) },
-                                    textStyle = TextStyle(
-                                        fontSize = 18.sp,
-                                        color = LocalCustomColors.current.itemText
-                                    ),
-                                    keyboardOptions = if (dialpadIcon == R.drawable.dialpad_on)
+                                    label = { Text(stringResource(R.string.transfer_destination)) },
+                                    textStyle = TextStyle(fontSize = 18.sp),
+                                    keyboardOptions = if (isDialpadVisible)
                                         KeyboardOptions(keyboardType = KeyboardType.Phone)
                                     else
                                         KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -1648,7 +1626,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         .fillMaxWidth()
                                         .shadow(8.dp, RoundedCornerShape(8.dp))
                                         .background(
-                                            LocalCustomColors.current.grayLight,
+                                            color = MaterialTheme.colorScheme.surfaceContainer,
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .animateContentSize()
@@ -1662,7 +1640,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                     .fillMaxWidth()
                                                     .verticalScrollbar(
                                                         state = lazyListState,
-                                                        color = LocalCustomColors.current.gray
+                                                        color = MaterialTheme.colorScheme.outlineVariant
                                                     ),
                                                 horizontalAlignment = Alignment.Start,
                                                 state = lazyListState,
@@ -1683,7 +1661,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                         Text(
                                                             text = suggestion,
                                                             modifier = Modifier.fillMaxWidth(),
-                                                            color = LocalCustomColors.current.grayDark,
+                                                            color = MaterialTheme.colorScheme.onSurface,
                                                             fontSize = 18.sp
                                                         )
                                                     }
@@ -1700,7 +1678,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.blind),
-                                                color = LocalCustomColors.current.alert,
+                                                color = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1714,7 +1692,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.attended),
-                                                color = LocalCustomColors.current.alert,
+                                                color = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1740,7 +1718,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                     ) {
                                         Text(
                                             text = stringResource(R.string.cancel),
-                                            color = LocalCustomColors.current.gray
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                     TextButton(
@@ -1788,7 +1766,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                                 else
                                                     R.string.call
                                             ).uppercase(),
-                                            color = LocalCustomColors.current.primary
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 }
@@ -1799,14 +1777,14 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
             val focusRequester = remember { FocusRequester() }
             val shouldRequestFocus by focusDtmf
-            val interactionSource = remember { MutableInteractionSource() }
-            BasicTextField(
+            TextField(
                 value = dtmfText.value,
                 onValueChange = {
                     if (it.length > dtmfText.value.length) {
                         val char = it.last()
                         if (char.isDigit() || char == '*' || char == '#') {
                             Log.d(TAG, "Got DTMF digit '$char'")
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
                             ua.currentCall()?.sendDigit(char)
                         }
                     }
@@ -1814,29 +1792,13 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
-                    .width(48.dp)
+                    .width(80.dp)
                     .focusRequester(focusRequester),
-                visualTransformation = VisualTransformation.None,
-                interactionSource = interactionSource,
-                textStyle = TextStyle(fontSize = 14.sp, color = LocalCustomColors.current.itemText),
-                singleLine = true,
-            ) { innerTextField ->
-                TextFieldDefaults.DecorationBox(
-                    value = dtmfText.value,
-                    visualTransformation = VisualTransformation.None,
-                    innerTextField = innerTextField,
-                    singleLine = true,
-                    enabled = dtmfEnabled.value,
-                    interactionSource = interactionSource,
-                    label =  {
-                        Text(
-                            text = stringResource(R.string.dtmf),
-                            style = TextStyle(fontSize = 12.sp)
-                        )
-                    },
-                    contentPadding = PaddingValues(4.dp),
-                )
-            }
+                enabled = dtmfEnabled.value,
+                textStyle = TextStyle(fontSize = 16.sp),
+                label = { Text(stringResource(R.string.dtmf)) },
+                singleLine = true
+            )
             LaunchedEffect(shouldRequestFocus) {
                 if (shouldRequestFocus) {
                     focusRequester.requestFocus()
@@ -1940,17 +1902,13 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 private fun OnHoldNotice() {
     OutlinedButton(
         onClick = {},
-        border = BorderStroke(2.dp, LocalCustomColors.current.accent),
-        modifier = Modifier
-            .padding(16.dp)
-            .wrapContentSize(),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+        modifier = Modifier.padding(16.dp).wrapContentSize(),
         shape = RoundedCornerShape(20)
     ) {
         Text(
             text = stringResource(R.string.call_is_on_hold),
-            fontSize = 18.sp,
-            color = LocalCustomColors.current.itemText,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            fontSize = 18.sp
         )
     }
 }
@@ -1959,11 +1917,8 @@ private fun OnHoldNotice() {
 fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()
-            .background(Color.Black),
-        color = LocalCustomColors.current.background
+        modifier = Modifier.fillMaxSize().navigationBarsPadding().background(Color.Black),
+        color = MaterialTheme.colorScheme.background
     ) {
         val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
         var videoSecurityButtonInstance: ImageButton? = null
@@ -2318,7 +2273,7 @@ private fun videoSecurityIcon(security: Int): Int {
 private fun spinToAor(viewModel: ViewModel, aor: String) {
     if (aor != viewModel.selectedAor.value)
         viewModel.updateSelectedAor(aor)
-    updateIcons(viewModel, Account.ofAor(aor))
+    viewModel.triggerAccountUpdate()
 }
 
 private fun callClick(ctx: Context, viewModel: ViewModel, video: Boolean) {
@@ -2738,7 +2693,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     when (ev[0]) {
         "call rejected" -> {
             if (aor == viewModel.selectedAor.value)
-                viewModel.updateCallsIcon(R.drawable.calls_missed)
+                viewModel.triggerAccountUpdate()
         }
         "call incoming", "call outgoing" -> {
             val callp = params[1] as Long
@@ -2911,7 +2866,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
                 if (acc.missedCalls)
-                    viewModel.updateCallsIcon(R.drawable.calls_missed)
+                    viewModel.triggerAccountUpdate()
             }
             //if (kgm.isDeviceLocked)
             //    this.setShowWhenLocked(false)
@@ -2931,13 +2886,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     break
                 }
             }
-            if (aor == viewModel.selectedAor.value) {
-                viewModel.updateVmIcon(if (acc.vmNew > 0)
-                    R.drawable.voicemail_new
-                else
-                    R.drawable.voicemail
-                )
-            }
+            if (aor == viewModel.selectedAor.value)
+                viewModel.triggerAccountUpdate()
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
@@ -3108,36 +3058,6 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
     } else {
         Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
         call.notifySipfrag(500, "Call Error")
-    }
-}
-
-private fun updateIcons(viewModel: ViewModel, acc: Account?) {
-    if (acc == null) {
-        viewModel.updateShowVmIcon(false)
-        viewModel.updateMessagesIcon(R.drawable.messages)
-        viewModel.updateCallsIcon(R.drawable.calls)
-    }
-    else {
-
-        if (acc.vmUri != "") {
-            viewModel.updateShowVmIcon(true)
-            viewModel.updateVmIcon(if (acc.vmNew > 0)
-                R.drawable.voicemail_new
-            else
-                R.drawable.voicemail
-            )
-        } else
-            viewModel.updateShowVmIcon(false)
-
-        viewModel.updateMessagesIcon(if (acc.unreadMessages)
-            R.drawable.messages_unread
-        else
-            R.drawable.messages)
-
-        viewModel.updateCallsIcon(if (acc.missedCalls)
-            R.drawable.calls_missed
-        else
-            R.drawable.calls)
     }
 }
 

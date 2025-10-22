@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -97,12 +98,12 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 TopAppBar(navController, account, callHistory)
@@ -152,10 +153,10 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = LocalCustomColors.current.primary,
-            navigationIconContentColor = LocalCustomColors.current.onPrimary,
-            titleContentColor = LocalCustomColors.current.onPrimary,
-            actionIconContentColor = LocalCustomColors.current.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
@@ -236,7 +237,6 @@ private fun Account(account: Account) {
             .padding(top = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
-        color = LocalCustomColors.current.itemText,
         textAlign = TextAlign.Center
     )
 }
@@ -275,9 +275,9 @@ private fun Calls(
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
-                color = LocalCustomColors.current.gray
+                color = MaterialTheme.colorScheme.outlineVariant
             )
-            .background(LocalCustomColors.current.background),
+            .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -398,13 +398,12 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text("...", color = LocalCustomColors.current.itemText)
+                            Text("...", color = MaterialTheme.colorScheme.onBackground)
                         Text(text = Utils.friendlyUri(ctx, peerUri, account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = LocalCustomColors.current.itemText
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -415,9 +414,9 @@ private fun Calls(
                     lineHeight = 16.sp,
                     textAlign = TextAlign.End,
                     color = if (recordings)
-                        LocalCustomColors.current.accent
+                        MaterialTheme.colorScheme.error
                     else
-                        LocalCustomColors.current.itemText,
+                        MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable(onClick = {

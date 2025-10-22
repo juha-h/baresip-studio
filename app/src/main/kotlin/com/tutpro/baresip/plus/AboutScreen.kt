@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -44,12 +45,12 @@ fun NavGraphBuilder.aboutScreenRoute(navController: NavController) {
 private fun AboutScreen(onBack: () -> Unit) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -58,7 +59,6 @@ private fun AboutScreen(onBack: () -> Unit) {
                     title = {
                         Text(
                             text = stringResource(R.string.about_title_plus),
-                            color = LocalCustomColors.current.light,
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -67,12 +67,13 @@ private fun AboutScreen(onBack: () -> Unit) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = LocalCustomColors.current.light
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 )
@@ -81,10 +82,11 @@ private fun AboutScreen(onBack: () -> Unit) {
     ) { contentPadding ->
         Text(
             text = AnnotatedString.fromHtml(
-                htmlString = stringResource(R.string.about_text_plus, BuildConfig.VERSION_NAME),
-                linkStyles = TextLinkStyles(SpanStyle(color = LocalCustomColors.current.accent))
+                htmlString = stringResource(R.string.about_text_plus,
+                    BuildConfig.VERSION_NAME),
+                linkStyles = TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.error))
             ),
-            color = LocalCustomColors.current.itemText,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 16.dp)
                 .padding(contentPadding)

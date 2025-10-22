@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,19 +13,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
@@ -40,10 +45,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +57,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
-import com.tutpro.baresip.plus.CustomElements.LabelText
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
@@ -68,12 +70,12 @@ fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
 fun AccountsScreen(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -86,9 +88,9 @@ fun AccountsScreen(navController: NavController) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -108,7 +110,6 @@ fun AccountsScreen(navController: NavController) {
         },
     )
 }
-
 
 @Composable
 fun AccountsContent(contentPadding: PaddingValues, navController: NavController) {
@@ -131,17 +132,23 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
     val showAccounts = remember { mutableStateOf(true) }
 
     if (showAccounts.value && BaresipService.uas.value.isNotEmpty()) {
-        val scrollState = rememberScrollState()
-        Column(
+
+        val lazyListState = rememberLazyListState()
+
+        LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                .verticalScrollbar(scrollState)
-                .verticalScroll(state = scrollState),
+                .verticalScrollbar(
+                    state = lazyListState,
+                    width = 4.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                ),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            for (ua in BaresipService.uas.value) {
+            items(BaresipService.uas.value) { ua ->
                 val account = ua.account
                 val aor = account.aor
                 val text = account.text()
@@ -151,13 +158,16 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                     Text(
                         text = text,
                         fontSize = 20.sp,
-                        color = LocalCustomColors.current.itemText,
-                        modifier = Modifier.weight(1f).padding(start = 10.dp)
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
                             .clickable {
                                 navController.navigate("account/$aor/old")
                             }
                     )
                     SmallFloatingActionButton(
+                        modifier = Modifier.padding(end = 8.dp),
                         onClick = {
                             message.value = String.format(
                                 ctx.getString(R.string.delete_account),
@@ -174,8 +184,8 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                             }
                             showDialog.value = true
                         },
-                        containerColor = LocalCustomColors.current.background,
-                        contentColor = LocalCustomColors.current.secondary
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ) {
                         Icon(
                             Icons.Filled.Delete,
@@ -272,32 +282,36 @@ fun NewAccount(navController: NavController) {
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = "Clear",
-                        modifier = Modifier.clickable { newAor = "" }
+                        modifier = Modifier.clickable { newAor = "" },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
-            label = { LabelText(stringResource(R.string.new_account)) },
+            label = { Text(stringResource(R.string.new_account)) },
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
             )
         )
-        Image(
-            painter = painterResource(id = R.drawable.plus),
-            contentDescription = "Add",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp)
-                .clickable(
-                    onClick = {
-                        val account = createNew(ctx, newAor.trim())
-                        if (account != null) {
-                            navController.navigate("account/${account.aor}/new")
-                            newAor = ""
-                            focusManager.clearFocus()
-                        }
-                    }
-                )
-        )
+        SmallFloatingActionButton(
+            modifier = Modifier.offset(y = 2.dp),
+            onClick = {
+                val account = createNew(ctx, newAor.trim())
+                if (account != null) {
+                    navController.navigate("account/${account.aor}/new")
+                    newAor = ""
+                    focusManager.clearFocus()
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                modifier = Modifier.size(36.dp),
+                contentDescription = stringResource(R.string.add)
+            )
+        }
     }
 }
 

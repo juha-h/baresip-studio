@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -78,12 +80,12 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = LocalCustomColors.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(LocalCustomColors.current.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
@@ -96,9 +98,9 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = LocalCustomColors.current.primary,
-                        navigationIconContentColor = LocalCustomColors.current.onPrimary,
-                        titleContentColor = LocalCustomColors.current.onPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -113,9 +115,11 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
             }
         },
         floatingActionButton = {
-            SmallFloatingActionButton(onClick = { navController.navigate("baresip_contact//new") },
-                containerColor = LocalCustomColors.current.accent,
-                contentColor = LocalCustomColors.current.background
+            SmallFloatingActionButton(
+                modifier = Modifier.offset(x = 2.dp),
+                onClick = { navController.navigate("baresip_contact//new") },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ) {
                 Icon(imageVector = Icons.Filled.Add,
                     modifier = Modifier.size(36.dp),
@@ -161,13 +165,13 @@ private fun ContactsContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LocalCustomColors.current.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
             .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 64.dp)
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
-                color = LocalCustomColors.current.gray
+                color = MaterialTheme.colorScheme.outlineVariant
             ),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -219,7 +223,6 @@ private fun ContactsContent(
                         Text(text = name,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            color = LocalCustomColors.current.itemText,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 10.dp)
@@ -288,8 +291,8 @@ private fun ContactsContent(
                         SmallFloatingActionButton(
                             modifier = Modifier.padding(end = 10.dp),
                             onClick = { navController.navigate("baresip_contact/${name}/old") },
-                            containerColor = LocalCustomColors.current.background,
-                            contentColor = LocalCustomColors.current.secondary
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
@@ -303,7 +306,6 @@ private fun ContactsContent(
                         Text(text = name,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            color = LocalCustomColors.current.itemText,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
