@@ -2,9 +2,6 @@ package com.tutpro.baresip
 
 import androidx.compose.ui.graphics.Color
 
-// App's color palette is defined by these values, which are used to build
-// the MaterialTheme in AppTheme.kt
-
 val Primary = Color(0xFF0CA1FD)
 val OnPrimary = Color(0xFFFFFFFF)
 val PrimaryContainer = Color(0xFFA1CBE6)
