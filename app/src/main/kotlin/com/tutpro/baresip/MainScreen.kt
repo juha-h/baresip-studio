@@ -1141,12 +1141,8 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
         ) {
             OutlinedTextField(
                 value = callUri.value,
-                enabled = callUriEnabled.value,
+                readOnly = !callUriEnabled.value,
                 singleLine = true,
-                //colors = OutlinedTextFieldDefaults.colors(
-                //    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                //    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                //),
                 onValueChange = {
                     if (it != callUri.value) {
                         callUri.value = it
