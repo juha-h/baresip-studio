@@ -1,0 +1,2 @@
+- Improved visibility of Main screen Call from field and Account screen SIP URI field
+- Improved surface container and error colors
