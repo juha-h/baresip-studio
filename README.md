@@ -6,7 +6,7 @@ If you need video calling and have a device that supports Camera2 API, you can i
 
 After cloning the project, generate static libraries and include files to distribution directory using master branch of <a href="https://github.com/juha-h/libbaresip-android">libbaresip-android</a>.
 
-Then in Android Studio (tested with Android Studio Meerkat | 2024.3.1):
+Then in Android Studio (tested with Android Studio Narwhal | 2025.1.4):
 
 - Open an existing Android Studio project
 
