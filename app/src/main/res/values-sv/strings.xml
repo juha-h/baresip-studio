@@ -465,4 +465,6 @@ där även problem kan rapporteras.</p>
     <string name="rel_100_help">Om detta är markerat, ange stöd för tillförlitliga provisoriska svar (RFC 3262).</string>
     <string name="dtmf_auto">In-band RTP eller SIP INFO</string>
     <string name="tone_country">Signalland</string>
+    <string name="dynamic_colors">Dynamiska färger</string>
+    <string name="dynamic_colors_help">Använd dynamiska färger om det är aktiverat i Android-inställningarna</string>
 </resources>
