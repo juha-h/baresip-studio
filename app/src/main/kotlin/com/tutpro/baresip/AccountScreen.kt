@@ -1539,7 +1539,11 @@ private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
                                     acc.outbound.add(text)
 
                             "registration-interval" ->
-                                acc.configuredRegInt = text.toInt()
+                                acc.configuredRegInt = try {
+                                    text.toInt()
+                                } catch (_: NumberFormatException) {
+                                    900
+                                }
 
                             "register" ->
                                 acc.regint = if (text == "yes") acc.configuredRegInt else 0
