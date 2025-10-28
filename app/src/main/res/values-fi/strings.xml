@@ -43,11 +43,11 @@
             <br>
             <h2>Lisenssit</h2>
                 <ul>
-                    <li><b>BSD-3-Clause</b> except the following:</li>
                     <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
                     <li><b>Apache 2.0</b> AMR koodausmenetelmät ja TLS turvallisuus</li>
                     <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
-                    <li><b>GNU LGPL 2.1</b> G.722, G.726, ja Codec2 koodausmenetelmät</li>
+                    <li><b>GNU LGPL 2.1</b> Codec2 koodausmenetelmä</li>
+                    <li><b>Ilmainen</b> G.722 koodausmenetelmä</li>
                     <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
                 </ul>
         ]]>
@@ -98,11 +98,11 @@
             <br>
             <h2>Lisenssit</h2>
             <ul>
-                <li><b>BSD-3-Clause</b> except the following:</li>
                 <li><b>BSD-3-Clause</b> paitsi seuraavat:</li>
                 <li><b>Apache 2.0</b> AMR koodausmenetelmät ja TLS turvallisuus</li>
                 <li><b>AGPLv4</b> ZRTP median salausmenetelmä</li>
-                <li><b>GNU LGPL 2.1</b> G.722, G.726, ja Codec2 koodausmenetelmät</li>
+                <li><b>GNU LGPL 2.1</b> Codec2 koodausmenetelmä</li>
+                <li><b>Ilmainen</b> G.722 koodausmenetelmä</li>
                 <li><b>GNU GPLv3</b> G.729 koodausmenetelmä</li>
                 <li><b>GNU GPLv2</b> H.264 ja H.265 koodausmenetelmät</li>
                 <li><b>AOMedia</b> AV1 koodausmenetelmä</li>
