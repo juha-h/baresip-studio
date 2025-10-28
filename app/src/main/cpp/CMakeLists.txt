@@ -22,9 +22,9 @@ add_library(lib_opus STATIC IMPORTED)
 set_target_properties(lib_opus PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/opus/lib/${ANDROID_ABI}/libopus.a)
 
-add_library(lib_spandsp STATIC IMPORTED)
-set_target_properties(lib_spandsp PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/spandsp/lib/${ANDROID_ABI}/libspandsp.a)
+add_library(lib_g722 STATIC IMPORTED)
+set_target_properties(lib_g722 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/g722/lib/${ANDROID_ABI}/libg722.a)
 
 add_library(lib_g722_1 STATIC IMPORTED)
 set_target_properties(lib_g722_1 PROPERTIES IMPORTED_LOCATION
@@ -79,7 +79,7 @@ target_link_libraries(baresip
         lib_ssl
         lib_crypto
         lib_opus
-        lib_spandsp
+        lib_g722
         lib_g722_1
         lib_g729
         lib_codec2
