@@ -82,9 +82,9 @@ add_library(lib_postproc SHARED IMPORTED)
 set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.so)
 
-add_library(lib_spandsp STATIC IMPORTED)
-set_target_properties(lib_spandsp PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/spandsp/lib/${ANDROID_ABI}/libspandsp.a)
+add_library(lib_g722 STATIC IMPORTED)
+set_target_properties(lib_g722 PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/g722/lib/${ANDROID_ABI}/libg722.a)
 
 add_library(lib_g722_1 STATIC IMPORTED)
 set_target_properties(lib_g722_1 PROPERTIES IMPORTED_LOCATION
@@ -164,7 +164,7 @@ target_link_libraries(baresip
         lib_avutil
         lib_swresample
         lib_postproc
-        lib_spandsp
+        lib_g722
         lib_g722_1
         lib_g729
         lib_codec2
