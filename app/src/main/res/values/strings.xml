@@ -48,7 +48,8 @@
             <li><b>BSD-3-Clause</b> except the following:</li>
             <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
             <li><b>AGPLv4</b> ZRTP media encryption</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726, and Codec2 codecs</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
         </ul>
         ]]>
@@ -104,7 +105,8 @@
             <li><b>BSD-3-Clause</b> except the following:</li>
             <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
             <li><b>AGPLv4</b> ZRTP media encryption</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726, and Codec2 codecs</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
             <li><b>GNU GPLv3</b> G.729 codec</li>
             <li><b>GNU GPLv2</b> H.264 and H.265 codecs</li>
             <li><b>AOMedia</b> AV1 codec</li>
