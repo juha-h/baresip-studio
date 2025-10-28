@@ -1,6 +1,6 @@
-This branch adds video calling capability to baresip app and provides its sister app called baresip+. Currently AV1, VP9, VP8, H.264, and H.265 video codecs are supported.
+This branch adds video calling capability to baresip app and provides its sister app called baresip+. Currently AV1, H.264, H.265, VP8, and VP9 video codecs are supported.
 
-Static libraries and include files need to be generated to distribution directory using video branch of <a href="https://github.com/juha-h/libbaresip-android">libbaresip-android</a>.  Video codecs and support of android_camera input device are provided by FFmpeg libraries and need at least Android API level 24.
+Static libraries and include files need to be generated to distribution directory using video branch of <a href="https://github.com/juha-h/libbaresip-android">libbaresip-android</a>.  Video codecs and support of android_camera input device are provided by FFmpeg libraries and need at least Android API level 28.
 
 Video calling is possible on devices that include Camera2 API at hardware support level LIMITED or higher.
 
