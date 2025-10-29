@@ -74,7 +74,7 @@ static bool jni_init_ids()
             jobjs.cam2.m_start);
     GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "stopCamera", "()V", jobjs.cam2.m_stop);
 
-    /* 注册 native PushFrame 回调 */
+    /* native PushFrame */
     {
         JNINativeMethod m[] = {{"PushFrame",
                 "(JLjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;II)V",
@@ -281,16 +281,18 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
 
         if (st->rotate == 0) {
             // YUV_420_888 → I420
-            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
-                    (const uint8_t *)srcV, rowStride2,
+            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
+                    rowStride1,(const uint8_t *)srcV, rowStride2,
                     pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2, width, height);
+                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2,
+                    width, height);
         } else {
             // YUV_420_888 → I420 (rotate)
             Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
                     rowStride1, (const uint8_t *)srcV, rowStride2,
                     pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2, width, height, st->rotate);
+                    dst_y, dst_w, dst_u, dst_w / 2, dst_v, dst_w / 2,
+                    width, height, st->rotate);
         }
     } else if (st->fmt == VID_FMT_NV12) {
         int i420_size = dst_w * dst_h * 3 / 2;
@@ -309,20 +311,23 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
 
         if (st->rotate == 0) {
             // Step1: YUV_420_888 → I420
-            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU, rowStride1,
-                    (const uint8_t *)srcV, rowStride2,
+            Android420ToI420((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
+                    rowStride1,(const uint8_t *)srcV, rowStride2,
                     pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                    i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height);
+                    i420_y, dst_w, i420_u, dst_w / 2, i420_v,
+                    dst_w / 2, width, height);
         } else {
             // Step1: YUV_420_888 → I420 (rotate)
             Android420ToI420Rotate((const uint8_t *)srcY, rowStride0, (const uint8_t *)srcU,
                     rowStride1, (const uint8_t *)srcV, rowStride2,
                     pixStride1, // UV pixel stride (usually 2, but must use the actual value)
-                    i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, width, height, st->rotate);
+                    i420_y, dst_w, i420_u, dst_w / 2, i420_v,
+                    dst_w / 2, width, height, st->rotate);
         }
 
         // Step2: I420 → NV12
-        I420ToNV12(i420_y, dst_w, i420_u, dst_w / 2, i420_v, dst_w / 2, dst_y, dst_w, dst_uv, dst_w,
+        I420ToNV12(i420_y, dst_w, i420_u, dst_w / 2, i420_v,
+                dst_w / 2, dst_y, dst_w, dst_uv, dst_w,
                 dst_w, dst_h);
     } else {
         // If the format is not supported, the black screen data will be output by default
