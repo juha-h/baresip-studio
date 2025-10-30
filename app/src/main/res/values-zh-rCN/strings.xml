@@ -394,7 +394,8 @@
             <li><b>BSD-3-Clause</b>，但以下内容除外：</li>
             <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>
             <li><b>AGPLv4</b> ZRTP 媒体加密</li>
-            <li><b>GNU LGPL 2.1</b> G.722、G.726 和 Codec2 编解码器</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 编解码器</li>
+            <li><b>Free</b> G.722 编解码器</li>
             <li><b>GNU GPLv3</b> G.729 编解码器</li>
             <li><b>GNU GPLv2</b> H.264 和 H.265 编解码器</li>
             <li><b>AOMedia</b> AV1 编解码器</li>
@@ -437,7 +438,8 @@
             <li><b>BSD-3-Clause</b>，但以下内容除外：</li>
             <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>
             <li><b>AGPLv4</b> ZRTP 媒体加密</li>
-            <li><b>GNU LGPL 2.1</b> G.722、G.726 和 Codec2 编解码器</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 编解码器</li>
+            <li><b>Free</b> G.722 编解码器</li>
             <li><b>GNU GPLv3</b> G.729 编解码器</li>
         </ul>
         ]]></string>
