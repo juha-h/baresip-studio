@@ -1,0 +1,4 @@
+- Removed G.726 codec due to too many dependencies
+- New G.722 codec with less dependencies
+- New translations (Swedish, Czech, and Chinese)
+
