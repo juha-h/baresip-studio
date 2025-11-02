@@ -815,9 +815,9 @@ private val showCancelButton = mutableStateOf(false)
 private val showAnswerRejectButtons = mutableStateOf(false)
 private val showHangupButton = mutableStateOf(false)
 private val showOnHoldNotice = mutableStateOf(false)
-private var holdIcon = mutableIntStateOf(R.drawable.call_hold)
+private var callOnHold = mutableStateOf(false)
 private val transferButtonEnabled = mutableStateOf(false)
-private val transferIcon = mutableIntStateOf(R.drawable.call_transfer)
+private val callTransfer = mutableStateOf(false)
 private var dtmfText = mutableStateOf("")
 private val dtmfEnabled = mutableStateOf(false)
 private val focusDtmf = mutableStateOf(false)
@@ -1414,7 +1414,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                             )
                             call.resume()
                             call.onhold = false
-                            holdIcon.intValue = R.drawable.call_hold
+                            callOnHold.value = false
                         } else {
                             Log.d(
                                 TAG,
@@ -1422,15 +1422,18 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                             )
                             call.hold()
                             call.onhold = true
-                            holdIcon.intValue = R.drawable.resume
+                            callOnHold.value = true
                         }
                     }
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = holdIcon.intValue),
+                    imageVector = ImageVector.vectorResource(R.drawable.call_hold),
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = if (callOnHold.value)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
                 )
             }
@@ -1455,9 +1458,12 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(transferIcon.intValue),
+                    imageVector = ImageVector.vectorResource(R.drawable.call_transfer),
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = if (callTransfer.value)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
                 )
             }
@@ -2037,7 +2043,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         showCallTimer.value = false
         securityIcon.intValue = -1
         showHangupButton.value = false
-        transferIcon.intValue = R.drawable.call_transfer
+        callTransfer.value = false
         dtmfText.value = ""
         dtmfEnabled.value = false
         focusDtmf.value = false
@@ -2117,10 +2123,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     }
                     transferButtonEnabled.value = true
                 }
-                transferIcon.intValue = if (call.onHoldCall == null)
-                    R.drawable.call_transfer
-                else
-                    R.drawable.call_transfer_execute
+                callTransfer.value = call.onHoldCall != null
                 callDuration = call.duration()
                 showCallTimer.value = true
                 if (ua.account.mediaEnc == "")
@@ -2131,10 +2134,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showCancelButton.value = false
                 showHangupButton.value = true
                 showAnswerRejectButtons.value = false
-                if (call.onhold)
-                    holdIcon.intValue = R.drawable.resume
-                else
-                    holdIcon.intValue = R.drawable.call_hold
+                callOnHold.value = call.onhold
                 Handler(Looper.getMainLooper()).postDelayed({
                     showOnHoldNotice.value = call.held
                 }, 100)
