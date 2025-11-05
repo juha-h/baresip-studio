@@ -39,14 +39,15 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         val err = Api.call_hold(callp, true)
         if (err != 0)
             return false
+        onhold = true
         referTo = uri
         return Api.call_transfer(callp, uri) == 0
     }
 
     fun executeTransfer(): Boolean {
-        return if (this.onHoldCall != null) {
+        return if (onHoldCall != null) {
             if (Api.call_hold(callp, true) == 0)
-                Api.call_replace_transfer(this.onHoldCall!!.callp, callp)
+                Api.call_replace_transfer(onHoldCall!!.callp, callp)
             else
                 false
         } else
