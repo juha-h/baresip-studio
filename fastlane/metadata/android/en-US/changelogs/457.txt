@@ -1,0 +1,3 @@
+- Fixed possible crash related to attended transfer
+- Show original call as being on hold when waiting for blind transfer
+- Use Material3 colors also in Hold, Transfer, and Info buttons
