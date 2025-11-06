@@ -1450,7 +1450,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     abandonAudioFocus(ctx)
                     val uaCalls = ua.calls()
                     if (uaCalls.isNotEmpty()) {
-                        val call = uaCalls.last()
+                        val call = uaCalls.first()
                         val callp = call.callp
                         Log.d(TAG, "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}")
                         Api.ua_hangup(ua.uap, callp, 0, "")
