@@ -1849,7 +1849,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.info),
                     modifier = Modifier.size(36.dp),
-                    tint = Color.Unspecified,
+                    tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
                 )
             }
