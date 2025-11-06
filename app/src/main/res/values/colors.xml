@@ -1,34 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="colorBackground">#fcfcfc</color>
     <color name="colorPrimary">#0ca1fd</color>
-    <color name="colorPrimaryDark">#0073c9</color>
-    <color name="colorPrimaryLight">#6ad2ff</color>
-    <color name="colorSecondary">#00B9A1</color>
-    <color name="colorSecondaryDark">#008873</color>
-    <color name="colorSecondaryLight">#5cecd2</color>
-    <color name="colorGray">#9e9e9e</color>
-    <color name="colorGrayDark">#424242</color>
-    <color name="colorGrayLight">#e0e0e0</color>
-    <color name="colorAccent">#F77445</color>
-    <color name="colorBaresip">#0ca1fd</color>
     <color name="colorWhite">#ffffff</color>
-    <color name="colorBlack">#000000</color>
-    <color name="colorStrong">@color/colorBlack</color>
-    <color name="colorGreen">#01df01</color>
     <color name="colorRed">#ff0000</color>
     <color name="colorTrafficGreen">#4CAF50</color>
     <color name="colorTrafficYellow">#FFEB3B</color>
     <color name="colorTrafficRed">#d83025</color>
-    <color name="colorLight">@color/colorWhite</color>
-    <color name="colorDark">#383838</color>
-    <color name="colorSpinnerText">@color/colorDark</color>
-    <color name="colorSpinnerDropdown">@color/colorGrayLight</color>
-    <color name="colorSpinnerDivider">@color/colorGray</color>
-    <color name="colorItemText">@color/colorBlack</color>
-    <color name="colorAlertText">@color/colorBlack</color>
-    <color name="colorCodec">@color/colorBlack</color>
-    <color name="colorCardBackground">@color/colorGrayLight</color>
-    <color name="colorPopupBackground">@color/colorSecondaryDark</color>
-    <color name="colorAlert">@color/colorPrimary</color>
 </resources>
