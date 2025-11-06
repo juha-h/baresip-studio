@@ -1498,7 +1498,6 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                             )
                             call.resume()
                             call.onhold = false
-                            callOnHold.value = false
                         } else {
                             Log.d(
                                 TAG,
@@ -1506,7 +1505,6 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                             )
                             call.hold()
                             call.onhold = true
-                            callOnHold.value = true
                         }
                     }
                 },
