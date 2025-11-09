@@ -118,6 +118,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -363,7 +364,7 @@ private fun MainScreen(
         VideoLayout(ctx = ctx, viewModel= viewModel,
             onCloseVideo = {
                 showVideoLayout.value = false
-                videoIcon.intValue = R.drawable.video_on
+                videoIcon.value = Video.ON
             }
         )
     else
@@ -872,6 +873,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     }
 }
 
+enum class Video { NONE, ON, PENDING, OFF }
+
 private val callUri = mutableStateOf("")
 private val callUriEnabled = mutableStateOf(true)
 private val callUriLabel = mutableStateOf("")
@@ -884,7 +887,7 @@ private val callButtonEnabled = mutableStateOf(true)
 private val showCallVideoButton = mutableStateOf(true)
 private val callVideoButtonEnabled = mutableStateOf(true)
 private val showCancelButton = mutableStateOf(false)
-private var videoIcon = mutableIntStateOf(-1)
+private var videoIcon = mutableStateOf(Video.NONE)
 private val showAnswerRejectButtons = mutableStateOf(false)
 private val showHangupButton = mutableStateOf(false)
 private val showOnHoldNotice = mutableStateOf(false)
@@ -1465,21 +1468,30 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 )
             }
 
-            if (videoIcon.intValue != -1)
+            if (videoIcon.value != Video.NONE)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         val call = ua.currentCall()
                         if (call != null) {
-                            videoIcon.intValue = R.drawable.video_pending
+                            videoIcon.value = Video.PENDING
                             videoClick(ctx, call)
                         }
                     }
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = videoIcon.intValue),
+                        imageVector = ImageVector.vectorResource(
+                            when (videoIcon.value) {
+                                Video.ON, Video.PENDING -> R.drawable.video_on
+                                Video.OFF -> R.drawable.video_off
+                                else -> 0
+                            }
+                        ),
                         modifier = Modifier.size(48.dp),
-                        tint = Color.Unspecified,
+                        tint = when (videoIcon.value) {
+                            Video.PENDING -> colorResource(R.color.colorTrafficYellow)
+                            else -> MaterialTheme.colorScheme.secondary
+                        },
                         contentDescription = null,
                     )
                 }
@@ -2245,7 +2257,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
                 frameLayout
             },
-            update = { frameLayout ->
+            update = { _ ->
                 Log.d(TAG, "AndroidView update")
                 videoSecurityButtonInstance?.let { button ->
                     if (securityIcon.intValue != -1) {
@@ -2256,7 +2268,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         button.visibility = View.GONE
                 }
             },
-            onRelease = { frameLayout ->
+            onRelease = { _ ->
                 Log.d(TAG, "AndroidView onRelease")
             }
         )
@@ -2550,7 +2562,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         showAnswerRejectButtons.value = false
         showOnHoldNotice.value = false
         dialpadButtonEnabled.value = true
-        videoIcon.intValue = -1
+        videoIcon.value = Video.NONE
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(R.drawable.mic_on)
@@ -2583,7 +2595,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 securityIcon.intValue = -1
                 showCallButton.value = false
                 showCallVideoButton.value = false
-                videoIcon.intValue = -1
+                videoIcon.value = Video.NONE
                 showCancelButton.value = call.status == "outgoing"
                 showHangupButton.value = !showCancelButton.value
                 showAnswerRejectButtons.value = false
@@ -2604,7 +2616,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 }
                 showCallButton.value = false
                 showCallVideoButton.value = false
-                videoIcon.intValue = -1
+                videoIcon.value = Video.NONE
                 showCancelButton.value = false
                 showHangupButton.value = false
                 showAnswerRejectButtons.value = true
@@ -2636,7 +2648,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 showCallButton.value = false
                 showCallVideoButton.value = false
                 if (call.hasVideo())
-                    videoIcon.intValue = R.drawable.video_on
+                    videoIcon.value = Video.ON
                 showCancelButton.value = false
                 showHangupButton.value = true
                 showAnswerRejectButtons.value = false
