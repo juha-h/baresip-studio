@@ -885,7 +885,7 @@ private fun SettingsContent(
             val ctx = LocalContext.current
             val batterySettingsLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
+            ) { _ ->
                 val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
                 viewModel.batteryOptimizations.value =
                     !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
