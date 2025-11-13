@@ -59,7 +59,7 @@ import java.text.DateFormat
 import java.util.GregorianCalendar
 
 fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewModel: ViewModel) {
-    composable("call_details") { backStackEntry ->
+    composable("call_details") { _ ->
         val callRow = remember { viewModel.consumeSelectedCallRow() }
         CallDetailsScreen(navController, callRow!!)
     }
