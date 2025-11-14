@@ -1081,7 +1081,7 @@ class BaresipService: Service() {
                                     val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
                                         intent, piFlags)
                                     val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                                    nb.setSmallIcon(R.drawable.ic_stat_phone_missed)
+                                    nb.setSmallIcon(R.drawable.ic_stat_call_missed)
                                             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                             .setContentIntent(pi)
                                             .setCategory(Notification.CATEGORY_CALL)
