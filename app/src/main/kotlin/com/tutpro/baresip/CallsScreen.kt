@@ -49,8 +49,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -97,7 +99,9 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -271,7 +275,9 @@ private fun Calls(
 
     val lazyListState = rememberLazyListState()
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 4.dp)
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
@@ -382,8 +388,8 @@ private fun Calls(
                                     CustomElements.TextAvatar(contact.name, contact.color)
                             }
                             null -> {
-                                val avatarImage = BitmapFactory
-                                    .decodeResource(ctx.resources, R.drawable.person_image)
+                                val avatarImage =
+                                    BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
                                 CustomElements.ImageAvatar(avatarImage)
                             }
                         }
@@ -394,7 +400,13 @@ private fun Calls(
                                 recordings = true
                             if (count > 3)
                                 continue
-                            Image(painterResource(d.direction), "Direction")
+                            Image(
+                                painter = painterResource(
+                                    if (callUp(d.direction)) R.drawable.call_up else R.drawable.call_down
+                                ),
+                                colorFilter = ColorFilter.tint(colorResource(id = callTint(d.direction))),
+                                contentDescription = "Direction"
+                            )
                             count++
                         }
                         if (count > 3)
@@ -436,25 +448,16 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
         if (h.aor == aor) {
             val direction: Int = if (h.direction == "in") {
                 if (h.startTime != null) {
-                    if (h.startTime != h.stopTime)
-                        R.drawable.call_down_green
-                    else
-                        R.drawable.call_down_blue
-                } else {
-                    if (h.rejected)
-                        R.drawable.call_down_red
-                    else
-                        R.drawable.call_missed_in
+                    if (h.startTime != h.stopTime) CALL_DOWN_GREEN else CALL_DOWN_BLUE
                 }
-            } else {
-                if (h.startTime != null) {
-                    R.drawable.call_up_green
-                } else {
-                    if (h.rejected)
-                        R.drawable.call_up_red
-                    else
-                        R.drawable.call_missed_out
-                }
+                else
+                    if (h.rejected) CALL_DOWN_RED else CALL_MISSED_IN
+            }
+            else {
+                if (h.startTime != null)
+                    CALL_UP_GREEN
+                else
+                    if (h.rejected) CALL_UP_RED else CALL_MISSED_OUT
             }
             if (res.isNotEmpty() && res.last().peerUri == h.peerUri)
                 res.last().details.add(CallRow.Details(
@@ -482,3 +485,18 @@ private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow:
     CallHistoryNew.save()
 }
 
+fun callUp(direction: Int): Boolean {
+    return when (direction) {
+        CALL_UP_GREEN, CALL_UP_RED, CALL_MISSED_OUT -> true
+        else -> false
+    }
+}
+
+fun callTint(direction: Int): Int {
+    return when (direction) {
+        CALL_UP_GREEN, CALL_DOWN_GREEN -> R.color.colorTrafficGreen
+        CALL_UP_RED, CALL_DOWN_RED -> R.color.colorTrafficRed
+        CALL_DOWN_BLUE -> R.color.colorPrimary
+        else -> R.color.colorTrafficYellow
+    }
+}

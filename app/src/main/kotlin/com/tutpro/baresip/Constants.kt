@@ -33,6 +33,14 @@ const val MESSAGE_UP = 2131165306
 const val MESSAGE_UP_FAIL = 2131165307
 const val MESSAGE_UP_WAIT = 2131165308
 
+const val CALL_UP_GREEN = 2131165323
+const val CALL_DOWN_GREEN = 2131165316
+const val CALL_UP_RED = 2131165324
+const val CALL_DOWN_BLUE = 2131165315
+const val CALL_DOWN_RED = 2131165317
+const val CALL_MISSED_OUT = 2131165320
+const val CALL_MISSED_IN = 2131165319
+
 val mediaEncMap = mapOf("zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND",
     "srtp" to "SRTP", "" to "--")
 
