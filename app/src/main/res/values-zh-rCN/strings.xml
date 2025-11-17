@@ -311,7 +311,7 @@
     <string name="start_failed">baresip 无法启动。这可能是由于设置值无效。请检查监听地址、TLS 证书文件和 TLS CA 文件。然后重启 baresip。</string>
     <string name="registering_failed">注册 %1$s 失败。</string>
     <string name="verify">验证请求</string>
-    <string name="verify_sas">‌是否要验证 SAS &lt;%1$s&gt;？</string>
+    <string name="verify_sas">是否要验证 SAS &lt;%1$s&gt;？</string>
     <string name="transfer_request">转接请求</string>
     <string name="transfer_request_query">是否接受将此通话转接到“%1$s”？</string>
     <string name="call_request">呼叫请求</string>
