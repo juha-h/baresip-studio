@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -244,10 +245,10 @@ private fun Uris(
                         }
                     }
                 )
-                Image(
-                    painter = painterResource(R.drawable.call_small),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                Icon(
+                    imageVector = Icons.Filled.Call,
                     contentDescription = "Call",
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.clickable {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
