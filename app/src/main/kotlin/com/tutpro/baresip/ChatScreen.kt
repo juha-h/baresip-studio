@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -260,7 +261,7 @@ private fun TopAppBar(
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_small),
+                    imageVector = Icons.Filled.Call,
                     contentDescription = "Call",
                 )
             }
@@ -399,7 +400,7 @@ private fun Messages(
                             neutralButtonText.value = ctx.getString(R.string.delete)
                             neutralAction.value = {
                                 message.delete()
-                                onMessageDeleted
+                                onMessageDeleted()
                             }
                         } else {
                             dialogMessage.value = ctx.getString(R.string.short_message_question)
