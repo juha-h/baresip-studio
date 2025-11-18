@@ -1082,9 +1082,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             )
             Icon(
                 imageVector = if (expanded)
-                    Icons.Default.KeyboardArrowUp
+                    Icons.Filled.KeyboardArrowUp
                 else
-                    Icons.Default.KeyboardArrowDown,
+                    Icons.Filled.KeyboardArrowDown,
                 contentDescription = null
             )
             androidx.compose.material3.DropdownMenu(
