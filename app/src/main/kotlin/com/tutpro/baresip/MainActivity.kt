@@ -150,12 +150,6 @@ class MainActivity : ComponentActivity() {
 
         initialized = true
 
-        viewModel.updateMicIcon(if (BaresipService.isMicMuted)
-            R.drawable.mic_off
-        else
-            R.drawable.mic_on
-        )
-
         val restartApp = {
             Log.i(TAG, "Restarting baresip")
             window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,

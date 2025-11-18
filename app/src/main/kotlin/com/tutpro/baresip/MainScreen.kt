@@ -58,6 +58,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
@@ -568,7 +570,7 @@ private fun TopAppBar(
             Spacer(modifier = Modifier.width(22.dp))
 
             Icon(
-                imageVector = ImageVector.vectorResource(currentMicIcon),
+                imageVector = currentMicIcon,
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
@@ -576,11 +578,11 @@ private fun TopAppBar(
                             if (Call.call("connected") != null) {
                                 BaresipService.isMicMuted = !BaresipService.isMicMuted
                                 if (BaresipService.isMicMuted) {
-                                    viewModel.updateMicIcon(R.drawable.mic_off)
+                                    viewModel.updateMicIcon(Icons.Filled.MicOff)
                                     Api.calls_mute(true)
                                 }
                                 else {
-                                    viewModel.updateMicIcon(R.drawable.mic_on)
+                                    viewModel.updateMicIcon(Icons.Filled.Mic)
                                     Api.calls_mute(false)
                                 }
                             }
@@ -2053,7 +2055,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
-            viewModel.updateMicIcon(R.drawable.mic_on)
+            viewModel.updateMicIcon(Icons.Filled.Mic)
         }
     } else {
         pullToRefreshEnabled.value = false
