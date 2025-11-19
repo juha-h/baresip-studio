@@ -56,14 +56,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Dialpad
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VoiceOverOff
+import androidx.compose.material.icons.filled.Voicemail
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
@@ -729,7 +733,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     .size(buttonSize)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.voicemail),
+                    imageVector = Icons.Filled.Voicemail,
                     contentDescription = null,
                     Modifier.size(buttonSize),
                     tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -743,7 +747,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.contacts),
+                imageVector = Icons.Filled.Person,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = MaterialTheme.colorScheme.secondary
@@ -777,7 +781,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.calls),
+                imageVector = Icons.Filled.History,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -790,7 +794,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.dialpad),
+                imageVector = Icons.Filled.Dialpad,
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
                 tint = if (isDialpadVisible)
