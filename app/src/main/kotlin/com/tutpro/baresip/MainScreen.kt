@@ -56,6 +56,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.ArrowCircleRight
 import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -68,7 +69,9 @@ import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
+import androidx.compose.material.icons.outlined.ArrowCircleRight
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -1430,7 +1433,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_hold),
+                    imageVector = Icons.Outlined.PauseCircle,
                     modifier = Modifier.size(48.dp),
                     tint = if (callOnHold.value)
                         MaterialTheme.colorScheme.error
@@ -1460,7 +1463,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_transfer),
+                    imageVector = Icons.Outlined.ArrowCircleRight,
                     modifier = Modifier.size(48.dp),
                     tint = if (callTransfer.value)
                         MaterialTheme.colorScheme.error
