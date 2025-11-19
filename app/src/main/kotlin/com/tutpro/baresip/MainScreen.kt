@@ -55,6 +55,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
@@ -759,7 +760,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.messages),
+                imageVector = Icons.AutoMirrored.Filled.Chat,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
