@@ -69,13 +69,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _hideKeyboard.intValue++
     }
 
-    private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)
-    val speakerIcon: StateFlow<Int> = _speakerIcon.asStateFlow()
-
-    fun updateSpeakerIcon(iconResId: Int) {
-        _speakerIcon.value = iconResId
-    }
-
     private val _micIcon = MutableStateFlow(Icons.Filled.Mic)
     val micIcon: StateFlow<ImageVector> = _micIcon.asStateFlow()
 

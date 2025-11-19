@@ -61,6 +61,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.BasicAlertDialog
@@ -499,7 +500,6 @@ private fun TopAppBar(
     onQuitClick: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val currentSpeakerIcon by viewModel.speakerIcon.collectAsState()
     val currentMicIcon by viewModel.micIcon.collectAsState()
 
     val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -507,6 +507,7 @@ private fun TopAppBar(
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
     var recImage by remember { mutableStateOf(recOffImage) }
+    val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
 
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -605,23 +606,17 @@ private fun TopAppBar(
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(
-                imageVector = ImageVector.vectorResource(currentSpeakerIcon),
+                imageVector = Icons.Filled.SpeakerPhone,
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(
-                                    TAG, "Toggling speakerphone when dev/mode is " +
-                                            "${am.communicationDevice!!.type}/${am.mode}"
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
                                 )
+                            isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                            viewModel.updateSpeakerIcon(
-                                if (Utils.isSpeakerPhoneOn(am))
-                                    R.drawable.speaker_on
-                                else
-                                    R.drawable.speaker_off
-                            )
                         },
                         onLongClick = {
                             alertTitle.value = ctx.getString(R.string.speakerphone_title)
@@ -629,7 +624,7 @@ private fun TopAppBar(
                             showAlert.value = true
                         },
                     ),
-                tint = if (Utils.isSpeakerPhoneOn(am))
+                tint = if (isSpeakerOn.value)
                     MaterialTheme.colorScheme.error
                 else
                     MaterialTheme.colorScheme.onPrimary,

@@ -138,11 +138,6 @@ class MainActivity : ComponentActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    val speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                        R.drawable.speaker_on
-                    else
-                        R.drawable.speaker_off
-                    viewModel.updateSpeakerIcon(speakerIcon)
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
