@@ -60,6 +60,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
@@ -502,8 +504,8 @@ private fun TopAppBar(
 
     val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    val recOffImage = ImageVector.vectorResource(R.drawable.rec_off)
-    val recOnImage = ImageVector.vectorResource(R.drawable.rec_on)
+    val recOffImage = Icons.Filled.VoiceOverOff
+    val recOnImage = Icons.Filled.RecordVoiceOver
     var recImage by remember { mutableStateOf(recOffImage) }
 
     var menuExpanded by remember { mutableStateOf(false) }
