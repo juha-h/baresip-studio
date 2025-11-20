@@ -1242,14 +1242,14 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
         }
         if (showCallTimer.value) {
             val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
-            var chronometerInstance: Chronometer? = null
+            val chronometerInstance = remember { mutableStateOf<Chronometer?>(null) }
             AndroidView(
                 factory = { context ->
                     Chronometer(context).apply {
                         textSize = 16F
                         setTextColor(textColor)
                         base = SystemClock.elapsedRealtime() - (callDuration * 1000L)
-                        chronometerInstance = this
+                        chronometerInstance.value = this
                     }
                 },
                 update = { chronometerView ->
@@ -1266,7 +1266,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             )
             DisposableEffect(Unit) {
                 onDispose {
-                    chronometerInstance?.let {
+                    chronometerInstance.value?.let {
                         it.stop()
                         Log.d(TAG, "Chronometer stopped in onDispose")
                     }
