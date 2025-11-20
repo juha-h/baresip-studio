@@ -56,7 +56,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.ArrowCircleRight
 import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -71,6 +70,7 @@ import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
 import androidx.compose.material.icons.outlined.ArrowCircleRight
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
@@ -1773,7 +1773,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                    imageVector = Icons.Outlined.Info,
                     modifier = Modifier.size(36.dp),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,

@@ -63,14 +63,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -168,22 +166,6 @@ object CustomElements {
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-        )
-    }
-
-    @Composable
-    fun DrawDrawable(
-        drawableId: Int,
-        modifier: Modifier = Modifier,
-        contentDescription: String? = null,
-        tint: Color? = null
-    ) {
-        val image = painterResource(id = drawableId)
-        Image(
-            painter = image,
-            contentDescription = contentDescription,
-            modifier = modifier,
-            colorFilter = if (tint != null) ColorFilter.tint(tint) else null
         )
     }
 
