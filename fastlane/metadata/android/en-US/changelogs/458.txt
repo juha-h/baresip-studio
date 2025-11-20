@@ -1,0 +1,3 @@
+- Replaced most drawables with Material Design icons
+- Avoided possible memory leak in chronometer
+- New translations (Chinese)
