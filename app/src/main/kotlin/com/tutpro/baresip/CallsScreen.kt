@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -30,6 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -388,9 +389,12 @@ private fun Calls(
                                     CustomElements.TextAvatar(contact.name, contact.color)
                             }
                             null -> {
-                                val avatarImage =
-                                    BitmapFactory.decodeResource(ctx.resources, R.drawable.person_image)
-                                CustomElements.ImageAvatar(avatarImage)
+                                Icon(
+                                    imageVector = Icons.Filled.AccountCircle,
+                                    contentDescription = "Avatar",
+                                    modifier = Modifier.size(36.dp).scale(1.2f),
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.width(4.dp))
