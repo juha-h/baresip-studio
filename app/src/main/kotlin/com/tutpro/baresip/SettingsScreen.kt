@@ -34,12 +34,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -367,7 +369,12 @@ private fun SettingsContent(
                     }
                 ) {
                     Text(text = familyNames[itemPosition.intValue])
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    //CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -744,7 +751,11 @@ private fun SettingsContent(
                     }
                 ) {
                     Text(text = contactNames[itemPosition.intValue])
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
